@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] cc65 + tcp/ip howto and/or</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] cc65 + tcp/ip howto and/or example" />
+<meta name="Date" content="2011-01-03" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] cc65 + tcp/ip howto and/or example</h1>
+<!-- received="Mon Jan  3 14:51:57 2011" -->
+<!-- isoreceived="20110103135157" -->
+<!-- sent="Mon, 3 Jan 2011 14:51:45 +0100" -->
+<!-- isosent="20110103135145" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] cc65 + tcp/ip howto and/or example" -->
+<!-- id="AANLkTikyi80P_AY119URi_Cew9RaBiMdWiHQpM8Lr_tH@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20110103105358.GD30776&#64;vega.lgb.hu" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9097.html" title="Oliver Schmidt: &quot;Re: [cc65] cc65 + tcp/ip howto and/or example&quot;">Next message</a> ]
+[ <a href="9095.html" title="Oliver Schmidt: &quot;Re: [cc65] cc65 + tcp/ip howto and/or example&quot;">Previous message</a> ]
+[ <a href="9092.html" title="Gábor Lénárt: &quot;Re: [cc65] cc65 + tcp/ip howto and/or example&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9099.html" title="Gábor Lénárt: &quot;Re: [cc65] cc65 + tcp/ip howto and/or example&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20cc65%20%2B%20tcp/ip%20howto%20and/or%20example">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-01-03 14:51:45</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Gábor,
+
+&gt; It would be so nice if cc65 has some kind of library for some TCP/IP so many
+&gt; new projects can be born using tcp/ip then. Sure, I can use Contiki, but now
+&gt; I'm thinkin in &quot;simple individual&quot; (not within contiki) programs utilizing
+&gt; TFE and/or RR-Net for example.
+
+I'm not sure what you are refering to with &quot;within Contiki&quot;:
+
+If you mean the Contiki O/S with its own desktop than you should know
+that this was Contiki 1.x. In Contiki 2.x you write &quot;individual&quot;
+programs loaded from your DOS running in full screen mode (or doing
+their own user interface).
+
+If you mean that Contiki isn't just a library you call into when you
+like but rather a framework you embedd your code into than this is
+because it is the *only* way to do TCP in a way efficient enough for
+cc65 targets. Just a few of the several reasons:
+
+- An event/callback architecture implicitly serializes access to
+resources. Otherwise explict locking and/or multiplication of
+resources would be necessary.
+
+- Have you ever written a GUI application? The GUI core calls you when
+your screen area needs to be (re-)drawn. This makes perfect sense as
+in most cases the code to do so is the same for drawing your screen in
+the first place. So there's no overhead on the application side but
+the GUI core can avoid to buffer your screen content offscreen. In
+many cases the GUI applications just send themselves a redraw event
+when they want to update the screen. uIP is using the very same
+paradigm for networking: If a packet needs to be resent it just calls
+the application to recreate it! In most cases this is no problem at
+all for the application but allows uIP to go without any
+buffering/copying. An exception is the web server on the C64 serving
+disk files as they allow only sequential access. Here the application
+buffers the last frame - still not worse than uIP doing it.
+
+&gt; Unfortunately, I am not so good in deep
+&gt; TCP/IP internals (yet?), I am experienced with writing servers/clients under
+&gt; UNIX-like OSes, though I doubt it can be easily adopted for cc65 (I mean the
+&gt; same API as Unices use) because of lacking enough system resources for a
+&gt; UNIX-like API (let's say POSIX, I mean now about socket(), connect(),
+&gt; listen() and similar functions).
+
+Exactly. Those APIs only work in a reasonable way in environments
+where &quot;everything is a file&quot; so you can put its handle into select().
+Because otherwise you can't multiplex I/O on several network streams,
+the user interface, ... That is one reason why you don't get far with
+those APIs i.e. on Windows...
+
+But even on UNIX-like OSes: Applications tend to be either
+thread-or-fork based or select() based. The thread-or-fork approach is
+supposed to perform better - but would you really want to program cc65
+targets that way? And when you look at a select() based application
+than you're basically back at event driven programming with select()
+being your event source you act upon - don't you?
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Jan  3 14:51:57 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9097.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] cc65 + tcp/ip howto and/or example"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9095.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] cc65 + tcp/ip howto and/or example"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9092.html" title="Message to which this message replies">Gábor Lénárt: "Re: [cc65] cc65 + tcp/ip howto and/or example"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9099.html" title="Next message in this discussion thread">Gábor Lénárt: "Re: [cc65] cc65 + tcp/ip howto and/or example"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9099.html" title="Message sent in reply to this message">Gábor Lénárt: "Re: [cc65] cc65 + tcp/ip howto and/or example"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9096" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9096" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9096" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-01-03 14:51:59 CET
+</em></small></p>
+</body>
+</html>

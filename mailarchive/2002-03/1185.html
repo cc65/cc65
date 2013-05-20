@@ -1,0 +1,202 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: RE: [cc65] Copyright violation</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="RE: [cc65] Copyright violation">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>RE: [cc65] Copyright violation</h1>
+<!-- received="Thu Mar 28 12:48:18 2002" -->
+<!-- isoreceived="20020328114818" -->
+<!-- sent="Thu, 28 Mar 2002 12:48:20 +0100" -->
+<!-- isosent="20020328114820" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="RE: [cc65] Copyright violation" -->
+<!-- id="20020328124820.A31973@trixie.musoftware.de" -->
+<!-- inreplyto="Pine.LNX.4.21.0203271452450.339-100000@localhost.localdomain" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=RE:%20[cc65]%20Copyright%20violation"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-03-28 12:48:20
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1184.html">troy silvey: "Re: [cc65] Whatever"</a>
+<li><strong>In reply to:</strong> <a href="1183.html">Adam Wozniak: "[cc65] Whatever"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1187.html">Mike McCarty: "Re: [cc65] Whatever"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Wed, Mar 27, 2002 at 02:53:36PM -0800, Adam Wozniak wrote:
+&gt; Let's forget for the moment that your email did not contain a copright notice.
+
+This does not matter. You may want to read the article &quot;10 Big Myths about
+copyright explained&quot; which is available as
+
+        <a href="http://www.templetons.com/brad/copymyths.html">http://www.templetons.com/brad/copymyths.html</a>
+
+Myth #1 covers your above claim.
+
+&gt; Let's forget for the moment that I spent time putting all the pieces together.
+
+This does not matter because it doesn't have any effects on copyright. Just
+because it costed someone months to circumvent a software protection device,
+does not make the the action itself legal.
+
+&gt; Let's forget for the moment that it's ludicrous to claim ownership over the
+&gt; idea of using a struct and a #define to access a memory mapped device.
+
+See Myth #6 in the article mentioned above. Not the letters of the alphabet
+are protected, but the actual ideas expressed. It is your luck that I'm not the
+one who had this idea originally (maybe I developed it myself, I don't
+remember, but it has be in use for a long time before I used it the first
+time).
+
+&gt; Let's forget for the moment that you had never seen a snip of 4 of the 6 files
+&gt; in the distribution before I released them.
+
+Your .cfg and .s files are based on other peoples code. Both of your .h files
+are based on my email. The license.txt file is from the FSF. I haven't looked
+at your .c file, maybe you're really the author. I don't know about the
+Makefile either.
+
+&gt; Let's forget for the moment that I really did write most of the assembly in
+&gt; the .S file.
+
+Untrue. Even your zbss and cdsr routines are stripped down versions of my code
+in zerobss.s and copydata.s. It is easy to see that you used these files as
+templates when writing your code. But even if it would be true, writing &quot;most
+of it&quot; is not enough to claim complete ownership and place it under a
+restrictive license.
+
+&gt; As well as all of the .h files.
+
+Untrue. Anyone who compares my email explaing to you how to do it with your
+actual files can see that.
+
+&gt; And the .c file.  And the
+&gt; Makefile.
+
+True (maybe).
+
+&gt; Let's forget that your compiler would not support this target if I hadn't
+&gt; bothered.
+
+So what does this have to do with copyright?
+
+&gt; Is there any way I could have supported this target with your compiler and
+&gt; GPL'd my work without upsetting you?
+
+There is an easy way for this: Just ask. I have contributed to a lot of GPLed
+projects.
+
+&gt; Are you truly upset with me, or the GPL?
+
+I'm upset because of several things:
+
+  1. You claimed ownership over other peoples code and ideas.
+
+  2. You did not bother to give credit where credit is due.
+
+  3. You placed other peoples code under a license that prohibits these people
+     from using it.
+
+  4. You did not ask before doing so.
+
+I have contributed to numerous open source projects in the last ten years. A
+lot of them were GPLed, and I had no problem placing my own code under the
+same license which means that my code in these projects is of course GPLed
+too. The difference is that
+
+  1. I decided about the license myself. My code and ideas were not stolen and
+     put under the GPL.
+
+  2. The authors gave credit to me for code written by me or ideas that came
+     from me.
+
+It is not that I dislike the GPL. I dislike GPL zealots and I don't use it for
+my own projects, that is true. But the GPL has its uses as well as other
+licenses.
+
+To solve this issue, I will give permission to use the pieces of code
+currently in the files you posted. I would suggest to give credit, but this is
+not required. I will probably not use your code for inclusion with cc65. I'm
+not sure about this decision. I know it would be nice for cc65 users to have
+the atari 2600 as an additional target, but I have a bad feeling about it, and
+there may be other problems as outlined below. However, I will sleep about it.
+Maybe someone else comes up with a target library that is better suited for
+inclusion in cc65.
+
+Problems with a GPLed cc65 target library: GPLed cc65 modules would make the
+complete program that includes such a module fall under the GPL. Since it is
+almost impossible to write a program that does not also include code from the
+runtime library, which is not GPLed and owned by other people, this is
+impossible, since it would change the license for code written by other
+people. So while anyone can write and offer GPLed modules for use with cc65,
+it is almost impossible to use these modules in a complete program. This is
+also true for your code. With my permission it is ok for you to GPL them, but
+anyone using them in a program will violate either your copyright or that of
+the writers of the runtime libraries.
+
+I do really hate myself for being so restrictive, but since you are trying to
+take away things from other people, I feel that I have to.
+
+Regards
+
+
+        Uz
+
+
+
+P.S.: I'm out of town until tomorrow. Discussions like this do really make me
+      feel sad:-(
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=RE:%20[cc65]%20Copyright%20violation">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=RE:%20[cc65]%20Copyright%20violation">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1184.html">troy silvey: "Re: [cc65] Whatever"</a>
+<li><strong>In reply to:</strong> <a href="1183.html">Adam Wozniak: "[cc65] Whatever"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1187.html">Mike McCarty: "Re: [cc65] Whatever"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-03-28 12:49:18 CET</em>
+</em>
+</small>
+</body>
+</html>

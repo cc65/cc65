@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Macros in inline assembler</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Macros in inline assembler" />
+<meta name="Date" content="2012-01-19" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Macros in inline assembler</h1>
+<!-- received="Thu Jan 19 17:59:23 2012" -->
+<!-- isoreceived="20120119165923" -->
+<!-- sent="Thu, 19 Jan 2012 17:59:12 +0100" -->
+<!-- isosent="20120119165912" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Macros in inline assembler" -->
+<!-- id="20120119165911.GA20418@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="20120119153526.132150&#64;gmx.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9907.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Macros in inline assembler&quot;">Next message</a> ]
+[ <a href="9905.html" title="Oliver Schmidt: &quot;Re: [cc65] Macros in inline assembler&quot;">Previous message</a> ]
+[ <a href="9901.html" title="Andreas Rückert: &quot;Re: [cc65] Macros in inline assembler&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Macros%20in%20inline%20assembler">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-01-19 17:59:12</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Thu, Jan 19, 2012 at 04:35:26PM +0100, &quot;Andreas RÃ¼ckert&quot; wrote:
+&gt; I did something else and just unrolled the loop by hand
+&gt; ========
+&gt;         uint8 *datap = data;
+&gt;
+&gt;         __asm__( &quot;lda %v+3&quot;, datap);
+&gt;         __asm__( &quot;sta %v&quot;, W);
+&gt;         __asm__( &quot;lda %v+2&quot;, datap);
+&gt;         __asm__( &quot;sta %v+1&quot;, W);
+&gt;         __asm__( &quot;lda %v+1&quot;, datap);
+&gt;         __asm__( &quot;sta %v+2&quot;, W);
+&gt;         __asm__( &quot;lda %v&quot;, datap);
+&gt;         __asm__( &quot;sta %v+3&quot;, W);
+&gt;
+&gt;         __asm__( &quot;lda %v+19&quot;, datap);
+&gt;         __asm__( &quot;sta %v+4&quot;, W);
+&gt; ...
+&gt; ========
+&gt; , which is also wrong as I see it, since the compiler might
+&gt; rearrange the asm statements.
+
+It might rearrange/change/delete the asm *instructions*. But this doesn't
+depend on using one or multiple asm statements. And if your code doesn't do
+something special, you don't have to fear anything. While the optmizer might
+rearrange the code or remove stuff, it will only do so if the behaviour
+doesn't change. The most prominent exception is data that is &quot;volatile&quot;. The
+compiler doesn't know about volatile data and may remove instructions that
+reference memory if they don't seem to have an effect. But this is also true
+for C code reading or writing such data.
+
+BTW: There seems to be another error with the code above which makes me wonder
+why it works: You're creating a pointer to your data, and then you use the
+storage occupied by the pointer, not the storage it points to. Are you sure
+this is correct?
+
+&gt; &gt; And, using the token
+&gt; &gt; pasting operator (##) is wrong, because pasting two strings together gives
+&gt; &gt; an
+&gt; &gt; invalid token. Strings do not need an operator to have them concatenated.
+&gt;
+&gt; That's what I thought. But when I had the macro argument in the
+&gt; string, I always got complaints, that asm expectected a ')'.
+
+If you get errors like this, it is always advisable to strip down the code to
+the minimum (in your case: one asm line), and then add more stuff until it
+breaks. This allows you to find the location of the errors without having to
+guess what might be wrong.
+
+&gt; &gt; I would first fix the problems then try again. There are some problems
+&gt; &gt; with
+&gt; &gt; cc65 macros, but as far as I can say, your code doesn't trigger any of
+&gt; &gt; them.
+&gt;
+&gt; So far I just accepted, that they don't work in asm Statements.
+
+They do work as they should. But not if your macros are wrong.
+
+&gt; I know. It just couldn't find an example in the docs...
+
+There is an example titled &quot;The next example shows how to use global variables
+to exchange data between C an assembler ...&quot;. What is wrong with this one?
+BTW: If you have any suggestions how to improve the documentation, you're
+always welcome!
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Jan 19 17:59:23 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9907.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Macros in inline assembler"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9905.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Macros in inline assembler"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9901.html" title="Message to which this message replies">Andreas Rückert: "Re: [cc65] Macros in inline assembler"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9906" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9906" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9906" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-01-19 17:59:26 CET
+</em></small></p>
+</body>
+</html>

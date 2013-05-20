@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+<title>cc65 mailing list archive: Re: [cc65] win32 one file installer</title>
+<meta name="Author" content="Spiro Trikaliotis (trik-news_at_gmx.de)">
+<meta name="Subject" content="Re: [cc65] win32 one file installer">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] win32 one file installer</h1>
+<!-- received="Thu Jul 17 07:21:07 2003" -->
+<!-- isoreceived="20030717052107" -->
+<!-- sent="Thu, 17 Jul 2003 07:21:47 +0200" -->
+<!-- isosent="20030717052147" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="trik-news_at_gmx.de" -->
+<!-- subject="Re: [cc65] win32 one file installer" -->
+<!-- id="20030717052147.GA1255@trikaliotis.hn.org" -->
+<!-- charset="iso-8859-15" -->
+<!-- inreplyto="001801c34be6$6ed7bee0$0100a8c0@1" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Spiro Trikaliotis (<a href="mailto:trik-news_at_gmx.de?Subject=Re:%20[cc65]%20win32%20one%20file%20installer"><em>trik-news_at_gmx.de</em></a>)<br>
+<strong>Date:</strong> 2003-07-17 07:21:47
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3189.html">Rafal: "[cc65] win32 one file installer"</a>
+<li><strong>In reply to:</strong> <a href="3189.html">Rafal: "[cc65] win32 one file installer"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3193.html">Rafal: "Re: [cc65] win32 one file installer"</a>
+<li><strong>Next in thread:</strong> <a href="3191.html">EMILIANO PERUCH: "RE: [cc65] win32 one file installer"</a>
+<li><strong>Reply:</strong> <a href="3193.html">Rafal: "Re: [cc65] win32 one file installer"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Rafal,
+
+On Thu, Jul 17, 2003 at 12:05:54AM +0200, Rafal wrote:
+
+&gt; I just compiled one file installer for win32 platform
+&gt; it contains all Commodore platforms &quot;only&quot;
+
+Issues:
+
+1. Why do CC65_9X.BAT and CC65_NT.BAT only use relative
+   paths for CC65_LIB, CC65_INC, PATH?
+
+2. NT.BAT is wrong:
+   a. use CMD.EXE instead of command.com
+   b. nt.bat calls NT.BAT; I think it should be 
+        CMD.EXE /K CC65_NT.BAT
+      shouldn't it?
+
+3. COMMAND.COM (for 9X) does not know the /K switch, at least
+   not on NT/2K/XP. Does it work for 9X?
+
+4. You should specify working directorys in the shortcuts to NT.BAT 
+   and 9X.BAT. Else, they don't work here.
+
+5. If I added files into the CC65 tree, they are not removed on
+   uninstalling. You could at least ask for it.
+   Furthermore, the uninstaller even does not tell me that it did
+   not remove the directories in this case. I know, this is common
+   behaviour on Win machines, but despite this, it is not good practice.
+
+6. It shouldn't be necessary for a person to choose whether
+   he's running on NT or 9X; it's your installer's task.
+
+7. After installing, you want to start \cc65\index.url to go to the
+   CC65 homepage. At least as guest, this does not work, I get:
+   &quot;Unable to execute file: c:\cc65\index.url
+   CreateProcess failed; code 193.
+   This is due to installing it as guest on my machine. Nevertheless, since
+   double-clicking on the URL works, the automatic start should work, too.
+
+
+Now, what was positive?
+
+1. Installing worked even as &quot;guest&quot; on a NT station worked.
+
+2. created hello.c, cl65 hello.c --&gt; got an executable.
+
+&gt; I'll be specially glad if someone with windows NT
+&gt; will test it... (win9x seems to be ok)
+
+Have done it. ;-)
+
+Spiro.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20win32%20one%20file%20installer">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3189.html">Rafal: "[cc65] win32 one file installer"</a>
+<li><strong>In reply to:</strong> <a href="3189.html">Rafal: "[cc65] win32 one file installer"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3193.html">Rafal: "Re: [cc65] win32 one file installer"</a>
+<li><strong>Next in thread:</strong> <a href="3191.html">EMILIANO PERUCH: "RE: [cc65] win32 one file installer"</a>
+<li><strong>Reply:</strong> <a href="3193.html">Rafal: "Re: [cc65] win32 one file installer"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-07-17 07:21:38 CEST</em>
+</em>
+</small>
+</body>
+</html>

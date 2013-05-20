@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Problem passing ',' as arg</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Problem passing ',' as argument to a macro..." />
+<meta name="Date" content="2010-07-04" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Problem passing ',' as argument to a macro...</h1>
+<!-- received="Sun Jul  4 21:45:08 2010" -->
+<!-- isoreceived="20100704194508" -->
+<!-- sent="Sun, 4 Jul 2010 21:45:00 +0200" -->
+<!-- isosent="20100704194500" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Problem passing ',' as argument to a macro..." -->
+<!-- id="20100704194500.GB4618@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="4C30A84F.10906&#64;web.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8497.html" title="Christian KrÃ¼ger: &quot;Re: [cc65] Problem passing ',' as argument to a macro...&quot;">Next message</a> ]
+[ <a href="8495.html" title="Christian Krüger: &quot;[cc65] Problem passing ',' as argument to a macro...&quot;">Previous message</a> ]
+[ <a href="8495.html" title="Christian Krüger: &quot;[cc65] Problem passing ',' as argument to a macro...&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8497.html" title="Christian KrÃ¼ger: &quot;Re: [cc65] Problem passing ',' as argument to a macro...&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Problem%20passing%20','%20as%20argument%20to%20a%20macro...">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-07-04 21:45:00</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Sun, Jul 04, 2010 at 05:27:11PM +0200, Christian KrÃ¼ger wrote:
+&gt; when trying to feed an e.g. 'lda $1234,x' as an argument to an
+&gt; macro, I get the error message:
+&gt; &quot;trailing garbage characters&quot; if I do so with &quot;{ }&quot; (ca65 2.13.2).
+
+Sorry, I cannot reproduce that here:
+
+uz&#64;trixie:~/src/cc65/src/ca65$ cat t&#46;<!--nospam-->s
+.macro test label, statement
+        label: statement
+.endmacro
+        test    label, {lda $1234,x}
+        jmp     label
+uz&#64;trixie:~/src/cc65/src/ca65$ ca65 -l t&#46;<!--nospam-->s
+uz&#64;trixie:~/src/cc65/src/ca65$ cat t&#46;<!--nospam-->lst
+ca65 V2.13.2 - (C) Copyright 1998-2005 Ullrich von Bassewitz
+Main file   : t.s
+Current file: t.s
+
+000000r 1               .macro test label, statement
+000000r 1                       label: statement
+000000r 1               .endmacro
+000000r 1  BD 34 12             test    label, {lda $1234,x}
+000003r 1  4C rr rr             jmp     label
+000003r 1
+uz&#64;trixie:~/src/cc65/src/ca65$ ca65 --version
+ca65 V2.13.2 - (C) Copyright 1998-2005 Ullrich von Bassewitz
+ca65: No input files
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Jul  4 21:45:08 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8497.html" title="Next message in the list">Christian KrÃ¼ger: "Re: [cc65] Problem passing ',' as argument to a macro..."</a></li>
+<li><dfn>Previous message</dfn>: <a href="8495.html" title="Previous message in the list">Christian Krüger: "[cc65] Problem passing ',' as argument to a macro..."</a></li>
+<li><dfn>In reply to</dfn>: <a href="8495.html" title="Message to which this message replies">Christian Krüger: "[cc65] Problem passing ',' as argument to a macro..."</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8497.html" title="Next message in this discussion thread">Christian KrÃ¼ger: "Re: [cc65] Problem passing ',' as argument to a macro..."</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8497.html" title="Message sent in reply to this message">Christian KrÃ¼ger: "Re: [cc65] Problem passing ',' as argument to a macro..."</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8496" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8496" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8496" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-07-04 21:45:12 CEST
+</em></small></p>
+</body>
+</html>

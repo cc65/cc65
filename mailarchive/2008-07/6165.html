@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] A bug?</title>
+<meta name="Author" content="Mark J. Reed (markjreed1mail.com)" />
+<meta name="Subject" content="Re: [cc65] A bug?" />
+<meta name="Date" content="2008-07-24" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] A bug?</h1>
+<!-- received="Thu Jul 24 23:51:50 2008" -->
+<!-- isoreceived="20080724215150" -->
+<!-- sent="Thu, 24 Jul 2008 17:51:44 -0400" -->
+<!-- isosent="20080724215144" -->
+<!-- name="Mark J. Reed" -->
+<!-- email="markjreed1mail.com" -->
+<!-- subject="Re: [cc65] A bug?" -->
+<!-- id="f60fe000807241451o509de159h59535bb9df931ab7@mail.gmail.com" -->
+<!-- charset="UTF-8" -->
+<!-- inreplyto="005601c8edcf$b1eb9a40$01299582&#64;CASCADE" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6166.html" title="silverdr1inet.com.pl: &quot;Re: [cc65] A bug?&quot;">Next message</a> ]
+[ <a href="6164.html" title="Stefan: &quot;[cc65] DA65 Selfmodification&quot;">Previous message</a> ]
+[ <a href="6163.html" title="Stefan: &quot;Re: [cc65] A bug?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6166.html" title="silverdr1inet.com.pl: &quot;Re: [cc65] A bug?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Mark J. Reed &lt;<a href="mailto:markjreed1mail.com?Subject=Re:%20[cc65]%20A%20bug?">markjreed1mail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-07-24 23:51:44</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I think perhaps the portable core of the program should be turned into
+a library that is then called by a wrapper program for the different
+platforms, which handle the output correctly for the platform, perhaps
+using conio.
+
+Alternatively, in the particular case of the Commodore 64, it wouldn't
+be hard to redirect the BSOUT/CHROUT call through a custom routine
+that handles CR specially when output to device 3.  It would be
+overkill, IMO, but not difficult, since the jump table calls through
+an indirect vector at 0x0326.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Jul 24 23:51:50 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6166.html" title="Next message in the list">silverdr1inet.com.pl: "Re: [cc65] A bug?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6164.html" title="Previous message in the list">Stefan: "[cc65] DA65 Selfmodification"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6163.html" title="Message to which this message replies">Stefan: "Re: [cc65] A bug?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6166.html" title="Next message in this discussion thread">silverdr1inet.com.pl: "Re: [cc65] A bug?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6166.html" title="Message sent in reply to this message">silverdr1inet.com.pl: "Re: [cc65] A bug?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6165" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6165" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6165" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-07-24 23:51:52 CEST
+</em></small></p>
+</body>
+</html>

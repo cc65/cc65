@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Romable configuration / run-ti</title>
+<meta name="Author" content="Darryl Sokoloski (darryl1sokoloski.ca)" />
+<meta name="Subject" content="[cc65] Romable configuration / run-time library?" />
+<meta name="Date" content="2013-01-18" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Romable configuration / run-time library?</h1>
+<!-- received="Fri Jan 18 18:22:49 2013" -->
+<!-- isoreceived="20130118172249" -->
+<!-- sent="Fri, 18 Jan 2013 12:22:39 -0500" -->
+<!-- isosent="20130118172239" -->
+<!-- name="Darryl Sokoloski" -->
+<!-- email="darryl1sokoloski.ca" -->
+<!-- subject="[cc65] Romable configuration / run-time library?" -->
+<!-- id="CABNV55wuZpzCGhkEyP0h4fk1URZi3JFrqW-t8zx1LmqT41qukg@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11100.html" title="Tilmann: &quot;Re: [cc65] parser bug?&quot;">Next message</a> ]
+[ <a href="11098.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] parser bug?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="11102.html" title="Oliver Schmidt: &quot;Re: [cc65] Romable configuration / run-time library?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Darryl Sokoloski &lt;<a href="mailto:darryl1sokoloski.ca?Subject=Re:%20[cc65]%20Romable%20configuration%20/%20run-time%20library?">darryl1sokoloski.ca</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2013-01-18 18:22:39</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Greetings!
+
+Thanks for everyone's hard work!  This is an amazing tool-chain and
+worked for me right &quot;out of the box&quot;!  I do have one question however,
+and I hope this is the right place to ask.
+
+I recently acquired a fully functional CBM 8032 PET and thought it
+would be fun to replace some the ROM data with my own program code.
+It comes with basic4 and my plan was replace ROMs UD 8, 9, 10 (0xB000
+- 0xDFFF) with my own.  I've built a device that attaches to the
+IEEE-488 interface and is essentially a parallel to serial Bluetooth
+pipe.  I will use the PET to output text from my home network (email
+subject lines, jabber chat, etc...)
+
+I'm now writing the ROM and noticed that something seems wrong with my
+CC65 (LD65) configuration perhaps.  I can not use all functions in
+conio.h.  Specifically, functions like cprintf.  When I call cprintf
+for example, execution jumps to some crazy address(es) eventually
+hitting a JAM or looping indefinitely.
+
+I think that perhaps I have not set-up my LD65 configuration properly
+and was wondering if any one in the community would be able to have a
+quick peek at this:
+
+# Test LD configuration for CBM 8032
+# Attempting to replace basic4 with my own romable code...
+
+SYMBOLS {
+    # 2K stack
+    __STACKSIZE__: type = weak, value = $0800;
+}
+
+MEMORY {
+    # First 256-bytes is zeropage
+    ZP:         file = &quot;&quot;, start = $0000, size = $0100, define = yes;
+    RAMDATA:    file = &quot;&quot;, start = $0100, size = $0200;
+    RAM:        file = &quot;&quot;, start = $0300,
+                size = $8000 - __STACKSIZE__ - 100;
+    # All ROM up to $D3B6 entry point
+    ROM:        file = %O, start = $B000, size = $23B6, fill = yes;
+    # Entry point from kernal, call start-up code
+    STARTUP:    file = %O, start = $D3B6, size = $0C4A, fill = yes;
+}
+
+SEGMENTS {
+    STARTUP:    type = ro,  load = STARTUP;
+    LOWCODE:    type = ro,  load = ROM, optional = yes;
+    INIT:       type = ro,  load = ROM, optional = yes, define = yes;
+    CODE:       type = ro,  load = ROM;
+    RODATA:     type = ro,  load = ROM;
+    DATA:       type = rw,  load = ROM, run = RAMDATA, define = yes;
+    ZPSAVE:     type = bss, load = RAM;
+    BSS:        type = bss, load = RAM, define = yes;
+    ZEROPAGE:   type = zp,  load = ZP;
+}
+
+FEATURES {
+    CONDES: segment = INIT,
+        type    = constructor,
+        label   = __CONSTRUCTOR_TABLE__,
+        count   = __CONSTRUCTOR_COUNT__;
+    CONDES: segment = RODATA,
+        type    = destructor,
+        label   = __DESTRUCTOR_TABLE__,
+        count   = __DESTRUCTOR_COUNT__;
+    CONDES: segment = RODATA,
+        type    = interruptor,
+        label   = __INTERRUPTOR_TABLE__,
+        count   = __INTERRUPTOR_COUNT__,
+            import  = __CALLIRQ__;
+}
+
+# vi: expandtab shiftwidth=4 softtabstop=4 tabstop=4
+Cheers,
+
+Darryl
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Jan 18 18:22:49 2013</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11100.html" title="Next message in the list">Tilmann: "Re: [cc65] parser bug?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="11098.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] parser bug?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="11102.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Romable configuration / run-time library?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="11102.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Romable configuration / run-time library?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="11106.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Romable configuration / run-time library?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#11099" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#11099" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#11099" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2013-01-18 18:22:53 CET
+</em></small></p>
+</body>
+</html>

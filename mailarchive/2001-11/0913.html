@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Serial port API</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] Serial port API">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Serial port API</h1>
+<!-- received="Mon Nov  5 17:11:00 2001" -->
+<!-- isoreceived="20011105161100" -->
+<!-- sent="Mon, 5 Nov 2001 16:57:10 +0100" -->
+<!-- isosent="20011105155710" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] Serial port API" -->
+<!-- id="5021992206.20011105165710@gmx.net" -->
+<!-- inreplyto="15334.45841.191032.851939@panini.cling.gu.se" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Serial%20port%20API"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2001-11-05 16:57:10
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0914.html">groepaz: "Re[2]: [cc65] Serial port API"</a>
+<li><strong>Previous message:</strong> <a href="0912.html">Adam Dunkels: "Re: [cc65] Serial port API"</a>
+<li><strong>In reply to:</strong> <a href="0911.html">MagerValp: "[cc65] Serial port API"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0918.html">MagerValp: "Re: [cc65] Serial port API"</a>
+<li><strong>Reply:</strong> <a href="0918.html">MagerValp: "Re: [cc65] Serial port API"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello MagerValp,
+
+gpz&gt;&gt; sio_init(portname,baudrate); /* init port, return 0 on success or -1 on error) */
+
+M&gt; Might I suggest that you add controls for word length, stop bits and
+M&gt; parity as well? And is baudrate a long or a named constant? 115200 and
+M&gt; up doesn't fit in an int.
+
+well :o)
+a) baudrate is obviously an unsigned long
+b) wordlength/parity/stopbit parameters are fixed at 8n1 ...
+programming that kinda stuff for ~10 years i have never ever seen
+anything else used.... if you'd ever need 5o2 or sth i am sure you can
+implement it yourself ;=P
+
+gpz&gt;&gt; sio_readbyte();              /* waits until character arrives and returns it */
+gpz&gt;&gt; sio_readbyte_nowait();       /* if character is waiting, returns it. otherwhise return 0 */
+gpz&gt;&gt; sio_writebyte(val);          /* send byte, waits until byte has been send */
+
+gpz&gt;&gt; all routines incorporate a timeout, and they set the global
+gpz&gt;&gt; variables sio_readerr and sio_writerr for further error-handling.
+
+M&gt; Can you control the timeout value?
+
+no :o) again, i have done that kinda stuff for long and this way it
+always worked perfectly fine for me (infact thats not even a real
+timeout but &quot;check data $ffff times max.&quot; ,=))
+
+M&gt; Just wrote a small driver that allows the C64 to use the PC's HD using
+M&gt; a SwiftLink and a null modem cable the other night. Right now it just
+M&gt; supports load&quot;file&quot;,6, load&quot;$&quot;,6, and load&quot;dir&quot;,6 (to change
+M&gt; directory). CD:ing into a D64 is halfway done. The C64 side is just
+M&gt; $110 bytes of code but if I decide to add some more exotic features
+M&gt; (like a nice menu controlled D64 reader/writer) I'd prefer doing it in
+M&gt; C. Hey, I'd even have a stab at writing the first real app for cc65 :)
+M&gt;   Oh, the server side is written in Perl and should work on both Win32
+M&gt; (use Win32::SerialPort;) and Unix (use Device::SerialPort;).
+
+reading this, i'd really think we should work together a bit ;=P
+actually a fileserver is among the features planned for the debugger i
+am working on (actually one of the few things NOT implemented by now),
+and a .d64 reciever is planned for the retro-replay software (my
+debugger would be serving data on the pc side for that)....
+
+also, i have designed the debugger code in a way so that it can easily
+support whatever target is connected, so i'd happily support your c64
+end aswell. (only thing beeing kinda hard at this point, i wouldnt
+have a swithlink for testing ;=P)
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Serial%20port%20API">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Serial%20port%20API">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0914.html">groepaz: "Re[2]: [cc65] Serial port API"</a>
+<li><strong>Previous message:</strong> <a href="0912.html">Adam Dunkels: "Re: [cc65] Serial port API"</a>
+<li><strong>In reply to:</strong> <a href="0911.html">MagerValp: "[cc65] Serial port API"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0918.html">MagerValp: "Re: [cc65] Serial port API"</a>
+<li><strong>Reply:</strong> <a href="0918.html">MagerValp: "Re: [cc65] Serial port API"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:43 CET</em>
+</em>
+</small>
+</body>
+</html>

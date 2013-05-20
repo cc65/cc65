@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] ca65 for stand-alone asm proje</title>
+<meta name="Author" content="Agent Friday (64subnet1gmail.com)" />
+<meta name="Subject" content="[cc65] ca65 for stand-alone asm projects" />
+<meta name="Date" content="2010-11-02" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] ca65 for stand-alone asm projects</h1>
+<!-- received="Tue Nov  2 03:26:43 2010" -->
+<!-- isoreceived="20101102022643" -->
+<!-- sent="Mon, 1 Nov 2010 19:26:35 -0700" -->
+<!-- isosent="20101102022635" -->
+<!-- name="Agent Friday" -->
+<!-- email="64subnet1gmail.com" -->
+<!-- subject="[cc65] ca65 for stand-alone asm projects" -->
+<!-- id="AANLkTimS5qYv1GF3NrXCxZBXuTVEkMLBO+CDN1o9P=Vd@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8735.html" title="Groepaz: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">Next message</a> ]
+[ <a href="8733.html" title="Marc 'BlackJack' Rintsch: &quot;[cc65] Bug(s) with -O/--static-locals?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8735.html" title="Groepaz: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Agent Friday &lt;<a href="mailto:64subnet1gmail.com?Subject=Re:%20[cc65]%20ca65%20for%20stand-alone%20asm%20projects">64subnet1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-11-02 03:26:35</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi.
+
+I'm wondering if there are any ca65 tutorials available, or a good
+example to start from.  I haven't been able to locate any from
+searching the docs and the mailing list archive.
+
+What I need most are details about linking assembler-only projects,
+and the format of the final binary.  I've created a config file
+(shown below) that so far SEEMS to be pretty close to what I want,
+which is all code in a single file ready to load at $8000.  What I'm
+getting seems to only be missing the load address as the first 2
+bytes of the file.
+
+The ld65 docs say very little about how to get the output format you
+want, just that you can't specify any options for the default output
+(binary) and the only other format seems to be .o65.
+
+ [Just curious...  are the name ca65 and dl65 abbreviations or
+  acronyms for a longer name?]
+
+Thanks for your help,
+// Agent Friday
+
+
+
+MEMORY
+{
+    ZP:         start = $0002, size = $001A, type = rw, define = yes;
+    LORAM:      start = $07FF, size = $C801, file = %O, define = yes;
+    RAM8000:    start = $8000, size = $2000, type = rw;
+
+}
+
+SEGMENTS
+{
+    CODE:     load = RAM8000, type = ro;
+    BSS:      load = RAM8000, type = bss, define = yes;
+}
+
+FEATURES
+{
+}
+
+SYMBOLS
+{
+    __STACKSIZE__: value = $0000, weak = yes;
+}
+
+
+// Agent Friday
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Nov  2 03:26:43 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8735.html" title="Next message in the list">Groepaz: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8733.html" title="Previous message in the list">Marc 'BlackJack' Rintsch: "[cc65] Bug(s) with -O/--static-locals?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8735.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8735.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8734" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8734" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8734" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-11-02 03:26:45 CET
+</em></small></p>
+</body>
+</html>

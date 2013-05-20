@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Need help getting started </title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Need help getting started with cc65 NES" />
+<meta name="Date" content="2005-11-16" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Need help getting started with cc65 NES</h1>
+<!-- received="Wed Nov 16 23:42:28 2005" -->
+<!-- isoreceived="20051116224228" -->
+<!-- sent="Wed, 16 Nov 2005 23:42:14 +0100" -->
+<!-- isosent="20051116224214" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Need help getting started with cc65 NES" -->
+<!-- id="20051116224214.GA14009@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="437BB36D.7020800&#64;alpinecom.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5266.html" title="PH: &quot;Re: [cc65] Need help getting started with cc65 NES&quot;">Next message</a> ]
+[ <a href="5264.html" title="PH: &quot;Re: [cc65] Need help getting started with cc65 NES&quot;">Previous message</a> ]
+[ <a href="5264.html" title="PH: &quot;Re: [cc65] Need help getting started with cc65 NES&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5266.html" title="PH: &quot;Re: [cc65] Need help getting started with cc65 NES&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Need%20help%20getting%20started%20with%20cc65%20NES">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-11-16 23:42:14</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Wed, Nov 16, 2005 at 04:32:13PM -0600, PH wrote:
+&gt; There is RAM at those locations, but it is Save RAM (I'm not sure what
+&gt; the specific use is), so maybe that is ok.  When it jumps there, the
+&gt; condes code isn't there that I can see.  The line it hits is a BRK.
+
+Ok. If there is no code, it cannot be executed:-) So either there's no RAM, or
+the copy operation fails for some reason. If you look at the startup code in
+the crt0.s file, you will notice a block of code that starts with
+
+        ; Copy the .data segment to RAM
+
+This is the code that copies that initialization data from the ROM into the
+RAM. Please check if this code works (it probably won't). That means, if a
+copied byte does actually appear at the target location. Unfortunately, I
+don't have any ideas what might be wrong besides missing or non writable RAM
+at $6000.
+
+&gt; As far as simpler programs, I don't think I could get much more
+&gt; simplified.  I would maybe have to compile without the -t nes option and
+&gt; try something else that doesn't include any startup code, but I don't
+&gt; know what that would be.  I do wish I had the option of what init code
+&gt; is called, such as having to call an Init() function if I want to use
+&gt; the built in init code.
+
+The startup code is always needed, because it does things like initialize the
+bss segment, setup the stack and so on. Without the startup code, the
+translated C code won't work. Simpler code (like the one from my earlier mail)
+will still have the startup code prepended, but almost no additional library
+initialization code added. The library initialization code is what is called
+from the initlib routine. Using explicit calls to init routines is a bad idea.
+For one, it is difficult to oversee, which calls are needed, because this
+depends on the target platform and which library routines are used. Second, a
+special calling order has to be used. And third, the compiler would violate
+the standard, because a simple
+
+        #include &lt;stdlib.h&gt;
+        #include &lt;stdio.h&gt;
+
+        int main (void)
+        {
+            printf (&quot;hello world!\n&quot;);
+            return EXIT_SUCCESS;
+        }
+
+would no longer work.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Nov 16 23:42:28 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5266.html" title="Next message in the list">PH: "Re: [cc65] Need help getting started with cc65 NES"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5264.html" title="Previous message in the list">PH: "Re: [cc65] Need help getting started with cc65 NES"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5264.html" title="Message to which this message replies">PH: "Re: [cc65] Need help getting started with cc65 NES"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5266.html" title="Next message in this discussion thread">PH: "Re: [cc65] Need help getting started with cc65 NES"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5266.html" title="Message sent in reply to this message">PH: "Re: [cc65] Need help getting started with cc65 NES"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5265" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5265" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5265" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-11-16 23:42:30 CET
+</em></small></p>
+</body>
+</html>

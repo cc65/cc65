@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] C128 functions slow()/fast</title>
+<meta name="Author" content="Daniel Pralle (dpralle1gmx.de)" />
+<meta name="Subject" content="Re: [cc65] C128 functions slow()/fast() for C64" />
+<meta name="Date" content="2012-10-21" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] C128 functions slow()/fast() for C64</h1>
+<!-- received="Sun Oct 21 15:41:07 2012" -->
+<!-- isoreceived="20121021134107" -->
+<!-- sent="Sun, 21 Oct 2012 15:40:51 +0200" -->
+<!-- isosent="20121021134051" -->
+<!-- name="Daniel Pralle" -->
+<!-- email="dpralle1gmx.de" -->
+<!-- subject="Re: [cc65] C128 functions slow()/fast() for C64" -->
+<!-- id="20121021154051.4611a4f9@pferd" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="201210211522.15253.marc&#64;rintsch.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10948.html" title="Groepaz: &quot;Re: [cc65] C128 functions slow()/fast() for C64&quot;">Next message</a> ]
+[ <a href="10946.html" title="Groepaz: &quot;Re: [cc65] C128 functions slow()/fast() for C64&quot;">Previous message</a> ]
+[ <a href="10945.html" title="Marc 'BlackJack' Rintsch: &quot;[cc65] C128 functions slow()/fast() for C64&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10948.html" title="Groepaz: &quot;Re: [cc65] C128 functions slow()/fast() for C64&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Daniel Pralle &lt;<a href="mailto:dpralle1gmx.de?Subject=Re:%20[cc65]%20C128%20functions%20slow()/fast()%20for%20C64">dpralle1gmx.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-10-21 15:40:51</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Sun, 21 Oct 2012 15:22:12 +0200
+&quot;Marc 'BlackJack' Rintsch&quot; &lt;marc&#64;rintsch&#46;<!--nospam-->de&gt; wrote:
+
+&gt; Hi *,
+&gt; 
+&gt; Any thoughts about providing `slow()` and `fast()` functions for the
+&gt; C64 target that switch the screen on/off and would set a C128 into 1
+&gt; Mhz/2 Mhz mode?
+&gt; 
+&gt; It is common to do this in computing intensive programs like
+&gt; compression software.  C128 users get some extra speed out of the C64
+&gt; application and on the C64 it doesn't do any harm AFAIK.  Even there
+&gt; you get a small speed gain because the VIC doesn't stall the CPU any
+&gt; more for memory access.
+&gt; 
+&gt; Ciao,
+&gt; 	Marc 'BlackJack' Rintsch
+
+
+Would be nice for Atari target as well. Display-DMA off increase speed
+from 1.2 MHz to 1.8MHz.
+To be precise, display-DMA steals cycles from 6502 that it effictivle
+runs at 1.2MHz instead of 1.8MHz  :)
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Oct 21 15:41:07 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10948.html" title="Next message in the list">Groepaz: "Re: [cc65] C128 functions slow()/fast() for C64"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10946.html" title="Previous message in the list">Groepaz: "Re: [cc65] C128 functions slow()/fast() for C64"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10945.html" title="Message to which this message replies">Marc 'BlackJack' Rintsch: "[cc65] C128 functions slow()/fast() for C64"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10948.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] C128 functions slow()/fast() for C64"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10948.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] C128 functions slow()/fast() for C64"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10947" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10947" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10947" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-10-21 15:41:11 CEST
+</em></small></p>
+</body>
+</html>

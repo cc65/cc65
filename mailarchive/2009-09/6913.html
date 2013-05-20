@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] More low hanging fruits fo</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] More low hanging fruits for target independence" />
+<meta name="Date" content="2009-09-11" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] More low hanging fruits for target independence</h1>
+<!-- received="Fri Sep 11 19:10:56 2009" -->
+<!-- isoreceived="20090911171056" -->
+<!-- sent="Fri, 11 Sep 2009 19:08:35 +0200" -->
+<!-- isosent="20090911170835" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] More low hanging fruits for target independence" -->
+<!-- id="20090911170835.GA18266@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="f97798c20909090113m182fb072qdecfcd2400d71818&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6914.html" title="Groepaz: &quot;Re: [cc65] Optimizer bug found&quot;">Next message</a> ]
+[ <a href="6912.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] New 80 col switch API&quot;">Previous message</a> ]
+[ <a href="6878.html" title="Oliver Schmidt: &quot;[cc65] More low hanging fruits for target independence&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6916.html" title="Oliver Schmidt: &quot;Re: [cc65] More low hanging fruits for target independence&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20More%20low%20hanging%20fruits%20for%20target%20independence">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-09-11 19:08:35</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Wed, Sep 09, 2009 at 10:13:56AM +0200, Oliver Schmidt wrote:
+&gt; 1. TGI_MODE_...
+&gt;
+&gt; Every target with TGI support might define a macro like i.e.
+&gt; TGI_MODE_HIRES or TGI_MODE_DEFAULT refering to one of the macros in
+&gt; tgi/tgi-mode.h. The cc65 sample tgidemo and mandelbrot could make use
+&gt; of them out-of-the-box.
+
+Hmm. If we use the name of a driver instead of a mode, we can define that the
+first driver in the mode map table is also the default driver. This is
+probably easier than a #define for every platform.
+
+&gt; 2. ..._stddrv
+&gt;
+&gt; Similiar to joy_stddrv there might be a &quot;built-in string&quot; mou_stddrv
+&gt; (or mouse_stddrv) containing to name of the standard mouse driver. The
+&gt; cc65 sample mousedemo could benefit from that without further mods.
+
+Good idea - done. With the exception of the apple targets, for which I thought
+you will add the necessary files :-)
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Sep 11 19:10:56 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6914.html" title="Next message in the list">Groepaz: "Re: [cc65] Optimizer bug found"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6912.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] New 80 col switch API"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6878.html" title="Message to which this message replies">Oliver Schmidt: "[cc65] More low hanging fruits for target independence"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6916.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] More low hanging fruits for target independence"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6916.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] More low hanging fruits for target independence"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6913" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6913" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6913" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-09-11 19:10:58 CEST
+</em></small></p>
+</body>
+</html>

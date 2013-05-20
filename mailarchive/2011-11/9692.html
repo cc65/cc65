@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] annoying problem with 1541</title>
+<meta name="Author" content="Chris Cureau (cmcureau1gmail.com)" />
+<meta name="Subject" content="[cc65] annoying problem with 1541" />
+<meta name="Date" content="2011-11-19" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] annoying problem with 1541</h1>
+<!-- received="Sat Nov 19 20:23:37 2011" -->
+<!-- isoreceived="20111119192337" -->
+<!-- sent="Sat, 19 Nov 2011 13:23:19 -0600" -->
+<!-- isosent="20111119192319" -->
+<!-- name="Chris Cureau" -->
+<!-- email="cmcureau1gmail.com" -->
+<!-- subject="[cc65] annoying problem with 1541" -->
+<!-- id="CAL0fNgW3c_v-g7td2LgkkfYx6=9PxLss=2Gn9M=1wb4R68rydA@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9693.html" title="Egan Ford: &quot;[cc65] --start-addr questions&quot;">Next message</a> ]
+[ <a href="9691.html" title="Joseph Rose: &quot;Re: [cc65] Accessing linker symbols from C?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9694.html" title="Spiro Trikaliotis: &quot;Re: [cc65] annoying problem with 1541&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Chris Cureau &lt;<a href="mailto:cmcureau1gmail.com?Subject=Re:%20[cc65]%20annoying%20problem%20with%201541">cmcureau1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-11-19 20:23:19</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I guess this is probably not the place to ask, but I'm sure there's plenty
+of Commodore people here!
+
+This is supposed to be an internal function rom image that starts at $8000
+on the C128.  I'm trying to use the U1 command from assembly to read Track
+18, Sector 1...and even though I can't see anything wrong with the code I
+keep getting an error 70 (no channel) from the drive.  Here's the
+code...I'd really appreciate knowing what I'm doing wrong!
+
+Thanks,
+Chris
+
+---
+
+SETLFS = $ffba
+SETNAM = $ffbd
+OPEN = $ffc0
+CHKIN = $ffc6
+CKOUT = $ffc9
+CLRCH = $ffcc
+BASIN = $ffcf
+BSOUT = $ffd2
+CLALL = $ffe7
+LOADADR = $1c01
+
+.org $8000
+
+; c128 Option ROM trickery
+
+jmp start_code     ;Cold start vector
+jmp start_code     ;Warm start vector
+.byte $FF           ;&gt; $01 for Autostart
+.byte $43,$42,$4d   ;&quot;CBM&quot;
+.byte $00,$00,$00   ;padding (easier on the eyes)
+
+
+start_code:
+lda #6  ;Kernal and Internal ROM (LOW), RAM(0), I/O
+sta $d501  ;write to preconfiguration register A
+sta $ff01  ;write to LCR A
+sei  ;disable interrupts
+jsr CLALL  ;close all files and channels
+
+; set up command channel
+lda #15  ;logical file number 15
+ldx #8  ;device 8
+ldy #15  ;secondary address 15
+jsr SETLFS  ;set LA, FA, SA
+lda #0  ;zero length file name
+jsr SETNAM
+jsr OPEN  ;open command channel
+
+; set up for random access
+lda #5 ;logical file number 2
+ldx #8 ;device 8
+ldy #5 ;secondary address 2
+jsr SETLFS ;set LA, FA, SA
+lda #1 ;single character file name
+ldx #&lt;buffer
+ldy #&gt;buffer ;set file name
+jsr SETNAM
+jsr OPEN ;open command channel
+
+; grab info from Track 1, Sector 0 (block-read)
+ldx #15  ;15 is active channel out
+jsr CKOUT
+ldx #0
+ldy #12 ;length of file name (11 characters)
+fname:
+lda drivecmd,x ;pointer to file name
+jsr BSOUT ;output to channel
+inx
+dey
+bne fname ;loop to finish sending filename
+jsr CLRCH ;restore default channel
+ldx #5 ;set 2 as active channel in
+jsr CHKIN
+ldx #0
+rdloop:
+jsr BASIN ;input from channel
+rl1:
+sta $0400,x ;put to screen
+inx
+bne rdloop ;read 256 bytes
+jsr CLRCH ;restore default channel
+jsr CLALL ;close all channels
+brk
+; data
+buffer:
+.byte &quot;#&quot;
+drivecmd:
+.byte &quot;u1:2 0 18 1&quot;, $0D
+readcnt:
+.byte 0
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Nov 19 20:23:37 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9693.html" title="Next message in the list">Egan Ford: "[cc65] --start-addr questions"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9691.html" title="Previous message in the list">Joseph Rose: "Re: [cc65] Accessing linker symbols from C?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9694.html" title="Next message in this discussion thread">Spiro Trikaliotis: "Re: [cc65] annoying problem with 1541"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9694.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Re: [cc65] annoying problem with 1541"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9692" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9692" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9692" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-11-19 20:23:41 CET
+</em></small></p>
+</body>
+</html>

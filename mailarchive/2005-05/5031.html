@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Re: signals</title>
+<meta name="Author" content="Jonathan Graham Harston (jgh1arcade.demon.co.uk)" />
+<meta name="Subject" content="[cc65] Re: signals" />
+<meta name="Date" content="2005-05-30" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Re: signals</h1>
+<!-- received="Mon May 30 22:18:25 2005" -->
+<!-- isoreceived="20050530201825" -->
+<!-- sent="30 May 2005 15:04:59 +0100" -->
+<!-- isosent="20050530140459" -->
+<!-- name="Jonathan Graham Harston" -->
+<!-- email="jgh1arcade.demon.co.uk" -->
+<!-- subject="[cc65] Re: signals" -->
+<!-- id="050530155504@arcade.demon.co.uk" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5032.html" title="dominic beesley: &quot;Re: [cc65] signals&quot;">Next message</a> ]
+[ <a href="5030.html" title="Jonathan Graham Harston: &quot;[cc65] Re: signals&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Jonathan Graham Harston &lt;<a href="mailto:jgh1arcade.demon.co.uk?Subject=Re:%20[cc65]%20Re:%20signals">jgh1arcade.demon.co.uk</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-05-30 16:04:59</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt; Message-ID: &lt;4295F4A7.7020400&#64;brahms&#46;<!--nospam-->demon.co.uk&gt;
+ 
+dominic beesley &lt;dominic&#64;brahms&#46;<!--nospam-->demon.co.uk&gt; wrote:
+&gt; the SIG_DFL handler for SIG_INT just does a BRK instruction to
+&gt; halt back to the OS (plus it has to reenable keyboard
+&gt; interrupts! I'm currently reading through the BBC OS disassembly
+&gt; to see what I should really do about this).
+ 
+Well, you're looking in thew wrong place. You should be looking
+through a disassembly of a foreground process, such as BASIC. That
+would give you the following answer:
+ 
+.StatementLoop
+; Executes current BASIC statement
+BIT &amp;FF              ; Check escape flag
+BPL StatementLoop    ; Not escape state, process next statement
+LDA #126:JSR OSBYTE  ; Acknowledge escape state
+BRK:EQUB 17          ; Generate error number 17
+EQUS &quot;Escape&quot;:BRK    ; Error string &quot;Escape&quot;
+ 
+-- 
+J.G.Harston - jgh&#64;arcade&#46;<!--nospam-->demon.co.uk - mdfs.net/User/JGH
+BBC BASIC for Windows and Internationalisation
+  See <a href="http://mdfs.net/Software/BBCBasic/Windows/ProgTips">http://mdfs.net/Software/BBCBasic/Windows/ProgTips</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon May 30 22:18:25 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5032.html" title="Next message in the list">dominic beesley: "Re: [cc65] signals"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5030.html" title="Previous message in the list">Jonathan Graham Harston: "[cc65] Re: signals"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5031" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5031" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5031" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-05-30 22:18:27 CEST
+</em></small></p>
+</body>
+</html>

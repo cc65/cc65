@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] cl65 ignoring -I option fo</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] cl65 ignoring -I option for assembler files, while ca65 does not?" />
+<meta name="Date" content="2005-03-13" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] cl65 ignoring -I option for assembler files, while ca65 does not?</h1>
+<!-- received="Sun Mar 13 21:00:14 2005" -->
+<!-- isoreceived="20050313200014" -->
+<!-- sent="Sun, 13 Mar 2005 21:00:10 +0100" -->
+<!-- isosent="20050313200010" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] cl65 ignoring -I option for assembler files, while ca65 does not?" -->
+<!-- id="20050313200010.GD10134@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="20050313162241.GA28257&#64;mail.trikaliotis.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4817.html" title="MagerValp: &quot;[cc65] .target&quot;">Next message</a> ]
+[ <a href="4815.html" title="Spiro Trikaliotis: &quot;[cc65] cl65 ignoring -I option for assembler files, while ca65 does not?&quot;">Previous message</a> ]
+[ <a href="4815.html" title="Spiro Trikaliotis: &quot;[cc65] cl65 ignoring -I option for assembler files, while ca65 does not?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4820.html" title="Spiro Trikaliotis: &quot;Re: [cc65] cl65 ignoring -I option for assembler files, while ca65 does not?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20cl65%20ignoring%20-I%20option%20for%20assembler%20files,%20while%20ca65%20does%20not?">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-03-13 21:00:10</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Sun, Mar 13, 2005 at 05:22:41PM +0100, Spiro Trikaliotis wrote:
+&gt; I believe cl65 called for assembler files ignores the -I (--include-dir)
+&gt; option (line breaks with \ by me), while ca65 does not:
+
+The -I option is ambigous, because it means different things to ca65 and cc65.
+cl65 allows to compile both, asm and C files in one go, and usually C and asm
+includes don't share the same directory, so it wouldn't be a good idea to pass
+directories given with -I to both, the assembler and compiler. Obviously, two
+different command line switches are needed, and since it is more common to
+compile C files using cl65, the -I option is only passed to the C compiler.
+For assembler include directories there's a separate option named
+--asm-include-dir.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Mar 13 21:00:14 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4817.html" title="Next message in the list">MagerValp: "[cc65] .target"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4815.html" title="Previous message in the list">Spiro Trikaliotis: "[cc65] cl65 ignoring -I option for assembler files, while ca65 does not?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4815.html" title="Message to which this message replies">Spiro Trikaliotis: "[cc65] cl65 ignoring -I option for assembler files, while ca65 does not?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4820.html" title="Next message in this discussion thread">Spiro Trikaliotis: "Re: [cc65] cl65 ignoring -I option for assembler files, while ca65 does not?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4820.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Re: [cc65] cl65 ignoring -I option for assembler files, while ca65 does not?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4816" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4816" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4816" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-03-13 21:00:21 CET
+</em></small></p>
+</body>
+</html>

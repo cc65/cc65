@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Atari: Loading code with DOS 2</title>
+<meta name="Author" content="Martin, Chris (cmartin1ti.com)" />
+<meta name="Subject" content="[cc65] Atari: Loading code with DOS 2.0 help?" />
+<meta name="Date" content="2004-07-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Atari: Loading code with DOS 2.0 help?</h1>
+<!-- received="Thu Jul 29 18:43:55 2004" -->
+<!-- isoreceived="20040729164355" -->
+<!-- sent="Thu, 29 Jul 2004 11:43:46 -0500" -->
+<!-- isosent="20040729164346" -->
+<!-- name="Martin, Chris" -->
+<!-- email="cmartin1ti.com" -->
+<!-- subject="[cc65] Atari: Loading code with DOS 2.0 help?" -->
+<!-- id="3BEAE8F834936647A2D11E7BA875236EA94308@dlee2k07.ent.ti.com" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4339.html" title="Shawn Jefferson: &quot;Re: [cc65] assembly subroutine return value&quot;">Next message</a> ]
+[ <a href="4337.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] assembly subroutine return value&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4340.html" title="Shawn Jefferson: &quot;Re: [cc65] Atari: Loading code with DOS 2.0 help?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Martin, Chris &lt;<a href="mailto:cmartin1ti.com?Subject=Re:%20[cc65]%20Atari:%20Loading%20code%20with%20DOS%202.0%20help?">cmartin1ti.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-07-29 18:43:46</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi all, 
+
+I have a piece of code that I have written and compiled with cc65 and am
+having trouble getting it to load from DOS 2.0. It loads fine from
+SpartaDOS 3.2, but I receive an ERROR 136 from DOS 2.0. The code is
+supposed to load to 0x3400-0x3c30 and to 0x6000-0xa3d0. 
+
+
+
+It looks like DOS 2.0 has some code loaded all the way up to 0x33xx, so
+I modified my code to load past this.  I also adjusted the HEADER
+location to no avail.
+
+ 
+
+My linker command file looks like:
+
+ 
+
+MEMORY {
+
+    ZP: start = $82, size = $7E, type = rw, define = yes;
+
+    #HEADER: start = $0000, size = $6, file = %O;
+
+    HEADER: start = $33f0, size = $6, file = %O;
+
+    RAM: start = $6000, size = $5c1f, file = %O;    # $8E1F: matches
+upper bound $BC1F
+
+    BANK: start = $4000, size = $4000, type = ro;
+
+    #SECHDR: start = $0006, size = $4, file = %O;
+
+    SECHDR: start = $33f6, size = $4, file = %O;
+
+    #RAM28: start = $2800, size = $1800,  file = %O;    # $1800: matches
+upper bound $3FFF
+
+    RAM28: start = $3400, size = $1800,  file = %O;    # $1800: matches
+upper bound $3FFF
+
+ 
+
+}
+
+SEGMENTS {
+
+    EXEHDR: load = HEADER, type = wprot;
+
+    CODE: load = RAM, type = wprot, define = yes;
+
+    BSS: load = RAM, type = bss, define = yes;
+
+    CHKHDR: load = SECHDR, type = wprot;
+
+    CODE2: load = RAM28, type = wprot, define = yes;
+
+    #DATA: load = RAM28, type = rw, align = $200;
+
+    DATA: load = RAM28, type = rw;
+
+    RODATA: load = RAM28, type = wprot;
+
+    ZEROPAGE: load = ZP, type = zp;
+
+    AUTOSTRT: load = RAM, type = wprot, define = yes;
+
+}
+
+FEATURES {
+
+    CONDES: segment = RODATA,
+
+     type = constructor,
+
+     label = __CONSTRUCTOR_TABLE__,
+
+     count = __CONSTRUCTOR_COUNT__;
+
+    CONDES: segment = RODATA,
+
+     type = destructor,
+
+     label = __DESTRUCTOR_TABLE__,
+
+     count = __DESTRUCTOR_COUNT__;
+
+}
+
+SYMBOLS {
+
+    __STACKSIZE__ = $100; # 512B stack (was 2K stack)
+
+}
+
+ 
+
+ 
+
+
+Any ideas? 
+
+Thanks, 
+Chris
+
+ 
+
+ 
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Jul 29 18:43:55 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4339.html" title="Next message in the list">Shawn Jefferson: "Re: [cc65] assembly subroutine return value"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4337.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] assembly subroutine return value"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4340.html" title="Next message in this discussion thread">Shawn Jefferson: "Re: [cc65] Atari: Loading code with DOS 2.0 help?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4340.html" title="Message sent in reply to this message">Shawn Jefferson: "Re: [cc65] Atari: Loading code with DOS 2.0 help?"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="4345.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] Atari: Loading code with DOS 2.0 help?"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="../2004-08/4378.html" title="Message sent in reply to this message">Christian Groessler: "Re: [cc65] Atari: Loading code with DOS 2.0 help?"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="../2004-09/4387.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] Atari: Loading code with DOS 2.0 help?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4338" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4338" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4338" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-07-29 18:44:03 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Fast multi-key keyboard input </title>
+<meta name="Author" content="Stefan Wessels (swessels1email.com)" />
+<meta name="Subject" content="[cc65] Fast multi-key keyboard input on C64?" />
+<meta name="Date" content="2010-11-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Fast multi-key keyboard input on C64?</h1>
+<!-- received="Mon Nov 29 01:00:37 2010" -->
+<!-- isoreceived="20101129000037" -->
+<!-- sent="Sun, 28 Nov 2010 16:00:01 -0800" -->
+<!-- isosent="20101129000001" -->
+<!-- name="Stefan Wessels" -->
+<!-- email="swessels1email.com" -->
+<!-- subject="[cc65] Fast multi-key keyboard input on C64?" -->
+<!-- id="F3D6194B-DACF-47E5-BBF2-88E3E1E33A7C@email.com" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8989.html" title="Groepaz: &quot;Re: [cc65] Fast multi-key keyboard input on C64?&quot;">Next message</a> ]
+[ <a href="8987.html" title="Oliver Schmidt: &quot;Re: [cc65] Documentation: combining switches -t and -C&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8989.html" title="Groepaz: &quot;Re: [cc65] Fast multi-key keyboard input on C64?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Stefan Wessels &lt;<a href="mailto:swessels1email.com?Subject=Re:%20[cc65]%20Fast%20multi-key%20keyboard%20input%20on%20C64?">swessels1email.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-11-29 01:00:01</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+2 Questions:
+
+1)
+I want to read the keyboard in a &quot;raw&quot; state.  I also need to be able to tell if multiple keys are down or not (direction and jump, for example).
+
+Is the only way to do this to use the row/column checks on the CIA ports ($DC00 &amp; DC01)?  Using cgetc, as well as looking at location 197 doesn't work - only 1 key pressed.  
+
+Interestingly enough, kbhit() with cgetc() doesn't give a continuos stream, even when I put values in 650, 651 &amp; 652.  The following illustrates:
+
+#include &lt;conio.h&gt;
+
+int main()
+{
+	char key;
+	int i;
+	
+	*(char*)650 = 0x80;
+	*(char*)651 = 0x01;
+	*(char*)652 = 0x01;
+	
+	while(1)
+	{
+		key = 0x20;
+		if(kbhit())
+			key = cgetc() ;
+		*(char*)0x400 = key;
+		
+		for(i = 0; i &lt; 100; i++);
+	}
+	return 0;
+}
+
+This code has the key you are holding down (let's say 'Q') &quot;flash&quot; in the corner.  Without the for loop, you don't even see the character at all - it's put and replaced with a space before you see it (which seems odd - I would have expected a flash in sync with a raster scan at least sometimes?  Am I missing something again?).
+
+
+2) 
+I once found web pages that had all the 6502 code listed that made up the routines like cgetc and showed what pusheax looked like, etc.  It was awesome.  I haven't been able to find this again.  Can someone please point me in the right direction?  I don't know if it was on the cc65 site or if someone else had done it.  Looked like ca65html generated pages, if I remember correctly.
+
+Thank you
+Stefan
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Nov 29 01:00:37 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8989.html" title="Next message in the list">Groepaz: "Re: [cc65] Fast multi-key keyboard input on C64?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8987.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Documentation: combining switches -t and -C"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8989.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] Fast multi-key keyboard input on C64?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8989.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] Fast multi-key keyboard input on C64?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9011.html" title="Message sent in reply to this message">Agent Friday: "Re: [cc65] Fast multi-key keyboard input on C64?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9012.html" title="Message sent in reply to this message">Chiron Bramberger: "Re: [cc65] Fast multi-key keyboard input on C64?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8988" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8988" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8988" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-11-29 01:00:40 CET
+</em></small></p>
+</body>
+</html>

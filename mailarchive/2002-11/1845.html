@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Super simple picture rout</title>
+<meta name="Author" content="MagerValp (MagerValp_at_cling.gu.se)">
+<meta name="Subject" content="Re: [cc65] Super simple picture routine needs a faster way">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Super simple picture routine needs a faster way</h1>
+<!-- received="Fri Nov 29 14:48:30 2002" -->
+<!-- isoreceived="20021129134830" -->
+<!-- sent="Fri, 29 Nov 2002 14:47:48 +0100" -->
+<!-- isosent="20021129134748" -->
+<!-- name="MagerValp" -->
+<!-- email="MagerValp_at_cling.gu.se" -->
+<!-- subject="Re: [cc65] Super simple picture routine needs a faster way" -->
+<!-- id="15847.28676.855218.317998@panini.cling.gu.se" -->
+<!-- inreplyto="E18Hgd4-0000FB-00@nd143-51-164-6.salpaus.edu.lahti.fi" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> MagerValp (<a href="mailto:MagerValp_at_cling.gu.se?Subject=Re:%20[cc65]%20Super%20simple%20picture%20routine%20needs%20a%20faster%20way"><em>MagerValp_at_cling.gu.se</em></a>)<br>
+<strong>Date:</strong> 2002-11-29 14:47:48
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1844.html">Ullrich von Bassewitz: "[cc65] Re: Extended memory API"</a>
+<li><strong>In reply to:</strong> <a href="1843.html">Visa: "[cc65] Super simple picture routine needs a faster way"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1851.html">Ullrich von Bassewitz: "[cc65] Koala picture viewer"</a>
+<li><strong>Reply:</strong> <a href="1851.html">Ullrich von Bassewitz: "[cc65] Koala picture viewer"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+&gt;&gt;&gt;&gt;&gt; &quot;V&quot; == Visa  &lt;<a href="mailto:visy_at_tukka.org?Subject=Re:%20[cc65]%20Super%20simple%20picture%20routine%20needs%20a%20faster%20way">visy_at_tukka.org</a>&gt; writes:
+
+V&gt; Okay, so I have made a little program that reads the picture from a
+V&gt; file using Groepaz's routines. I use his putpixel to draw the pixel
+V&gt; to the screen. the image is stored like unsigned char pic1[32000] =
+V&gt; {0,0,0,0...}. I know this eats a lot of memory, and it is VERY
+V&gt; slow, so, is there any faster way to blit the image on the screen.
+V&gt; Sorry for being such a newbie, but I really suck at programming.
+
+First of all, work with the picture 8 pixels (4 in multicolour) at a
+time. This will reduce the memory consumption to 8K, and speed up all
+the processing immensely. To copy memory, use the memcpy in string.h.
+If you're not familiar with how the C64 stores bitmaps and colours in
+memory, read through the graphics chapter in the Programmer's Referen-
+ce Guide.
+
+Work sure is boring today so I wrote a small example koala viewer. You
+can grab the source from
+
+  <a href="http://www.cling.gu.se/~cl3polof/loadkoala.zip">http://www.cling.gu.se/~cl3polof/loadkoala.zip</a>
+
+-- 
+    ___          .     .  .         .       . +  .         .      o   
+  _|___|_   +   .  +     .     +         .  Per Olofsson, arkadspelare
+    o-o    .      .     .   o         +          <a href="mailto:MagerValp_at_cling.gu.se?Subject=Re:%20[cc65]%20Super%20simple%20picture%20routine%20needs%20a%20faster%20way">MagerValp_at_cling.gu.se</a>
+     -       +            +    .     <a href="http://www.cling.gu.se/~cl3polof/">http://www.cling.gu.se/~cl3polof/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Super%20simple%20picture%20routine%20needs%20a%20faster%20way">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1844.html">Ullrich von Bassewitz: "[cc65] Re: Extended memory API"</a>
+<li><strong>In reply to:</strong> <a href="1843.html">Visa: "[cc65] Super simple picture routine needs a faster way"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1851.html">Ullrich von Bassewitz: "[cc65] Koala picture viewer"</a>
+<li><strong>Reply:</strong> <a href="1851.html">Ullrich von Bassewitz: "[cc65] Koala picture viewer"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-11-29 14:49:02 CET</em>
+</em>
+</small>
+</body>
+</html>

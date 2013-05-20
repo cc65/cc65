@@ -1,0 +1,177 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] statics in zero page</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] statics in zero page">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] statics in zero page</h1>
+<!-- received="Tue May 21 19:47:33 2002" -->
+<!-- isoreceived="20020521174733" -->
+<!-- sent="Tue, 21 May 2002 19:48:49 +0200" -->
+<!-- isosent="20020521174849" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] statics in zero page" -->
+<!-- id="12229411129.20020521194849@gmx.net" -->
+<!-- inreplyto="20020521190512.A18933@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20statics%20in%20zero%20page"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2002-05-21 19:48:49
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1363.html">Ullrich von Bassewitz: "Re: [cc65] statics in zero page"</a>
+<li><strong>In reply to:</strong> <a href="1363.html">Ullrich von Bassewitz: "Re: [cc65] statics in zero page"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1355.html">Keates, Mark: "RE: Re[2]: [cc65] statics in zero page"</a>
+<li><strong>Maybe reply:</strong> <a href="1355.html">Keates, Mark: "RE: Re[2]: [cc65] statics in zero page"</a>
+<li><strong>Reply:</strong> <a href="1366.html">Ullrich von Bassewitz: "[cc65] Floating point support"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+UvB&gt; If we can bring this into a shape where it works across all target system,
+UvB&gt; that would ok for me.
+
+mmmmh that shouldnt be a major problem.... except that not all targets
+might offer all kinds of interupts (most may have a raster- and timer-
+interupt though)
+
+&gt;&gt; uhmz... dont have the actual file handy atm (not at home) but its got
+&gt;&gt; everything that is available in the kernal:
+
+UvB&gt; Bad word: kernal :-)
+
+eh? its THE key to short code on any embedded system AFAIK :=P Also
+codesize is one of the MAJOR concerns when using cc65, so for heavens
+sake i'd say use the kernal whenever possible.
+
+how is that issue different from stuff like disc/file i/o for example?
+
+UvB&gt; Remember: cc65 is not C64 only. I know that it seems wasteful to add extra
+UvB&gt; floating point routines if there is already something like that in the (C64-)
+UvB&gt; kernal, but there are other platforms that don't have floating point support
+UvB&gt; in a ROM.
+
+well its perfectly portable across all cbm-machines - and AFAIK all
+kernals of other homecomputers have some kind of floating-point
+support in their kernals aswell so simelar wrappers could be written.
+and if they dont have, you are still free to write a complete solution
+yourself. not using the c64's (or cbm's for that matter) kernal
+because of that reason would mean adding in a KB or more of code just
+for that one or two floating-point variables your code uses. and that
+IS wasteful, actually it makes floats completely useless when the code
+needed to support them is larger than the table i wanted to calculate
+by using them.
+
+UvB&gt; There may also be platforms that have a different floating point
+UvB&gt; format/interface.
+
+yes indeed, and NOT supporting those (thats what you are suggesting by
+saying one should create a standalone generic version) would lower the
+actual usefulness of floats a LOT. any assembler coder who has used
+floats before probably has a bunch of useful routines laying around
+which do OFCOZ interface to the kernal and use its floating-point
+format aswell - not only c64 coders i bet my arse :=)
+
+UvB&gt; For example, how do you expect printf to work consistent, if
+UvB&gt; some kernal function is called for float -&gt; string conversion?
+
+one thing i learned when programming C is that you generally DONT
+expect printf to work even close to consistent ;=P moreover, that
+statement is true when using floats in printf :=))
+
+however, a non-consistant string conversion is still better than none
+- and you could ofcoz always create your own 100% standard compliant
+routine once you really need it.
+
+UvB&gt; And, if you
+UvB&gt; decide to code this separately, how do you deal with different floating point
+UvB&gt; formats?
+
+easy (more or less) if the assembler knows about the specific
+target-format... let the compiler handle them as &quot;real&quot; floats and
+make the assembler support some directive &quot;.float&quot; that works simelar
+to &quot;.byte&quot; but which inserts a floating-point number in the format of
+the selected target. that could even achive compatibility on assembler
+level and only the actual routines doing arithmetics on them would
+need to be target-specific.
+
+UvB&gt; And at least, there's a good chance that the kernal routines will not
+UvB&gt; work like expected by the C standard.
+
+yes, true - but who carez? there may be a loss of precision and maybe
+the one or other really minor thing - but would it really seriously
+break any code? its not like you would be porting that old 3d engine
+of yours which requires floats to be perfectly accurate.
+
+you arent really seriously suggesting to implement a full IEE
+compliant floating-point emulator that passes all tests are you ? That
+may be a nice tech-demo, but completely useless for real use (large
+and slow, just what we like ,=P)
+
+i do however not see your problem at all.... if the assembler knows
+about the targets float-format and the compiler spills calls to the
+floating-point routines accordingly, you could easily support that
+&quot;non accurate&quot; kernal stuff and a real, standard compliant (and dead
+slow ;=P) library aswell - without even bothering about how these
+libraries are actually implemented, how (or if) they work and what
+kind of float-format they use - that should all be up to the user
+imho.
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20statics%20in%20zero%20page">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20statics%20in%20zero%20page">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1363.html">Ullrich von Bassewitz: "Re: [cc65] statics in zero page"</a>
+<li><strong>In reply to:</strong> <a href="1363.html">Ullrich von Bassewitz: "Re: [cc65] statics in zero page"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1355.html">Keates, Mark: "RE: Re[2]: [cc65] statics in zero page"</a>
+<li><strong>Maybe reply:</strong> <a href="1355.html">Keates, Mark: "RE: Re[2]: [cc65] statics in zero page"</a>
+<li><strong>Reply:</strong> <a href="1366.html">Ullrich von Bassewitz: "[cc65] Floating point support"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-05-21 19:47:45 CEST</em>
+</em>
+</small>
+</body>
+</html>

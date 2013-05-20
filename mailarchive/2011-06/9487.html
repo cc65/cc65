@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] THE Makefile V1.2 availabl</title>
+<meta name="Author" content="Greg King (greg.king41verizon.net)" />
+<meta name="Subject" content="Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies" />
+<meta name="Date" content="2011-06-02" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies</h1>
+<!-- received="Thu Jun  2 20:59:58 2011" -->
+<!-- isoreceived="20110602185958" -->
+<!-- sent="Thu, 02 Jun 2011 14:59:20 -0400" -->
+<!-- isosent="20110602185920" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king41verizon.net" -->
+<!-- subject="Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies" -->
+<!-- id="001201cc2157$489509a0$443efea9@monarch" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="BANLkTik_YkY9_TUraX23327g27f+XPwmog&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9488.html" title="Oliver Schmidt: &quot;Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies&quot;">Next message</a> ]
+[ <a href="9486.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies&quot;">Previous message</a> ]
+[ <a href="9484.html" title="Oliver Schmidt: &quot;Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9488.html" title="Oliver Schmidt: &quot;Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king41verizon.net?Subject=Re:%20[cc65]%20THE%20Makefile%20V1.2%20available%20-%20was:%20automatic%20generation%20of%20makefile%20dependencies">greg.king41verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-06-02 20:59:20</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: &quot;Oliver Schmidt&quot;; on Wed., June 01, 2011; at 05:18 PM -0400
+&gt;
+&gt; &gt; The &quot;mkdir&quot; and &quot;rmdir&quot; commands should be handled in the same way
+&gt; &gt; that &quot;rm&quot; is handled. Define and use:
+&gt; &gt;
+&gt; &gt; MKDIR ?= mkdir -p
+&gt; &gt; RMDIR ?= rmdir
+&gt;
+&gt; They &quot;could&quot; be handled that way, but it's not correct to say they
+&gt; &quot;should&quot; because - intentionally - there's an implicit variable RM,
+&gt; but no MKDIR / RMDIR:
+&gt; <a href="http://www.gnu.org/software/make/manual/make.html#Implicit-Variables">http://www.gnu.org/software/make/manual/make.html#Implicit-Variables</a>
+
+I didn't see anything about it being intentional.  I claim that it is an
+oversight.  I claim that &quot;should&quot; is the correct word.  I go further:  I
+say that _all_ command-names that a makefile will issue _should_ be
+&quot;encapsulated&quot; in predefined variables.  The reason why it should be
+done for all of them is the same reason why it was done for &quot;rm -f&quot;: so
+that a developer easily can accomodate the differences between different
+operating systems' command-processors.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Jun  2 20:59:58 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9488.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9486.html" title="Previous message in the list">silverdr1wfmh.org.pl: "Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9484.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9488.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9488.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9487" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9487" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9487" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-06-02 21:00:02 CEST
+</em></small></p>
+</body>
+</html>

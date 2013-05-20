@@ -1,0 +1,157 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] documentation</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] documentation">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] documentation</h1>
+<!-- received="Fri Mar 17 16:15:51 2000" -->
+<!-- isoreceived="20000317151551" -->
+<!-- sent="Fri, 17 Mar 2000 16:17:33 +0100 (CET)" -->
+<!-- isosent="20000317151733" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] documentation" -->
+<!-- id="200003171517.QAA02614@trixie.musoftware.de" -->
+<!-- inreplyto="Pine.LNX.3.96.1000317004249.8092B-100000@janis.pds.twi.tudelft.nl" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20documentation"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2000-03-17 16:17:33
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0082.html">troy silvey: "Re: [cc65] documentation"</a>
+<li><strong>Previous message:</strong> <a href="0080.html">Ullrich von Bassewitz: "Re: [cc65] proposed replacement random generator"</a>
+<li><strong>In reply to:</strong> <a href="0078.html">Sidney Cadot: "[cc65] documentation"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0082.html">troy silvey: "Re: [cc65] documentation"</a>
+<li><strong>Reply:</strong> <a href="0082.html">troy silvey: "Re: [cc65] documentation"</a>
+<li><strong>Reply:</strong> <a href="0083.html">Sidney Cadot: "Re: [cc65] documentation"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+&gt; All this should only be done, IMHO, if Ullrich thinks this is a good idea.
+
+I think, having good and readable documentation is always a very good idea:-)
+
+So, yes, I like your suggestion. However, there are some issues that have to
+be discussed:
+
+  * PDF is not available on every platform: The Amigas, for example, don't
+    have a PDF viewer (at least not one that works with all PDF features).
+    Please correct me if I'm wrong here.
+
+  * PDF is bad in some situations. Maybe you're logged in remotely (no X), or
+    you just have the source in the editor and want to lookup a specific
+    assembler directive. For me it's more comfortable to load the doc file
+    into the editor and search for the things I need.
+
+    There are of course other situations where PDF files are better: They look
+    much better when printed, and they are easier to read if you want to read
+    the whole thing, and aren't just looking for a specific paragraph or
+    keyword.
+
+    So is there is a way to have both? The Linux DOC project uses some sort of
+    meta language to produce LaTeX output, PS output, text files. Maybe using
+    such a tool would be possible? The drawback would be that I have to learn
+    something new:-)
+
+  * I try to keep the documentation and the tools in sync. I've added several
+    features to the assembler in the last few weeks, and it is easier to add a
+    new section or paragraph to the documentation, when coding. Sometimes I
+    find problems with an implementation or things that could be improved as
+    soon as I try to describe the feature in the docs. So, writing docs in
+    parallel to the code is actually a way to improve the design.
+
+    Separating the docs from the code, or using a meta language would increase
+    the burden for me to write docs, which is not be a good idea. Writing docs
+    is already a tough job for a programmer, so it should be as easy as
+    possible.
+
+  * Having the documentation in a meta language makes it difficult for other
+    people to use the snapshot code. Say, I have added a new feature and I
+    want as many people as possible to test it and give me some feedback. The
+    feature is described somewhere in the docs. How many of the Windows people
+    out there would be able to translate LaTeX (or DocBook, or SGML, or ...)
+    into something readable (or printable)?
+
+Writing the docs in LaTeX wouldn't be a problem for me (I do all my business
+stuff in LaTex), so I could use it instead of plain text files. I'm not sure
+about the other things mentioned. How many of you have actually read the docs?
+Would it be ok to have it in LaTeX or PostScript format? What format would be
+usable for as many people as possible?
+
+Maybe we could separate the docs? An introduction to the compiler plus some
+docs for the C library are likely not to change with every compiler release.
+So maybe we can have such a documentation as an addon?
+
+A lot of question marks here:-)
+
+&gt; Any comments, especially about content (did I miss anything?) are
+&gt; welcome.
+
+I have thought about adding another text file that describes porting the
+runtime to other 6502 systems. This is not too difficult once you know how to
+do it, and it would save me some work, since I have explained it in email over
+and over again. There are a lot of homemade 6502 systems out there that could
+benefit from a C compiler.
+
+Regards
+
+
+	Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20documentation">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20documentation">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0082.html">troy silvey: "Re: [cc65] documentation"</a>
+<li><strong>Previous message:</strong> <a href="0080.html">Ullrich von Bassewitz: "Re: [cc65] proposed replacement random generator"</a>
+<li><strong>In reply to:</strong> <a href="0078.html">Sidney Cadot: "[cc65] documentation"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0082.html">troy silvey: "Re: [cc65] documentation"</a>
+<li><strong>Reply:</strong> <a href="0082.html">troy silvey: "Re: [cc65] documentation"</a>
+<li><strong>Reply:</strong> <a href="0083.html">Sidney Cadot: "Re: [cc65] documentation"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:35 CET</em>
+</em>
+</small>
+</body>
+</html>

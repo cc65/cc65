@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] HEAP from here to there</title>
+<meta name="Author" content="Greg King (greg.king41verizon.net)" />
+<meta name="Subject" content="Re: [cc65] HEAP from here to there" />
+<meta name="Date" content="2009-06-05" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] HEAP from here to there</h1>
+<!-- received="Fri Jun  5 02:50:24 2009" -->
+<!-- isoreceived="20090605005024" -->
+<!-- sent="Thu, 04 Jun 2009 20:51:29 -0400" -->
+<!-- isosent="20090605005129" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king41verizon.net" -->
+<!-- subject="Re: [cc65] HEAP from here to there" -->
+<!-- id="000901c9e577$d7ffbc20$443efea9@monarch" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="20090529210004.GA21236&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6585.html" title="Thomas Giesel: &quot;Re: Re: [cc65] HEAP from here to there&quot;">Next message</a> ]
+[ <a href="../2009-05/6583.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] HEAP from here to there&quot;">Previous message</a> ]
+[ <a href="../2009-05/6583.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] HEAP from here to there&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king41verizon.net?Subject=Re:%20[cc65]%20HEAP%20from%20here%20to%20there">greg.king41verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-06-05 02:51:29</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: &quot;Ullrich von Bassewitz&quot;; on Friday, May 29, 2009; at 05:00 PM -0400
+&gt;
+&gt; Regarding the heap segment: The current state of the sources seem to say
+&gt; that something like what you were suggesting was planned, and not
+&gt; finished.  Unfortunately, I'm so old that I cannot remember. :-)
+&gt;
+&gt; Most, but not all, platforms have a HEAP segment that is located at top of
+&gt; the RAM (or similar) area, but this segment is nowhere defined.
+&gt;
+&gt; I think (but, I'm not sure) that the plan was to mark the start of the
+&gt; heap with that segment to make it independent of BSS.  Using the size of
+&gt; the heap segment won't work with the current linker, because what we
+&gt; usually want is to use the complete remainder of the memory area that
+&gt; contains the BSS and STACK for the heap.  Since segments have fixed sizes,
+&gt; your suggestion is not satisfactory.  A fixed-size heap segment is either
+&gt; too small or too large for &gt; 99% of all programs. :-) Maybe, that is the
+&gt; reason why the current solution is still in place:  It works quite well
+&gt; for most platforms and programs, and if you need something else, the hooks
+&gt; are in place to change the behaviour to your liking.
+
+Uz is not as old as he thinks that he is. :-)
+His description is what I had in mind when I put that &quot;HEAP:&quot; line in the
+LD65 configure files.  But, Uz pointed out that my idea would have problems
+on platforms that must copy the stack-pointer, at run-time, from system
+variables (Apple2, Atari, and Pet, for example).  He left &quot;HEAP:&quot; in those
+files because he planned to move the heap constructor out of the common part
+of the library, and into the platform-specific part of the library.  Then,
+we could use the configure-file method on platforms that allow it.
+
+----------------------------------------
+
+Here is my (improved) idea:
+
+The boundaries of the heap would be formed by two segments (or, only one in
+some targets).  They would be placed in different memory areas.  Their size
+would be zero; only their starting addresses would be important.  The distance
+between those two addresses would be the heap's size.
+
+This would be the relevant part of the standard &quot;c64.cfg&quot; file:
+
+SYMBOLS {
+    __STACKSIZE__: value = $800, weak = yes;    # 2 Ki stack
+}
+MEMORY {
+    ZP:  start = $02, size = $1A, define = yes;
+    RAM: start = $07FF, size = $C801, define = yes;
+    STACK: start = $D000-__STACKSIZE__, size = __STACKSIZE__, define = yes, file = &quot;&quot;;
+}
+SEGMENTS {
+    ZEROPAGE: load = ZP,  type = zp;
+    STARTUP:  load = RAM, type = ro,  optional = yes;
+    LOWCODE:  load = RAM, type = rw,  optional = yes;
+    CODE:     load = RAM, type = ro;
+    RODATA:   load = RAM, type = ro;
+    DATA:     load = RAM, type = rw;
+    INIT:     load = RAM, type = rw,  optional = yes, define = yes;
+    ZPSAVE:   load = RAM, type = bss, optional = yes;
+    BSS:      load = RAM, type = bss,                 define = yes;
+    HEAP:     load = RAM, type = bss, optional = yes;
+    HEAPEND: load = STACK, type = bss, optional = yes;
+}
+
+--------
+And, the relevant part of &quot;libsrc/c64/_heap.s&quot; would be:
+
+; This file doesn't need a constructor.
+
+        .data
+
+__heaporg:
+        .addr   heap
+__heapptr:
+        .addr   heap
+__heapend:
+        .addr   heapend
+
+        .bss
+
+__heapfirst:
+        .res    2,0             ; zerobss puts NULL here
+__heaplast:
+        .res    2,0
+
+        .segment        &quot;HEAP&quot;
+heap:
+
+        .segment        &quot;HEAPEND&quot;
+heapend:
+
+--------
+If __STACKSIZE__ is changed, then the heap automatically is adjusted.  It
+uses all of the memory between the program and the stack.  And, if someone
+needs to use some of that RAM for something else, then &quot;HEAP&quot; and &quot;HEAPEND&quot;
+can be moved easily, without needing to rebuild the library.
+
+Configure-files for targets like the Pet would not have the &quot;STACK:&quot; and
+&quot;HEAPEND:&quot; lines in them.  And, those targets' &quot;_heap.s&quot; files would have
+the constructor (the one that is there now).  But, the &quot;HEAP&quot; segment-marker
+still would give programmers some flexibility!
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Jun  5 02:50:24 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6585.html" title="Next message in the list">Thomas Giesel: "Re: Re: [cc65] HEAP from here to there"</a></li>
+<li><dfn>Previous message</dfn>: <a href="../2009-05/6583.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] HEAP from here to there"</a></li>
+<li><dfn>In reply to</dfn>: <a href="../2009-05/6583.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] HEAP from here to there"</a></li>
+<!-- lnextthread="start" -->
+<li><a name="replies" id="replies"></a>
+<dfn>Maybe reply</dfn>: <a href="../2009-05/6581.html" title="Message sent in reply to this message">Thomas Giesel: "Re: Re: [cc65] HEAP from here to there"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="6585.html" title="Message sent in reply to this message">Thomas Giesel: "Re: Re: [cc65] HEAP from here to there"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6586.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] HEAP from here to there"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6588.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] HEAP from here to there"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6584" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6584" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6584" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-06-05 02:50:27 CEST
+</em></small></p>
+</body>
+</html>

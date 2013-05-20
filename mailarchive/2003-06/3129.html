@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: 24bit ints (was: [cc65] 24bit ad</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: 24bit ints (was: [cc65] 24bit addresses)">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: 24bit ints (was: [cc65] 24bit addresses)</h1>
+<!-- received="Wed Jun 18 11:31:35 2003" -->
+<!-- isoreceived="20030618093135" -->
+<!-- sent="Wed, 18 Jun 2003 11:31:33 +0200" -->
+<!-- isosent="20030618093133" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: 24bit ints (was: [cc65] 24bit addresses)" -->
+<!-- id="20030618093133.GA28136@trixie.musoftware.de" -->
+<!-- inreplyto="Pine.LNX.4.30.0306181120430.8261-100000@ds9.reckziegel.com" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%2024bit%20ints%20(was:%20[cc65]%2024bit%20addresses)"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-06-18 11:31:33
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3128.html">Christian Groessler: "Re: 24bit ints (was: [cc65] 24bit addresses)"</a>
+<li><strong>In reply to:</strong> <a href="3128.html">Christian Groessler: "Re: 24bit ints (was: [cc65] 24bit addresses)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3130.html">Christian Groessler: "Re: 24bit ints (was: [cc65] 24bit addresses)"</a>
+<li><strong>Next in thread:</strong> <a href="../2003-05/3033.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="3130.html">Christian Groessler: "Re: 24bit ints (was: [cc65] 24bit addresses)"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Wed, Jun 18, 2003 at 11:22:08AM +0200, Christian Groessler wrote:
+&gt; Ups, really?
+&gt; I thought, the only thing the standard requires is
+&gt; sizeof(char) &lt;= sizeof(short) &lt;= sizeof(int) &lt;= sizeof(long).
+&gt;
+&gt; Did I miss something?
+
+Yes. The following is from &quot;ISO/IEC 9899:1999 (E), 5.2.4.2.1 Sizes of integer
+types &lt;limits.h&gt;&quot;:
+
+-----------------------------------------------------------------------------
+The values given below shall be replaced by constant expressions suitable for
+use in #if preprocessing directives. Moreover, except for CHAR_BIT and
+MB_LEN_MAX, the following shall be replaced by expressions that have the same
+type as would an expression that is an object of the corresponding type
+converted according to the integer promotions. Their implementation-defined
+values shall be equal or greater in magnitude (absolute value) to those shown,
+with the same sign.
+[...]
+
+-  minimum value for an object of type short int
+        SHRT_MIN -32767                 // -(2^15 - 1)
+- maximum value for an object of type short int
+        SHRT_MAX +32767                 // 2^15 - 1
+- maximum value for an object of type unsigned short int
+        USHRT_MAX 65535                 // 2^16 - 1
+- minimum value for an object of type int
+        INT_MIN -32767                  // -(2^15 - 1)
+- maximum value for an object of type int
+        INT_MAX +32767                  // 2^15 - 1
+- maximum value for an object of type unsigned int
+        UINT_MAX 65535                  // 2^16 - 1
+- minimum value for an object of type long int
+        LONG_MIN -2147483647            // -(2^31 - 1)
+- maximum value for an object of type long int
+        LONG_MAX +2147483647            // 2^31 - 1
+- maximum value for an object of type unsigned long int
+        ULONG_MAX 4294967295            // 2^32 - 1
+-----------------------------------------------------------------------------
+
+This means that any compiler using 8 bit ints, 24 bits longs or similar is not
+standards compliant. It does also mean, that portable code can rely on certain
+ranges: A variable used to store values between 0 and 100000 needs to be a
+long, but you can rely on the fact that this will work in every C
+implementation.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%2024bit%20ints%20(was:%20[cc65]%2024bit%20addresses)">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%2024bit%20ints%20(was:%20[cc65]%2024bit%20addresses)">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3128.html">Christian Groessler: "Re: 24bit ints (was: [cc65] 24bit addresses)"</a>
+<li><strong>In reply to:</strong> <a href="3128.html">Christian Groessler: "Re: 24bit ints (was: [cc65] 24bit addresses)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3130.html">Christian Groessler: "Re: 24bit ints (was: [cc65] 24bit addresses)"</a>
+<li><strong>Next in thread:</strong> <a href="../2003-05/3033.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="3130.html">Christian Groessler: "Re: 24bit ints (was: [cc65] 24bit addresses)"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-06-18 11:31:41 CEST</em>
+</em>
+</small>
+</body>
+</html>

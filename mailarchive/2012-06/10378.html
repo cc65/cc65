@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Odd problems creating a ne</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Odd problems creating a new target." />
+<meta name="Date" content="2012-06-21" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Odd problems creating a new target.</h1>
+<!-- received="Thu Jun 21 16:57:04 2012" -->
+<!-- isoreceived="20120621145704" -->
+<!-- sent="Thu, 21 Jun 2012 16:56:54 +0200" -->
+<!-- isosent="20120621145654" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Odd problems creating a new target." -->
+<!-- id="CACT=u73NxqL0_6K6VaJcEbY8vePGLnh6RbjMV4QCFJS5TpDSZw@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="CACz_Yz1mYEHydfJ_sExvW6JMfB48hVxEhmp56Y-R6q-3ao+QLw&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10379.html" title="L. Adamson: &quot;Re: [cc65] Odd problems creating a new target.&quot;">Next message</a> ]
+[ <a href="10377.html" title="L. Adamson: &quot;[cc65] Odd problems creating a new target.&quot;">Previous message</a> ]
+[ <a href="10377.html" title="L. Adamson: &quot;[cc65] Odd problems creating a new target.&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10379.html" title="L. Adamson: &quot;Re: [cc65] Odd problems creating a new target.&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Odd%20problems%20creating%20a%20new%20target.">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-06-21 16:56:54</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi L.,
+
+&gt; crt0.s: <a href="http://pastebin.com/Wz4sTSPP">http://pastebin.com/Wz4sTSPP</a> (note that init and exit code is
+&gt; commented out. 6502 housekeeping is done by the bootloader and not needed,
+&gt; as well).
+&gt;
+
+Why do you think that 'zerobss' and 'initlib' are not needed?
+
+
+&gt; I have a feeling there's something wrong with my memory map definition in
+&gt; the .cfg, but I've piddled it around to no avail.
+&gt;
+
+Your shell script generates a map file called 'test.map'. You should
+consult it to make sure things are actually going where you'd like them to
+go.
+
+- If your program is expected to run from $500 and your MEMORY named RAM
+starts at $500 then you have to make sure that the SEGMENT named STARTUP is
+the first one listed with &quot;load = RAM&quot;. Otherwise your crt0.s code isn't
+guaranteed to end up at $500.
+
+- A SEGMENT named &quot;HEAP&quot; is an obsolete concept. You should remove it.
+
+- The SEGMENT named BSS has &quot;type = bss&quot;. This means that it won't be
+represented by bytes in the output file. So placing a SEGMENT of &quot;type =
+bss&quot; between other SEGMENTS with the same &quot;load =&quot; (thus placed in the same
+MEMEORY) that _are_ represented in the outputfile (those with &quot;type = rw&quot;
+or &quot;type = ro&quot;) is usually a bad-idea(tm) as you'd have to split the
+outputfile in RAM in order to re-create the gap of the bytes missing in the
+outputfile.
+
+I'd consider the following &quot;SEGMENTS&quot; section more promising:
+
+SEGMENTS {
+ ZEROPAGE: load = ZP,  type = zp,  define  = yes;
+ STARTUP: load = RAM, type = ro;
+ INIT:  load = RAM, type = ro,  optional = yes;
+ CODE:  load = RAM, type = ro;
+ RODATA:  load = RAM, type = ro;
+ DATA: load = RAM, type = rw, define = yes;
+ BSS: load = RAM, type = bss, define = yes;
+}
+
+Regards,
+Oliver
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Jun 21 16:57:04 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10379.html" title="Next message in the list">L. Adamson: "Re: [cc65] Odd problems creating a new target."</a></li>
+<li><dfn>Previous message</dfn>: <a href="10377.html" title="Previous message in the list">L. Adamson: "[cc65] Odd problems creating a new target."</a></li>
+<li><dfn>In reply to</dfn>: <a href="10377.html" title="Message to which this message replies">L. Adamson: "[cc65] Odd problems creating a new target."</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10379.html" title="Next message in this discussion thread">L. Adamson: "Re: [cc65] Odd problems creating a new target."</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10379.html" title="Message sent in reply to this message">L. Adamson: "Re: [cc65] Odd problems creating a new target."</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10378" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10378" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10378" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-06-21 16:57:07 CEST
+</em></small></p>
+</body>
+</html>

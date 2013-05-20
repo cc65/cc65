@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] TGI summary</title>
+<meta name="Author" content="Karri Kaksonen (karri1sipo.fi)" />
+<meta name="Subject" content="Re: [cc65] TGI summary" />
+<meta name="Date" content="2009-10-27" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] TGI summary</h1>
+<!-- received="Tue Oct 27 06:59:13 2009" -->
+<!-- isoreceived="20091027055913" -->
+<!-- sent="Tue, 27 Oct 2009 07:59:02 +0200" -->
+<!-- isosent="20091027055902" -->
+<!-- name="Karri Kaksonen" -->
+<!-- email="karri1sipo.fi" -->
+<!-- subject="Re: [cc65] TGI summary" -->
+<!-- id="4AE68C26.2050508@sipo.fi" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="f0796bb70910261725o54250785kb029488533963cd1&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7340.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Re: cc65-2.13.0 DEBs available&quot;">Next message</a> ]
+[ <a href="7338.html" title="Daniel Serpell: &quot;Re: [cc65] Atari __RESERVED_MEMORY__&quot;">Previous message</a> ]
+[ <a href="7336.html" title="Daniel Serpell: &quot;Re: [cc65] TGI summary&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Karri Kaksonen &lt;<a href="mailto:karri1sipo.fi?Subject=Re:%20[cc65]%20TGI%20summary">karri1sipo.fi</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-10-27 06:59:02</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Daniel Serpell wrote:
+&gt; I think some conventions could be enforced:
+&gt;
+&gt; * The default palette should be (approximately) the same in all drivers:
+&gt;   0 = black
+&gt;   1 = white
+&gt;   2 = ....
+&gt;
+&gt; * If the driver has no palette, it can emulate the above by replacing the
+&gt;   indexes in setcolor.
+&gt;   
+
+The Lynx can map the colors to any indexes. The only limitation is pen 0 
+that is the only one that can hold &quot;transparent&quot; color. Therefore 
+COLOR_BLACK may need to be duplicated somewhere else if we need black in 
+a sprite with transparency.
+
+On the other hand TGI knows nothing about transparent colors anyway.
+
+If it helps then the Lynx implementation can agree on a default palette.
+
+/* Color defines (default palette) */
+
+#define COLOR_BLACK             0x00
+#define COLOR_RED               0x01
+#define COLOR_BLUE              0x02
+#define COLOR_GREEN             0x03
+#define COLOR_VIOLET            0x04
+#define COLOR_PURPLE            COLOR_VIOLET
+#define COLOR_CYAN              0x05
+#define COLOR_PEAGREEN          0x06
+#define COLOR_GREY              0x07
+#define COLOR_NAVYBLUE          0x08
+#define COLOR_LIGHTRED          0x09
+#define COLOR_LIGHTBLUE         0x0A
+#define COLOR_LIGHTGREEN        0x0B
+#define COLOR_LIGHTPURPLE       0x0C
+#define COLOR_LIGHTCYAN         0x0D
+#define COLOR_YELLOW            0x0E
+#define COLOR_WHITE             0x0F
+
+At least we need
+COLOR_BLACK, COLOR_WHITE, COLOR_GREY
+
+It is also good to have
+COLOR_RED, COLOR_GREEN, COLOR_BLUE, COLOR_YELLOW
+
+So how about agreeing of these indexes:
+#define COLOR_BLACK             0x00
+#define COLOR_WHITE             0x01
+#define COLOR_GREY              0x02
+#define COLOR_RED               0x03
+#define COLOR_GREEN             0x04
+#define COLOR_BLUE              0x05
+#define COLOR_YELLOW            0x06
+#define COLOR_NAVYBLUE          0x07
+
+That would be 8 cool, usable colors.
+
+If some platform has hard-coded color indexes then we could adapt to 
+these indexes.
+--
+Regards,
+
+Karri
+
+
+
+The rest is really garbage in my opinion.
+
+--
+Regards,
+
+Karri
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Oct 27 06:59:13 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7340.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Re: cc65-2.13.0 DEBs available"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7338.html" title="Previous message in the list">Daniel Serpell: "Re: [cc65] Atari __RESERVED_MEMORY__"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7336.html" title="Message to which this message replies">Daniel Serpell: "Re: [cc65] TGI summary"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7339" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7339" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7339" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-10-27 06:59:16 CET
+</em></small></p>
+</body>
+</html>

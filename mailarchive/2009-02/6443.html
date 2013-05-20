@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] OT: user port printer driv</title>
+<meta name="Author" content="silverdr1wfmh.org.pl (silverdr1wfmh.org.pl)" />
+<meta name="Subject" content="Re: [cc65] OT: user port printer driver for C64" />
+<meta name="Date" content="2009-02-03" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] OT: user port printer driver for C64</h1>
+<!-- received="Tue Feb  3 02:16:35 2009" -->
+<!-- isoreceived="20090203011635" -->
+<!-- sent="Tue, 3 Feb 2009 02:16:27 +0100" -->
+<!-- isosent="20090203011627" -->
+<!-- name="silverdr1wfmh.org.pl" -->
+<!-- email="silverdr1wfmh.org.pl" -->
+<!-- subject="Re: [cc65] OT: user port printer driver for C64" -->
+<!-- id="1C7B5E24-7CC7-4523-A44B-8E7C0EE18F9D@wfmh.org.pl" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="200902022322.40676.groepaz&#64;gmx.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6444.html" title="Shawn Jefferson: &quot;[cc65] Zeropage Regbank&quot;">Next message</a> ]
+[ <a href="6442.html" title="Groepaz: &quot;Re: [cc65] OT: user port printer driver for C64&quot;">Previous message</a> ]
+[ <a href="6442.html" title="Groepaz: &quot;Re: [cc65] OT: user port printer driver for C64&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:silverdr1wfmh.org.pl?Subject=Re:%20[cc65]%20OT:%20user%20port%20printer%20driver%20for%20C64">silverdr1wfmh.org.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-02-03 02:16:27</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 2009-02-02, at 23:22, Groepaz wrote:
+
+&gt;&gt; I'm looking for a printer driver which enables printing to a  
+&gt;&gt; centronics
+&gt;&gt; (parallel) printer connected to the user port.
+&gt;&gt;
+&gt;&gt; I need the source code, too, in order to find out how to drive the  
+&gt;&gt; 6526
+&gt;&gt; correctly.
+&gt;
+&gt; personally i'd have a look at the speeddos kernal ... first make a  
+&gt; diff
+&gt; between the speeddos kernal and the original (so you see the  
+&gt; differences,
+&gt; somewhere in there must be the centronics code) then trace the  
+&gt; kernal chrout
+&gt; call to device 6 (i think that was used for centronics in speeddos)
+
+I don't recall what SpeedDOS used but 6 was the 1520 printer/plotter.  
+If they would use number six, they would have effectively disabled the  
+plotter. Wouldn't they? OTOH I don't say they didn't ;-) Dolphin  
+(which I used heavily those many years ago) used regular device  
+numbering so it was not a problem. Anyway - if not SpeedDOS then  
+DolphinDOS had the &quot;Centronics&quot; routines too.
+
+&gt; and you
+&gt; should quickly end up in the routine you are looking for :) shouldnt  
+&gt; be
+&gt; terribly complex or anything either.
+
+I guess - basically PETASCII conversion plus BUSY/STROBE?
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Feb  3 02:16:35 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6444.html" title="Next message in the list">Shawn Jefferson: "[cc65] Zeropage Regbank"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6442.html" title="Previous message in the list">Groepaz: "Re: [cc65] OT: user port printer driver for C64"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6442.html" title="Message to which this message replies">Groepaz: "Re: [cc65] OT: user port printer driver for C64"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6443" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6443" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6443" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-02-03 02:16:36 CET
+</em></small></p>
+</body>
+</html>

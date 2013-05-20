@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Library in ROM</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Library in ROM" />
+<meta name="Date" content="2007-11-22" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Library in ROM</h1>
+<!-- received="Thu Nov 22 22:43:08 2007" -->
+<!-- isoreceived="20071122214308" -->
+<!-- sent="Thu, 22 Nov 2007 22:42:49 +0100" -->
+<!-- isosent="20071122214249" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Library in ROM" -->
+<!-- id="20071122214249.GA8324@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="DC4AEE2FD9F04DF59115D633CC73EFC7&#64;paytonbyrd.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5920.html" title="Anders Åstrand: &quot;[cc65] local .res ?&quot;">Next message</a> ]
+[ <a href="5918.html" title="Payton Byrd: &quot;[cc65] Library in ROM&quot;">Previous message</a> ]
+[ <a href="5918.html" title="Payton Byrd: &quot;[cc65] Library in ROM&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Library%20in%20ROM">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-11-22 22:42:49</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Tue, Nov 20, 2007 at 03:05:06PM -0600, Payton Byrd wrote:
+&gt; I'm thinking about making a 16k ROM for the 128 that includes a library of
+&gt; commonly used CC65 functions.  This would provide a fixed location for the
+&gt; most common functions.  Would it be possible to create a custom link config
+&gt; that would use this location for functions instead of bundling them at the end
+&gt; of the user program?
+
+I haven't tried it, but since the linker config may contain symbols, it should
+be possible to create a linker config with the addresses of all external
+symbols in the linker config.
+
+&gt; The ROM could copy the library to RAM in BANK 0 on
+&gt; bootup so that programs wouldn't have to deal with bank switching to see the
+&gt; ROM.
+
+I'm not sure if this is really an advantage. Each program compiled with cc65
+contains just the library routines it needs. If you pack all of them into a
+ROM and copy this ROM into RAM before execution, less RAM is available for the
+application. And, since the ROM will probably contain library subroutines not
+used by the application, even less RAM is avaible than without the library
+ROM.
+
+&gt;  We could put things like device drivers in there too, which could make
+&gt; it a lot easier to distribute programs since the correct driver for the 128
+&gt; would always be available.
+
+It is probably easier to copy a specific device driver to the disk or d64
+image that contains the program instead of requiring people to burn special
+ROMs, open their C128 and install it, before an application can be used.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Nov 22 22:43:08 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5920.html" title="Next message in the list">Anders Åstrand: "[cc65] local .res ?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5918.html" title="Previous message in the list">Payton Byrd: "[cc65] Library in ROM"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5918.html" title="Message to which this message replies">Payton Byrd: "[cc65] Library in ROM"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5919" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5919" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5919" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-11-22 22:43:11 CET
+</em></small></p>
+</body>
+</html>

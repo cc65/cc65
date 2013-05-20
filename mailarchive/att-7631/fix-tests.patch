@@ -1,0 +1,31 @@
+# HG changeset patch
+# User Daniel Serpell <daniel.serpell@gmail.com>
+# Date 1259032715 10800
+# Branch trunk
+# Node ID 470751eaee12f81fcfc5d3482de22a18ef5037f7
+# Parent  61810186087acda3c7ce87b817c4d57313c67800
+Update two test programs using posix file i/o.
+
+diff --git a/testcode/lib/ft.c b/testcode/lib/ft.c
+--- a/testcode/lib/ft.c
++++ b/testcode/lib/ft.c
+@@ -20,6 +20,7 @@
+ #include <fcntl.h>
+ #include <errno.h>
+ #include <conio.h>
++#include <unistd.h>
+ 
+ extern int getsp(void);  /* is provided in getsp.s */
+ 
+diff --git a/testcode/lib/posixio-test.c b/testcode/lib/posixio-test.c
+--- a/testcode/lib/posixio-test.c
++++ b/testcode/lib/posixio-test.c
+@@ -1,7 +1,7 @@
+ #include <stdio.h>
+ #include <errno.h>
+ #include <fcntl.h>
+-
++#include <unistd.h>
+ 
+ 
+ int Open (const char* Name, int Flags)

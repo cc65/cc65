@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Secondary linker configura</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Secondary linker configurations" />
+<meta name="Date" content="2009-09-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Secondary linker configurations</h1>
+<!-- received="Fri Sep 25 10:03:17 2009" -->
+<!-- isoreceived="20090925080317" -->
+<!-- sent="Fri, 25 Sep 2009 10:03:09 +0200" -->
+<!-- isosent="20090925080309" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Secondary linker configurations" -->
+<!-- id="f97798c20909250103o63708959kfbc01dae50064b36@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="200909241807.31828.groepaz&#64;gmx.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6987.html" title="Groepaz: &quot;Re: [cc65] Secondary linker configurations&quot;">Next message</a> ]
+[ <a href="6985.html" title="Thomas Giesel: &quot;[cc65] c64 kernal 02 vs. 03&quot;">Previous message</a> ]
+[ <a href="6974.html" title="Groepaz: &quot;Re: [cc65] Secondary linker configurations&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6987.html" title="Groepaz: &quot;Re: [cc65] Secondary linker configurations&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Secondary%20linker%20configurations">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-09-25 10:03:09</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt;&gt; If your conio implementations are contained within one file (for example,
+&gt;&gt; because all they replace is putchar), they would definitely qualify for
+&gt;&gt; this approach. If they're contained in multiple modules, this becomes too
+&gt;&gt; complex, and I would rather suggest adding them as a project to the cc65
+&gt;&gt; contrib section.
+
+&gt; the replace several modules, just putchar isnt enough. clrscr is another, an
+&gt; init call is needed too (in a constructor) since the 80 colums one uses hires
+&gt; mode, and a few more (dont recall exactly). mmmh
+
+Just my two cents...
+
+I see two primary reasons for distributing code into modules:
+a) Allow the linker to only link in what is actually needed
+b) Source code maintainance
+
+Regarding a): AFAIK Object files placed on the linker comdline are
+always linked in regardless of being used or not. So from that
+perspective there's no benefit in several modules for 'extra' code
+that logically belongs together.
+
+Regarding b): A &quot;master&quot; source file containing just some '.include'
+assembler control commands can allow to keep the actual source code
+distributed in files.
+
+Obviously this only makes sense if the code in question isn't that
+large and/or it can presumed that using some of if more or less
+implies using all/most of it...
+
+Best, Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Sep 25 10:03:17 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6987.html" title="Next message in the list">Groepaz: "Re: [cc65] Secondary linker configurations"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6985.html" title="Previous message in the list">Thomas Giesel: "[cc65] c64 kernal 02 vs. 03"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6974.html" title="Message to which this message replies">Groepaz: "Re: [cc65] Secondary linker configurations"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6987.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] Secondary linker configurations"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6987.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] Secondary linker configurations"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6986" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6986" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6986" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-09-25 10:03:19 CEST
+</em></small></p>
+</body>
+</html>

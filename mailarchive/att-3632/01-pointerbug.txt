@@ -1,0 +1,97 @@
+
+int __fastcall__ setmarks(int mousex, unsigned char mousey, unsigned char firstspr){
+	register unsigned char* sprkor = (char*)&VIC.spr0_x+(unsigned char)(firstspr << 1);
+	
+/*The following two lines are the important ones!*/
+
+	*sprkor = sprkor[2] = sprkor[4] = sprkor[6] = (unsigned char)mousex&255;
+	sprkor[1] = sprkor[3] = sprkor[5] = sprkor[7] = mousey;
+
+	if (mousex>255) VIC.spr_hi_x = VIC.spr_hi_x | marksprpots[firstspr];
+	else VIC.spr_hi_x = VIC.spr_hi_x & (!marksprpots[firstspr]);
+}
+
+000006r 1               ; ---------------------------------------------------------------
+000006r 1               ; int __fastcall__ setmarks (int, unsigned char, unsigned char)
+000006r 1               ; ---------------------------------------------------------------
+000006r 1               
+000006r 1               .segment	"CODE"
+000006r 1               
+000006r 1               .proc	_setmarks
+000006r 1               
+000006r 1               .segment	"CODE"
+000006r 1      
+
+/* This part is all right */
+
+000006r 1  20 rr rr     	jsr     pusha
+000009r 1  A5 rr        	lda     regbank+4
+00000Br 1  A6 rr        	ldx     regbank+5
+00000Dr 1  20 rr rr     	jsr     pushax
+000010r 1  A0 02        	ldy     #$02
+000012r 1  B1 rr        	lda     (sp),y
+000014r 1  0A           	asl     a
+000015r 1  18           	clc
+000016r 1  48           	pha
+000017r 1  A9 00        	lda     #$00
+000019r 1  69 D0        	adc     #$D0
+00001Br 1  AA           	tax
+00001Cr 1  68           	pla
+00001Dr 1  85 rr        	sta     regbank+4
+00001Fr 1  86 rr        	stx     regbank+4+1
+000021r 1  A0 04        	ldy     #$04
+000023r 1  B1 rr        	lda     (sp),y
+000025r 1  91 rr        	sta     (regbank+4),y
+
+/* A ldy #$06 is missing here obviously !!! */
+
+000027r 1  91 rr        	sta     (regbank+4),y
+000029r 1  A0 02        	ldy     #$02
+00002Br 1  91 rr        	sta     (regbank+4),y
+00002Dr 1  A0 00        	ldy     #$00
+00002Fr 1  91 rr        	sta     (regbank+4),y
+000031r 1  A0 03        	ldy     #$03
+000033r 1  B1 rr        	lda     (sp),y
+
+/* Here are obviously missing ldy #$05, ldy #$07 */
+
+000035r 1  91 rr        	sta     (regbank+4),y
+000037r 1  91 rr        	sta     (regbank+4),y
+000039r 1  91 rr        	sta     (regbank+4),y
+00003Br 1  A0 01        	ldy     #$01
+00003Dr 1  91 rr        	sta     (regbank+4),y
+
+/* This part is all right again */
+
+00003Fr 1  A0 05        	ldy     #$05
+000041r 1  20 rr rr     	jsr     ldaxysp
+000044r 1  E0 01        	cpx     #$01
+000046r 1  30 10        	bmi     L001E
+000048r 1  A2 00        	ldx     #$00
+00004Ar 1  A0 02        	ldy     #$02
+00004Cr 1  B1 rr        	lda     (sp),y
+00004Er 1  A8           	tay
+00004Fr 1  B9 rr rr     	lda     _marksprpots,y
+000052r 1  0D 10 D0     	ora     $D010
+000055r 1  4C rr rr     	jmp     L0076
+000058r 1  A2 00        L001E:	ldx     #$00
+00005Ar 1  AD 10 D0     	lda     $D010
+00005Dr 1  20 rr rr     	jsr     pushax
+000060r 1  A0 04        	ldy     #$04
+000062r 1  B1 rr        	lda     (sp),y
+000064r 1  A8           	tay
+000065r 1  B9 rr rr     	lda     _marksprpots,y
+000068r 1  20 rr rr     	jsr     bnega
+00006Br 1  20 rr rr     	jsr     tosandax
+00006Er 1  8D 10 D0     L0076:	sta     $D010
+000071r 1  48           	pha
+000072r 1  A0 00        	ldy     #$00
+000074r 1  B1 rr        	lda     (sp),y
+000076r 1  85 rr        	sta     regbank+4
+000078r 1  C8           	iny
+000079r 1  B1 rr        	lda     (sp),y
+00007Br 1  85 rr        	sta     regbank+5
+00007Dr 1  68           	pla
+00007Er 1  4C rr rr     	jmp     incsp6
+000081r 1               
+000081r 1               .endproc

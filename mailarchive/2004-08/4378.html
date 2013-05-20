@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Atari: Loading code with D</title>
+<meta name="Author" content="Christian Groessler (chris1groessler.org)" />
+<meta name="Subject" content="Re: [cc65] Atari: Loading code with DOS 2.0 help?" />
+<meta name="Date" content="2004-08-31" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Atari: Loading code with DOS 2.0 help?</h1>
+<!-- received="Wed Sep  1 01:34:57 2004" -->
+<!-- isoreceived="20040831233457" -->
+<!-- sent="31 Aug 2004 20:04:34 +0200" -->
+<!-- isosent="20040831180434" -->
+<!-- name="Christian Groessler" -->
+<!-- email="chris1groessler.org" -->
+<!-- subject="Re: [cc65] Atari: Loading code with DOS 2.0 help?" -->
+<!-- id="87ekln5glp.fsf@groessler.org" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="[cc65] Atari: Loading code with DOS 2.0 help?" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="../2004-09/4379.html" title="Sidney Cadot: &quot;[cc65] cc65 calling conventions&quot;">Next message</a> ]
+[ <a href="4377.html" title="Ullrich von Bassewitz: &quot;[cc65] Server problems&quot;">Previous message</a> ]
+[ <a href="../2004-07/4338.html" title="Martin, Chris: &quot;[cc65] Atari: Loading code with DOS 2.0 help?&quot;">Maybe in reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="../2004-09/4387.html" title="Greg King: &quot;Re: [cc65] Atari: Loading code with DOS 2.0 help?&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Christian Groessler &lt;<a href="mailto:chris1groessler.org?Subject=Re:%20[cc65]%20Atari:%20Loading%20code%20with%20DOS%202.0%20help?">chris1groessler.org</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-08-31 20:04:34</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Wed, 4 Aug 2004, Christian Groessler wrote:
+&gt;
+&gt; On Tue, 3 Aug 2004, Ullrich von Bassewitz wrote:
+&gt;
+&gt; &gt; How about adding this information to the platform specific documentation
+&gt; &gt; (atari.sgml)? I'm pretty sure this is useful for more people.
+&gt;
+&gt; Hmm, yes, good idea.
+&gt; I'll write a draft and post it here for review.
+
+I've added a chapter to the Atari specific cc65 docs. You can find the
+new docs on
+
+   <a href="ftp://ftp.groessler.org/pub/chris/cc65/atari.txt">ftp://ftp.groessler.org/pub/chris/cc65/atari.txt</a>   and
+   <a href="ftp://ftp.groessler.org/pub/chris/cc65/atari.html">ftp://ftp.groessler.org/pub/chris/cc65/atari.html</a>.
+
+Maybe a native English speaker should proof read it so we can get all
+the German English phrases fixed :-)
+
+I've appended the relevant chapter to this mail for quick access
+
+regards,
+chris
+
+
+
+  [1m7.2.  Reserving a memory area inside the program[0m
+
+
+  The Atari 130XE maps its additional memory into CPU memory in 16K
+  chunks at address $4000 to $7FFF. One might want to prevent this
+  memory area from being used by cc65. Other reasons to prevent the use
+  of some memory area could be the buffers for display lists and screen
+  memory.
+
+  The Atari executable format allows holes inside a program, e.g. one
+  part loads into $2E00 to $3FFF, going below the reserved memory area
+  (assuming a reserved area from $4000 to $7FFF), and another part loads
+  into $8000 to $BC1F.
+
+  Each load chunk of the executable starts with a 4 byte header which
+  defines its load address and size.
+
+
+  [1m7.2.1.  Low code and high data example[0m
+
+  Create an executable with 2 load chunks which doesn't use the memory
+  area from $4000 to $7FFF. The CODE segment of the program should go
+  below $4000 and the DATA and RODATA segments should go above $7FFF.
+
+  The main problem is that the EXE header generated by the cc65 runtine
+  lib is wrong. It defines a single load chunk with the sizes/addresses
+  of the CODE, RODATA, and DATA segments (the whole user program).
+
+  The contents of the EXE header come from the EXEHDR segment, which is
+  defined in crt0.s. This cannot be changed w/o modifiying and
+  recompiling the cc65 atari runtime lib. Therefore the original EXE
+  header must be discarded. It will be replaced by a user created one.
+
+  The user needs to create a customized linker config file which adds
+  new memory areas and segments to hold the new EXE header and added
+  load chunk header data. Also an assembly source file needs to be
+  created which defines the contents of the new EXE header and the
+  second load chunk header.
+
+
+  This is a modified cc65 Atari linker configuration file (split.cfg):
+
+
+
+  MEMORY {
+      ZP: start = $82, size = $7E, type = rw, define = yes;
+
+      HEADER: start = $0000, size = $6, file = %O;        # first load chunk
+      RAMLO: start = $2E00, size = $1200, file = %O;
+
+      BANK: start = $4000, size = $4000, file = &quot;&quot;;
+
+      SECHDR: start = $0000, size = $4, file = %O;        # second load chunk
+      RAM: start = $8000, size = $3C20, file = %O;        # $3C20: matches upper bound $BC1F
+  }
+  SEGMENTS {
+      EXEHDR: load = BANK, type = wprot;
+
+      NEXEHDR: load = HEADER, type = wprot;               # first load chunk
+      CODE: load = RAMLO, type = wprot, define = yes;
+
+      CHKHDR: load = SECHDR, type = wprot;                # second load chunk
+      RODATA: load = RAM, type = wprot, define = yes;
+      DATA: load = RAM, type = rw, define = yes;
+      BSS: load = RAM, type = bss, define = yes;
+
+      ZEROPAGE: load = ZP, type = zp;
+      AUTOSTRT: load = RAM, type = wprot;                 # defines program entry point
+  }
+  FEATURES {
+      CONDES: segment = RODATA,
+              type = constructor,
+              label = __CONSTRUCTOR_TABLE__,
+              count = __CONSTRUCTOR_COUNT__;
+      CONDES: segment = RODATA,
+              type = destructor,
+              label = __DESTRUCTOR_TABLE__,
+              count = __DESTRUCTOR_COUNT__;
+  }
+  SYMBOLS {
+      __STACKSIZE__ = $800;       # 2K stack
+  }
+
+
+
+  A new memory area BANK was added which describes the reserved area.
+  It gets loaded with the contents of the old EXEHDR segment. But the
+  memory area isn't written to the output file. This way the contents of
+  the EXEHDR segment get discarded.
+
+  The added NEXEHDR segment defines the correct EXE header. It puts only
+  the CODE segment into load chunk #1 (RAMLO memory area).
+
+  The header for the second load chunk comes from the new CHKHDR
+  segment. It puts the RODATA and DATA segments into load chunk #2 (RAM
+  memory area).
+
+
+  The contents of the new NEXEHDR and CHKHDR segments come from this
+  file (split.s):
+
+
+
+          .import __CODE_LOAD__, __BSS_LOAD__, __CODE_SIZE__
+          .import __DATA_LOAD__, __RODATA_LOAD__
+
+          .segment &quot;NEXEHDR&quot;
+          .word    $FFFF          ; EXE file magic number
+          ; 1st load chunk
+          .word    __CODE_LOAD__
+          .word    __CODE_LOAD__ + __CODE_SIZE__ - 1
+
+          .segment &quot;CHKHDR&quot;
+          ; 2nd load chunk (contains with AUTOSTRT in fact a 3rd load chunk)
+          .word    __RODATA_LOAD__
+          .word    __BSS_LOAD__ - 1
+
+
+
+  Compile with
+
+
+       cl65 -t atari -C split.cfg -o prog.com prog.c split.s
+
+
+
+  [1m7.2.2.  Low data and high code example[0m
+
+
+
+  Put RODATA and DATA into low memory and CODE with BSS into high memory
+  (split2.cfg):
+
+
+
+  MEMORY {
+      ZP: start = $82, size = $7E, type = rw, define = yes;
+
+      HEADER: start = $0000, size = $6, file = %O;        # first load chunk
+      RAMLO: start = $2E00, size = $1200, file = %O;
+
+      BANK: start = $4000, size = $4000, file = &quot;&quot;;
+
+      SECHDR: start = $0000, size = $4, file = %O;        # second load chunk
+      RAM: start = $8000, size = $3C20, file = %O;        # $3C20: matches upper bound $BC1F
+  }
+  SEGMENTS {
+      EXEHDR: load = BANK, type = wprot;                  # discarded old EXE header
+
+      NEXEHDR: load = HEADER, type = wprot;               # first load chunk
+      RODATA: load = RAMLO, type = wprot, define = yes;
+      DATA: load = RAMLO, type = rw, define = yes;
+
+      CHKHDR: load = SECHDR, type = wprot;                # second load chunk
+      CODE: load = RAM, type = wprot, define = yes;
+      BSS: load = RAM, type = bss, define = yes;
+
+      ZEROPAGE: load = ZP, type = zp;
+      AUTOSTRT: load = RAM, type = wprot;                 # defines program entry point
+  }
+  FEATURES {
+      CONDES: segment = RODATA,
+              type = constructor,
+              label = __CONSTRUCTOR_TABLE__,
+              count = __CONSTRUCTOR_COUNT__;
+      CONDES: segment = RODATA,
+              type = destructor,
+              label = __DESTRUCTOR_TABLE__,
+              count = __DESTRUCTOR_COUNT__;
+  }
+  SYMBOLS {
+      __STACKSIZE__ = $800;       # 2K stack
+  }
+
+
+
+  New contents for NEXEHDR and CHKHDR are needed (split2.s):
+
+
+               .import __CODE_LOAD__, __BSS_LOAD__, __DATA_SIZE__
+               .import __DATA_LOAD__, __RODATA_LOAD__
+
+               .segment &quot;NEXEHDR&quot;
+               .word    $FFFF
+               .word    __RODATA_LOAD__
+               .word    __DATA_LOAD__ + __DATA_SIZE__ - 1
+
+               .segment &quot;CHKHDR&quot;
+               .word    __CODE_LOAD__
+               .word    __BSS_LOAD__ - 1
+
+
+
+  Compile with
+
+
+       cl65 -t atari -C split2.cfg -o prog.com prog.c split2.s
+
+
+  [1m7.2.3.  Final note[0m
+
+
+  There are two other memory areas which don't appear directly in the
+  linker script. They are the stack and the heap.
+
+  The cc65 runtime lib places the stack location at the end of available
+  memory. This is dynamically set from the MEMTOP system variable at
+  startup. The heap is located in the area between the end of the BSS
+  segment and the top of the stack as defined by __STACKSIZE__.
+
+  If BSS and/or the stack shouldn't stay at the end of the program, some
+  parts of the cc65 runtime lib need to be replaced/modified.
+
+  runtime/_heap.s defines the location of the heap and atari/crt0.s
+  defines the location of the stack by initializing sp.
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Sep  1 01:34:57 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="../2004-09/4379.html" title="Next message in the list">Sidney Cadot: "[cc65] cc65 calling conventions"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4377.html" title="Previous message in the list">Ullrich von Bassewitz: "[cc65] Server problems"</a></li>
+<li><dfn>Maybe in reply to</dfn>: <a href="../2004-07/4338.html" title="Message to which this message replies">Martin, Chris: "[cc65] Atari: Loading code with DOS 2.0 help?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="../2004-09/4387.html" title="Next message in this discussion thread">Greg King: "Re: [cc65] Atari: Loading code with DOS 2.0 help?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4378" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4378" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4378" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-09-01 01:35:06 CEST
+</em></small></p>
+</body>
+</html>

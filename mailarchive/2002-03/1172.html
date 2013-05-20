@@ -1,0 +1,242 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] new target</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] new target">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] new target</h1>
+<!-- received="Sat Mar 23 11:41:36 2002" -->
+<!-- isoreceived="20020323104136" -->
+<!-- sent="Sat, 23 Mar 2002 11:41:38 +0100" -->
+<!-- isosent="20020323104138" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] new target" -->
+<!-- id="20020323114138.A9559@trixie.musoftware.de" -->
+<!-- inreplyto="Pine.LNX.4.21.0203221542250.6671-100000@localhost.localdomain" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20new%20target"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-03-23 11:41:38
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1171.html">Adam Wozniak: "[cc65] new target"</a>
+<li><strong>In reply to:</strong> <a href="1171.html">Adam Wozniak: "[cc65] new target"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1173.html">Mike McCarty: "[cc65] Benchmarking"</a>
+<li><strong>Reply:</strong> <a href="1173.html">Mike McCarty: "[cc65] Benchmarking"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Fri, Mar 22, 2002 at 03:51:16PM -0800, Adam Wozniak wrote:
+&gt; I think I need a better understanding of how the cc65 parameter stack
+&gt; relates to the 6502 call/return stack.
+&gt;
+&gt; Are these the same beast?  Do they overlap?  Or ar they completely separate?
+
+They are completely separate.
+
+&gt; I've only got 128 bytes of real ram to work with, mapped at 0x80-&gt;0xFF
+&gt; I've got some other areas (0x00-&gt;0x3F and 0x280-&gt;0x29F) which are memory
+&gt; mapped devices.  My ROM is 0xF000-&gt;0xFFFF.
+&gt;
+&gt; Where should the 6502 stack go?  The parameter stack?
+
+You will become quite some problems with such a limited target system. The
+compiler and runtime needs 24 bytes in the zero page for itself (you may be
+able to strip that down to 18 bytes, but I cannot guarantee that this will
+work with new versions of the compiler).
+
+So you are left with 104 bytes for your data and both stacks. Assuming that
+you will use 10 nested levels of subroutine calls plus a few bytes for
+register saves inside these routines, plus 6 bytes for an interrupt handler,
+you will need about 30 bytes of call stack. The size of the parameter stack
+depends heavily on your code and setup. Let's assume you will use mostly
+global variables, and almost no parameters passed on the stack. This would
+mean that 30-50 bytes for the parameter stack should be ok for 10 nested
+subroutine levels. This sums up to
+
+        128             RAM bytes total
+     -   24             Zero page usage of the compiler
+     -   30             Call stack size
+     -   30             Parameter stack size
+   ---------
+         44             Bytes left for your program
+
+As you can see there is not much left.
+
+&gt; MEMORY {
+&gt; RAM:   start = $80,   size=$80, file=&quot;trash.bin&quot;;
+&gt; ROM:   start = $F000, size=$1000, file=&quot;rom.bin&quot;;
+&gt; TIA:   start = $00,   size=$40, file=&quot;trash.bin&quot;;
+&gt; RIOT:  start = $280,  size=$20, file=&quot;trash.bin&quot;;
+&gt; }
+
+If you leave the file name empty (file=&quot;&quot;), the data will be discarded and not
+written to any file. So there is no need to use a &quot;trash&quot; file. And %O is
+replaced by the output file name from the command line, so using
+
+        MEMORY {
+            RAM:   start = $80,   size=$80, file=&quot;&quot;;
+            ROM:   start = $F000, size=$1000, file=%O;
+            TIA:   start = $00,   size=$40, file=&quot;&quot;;
+            RIOT:  start = $280,  size=$20, file=&quot;&quot;;
+        }
+        
+the target file name may be specified on the linker command line using the -o
+option.
+
+Adding the devices to the linker config is possible, but since the actual
+values are then unknown by the compiler, the compiler generated code is not as
+good as it could be. So I would suggest to use define these devices as memory
+mapped structures in a header file like this:
+
+        struct RIOT_ {
+            unsigned char       a;              /* Register a */
+            unsigned char       b;              /* Register b */
+        };
+
+        /* Map a RIOT structure to $280 */
+        #define RIOT    (*(struct RIOT_*)0x280)
+
+This will allow you to use the RIOT as
+
+        unsigned char x = RIOT.b;
+        RIOT.a = 0x01;
+
+while the compiler still works with known target addresses.
+
+&gt; SYMBOLS {
+&gt;    __STACKSIZE__ = $80;
+&gt; }
+
+This symbol is unused in your code, so there is no need to define it.
+
+You may also need the FEATURE CONDES declarations depending on which library
+file you use. If in doubt, it is better to include it.
+
+&gt; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+&gt; ;;;;;;;;;;; Is any of this right???
+&gt;
+&gt;    ; set the 6502 stack pointer to FF
+&gt;    ldx #$ff
+&gt;    txs
+&gt;
+&gt;    ; set up the cc65 parameter stack
+&gt;    tsx
+&gt;    stx spsave
+
+Since your program will probably run forever, there is no need to save the
+current stackpointer, since you will never come back and restore it.
+
+&gt;    lda #&lt;TOPMEM
+&gt;    sta sp
+&gt;    lda #&gt;TOPMEM
+&gt;    sta sp+1
+
+This would mean that your call stack lives at $E0-$FF, and below that, the
+parameter stack. Assuming the parameter stack will also have 32 bytes, the RAM
+left goes from $80 to $BF. This is the memory available for the RAM segment,
+so you have to change the linker config accordingly:
+
+        MEMORY {
+            RAM:   start = $80,   size=$40, file=&quot;&quot;;
+            ROM:   start = $F000, size=$1000, file=%O;
+        }
+
+You can also move the symbols for the stack sizes into the linker config, so
+you can change the stack sizes without changing your sources. Please note that
+you will have to adjust the size of the RAM segment manually when changing the
+stack sizes, the linker will not do that automatically.
+
+        MEMORY {
+            # The following three areas cover the $80-$FF range completely
+            RAM:        start = $80,   size = $40, file = &quot;&quot;;
+            PARMSTACK:  start = $C0,   size = $20, file = &quot;&quot;, define = yes;
+            CALLSTACK:  start = $E0,   size = $20, file = &quot;&quot;, define = yes;
+            #
+            ROM:        start = $F000, size = $1000, file=%O;
+        }
+
+The following code will use this symbols:
+
+        ; Import linker generated symbols
+        .import         __CALLSTACK_START__, __CALLSTACK_SIZE__;
+        .import         __PARMSTACK_START__, __PARMSTACK_SIZE__;
+
+        ; Set the 6502 call stack as defined in the linker config
+        ldx     #&lt;(__CALLSTACK_START__ + __CALLSTACK_SIZE__ - 1)
+        txs
+
+        ; Set the parameter stack as defined in the linker config
+        lda     #&lt;(__PARMSTACK_START__ + __PARMSTACK_SIZE__)
+        sta     sp
+        lda     #&gt;(__PARMSTACK_START__ + __PARMSTACK_SIZE__)
+        sta     sp+1
+
+BTW: There are several ways to achieve the same result, you may also declare
+call and parameter stack as BSS style segments and map the into the RAM
+segment. The disadvantage is that the linker will emit a warning if none such
+segment is found, so you will have to generate it in an assembly file. The
+advantage is, that the linker will do all the needed size calculations for
+you.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20new%20target">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20new%20target">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1171.html">Adam Wozniak: "[cc65] new target"</a>
+<li><strong>In reply to:</strong> <a href="1171.html">Adam Wozniak: "[cc65] new target"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1173.html">Mike McCarty: "[cc65] Benchmarking"</a>
+<li><strong>Reply:</strong> <a href="1173.html">Mike McCarty: "[cc65] Benchmarking"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-03-23 11:41:58 CET</em>
+</em>
+</small>
+</body>
+</html>

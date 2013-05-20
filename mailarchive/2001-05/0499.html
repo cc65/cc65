@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] Debug info question</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] Debug info question">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] Debug info question</h1>
+<!-- received="Wed May 23 16:39:00 2001" -->
+<!-- isoreceived="20010523143900" -->
+<!-- sent="Wed, 23 May 2001 16:39:07 +0200" -->
+<!-- isosent="20010523143907" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] Debug info question" -->
+<!-- id="16720720068.20010523163907@gmx.net" -->
+<!-- inreplyto="20010523160938.A11716@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20Debug%20info%20question"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2001-05-23 16:39:07
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0500.html">Mike McCarty: "Re: [cc65] Debug info question"</a>
+<li><strong>Previous message:</strong> <a href="0498.html">Ullrich von Bassewitz: "Re: [cc65] Debug info question"</a>
+<li><strong>In reply to:</strong> <a href="0498.html">Ullrich von Bassewitz: "Re: [cc65] Debug info question"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0502.html">Mike McCarty: "Re: Re[2]: [cc65] Debug info question"</a>
+<li><strong>Reply:</strong> <a href="0502.html">Mike McCarty: "Re: Re[2]: [cc65] Debug info question"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+Wednesday, May 23, 2001, 4:09:38 PM, you wrote:
+
+UvB&gt; At that time I wrote that having source level debugging information is rather
+UvB&gt; difficult with the current compiler, since it does not have an abstract
+UvB&gt; intermediate code, so the optimizer would mess up the debug infos. I've used
+UvB&gt; the last two weeks to rewrite the compiler backend, so this argument is no
+UvB&gt; longer valid.
+
+ehrm.... most compilers DO mess up the debug info when optimization is
+enabled ;) (well, some compilers manage to even fuck it up entirely
+;D)
+
+UvB&gt; Regarding the debug info format: I've searched the web for more information on
+UvB&gt; the AD2500 and WD formats and found some interesting links. One is NoICE, a
+UvB&gt; shareware remote debugger that supports lots of different compilers:
+
+UvB&gt;         <a href="http://www.noicedebugger.com/">http://www.noicedebugger.com/</a>
+
+UvB&gt; It is interesting to note that almost *any* compiler for embedded systems out
+UvB&gt; there supports it's own debug information format. See
+
+UvB&gt;         <a href="http://www.noicedebugger.com/tools.html">http://www.noicedebugger.com/tools.html</a>
+
+mmmh, this page is obviously not listing the &quot;object files that
+contain debugging info&quot; (most compilers there seem not to output that)
+but its listing how to convert the map and symbol files produced by
+them to some other map/sym file the debugger understands.
+
+but you are right, most &quot;small&quot; compilers and assemblers dont produce
+any output except for the actual binary, and with some luck you get a
+map and/or sym file ;)
+
+
+UvB&gt; This is what they say about COFF: &quot;Unfortunately, there is not real standard
+UvB&gt; for COFF: every compiler and assembler seems to produce a slightly different
+UvB&gt; format.&quot;
+
+thats not enterily true.... infact the only non-standard COFF format
+that exists in real life environments is the one produced by microshit
+compilers. (VC++ that is)
+
+UvB&gt; There seems to be a file format named IEEE-695 which is very well supported by
+UvB&gt; NoICE and &quot;IEEE&quot; sounds very standard:-) So I will have a closer look at it.
+UvB&gt; There are several IEEE-695 resources listed on
+
+UvB&gt;         <a href="http://www.eskimo.com/~dalus/ieee-695.html">http://www.eskimo.com/~dalus/ieee-695.html</a>
+
+UvB&gt; Among other things, they mention that the GNU binutils come with a library to
+UvB&gt; read and parse this format - this should be helpful for VICE since VICE is
+UvB&gt; also GPL licensed and may therefore use other GPL code without problems.
+
+infact, there is a library that supports all kinda object-formats with
+debug info, thats why i said it would be easy for the emulator-authors
+to add support for them.
+
+
+however..... if you are going to implement whatever debug-stuff that
+is understood by whatever sourcelevel debugger (like the one above)
+i'd be more than happy to create a rom-monitor program for use with it
+(done that various times on different systems before, and i think i
+can say that it'll be more or less an easy job once there are object
+files to play with ;))
+
+thats another reason why i suggested ELF.... a lot of tools one could
+use already exist.... and a lot would automagically work without
+modification .... think of profilers, resource browsers,
+remote-debuggers (ok they'd need a 6510 module for disassembly, i bet
+you can get c-source-level debug/stepping for free without disassembly
+though)
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20Debug%20info%20question">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20Debug%20info%20question">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0500.html">Mike McCarty: "Re: [cc65] Debug info question"</a>
+<li><strong>Previous message:</strong> <a href="0498.html">Ullrich von Bassewitz: "Re: [cc65] Debug info question"</a>
+<li><strong>In reply to:</strong> <a href="0498.html">Ullrich von Bassewitz: "Re: [cc65] Debug info question"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0502.html">Mike McCarty: "Re: Re[2]: [cc65] Debug info question"</a>
+<li><strong>Reply:</strong> <a href="0502.html">Mike McCarty: "Re: Re[2]: [cc65] Debug info question"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:40 CET</em>
+</em>
+</small>
+</body>
+</html>

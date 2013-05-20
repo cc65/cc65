@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Target &quot;BBC&quot;</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Target &quot;BBC&quot;" />
+<meta name="Date" content="2005-03-30" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Target &quot;BBC&quot;</h1>
+<!-- received="Wed Mar 30 10:00:57 2005" -->
+<!-- isoreceived="20050330080057" -->
+<!-- sent="Wed, 30 Mar 2005 10:00:55 +0200" -->
+<!-- isosent="20050330080055" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Target &quot;BBC&quot;" -->
+<!-- id="20050330080055.GC29497@trixie.musoftware.de" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="42498950.2080005&#64;kollus.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4854.html" title="Kolja Nikolaus Sträter: &quot;Re: [cc65] Target &quot;BBC&quot;&quot;">Next message</a> ]
+[ <a href="4852.html" title="Kolja Nikolaus Sträter: &quot;Re: [cc65] Re: Target &quot;BBC&quot;&quot;">Previous message</a> ]
+[ <a href="4849.html" title="Kolja Nikolaus Sträter: &quot;[cc65] Target &quot;BBC&quot;&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4854.html" title="Kolja Nikolaus Sträter: &quot;Re: [cc65] Target &quot;BBC&quot;&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Target%20&amp;quot;BBC&amp;quot;">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-03-30 10:00:55</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Good morning!
+
+On Tue, Mar 29, 2005 at 06:58:56PM +0200, Kolja Nikolaus Sträter wrote:
+&gt; First of all, since this is my first post to the mailing list, can I say
+&gt; what a truly wonderful thing this tool-chain is! Clear code, open
+&gt; source, many platforms - just great!! Thanks a lot for this, Uz and
+&gt; collaborators!
+
+Well, in some places the code could definitely be clearer, but thanks
+anyway:-) Especially in support for the platforms, there's quite some help
+from other people (hint, hint! :-)
+
+&gt; I'm wondering about the BBC target: it exists, details are listable, but
+&gt; what about the lib?? Have I missed anything, I looked through all the
+&gt; ftp-servers, but sometimes I'm just blind :-).
+
+The BBC is not a supported target, so there are no libs. The linker config
+(this is probably what you're talking about) was created a long time ago, when
+someone wanted to create a bbc target. There was never any code besides the
+linker config (and if I remember correctly, even the linker config was created
+by me, using the information I got).
+
+&gt; First of all, I need basic stuff, memory, i/o. If it hasn't been done
+&gt; yet, I'm going do a bit myself, don't know though whether I'd have time
+&gt; to do the whole thing.
+
+Since the linker config does already exist, the only thing needed to get
+simple programs running is the necessary startup code. Writing it should be
+easy with some knowledge about the machine and a look at the startup code of
+the other platforms. If you have the startup code, most of the C library will
+work, since it is platform independent. You can then add more support (conio,
+...) later.
+
+If you start working on bbc support, and want your changes to go into the
+official distribution, I would strongly suggest that you do that with at least
+some consultation with me. There are guidelines to follow, and it would
+probably be frustrating if I had to refuse your code, because it doesn't fit
+into existing or planned concepts. Second, someone else could work on the same
+goal. Early coordination will prevent later frustration.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Mar 30 10:00:57 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4854.html" title="Next message in the list">Kolja Nikolaus Sträter: "Re: [cc65] Target &quot;BBC&quot;"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4852.html" title="Previous message in the list">Kolja Nikolaus Sträter: "Re: [cc65] Re: Target &quot;BBC&quot;"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4849.html" title="Message to which this message replies">Kolja Nikolaus Sträter: "[cc65] Target &quot;BBC&quot;"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4854.html" title="Next message in this discussion thread">Kolja Nikolaus Sträter: "Re: [cc65] Target &quot;BBC&quot;"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4854.html" title="Message sent in reply to this message">Kolja Nikolaus Sträter: "Re: [cc65] Target &quot;BBC&quot;"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4853" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4853" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4853" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-03-30 10:01:05 CEST
+</em></small></p>
+</body>
+</html>

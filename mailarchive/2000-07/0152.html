@@ -1,0 +1,264 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] cc65 version 2.5.0 released</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="[cc65] cc65 version 2.5.0 released">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] cc65 version 2.5.0 released</h1>
+<!-- received="Fri Jul 21 18:09:03 2000" -->
+<!-- isoreceived="20000721160903" -->
+<!-- sent="Fri, 21 Jul 2000 18:08:45 +0200" -->
+<!-- isosent="20000721160845" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="[cc65] cc65 version 2.5.0 released" -->
+<!-- id="20000721180845.A21068@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%20version%202.5.0%20released"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2000-07-21 18:08:45
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0153.html">Sidney Cadot: "[cc65] Atari ROM listing available in CC65 format"</a>
+<li><strong>Previous message:</strong> <a href="0151.html">Ullrich von Bassewitz: "[cc65] Version 2.5 final beta available"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+I've placed the packages for the new version on the FTP server a few
+minutes ago. The official announcement is attached below.
+
+Thanks to all contributors!
+
+Regards
+
+
+	Uz
+
+								   
+
+-------------------------------------------------------------------------
+
+I'm proud to announce version 2.5 of CC65, a C crosscompiler /
+crossassembler combo for 6502 systems.
+
+CC65 has C and runtime library support for many of the old 6502 machines.
+The libraries are fairly portable, so creating a version for other 6502s
+shouldn't be too much work.
+
+Here is a list of the compiler features:
+
+  * Includes a C compiler, macro assembler, archiver, linker, GEOS
+    resource compiler and a frontend (compile &amp; link) utility. The
+    assembler generates relocatable object files, the linker is very
+    configurable and allows overlays, ROMable code, split output and
+    much more.
+
+  * The compiler is not quite ISO compatible, however, a large subset
+    is supported.
+
+  * Supported target systems are:
+
+    	- C64
+    	- C128
+    	- C16, C116, Plus/4
+    	- CBM 600/700 family (programs run in bank 1)
+    	- Newer PET machines (not 2001)
+	- The Apple ][ (thanks to Kevin Ruland &lt;<a href="mailto:kevin_at_rodin.wustl.edu?Subject=Re:%20[cc65]%20cc65%20version%202.5.0%20released">kevin_at_rodin.wustl.edu</a>&gt;)
+	- The Atari 8 bit machines
+	- GEOS for the C64 and C128
+
+    For all these systems a precompiled runtime and C library is
+    available. Supporting more targets is not very difficult since the C
+    library was written with portability in mind.
+
+  * Several system specific support routines like a conio library or
+    modules for joystick access are available.
+
+  * The assembler and linker do also support the 65816 as a target,
+    however, the compiler is not able to generate code for this CPU and
+    there is no RTL support.
+
+  * Lots of docs and a few sample programs included.
+
+  * Easy interfacing between C code and assembler.
+
+  * Fullscreen debugger for most machines as a linkable module.
+
+  * Full sourcecode available as well as binaries for
+
+  	- Linux (several RedHat RPMs)
+       	- DOS
+  	- Windows 95/98/NT
+
+
+
+What is new in this version:
+
+  * As usual many bugs fixed (and new ones introduced, so it does not get
+    boring:-).
+
+  * New -j switch to make the default character signed. New #pragma to do
+    the same.
+
+  * Slightly better code in some situations.
+
+  * A lot of new features for the assembler:
+
+	- Unnamed labels
+	- Several emulation features
+	- Listing support
+	- New builtin functions
+	- Include file search path support
+
+  * The linker generates an imports list in the map file.
+
+  * Completely rewritten symbol table handling for the compiler.
+
+  * Lots of code cleanups. One result of this is that the -T option does
+    now work without clobbering the output in some cases as it was
+    before.
+
+  * Much more code is now shared between the tools.
+
+  * Experimental 65C02 support for the compiler.
+
+  * Support for the Atari 8 bit machines was contributed by the Atari team:
+
+        Christian Groessler &lt;<a href="mailto:cpg_at_aladdin.de?Subject=Re:%20[cc65]%20cc65%20version%202.5.0%20released">cpg_at_aladdin.de</a>&gt;
+	Mark Keates &lt;<a href="mailto:markk_at_dendrite.co.uk?Subject=Re:%20[cc65]%20cc65%20version%202.5.0%20released">markk_at_dendrite.co.uk</a>&gt;
+	Freddy Offenga &lt;<a href="mailto:F.Offenga_at_student.kun.nl?Subject=Re:%20[cc65]%20cc65%20version%202.5.0%20released">F.Offenga_at_student.kun.nl</a>&gt;
+	David Lloyd &lt;<a href="mailto:dmlloyd_at_atari-central.com?Subject=Re:%20[cc65]%20cc65%20version%202.5.0%20released">dmlloyd_at_atari-central.com</a>&gt;
+
+  * It is now possible to write GEOS programs for the C64 and C128 using
+    cc65, thanks to the GEOSLib library contributed by
+
+       	Maciej Witkowiak (YTM/Elysium) &lt;<a href="mailto:ytm_at_friko.onet.pl?Subject=Re:%20[cc65]%20cc65%20version%202.5.0%20released">ytm_at_friko.onet.pl</a>&gt;
+
+  * Documentation updates.
+
+  * More minor changes.
+
+
+
+Support for some features is still missing. To name a few:
+
+  * No floats, no bit fields.
+
+  * No file routines on most systems. The 8 bit Ataris are the first
+    machines that do have full file I/O support (besides the ACE port
+    which was dropped some time ago). Please note that the complete CBM
+    family doesn't have file I/O support!
+
+  * The 80 column mode on the C128 is not supported by the conio library.
+
+
+
+More information:
+
+For your convenience, I've put all doc files also on the web server:
+
+    <a href="http://www.von-bassewitz.de/uz/cc65/doc/">http://www.von-bassewitz.de/uz/cc65/doc/</a>
+
+The cc65 main page
+
+    <a href="http://www.von-bassewitz.de/uz/cc65/">http://www.von-bassewitz.de/uz/cc65/</a>
+
+will get updated to reflect the new version in the next few days.
+
+There is also a cc65 mailing list. To subscribe, send a mail to
+<a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%20version%202.5.0%20released">majordomo_at_musoftware.de</a> with the command
+
+    subscribe cc65
+
+in the body of the mail.
+
+
+
+Available packages:
+
+As usual I will provide the complete sources and several binary packages.
+There are some binary RPMs for different versions of RedHat Linux, which
+is probably one of the fastest ways to get going. Since Linux is also my
+development platform, new features and bug fixes are first available for
+Linux.
+
+Binaries for DOS and and Windows will follow or may already be available
+at the time you read this. While the sources do still compile under OS/2,
+I have dropped support for OS/2 binaries, since were almost no downloads
+of the OS/2 version.
+
+
+
+Download:
+
+For more information and links to the FTP server, see
+
+    	<a href="http://www.von-bassewitz.de/uz/cc65/">http://www.von-bassewitz.de/uz/cc65/</a>
+
+For direct download, use
+
+        <a href="ftp://ftp.musoftware.de/pub/uz/cc65/">ftp://ftp.musoftware.de/pub/uz/cc65/</a>
+
+
+
+Thanks to all who sent feedback and suggestions!
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%20version%202.5.0%20released">uz_at_musoftware.de</a>
+
+
+</pre>
+<hr noshade>
+<ul>
+<li>application/pgp-signature attachment: <a href="../att-0152/01-part">stored</a>
+</ul>
+<!-- attachment="01-part" -->
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%20version%202.5.0%20released">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0153.html">Sidney Cadot: "[cc65] Atari ROM listing available in CC65 format"</a>
+<li><strong>Previous message:</strong> <a href="0151.html">Ullrich von Bassewitz: "[cc65] Version 2.5 final beta available"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:36 CET</em>
+</em>
+</small>
+</body>
+</html>

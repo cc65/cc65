@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] raw disk access (was: cr/</title>
+<meta name="Author" content="MagerValp (MagerValp_at_cling.gu.se)">
+<meta name="Subject" content="Re: [cc65] raw disk access (was: cr/lf translation?)">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] raw disk access (was: cr/lf translation?)</h1>
+<!-- received="Sat Jul 13 15:45:30 2002" -->
+<!-- isoreceived="20020713134530" -->
+<!-- sent="Sat, 13 Jul 2002 15:41:10 +0200" -->
+<!-- isosent="20020713134110" -->
+<!-- name="MagerValp" -->
+<!-- email="MagerValp_at_cling.gu.se" -->
+<!-- subject="Re: [cc65] raw disk access (was: cr/lf translation?)" -->
+<!-- id="15664.11766.74234.274271@panini.cling.gu.se" -->
+<!-- inreplyto="3D2FEFFE.2080901@hut.fi" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> MagerValp (<a href="mailto:MagerValp_at_cling.gu.se?Subject=Re:%20[cc65]%20raw%20disk%20access%20(was:%20cr/lf%20translation?)"><em>MagerValp_at_cling.gu.se</em></a>)<br>
+<strong>Date:</strong> 2002-07-13 15:41:10
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1479.html">Marko Mäkelä: "Re: [cc65] raw disk access (was: cr/lf translation?)"</a>
+<li><strong>In reply to:</strong> <a href="1479.html">Marko Mäkelä: "Re: [cc65] raw disk access (was: cr/lf translation?)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1483.html">Marko Mäkelä: "Re: [cc65] raw disk access (was: cr/lf translation?)"</a>
+<li><strong>Next in thread:</strong> <a href="1476.html">cbmnut_at_hushmail.com: "Re: Re: [cc65] raw disk access (was: cr/lf translation?)"</a>
+<li><strong>Maybe reply:</strong> <a href="1476.html">cbmnut_at_hushmail.com: "Re: Re: [cc65] raw disk access (was: cr/lf translation?)"</a>
+<li><strong>Reply:</strong> <a href="1483.html">Marko Mäkelä: "Re: [cc65] raw disk access (was: cr/lf translation?)"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+&gt;&gt;&gt;&gt;&gt; &quot;MM&quot; == Marko Mäkelä &lt;<a href="mailto:marko.makela_at_hut.fi?Subject=Re:%20[cc65]%20raw%20disk%20access%20(was:%20cr/lf%20translation?)">marko.makela_at_hut.fi</a>&gt; writes:
+
+MV&gt; Blinking led is the result, and reading the error channel gives me
+MV&gt; 73, jiffydos 6.0 1571, 18, 00. WTF?
+
+MM&gt; Maybe you have toasted the DOS version byte in the beginning of
+MM&gt; track 18, sector 0, in your previous tries? Then the DOS would
+MM&gt; still read the disk, but refuse to write to it.
+
+Thank you very much, formatting helped. OK, the problem appears to be
+that the data written gets shifted by one byte. 18,00 starts with 00
+21 01 41. A B-P: 2 0 fixed that problem. I though B-P weren't neces-
+sary for U1/U2? At least that's what the 1541 and 1581 user guides
+claim.
+
+-- 
+    ___          .     .  .         .       . +  .         .      o   
+  _|___|_   +   .  +     .     +         .  Per Olofsson, arkadspelare
+    o-o    .      .     .   o         +          <a href="mailto:MagerValp_at_cling.gu.se?Subject=Re:%20[cc65]%20raw%20disk%20access%20(was:%20cr/lf%20translation?)">MagerValp_at_cling.gu.se</a>
+     -       +            +    .     <a href="http://www.cling.gu.se/~cl3polof/">http://www.cling.gu.se/~cl3polof/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20raw%20disk%20access%20(was:%20cr/lf%20translation?)">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1479.html">Marko Mäkelä: "Re: [cc65] raw disk access (was: cr/lf translation?)"</a>
+<li><strong>In reply to:</strong> <a href="1479.html">Marko Mäkelä: "Re: [cc65] raw disk access (was: cr/lf translation?)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1483.html">Marko Mäkelä: "Re: [cc65] raw disk access (was: cr/lf translation?)"</a>
+<li><strong>Next in thread:</strong> <a href="1476.html">cbmnut_at_hushmail.com: "Re: Re: [cc65] raw disk access (was: cr/lf translation?)"</a>
+<li><strong>Maybe reply:</strong> <a href="1476.html">cbmnut_at_hushmail.com: "Re: Re: [cc65] raw disk access (was: cr/lf translation?)"</a>
+<li><strong>Reply:</strong> <a href="1483.html">Marko Mäkelä: "Re: [cc65] raw disk access (was: cr/lf translation?)"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-07-13 15:45:58 CEST</em>
+</em>
+</small>
+</body>
+</html>

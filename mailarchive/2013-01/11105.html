@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Romable configuration / ru</title>
+<meta name="Author" content="Darryl Sokoloski (darryl1sokoloski.ca)" />
+<meta name="Subject" content="Re: [cc65] Romable configuration / run-time library?" />
+<meta name="Date" content="2013-01-18" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Romable configuration / run-time library?</h1>
+<!-- received="Fri Jan 18 20:48:50 2013" -->
+<!-- isoreceived="20130118194850" -->
+<!-- sent="Fri, 18 Jan 2013 14:48:39 -0500" -->
+<!-- isosent="20130118194839" -->
+<!-- name="Darryl Sokoloski" -->
+<!-- email="darryl1sokoloski.ca" -->
+<!-- subject="Re: [cc65] Romable configuration / run-time library?" -->
+<!-- id="CABNV55wniEuDoatqgS0deUBdVG58Kd-Zd+6ZVp8xxgna+AVB0Q@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="CAJm6qqfA-iwzkgKVj0xwbSMsEOrWS2SP6RCi6dOOrebJdreEKA&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11106.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Romable configuration / run-time library?&quot;">Next message</a> ]
+[ <a href="11104.html" title="Payton Byrd: &quot;Re: [cc65] Romable configuration / run-time library?&quot;">Previous message</a> ]
+[ <a href="11104.html" title="Payton Byrd: &quot;Re: [cc65] Romable configuration / run-time library?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="11106.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Romable configuration / run-time library?&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Darryl Sokoloski &lt;<a href="mailto:darryl1sokoloski.ca?Subject=Re:%20[cc65]%20Romable%20configuration%20/%20run-time%20library?">darryl1sokoloski.ca</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2013-01-18 20:48:39</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt; Yup, that's exactly why I wanted to see his crt0.s
+
+Payton, these are my changes to crt0.s:
+
+--- ../../cc65/libsrc/pet/crt0.s (revision 5963)
++++ ../../cc65/libsrc/pet/crt0.s (working copy)
+&#64;&#64; -6,9 +6,10 &#64;&#64;
+         .export         __STARTUP__ : absolute = 1      ; Mark as startup
+  .import initlib, donelib, callirq
+        .import       zerobss, push0
+- .import callmain
++ .import _main
+         .import         CLRCH, BSOUT
+  .import __INTERRUPTOR_COUNT__
++ .import __DATA_LOAD__, __DATA_RUN__, __DATA_SIZE__
+  .importzp       ST
+
+         .include        &quot;zeropage.inc&quot;
+&#64;&#64; -22,6 +23,14 &#64;&#64;
+
+ Start:
+
++; Copy DATA_LOAD to DATA_RUN
++ ldy     __DATA_SIZE__
++L0: lda     __DATA_LOAD__,y
++ sta     __DATA_RUN__,y
++ iny
++ cpy     #&lt;__DATA_SIZE__
++ bne     L0
++
+ ; Save the zero page locations we need
+
+         ldx #zpspace-1
+&#64;&#64; -79,7 +88,7 &#64;&#64;
+
+ ; Push arguments and call main()
+
+-        jsr callmain
++        jmp _main
+
+ ; Call module destructors. This is also the _exit entry.
+
+Cheers,
+
+Darryl
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Jan 18 20:48:50 2013</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11106.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Romable configuration / run-time library?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="11104.html" title="Previous message in the list">Payton Byrd: "Re: [cc65] Romable configuration / run-time library?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="11104.html" title="Message to which this message replies">Payton Byrd: "Re: [cc65] Romable configuration / run-time library?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="11106.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Romable configuration / run-time library?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#11105" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#11105" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#11105" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2013-01-18 20:48:53 CET
+</em></small></p>
+</body>
+</html>

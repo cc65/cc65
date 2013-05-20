@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Re: Target BBC - info only</title>
+<meta name="Author" content="Jonathan Graham Harston (jgh1arcade.demon.co.uk)" />
+<meta name="Subject" content="[cc65] Re: Target BBC - info only" />
+<meta name="Date" content="2005-04-05" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Re: Target BBC - info only</h1>
+<!-- received="Wed Apr  6 00:00:21 2005" -->
+<!-- isoreceived="20050405220021" -->
+<!-- sent="05 Apr 2005 22:14:02 +0100" -->
+<!-- isosent="20050405211402" -->
+<!-- name="Jonathan Graham Harston" -->
+<!-- email="jgh1arcade.demon.co.uk" -->
+<!-- subject="[cc65] Re: Target BBC - info only" -->
+<!-- id="050405225506@arcade.demon.co.uk" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4913.html" title="Andy Dannelley: &quot;[cc65] cc65 on Mac OS X&quot;">Next message</a> ]
+[ <a href="4911.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Target BBC - info only&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4916.html" title="Kolja Nikolaus Sträter: &quot;Re: [cc65] Re: Target BBC - info only&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Jonathan Graham Harston &lt;<a href="mailto:jgh1arcade.demon.co.uk?Subject=Re:%20[cc65]%20Re:%20Target%20BBC%20-%20info%20only">jgh1arcade.demon.co.uk</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-04-05 23:14:02</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt; Message-ID: &lt;4252A544.3040103&#64;kollus&#46;<!--nospam-->de&gt;
+ 
+Kolja_Nikolaus_Sträter &lt;k&#64;kollus&#46;<!--nospam-->de&gt; wrote:
+&gt; Just wanted to say that I've done a bit of initial delving into the
+&gt; BBC-target problem. I needed some in- and output, so I got a couple of
+&gt; routines working using OSWORD calls. Somebody must have done this
+&gt; already, but I wanted to do this myself to get to know Uz's code a bit.
+&gt; Anyway, reinventing a few small wheels can't do any harm :-)
+ 
+Hi Kol.
+ 
+Can I suggest you look at www.mdfs.net/System/C/6502/Small-C/v072
+where I've been working on 'ANSI-ising' A.J.Travis' Small-C for
+the BBC. Specifically, browse through includes/os.h and
+includes/kernel.h. os.h functions modify the passed variables and
+return an 'ok/not ok' flag. The kernel.h functions return their
+return value.
+ 
+source/sys.s has the 6502 source of many of the core library
+functions.
+ 
+The OS functions should be named 'os_*' as listed in os.h. I need
+to add a few others:
+ 
+os_escape() - check Escape flag:
+   LDA &amp;FF, AND #&amp;80, return value
+os_error() - generate an error:
+   copy error number and string to &amp;0100, jump to cause error
+os_report() - return pointer to last error:
+   Read &amp;FD/&amp;FE, return value.
+ 
+one of the signal() states should be 'error' to do a signal trap
+equivalent of ON ERROR.
+ 
+...and the equivalents for kernel.h. I need to think a bit about
+the parameters, etc., ultimately, you should be able to do
+something like: fprint(&quot;%s&quot;,_kernel_report());
+ 
+Also, somewhere, I've got some relocation code so that a 'C'
+program can be compiled to load in high memory (&amp;8000-length) and
+then it relocates itself to the current PAGE, clears screen to
+reset high memory and RTSes to PAGE to execute.
+ 
+And some sort of directive to specify actual load/exec addresses.
+It would be theortically possible to compile a 'C' program as a
+transient program loaded to the transient command area at
+&amp;0900-&amp;0AFF.
+ 
+main() { os_vdu(7); }
+ 
+/should/ compile to LDA #7:JSR &amp;FFEE:LDA #0:RTS if appropriate
+switches are set. Maybe even to: LDA #7:JMP &amp;FFEE :)
+ 
+I'm going to be hugely busy for the next 30 days, but I'll try to
+keep in touch.
+ 
+-- 
+J.G.Harston - jgh&#64;arcade&#46;<!--nospam-->demon.co.uk - mdfs.net/User/JGH
+Prospective Parliamentary Candidate for Sheffield Brightside
+BBC BASIC for Windows and Internationalisation
+  See <a href="http://mdfs.net/Software/BBCBasic/Windows/ProgTips">http://mdfs.net/Software/BBCBasic/Windows/ProgTips</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Apr  6 00:00:21 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4913.html" title="Next message in the list">Andy Dannelley: "[cc65] cc65 on Mac OS X"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4911.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Target BBC - info only"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4916.html" title="Next message in this discussion thread">Kolja Nikolaus Sträter: "Re: [cc65] Re: Target BBC - info only"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4916.html" title="Message sent in reply to this message">Kolja Nikolaus Sträter: "Re: [cc65] Re: Target BBC - info only"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4912" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4912" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4912" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-04-06 00:00:28 CEST
+</em></small></p>
+</body>
+</html>

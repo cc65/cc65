@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Colormania (was: TGI summa</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Colormania (was: TGI summary)" />
+<meta name="Date" content="2009-11-02" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Colormania (was: TGI summary)</h1>
+<!-- received="Mon Nov  2 15:44:59 2009" -->
+<!-- isoreceived="20091102144459" -->
+<!-- sent="Mon, 2 Nov 2009 15:44:47 +0100" -->
+<!-- isosent="20091102144447" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Colormania (was: TGI summary)" -->
+<!-- id="f97798c20911020644y268285a8i7b5026ff22009404@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="200911021452.53735.groepaz&#64;gmx.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7454.html" title="Groepaz: &quot;Re: [cc65] Colormania (was: TGI summary)&quot;">Next message</a> ]
+[ <a href="7452.html" title="Groepaz: &quot;Re: [cc65] Colormania (was: TGI summary)&quot;">Previous message</a> ]
+[ <a href="7452.html" title="Groepaz: &quot;Re: [cc65] Colormania (was: TGI summary)&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7454.html" title="Groepaz: &quot;Re: [cc65] Colormania (was: TGI summary)&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Colormania%20(was:%20TGI%20summary)">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-11-02 15:44:47</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt;&gt; Yep, because there is no support for Sprites or Sound.
+&gt;&gt; The best would be something like an &quot;DirectEightBit&quot; API where someone
+&gt;&gt; can write a game for C64 and compile it later for, for example, Apple 2
+&gt;&gt; without much effort.
+&gt;&gt;
+&gt;&gt; Just my 2 eurocent...
+&gt;
+&gt; that doesnt make a lot of sense really. sprites and sound are highly system
+&gt; dependend, and to do anything half serious you will even need application
+&gt; specific code.
+
+The example above is (most likely unintentionally) an excellent
+example fo the difficulties of such an approach: The Apple2 doesn't
+have sprites nor a sound chip at all.
+
+Nevertheless one can imagine reasonable things for an &quot;DirectEightBit&quot; API...
+
+- Allow to create offscreen drawpages selectable as target for the
+existing tgi drawing primitives.
+- Allow fast bit blitting between those offscreen drawpages and the viewpage(s).
+
+With those two features programs could create graphic elements
+offscreen during initialization using the tgi drawing primitives and
+then show / move / ... those graphic elements - all in a portable way.
+
+Additionally one could have a separate graphics creation program using
+the tgi drawing primitives and then saving the generated offscreen
+drawpages to disk. One would build and run that program once on every
+target to support. Then another program could create offscreen
+drawpages and load the (obviously target-specific) files into them.
+
+Already these things would allow for a new type of programs to be
+created with cc65 and tgi - while still being portable.
+
+The next step could be...
+
+Allow to access the onscreen and offscreen drawpages directly in a
+&quot;device aware&quot; but still not target dependent way. This is what MS
+DirectDraw at its core is about. There are some presumptions made
+maybe not true for all cc65 tgi drivers, but the general idea is, that
+- the drawpage memory is organized depending on the color depth (2
+color -&gt; 8 pixels/bit, 4 color -&gt; 4pixels/bit, ...)
+- the next pixels to the right are in the byte with the next address
+- there's a certain address offset to the bytes representing the
+pixels in the next row
+- ...
+
+The program asks for this type metadata for a certain coordinate on a
+certain drawpage and gets the info together with an address to use for
+accessing the memory. The program has fore sure to distinguish between
+the different color depths when writing into a drawpage but can still
+be target-neutral.
+
+Things like this could for example allow for fast yet portable
+character drawing.
+
+To be clear about this: I'm not advocating for implenting this stuff.
+I just want to point to that in my opinion there _are_ portable
+approaches reasonable for 6502 targets.
+
+Best, Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Nov  2 15:44:59 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7454.html" title="Next message in the list">Groepaz: "Re: [cc65] Colormania (was: TGI summary)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7452.html" title="Previous message in the list">Groepaz: "Re: [cc65] Colormania (was: TGI summary)"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7452.html" title="Message to which this message replies">Groepaz: "Re: [cc65] Colormania (was: TGI summary)"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7454.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] Colormania (was: TGI summary)"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7454.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] Colormania (was: TGI summary)"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7453" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7453" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7453" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-11-02 15:45:01 CET
+</em></small></p>
+</body>
+</html>

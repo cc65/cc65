@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="iso-8859-15"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Problem with generating o65 fi</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="[cc65] Problem with generating o65 files" />
+<meta name="Date" content="2005-01-19" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Problem with generating o65 files</h1>
+<!-- received="Wed Jan 19 22:17:46 2005" -->
+<!-- isoreceived="20050119211746" -->
+<!-- sent="Wed, 19 Jan 2005 22:17:17 +0100" -->
+<!-- isosent="20050119211717" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="[cc65] Problem with generating o65 files" -->
+<!-- id="20050119211717.GA21995@mail.trikaliotis.net" -->
+<!-- charset="iso-8859-15" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4771.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Problem with generating o65 files&quot;">Next message</a> ]
+[ <a href="4769.html" title="Oliver Schmidt: &quot;[cc65] Re: [cc65] Überarbeitete Apple2 C-Library&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4771.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Problem with generating o65 files&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20[cc65]%20Problem%20with%20generating%20o65%20files">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-01-19 22:17:17</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello,
+
+I have a problem generating O65 files. It might be I completely
+misunderstand something.
+
+My cc65 version is v2.10.1, running on Windows (cygwin).
+
+On <a href="http://www.trikaliotis.net/download/o65test.tar.gz">http://www.trikaliotis.net/download/o65test.tar.gz</a>, I put a small
+tarball (exactly 837 byte) of what I tried so far. I generated three
+very simply a65 files, which I link with own config files for the
+linker.
+
+At first, I link them using linker-config-bin, which is very simple.
+This works.
+
+Then, I link them using linker-config-o65. The difference to the other
+config file are the two entries
+
+
+FILES {
+	%O: format = o65;
+}
+
+FORMATS {
+	o65: os = lunix, version = 0, type = small,
+		import = LUNIXKERNEL,
+		export = _main;
+}
+
+With these, I always get the error message:
+
+  ld65.exe: Error: linker-config-o65(2): No such file: `test1571.o65'
+
+But test1541.o65 (or test1571.o65) is the file I want to generate, so I
+am not surprised that these files do not exist. ;-)
+
+What am I doing wrong? I literally copied the lines above from the ld65
+documentation, sections 4.7 and 4.8.
+
+BTW: Replacing
+
+-	%O: format = o65;
++	%O: format = bin;
+
+results in the same error. If I skip the -o for ld65, I get the same
+error, but stating a.out does not exist.
+
+What am I doing wrong?
+
+BTW: Can ld65 handle such (André Fachat's) o65 files as inputs? I would
+     have tested myself, but as you see from above, I was not able yet
+     to generate such files. ;-)
+
+
+Regards,
+   Spiro.
+
+-- 
+Spiro R. Trikaliotis
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<div>
+<ul>
+<li>application/pgp-signature attachment: <a href="../att-4770/signature.asc">Digital signature</a></li>
+</ul>
+<!-- attachment="signature.asc" -->
+</div>
+<span id="received"><dfn>Received on</dfn> Wed Jan 19 22:17:46 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4771.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Problem with generating o65 files"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4769.html" title="Previous message in the list">Oliver Schmidt: "[cc65] Re: [cc65] Überarbeitete Apple2 C-Library"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4771.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Problem with generating o65 files"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4771.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Problem with generating o65 files"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4770" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4770" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4770" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-01-19 22:17:58 CET
+</em></small></p>
+</body>
+</html>

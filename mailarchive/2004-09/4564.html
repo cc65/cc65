@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Floating point support?</title>
+<meta name="Author" content="Sidney Cadot (cadot1science-and-technology.nl)" />
+<meta name="Subject" content="Re: [cc65] Floating point support?" />
+<meta name="Date" content="2004-09-27" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Floating point support?</h1>
+<!-- received="Mon Sep 27 23:39:40 2004" -->
+<!-- isoreceived="20040927213940" -->
+<!-- sent="Mon, 27 Sep 2004 23:39:21 +0200" -->
+<!-- isosent="20040927213921" -->
+<!-- name="Sidney Cadot" -->
+<!-- email="cadot1science-and-technology.nl" -->
+<!-- subject="Re: [cc65] Floating point support?" -->
+<!-- id="B1922C39-10CD-11D9-BC31-000A95914D12@science-and-technology.nl" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="20040927083510.GA10810&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4565.html" title="Mats Andrén: &quot;[cc65] pre processor #define and assembler constants&quot;">Next message</a> ]
+[ <a href="4563.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] quickly getting the adress from somewhere in the code&quot;">Previous message</a> ]
+[ <a href="4549.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Floating point support?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4567.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Floating point support?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Sidney Cadot &lt;<a href="mailto:cadot1science-and-technology.nl?Subject=Re:%20[cc65]%20Floating%20point%20support?">cadot1science-and-technology.nl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-09-27 23:39:21</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 27 Sep 2004, at 10:35, Ullrich von Bassewitz wrote:
+
+&gt; I was talking about the *compiler*, not one of the targets. The 
+&gt; compiler must
+&gt; be able to evaluate floating point expressions in exactly the same 
+&gt; format as
+&gt; the target platform, otherwise expressions evaluated by the compiler 
+&gt; would
+&gt; have other results than the ones evaluated by a program running on the 
+&gt; target.
+
+Ah, ok - I misunderstood.
+
+&gt;&gt; Yes, and rightly so. Still, it would perhaps be a good idea to add
+&gt;&gt; supports for 4-byte floats first, then based on the experience look
+&gt;&gt; towards a 6 (or even 8) byte double.
+&gt;
+&gt; That's not really an option, because it means doing most of the work 
+&gt; twice.
+
+Well, most of the &quot;thinking work&quot; would be quite similar... But still, 
+yes, there would be quite a bit of work to be done twice.
+
+&gt;&gt; That's fine. As a starting point, I think it would be convenient if at
+&gt;&gt; least the basic operations were available (addition, subtraction,
+&gt;&gt; multiplication, division, and comparison operators - am I missing any
+&gt;&gt; out?), this would at least allow people to do basic FP stuff using
+&gt;&gt; function calls for now, and these will suffice later on for providing
+&gt;&gt; compilation ability.
+&gt;
+&gt; Yes, but as I said already: Not in the near future. What you call 
+&gt; &quot;basic
+&gt; operations&quot; requires most of the real work to be done.
+
+You are referring to what i called step (4) in my previous email, I 
+think. This is indeed by far the most work. However, if a 
+function-based interface would already be present, one could already do 
+some floating-point stuff without actual compiler support (by calling 
+the functions).
+
+&gt;&gt; I propose to settle on IEEE-754 single-precision for now. We should be
+&gt;&gt; able to use these as a base for a widened implementation later on.
+&gt;
+&gt; I don't agree with the latter. As I said above, changing horses is not 
+&gt; really
+&gt; an option, because it means doing most of the work twice. So, *if* we 
+&gt; agree on
+&gt; the 32 bit IEEE format, we will have to do that knowing that it will 
+&gt; be the
+&gt; only format, and that it doesn't meet the requirements of the C 
+&gt; standard,
+&gt; meaning that some code requiring more precision (which is guaranteed 
+&gt; by the
+&gt; standard for a conforming implementation) will not to run. Please note 
+&gt; that I
+&gt; don't vote against the 32 bit format. I just want to show the 
+&gt; consequences of
+&gt; the decision. Maybe we should consider a 6 byte format, just to see 
+&gt; what that
+&gt; would mean. The data type REAL implemented by Turbo Pascal was a 6 
+&gt; byte data
+&gt; type, and it was quite fast. But then, the platforms where it was 
+&gt; implemented
+&gt; had 16 bit registers ...
+
+Ok. If it's a given that we are going to support just one FP-type (and 
+now that I think about it this makes a lot of sense), I would agree 
+that indeed the natural choice is between a 4-byte and a roll-your-own 
+6-byte type.
+
+As to the Turbo Pascal type, it looks like this (assuming you are using 
+a fixed width font ;-)):
+
+  47     40 39 38                                 0
+   .-----------------------------------------------.
+   | 8 bits |s|msb         39 bit mantissa      lsb|
+   `-----------------------------------------------'
+        |    |                  `------------  mantissa
+        |    `-----------------------------  sign bit
+        `--------------------------------  biased exponent (80h)
+
+
+Compared to the IEEE formats, the sign bit is in a different place - 
+but there is much to be said for this scheme (the exponent byte now 
+being in a separate byte). The 39-bit mantissa guarantees 11 decimal 
+digits which would be compliant to ISO C requirements. I am not sure 
+whether TP used an implicit '1' in its mantissa, and how (if at all) it 
+handled non-normalized numbers.
+
+On a related note: do you have strong feelings about whether or not to 
+fully support IEEE-754 notions such as Not-A-Number, Infinity, rounding 
+modes? If we'd go for the 4-byte implementation it may we worth 
+considering (since we'd then be confirming to a well-established 
+standard), but for an artificial 6-byte format it might be just too 
+much of a hassle.... No-one in his right mind is going to use a 6502 
+for heavy-duty number-crunching anyway, it would come at a cost in 
+terms of performance, complexity, and code size, and there's nothing in 
+the C standard that demands it (since annex F of C99 is 
+non-normative)...
+
+Regards,
+
+  Sidney
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Sep 27 23:39:40 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4565.html" title="Next message in the list">Mats Andrén: "[cc65] pre processor #define and assembler constants"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4563.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] quickly getting the adress from somewhere in the code"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4549.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Floating point support?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4567.html" title="Next message in this discussion thread">Spiro Trikaliotis: "Re: [cc65] Floating point support?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4567.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Re: [cc65] Floating point support?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="4568.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Floating point support?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4564" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4564" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4564" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-09-27 23:39:48 CEST
+</em></small></p>
+</body>
+</html>

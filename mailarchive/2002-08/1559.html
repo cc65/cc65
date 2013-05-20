@@ -1,0 +1,139 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Other uses of BRK, stack</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Other uses of BRK, stack snooping">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Other uses of BRK, stack snooping</h1>
+<!-- received="Wed Aug 14 14:37:47 2002" -->
+<!-- isoreceived="20020814123747" -->
+<!-- sent="Wed, 14 Aug 2002 14:37:50 +0200" -->
+<!-- isosent="20020814123750" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Other uses of BRK, stack snooping" -->
+<!-- id="20020814123750.GA31506@trixie.musoftware.de" -->
+<!-- inreplyto="04ce01c24259$76e97890$6902a8c0@magnesium" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Other%20uses%20of%20BRK,%20stack%20snooping"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-08-14 14:37:50
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1558.html">David Holz: "Re: [cc65] Other uses of BRK, stack snooping"</a>
+<li><strong>In reply to:</strong> <a href="1553.html">David Holz: "[cc65] Other uses of BRK, stack snooping"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1560.html">stefan: "Re: [cc65] Other uses of BRK, stack snooping"</a>
+<li><strong>Reply:</strong> <a href="1560.html">stefan: "Re: [cc65] Other uses of BRK, stack snooping"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Mon, Aug 12, 2002 at 04:39:13PM -0700, David Holz wrote:
+&gt; Hi, I had an idea.  I don't know if you guys have thought of it before, but
+&gt; using BRK followed by data bytes is a great way to save space in user code.
+
+I've used a similar idea for some time, but have removed it, because it had
+several disadvantages. Some may remember seeing code like this in older
+versions of the compiler:
+
+        jsr     ldeax
+        .dword  $12345678
+
+The ldeax routine fetched the return address from stack, loaded the dword
+located behind the call, incremented the return address and returned. It needs
+one byte more than the solution using BRK, but is somewhat faster, since the
+overhead for the call is smaller, and it doesn't need a dispatcher in the
+subroutine. But as said above, I've removed this particular sort of code
+generation for several reasons:
+
+    * The code is difficult to understand. I got several bug reports from
+      people looking at the generated code, who thought something was wrong.
+
+    * The generated code is slow, and the difference is not only some percent.
+      Data access via the return address is several times slower (in case of a
+      simple subroutine like ldeax). Using BRK saves one additional byte, but
+      needs even more cycles, which means it's even slower than the subroutine
+      solution.
+
+    * The optimizer works on 6502 code level. Things like subroutines that
+      manipulate the return address do not work very well with the optimizer,
+      in fact, I had severe problems when using code generation like shown
+      above.
+
+    * The optimizer does register tracking (at least for immediate values).
+      This means that the register loads before subroutine calls are often
+      not necessary or replaced by transfers from one register into another.
+      Doing this saves a few bytes/and or cylces and would not be possible
+      with the embedded data method.
+
+&gt; I see that there's support for setting up the BRK vector from C now; do you
+&gt; think that it's used much, because it'd need a bit of work to make it
+&gt; interoperate with this (something like making 'brk $ff' the user BRK
+&gt; handler).
+
+The current BRK handler is used for the debugger and this brings in a new
+problem: Using BRK for subroutine calls would mean that the debugger could no
+longer be used for such programs.
+
+So while the idea itself is good, I think it has several disadvantages when
+used with cc65.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Other%20uses%20of%20BRK,%20stack%20snooping">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Other%20uses%20of%20BRK,%20stack%20snooping">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1558.html">David Holz: "Re: [cc65] Other uses of BRK, stack snooping"</a>
+<li><strong>In reply to:</strong> <a href="1553.html">David Holz: "[cc65] Other uses of BRK, stack snooping"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1560.html">stefan: "Re: [cc65] Other uses of BRK, stack snooping"</a>
+<li><strong>Reply:</strong> <a href="1560.html">stefan: "Re: [cc65] Other uses of BRK, stack snooping"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-08-14 14:39:39 CEST</em>
+</em>
+</small>
+</body>
+</html>

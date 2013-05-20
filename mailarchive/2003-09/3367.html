@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-7">
+<title>cc65 mailing list archive: Re: [cc65] Optimizing C code</title>
+<meta name="Author" content="Shawn Jefferson (sjefferson_at_sd62.bc.ca)">
+<meta name="Subject" content="Re: [cc65] Optimizing C code">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Optimizing C code</h1>
+<!-- received="Tue Sep  9 17:31:02 2003" -->
+<!-- isoreceived="20030909153102" -->
+<!-- sent="Tue, 09 Sep 2003 08:28:28 -0700" -->
+<!-- isosent="20030909152828" -->
+<!-- name="Shawn Jefferson" -->
+<!-- email="sjefferson_at_sd62.bc.ca" -->
+<!-- subject="Re: [cc65] Optimizing C code" -->
+<!-- id="sf5d8f4e.035@gwmail.sd62.bc.ca" -->
+<!-- charset="ISO-8859-7" -->
+<!-- inreplyto="[cc65] Optimizing C code" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Shawn Jefferson (<a href="mailto:sjefferson_at_sd62.bc.ca?Subject=Re:%20[cc65]%20Optimizing%20C%20code"><em>sjefferson_at_sd62.bc.ca</em></a>)<br>
+<strong>Date:</strong> 2003-09-09 17:28:28
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3366.html">Groepaz: "Re: [cc65] Optimizing C code"</a>
+<li><strong>Maybe in reply to:</strong> <a href="3327.html">Shawn Jefferson: "[cc65] Optimizing C code"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3371.html">MagerValp: "Re: [cc65] Optimizing C code"</a>
+<li><strong>Next in thread:</strong> <a href="3368.html">Shawn Jefferson: "Re: [cc65] Optimizing C code"</a>
+<li><strong>Reply:</strong> <a href="3371.html">MagerValp: "Re: [cc65] Optimizing C code"</a>
+<li><strong>Reply:</strong> <a href="3377.html">Maciej Witkowiak: "Re: [cc65] Optimizing C code"</a>
+<li><strong>Reply:</strong> <a href="3380.html">Daniel Pralle: "Re: [cc65] Optimizing C code"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+&gt;&gt;&gt; MagerValp &lt;<a href="mailto:MagerValp_at_cling.gu.se?Subject=Re:%20[cc65]%20Optimizing%20C%20code">MagerValp_at_cling.gu.se</a>&gt; 09/09/03 02:20AM &gt;&gt;&gt;
+
+&gt;Is there a reason why you're not writing this routine in assembler? It
+&gt;would benefit a lot from it...
+
+I thought that I would see how far I can get it with just optimizing the C code.  There is also the fact that I can do some basic coding in assembly, but mutliplications and such are a little confusing (to me.)  I will eventually code all the functions up in assembly, I guess.  This has been a good learning experience for me for optimizing the rest of my C code, in general and I thank those of you who have helped me!
+
+Here's the current code (for Nick):
+
+void __fastcall__ plot_4colmode_nc(BITMAP *bmp, unsigned int x, unsigned int y, unsigned char creg)
+{
+  unsigned char bit;
+  unsigned char data;
+  unsigned int index;
+
+
+  bit  = (x % 4);
+  index = (bmp-&gt;bpl * y) + (x / 4);
+
+  data = bmp-&gt;dat[index];
+  data &amp;= plot4cmask[bit];                      // clear the pixel first
+
+  if (creg != BAKCOL(bmp-&gt;mode)) {              // not background color?
+    //++creg;                                     // creg 0-&gt;01, 1-&gt;10, 2-&gt;11
+    data |= ((creg+1) &lt;&lt; plot4cshift[bit]);
+  }
+
+  bmp-&gt;dat[index] = data;
+  return;
+}
+
+plot4cmask and plot4cshift are the values to mask out the pixel, and the amount of bits to shift the color register value (0-3) passed in.  bmp is a structure that lets us pass information around about the bitmap (data pointer, graphics mode and the newly added value bytes per line, as well as width and height.)
+
+The library is sort of modeled after the Allegro cross platform graphics library that I've used on and off for a couple of years on the PC.
+
+―
+Shawn Jefferson
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Optimizing%20C%20code">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3366.html">Groepaz: "Re: [cc65] Optimizing C code"</a>
+<li><strong>Maybe in reply to:</strong> <a href="3327.html">Shawn Jefferson: "[cc65] Optimizing C code"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3371.html">MagerValp: "Re: [cc65] Optimizing C code"</a>
+<li><strong>Next in thread:</strong> <a href="3368.html">Shawn Jefferson: "Re: [cc65] Optimizing C code"</a>
+<li><strong>Reply:</strong> <a href="3371.html">MagerValp: "Re: [cc65] Optimizing C code"</a>
+<li><strong>Reply:</strong> <a href="3377.html">Maciej Witkowiak: "Re: [cc65] Optimizing C code"</a>
+<li><strong>Reply:</strong> <a href="3380.html">Daniel Pralle: "Re: [cc65] Optimizing C code"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-09-09 17:31:24 CEST</em>
+</em>
+</small>
+</body>
+</html>

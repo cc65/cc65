@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] A midi player for the cc65 tar</title>
+<meta name="Author" content="Karri Kaksonen (karri1sipo.fi)" />
+<meta name="Subject" content="[cc65] A midi player for the cc65 targets ;)" />
+<meta name="Date" content="2005-09-06" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] A midi player for the cc65 targets ;)</h1>
+<!-- received="Tue Sep  6 10:29:35 2005" -->
+<!-- isoreceived="20050906082935" -->
+<!-- sent="Tue, 06 Sep 2005 11:31:56 +0300" -->
+<!-- isosent="20050906083156" -->
+<!-- name="Karri Kaksonen" -->
+<!-- email="karri1sipo.fi" -->
+<!-- subject="[cc65] A midi player for the cc65 targets ;)" -->
+<!-- id="431D53FC.40901@sipo.fi" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5208.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] A midi player for the cc65 targets ;)&quot;">Next message</a> ]
+[ <a href="5206.html" title="Sidney Cadot: &quot;Re: [cc65] A question about .org and the linker&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5208.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] A midi player for the cc65 targets ;)&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Karri Kaksonen &lt;<a href="mailto:karri1sipo.fi?Subject=Re:%20[cc65]%20A%20midi%20player%20for%20the%20cc65%20targets%20;)">karri1sipo.fi</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-09-06 10:31:56</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>As you may remember from 2004 I tried to start a discussion about a
+simplified abc music library for the cc65 compiler.
+
+During the last few days I have experimented with a package called abcMIDI.
+It contains midi2abc and abc2midi. The cool thing is that it also contains a
+reformatting package called abc2abc. This allows you to transpose the tune
+and change the time base etc.
+
+The sources are all available at sourceforge.net and they are quite modular.
+Every tool uses the same parser and the output module is just one c-file
+that can easily be changed to create new tools.
+
+So I actually created an output module tocc65.c that outputs the tune as
+a c-file that can be compiled by the cc65 and included in a project.
+
+The steps required to play a midi-tune is then:
+
+midi2abc Austin_Powers.midi &gt; austin.abc
+abc2c austin.abc &gt; austin.c
+compile austin.c and link it to your cc65 application.
+
+The file austin.c will then contain the same number of instruments that
+the original midi file had. Depending on your hardware you can then
+play just the melody or perhaps the melody and a few other voices.
+
+Ok. This was not a real midi player. But as the internet is swamped
+with midi files this is an easy way of playing music on a cc65 target.
+
+Here is what the Austin Powers theme looks like in 4 voices.
+No editing by hand. This is what these tools produce.
+Playing time is 2 minutes 34 seconds. The original midi file was 21k
+and the resulting abc byte array is 3.7k. The original midi file played
+on a multitimbral synthesizer sounds better than the abc file on the
+Lynx. But the Lynx version is not bad either.
+
+char voice1[] = {
+// Flute 1
+//MIDI program 73
+// intro
+&quot;z16|z16|z16|z16|&quot;
+&quot;z16|z12 zaf'f'|&quot;
+// Main tune (a)
+&quot;d'd'z3af'f' d'd'z3af'f'|d'd'z3af'f' d'd'z3af'f'|&quot;
+&quot;d'd'z3af'f' d'd'z3af'f'|d'd'z3af'f' d'd'z3f'f'd'|f'f'z3f'f'd' 
+f'f'z3af'f'|d'2z8z3af'f'|&quot;
+// Main tune (b)
+&quot;d'd'z3af'f' d'd'z3af'f'|d'd'z3af'f' d'd'z3af'f'|d'd'z3af'f' 
+d'd'z3af'f'|d'd'z3af'f' d'd'z3f'f'd'|&quot;
+&quot;f'f'z3f'f'd' f'f'z3af'f'|d'2z12z2|&quot;
+// Flute bridge
+&quot;^fa6z ^fdzB edz2|^fa6z ^fdzB edz2|&quot;
+&quot;^fa6z ^fdzB edz2|z12 zaf'f'|&quot;
+// Main tune (b)
+&quot;d'd'z3af'f' d'd'z3af'f'|d'd'z3af'f' d'd'z3af'f'|&quot;
+&quot;d'd'z3af'f' d'd'z3af'f'|d'd'z3af'f' d'd'z3f'f'd'|f'f'z3f'f'd' 
+f'f'z3af'f'|d'2z12z2|&quot;
+&quot;z&quot;
+// Trumpet Bridge
+&quot;A2&gt;B2B3 Az6z|zA2&gt;B2B3 cz6z|zA2&gt;B2B3 Az6z|zA2&gt;B2B3 d2Be d2B2|&quot;
+// ad lib. solo
+&quot;d2=fd gfdd2ddA c2dA|c2dA c2dc2ddc dfgf|a2a2 c'a2c' d'd'd'c' agfc|dAcA 
+c2^cd z8|&quot;
+// Flute bridge (DS)
+&quot;^fa6z ^fdzB edz2|^fa6z ^fdzB edz2|^fa6z ^fdzB edz2|z12 zaf'f'|&quot;
+// Main tune (b) (DS)
+&quot;d'd'z3af'f' d'd'z3af'f'|d'd'z3af'f' d'd'z3af'f'|d'd'z3af'f' 
+d'd'z3af'f'|d'd'z3af'f' &quot;
+// Coda
+&quot;d'd'z3f'f'd'|&quot;
+&quot;f'f'z3f'f'd' f'f'z3af'f'|d'2z8z3f'f'd'|f'f'z3f'f'd' f'f'z3af'f'|d'2z6 d'2&quot;
+};
+
+char voice2[] = {
+// Trumpet 1
+//MIDI program 56
+// intro
+&quot;z16|z16|z16|z16|&quot;
+&quot;z16|a2za az2a aza2 z4|z16|z16|&quot;
+&quot;z16|z12 z&quot;
+// Main tune (a)
+&quot;=ffd|ffz3ffd ffz3Aff|d2z12z2|&quot;
+&quot;z3&quot;
+// Main tune (b)
+&quot;d z12|z3d z12|z3g z12|z3d z8 zffd|&quot;
+&quot;ffz3ffd ffz3Aff|d2z12z2|z2&quot;
+// Flute bridge
+&quot;dz ddz2 dzdd z4|z2dz ddz2 dzdd z4|&quot;
+&quot;z2dz ddz2 dzdd z4|zc'^c'^d' e'^f'g'^g' a'z6z|z3&quot;
+// Main tune (b)
+&quot;d z12|z3d z12|&quot;
+&quot;z3g z12|z3d z8 zffd|ffz3ffd ffz3Aff|d2z8a2 gfdB|&quot;
+// Trumpet Bridge
+&quot;d6-dz2dfg2fdB|d6-dz3a2 gfdB|d6-dz2dfg2fdB|d6-dz8z|&quot;
+&quot;z16|z16|z16|z16|&quot;
+&quot;z2&quot;
+// ad lib. solo
+// Flute bridge (DS)
+&quot;dz ddz2 dzdd z4|z2dz ddz2 dzdd z4|z2dz ddz2 dzdd z4|z=c'^c'^d' 
+e'^f'=g'^g' a'z6z|&quot;
+&quot;z3&quot;
+// Main tune (b) (DS)
+&quot;d z12|z3d z12|z3g z12|z3d z8 z&quot;
+// Coda
+&quot;ffd|&quot;
+&quot;ffz3ffd ffz3Aff|d2z8z3ffd|ffz3ffd ffz3Aff|d2z6 f2&quot;
+};
+
+char voice3[] = {
+// Trombone 1
+//MIDI program 57
+// intro
+&quot;D,z2D z2D,z3D,z2Dz2|D,zD,D zDD,z D,zD,D zDD,z|D,zD,D zDD,z D,zD,D 
+zDD,z|D,zD,D
+zDD,z D,zD,D zDD,z|&quot;
+&quot;D,zD,D zDD,z D,zD,D zDD,z|z16|z16|z16|&quot;
+&quot;z16|z12 z&quot;
+// Main tune (a)
+&quot;B,B,^G,|B,B,z3B,B,^G, A,A,z3A,FF|D2z12z2|&quot;
+&quot;z8 z2&quot;
+// Main tune (b)
+&quot;D,2 z4|z8 z2D,2 z4|z8 z2=G,2 z4|z8 z2B,2 zB,B,^G,|&quot;
+&quot;B,B,z3B,B,^G, A,A,z3A,FF|D2z8z3^F,=G,^G,|&quot;
+// Flute bridge
+&quot;A,3z2^G,A,_B, =B,3z2^F,=G,^G,|A,3z2^G,A,_B, =B,3z2^F,=G,^G,|&quot;
+&quot;A,3z2^G,A,_B, =B,3z2^CD^D|E6-Ez3A,,4-A,,z|z8 z2&quot;
+// Main tune (b)
+&quot;D,2 z4|z8 z2D,2 z4|&quot;
+&quot;z8 z2=G,2 z4|z8 z2B,2 zB,B,^G,|B,B,z3B,B,^G, A,A,z3A,FF|=D2z12z2|&quot;
+&quot;z&quot;
+// Trumpet Bridge
+&quot;A,2&gt;B,2B,3 Dz6z|zD2&gt;B,2B,3 A,z6z|zA,2&gt;B,2B,3 Dz6z|zD2&gt;B,2B,3 A,z6z|&quot;
+// ad lib. solo
+&quot;=G,zG,G zGG,z G,zG,G zGG,z|D,zD,D zDD,z D,zD,D zDD,z|A,zA,A zAA,z 
+G,zG,G zGG,z|
+D2z8z3^F,G,^G,|&quot;
+// Flute bridge (DS)
+&quot;A,3z2^G,A,_B, =B,3z2^F,=G,^G,|A,3z2^G,A,_B, 
+=B,3z2^F,=G,^G,|A,3z2^G,A,_B, =B,3z
+2^CD^D|E6-Ez3A,,4-A,,z|&quot;
+&quot;z8 z2&quot;
+// Main tune (b) (DS)
+&quot;D,2 z4|z8 z2D,2 z4|z8 z2=G,2 z4|z8 z2&quot;
+// Coda
+&quot;B,2 zB,B,^G,|&quot;
+&quot;B,B,z3B,B,^G, A,A,z3A,FF|=D2z8z3B,B,^G,|B,B,z3B,B,^G, A,A,z3A,FF|D2z6 D2&quot;
+};
+
+char voice4[] = {
+//MIDI channel 10
+// Drums
+// intro
+&quot;=G,G,G,G, G,G,G,G, G,G,G,G, G,G,G,G,|G,G,G,G, G,G,G,G, G,G,G,G, 
+G,G,G,G,|G,G,G,G, G,G,G,G, G,G,G,G, G,G,G,G,|G,G,G,G, G,G,G,G, G,G,G,G, 
+G,G,G,G,|&quot;
+&quot;G,G,G,G, G,G,G,G, G,G,G,G, G,G,G,G,|G,z2G, G,z2G, G,z^Cz4z|&quot;
+// Main tune (a)
+&quot;G,G,G,G, G,G,G,G, G,G,G,G, G,G,G,G,|G,G,G,G, G,G,G,G, G,G,G,G, G,G,G,G,|&quot;
+&quot;G,G,G,G, G,G,G,G, G,G,G,G, G,G,G,G,|G,G,G,G, G,G,G,G, G,G,G,G, 
+G,G,G,G,|G,G,G,G, G,G,G,G, G,G,G,G, G,G,G,G,|G,G,G,G, G,G,G,G, 
+^F,,^F,,^F,,^F, ^F,^F,,E,^F,,|&quot;
+// Main tune (b)
+&quot;G,G,G,G, G,G,G,G, G,G,G,G, G,G,G,G,|G,G,G,G, G,G,G,G, G,G,G,G, 
+G,G,G,G,|G,G,G,G, G,G,G,G, G,G,G,G, G,G,G,G,|G,G,G,G, G,G,G,G, G,G,G,G, 
+G,G,G,G,|&quot;
+&quot;G,G,G,G, G,G,G,G, G,G,G,G, G,G,G,G,|G,G,G,G, G,G,G,G, G,G,G,G, G,G,G,G,|&quot;
+// Flute bridge
+&quot;G,G,G,G, G,G,G,G, G,G,G,G, G,G,G,G,|G,G,G,G, G,G,G,G, G,G,G,G, G,G,G,G,|&quot;
+&quot;G,G,G,G, G,G,G,G, G,G,G,G, G,G,G,G,|G,^F,,^F,,^F,, ^F,,^F,,^F,,^F,, 
+^F,,z^Cz2=F,,F,,F,,|&quot;
+// Main tune (b)
+&quot;G,G,G,G, G,G,G,G, G,G,G,G, G,G,G,G,|G,G,G,G, G,G,G,G, G,G,G,G, G,G,G,G,|&quot;
+&quot;G,G,G,G, G,G,G,G, G,G,G,G, G,G,G,G,|G,G,G,G, G,G,G,G, G,G,G,G, 
+G,G,G,G,|G,G,G,G, G,G,G,G,G,G,G,G,G,G,G,G,|G,G,G,G, G,G,G,G, G,G,G,G, 
+G,G,G,G,|&quot;
+// Trumpet Bridge
+&quot;G,G,G,G, G,G,G,G, G,G,G,G, G,G,G,G,|G,G,G,G, G,G,G,G, G,G,G,G, 
+G,G,G,G,|G,G,G,G
+, G,G,G,G, G,G,G,G, G,G,G,G,|G,G,G,G, G,G,G,G, G,G,G,G, G,G,G,G,|&quot;
+// ad lib. solo
+&quot;G,G,G,G, G,G,G,G, G,G,G,G, G,G,G,G,|G,G,G,G, G,G,G,G, G,G,G,G, 
+G,G,G,G,|G,G,G,G
+, G,G,G,G, G,G,G,G, G,G,G,G,|G,G,G,G, G,G,G,G, G,G,G,G, G,G,G,G,|&quot;
+// Flute bridge (DS)
+&quot;G,G,G,G, G,G,G,G, G,G,G,G, G,G,G,G,|G,G,G,G, G,G,G,G, G,G,G,G, 
+G,G,G,G,|G,G,G,G
+, G,G,G,G, G,G,G,G, G,G,G,G,|G,^F,,^F,,^F,, ^F,,^F,,^F,,^F,, 
+^F,,z^Cz2=F,,F,,F,,
+|&quot;
+// Main tune (b) (DS)
+&quot;G,G,G,G, G,G,G,G, G,G,G,G, G,G,G,G,|G,G,G,G, G,G,G,G, G,G,G,G, 
+G,G,G,G,|G,G,G,G
+, G,G,G,G, G,G,G,G, G,G,G,G,|G,G,G,G, G,G,G,G, &quot;
+// Coda
+&quot;G,G,G,G, G,G,G,G,|&quot;
+&quot;G,G,G,G, G,G,G,G, G,G,G,G, G,G,G,G,|G,G,G,G, G,G,G,G, G,G,G,G, 
+G,G,G,G,|G,G,G,G
+, G,G,G,G, G,G,G,G, G,G,G,G,|&quot;
+};
+
+--
+Karri
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Sep  6 10:29:35 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5208.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] A midi player for the cc65 targets ;)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5206.html" title="Previous message in the list">Sidney Cadot: "Re: [cc65] A question about .org and the linker"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5208.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] A midi player for the cc65 targets ;)"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5208.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] A midi player for the cc65 targets ;)"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5207" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5207" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5207" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-09-06 10:29:38 CEST
+</em></small></p>
+</body>
+</html>

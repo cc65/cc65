@@ -1,0 +1,153 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] Serial port API</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] Serial port API">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] Serial port API</h1>
+<!-- received="Mon Nov  5 20:40:56 2001" -->
+<!-- isoreceived="20011105194056" -->
+<!-- sent="Mon, 5 Nov 2001 20:39:19 +0100" -->
+<!-- isosent="20011105193919" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] Serial port API" -->
+<!-- id="1835562032.20011105203919@gmx.net" -->
+<!-- inreplyto="15334.52286.139142.811488@panini.cling.gu.se" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20Serial%20port%20API"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2001-11-05 20:39:19
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0920.html">groepaz: "Re[2]: [cc65] ca65 syntax problems"</a>
+<li><strong>Previous message:</strong> <a href="0918.html">MagerValp: "Re: [cc65] Serial port API"</a>
+<li><strong>In reply to:</strong> <a href="0918.html">MagerValp: "Re: [cc65] Serial port API"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0921.html">MagerValp: "Re: [cc65] Serial port API"</a>
+<li><strong>Reply:</strong> <a href="0921.html">MagerValp: "Re: [cc65] Serial port API"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello MagerValp,
+
+M&gt; 8N2 is often overlooked -- sometimes it makes it possible to use a
+M&gt; higher baudrate. 115200 8N2 might be stable where 115200 8N1 isn't,
+M&gt; and it's 80% faster than 57600 8N1.
+
+oh well.... read uart specs... the second stop-bit is practically
+nothing more than an additional delay after each sent byte (the
+reciever doesnt care about the second stopbit) (not starting a
+religious war here anyway ;=))
+
+also...well... its not like the transfer would be unreliable even at
+115k here ;=P atm its the pc that limits the speed, not the c64 *G*
+(just stupid ppl use crystals on serial ports that result in the
+divisor beeing 1 at 115k already.... bah)
+
+M&gt; Well, that works nicely, we're not multitasking or anything :)
+
+well, it works nicely for me even in a turbo-c or djgpp compiled
+programm running in a dosbox of win9x ;=) (then again, i am not
+claiming windooze would be multitasking hehehehe)
+
+M&gt; I'll release this under the GPL. I'd send it to you straight away, but
+M&gt; I haven't implemented SAVE yet so I can't transfer the TASS source :)
+
+ok, send when it's done then hehe ,=P
+
+M&gt; Feel free to use whatever you want. I'm writing the server in Perl,
+M&gt; but the protocol is simple and could easily be implemented in the
+M&gt; language of your choice. Right now it's limited to a single command.
+M&gt; C64 sends &lt;NAME\r\n and the PC answers with ? if it for some reason
+M&gt; can't send NAME, otherwise it sends a ! followed by the length of the
+M&gt; file. Then it just sends the raw PRG binary. If the C64 tries to load
+M&gt; $ the server lists the current dir and makes a basic listing out of
+M&gt; it, just like a real drive. If NAME is a directory the server CDs
+M&gt; there and sends a listing (just like $). Saving will be implemented
+with &gt;&gt;NAME\r\n (duh :) followed by the length, wait for ? or !, then
+M&gt; raw data. Oh, it supports @0: too.
+M&gt;   This is good enough for load and save, but open and more advanced
+M&gt; drive emulation needs some sort of packet protocol and a much larger
+M&gt; driver. I probably won't bother.
+
+well.... what i/we (the retroreplay devers) were actually planning is
+letting the cartridge route all file-accesses done through standard
+kernal calls (and a certain device adress) to the fileserver, so i
+guess we would need more advanced handling than just loading/saving
+like you implemented (actually what you have done is already
+implemented in a different way, controlled from the remote host that
+is)
+
+however like i said my host program is supposed to support as many
+possible solutions on the c64 side as possible, so it'll be still very
+interisting to have a look at what you have done. (btw if you want the
+true debugging experience, implement 2 simple commands accessable from
+the host side which are &quot;read block of memory&quot; and &quot;write block of
+memory&quot; ... and to be truely hooked &quot;set pc&quot; &quot;get pc&quot; &quot;set breakpoint&quot;
+&quot;clear breakpoint&quot; &quot;get breakpoints&quot; &quot;halt&quot; &quot;go&quot; .... uhmz no well,
+let me first release the debugger before bugging ppl to support it
+hehehe ,=P)
+
+M&gt; I don't mind testing for you. You'd only have to change a few low
+M&gt; level routines:
+
+hehe although that stuff is interisting, it may be more intelligent if
+i replace your routines by mine, test it, and then send to you (you
+change back to your swithlink stuff ofcoz) :o)
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20Serial%20port%20API">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20Serial%20port%20API">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0920.html">groepaz: "Re[2]: [cc65] ca65 syntax problems"</a>
+<li><strong>Previous message:</strong> <a href="0918.html">MagerValp: "Re: [cc65] Serial port API"</a>
+<li><strong>In reply to:</strong> <a href="0918.html">MagerValp: "Re: [cc65] Serial port API"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0921.html">MagerValp: "Re: [cc65] Serial port API"</a>
+<li><strong>Reply:</strong> <a href="0921.html">MagerValp: "Re: [cc65] Serial port API"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:43 CET</em>
+</em>
+</small>
+</body>
+</html>

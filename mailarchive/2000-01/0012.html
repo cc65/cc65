@@ -1,0 +1,229 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] Version 2.4.0 is out</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="[cc65] Version 2.4.0 is out">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] Version 2.4.0 is out</h1>
+<!-- received="Sun Jan 16 14:56:08 2000" -->
+<!-- isoreceived="20000116135608" -->
+<!-- sent="Sun, 16 Jan 2000 14:55:50 +0100 (CET)" -->
+<!-- isosent="20000116135550" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="[cc65] Version 2.4.0 is out" -->
+<!-- id="200001161355.OAA31353@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Version%202.4.0%20is%20out"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2000-01-16 14:55:50
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0013.html">Groepaz: "[cc65] Back on Track"</a>
+<li><strong>Previous message:</strong> <a href="0011.html">Ullrich von Bassewitz: "Re: [cc65] Preparing for version 2.4"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+									   
+Version 2.4.0 of the cc65 compiler is released. I've appended the
+announcement below.
+
+Regards
+
+
+	Uz
+
+
+---------------------------------------------------------------------------
+
+I'm proud to announce version 2.4 of CC65, a C crosscompiler /
+crossassembler combo for 6502 systems.
+
+CC65 has C and runtime library support for most CBM machines, and -
+thanks to the great work of Kevin Ruland - for the Apple ][. The
+libraries are fairly portable, so creating a version for other 6502s
+shouldn't be too much work.
+
+Here is a list of the compiler features:
+
+  * Includes a C compiler, macro assembler, archiver, linker and a
+    frontend (compile &amp; link) utility. The assembler generates
+    relocatable object files, the linker is very configurable and allows
+    overlays, ROMable code, splitted output and much more.
+
+  * The compiler is not quite ISO compatible, however, a large subset
+    is supported.
+
+  * Supported target systems are:
+
+    	- C64
+    	- C128
+    	- C16, C116, Plus/4
+    	- CBM 600/700 family (programs run in bank 1)
+    	- Newer PET machines (not 2001)
+	- The Apple ][
+
+    For all these systems a precompiled runtime and C library is
+    available. Supporting more targets is not very difficult since the C
+    library was written with portability in mind.
+
+  * Several system specific support routines like a conio library or
+    modules for joystick access are available.
+
+  * The assembler and linker do also support the 65816 as a target,
+    however, the compiler is not able to generate code for this CPU and
+    there is no RTL support.
+
+  * Lots of docs and a few sample programs included.
+
+  * Easy interfacing between C code and assembler.
+
+  * Fullscreen debugger for most machines as a linkable module.
+
+  * Full sourcecode available as well as binaries for
+
+  	- Linux (RedHat 6.1 and 5.x RPM)
+  	- DOS
+  	- Windows 95/98/NT
+
+
+
+What is new in this version:
+
+  * Several bugs fixed.
+
+  * Use of line continuations.
+
+  * Removed/upped some internal compiler limits (larger lines &amp; macros).
+
+  * Local variables may be handled as static variables. There is a #pragma
+    available to switch it on and off inside your sources.
+
+  * Check for and refuse __fastcall__ C functions.
+
+  * Check for a maximum size of 64K in variable definitions.
+
+  * The &quot;defined&quot; preprocessor operator is now available.
+
+  * More warnings/better error messages, stricter type checking.	
+
+  * Documentation updates.
+
+  * More minor changes.
+
+
+
+Support for some features is still missing. To name a few:
+
+  * No floats.
+
+  * No file routines. Actually, most stdio routines are there, but the
+    low level file I/O is missing, so you get linker errors if you try to
+    use them with files.
+
+  * The 80 column mode on the C128 is not supported by the conio library.
+
+
+
+More information:
+
+For your convenience, I've put all doc files also on the web server:
+
+    <a href="http://www.von-bassewitz.de/uz/cc65/doc/">http://www.von-bassewitz.de/uz/cc65/doc/</a>
+
+The cc65 main page
+
+    <a href="http://www.von-bassewitz.de/uz/cc65/">http://www.von-bassewitz.de/uz/cc65/</a>
+
+will get updated to reflect the new version in the next few days.
+
+There is also a cc65 mailing list. To subscribe, send a mail to
+<a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Version%202.4.0%20is%20out">majordomo_at_musoftware.de</a> with the command
+
+    subscribe cc65
+
+in the body of the mail.
+
+
+
+Available packages:
+
+As usual I will provide the complete sources and several binary packages
+binaries. There's a binary RPM for RedHat which is probably the fastest
+way to get going if you're running RedHat Linux. Since this is also my
+development platform, new features and bug fixes are first available for
+Linux.
+
+Binaries for DOS and and Windows will follow or may already be available
+at the time you read this. While the sources do still compile under OS/2,
+I have dropped support for OS/2 binaries, since were almost no downloads
+of the OS/2 version.
+
+
+
+Download:
+
+For more information and links to the FTP server, see
+
+    	<a href="http://www.von-bassewitz.de/uz/cc65/">http://www.von-bassewitz.de/uz/cc65/</a>
+
+For direct download, use
+
+        <a href="ftp://ftp.musoftware.de/pub/uz/cc65/">ftp://ftp.musoftware.de/pub/uz/cc65/</a>
+
+
+
+Thanks to all who sent feedback and suggestions!
+
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Version%202.4.0%20is%20out">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Version%202.4.0%20is%20out">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0013.html">Groepaz: "[cc65] Back on Track"</a>
+<li><strong>Previous message:</strong> <a href="0011.html">Ullrich von Bassewitz: "Re: [cc65] Preparing for version 2.4"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:35 CET</em>
+</em>
+</small>
+</body>
+</html>

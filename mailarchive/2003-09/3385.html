@@ -1,0 +1,214 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] code generation</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] code generation">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] code generation</h1>
+<!-- received="Fri Sep 12 01:43:06 2003" -->
+<!-- isoreceived="20030911234306" -->
+<!-- sent="Fri, 12 Sep 2003 01:38:38 +0200" -->
+<!-- isosent="20030911233838" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] code generation" -->
+<!-- id="200309120138.38909.groepaz@gmx.net" -->
+<!-- inreplyto="20030911183919.GA25991@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20code%20generation"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2003-09-12 01:38:38
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3384.html">Ullrich von Bassewitz: "Re: [cc65] code generation"</a>
+<li><strong>In reply to:</strong> <a href="3384.html">Ullrich von Bassewitz: "Re: [cc65] code generation"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3387.html">Ullrich von Bassewitz: "Re: [cc65] code generation"</a>
+<li><strong>Next in thread:</strong> <a href="3377.html">Maciej Witkowiak: "Re: [cc65] Optimizing C code"</a>
+<li><strong>Reply:</strong> <a href="3387.html">Ullrich von Bassewitz: "Re: [cc65] code generation"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Thursday 11 September 2003 20:39, Ullrich von Bassewitz wrote:
+&gt; The inline assembler doesn't accept macro names. In fact, it accepts only
+&gt; valid 6502 opcodes, label names and nothing else (not even .byte or
+&gt; similar). This is a deliberate decision, since the code is translated into
+&gt; an abstract form so it can be handled by the optimizer later. Having
+&gt; unknown instructions would break the optimizer.
+
+ok i see
+
+&gt; &gt; shouldnt a simple feature to generate unique names for labels solve it
+&gt; &gt; then?
+&gt;
+&gt; Yes - if you come up with something that makes this feature &quot;simple&quot;.
+
+mmmh.... ok.... let me just try to come up with something, it doesnt seem to 
+be super simple now i think of it (:=P) but it cant be really hard either (i 
+hope :))
+
+so... first of all, since it works within one single macro invokation (or 
+better, within a single occurance in inline asm in general) there isnt a 
+general problem with emitting labels from within inline asm...
+
+second, the real problem is not generating unique labels by itself, but the 
+problem is to let the inline asm know when to generate a new label and 
+when/where those labels are referenced....the main problem beeing here that 
+each single __asm__ statement must be looked at seperatly here...
+
+mmmmh... so what about this... (this exploits that the preprocessor isnt 
+really a single pass but the input stream goes directly into the 
+compiler...uhm :))
+
+a) everytime a macro expansion takes place a certain counter &quot;local_prefix&quot; is 
+incremented
+b) inline asm gets a format-string added that works like this:
+
+	__asm__(&quot;beq %l&quot;, 1); // generates labelnr=1
+
+the actual label is now formed as &quot;@%4d%4d&quot;,local_prefix,labelnr
+
+that should allow labels in inline asm in both macros and functions with the 
+following restrictions:
+
+- numbers of labels in macros can be used only once per macro (ofcoz! :=))
+- also in a C functions several &quot;chunks&quot; of inline asm can not share the same
+label numbers - UNLESS the asm occurs in macros!
+- right after a macro expansion, label numbers used by the macro will clash 
+with label numbers in further inline assembly in the function outside a macro 
+(this could be solved by incrementing local_prefix AFTER each macro expansion 
+too....mmmh i think that could be kinda difficult though right? :=P)
+
+mmmh...could that even work? :)
+
+&gt; &gt; even something that loads AX with swapped byte order would be cool :=P
+&gt;
+&gt; I can see that you have a situation where this might be useful. But how
+&gt; generic is this and how many people are writing code making use of this
+&gt; feature? If I would sit here, bored and waiting for something to do then I
+&gt; would be happy to add all sorts of esoteric features. Unfort^WFortunately
+&gt; this is not the case, so I try to concentrate on the things that are more
+&gt; important, otherwise I don't get anything done.
+
+*GGG* i'm just kidding :) actually i think that this sort of things should 
+also be &quot;rearranged&quot; by the optimizer.... __AX__ (and i think theres __EAX__ 
+or sth too?! mmh :)) really is all the inline asm by itself should feature - 
+again, the concern is to possibly brake something by manually loading 
+stuff...fine if thats not the case :)
+
+&gt; Why not develop opt65 into a tool that can be run as an intermediate
+&gt; processor before running the assembler over the compiler generated code?
+&gt; This would ease the task of testing new peephole optimization stuff which
+&gt; can later go into the builtin cc65 backend. Hey, you can even write it in
+&gt; perl to make it unreadable:-)
+
+its almost at that state actually :) i've made some minor modifications so it 
+runs flawlessly on cc65 generated code, and currently try to teach it some 
+more little details (eg removing immediate lda followed by immediate 
+ora/and/eor)... well and i hacked some rather dumb pattern based thingy thats 
+basically useful to test some peephole rule without actually coding much :) 
+(its dog slow in return :=P) ... i'll upload it all as soon as i dont see any 
+more room for optimizations left in that raycasting thingy (its surprising 
+13fps now with just a few snippets of asm in macros...really nice :))
+
+however, the main things that opt65 catches atm is a lot of unnessary lda/tax 
+ldx/txa etc stuff (~400 lines removed on ~5000 lines of asm for the raycaster 
+- although i have to make better figures here, the numbers seem to be 
+somewhat large, there must be a bug in the linecounter in opt65 somewhere 
+:=P).... then my pattern based thingy removes some more (eg the highbyte add 
+on short+char).
+
+however, optimizing the code with opt65 still gave only minor speed 
+improvements compared to what certain inline macros could gain :) 
+
+&gt; No. The only thing that may happen is that the compiler refuses to
+&gt; translate the code, if it is no valid expression because of the missing
+&gt; __AX__.
+
+ok thats good to hear....so i can improve some of those macros a bit more i 
+think :) .... cant await the snapshot with the macro stuff fixed :O)
+
+one more thing though.... 
+
+this macro... (you reckon why asking for __X__/__Y__ eh? :=P)
+
+#define getblock(_x,_y) (unsigned char) \
+	( \
+	__AX__= (_y), \
+	__asm__ (&quot;txa&quot;), \
+	__asm__ (&quot;tay&quot;), \
+	__AX__= (_x), \
+	__asm__ (&quot;lda %v,x&quot;, worldptr_lo ), \
+	__asm__ (&quot;sta ptr1&quot;), \
+	__asm__ (&quot;lda %v,x&quot;, worldptr_hi ), \
+	__asm__ (&quot;sta ptr1+1&quot;), \
+	__asm__ (&quot;lda (ptr1),y&quot;), \
+	__asm__ (&quot;ldx #%b&quot;, 0), \
+     __AX__)
+
+used in an if-expression...like
+
+if(getblock(x,y))
+{ ...
+
+will result in wrong code (i think the condition was not checked at all,dont 
+remember exactly sorry :=P), whereas
+
+if(getblock(x,y)!=0)
+{ ...
+
+will just work as expected.
+
+gpz
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20code%20generation">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3384.html">Ullrich von Bassewitz: "Re: [cc65] code generation"</a>
+<li><strong>In reply to:</strong> <a href="3384.html">Ullrich von Bassewitz: "Re: [cc65] code generation"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3387.html">Ullrich von Bassewitz: "Re: [cc65] code generation"</a>
+<li><strong>Next in thread:</strong> <a href="3377.html">Maciej Witkowiak: "Re: [cc65] Optimizing C code"</a>
+<li><strong>Reply:</strong> <a href="3387.html">Ullrich von Bassewitz: "Re: [cc65] code generation"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-09-12 01:44:02 CEST</em>
+</em>
+</small>
+</body>
+</html>

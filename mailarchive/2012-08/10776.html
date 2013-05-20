@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] C64 POSIX dirent stuff act</title>
+<meta name="Author" content="Greg King (greg.king41verizon.net)" />
+<meta name="Subject" content="Re: [cc65] C64 POSIX dirent stuff actually working?" />
+<meta name="Date" content="2012-08-24" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] C64 POSIX dirent stuff actually working?</h1>
+<!-- received="Fri Aug 24 15:35:13 2012" -->
+<!-- isoreceived="20120824133513" -->
+<!-- sent="Fri, 24 Aug 2012 08:32:54 -0400" -->
+<!-- isosent="20120824123254" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king41verizon.net" -->
+<!-- subject="Re: [cc65] C64 POSIX dirent stuff actually working?" -->
+<!-- id="F343A468547342669F34C69C5EA77EAD@Kaiser" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="20120806193458.GA12650&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10777.html" title="Greg King: &quot;Re: [cc65] [PATCH 3/3] Generate libsrc/apple2enh/extra if necessary&quot;">Next message</a> ]
+[ <a href="10775.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Uniform mass storage device discovery and file locations&quot;">Previous message</a> ]
+[ <a href="10553.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] C64 POSIX dirent stuff actually working?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+[ <a href="10540.html" title="A.Fachat: &quot;Re: [cc65] C64 POSIX dirent stuff actually working?&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king41verizon.net?Subject=Re:%20[cc65]%20C64%20POSIX%20dirent%20stuff%20actually%20working?">greg.king41verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-08-24 14:32:54</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: &quot;Ullrich von Bassewitz&quot;; on Monday, August 06, 2012; at 3:34 PM -0400
+&gt;
+&gt; On Mon, Aug 06, 2012 at 09:14:09PM +0200, Spiro Trikaliotis wrote:
+&gt;&gt; r5804? Well, LOAD &quot;$:*,R&quot;,8 does not work as you expect, indeed.
+&gt;
+&gt; It does, but &quot;$0,R&quot; does not. The problem was (r5804 vs r5805) that I
+&gt; either
+&gt; need to do special casing in open(), and don't add &quot;,R&quot; because &quot;$0,R&quot;
+&gt; does
+&gt; not work; or, do more special casing when parsing the file name, and make
+&gt; it &quot;$0:*&quot;, because the drive accepts &quot;$0:*,R&quot;.
+&gt;
+&gt; Does anybody have an &quot;official&quot; guide to what the CBM drives accept? 
+&gt; Doing
+&gt; all this stuff with try&amp;error is a bit tiring.
+
+I doubt that there is a guide to this particular stuff.  I learned about it
+from tests and ROM disassemblies.
+
+The directory and Scratch commands have the same syntax (the Copy command
+has a somewhat similar syntax):
+* from one to five file-name patterns;
+* each pattern has its own, independent, optional drive number (the absense
+of a colon means &quot;_both_ drives&quot;);
+* there can be a file-type filter at the end of the command.
+
+When those commands run, they initiate the disks first, if that hasn't been
+done already.  If the list of patterns refers to both drives, then both of
+them are initiated _before_ the first disk is searched!  As each file-name
+in a directory is seen, it is compared to the entire list -- the operation
+is performed if any pattern matches that name.  When the list refers to 
+both
+drives, the other disk is searched after the first directory is finished.
+
+When all of the patterns want both drives, the choice about which drive is
+seen first is complicated.  It is supposed to be the drive that was used
+most recently by a previous operation.  But, that doesn't do always what 
+you
+might expect.  With some arguments, a command will stop after the second
+drive; that drive becomes the new &quot;most recent&quot;.  With other arguments, the
+command will go back to the first drive; it stays as the &quot;most recent&quot;.
+
+----------------------------------------------
+
+Your string &quot;$0:*,r&quot; has two patterns.  The second one doesn't have a 
+colon.
+Therefore, it will search both disks for the file-name &quot;r&quot;.  The fix for
+that problem is very simple:  don't add &quot;,r&quot; to _any_ file-name.  It isn't
+needed because the read access-mode is the default for all secondary
+addresses except 1.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Aug 24 15:35:13 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10777.html" title="Next message in the list">Greg King: "Re: [cc65] [PATCH 3/3] Generate libsrc/apple2enh/extra if necessary"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10775.html" title="Previous message in the list">Spiro Trikaliotis: "Re: [cc65] Uniform mass storage device discovery and file locations"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10553.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] C64 POSIX dirent stuff actually working?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10540.html" title="Next message in this discussion thread">A.Fachat: "Re: [cc65] C64 POSIX dirent stuff actually working?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10776" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10776" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10776" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-08-24 15:35:16 CEST
+</em></small></p>
+</body>
+</html>

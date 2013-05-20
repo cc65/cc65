@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] snapshot #1</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] snapshot #1">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] snapshot #1</h1>
+<!-- received="Wed Sep 26 20:03:22 2001" -->
+<!-- isoreceived="20010926180322" -->
+<!-- sent="Wed, 26 Sep 2001 20:02:10 +0200" -->
+<!-- isosent="20010926180210" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] snapshot #1" -->
+<!-- id="1193165196.20010926200210@gmx.net" -->
+<!-- inreplyto="20010926171727.A31020@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20snapshot%20#1"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2001-09-26 20:02:10
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0761.html">groepaz: "Re[2]: [cc65] snapshot #1"</a>
+<li><strong>Previous message:</strong> <a href="0759.html">Ullrich von Bassewitz: "Re: [cc65] snapshot #1"</a>
+<li><strong>In reply to:</strong> <a href="0758.html">Ullrich von Bassewitz: "Re: [cc65] snapshot #1"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0749.html">Michal Bartczak: "RE: [cc65] Compiling"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+UvB&gt; What I've seen it is quite C64 specific but as I said I didn't have a closer
+UvB&gt; look because I have so many open topics with the current development compiler
+UvB&gt; and I didn't want to start new ones.
+
+well, yes it probably is pretty much c64 specific, since i develop for
+a c64 ;=) however, i have written loads of portable code before and i
+have atleast prepared most of this lib stuff to make it portable later
+with ease. (all important stuff like kernal-entry points etc defined
+in header/include files for example)
+
+UvB&gt; Well, what I said was not correct. Programs on the C64 have 50K memory
+UvB&gt; available, on the CBM510 it is 48K. This is somewhat less as with the CBM610
+UvB&gt; machines, mostly because I had to move the complete VIC data including the
+UvB&gt; character ROM into the execution bank to make sprites possible (which are
+UvB&gt; needed for the mouse support). But this does also mean that the character data
+UvB&gt; is also in RAM and modifyable.
+
+ah ok ;=) i guess it would be kind of hard to get my hands on a p500
+anyway ;=))
+
+UvB&gt; I will send you the changed source in private mail and add it as a new sample
+UvB&gt; program to the head branch. Most of the changes are for readbility, some more
+UvB&gt; to support other platforms than the C64, and a great part of the remaining
+UvB&gt; changes do not help with the current stable compiler version. See my next mail
+UvB&gt; for a discussion of the changes that were responsible for the first 50%
+UvB&gt; speedup.
+
+got it..thanx.. your changes make this look like an entire
+new/different program to me hehehe ;=P probably its those massive
+comments (my comments are sparse...the code says it all ;D)
+
+btw to make this look like in a real (bad ;=P) demo, add
+    *(VIC+0x16)^=4;
+after each screen-buffer swap (will look horrible if less than 50 fps
+though ;=P)
+
+&gt;&gt; 12 fps is VERY acceptable now i think, considering how hard the job
+&gt;&gt; for the compiler is in this case :=)
+
+UvB&gt; Here is what the current development compiler generates for the inner loop:
+
+[snip]
+
+UvB&gt; I think this is rather good, and it is almost impossible to generate better
+UvB&gt; code with an all purpose compiler/optimizer.
+
+looks almost optimal to me, right ;) (other optimizations that come to
+mind would all involve self-modifying code which i think the compiler
+wouldnt be able to handle nor generate, right?)
+
+another question would be, how it'll look if you'd use 2 different
+routines for each of the screenbuffers (one of the common
+optimizations when it comes to handcoded demo-routines) .... maybe
+it's also possible to write the C code in a different way so both the
+screen and the sinus-buffers can use indexed adressing....
+
+i'll check this out when the compiler has been released i guess :=)
+it'll be WAY cool if it'd be possible to make this sucker run at full
+speed (say 50fps) ;=)
+
+UvB&gt; You may add the module as the second module on the command line, or you may
+UvB&gt; use a special memory setup. When using banking you will probably need such a
+UvB&gt; setup anyway, because some of the code may be banked, while other code and all
+UvB&gt; of the data must always be available.
+
+well the current implementation uses handwritten routines to copy data
+from/to the floating-point &quot;registers&quot; (that is, zeropage locations
+called &quot;FAC&quot; and &quot;ARG&quot;) and just the basic-routines that actually
+process that data need the basic-rom to be banked in.... this way
+source+destination of the data can be anywhere in memory, even under
+the banked rom.... just the stub that calls the rom-routines (and
+which does the banking) needs a safe place that isnt affected by
+banking to live in. (and its a small stub aswell, around 2 pages or
+sth, working on getting this even smaller)
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20snapshot%20#1">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20snapshot%20#1">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0761.html">groepaz: "Re[2]: [cc65] snapshot #1"</a>
+<li><strong>Previous message:</strong> <a href="0759.html">Ullrich von Bassewitz: "Re: [cc65] snapshot #1"</a>
+<li><strong>In reply to:</strong> <a href="0758.html">Ullrich von Bassewitz: "Re: [cc65] snapshot #1"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0749.html">Michal Bartczak: "RE: [cc65] Compiling"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:42 CET</em>
+</em>
+</small>
+</body>
+</html>

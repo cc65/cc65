@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Lynx target</title>
+<meta name="Author" content="Karri Kaksonen (karri1kosh.dna.fi)" />
+<meta name="Subject" content="Re: [cc65] Lynx target" />
+<meta name="Date" content="2008-03-21" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Lynx target</h1>
+<!-- received="Fri Mar 21 15:47:57 2008" -->
+<!-- isoreceived="20080321144757" -->
+<!-- sent="Fri, 21 Mar 2008 16:47:09 +0200" -->
+<!-- isosent="20080321144709" -->
+<!-- name="Karri Kaksonen" -->
+<!-- email="karri1kosh.dna.fi" -->
+<!-- subject="Re: [cc65] Lynx target" -->
+<!-- id="47E3CA6D.20504@kosh.dna.fi" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="000601c88add$6455a8c0$443efea9&#64;monarch" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6063.html" title="Oliver Schmidt: &quot;[cc65] Compiler Bug (?)&quot;">Next message</a> ]
+[ <a href="6061.html" title="Greg King: &quot;Re: [cc65] Lynx target&quot;">Previous message</a> ]
+[ <a href="6061.html" title="Greg King: &quot;Re: [cc65] Lynx target&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6067.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Lynx target&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Karri Kaksonen &lt;<a href="mailto:karri1kosh.dna.fi?Subject=Re:%20[cc65]%20Lynx%20target">karri1kosh.dna.fi</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-03-21 15:47:09</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Greg King kirjoitti:
+&gt; From: &quot;Karri Kaksonen&quot; on Thursday, March 20, 2008; at 05:20 AM -0400
+&gt;   
+&gt;&gt; void __fastcall__ FileLoadFile(int filenumber)
+&gt;&gt; void __fastcall__ FileExecFile(int filenumber)
+&gt;&gt;     
+&gt;
+&gt; I think that those functions should be renamed CartLoadFile() and
+&gt; CartExecFile().  It will avoid confusion about the source of what they load.
+&gt;   
+Makes sense.
+&gt; I adapted some code from your &quot;lynx-cart-demo-1.1.zip&quot;
+&gt; contribution, and created enough POSIX input functions to allow Lynx
+&gt; programs to load dynamic drivers (into heap space) in the same way that
+&gt; other targets do it.  Examples:
+&gt;
+&gt;     // The joystick and graphics drivers are the third and fourth files
+&gt;     // in the directory.
+&gt;     status = joy_load_driver(joy_stddrv);
+&gt;     tgi_load_driver(&quot;\3&quot;);
+&gt;   
+Interesting. I have to add this to my template.
+&gt; It might be interesting to add a layer above those EEPROM functions that
+&gt; sees the EEPROM as a POSIX file.
+&gt;   
+Yes. There is also big EEPROMs on the market up tp 256k for about a 
+dollar or two. These could also be supported by the same driver.
+
+The getenv/putenv idea in a previous post was a bit strange as I would 
+also need to save the key and the data. The size of the current EEPROM 
+is so small that in MegaPak I needed every byte just to save the state 
+of the included adventure game.
+--
+Thanks,
+
+Karri
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Mar 21 15:47:57 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6063.html" title="Next message in the list">Oliver Schmidt: "[cc65] Compiler Bug (?)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6061.html" title="Previous message in the list">Greg King: "Re: [cc65] Lynx target"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6061.html" title="Message to which this message replies">Greg King: "Re: [cc65] Lynx target"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6067.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Lynx target"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6062" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6062" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6062" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-03-21 15:48:00 CET
+</em></small></p>
+</body>
+</html>

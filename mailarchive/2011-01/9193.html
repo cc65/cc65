@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] atexit() destructor priori</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] atexit() destructor priority" />
+<meta name="Date" content="2011-01-27" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] atexit() destructor priority</h1>
+<!-- received="Thu Jan 27 22:11:13 2011" -->
+<!-- isoreceived="20110127211113" -->
+<!-- sent="Thu, 27 Jan 2011 22:11:05 +0100" -->
+<!-- isosent="20110127211105" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] atexit() destructor priority" -->
+<!-- id="20110127211105.GA12306@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="AANLkTim1Ltq62jTN3hpappk41EQ-+794K1SjC4OOaghH&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9194.html" title="Oliver Schmidt: &quot;Re: [cc65] atexit() destructor priority&quot;">Next message</a> ]
+[ <a href="9192.html" title="Oliver Schmidt: &quot;Re: [cc65] atexit() destructor priority&quot;">Previous message</a> ]
+[ <a href="9192.html" title="Oliver Schmidt: &quot;Re: [cc65] atexit() destructor priority&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9194.html" title="Oliver Schmidt: &quot;Re: [cc65] atexit() destructor priority&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20atexit()%20destructor%20priority">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-01-27 22:11:05</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Thu, Jan 27, 2011 at 03:42:48PM +0100, Oliver Schmidt wrote:
+&gt; Here you go:
+
+Ok, here is the same information ordered by priority:
+
+-------------------------------------------------------------------------
+
+Constructors:
+
+30 initcurunit          cbm
+27 initmouse            atari
+26 detect               atari
+25 initmainargs         atari
+25 initstkchk           runtime
+24 __getdefdev          atari
+24 initheap             common
+24 initmainargs         atmos, c16, c128, c64, cbm510, cbm610, geos, lynx,
+                        pet, plus4, vic20
+19 initdostype          apple2
+18 initmainargs         apple2
+17 raisefilelevel       apple2
+16 initconio            apple2
+ 7 initsystime          c128, c64
+ 7 cwd_init             common
+ 7 env_init             common
+ 7 initcgetc            atmos, c128
+ 7 initkbd              c16, plus4
+ 7 initstdin            cbm
+ 7 initstdout           cbm
+ 7 initostype           apple2
+ 7 initprompt           apple2
+ 7 initreboot           apple2
+ 7 initiobuf            apple2
+ 7 initscrsize          geos
+ 7 conioinit            nes
+
+
+
+Destructors:
+
+17      closeallfiles   apple2, atari, cbm
+ 7      _reset_brk      apple2, atari, c16, c128, c64, pet, vic20
+ 7      donecgetc       c128
+ 7      donekbd         c16, plus4
+ 7      setsyscursor    cbm610
+ 5      doatexit        common
+
+-------------------------------------------------------------------------
+
+7 is the default priority, which explains why there are so many routines with
+this priority.
+
+The constructor with priority 27 for the Atari (initmouse) will get removed in
+the next days by me. It is part of an ancient mouse module with static
+linkage. It cannot be used anyway, since the necessary header files are
+missing. If anybody is interested in mouse support for the Atari, please
+consider converting this module into a loadable driver.
+
+Regarding the destructors: Having priorities 17 and 5 exchanged should do the
+job.
+
+For the constructors, it seems that they accumulate at the high priorities. I
+can't see any necessary adjustments. Maybe removing explicit priorities where
+possible.
+
+For the nes, I will rename conioinit to initconio.
+
+Anything else?
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Jan 27 22:11:13 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9194.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] atexit() destructor priority"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9192.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] atexit() destructor priority"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9192.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] atexit() destructor priority"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9194.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] atexit() destructor priority"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9194.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] atexit() destructor priority"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9201.html" title="Message sent in reply to this message">Christian Grössler: "Re: [cc65] atexit() destructor priority"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9193" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9193" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9193" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-01-27 22:11:16 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] octal character constants</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] octal character constants bug (again :=P)">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] octal character constants bug (again :=P)</h1>
+<!-- received="Tue Sep 30 22:34:57 2003" -->
+<!-- isoreceived="20030930203457" -->
+<!-- sent="Tue, 30 Sep 2003 22:34:52 +0200" -->
+<!-- isosent="20030930203452" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] octal character constants bug (again :=P)" -->
+<!-- id="20030930203452.GA28301@trixie.musoftware.de" -->
+<!-- inreplyto="200309302205.16885.groepaz@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20octal%20character%20constants%20bug%20(again%20:=P)"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-09-30 22:34:52
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3529.html">Groepaz: "Re: [cc65] octal character constants bug (again :=P)"</a>
+<li><strong>In reply to:</strong> <a href="3528.html">Groepaz: "Re: [cc65] octal character constants bug (again :=P)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3531.html">Groepaz: "Re: [cc65] octal character constants bug (again :=P)"</a>
+<li><strong>Reply:</strong> <a href="3531.html">Groepaz: "Re: [cc65] octal character constants bug (again :=P)"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Tue, Sep 30, 2003 at 10:05:16PM +0200, Groepaz wrote:
+&gt; can you (briefly :=P) tell what the standard says on that then? (ie, what are
+&gt; the properties of escaped numerics?) i thought that escaped numeric
+&gt; characters shouldnt be translated like this.... mmmmh. is this even defined
+&gt; at all? or is it implementation defined?
+                                                      
+    5.2.1 Character sets
+
+    2 In a character constant or string literal, members of the execution
+      character set shall be represented by corresponding members of the
+      source character set or by escape sequences consisting of the backslash
+      \ followed by one or more characters. A byte with all bits set to 0,
+      called the null character, shall exist in the basic execution character
+      set; it is used to terminate a character string.
+
+I would interpret this as if the current behaviour of cc65 is correct. It's
+also easy to remember: Any character or string constant is translated into the
+target character set.
+
+&gt; however, i am
+&gt; still not quite sure if this translation should take place... what about
+&gt; binary data that's embedded into the c-program, translation would be fatal
+&gt; here? (maybe such thing is simply considered non portable by the standard?)
+
+If you don't want the translation, don't use character constants. For binary
+data it is not a good idea to use character constants, why not just use
+numbers:
+
+        printf(&quot;%3d : %3d\n&quot;,010,8);
+
+works as expected.
+
+&gt; a) each character has exactly one corrosponding escaped numeric. since both
+&gt; will be translated, a check like ('A' == '\101') must work on all targets
+&gt; (ie, its portable)
+
+Not exactly. Two characters of the source character set may be translated into
+the same character of the execution character set. But you check will be ok.
+
+&gt; b) the same as a), but for escaped characters ('\n' etc)
+
+The represenation of character like \n depends on the target platform, so a
+check like ('\n' == '\101') depends on the target platform.
+
+&gt; c) a binary value does not need to corrospond to a character in the target
+&gt; characterset. comparison and/or assignments of binary values with/to
+&gt; characters/strings is dependend on the target characterset and thus not
+&gt; portable. (like the tests i have pasted :=P)
+
+Yes, same as in b)
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20octal%20character%20constants%20bug%20(again%20:=P)">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20octal%20character%20constants%20bug%20(again%20:=P)">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3529.html">Groepaz: "Re: [cc65] octal character constants bug (again :=P)"</a>
+<li><strong>In reply to:</strong> <a href="3528.html">Groepaz: "Re: [cc65] octal character constants bug (again :=P)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3531.html">Groepaz: "Re: [cc65] octal character constants bug (again :=P)"</a>
+<li><strong>Reply:</strong> <a href="3531.html">Groepaz: "Re: [cc65] octal character constants bug (again :=P)"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-09-30 22:35:05 CEST</em>
+</em>
+</small>
+</body>
+</html>

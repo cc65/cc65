@@ -1,0 +1,171 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Supervision support</title>
+<meta name="Author" content="Peter Trauner (peter.trauner_at_utanet.at)">
+<meta name="Subject" content="Re: [cc65] Supervision support">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Supervision support</h1>
+<!-- received="Wed Sep 24 07:01:58 2003" -->
+<!-- isoreceived="20030924050158" -->
+<!-- sent="Wed, 24 Sep 2003 06:35:21 +0200" -->
+<!-- isosent="20030924043521" -->
+<!-- name="Peter Trauner" -->
+<!-- email="peter.trauner_at_utanet.at" -->
+<!-- subject="Re: [cc65] Supervision support" -->
+<!-- id="3F711F09.9020007@utanet.at" -->
+<!-- inreplyto="200309221604.16187.groepaz@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Peter Trauner (<a href="mailto:peter.trauner_at_utanet.at?Subject=Re:%20[cc65]%20Supervision%20support"><em>peter.trauner_at_utanet.at</em></a>)<br>
+<strong>Date:</strong> 2003-09-24 06:35:21
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3447.html">Groepaz: "[cc65] feature questions..."</a>
+<li><strong>In reply to:</strong> <a href="3434.html">Groepaz: "Re: [cc65] Supervision support"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3449.html">Groepaz: "Re: [cc65] Supervision support"</a>
+<li><strong>Next in thread:</strong> <a href="3436.html">Ullrich von Bassewitz: "Re: [cc65] Supervision support"</a>
+<li><strong>Reply:</strong> <a href="3449.html">Groepaz: "Re: [cc65] Supervision support"</a>
+<li><strong>Reply:</strong> <a href="3453.html">Ullrich von Bassewitz: "Re: [cc65] Supervision support"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello gpz,
+
+Sorry for the delay, but I thought it is better to download the
+actual snapshot and take a closer look as suggested by you.
+
+&gt;care to explain what it is? never heard of that one :o)
+&gt;  
+&gt;
+
+Gameboy style handheld, but w65c02s cpu clocked at 4Mhz, hires 4 greys
+160x160 lcd, ...
+(details in technical summary, there are also 2 faqs available in the web)
+
+&gt;&gt;I looked a little bit on the compiler and started to add supervision c
+&gt;&gt;support.
+&gt;&gt;
+&gt;&gt;Since this is a console and the program is in ROM, how do I
+&gt;&gt;initialize/handle
+&gt;&gt;non const global variables?
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;write a linker config that puts everything into rom, except the .bss and .data 
+&gt;sections (which should be in ram) (if you dont have any ram at all - you have 
+&gt;problems :=P)
+&gt;  
+&gt;
+
+8 kbyte + 8kbyte for video.
+
+&gt;you may want to look at the NES port (which is available in the development 
+&gt;version) - looking at the code/linkerconfig might solve some of your 
+&gt;questions.
+&gt;  
+&gt;
+
+Thanks, based my data init on your one (and will look at the library 
+function mentioned by Uz)
+
+&gt;&gt;Is it safe to call c functions from irq, nmi?
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;no - (not entire true, its very &quot;hard&quot; and features lot of overhead)... the 
+&gt;general rule is to write that stuff in assembler.
+&gt;
+&gt;if you really think you want to do this in C (you dont, believe me :=)), look 
+&gt;at the code of the debug library....somewhere in there is a brk-handler that 
+&gt;calls a C function.
+&gt;
+
+I read the explaination in the faq. (I have been afraid about this).
+
+&gt;&gt;Is it allowed to support several supervision targets?
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;maybe you also want to look at the atari stuff and see how they support 
+&gt;several different targets with just one config? having several configs for 
+&gt;the same target (ie, computer) would probably be kinda overkill... (offhand, 
+&gt;i could probably come up with 10+ configs just for the c64 :=))
+
+Didn't find something special in snapshot 2.9.5 and atari.
+
+&gt;&gt;(some remarks about my first cc65 usage?)
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;after a quick look.... seems to be ok overall... some tips though
+&gt;
+&gt;- have a look at the conio-interface and design your screen i/o stuff like 
+&gt;that... might make some things easier in the future
+&gt;
+
+I will look at it.
+
+&gt;- use seperate files for each function, that will reduce the overhead when 
+&gt;linking a larger library 
+&gt;  
+&gt;
+
+Ok. I haven't splitted common into common and draw stuff yet.
+(splitting into 1 function in 1 file is overkill in my opinion).
+
+Peter
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Supervision%20support">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3447.html">Groepaz: "[cc65] feature questions..."</a>
+<li><strong>In reply to:</strong> <a href="3434.html">Groepaz: "Re: [cc65] Supervision support"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3449.html">Groepaz: "Re: [cc65] Supervision support"</a>
+<li><strong>Next in thread:</strong> <a href="3436.html">Ullrich von Bassewitz: "Re: [cc65] Supervision support"</a>
+<li><strong>Reply:</strong> <a href="3449.html">Groepaz: "Re: [cc65] Supervision support"</a>
+<li><strong>Reply:</strong> <a href="3453.html">Ullrich von Bassewitz: "Re: [cc65] Supervision support"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-09-24 07:02:05 CEST</em>
+</em>
+</small>
+</body>
+</html>

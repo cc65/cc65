@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] assembler hello world</title>
+<meta name="Author" content="mog (mog-lists1rldn.net)" />
+<meta name="Subject" content="[cc65] assembler hello world" />
+<meta name="Date" content="2011-09-14" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] assembler hello world</h1>
+<!-- received="Wed Sep 14 00:25:17 2011" -->
+<!-- isoreceived="20110913222517" -->
+<!-- sent="Tue, 13 Sep 2011 17:25:01 -0500" -->
+<!-- isosent="20110913222501" -->
+<!-- name="mog" -->
+<!-- email="mog-lists1rldn.net" -->
+<!-- subject="[cc65] assembler hello world" -->
+<!-- id="20110913222501.GC10008@geminiman" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9651.html" title="mog: &quot;[cc65] Re: assembler hello world&quot;">Next message</a> ]
+[ <a href="9649.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] looking for 2.11.0&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9651.html" title="mog: &quot;[cc65] Re: assembler hello world&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: mog &lt;<a href="mailto:mog-lists1rldn.net?Subject=Re:%20[cc65]%20assembler%20hello%20world">mog-lists1rldn.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-09-14 00:25:01</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi everyone
+
+I am trying to get a hello world working for my apple ii and cant seem
+to get past linking step.  below is my code and compile chain. I am using
+ca65 V2.13.9 - (C) Copyright 1998-2011 Ullrich von Bassewitz
+ld65 V2.13.9 - (C) Copyright 1998-2009, Ullrich von Bassewitz
+
+hello.s:
+-----------------------------------------------------------
+.import __STARTUP_LOAD__, __BSS_LOAD__ ; Linker generated
+
+.segment &quot;EXEHDR&quot;
+.addr __STARTUP_LOAD__ ; Start address
+.word __BSS_LOAD__ - __STARTUP_LOAD__ ; Size
+
+.segment &quot;RODATA&quot;
+MSG: .ASCIIZ &quot;Hello, world!&quot;
+
+.segment &quot;STARTUP&quot;
+
+LDA #$8D ; next line
+JSR $FDED
+LDX #0
+LDA MSG,X ; load initial char
+&#64;LP: ORA #$80
+JSR $FDED ; cout
+INX
+LDA MSG,X
+BNE &#64;LP
+LDA #$8D ; next line
+JSR $FDED
+JMP $03D0 ; warm start
+----------------------------------------------------------
+
+Makefile:
+----------------------------------------------------------
+all:
+	ca65 -t apple2 hello.s
+	ld65 -t apple2 -o hello hello.o
+	cp ../cc65.dsk ./
+	java -jar ../ac.jar -cc65 cc65.dsk hello B &lt; hello
+----------------------------------------------------------
+it fails on the linker with
+
+ld65: Warning: [builtin config](43): Segment `LOWCODE' does not exist
+ld65: Warning: [builtin config](43): Segment `ZPSAVE' does not exist
+ld65: Warning: [builtin config](43): Segment `INIT' does not exist
+Unresolved external `__STARTUP_LOAD__' referenced in:
+  hello.s(4)
+  hello.s(5)
+ld65: Error: 1 unresolved external(s) found - cannot create output file
+
+-- 
+Matthew O'Gorman
+xim: mog&#64;rldn&#46;<!--nospam-->net
+email: mog&#64;rldn&#46;<!--nospam-->net
+site: <a href="http://blog.rldn.net">http://blog.rldn.net</a>
+/***********************************************/
+/* The truth is rarely pure, and never simple. */
+/*                 -- Oscar Wilde              */
+/***********************************************/
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<div>
+<ul>
+<li>application/pgp-signature attachment: <a href="../att-9650/signature.asc">Digital signature</a></li>
+</ul>
+<!-- attachment="signature.asc" -->
+</div>
+<span id="received"><dfn>Received on</dfn> Wed Sep 14 00:25:17 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9651.html" title="Next message in the list">mog: "[cc65] Re: assembler hello world"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9649.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] looking for 2.11.0"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9651.html" title="Next message in this discussion thread">mog: "[cc65] Re: assembler hello world"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9651.html" title="Message sent in reply to this message">mog: "[cc65] Re: assembler hello world"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9650" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9650" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9650" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-09-14 00:25:21 CEST
+</em></small></p>
+</body>
+</html>

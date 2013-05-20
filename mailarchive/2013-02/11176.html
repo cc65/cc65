@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Disable KERNAL ROM ?</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Disable KERNAL ROM ?" />
+<meta name="Date" content="2013-02-13" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Disable KERNAL ROM ?</h1>
+<!-- received="Wed Feb 13 15:00:54 2013" -->
+<!-- isoreceived="20130213140054" -->
+<!-- sent="Wed, 13 Feb 2013 15:00:35 +0100" -->
+<!-- isosent="20130213140035" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Disable KERNAL ROM ?" -->
+<!-- id="CACT=u73yn_z_YQA_eV4MMwjmgxgQZ4kNxV4UVqzghjHQ5FSVAw@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="7A075D5A-E110-4C84-9457-767BE5310DF1&#64;wfmh.org.pl" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11177.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Changes in Interrupt Handling&quot;">Next message</a> ]
+[ <a href="11175.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Disable KERNAL ROM ?&quot;">Previous message</a> ]
+[ <a href="11175.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Disable KERNAL ROM ?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="11178.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Disable KERNAL ROM ?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Disable%20KERNAL%20ROM%20?">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2013-02-13 15:00:35</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt;&gt; Note that by this usage scenario there's no problem with code banking
+&gt;&gt; out itself as the thunks
+&gt;
+&gt; What are &quot;thunks&quot; in this context?
+
+You're right, the term isn't actually well defined...
+
+I'm thinking of routines like this
+
+BSOUT:
+  pha
+  lda #??
+  sta $01
+  pla
+  jsr $FFD2
+  pha
+  lda #??
+  sta $01
+  pla
+  rts
+
+If a certain routine isn't known to not use A, X or Y as parameter
+then of course the code can be optimized. The code shown above is the
+generic one that preserves &quot;everything&quot; accross the banking.
+
+&gt;&gt; I understand that the C64 would additionally require the setup of an
+&gt;&gt; IRQ thunk handler...
+
+&gt; I am not 100% sure if I understand but IRQ and NMI vectors are on the top of KERNAL ROM. If this is banked out at least NMI should be covered but IRQ preferably as well. This can be done by placing appropriate values in the RAM but the values has to be &quot;appropriate&quot; as original ones point to ROM locations.
+
+The vectors in RAM have to point to routines that switch to ROM, call
+the original handler, switch back to RAM and return from the
+interrupt.
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Feb 13 15:00:54 2013</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11177.html" title="Next message in the list">silverdr1wfmh.org.pl: "Re: [cc65] Changes in Interrupt Handling"</a></li>
+<li><dfn>Previous message</dfn>: <a href="11175.html" title="Previous message in the list">silverdr1wfmh.org.pl: "Re: [cc65] Disable KERNAL ROM ?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="11175.html" title="Message to which this message replies">silverdr1wfmh.org.pl: "Re: [cc65] Disable KERNAL ROM ?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="11178.html" title="Next message in this discussion thread">silverdr1wfmh.org.pl: "Re: [cc65] Disable KERNAL ROM ?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="11178.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] Disable KERNAL ROM ?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="11181.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Re: [cc65] Disable KERNAL ROM ?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#11176" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#11176" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#11176" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2013-02-13 15:00:57 CET
+</em></small></p>
+</body>
+</html>

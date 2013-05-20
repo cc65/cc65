@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Minor feature request? Inl</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Minor feature request? Inline assembly section?" />
+<meta name="Date" content="2009-08-15" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Minor feature request? Inline assembly section?</h1>
+<!-- received="Sat Aug 15 11:04:53 2009" -->
+<!-- isoreceived="20090815090453" -->
+<!-- sent="Sat, 15 Aug 2009 11:03:42 +0200" -->
+<!-- isosent="20090815090342" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Minor feature request? Inline assembly section?" -->
+<!-- id="20090815090342.GA21104@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="aec6e65a0908142129r4cfbcc48y81c680010f1aab11&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6679.html" title="Egan Ford: &quot;Re: [cc65] Apple //e time() and printer support.&quot;">Next message</a> ]
+[ <a href="6677.html" title="Scott Hutter: &quot;[cc65] Minor feature request? Inline assembly section?&quot;">Previous message</a> ]
+[ <a href="6677.html" title="Scott Hutter: &quot;[cc65] Minor feature request? Inline assembly section?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Minor%20feature%20request?%20Inline%20assembly%20section?">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-08-15 11:03:42</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Fri, Aug 14, 2009 at 11:29:38PM -0500, Scott Hutter wrote:
+&gt; Rather than a function style, as in _asm(&quot;LDA #$00&quot;);.  what about blocks
+&gt; like:
+&gt;
+&gt; asm
+&gt; {
+&gt;     LDA #$00
+&gt;     TAX
+&gt;      STA $C000
+&gt; };
+&gt;
+&gt; Could this be done? (Maybe it already can and I just havent done it right or
+&gt; something.)
+
+The correct question is not if it could be done, but if it should be done.
+Currently I see no appealing reasons to implement asm {}. If you had good
+reasons to suggest it, you forgot to mention them:-)
+
+Here are some of the reasons why it is as it is:
+
+Very old versions had this style of inline assembler (#asm if I remember
+correctly). There are a few problems with this approach that let me do it the
+other way: First, the C standard suggests to use
+
+        asm ( character-string-literal );
+
+(in ISO/IEC 9899:1999 (E), Annex J, Chapter 5, &quot;Common Extensions&quot;).
+
+Second, for quite a few things, an extended syntax is necessary. For example
+when accessing variables declared in C (quite a common case). How do you
+determine the name of a static variable in your asm {} block?
+
+Third, an asm {} block has much more impact on the compiler itself. You will
+need to enable the scanner to read tokens from this block. An asm(&quot;string&quot;)
+statement is much less disruptive, because it needs support in the parser
+only.
+
+Fourth, asm {} is a block, while asm() as implemented by cc65 is a primary
+expression. This means you can use it in every place, where a primary
+expression is expected, not only on statement level. As an example, the
+isalpha() function may be implemented as a macro:
+
+#define isalpha(c)  (__AX__ = (c),                  \
+                    asm (&quot;tay&quot;),                    \
+                    asm (&quot;lda %v,y&quot;, _ctype),       \
+                    asm (&quot;and #%b&quot;, _CT_ALPHA),     \
+                    __AX__)
+
+Calling isalpha() will then add the assembler sequence to the code without
+calling a subroutine.
+
+Fifth, for portability and readability reasons, you don't want to add larger
+pieces of assembler code to your C sources anyway. cc65 makes it very easy to
+mix C and assembler modules, so for more than a few lines of assembler just
+use the ca65 macro assembler that comes with cc65.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Aug 15 11:04:53 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6679.html" title="Next message in the list">Egan Ford: "Re: [cc65] Apple //e time() and printer support."</a></li>
+<li><dfn>Previous message</dfn>: <a href="6677.html" title="Previous message in the list">Scott Hutter: "[cc65] Minor feature request? Inline assembly section?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6677.html" title="Message to which this message replies">Scott Hutter: "[cc65] Minor feature request? Inline assembly section?"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6678" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6678" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6678" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-08-15 11:04:55 CEST
+</em></small></p>
+</body>
+</html>

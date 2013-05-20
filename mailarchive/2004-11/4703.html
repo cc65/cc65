@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Stack problems with severa</title>
+<meta name="Author" content="Shawn Jefferson (jefferson_shawn_a8bit1yahoo.com)" />
+<meta name="Subject" content="Re: [cc65] Stack problems with several segments." />
+<meta name="Date" content="2004-11-17" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Stack problems with several segments.</h1>
+<!-- received="Wed Nov 17 17:21:26 2004" -->
+<!-- isoreceived="20041117162126" -->
+<!-- sent="Wed, 17 Nov 2004 08:21:20 -0800 (PST)" -->
+<!-- isosent="20041117162120" -->
+<!-- name="Shawn Jefferson" -->
+<!-- email="jefferson_shawn_a8bit1yahoo.com" -->
+<!-- subject="Re: [cc65] Stack problems with several segments." -->
+<!-- id="20041117162120.99386.qmail@web52209.mail.yahoo.com" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="Pine.LNX.4.58.0411171101110.26898&#64;kosh.sipo.fi" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4704.html" title="Shawn Jefferson: &quot;[cc65] When not to use fastcall?&quot;">Next message</a> ]
+[ <a href="4702.html" title="Karri Kaksonen: &quot;Re: [cc65] Stack problems with several segments.&quot;">Previous message</a> ]
+[ <a href="4701.html" title="Karri Kaksonen: &quot;[cc65] Stack problems with several segments.&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4708.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Stack problems with several segments.&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Shawn Jefferson &lt;<a href="mailto:jefferson_shawn_a8bit1yahoo.com?Subject=Re:%20[cc65]%20Stack%20problems%20with%20several%20segments.">jefferson_shawn_a8bit1yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-11-17 17:21:20</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>--- Karri Kaksonen &lt;karri&#64;sipo&#46;<!--nospam-->fi&gt; wrote:
+&gt; When I compare the codes in the working and
+&gt; non-working setup I found that
+&gt; there is a missing
+&gt; 
+&gt; ldy #$01
+&gt; 
+&gt; statement in the non-working version.
+&gt; 
+&gt; Working:
+&gt; 
+&gt; lda #$00
+&gt; jsr pusha
+&gt; ldy #$01
+&gt; jsr _check_channels
+&gt; 
+&gt; Non-working (check_channels is in a different
+&gt; segment):
+&gt; 
+&gt; lda #$00
+&gt; jsr pusha
+&gt; jsr _check_channels
+
+Where is the y register used even?  Is this compiled
+with optimization?  I've seen where unoptimized code
+has things like this, but the optimizer takes them out
+(registers given values that they don't really need.)
+
+&gt; The check_channels is defined as
+&gt; 
+&gt; extern void check_channels(unsigned char action);
+
+You aren't using __fastcall__ , or is one side of
+things assuming you are (like in your check_channels
+code?)  Are you popping the action value off the stack
+or getting it from the a register?
+ 
+That's all I could think of from what you've
+mentioned.
+
+--
+Shawn
+
+
+		
+__________________________________ 
+Do you Yahoo!? 
+Meet the all-new My Yahoo! - Try it today! 
+<a href="http://my.yahoo.com">http://my.yahoo.com</a> 
+ 
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Nov 17 17:21:26 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4704.html" title="Next message in the list">Shawn Jefferson: "[cc65] When not to use fastcall?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4702.html" title="Previous message in the list">Karri Kaksonen: "Re: [cc65] Stack problems with several segments."</a></li>
+<li><dfn>In reply to</dfn>: <a href="4701.html" title="Message to which this message replies">Karri Kaksonen: "[cc65] Stack problems with several segments."</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4708.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Stack problems with several segments."</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4708.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Stack problems with several segments."</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4703" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4703" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4703" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-11-17 17:21:36 CET
+</em></small></p>
+</body>
+</html>

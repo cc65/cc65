@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Macro scoping problem...</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Macro scoping problem..." />
+<meta name="Date" content="2010-07-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Macro scoping problem...</h1>
+<!-- received="Sat Jul 10 14:29:04 2010" -->
+<!-- isoreceived="20100710122904" -->
+<!-- sent="Sat, 10 Jul 2010 14:28:56 +0200" -->
+<!-- isosent="20100710122856" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Macro scoping problem..." -->
+<!-- id="20100710122855.GA22421@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="4C3858BD.4080403&#64;web.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8512.html" title="silverdr1wfmh.org.pl: &quot;[cc65] error in snapshot&quot;">Next message</a> ]
+[ <a href="8510.html" title="Christian Krüger: &quot;Re: [cc65] Macro scoping problem...&quot;">Previous message</a> ]
+[ <a href="8509.html" title="Christian Krüger: &quot;Re: [cc65] Macro scoping problem...&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Macro%20scoping%20problem...">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-07-10 14:28:56</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Sat, Jul 10, 2010 at 01:25:49PM +0200, Christian Krüger wrote:
+&gt; in my case, I just like to have labels with a postfix, given by
+&gt; using the macro:
+&gt;
+&gt; .ident(.concat(.string(label, &quot;_SMC&quot;)))
+
+You will have to think in terms of tokens when writing macros for cc65. This
+is unusual, but it offers a lot of advantages. Because of these advantages,
+assemblers and compilers do translate the input into tokens before processing
+them.
+
+In your case, the argument &quot;label&quot; passed to the macro is a list of tokens.
+What you want to do is to append &quot;_SMC&quot; to the rightmost token in this list.
+The rightmost token must be an identifier for this to work. There are some
+constraints for the other tokens in the list, but this is checked by the
+assembler, so we don't need to care about it.
+
+Using this knowledge, we can come up with a macro as follows:
+
+.macro DoJmp label
+        .if .match(.right(1, label), ident)
+                jmp     .mid(0, .tcount(label) - 1, label) .ident(.concat(.string(.right(1, label)), &quot;_SMC&quot;))
+        .else
+                .error &quot;Last token of label must be an identifier&quot;
+        .endif
+.endmacro
+
+First thing is to check if the rightmost token is an identifier. If not, we
+will output an error. Once we know, the rightmost token is an identifier, we
+construct a new token list that consists of all tokens up to but not including
+the right one, plus the rightmost token, converted to a string, &quot;_SMC&quot;
+appended and converted by to an identifier.
+
+If we test the macros using
+
+18: DoJmp  GlobalLabel
+19: DoJmp  Test::Label
+20: DoJmp  12+24
+
+we get
+
+t.s(20): Error: Argument of .IDENT is not a valid identifier
+t.s(20): Error: User error: Last token of label must be an identifier
+
+so this works as expected. We can of course add some improvements, for example
+add curly braces around label, but this will only improve handling in case of
+errors.
+
+Please note that your naming scheme seems to be somewhat shaky, since adding
+another nested scope within Test will break the whole thing. _SMC is the added
+to the last identifier, but you yould need something like
+Test::Label_SMC::Inner.
+
+Regards
+
+
+        Uz
+
+
+
+P.S.: It seems that .LEFT contains an error that prevents negative token
+      counts to be handled correctly. So if you have problems with .LEFT,
+      use .MID with a starting index of zero.
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Jul 10 14:29:04 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8512.html" title="Next message in the list">silverdr1wfmh.org.pl: "[cc65] error in snapshot"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8510.html" title="Previous message in the list">Christian Krüger: "Re: [cc65] Macro scoping problem..."</a></li>
+<li><dfn>In reply to</dfn>: <a href="8509.html" title="Message to which this message replies">Christian Krüger: "Re: [cc65] Macro scoping problem..."</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8511" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8511" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8511" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-07-10 14:29:07 CEST
+</em></small></p>
+</body>
+</html>

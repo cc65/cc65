@@ -1,0 +1,352 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] command line parser hack</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="[cc65] command line parser hack">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] command line parser hack</h1>
+<!-- received="Mon Aug 13 22:38:58 2001" -->
+<!-- isoreceived="20010813203858" -->
+<!-- sent="Mon, 13 Aug 2001 22:36:55 +0200" -->
+<!-- isosent="20010813203655" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="[cc65] command line parser hack" -->
+<!-- id="1938216196.20010813223655@gmx.net" -->
+<!-- inreplyto="1395245271.20010813214725@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20command%20line%20parser%20hack"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2001-08-13 22:36:55
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0637.html">Ullrich von Bassewitz: "Re: [cc65] command line parser hack"</a>
+<li><strong>Previous message:</strong> <a href="0635.html">groepaz: "Re[2]: [cc65] Graphics library"</a>
+<li><strong>In reply to:</strong> <a href="0626.html">groepaz: "Re[2]: [cc65] Graphics library"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0637.html">Ullrich von Bassewitz: "Re: [cc65] command line parser hack"</a>
+<li><strong>Reply:</strong> <a href="0637.html">Ullrich von Bassewitz: "Re: [cc65] command line parser hack"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+ok ppl.... the first thing i come up with is a little hack that makes
+it possible to pass arguments to a program very simelar to what you do
+on a command line of some shell....
+
+like:
+
+RUN:arg1 arg2 arg3
+
+this hack will read what you have written after the RUN command and
+setup the respective variables (argc/argv) just as you would expect in
+a standard C program.
+
+oh yeah... this was developed on a c64, but should be possible to
+convert to any other cbm-machine with minimum effort (will probably
+work already on a vic-20)
+
+appended below is a little test-program that just prints the arguments
+that you gave them.... it also has an option to generate BASIC
+error-messages (i included a modified version of exit() aswell that
+does the job)
+
+eg
+
+RUN:!e 1
+
+will print the error with the internal number 1
+
+?too many files  error
+ready.
+
+ahyeah... there are still some minor quirks to circumvent in this
+implementation, if there is any interest i might fix that ;)
+
+UZ: try this... seems to be the compiler bugs somewhere, some errors
+are just tooooo weird to make any sence (and i cant really track them
+down to a mistake in my code ;D) ... that is for SOME combinations of
+arguments, the test-prog prints out total junk, there doesnt seem to
+be some kind of system behind it though ... errrr ;D (too bad, i cant
+find one on a quick test, i'll post a combination that fails if i
+stumble about one once again)
+
+;=)
+
+....and now i am gone writing test programs for the file i/o stuff ;=)
+
+UZ: is there a possibility of creating some directory for me on your
+ftp-server where i could share my file-i/o stuff ? i guess it wouldnt
+be too practical to send you emails every day when i make minor
+changes...... but i'd really like to get some feedback/bug reports
+this early, since it has been a while since i last looked at those
+sources and i probably dont remember everything that still has to be
+fixed. (and feedback will also help to write some documentation on the
+non-standard functions)
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20command%20line%20parser%20hack">groepaz_at_gmx.net</a>
+
+-file&quot;hello.c&quot;--------------------------------------------------------------
+
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+
+/* include command line processing */
+#include &quot;cmdline.c&quot;
+
+int main(int argc,char **argv) {
+int i;
+
+    printf(&quot;commandline test (RUN:[ARGS])\n&quot;);
+
+    if(argv[1][0]=='!') {
+        switch(argv[1][1]){
+            /* create an error with specified code */
+            case 'e':
+                    printf(&quot;error no.: %d\n&quot;,atoi(argv[2]));
+                    return(atoi(argv[2]));
+                break;
+        }
+    } else {
+
+        /* number of arguments (argv[0] is always the full path+name of the executeable) */
+        printf(&quot; argc    : %d\n&quot;,argc);
+        /* arguments */
+        for(i=0;i&lt;(argc);i++){
+            printf(&quot; argv[%d] : %s\n&quot;,i,argv[i]);
+        }
+
+    }
+
+    /* return OK */
+    return(0);
+
+}
+
+-file&quot;cmdline.h&quot;------------------------------------------------------------
+
+#ifndef _CMDLINE_H_
+#define _CMDLINE_H_
+
+#define CMDLINEMAXLEN 50
+
+unsigned char *__cmdlinegetexename(void);
+unsigned char *__cmdlinegetcmdline(void);
+unsigned char __cmdlinetrimcmdline(unsigned char *ptr);
+unsigned char **__cmdlinemakearray(unsigned char numargs,unsigned char *cmdline,unsigned char *nameptr);
+int __cmdlinemain(int argc,char **argv);
+void __cmdlineexit(unsigned char err);
+
+#include &lt;string.h&gt;
+
+#endif /* _CMDLINE_H_ */
+
+-file&quot;cmdline.c&quot;------------------------------------------------------------
+
+#include &quot;cmdline.h&quot;
+
+/*
+        get program filename
+*/
+
+unsigned char *__cmdlinegetexename(void) {
+unsigned char i,ii;
+unsigned char *ptr,*nameptr;
+
+    /* get basic memory top (filename has been buffered here) */
+    ptr=(unsigned char*) (*((unsigned char*)0x37))+((*((unsigned char*)0x38))&lt;&lt;8);
+    /* length of filename */
+    ii=(*((unsigned char*)0xb7));
+    /* alloc space for a save copy of the filename string */
+    nameptr=(unsigned char*)malloc((ii+1)*sizeof(unsigned char));
+    ptr-=ii;
+    for(i=0;i&lt;ii;i++){
+            nameptr[i]=ptr[i];
+    }
+    nameptr[i]=0;
+
+    return(nameptr);
+
+}
+
+/*
+        get pointer to command line arguments
+*/
+
+unsigned char *__cmdlinegetcmdline(void) {
+unsigned char *ptr,*cmdline;
+unsigned char i,len;
+
+    /* basic input buffer */
+    ptr=(unsigned char*)0x0200;
+    /* read until ':' */
+    i=0;while((ptr[i]!=0)&amp;(i&lt;CMDLINEMAXLEN)&amp;(ptr[i]!=':')) i++;
+    /* if ':' found, get arguments-string from command line */
+    if(ptr[i]==':') {
+        i++;/* one more ;) */
+        len=strlen(&amp;ptr[i]);
+        cmdline=(unsigned char*)malloc((len+1)*sizeof(unsigned char));
+        strcpy(cmdline,&amp;ptr[i]);
+        return(cmdline);
+    /* return NULL if no arguments found */
+    } else {
+        return(NULL);
+    }
+
+}
+
+/*
+    remove spaces from command line &amp; terminate args with zero
+ */
+
+unsigned char __cmdlinetrimcmdline(unsigned char *ptr) {
+unsigned char src,dest,numargs,len;
+
+    if(ptr==NULL) return(0);
+
+    len=strlen(ptr);
+    numargs=0;src=0;dest=0;
+    while(src&lt;len){
+        /* skip spaces */
+        while((ptr[src]!=0)&amp;(src&lt;CMDLINEMAXLEN)&amp;(ptr[src]==' ')){
+             src++;
+        }
+        /* arg */
+        while((ptr[src]!=0)&amp;(src&lt;CMDLINEMAXLEN)&amp;(ptr[src]!=' ')){
+            ptr[dest]=ptr[src];
+            src++;dest++;
+        }
+        ptr[dest]=0;dest++;src++;
+        numargs++;
+    }
+
+    return(numargs);
+}
+
+/*
+    create pointer-structure for array of arguments
+ */
+
+unsigned char **__cmdlinemakearray(unsigned char numargs,unsigned char *cmdline,unsigned char *nameptr){
+unsigned char **argv;
+unsigned char i;
+
+    argv=(unsigned char**)malloc(sizeof(unsigned char*)*(numargs));
+    argv[0]=nameptr;
+    for(i=1;(i&lt;(numargs));i++,cmdline++){
+        argv[i]=cmdline;
+        while(*cmdline!=0) cmdline++;
+    }
+    return(argv);
+}
+
+void __cmdlineexit(unsigned char err){
+    /* restore the environment */
+    asm(&quot;\tsei&quot;);
+    asm(&quot;\tlda #$37&quot;);
+    asm(&quot;\tsta $01&quot;);
+    /* direct mode */
+    asm(&quot;\tlda #$ff&quot;);
+    asm(&quot;\tsta $3a&quot;);
+    /* clrch */
+    asm(&quot;\tjsr $ffcc&quot;);
+    /* stdin=keyboard */
+    asm(&quot;\tlda #$00&quot;);
+    asm(&quot;\tsta $13&quot;);
+    /* init basic */
+    asm(&quot;\tjsr $a67a&quot;);
+    asm(&quot;\tcli&quot;);
+    /* get error code */
+    asm(&quot;\tjsr popa&quot;);
+    /* reset stack */
+    asm(&quot;\tldx #$fb&quot;);
+    asm(&quot;\ttxs&quot;);
+    /* make error code */
+    asm(&quot;\ttax&quot;);
+    asm(&quot;\tbne @sk&quot;);
+    asm(&quot;\tldx #$80&quot;);
+    asm(&quot;@sk:&quot;);
+    /* jump to basic warmstart */
+    asm(&quot;\tcli&quot;);
+    asm(&quot;\tjmp $a437&quot;);
+}
+
+void main (void) {
+unsigned char numargs;
+unsigned char *nameptr,*cmdline,**argv;
+int err;
+
+    /* get application filename string, alloc+copy to new string if needed */
+    nameptr=__cmdlinegetexename();
+    /* get command line string, alloc+copy to new string if needed */
+    cmdline=__cmdlinegetcmdline();
+    /* trim command line string and count args */
+    numargs=__cmdlinetrimcmdline(cmdline)+1; /* one arg is filename */
+    /* alloc and setup array structure */
+    argv=__cmdlinemakearray(numargs,cmdline,nameptr);
+    /* call the user's int main(int argc,char **argv) */
+    err=__cmdlinemain(numargs,argv);
+    /* clean up the environment variables */
+    free(argv);free(cmdline);free(nameptr);
+    /* exit to environment */
+    __cmdlineexit((unsigned char)err);
+
+    /* we will never return from here */
+
+}
+
+#define main(__argc,__argv) __cmdlinemain(__argc,__argv)
+#define exit(__err) __cmdlineexit(__err)
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20command%20line%20parser%20hack">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0637.html">Ullrich von Bassewitz: "Re: [cc65] command line parser hack"</a>
+<li><strong>Previous message:</strong> <a href="0635.html">groepaz: "Re[2]: [cc65] Graphics library"</a>
+<li><strong>In reply to:</strong> <a href="0626.html">groepaz: "Re[2]: [cc65] Graphics library"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0637.html">Ullrich von Bassewitz: "Re: [cc65] command line parser hack"</a>
+<li><strong>Reply:</strong> <a href="0637.html">Ullrich von Bassewitz: "Re: [cc65] command line parser hack"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:41 CET</em>
+</em>
+</small>
+</body>
+</html>

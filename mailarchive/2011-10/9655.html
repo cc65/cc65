@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] C128: ass. config. initlib sub</title>
+<meta name="Author" content="Joseph Rose (rose.joseph121yahoo.com)" />
+<meta name="Subject" content="[cc65] C128: ass. config. initlib subroutine?" />
+<meta name="Date" content="2011-10-12" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] C128: ass. config. initlib subroutine?</h1>
+<!-- received="Wed Oct 12 18:30:16 2011" -->
+<!-- isoreceived="20111012163016" -->
+<!-- sent="Wed, 12 Oct 2011 09:30:04 -0700 (PDT)" -->
+<!-- isosent="20111012163004" -->
+<!-- name="Joseph Rose" -->
+<!-- email="rose.joseph121yahoo.com" -->
+<!-- subject="[cc65] C128: ass. config. initlib subroutine?" -->
+<!-- id="1318437004.72996.YahooMailNeo@web120608.mail.ne1.yahoo.com" -->
+<!-- charset="iso-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9656.html" title="Joseph Rose: &quot;[cc65] ld65: _exit redefined warning?&quot;">Next message</a> ]
+[ <a href="9654.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Permission to use Huffman cc65 lib.?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Joseph Rose &lt;<a href="mailto:rose.joseph121yahoo.com?Subject=Re:%20[cc65]%20C128:%20ass.%20config.%20initlib%20subroutine?">rose.joseph121yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-10-12 18:30:04</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I am working on a C128 extension to handle more memory and the start-up code keeps brealing into the monitor.  The start-up code is a modified form of the default c128 crt0.s file to handle bank-switching.  I've been able to narrow it down to the JSR instruction to the initlib routine.  I checked the init. routines in my modified standard read and write routines, and they should work.  I attached the test code to this post.  Can anybody tell me where the bug might be, i.e. which library source file's init. routine may be called?  The initlib routine is called from Bank 0.  I'd appreciate any help.
+----------------------
+Joseph Rose, a.k.a. Harry Potter
+Working magic in the computer community
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<div>
+<ul>
+<li>text/plain attachment: <a href="../att-9655/TEST.C">TEST.C</a></li>
+</ul>
+<!-- attachment="TEST.C" -->
+</div>
+<span id="received"><dfn>Received on</dfn> Wed Oct 12 18:30:16 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9656.html" title="Next message in the list">Joseph Rose: "[cc65] ld65: _exit redefined warning?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9654.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Permission to use Huffman cc65 lib.?"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9655" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9655" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9655" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-10-12 18:30:20 CEST
+</em></small></p>
+</body>
+</html>

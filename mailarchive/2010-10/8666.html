@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Re: Porting to CC65</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Re: Porting to CC65" />
+<meta name="Date" content="2010-10-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Re: Porting to CC65</h1>
+<!-- received="Sun Oct 10 14:54:35 2010" -->
+<!-- isoreceived="20101010125435" -->
+<!-- sent="Sun, 10 Oct 2010 14:54:28 +0200" -->
+<!-- isosent="20101010125428" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Re: Porting to CC65" -->
+<!-- id="20101010125428.GB9405@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="AANLkTimKpusP_Y3-eFwwS9Pbf_a7NP-uScE8c8W8Pa9y&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8667.html" title="doynax: &quot;Re: [cc65] Re: Porting to CC65&quot;">Next message</a> ]
+[ <a href="8665.html" title="Oliver Schmidt: &quot;Re: [cc65] Re: Porting to CC65&quot;">Previous message</a> ]
+[ <a href="8664.html" title="doynax: &quot;[cc65] Re: Porting to CC65&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8669.html" title="doynax: &quot;Re: [cc65] Re: Porting to CC65&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Re:%20Porting%20to%20CC65">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-10-10 14:54:28</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Sat, Oct 09, 2010 at 10:51:22PM +0200, doynax wrote:
+&gt; 1. Am I likely to get into trouble compiling the odd C function into
+&gt; an existing project?
+
+Not sure what you mean with that. If you have an asm project and want to add C
+code, you will have to make sure that the C runtime is setup properly. This
+means that you will have to look at the C startup code and merge the important
+parts into the startup code of your program.
+
+&gt; 2. My old code makes frequent use of a certain &quot;single_page N&quot; macro
+&gt; which insures that the following N-byte array stays within a single
+&gt; page. Is there any way I can handle this efficiently in CA65? As far
+&gt; as I can see just aligning would waste up to 4*(N-1) bytes.
+
+That depends. You can use .assert statements if all you want is to get a
+warning or an error from the linker if the requirements aren't met. You can
+use segments to actively place these arrays. 
+
+How does your current code avoid wasting space for alingment?
+
+&gt; 3. Should I be using the preprocessor to implement non-trivial loops?
+&gt; I can't see how to redefine labels imperatively so I tried using macro
+&gt; recursion but ran into if-nesting limits.
+
+My suggestion is to avoid .define (if that is, what you call the
+&quot;preprocessor&quot;) if you can. .define works on token level, and therefore
+ignores scoping. You can get all sorts of weird side effects when using it.
+
+Apart from that I'm not able to make any suggestions, without knowing a bit
+more about what you're trying to do.
+
+&gt; 4. Am I abusing named scopes by trying to use them like C++
+&gt; namespaces? I seem to end up wanting to open scopes twice, both in the
+&gt; code itself and in the .inc &quot;header.&quot;
+
+scopes aren't namespaces and therefore you cannot open them twice. However,
+the snapshot (not 2.13) allows to introduce new symbols into a scope even when
+the scope is closed. So you can do something like
+
+        .proc   foo
+        bar     = $20
+        .endproc
+        foo::baz = $10
+
+Again here, without knowing the exact problem, it's difficult to suggest
+actions.
+
+My usual approach is to do it in a similar way as with C sources:
+
+  * An include files defines an interface to a module. So it contains
+    constantds, structures and has .global statements for the external
+    identifiers, but no data or code definitions.
+
+  * The implementation module includes above file and defines the necessary
+    code and data. In this case the .global directives will turn into .export
+    statements.
+
+  * Other modules will just reference the stuff defined in the include file,
+    so the .global directives will turn into .import statements.
+
+This has proved to work quite well, especially for bigger projects.
+
+&gt; I apologize ahead of time if any of this has already been covered by
+&gt; the manual or previous discussions in the mailing list.
+
+It's not covered in the manual because it's more a &quot;how to make best use&quot;
+discussion. ca65 allows several styles which is one of its strengths as I see
+it. There is no &quot;best style&quot;, it all depends on the actual problem.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Oct 10 14:54:35 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8667.html" title="Next message in the list">doynax: "Re: [cc65] Re: Porting to CC65"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8665.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Re: Porting to CC65"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8664.html" title="Message to which this message replies">doynax: "[cc65] Re: Porting to CC65"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8669.html" title="Next message in this discussion thread">doynax: "Re: [cc65] Re: Porting to CC65"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8669.html" title="Message sent in reply to this message">doynax: "Re: [cc65] Re: Porting to CC65"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8666" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8666" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8666" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-10-10 14:54:38 CEST
+</em></small></p>
+</body>
+</html>

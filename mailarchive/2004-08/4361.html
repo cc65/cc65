@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Atari: Loading code with D</title>
+<meta name="Author" content="Christian Groessler (chris1groessler.org)" />
+<meta name="Subject" content="Re: [cc65] Atari: Loading code with DOS 2.0 help? (LONG)" />
+<meta name="Date" content="2004-08-03" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Atari: Loading code with DOS 2.0 help? (LONG)</h1>
+<!-- received="Tue Aug  3 22:22:24 2004" -->
+<!-- isoreceived="20040803202224" -->
+<!-- sent="03 Aug 2004 22:22:08 +0200" -->
+<!-- isosent="20040803202208" -->
+<!-- name="Christian Groessler" -->
+<!-- email="chris1groessler.org" -->
+<!-- subject="Re: [cc65] Atari: Loading code with DOS 2.0 help? (LONG)" -->
+<!-- id="87zn5cm0pb.fsf@groessler.org" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="[cc65] Atari: Loading code with DOS 2.0 help? (LONG)" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4362.html" title="Shawn Jefferson: &quot;Re: [cc65] Atari: Loading code with DOS 2.0 help? (LONG)&quot;">Next message</a> ]
+[ <a href="4360.html" title="Oliver Schmidt: &quot;Re: [cc65] Apple2 file io - here: memory management questions&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4362.html" title="Shawn Jefferson: &quot;Re: [cc65] Atari: Loading code with DOS 2.0 help? (LONG)&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Christian Groessler &lt;<a href="mailto:chris1groessler.org?Subject=Re:%20[cc65]%20Atari:%20Loading%20code%20with%20DOS%202.0%20help?%20(LONG)">chris1groessler.org</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-08-03 22:22:08</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+I wanted to play around with this since some time. Recently motivated
+by Chris Martin's problem I've tried to make a program where code
+loads below $4000 (starting at $2E00) and the rest at $8000.
+
+
+The main problem is that the generated EXE header is wrong. It defines
+a single load chunk with the sizes/addresses of the code, rodata, and
+data segments (the whole user program).
+
+I need to have 2 load chunks, one with code and one with the rest.
+
+The contents of the EXE header come from the EXEHDR segment, which is
+defined in crt0.s. Since this cannot be changed w/o modifiying and
+recompiling the cc65 atari runtime lib, I've added a second segment
+NEXEHDR to the linker script, which defines the correct header.
+This one puts only the code segment into load chunk #1.
+
+I've also added a CHKHDR segment, which provides the contents of the
+header for load chunk #2.
+
+This is the modified cc65 Atari linker configuration file (split.cfg):
+
+------------------
+MEMORY {
+    ZP: start = $82, size = $7E, type = rw, define = yes;
+    HEADER: start = $0000, size = $6, file = %O;
+    RAMLO: start = $2E00, size = $1200, file = %O;
+
+    SECHDR: start = $0000, size = $4, file = %O;
+    BANK: start = $4000, size = $4000, file = &quot;&quot;;	# &quot;&quot; is used to discard the contents
+    RAM: start = $8000, size = $3C20, file = %O;	# $3C20: matches upper bound $BC1F
+}
+SEGMENTS {
+    EXEHDR: load = BANK, type = wprot;
+    NEXEHDR: load = HEADER, type = wprot;		# new EXE header and 1st chunk of file data
+    CODE: load = RAMLO, type = wprot, define = yes;
+
+    CHKHDR: load = SECHDR, type = wprot;		# header for 2nd chunk of file data
+
+    RODATA: load = RAM, type = wprot, define = yes;
+    DATA: load = RAM, type = rw, define = yes;
+    BSS: load = RAM, type = bss, define = yes;
+    ZEROPAGE: load = ZP, type = zp;
+    AUTOSTRT: load = RAM, type = wprot;
+}
+FEATURES {
+    CONDES: segment = RODATA,
+	    type = constructor,
+	    label = __CONSTRUCTOR_TABLE__,
+	    count = __CONSTRUCTOR_COUNT__;
+    CONDES: segment = RODATA,
+	    type = destructor,
+	    label = __DESTRUCTOR_TABLE__,
+	    count = __DESTRUCTOR_COUNT__;
+}
+SYMBOLS {
+    __STACKSIZE__ = $800;	# 2K stack
+}
+------------------
+
+The contents of the old EXEHDR segment should be discarded. Therefore
+they're relocated into the BANK memory area, which isn't written to
+the output file.
+
+The contents of the new NEXEHDR and CHKHDR segments come from this
+file (split.s):
+
+------------------
+	.import	__CODE_LOAD__, __BSS_LOAD__, __CODE_SIZE__
+	.import	__DATA_LOAD__, __RODATA_LOAD__
+
+	.segment &quot;NEXEHDR&quot;
+	.word	 $FFFF
+	.word	 __CODE_LOAD__
+	.word	 __CODE_LOAD__ + __CODE_SIZE__ - 1
+
+	.segment &quot;CHKHDR&quot;
+	.word	 __RODATA_LOAD__
+	.word	 __BSS_LOAD__ - 1
+------------------
+
+
+That's the demo program I've used:
+
+------------------
+/* $Id: mem.c,v 1.2 2004/08/01 19:50:43 chris Exp $
+ *
+ * show some memory stuff
+ *
+ * 06-Mar-2003, chris
+ */
+
+#include &lt;stdio.h&gt;
+#include &lt;conio.h&gt;
+#include &lt;atari.h&gt;
+
+extern char _dos_type;
+extern unsigned char _graphmode_used;
+
+unsigned int *APPMHI = (unsigned int *)14;      /* 14,15 */
+unsigned char *RAMTOP = (unsigned char *)106;   /* in pages */
+unsigned int *LOMEM = (unsigned int *)128;      /* used by BASIC */
+unsigned int *MEMTOP = (unsigned int *)741;
+unsigned int *MEMLO = (unsigned int *)743;
+
+int main(void)
+{
+
+  clrscr();
+
+  printf(&quot;   RAMTOP = %02X (%u) - $%04X (%u)\n&quot;,
+         *RAMTOP, *RAMTOP, *RAMTOP * 256, *RAMTOP * 256);
+  printf(&quot;   APPMHI = $%04X (%u)\n&quot;, *APPMHI, *APPMHI);
+  printf(&quot;   LOMEM  = $%04X (%u)  &lt;BASIC only&gt;\n&quot;, *LOMEM, *LOMEM);
+  printf(&quot;   MEMTOP = $%04X (%u)\n&quot;, *MEMTOP, *MEMTOP);
+  printf(&quot;   MEMLO  = $%04X (%u)\n&quot;, *MEMLO, *MEMLO);
+
+  printf(&quot;   ----------------------\n&quot;);
+  printf(&quot;   main:            $%04X  (code)\n&quot;, &amp;main);
+  printf(&quot;   _graphmode_used: $%04X  (data)\n&quot;, &amp;_graphmode_used);
+  printf(&quot;   _dos_type:       $%04X  (bss)\n&quot;, &amp;_dos_type);
+
+  if (_dos_type != 1) cgetc();
+  return(0);
+}
+------------------
+
+Compile with
+
+cl65 -t atari -C split.cfg -o mt.com mem.c split.s
+
+Running it:
+
+[snip]
+   main:            $2E8F  (code)
+   _graphmode_used: $8286  (data)
+   _dos_type:       $82D9  (bss)
+
+
+Nice, this seems to work.
+
+
+Now let's try a different configuration...
+
+Put RODATA and DATA into low memory (below $4000) and CODE with BSS
+into high memory (split2.cfg):
+
+------------------
+MEMORY {
+    ZP: start = $82, size = $7E, type = rw, define = yes;
+    HEADER: start = $0000, size = $6, file = %O;
+    RAMLO: start = $2E00, size = $1200, file = %O;
+
+    SECHDR: start = $0000, size = $4, file = %O;
+    BANK: start = $4000, size = $4000, file = &quot;&quot;;	# &quot;&quot; is used to discard the contents
+    RAM: start = $8000, size = $3C20, file = %O;	# $3C20: matches upper bound $BC1F
+}
+SEGMENTS {
+    EXEHDR: load = BANK, type = wprot;
+    NEXEHDR: load = HEADER, type = wprot;		# new EXE header and 1st chunk of file data
+    RODATA: load = RAMLO, type = wprot, define = yes;
+    DATA: load = RAMLO, type = rw, define = yes;
+
+    CHKHDR: load = SECHDR, type = wprot;		# header for 2nd chunk of file data
+
+    CODE: load = RAM, type = wprot, define = yes;
+    BSS: load = RAM, type = bss, define = yes;
+    ZEROPAGE: load = ZP, type = zp;
+    AUTOSTRT: load = RAM, type = wprot;
+}
+FEATURES {
+    CONDES: segment = RODATA,
+	    type = constructor,
+	    label = __CONSTRUCTOR_TABLE__,
+	    count = __CONSTRUCTOR_COUNT__;
+    CONDES: segment = RODATA,
+	    type = destructor,
+	    label = __DESTRUCTOR_TABLE__,
+	    count = __DESTRUCTOR_COUNT__;
+}
+SYMBOLS {
+    __STACKSIZE__ = $800;	# 2K stack
+}
+------------------
+
+New contents for NEXEHDR and CHKHDR are needed (split2.s):
+
+------------------
+	.import	__CODE_LOAD__, __BSS_LOAD__, __DATA_SIZE__
+	.import	__DATA_LOAD__, __RODATA_LOAD__
+
+	.segment &quot;NEXEHDR&quot;
+	.word	 $FFFF
+	.word	 __RODATA_LOAD__
+	.word	 __DATA_LOAD__ + __DATA_SIZE__ - 1
+
+	.segment &quot;CHKHDR&quot;
+	.word	 __CODE_LOAD__
+	.word	 __BSS_LOAD__ - 1
+------------------
+
+Compiling it with
+
+cl65 -t atari -C split2.cfg -o mt.com mem.c split2.s
+
+and running it:
+
+[snip]
+   main:            $808F  (code)
+   _graphmode_used: $3086  (data)
+   _dos_type:       $8C86  (bss)
+
+
+Good. Works as well :-)
+
+
+You have to be careful about two other memory areas which don't appear
+directly in the linker script. They are the stack and the heap.
+
+The cc65 runtime lib places the stack location at the end of available
+memory (end of RAM in theory, but on the Atari dynamically set from
+the APPMHI system variable). The heap is located in the area between
+the end of the BSS segment and the top of the stack as defined by
+__STACKSIZE__.
+
+If you don't want to place BSS and/or the stack at the end of the
+program, you'll have to replace/modify some parts of the cc65 runtime
+lib.
+
+runtime/_heap.s defines the location of the heap and atari/crt0.s
+defines the location of the stack by initializing sp.
+
+I haven't tried such a configuration yet, so maybe there's something
+else to care about...
+
+regards,
+chris
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Aug  3 22:22:24 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4362.html" title="Next message in the list">Shawn Jefferson: "Re: [cc65] Atari: Loading code with DOS 2.0 help? (LONG)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4360.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Apple2 file io - here: memory management questions"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4362.html" title="Next message in this discussion thread">Shawn Jefferson: "Re: [cc65] Atari: Loading code with DOS 2.0 help? (LONG)"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4362.html" title="Message sent in reply to this message">Shawn Jefferson: "Re: [cc65] Atari: Loading code with DOS 2.0 help? (LONG)"</a></li>
+<li><dfn>Reply</dfn>:  <a href="4363.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Atari: Loading code with DOS 2.0 help? (LONG)"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="../2004-09/4386.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] Atari: Loading code with DOS 2.0 help? (LONG)"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4361" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4361" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4361" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-08-03 22:22:33 CEST
+</em></small></p>
+</body>
+</html>

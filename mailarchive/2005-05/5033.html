@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Re: signals</title>
+<meta name="Author" content="Jonathan Graham Harston (jgh1arcade.demon.co.uk)" />
+<meta name="Subject" content="[cc65] Re: signals" />
+<meta name="Date" content="2005-05-31" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Re: signals</h1>
+<!-- received="Tue May 31 03:00:42 2005" -->
+<!-- isoreceived="20050531010042" -->
+<!-- sent="31 May 2005 01:10:48 +0100" -->
+<!-- isosent="20050531001048" -->
+<!-- name="Jonathan Graham Harston" -->
+<!-- email="jgh1arcade.demon.co.uk" -->
+<!-- subject="[cc65] Re: signals" -->
+<!-- id="050531015504@arcade.demon.co.uk" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5034.html" title="Jonathan Graham Harston: &quot;[cc65] Re: signals&quot;">Next message</a> ]
+[ <a href="5032.html" title="dominic beesley: &quot;Re: [cc65] signals&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5037.html" title="dominic beesley: &quot;Re: [cc65] Re: signals&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Jonathan Graham Harston &lt;<a href="mailto:jgh1arcade.demon.co.uk?Subject=Re:%20[cc65]%20Re:%20signals">jgh1arcade.demon.co.uk</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-05-31 02:10:48</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt; Message-ID: &lt;4299ACB3.5040203&#64;brahms&#46;<!--nospam-->demon.co.uk&gt;
+ 
+dominic beesley &lt;dominic&#64;brahms&#46;<!--nospam-->demon.co.uk&gt; wrote:
+&gt; I guess really the main worry is that I'm in the middle of
+&gt; updating one of the file structures. I'm trying to work out if an
+&gt; Escape is ever delivered in the middle of an OS operation. In
+ 
+Yes, Escapes can happen at *any* time when IRQs are enabled. The
+foreground program should check for an escape state at safe points
+in the program, eg between BASIC statements, at the end or start
+of loops, after a received keypress.
+ 
+&gt; which case it gets very messy. Otherwise I'll just try and make
+&gt; sure that the cleanup code uses some kind of semaphore to protect
+&gt; other file ops (and possibly delays the Escape handling until
+&gt; after it has happened).
+ 
+Don't abort on Escape! It's so much easier. Just let Escape set
+its flag in the background. Let the foreground check for it.
+ 
+It's no good saying you'll close all open files (or files opened
+by the program) on an escape-induced abort. What if you abort
+halfway through a file delete? The directory may have been written
+to disk before the free space map has been written. Even worse,
+only one sector of the directory may have been written, destroying
+the catalogue!
+ 
+&gt; so it means hanging off the interrupt vector somewhere. Also
+&gt; there is no way of returning from BRK so I'm setting something
+ 
+There is, it's called setting up an error handler. In machine code
+you do it by setting BRKV to point to you error handler. In BASIC
+you do it by using ON ERROR.
+ 
+-- 
+J.G.Harston - jgh&#64;arcade&#46;<!--nospam-->demon.co.uk - mdfs.net/User/JGH
+RISC OS Choices System - <a href="http://mdfs.net/Software/RISCOS">http://mdfs.net/Software/RISCOS</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue May 31 03:00:42 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5034.html" title="Next message in the list">Jonathan Graham Harston: "[cc65] Re: signals"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5032.html" title="Previous message in the list">dominic beesley: "Re: [cc65] signals"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5037.html" title="Next message in this discussion thread">dominic beesley: "Re: [cc65] Re: signals"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5037.html" title="Message sent in reply to this message">dominic beesley: "Re: [cc65] Re: signals"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5033" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5033" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5033" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-05-31 03:00:45 CEST
+</em></small></p>
+</body>
+</html>

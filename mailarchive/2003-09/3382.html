@@ -1,0 +1,185 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] code generation</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] code generation">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] code generation</h1>
+<!-- received="Thu Sep 11 11:52:28 2003" -->
+<!-- isoreceived="20030911095228" -->
+<!-- sent="Thu, 11 Sep 2003 11:52:25 +0200" -->
+<!-- isosent="20030911095225" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] code generation" -->
+<!-- id="20030911095225.GA23209@trixie.musoftware.de" -->
+<!-- inreplyto="200309100526.50847.groepaz@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20code%20generation"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-09-11 11:52:25
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3381.html">Shawn Jefferson: "Re: [cc65] Optimizing C code"</a>
+<li><strong>In reply to:</strong> <a href="3379.html">Groepaz: "[cc65] code generation"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3383.html">Groepaz: "Re: [cc65] code generation"</a>
+<li><strong>Next in thread:</strong> <a href="3377.html">Maciej Witkowiak: "Re: [cc65] Optimizing C code"</a>
+<li><strong>Reply:</strong> <a href="3383.html">Groepaz: "Re: [cc65] code generation"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Wed, Sep 10, 2003 at 05:26:50AM +0200, Groepaz wrote:
+&gt; two things here... 1) i think the immediate eor after immediate lda should
+&gt; really be catched by the optimizer :)
+
+There's always a situation where the compiler won't spot a chance to improve
+the code.
+
+&gt; 2) it maybe a nice possible
+&gt; optimisation to use a branch/increment type of code for the highbyte when
+&gt; adding an unsigned char to an unsigned short.
+
+There is no separate code generation for characters in most cases. According
+to the C rules, for arithmetic operations on integers, the usual integer
+promotions apply, which means that the addition works with integers, not with
+chars. The compiler is not smart enough to find possible exceptions. The
+optimizer will sometimes remove high byte operations, but since the compiler
+doesn't build a parse tree in memory, but generates code on the fly, there's
+no chance to spot this in the parser.
+
+&gt; 1) for the heck of it, i cant find out how to make the branch work :=P neither
+&gt; a local label, nor a &quot;*+3&quot; or anything else i could think of would do the
+&gt; trick...any ideas? :) (sth to generate a unique local label could be a
+&gt; solution)
+
+There is no easy way to work around this, and I don't think it's really worth
+the effort.
+
+&gt; 2) if any of the arguments passed to the macro are register variables, the
+&gt; resulting code will be all wrong - it generates references to bogus memory
+&gt; locations instead of the register variables :=P
+
+Fixed, thanks!
+
+&gt; 1) additional pseudo-variables for the X and Y registers so that kinda macro
+&gt; can be written more efficiantly
+
+This will not work in most cases, which means that people will start to
+complain. Because the 6502 has very limited registers, and all registers
+besides the accu are special purpose, loading the Y and X registers will in
+most cases destroy A and vice versa. Code like
+
+        void f (char b)
+        {
+            char c;
+            ....
+            __Y__ = b;
+            __A__ = c;
+            ....
+        }
+
+will not work, the same is true for
+
+        void f (char b)
+        {
+            char c;
+            ....
+            __A__ = b;
+            __Y__ = c;
+            ....
+        }
+
+There is simply no way for the compiler to load one register without a high
+chance for using some other. This is the reason why there are no __Y__ and
+__X__ pseudo variables.
+
+&gt; 2) i am wondering why the optimizer doesnt change the lda/tay into ldy
+
+Maybe because it's not perfect:-)
+
+&gt; - what impact does it have if i write inline-macros and i dont load parameters
+&gt; using the __AX__ pseudo-variable but directly like in the uaddsc macro above?
+&gt; i think it shouldnt make a difference except that using __AX__ will help the
+&gt; optimizer to eg remove the lda/ldx alltogether if the value is in a/x
+&gt; currently anyway....but maybe there is more :)
+
+The use of __AX__ in macros together with the comma operator means that you
+can use this macro in expressions. If you don't do it this way, it will also
+work, but the compiler may not accept the macro in an expression. Since all
+optimzations take place in the back end, removal of unused code does not
+depend on using __AX__ vs. inline assembly.
+
+&gt; - i'd like to page-align some global arrays (since that saves some cycles for
+&gt; free on 0x100 byte tables, avoiding crossing page-boundaries) ... is that
+&gt; possible in C somehow?
+
+Nope.
+
+&gt; - how much do the c64 libraries depend on the system interupt, ie $ea31 beeing
+&gt; called frequently? will it for example affect the clock() call if i use my
+&gt; own interupt handler? (i'd like to skip the kernel stuff alltogether and just
+&gt; do some simple joystick stuff)...i need a working clock/time for syncing :)
+
+It will affect the clock, the mouse, the rs232 interface and maybe some
+others. You can work around that by not using the mouse, and others and
+updating the clock stuff in your own interrupt handler.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20code%20generation">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20code%20generation">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3381.html">Shawn Jefferson: "Re: [cc65] Optimizing C code"</a>
+<li><strong>In reply to:</strong> <a href="3379.html">Groepaz: "[cc65] code generation"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3383.html">Groepaz: "Re: [cc65] code generation"</a>
+<li><strong>Next in thread:</strong> <a href="3377.html">Maciej Witkowiak: "Re: [cc65] Optimizing C code"</a>
+<li><strong>Reply:</strong> <a href="3383.html">Groepaz: "Re: [cc65] code generation"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-09-11 11:53:30 CEST</em>
+</em>
+</small>
+</body>
+</html>

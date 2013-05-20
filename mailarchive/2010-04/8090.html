@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Please be patient... More ques</title>
+<meta name="Author" content="Payton Byrd (plbyrd1gmail.com)" />
+<meta name="Subject" content="[cc65] Please be patient... More questions" />
+<meta name="Date" content="2010-04-22" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Please be patient... More questions</h1>
+<!-- received="Thu Apr 22 04:30:30 2010" -->
+<!-- isoreceived="20100422023030" -->
+<!-- sent="Wed, 21 Apr 2010 21:30:03 -0500" -->
+<!-- isosent="20100422023003" -->
+<!-- name="Payton Byrd" -->
+<!-- email="plbyrd1gmail.com" -->
+<!-- subject="[cc65] Please be patient... More questions" -->
+<!-- id="y2h1adf4c761004211930k2eb2d851u9a8178f2a7fce1f@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8091.html" title="Oliver Schmidt: &quot;Re: [cc65] Please be patient... More questions&quot;">Next message</a> ]
+[ <a href="8089.html" title="Payton Byrd: &quot;Re: [cc65] Please critique this makefile&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8091.html" title="Oliver Schmidt: &quot;Re: [cc65] Please be patient... More questions&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Payton Byrd &lt;<a href="mailto:plbyrd1gmail.com?Subject=Re:%20[cc65]%20Please%20be%20patient...%20More%20questions">plbyrd1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-04-22 04:30:03</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I have so much to learn about CC65, so please be patient with me as Google
+doesn't return much about CC65.
+
+So, my next question is two-fold.  I have found the c128.h header has the
+methods I'm looking for to change the video mode and to set the speed of the
+system.  However, what it doesn't have is a method to tell me the current
+video mode.  I don't want to force a video mode on the user when they start
+the application, I want to read the current mode and scale accordingly.
+
+So, after some digging in the C128 PRG, I found the SCRORG kernel routine
+which does exactly what I want.  It takes the current mode and places it in
+the accumulator.  Superb.  Now, I want to create a method to call the kernel
+routine and return the value in the accumulator such as:
+
+unsigned char getScreenSize(void);
+
+I realize this will require some inline assembler.  This is where my
+question comes in.  How do I do inline assembler.  I Googled for over an
+hour and couldn't find a single example, just vague references to it.  I
+know I've seen an example in the past, and I'm pretty sure it was on this
+mailing list, but I no longer have an archive of the list and Google doesn't
+seem to have an archive of it either. I also scoured the libsrc directory of
+the sources but I couldn't find a c128.c file to correspond to the c128.h
+file.  So I'm assuming that the various assembler files are somehow glued
+together to the c128.h file by the linker, but I don't know enough about
+assembler to go that route yet.
+
+Would someone mind posting an example of creating a method that utilizes
+inline assembler to call a kernel routine?
+
+Thanks!
+
+PS.  This is the kind of stuff that would be great for the wiki, as well as
+things like my adventures in makefile creation.  I also have some very
+valuable insights on using VS 2010 as a full-blown IDE for cc65 (I have
+everything working except intellisense).
+
+-- 
+Payton Byrd
+&lt;<a href="http://www.paytonbyrd.com">http://www.paytonbyrd.com</a>&gt;
+&lt;<a href="http://it.toolbox.com/blogs/paytonbyrd">http://it.toolbox.com/blogs/paytonbyrd</a>&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Apr 22 04:30:30 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8091.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Please be patient... More questions"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8089.html" title="Previous message in the list">Payton Byrd: "Re: [cc65] Please critique this makefile"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8091.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Please be patient... More questions"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8091.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Please be patient... More questions"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8101.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Please be patient... More questions"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8090" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8090" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8090" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-04-22 04:30:34 CEST
+</em></small></p>
+</body>
+</html>

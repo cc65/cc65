@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] tgi_save</title>
+<meta name="Author" content="Karri Kaksonen (karri1sipo.fi)" />
+<meta name="Subject" content="Re: [cc65] tgi_save" />
+<meta name="Date" content="2011-01-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] tgi_save</h1>
+<!-- received="Mon Jan 10 11:21:48 2011" -->
+<!-- isoreceived="20110110102148" -->
+<!-- sent="Mon, 10 Jan 2011 12:21:25 +0200" -->
+<!-- isosent="20110110102125" -->
+<!-- name="Karri Kaksonen" -->
+<!-- email="karri1sipo.fi" -->
+<!-- subject="Re: [cc65] tgi_save" -->
+<!-- id="4D2ADDA5.5030300@sipo.fi" -->
+<!-- charset="UTF-8" -->
+<!-- inreplyto="20110110092535.66620&#64;gmx.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9134.html" title="Oliver Schmidt: &quot;Re: [cc65] tgi_save&quot;">Next message</a> ]
+[ <a href="9132.html" title="Stefan: &quot;[cc65] tgi_save&quot;">Previous message</a> ]
+[ <a href="9132.html" title="Stefan: &quot;[cc65] tgi_save&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9134.html" title="Oliver Schmidt: &quot;Re: [cc65] tgi_save&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Karri Kaksonen &lt;<a href="mailto:karri1sipo.fi?Subject=Re:%20[cc65]%20tgi_save">karri1sipo.fi</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-01-10 11:21:25</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 01/10/2011 11:25 AM, Stefan wrote:
+&gt; Using tgi.h in my recent project i came across the problem
+&gt; of how to save a bitmap generated with tgi.h to disk.
+&gt; Of course this should be done in a proper way, which means not by saving
+&gt; the memory area containing the bitmap data directly, which would be
+&gt; system dependent. The only idea i have is using tgi_getpixel and
+&gt; saving the bitmap pixel by pixel?
+&gt; Is there a better way?
+&gt;
+&gt; Monte Carlos
+&gt;
+
+Probably not. If the speed is too slow you could extend the existing 
+driver to copy and area of pixels to some buffer.
+
+Every driver has a CONTROL: entry point where you can implement your own 
+extensions to the tgi driver.
+
+#define tgi_copy(dst, x, y, w, h) tgi_ioctl(0, dst, x, y, w, h)
+
+tgi_copy(void *dst, int x, int y, int w, int h);
+
+Or something like this. If this gets popular then Uz might implement 
+this in the tgi driver as a new command mode.
+
+I have also had similar needs. Mainly to use screen 0 as a background 
+for static data and screen 1 for dynamic data. When you run animation a 
+Lynx may not have the power to render the background over and over 
+again. Some function to copy and area from screen 0 to screen 1 would be 
+nice.
+
+tgi_copydrawpage(x, y, w, h);
+
+This would copy an area from drawpage to viewpage.
+
+--
+Regards,
+
+Karri
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Jan 10 11:21:48 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9134.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] tgi_save"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9132.html" title="Previous message in the list">Stefan: "[cc65] tgi_save"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9132.html" title="Message to which this message replies">Stefan: "[cc65] tgi_save"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9134.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] tgi_save"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9134.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] tgi_save"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9133" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9133" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9133" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-01-10 11:21:51 CET
+</em></small></p>
+</body>
+</html>

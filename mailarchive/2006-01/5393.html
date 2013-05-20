@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] NES Header modifications</title>
+<meta name="Author" content="PH (shackman1alpinecom.net)" />
+<meta name="Subject" content="Re: [cc65] NES Header modifications" />
+<meta name="Date" content="2006-01-13" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] NES Header modifications</h1>
+<!-- received="Fri Jan 13 00:47:40 2006" -->
+<!-- isoreceived="20060112234740" -->
+<!-- sent="Thu, 12 Jan 2006 17:49:34 -0600" -->
+<!-- isosent="20060112234934" -->
+<!-- name="PH" -->
+<!-- email="shackman1alpinecom.net" -->
+<!-- subject="Re: [cc65] NES Header modifications" -->
+<!-- id="43C6EB0E.3070000@alpinecom.net" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20060108113028.GA8660&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5394.html" title="Payton Byrd: &quot;[cc65] C Compiler Semantic Analysis&quot;">Next message</a> ]
+[ <a href="5392.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] NES Header modifications&quot;">Previous message</a> ]
+[ <a href="5392.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] NES Header modifications&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: PH &lt;<a href="mailto:shackman1alpinecom.net?Subject=Re:%20[cc65]%20NES%20Header%20modifications">shackman1alpinecom.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2006-01-13 00:49:34</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt;Hi!
+&gt;
+&gt;On Sat, Jan 07, 2006 at 04:37:46PM -0600, PH wrote:
+&gt;  
+&gt;
+&gt;&gt;   I am running into some issues with the header information in the nes
+&gt;&gt;crt0.s.  If I am not mistaken, it is fixed and can't be changed without
+&gt;&gt;recompiling the library, is this right?  Are there any instructions for
+&gt;&gt;making modifications to the library files?  I would like to add some
+&gt;&gt;hooks into it to allow me to change the values for prg,chr,mir, and map
+&gt;&gt;bytes in my c code.  Any guidance is appreciated.
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;Using modififed library files with your code is no problem. Just create a
+&gt;copy, make your modifications, and link it to your application *before* any
+&gt;of the files supplied with cc65. If you have more than one modified file, or a
+&gt;complete replacement library, you may have to use library groups. Please see
+&gt;the linker docs for more information about library groups.
+&gt;
+&gt;Changing the header files from your C code is difficult and I wouldn't suggest
+&gt;trying it. I would use constants in the linker config file instead. This
+&gt;allows to change the header when linking.
+&gt;
+&gt;Regards
+&gt;
+&gt;
+&gt;        Uz
+&gt;  
+&gt;
+It took me a bit of looking, but I found what I needed to change in the 
+crt0.s file and the nes.cfg file.  Progress is being made.  Thanks for 
+the help!
+
+Paul
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Jan 13 00:47:40 2006</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5394.html" title="Next message in the list">Payton Byrd: "[cc65] C Compiler Semantic Analysis"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5392.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] NES Header modifications"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5392.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] NES Header modifications"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5393" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5393" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5393" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2006-01-13 00:47:44 CET
+</em></small></p>
+</body>
+</html>

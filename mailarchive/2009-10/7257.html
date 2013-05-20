@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] .global vs .export vs what i r</title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="[cc65] .global vs .export vs what i really need :)" />
+<meta name="Date" content="2009-10-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] .global vs .export vs what i really need :)</h1>
+<!-- received="Fri Oct 23 21:41:54 2009" -->
+<!-- isoreceived="20091023194154" -->
+<!-- sent="Fri, 23 Oct 2009 21:42:27 +0200" -->
+<!-- isosent="20091023194227" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="[cc65] .global vs .export vs what i really need :)" -->
+<!-- id="200910232142.28173.groepaz@gmx.net" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7258.html" title="Oliver Schmidt: &quot;Re: [cc65] Atari TGI drivers, finally&quot;">Next message</a> ]
+[ <a href="7256.html" title="Fatih Aygün: &quot;[cc65] Atari TGI drivers, finally&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7272.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] .global vs .export vs what i really need :)&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20.global%20vs%20.export%20vs%20what%20i%20really%20need%20:)">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-10-23 21:42:27</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>yay,
+
+while testing my work-in-progress size optimizer program i came to the 
+conclusion that i hit a limitation of the assembler, which makes it kinda 
+tedious if not impossible to cleanly do what i want/need to do. this is the 
+problem:
+
+the optimizer moves around small pieces of code, which means that often labels 
+will be referenced from a totally different place as before. the consequence 
+is that i need to tell the assembler somehow that this symbol exists, ie i 
+need to add the equivalent of a c prototype kindof. to do this there are 
+currently two pseudo operators, .global and .export (and .import, but that 
+doesnt make sence since the symbol is internal). this works for the most part 
+and gets the job done nicely. BUT, and thats really a let down, it means that 
+in the resulting (object)file a lot of symbols will be marked as export which 
+really shouldnt be marked as such. this doesnt matter much on first sight, 
+but once you want to run two files seperatly through the optimizer and then 
+link them together you will get conflicts on eg compiler generated symbols 
+(LXXXX labels etc)... bummer
+
+so, what i really need is a way to tell the assembler &quot;this symbol is 
+global/does exist in this file - but should NOT be exported from the 
+resulting object file&quot; (actually i assumed .global works like that, because 
+it does so in other assemblers i have used, until i found out it doesnt =P)
+
+mmh, since .global is already used, maybe you can add something 
+like .proto / .protozp that does this? or is there infact a way to achive 
+this with the existing stuff and i am just too dumb to read the docs? :)
+
+and last not least as a teaser, this is from skoe's easyprog tool, compiled 
+with -O, and then run through the optimizer:
+
+result: 8563 bytes, old: 10711 (2148 saved, 20%) time:374s
+
+besides the fact that its still kinda slow and needs some optimization itself, 
+it looks really promosing right now (similar results for every arbitrary 
+program i checked so far). i really want to get this working 100% and then 
+mess around with eg contiki :)
+
+-- 
+
+<a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    <a href="http://magicdisk.untergrund.net">http://magicdisk.untergrund.net</a>
+<a href="http://www.pokefinder.org">http://www.pokefinder.org</a>        <a href="http://ftp.pokefinder.org">http://ftp.pokefinder.org</a>
+
+I do not believe in a personal God and I have never denied this but have 
+expressed it clearly. 
+&lt;Albert Einstein&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Oct 23 21:41:54 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7258.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Atari TGI drivers, finally"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7256.html" title="Previous message in the list">Fatih Aygün: "[cc65] Atari TGI drivers, finally"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7272.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] .global vs .export vs what i really need :)"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7272.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] .global vs .export vs what i really need :)"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7257" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7257" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7257" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-10-23 21:41:56 CEST
+</em></small></p>
+</body>
+</html>

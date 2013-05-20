@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Changes in Interrupt Handling</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] Changes in Interrupt Handling" />
+<meta name="Date" content="2013-02-13" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Changes in Interrupt Handling</h1>
+<!-- received="Wed Feb 13 13:36:47 2013" -->
+<!-- isoreceived="20130213123647" -->
+<!-- sent="Wed, 13 Feb 2013 13:36:34 +0100" -->
+<!-- isosent="20130213123634" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] Changes in Interrupt Handling" -->
+<!-- id="CACT=u706FQE73s2iD_TLk1m2vOOe=XZA4+qG0=Z86izrkJf-mA@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11175.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Disable KERNAL ROM ?&quot;">Next message</a> ]
+[ <a href="11173.html" title="Oliver Schmidt: &quot;[cc65] Disable KERNAL ROM ?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="11177.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Changes in Interrupt Handling&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Changes%20in%20Interrupt%20Handling">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2013-02-13 13:36:34</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+This is to inform you about changes in cc65 interrupt handling applied recently.
+
+Up to now it was the responsibility of the target-specific startup
+code to hook and unhook a cc65 interrupt handler which calls the
+function 'callirq' which in turn calls the interruptors defined.
+
+In the (quite usual) case of no interruptors defined at all there was
+no interrupt handler hooked. While this avoided the CPU overhead there
+was still the RAM overhead for the code mentioned above.
+
+But now the interruptors import a symbol (a new feature added by Uz
+for this purpose: <a href="http://www.cc65.org/snapshot-doc/ld65-5.html#ss5.9">http://www.cc65.org/snapshot-doc/ld65-5.html#ss5.9</a>)
+which is exported by 'callirq'. And 'callirq' in turn defines a
+constructor and destructor. The symbols for those are aliased to
+target-specific code that hooks the cc65 interrupt handler in the
+constructor and unhooks it in the destructor.
+
+The benefit of this new approach is that the startup code for most
+targets is now totally free of interrupt handling code (and the call
+to 'callirq'). Thus there's no RAM overhead at all for programs
+without any interruptors.
+
+I.e. C64 programs without interruptors (which is very common) are now
+nearly 120 bytes smaller - both on disk and in memory :-)
+
+I implemented this change for (almost) all targets but tested it only
+Apple2, C64 and C128. So if you are familiar with the startup code of
+a certain target it would be great if you could check if I didn't
+break anything (the new constructors/destructors are implemented in
+'irq.s' files in the target directories).
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Feb 13 13:36:47 2013</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11175.html" title="Next message in the list">silverdr1wfmh.org.pl: "Re: [cc65] Disable KERNAL ROM ?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="11173.html" title="Previous message in the list">Oliver Schmidt: "[cc65] Disable KERNAL ROM ?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="11177.html" title="Next message in this discussion thread">silverdr1wfmh.org.pl: "Re: [cc65] Changes in Interrupt Handling"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="11177.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] Changes in Interrupt Handling"</a></li>
+<li><dfn>Reply</dfn>:  <a href="11194.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] Changes in Interrupt Handling"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#11174" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#11174" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#11174" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2013-02-13 13:36:51 CET
+</em></small></p>
+</body>
+</html>

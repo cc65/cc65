@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] How to force a read from a</title>
+<meta name="Author" content="Dave Dribin (ddribin1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] How to force a read from a memory mapped register w/o volatile" />
+<meta name="Date" content="2010-12-06" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] How to force a read from a memory mapped register w/o volatile</h1>
+<!-- received="Mon Dec  6 15:49:04 2010" -->
+<!-- isoreceived="20101206144904" -->
+<!-- sent="Mon, 6 Dec 2010 08:48:57 -0600" -->
+<!-- isosent="20101206144857" -->
+<!-- name="Dave Dribin" -->
+<!-- email="ddribin1gmail.com" -->
+<!-- subject="Re: [cc65] How to force a read from a memory mapped register w/o volatile" -->
+<!-- id="AANLkTimtJS=d=40x-FjSx5+erhGgvsH-md6xu-yPmUyE@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="AANLkTim4YEdKDqfrbu2Dxm4v_ejCwUzkmW4_v4sV-krt&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9044.html" title="Dave Dribin: &quot;Re: [cc65] How to force a read from a memory mapped register w/o volatile&quot;">Next message</a> ]
+[ <a href="9042.html" title="Oliver Schmidt: &quot;Re: [cc65] How to force a read from a memory mapped register w/o volatile&quot;">Previous message</a> ]
+[ <a href="9041.html" title="thefox xofeht: &quot;Re: [cc65] How to force a read from a memory mapped register w/o volatile&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9053.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] How to force a read from a memory mapped register w/o volatile&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Dave Dribin &lt;<a href="mailto:ddribin1gmail.com?Subject=Re:%20[cc65]%20How%20to%20force%20a%20read%20from%20a%20memory%20mapped%20register%20w/o%20volatile">ddribin1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-12-06 15:48:57</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Mon, Dec 6, 2010 at 2:40 AM, thefox xofeht &lt;thefox&#64;aspekt&#46;<!--nospam-->fi&gt; wrote:
+&gt; Read the value to a dummy variable. If there's a better way, I'd like
+&gt; to know also.
+
+That does cause the read to happen, but now the optimizer is not being
+smart enough.  It doesn't realize the dummy variable is never used and
+it is unnecessarily pushed/popped to the parameter stack:
+
+
+000000r 1               .proc	_foo: near
+000000r 1
+000000r 1               .segment	&quot;CODE&quot;
+000000r 1
+000000r 1               ;
+000000r 1               ; uint8_t dummy = IO_Read8(0x2002);
+000000r 1               ;
+000000r 1  AD 02 20     	lda     $2002
+000003r 1  20 rr rr     	jsr     pusha
+000006r 1               ;
+000006r 1               ; IO_Write8(0x2006, 0x20);
+000006r 1               ;
+000006r 1  A9 20        	lda     #$20
+000008r 1  8D 06 20     	sta     $2006
+00000Br 1               ;
+00000Br 1               ; IO_Write8(0x2006, 0x00);
+00000Br 1               ;
+00000Br 1  A9 00        	lda     #$00
+00000Dr 1  8D 06 20     	sta     $2006
+000010r 1               ;
+000010r 1               ; }
+000010r 1               ;
+000010r 1  4C rr rr     	jmp     incsp1
+000013r 1
+000013r 1               .endproc
+
+-Dave
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Dec  6 15:49:04 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9044.html" title="Next message in the list">Dave Dribin: "Re: [cc65] How to force a read from a memory mapped register w/o volatile"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9042.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] How to force a read from a memory mapped register w/o volatile"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9041.html" title="Message to which this message replies">thefox xofeht: "Re: [cc65] How to force a read from a memory mapped register w/o volatile"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9053.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] How to force a read from a memory mapped register w/o volatile"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9043" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9043" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9043" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-12-06 15:49:07 CET
+</em></small></p>
+</body>
+</html>

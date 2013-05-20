@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="ISO-8859-2"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-2" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] some patches</title>
+<meta name="Author" content="Kajtár Zsolt (kajtarzsolt1googlemail.com)" />
+<meta name="Subject" content="Re: [cc65] some patches" />
+<meta name="Date" content="2010-03-15" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] some patches</h1>
+<!-- received="Mon Mar 15 22:53:25 2010" -->
+<!-- isoreceived="20100315215325" -->
+<!-- sent="Mon, 15 Mar 2010 22:51:30 +0100" -->
+<!-- isosent="20100315215130" -->
+<!-- name="Kajtár Zsolt" -->
+<!-- email="kajtarzsolt1googlemail.com" -->
+<!-- subject="Re: [cc65] some patches" -->
+<!-- id="4B9EABE2.6040509@googlemail.com" -->
+<!-- charset="ISO-8859-2" -->
+<!-- inreplyto="20100315203017.GA1835&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7955.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] some patches&quot;">Next message</a> ]
+[ <a href="7953.html" title="Kajtár Zsolt: &quot;Re: [cc65] some patches&quot;">Previous message</a> ]
+[ <a href="7951.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] some patches&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7956.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] some patches&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Kajtár Zsolt &lt;<a href="mailto:kajtarzsolt1googlemail.com?Subject=Re:%20[cc65]%20some%20patches">kajtarzsolt1googlemail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-03-15 22:51:30</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+&gt; On Mon, Mar 15, 2010 at 09:12:50PM +0100, Groepaz wrote:
+&gt;&gt;&gt; Is it a good idea to create some header file, which would redefine
+&gt;&gt;&gt; read/write/fread/fwrite when included? (something like #define read(a,b,c)
+&gt;&gt;&gt; read_ide64(a,b,c) ) But then I have to make a copy from fread/fwrite as
+&gt;&gt;&gt;  well...
+&gt;&gt; no, bad idea. much better idea to simply link custom versions of read/write
+&gt; 
+&gt; That's true. But the real problem is the amount of custom hardware that is in
+&gt; use. It is impossible to support everybodys pet hardware in the standard cc65
+&gt; libraries. I cannot produce a separate library for each combination of
+&gt; patches. A library for the C64 without IDE64 routines for smaller size,
+
+Ok, of course it does not have to be compiled in by default. I was thinking
+about something like this:
+
+#define __USE_IDE64
+
+At the beginning of a the user's program would redefine a few routine calls to
+alternative versions in the library header files (stdio.h, unistd.h) for
+read/write and possibly seek.
+
+&gt; another library for the C64 with IDE64 support. Both with and without the
+&gt; final call to RESTOR. Another one tailored for JiffyDOS, and one with
+
+What is the reason for the final RESTOR? Interrupts are restored already,
+anything else?
+
+&gt; optimizations for the C64 DTV. All these in additional variants that use self
+&gt; modifying code for a small speedup. And so forth ...
+&gt; 
+&gt; So we will have to live with the fact that the cc65 do only cover the most
+&gt; common case. If it is cheap, they can also cover a few less common ones, too.
+
+There would be no cost if it's not selected.
+
+&gt; Maybe a solution would be if someone starts to offer the standard libraries
+&gt; for the stable versions in a few less used variants outside of the regular
+&gt; cc65 distribution. If yomeone is interested in IDE64 support, why not offer a
+&gt; C64 library for download that has the relevant routines replaced? With some
+&gt; clever scripting, it shouldn't be too difficult to make the patch process more
+&gt; or less automatic, so it is possible to track cc65 releases without too much
+&gt; hazzle.
+
+I'm not sure if this is a good idea, at least I would not do it.
+
+- --
+						    -soci-
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAkueq+IACgkQyBOVYiJltRZ3AwCg4GtDv20DyL3uwGscPaQsmpaK
+VYUAnRhC2WMPjlamLd3lNT4oQrY7oBkw
+=QqdI
+-----END PGP SIGNATURE-----
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Mar 15 22:53:25 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7955.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] some patches"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7953.html" title="Previous message in the list">Kajtár Zsolt: "Re: [cc65] some patches"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7951.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] some patches"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7956.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] some patches"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7956.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] some patches"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7954" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7954" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7954" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-03-15 22:53:27 CET
+</em></small></p>
+</body>
+</html>

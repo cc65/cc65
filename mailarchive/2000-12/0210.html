@@ -1,0 +1,295 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] bug?</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] bug?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] bug?</h1>
+<!-- received="Tue Dec 12 20:16:23 2000" -->
+<!-- isoreceived="20001212191623" -->
+<!-- sent="Tue, 12 Dec 2000 20:14:40 +0100" -->
+<!-- isosent="20001212191440" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] bug?" -->
+<!-- id="3A367920.A7A177BA@gmx.net" -->
+<!-- inreplyto="20001212105111.C24606@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20bug?"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2000-12-12 20:14:40
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0211.html">Ullrich von Bassewitz: "Re: [cc65] bug?"</a>
+<li><strong>Previous message:</strong> <a href="0209.html">Sidney Cadot: "[cc65] Announcement: Atari 8-bit ROM source in CC65 format, third revision"</a>
+<li><strong>In reply to:</strong> <a href="0208.html">Ullrich von Bassewitz: "Re: [cc65] bug?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0211.html">Ullrich von Bassewitz: "Re: [cc65] bug?"</a>
+<li><strong>Reply:</strong> <a href="0211.html">Ullrich von Bassewitz: "Re: [cc65] bug?"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Ullrich von Bassewitz wrote:
+
+&gt; The .repeat command does have a loop counter. See my example posted earlier to
+&gt; the list.
+
+ah, ok then ;)
+
+&gt; C style macros were invented to allow translating sources written for some
+&gt; other assembler. I was payed to do this, and I didn't want to add all sorts of
+&gt; duplicate stuff to ca65. However, C style macros ignore scoping rules and do
+&gt; in general work on a very low level. So these macros have the same problems as
+&gt; their C counterparts. In other words: They are evil:-) Try to avoid them if
+&gt; you can.
+
+well, i DO if i can, but that still means that there are cases when c-style
+macros would fit the job just perfectly fine
+
+&gt; C style macros *are* operating at the scanner level. They are working with
+&gt; tokens, not strings. This is the reason why you you cannot do anything with C
+&gt; style macros that works on or creates invalid tokens. For example:
+&gt; 
+&gt;         .define 'a      'b              ; ILLEGAL!
+
+yeah exactly =)
+ 
+&gt; Neither 'a, not 'b are legal tokens, so this will not work. If you need
+&gt; anything more C like, you're free to run your favorite C preprocessor over the
+&gt; sources before passing them to ca65.
+
+well, thats what i wanna avoid ... i am infact 'cleaning up' my c64 code 
+library from all that sort of things since i want ppl to be able to compile
+it without needing to get hundreds of obscure tools.
+
+&gt; Traditional macros *can* take string arguments, and the example for the new
+&gt; functions in 2.6 (example posted to the list a few days ago) did exactly what
+&gt; you're describing here: Working on each of the characters of a string passed
+&gt; as argument to the macro.
+
+uhm really? oooops 8=) hehehe.... then why the hell didnt i get it working for
+me? eeehrm ;=)
+
+&gt; &gt; f) if you enclose a block using .proc / .endproc, other global symbols
+&gt; &gt; become invisible to this block ?!? HU?! ;=D should i include my global header
+&gt; &gt; files in each of these blocks ?!? nononono this can only be a bug ;)
+&gt; 
+&gt; This seems to be a misinformation or I don't understand it correctly.
+
+standard.inc:
+
+bla=1
+
+
+dont work:
+
+foo.asm:
+
+.include &quot;standard.inc&quot;
+
+.proc
+
+.if (bla=1)			; 'bla constant expression expected'
+	.byte $00
+.endif
+
+.endproc
+
+
+works:
+
+foo.asm:
+
+
+.include &quot;standard.inc&quot;
+
+.if (bla=1)			
+.proc
+	bla=1
+else
+.proc
+.endif
+
+.if (bla=1)			
+	.byte $00
+.endif
+
+.endproc
+
+&gt; Variables from inside the block are not visible to the outside, but variables
+&gt; &gt;from all enclosing lexical blocks are visible in the inside. So there's no
+&gt; need to include any global headers in a block, including them outside the
+&gt; block makes the variables visible inside, too. In general, .proc/.endproc work
+&gt; something like PROCEDUREs in pascal.
+
+thats what i expected... but look above :/
+
+&gt; &gt; some more stuff.... (more like nice things i've seen elsewhere....) ;=D
+&gt; 
+&gt; I'm very cautious when adding things. Featurism causes code bloat and more
+&gt; bugs. Adding complex stuff that one person needs once in a year is usually not
+&gt; a good idea. So I'm quite sceptic about new feature proposals, at least until
+&gt; I know, the feature is really needed, and it has the most generic form.
+
+i generally agree on this, aslong as those missing features can be 'emulated'
+using other features in an exceptable way. (which is eg. not the case regarding
+the .rept vs recursive macros topic)
+
+&gt; &gt; - extend the .incbin directive to work like
+&gt; &gt;
+&gt; &gt;       .incbin &quot;filename&quot;,start,end,step
+&gt; 
+&gt; Someone else had proposed this feature, but I have never seen it used. As long
+&gt; as usage is quite rare, it may be emulated by &quot;dd&quot; in the makefile.
+
+err 'dd' ? tell windoze peeps to use *nix tools ;=D
+
+no really, while this may be exceptable to achive the equivalent to eg
+
+	.incbin &quot;file1&quot;,0,4096,2
+	.incbin &quot;file2&quot;,1,4096,2
+
+..it becomes painful to create a replacement for
+
+.macro chunk a
+
+	.incbin &quot;file1&quot;,a*10,256,2
+
+	.if (a&gt;0)
+		chunk a-1
+	.endif
+
+.endmacro
+
+	chunk 5
+	chunk 7
+	chunk 8
+	chunk 5
+	chunk 7
+	chunk 8
+
+
+&gt; &gt; - add a simelar directive for use in macros, that works like
+&gt; &gt;
+&gt; &gt;       .readbin &quot;filename&quot;,pos
+&gt; 
+&gt; This shouldn't be needed any longer with the new macro features (hopefully).
+
+can't await to check those then ;=D 
+
+&gt; &gt; - introduce &quot;compiler variables&quot; as a new kind of symbols. these could live
+&gt; &gt; in their own seperated namespace, or even coexist with other global symbols
+&gt; &gt; in the top-level namespace. compiler variables may be 16bit integers (wether
+&gt; &gt; signed or unsigned may depend on how the user works with them) that can be
+&gt; &gt; modified at any time and multiple times at compile time.
+&gt; 
+&gt; These will be in the next version (the one after 2.6). I fact, after my last
+&gt; mail to the list (stating that constants may not be modified), I had almost
+&gt; the same idea than what you're describing here.
+
+cool to hear that ;=) 
+
+&gt; &gt; - make some basic math/trig functions available ... democoders will
+&gt; &gt;   love you for ever ;=D
+&gt; 
+&gt; While the addition may be useful, as long as there is no support for floats in
+&gt; the assembler, adding this feature would always be a hack.
+
+mmh 'a hack' ? no, thats why i said '16 bit integer variables' .... since those
+can either represent
+
+a) 16bit unsigned 'addresses'
+b) 16bit signed 'variables'
+c) 8.8 signed fixed-point 'variables'
+
+math functions should take and return variables in 8.8 format, whereas the user
+would be responsible to properly convert them forth and back.
+
+
+.macro table origin,range,length
+
+.rept length
+
+	; do whatever math here
+	.byte origin+((.sin(loopcount&lt;&lt;8)/($100/range))&gt;&gt;8)
+	
+.endrept
+
+.endmacro
+
+table $80,$100
+
+
+_I_ can't actually think of any case were the use of floats would make real
+sence (as in, would be superior to using fixed point) ...
+
+regards
+
+gpz
+
+-- 
+----------------------------------------------------------------------
+                                 /^\
+                                 \ /
+          ASCII RIBBON CAMPAIGN   X   AGAINST HTML JUNK MAIL
+                                 / \
+----------------------------------------------------------------------
+          ___ ___ .___________________ .___________ _______.
+  c=64   /   |   \|   \__    ___/     \ \_   _____/ \      \ groepaz
+   cgb  /    '    \   | |    | /  \ /  \ |    __)_  /   |   \
+    psx \    .    /   | |    |/    '    \|        \/    |    \
+     dc  \___|_  /|___| |____|\____|__  /_______  /\____|__  /
+               \/     '               \/        \/         \/
+       <a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    Hitmen WWW Headquarters
+       <a href="http://fly.to/hitmen-groepaz">http://fly.to/hitmen-groepaz</a>     my personal playground
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20bug?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0211.html">Ullrich von Bassewitz: "Re: [cc65] bug?"</a>
+<li><strong>Previous message:</strong> <a href="0209.html">Sidney Cadot: "[cc65] Announcement: Atari 8-bit ROM source in CC65 format, third revision"</a>
+<li><strong>In reply to:</strong> <a href="0208.html">Ullrich von Bassewitz: "Re: [cc65] bug?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0211.html">Ullrich von Bassewitz: "Re: [cc65] bug?"</a>
+<li><strong>Reply:</strong> <a href="0211.html">Ullrich von Bassewitz: "Re: [cc65] bug?"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:37 CET</em>
+</em>
+</small>
+</body>
+</html>

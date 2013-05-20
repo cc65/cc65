@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] vic20 improvements</title>
+<meta name="Author" content="Daniel Gimpelevich (daniel1gimpelevich.san-francisco.ca.us)" />
+<meta name="Subject" content="[cc65] vic20 improvements" />
+<meta name="Date" content="2006-10-03" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] vic20 improvements</h1>
+<!-- received="Tue Oct  3 11:00:35 2006" -->
+<!-- isoreceived="20061003090035" -->
+<!-- sent="Tue, 3 Oct 2006 02:00:23 -0700" -->
+<!-- isosent="20061003090023" -->
+<!-- name="Daniel Gimpelevich" -->
+<!-- email="daniel1gimpelevich.san-francisco.ca.us" -->
+<!-- subject="[cc65] vic20 improvements" -->
+<!-- id="739ae0130f0b5c19866d59f9ebb56147@gimpelevich.san-francisco.ca.us" -->
+<!-- charset="US-ASCII" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5589.html" title="Daniel Gimpelevich: &quot;[cc65] Re: vic20 improvements&quot;">Next message</a> ]
+[ <a href="../2006-09/5587.html" title="MagerValp: &quot;Re: [cc65] ca65html and anonymous labels&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5589.html" title="Daniel Gimpelevich: &quot;[cc65] Re: vic20 improvements&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Daniel Gimpelevich &lt;<a href="mailto:daniel1gimpelevich.san-francisco.ca.us?Subject=Re:%20[cc65]%20vic20%20improvements">daniel1gimpelevich.san-francisco.ca.us</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2006-10-03 11:00:23</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Before I get into what this message is about, Groepaz wanted me to add 
+a second voice to his pleas to fix the cc65 preprocessor. Consider the 
+following two lines:
+#define FOO &quot;foo.h&quot;
+#include FOO
+The cc65 preprocessor does not accept that, although it should. It also 
+does not allow preprocessor macros with a variable number of arguments, 
+which it should. The patch below addresses neither of these issues.
+
+There are also a couple of problems with the main makefile, corrected 
+in the patch below.
+
+Now, the good stuff: I saw in the archives of this list that 
+suggestions to allow compiling for different memory configurations on 
+the Commodore VIC-20 were at one point rejected, but later made 
+feasible without actually being implemented. The VIC-20 allowed 127 
+different possible physical configurations of memory (not making a 
+distinction between additional RAM and ROM), most of which would have 
+no point whatsoever. I made .cfg files for the configurations one would 
+be most likely to encounter and included them in the patch below. This 
+brings up an interesting topic: What happens when something compiled 
+for one memory configuration is loaded on another? If loaded with 
+relocation (the default), the first reference to an absolute address 
+will send it into the wild blue yonder. If relocation is turned off, 
+the load itself will likely fail, but loading without relocation 
+(load&quot;*&quot;,8,1) is useful only for special effects that cc65 isn't 
+concerned with anyway. My patch adds comparison of the compile-time and 
+run-time memory configurations, with a graceful way out if they don't 
+match. As expected, there is a price to pay: 82 bytes. I don't think 
+that's very much, considering the bloat that cc65 introduces, e.g. the 
+compiled hello.c loads with a mere 737 bytes to spare on an unexpanded 
+VIC-20. Keep up the good work!
+-- 
+&quot;No gnu's is good gnu's.&quot;   --Gary Gnu, &quot;The Great Space Coaster&quot;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Oct  3 11:00:35 2006</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5589.html" title="Next message in the list">Daniel Gimpelevich: "[cc65] Re: vic20 improvements"</a></li>
+<li><dfn>Previous message</dfn>: <a href="../2006-09/5587.html" title="Previous message in the list">MagerValp: "Re: [cc65] ca65html and anonymous labels"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5589.html" title="Next message in this discussion thread">Daniel Gimpelevich: "[cc65] Re: vic20 improvements"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5589.html" title="Message sent in reply to this message">Daniel Gimpelevich: "[cc65] Re: vic20 improvements"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5588" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5588" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5588" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2006-10-03 11:00:38 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+<title>cc65 mailing list archive: Re: [cc65] [very OT] KVM</title>
+<meta name="Author" content="Spiro Trikaliotis (trik-news_at_gmx.de)">
+<meta name="Subject" content="Re: [cc65] [very OT] KVM">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] [very OT] KVM</h1>
+<!-- received="Thu Oct  9 10:18:51 2003" -->
+<!-- isoreceived="20031009081851" -->
+<!-- sent="Thu, 9 Oct 2003 10:08:27 +0200" -->
+<!-- isosent="20031009080827" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="trik-news_at_gmx.de" -->
+<!-- subject="Re: [cc65] [very OT] KVM" -->
+<!-- id="20031009080827.GA2997@trikaliotis.hn.org" -->
+<!-- charset="iso-8859-15" -->
+<!-- inreplyto="200310090044.10442.groepaz@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Spiro Trikaliotis (<a href="mailto:trik-news_at_gmx.de?Subject=Re:%20[cc65]%20[very%20OT]%20KVM"><em>trik-news_at_gmx.de</em></a>)<br>
+<strong>Date:</strong> 2003-10-09 10:08:27
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3589.html">Groepaz: "Re: [cc65] Overflows in signed comparisions"</a>
+<li><strong>In reply to:</strong> <a href="3588.html">Groepaz: "Re: [cc65] [very OT] KVM"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3597.html">Groepaz: "Re: [cc65] [very OT] KVM"</a>
+<li><strong>Next in thread:</strong> <a href="../2003-09/3514.html">Keates, Mark: "RE: [cc65] [very OT] KVM"</a>
+<li><strong>Reply:</strong> <a href="3597.html">Groepaz: "Re: [cc65] [very OT] KVM"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello,
+
+On Thu, Oct 09, 2003 at 12:44:10AM +0200, Groepaz wrote:
+&gt; On Wednesday 08 October 2003 23:38, Ullrich von Bassewitz wrote:
+
+&gt; &gt; Just out of curiosity: Is there more than one version of vice? I thought
+&gt; &gt; the only difference between the versions was the user interface, but it
+&gt; &gt; seems that they do also differ in the supported features.
+&gt; 
+&gt; yes... other than common belief, vice isnt really a well written program
+&gt; when it comes to portability. there are lots of differences between the
+&gt; different &quot;ports&quot;, not only in the userinterface, but also in the supported
+&gt; features.
+
+Well, this is only half true.
+
+VICE essentially is arch-independant. There are some parts, especially very
+old ones, which are not written very portable and confuse
+architecture-dependant with -independant stuff. Some (many?) changes to every
+new version of VICE are rewriting parts of the code to make a distinction 
+between architecture-dependant stuff and non-dependant stuff.
+
+As for the RR-Net emulation, it is written in a portable way. Anyway,
+currently, I have problems with the libpcap library on Unix, since it does
+not allow sending raw packets (which is possible with the Windows version of
+it). Reception of the packets works, but not sending.
+
+I'm currently thinking about two possibilities:
+
+1. Make an own version of libpcap, adding send capabilities
+2. Use another library like TAP.
+
+Anyway, I don't have experience with TAP, ruling out no 2, and I don't have 
+experience with anything but Linux, so even no 1 is not very easy to
+accomplish.
+
+If anyone wants to help out, just write me (privately is better, I think, is
+this is getting OT here).
+
+
+&gt; (for example, the windows version doesnt support rs232 emulation, 
+&gt; which the linux port does [even if it doesnt work, which is another story])
+
+I never looked at the rs232 emulation, so I'm not sure if it heavily uses
+Unix features or not. Anyway, there seems not to be much interest of the
+VICE developers in this, thus, it is not taken care of.
+
+&gt; as for rr-net ... its even a quite &quot;interisting&quot; solution in the win port ....
+&gt; using some 3rd party program to be able to hook into the systems networking
+&gt; (instead of implementing a common interface and a lowlevel device driver).
+
+WinPCAP was used deliberately as it is available on many plattforms (Linux,
+BSD, Solaris, Irix, ..., and Windows 9x/Me/NT/2K/XP, as well as OS2), so the
+thought was to be able to use most parts of the code for every OS.
+
+If you have a look into the sources, you encounter that there is a file
+src/c64/tfe.c which has the arch-independant stuff, as well as
+arch/win32/tfearch.c which performs the interfacing to the OS. Do you want
+another interface, other than WinPCAP? Just replace tfearch.c by anything
+else (or, even better, make autoconf decide itself).
+
+
+&gt; whats most disturbing with all that is that appearently none of the vice
+&gt; team really cares about making all features available across all platforms,
+
+Every member of the team implements features for his favourite plattform,
+that is, the one he is using himself. This is only natural. I, for example,
+could not even implement something for BeOS, for example, since I don't have
+this around. 
+
+Anyway, most times, we do coordinate our efforts to be able to ports
+features as easy as possible.
+
+&gt; nor about fixing problems that are known for ages (like the rs232 emulation
+&gt; beeing broken since vice &gt;1.4, the autostart bugs, the filerequester issues 
+&gt; in linux, etcetcetc)...hmpf
+
+BTW: VICE is open source. :-)
+
+Which autostart bugs do you mean? AFAIK, they have been fixed some time (and
+releases) ago. If there are other bugs which remain, please make a bug report.
+
+I have heard that there are some RS232 issues, but I don't know exactly what
+they are. I never heard of filerequester issues in linux. BTW, as there are
+different UIs for Linux (xaw, xaw3d, Gnome, ...), which one(s) is/are affected?
+
+Why does everyone think that the VICE developers are all around and look at
+every forum, every IRC chat or the like? Even if some do, they do not always
+forward everything to the VICE Developers ML.
+
+If you have some bug reports (descriptions how to reproduce would be good),
+feel free to write to vice-devel .at. firenze.linux.it
+
+Thanks for your support,
+    Spiro.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20[very%20OT]%20KVM">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3589.html">Groepaz: "Re: [cc65] Overflows in signed comparisions"</a>
+<li><strong>In reply to:</strong> <a href="3588.html">Groepaz: "Re: [cc65] [very OT] KVM"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3597.html">Groepaz: "Re: [cc65] [very OT] KVM"</a>
+<li><strong>Next in thread:</strong> <a href="../2003-09/3514.html">Keates, Mark: "RE: [cc65] [very OT] KVM"</a>
+<li><strong>Reply:</strong> <a href="3597.html">Groepaz: "Re: [cc65] [very OT] KVM"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-10-09 10:21:54 CEST</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Directory/Drive functions</title>
+<meta name="Author" content="Greg King (gngking_at_erols.com)">
+<meta name="Subject" content="Re: [cc65] Directory/Drive functions">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Directory/Drive functions</h1>
+<!-- received="Fri Jun 13 04:11:08 2003" -->
+<!-- isoreceived="20030613021108" -->
+<!-- sent="Thu, 12 Jun 2003 21:19:23 -0400" -->
+<!-- isosent="20030613011923" -->
+<!-- name="Greg King" -->
+<!-- email="gngking_at_erols.com" -->
+<!-- subject="Re: [cc65] Directory/Drive functions" -->
+<!-- id="000001c33151$194b8ec0$ee672c42@palace" -->
+<!-- inreplyto="[cc65] Directory/Drive functions" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Greg King (<a href="mailto:gngking_at_erols.com?Subject=Re:%20[cc65]%20Directory/Drive%20functions"><em>gngking_at_erols.com</em></a>)<br>
+<strong>Date:</strong> 2003-06-13 03:19:23
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3107.html">Greg King: "Re: [cc65] Restoring vectors (CBM machines)"</a>
+<li><strong>Maybe in reply to:</strong> <a href="3055.html">Tom Watt: "[cc65] Directory/Drive functions"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3109.html">Groepaz: "Re: [cc65] Directory/Drive functions"</a>
+<li><strong>Next in thread:</strong> <a href="../2003-05/3033.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="3109.html">Groepaz: "Re: [cc65] Directory/Drive functions"</a>
+<li><strong>Reply:</strong> <a href="3110.html">Ullrich von Bassewitz: "Re: [cc65] Directory/Drive functions"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+From: Ullrich von Bassewitz
+Date: Wednesday, June 11, 2003, 04:23 PM
+&gt;
+&gt; On Wed, Jun 11, 2003, at 02:50:04PM -0400, Greg King wrote:
+&gt; &gt; ...  It takes only a few extra bytes to
+&gt; &gt; restore DEVNUM.  I see no valid reason to leave it out.
+&gt;
+&gt; And, I see no reason to restore it, since no one relies on it.
+&gt; ...
+&gt; My suggestion would be to ask the following question (in fact,
+&gt; this is the question, I've asked when deciding if a save/restore
+&gt; of other variables is necessary):  Is there a need to save and restore
+&gt; this variable?
+
+I rely on it.  (When I write BASIC programs that use more than one drive
+[and/or printer], I make those programs remember and restore DEVNUM,
+so that I can depend on it being what I expect it to be.)
+
+The IDE64 cartridge is another thing that relies on DEVNUM's value.
+We can see a directory-listing simply by typing DIR or LL.  When we do not
+type the other parts of those statements, (
+    &quot;&quot;,12
+for example), they will read from whatever device is &quot;named&quot; by DEVNUM.
+I like the convenience of being able to run a program, then afterwards,
+display a directory without needing to remember to type the device-number
+[but, apparently, no one else likes it :-)].
+
+I will concede that it is not absolutely vital to restore DEVNUM -- unless
+you consider convenience to be a necessity [sometimes, I do! :-)].
+----------------
+
+From: Groepaz
+Date: Wednesday, June 11, 2003, 04:42 PM
+&gt;
+&gt; If you decide that you would like to restore this (and maybe more)
+&gt; variables, you can still link some own code to your programs easily and
+&gt; without much effort.
+
+I go further than that.  I changed my copy of the libraries so that they
+save-and-restore some useful things that might be trashed.  I mentioned it
+to Uz because I thought that other people might appreciate that convenience
+as much as I do [if I am wrong, my ego will survive -- just barely ;-)].
+
+&gt; Just for curiousity ... what kind of tool/program is that what you think
+&gt; could need such treatment?  And, why wouldn't you have it loop
+&gt; infinitely, and provide an &quot;exit&quot; option rather than restarting it
+&gt; by &quot;run&quot;?
+
+Suppose I run a program that asks me to type a file-name -- and, I forget
+how to spell it (I refuse to admit how often it happens! :-P).  If I am
+lucky, then that program has a fancy user-interface, and I can make it show
+a directory.  But, what if it cannot do that?  It is nice when I can stop
+the program, use a &quot;wedge&quot; to display the directory, re-run that program,
+and type the file's name.
+----------------
+
+From: Groepaz
+Date: Thursday, June 12, 2003, 11:02 AM
+&gt;
+&gt; On Thursday, 12 June 2003, 16:36, MagerValp wrote:
+&gt; &gt; &gt;&gt;&gt;&gt;&gt; &quot;G&quot; == Groepaz writes:
+&gt; &gt;
+&gt; &gt; G&gt; Mmmmh well, are there actually any of these &quot;wedges&quot; that would
+&gt; &gt; G&gt; even survive after running a cc65 program?
+&gt; &gt;
+&gt; &gt; Anything that stays in low mem. ( &lt; $0400, like the tape buffer) and
+&gt; &gt; under the Kernal ROM does.  $c000 stuff stands a fair chance of getting
+&gt; &gt; nuked though, but that's to be expected.
+&gt;
+&gt; Well, RAM under Kernal is used by both TGI and also the exp. mem.
+&gt; interface.  And, most low mem. can't be used for user programs, either
+&gt; (tape buffer being the only practical exception, if and only if
+&gt; your cc65 is made to never use tape).
+
+Don't forget that we easily can write and use configuration-scripts that
+protect anything that we want to keep in high-RAM.
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Directory/Drive%20functions">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3107.html">Greg King: "Re: [cc65] Restoring vectors (CBM machines)"</a>
+<li><strong>Maybe in reply to:</strong> <a href="3055.html">Tom Watt: "[cc65] Directory/Drive functions"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3109.html">Groepaz: "Re: [cc65] Directory/Drive functions"</a>
+<li><strong>Next in thread:</strong> <a href="../2003-05/3033.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="3109.html">Groepaz: "Re: [cc65] Directory/Drive functions"</a>
+<li><strong>Reply:</strong> <a href="3110.html">Ullrich von Bassewitz: "Re: [cc65] Directory/Drive functions"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-06-13 04:12:41 CEST</em>
+</em>
+</small>
+</body>
+</html>

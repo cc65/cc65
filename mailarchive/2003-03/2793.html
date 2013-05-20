@@ -1,0 +1,160 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] char-copy and interrupts</title>
+<meta name="Author" content="Tim Schürmann (tischuer_at_web.de)">
+<meta name="Subject" content="Re: [cc65] char-copy and interrupts (C64)">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] char-copy and interrupts (C64)</h1>
+<!-- received="Sun Mar 16 10:38:35 2003" -->
+<!-- isoreceived="20030316093835" -->
+<!-- sent="Sun, 16 Mar 2003 10:39:47 +0100" -->
+<!-- isosent="20030316093947" -->
+<!-- name="Tim Schürmann" -->
+<!-- email="tischuer_at_web.de" -->
+<!-- subject="Re: [cc65] char-copy and interrupts (C64)" -->
+<!-- id="3E744663.E9EFBE49@web.de" -->
+<!-- inreplyto="20030315235039.GD2429@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Tim Schürmann (<a href="mailto:tischuer_at_web.de?Subject=Re:%20[cc65]%20char-copy%20and%20interrupts%20(C64)"><em>tischuer_at_web.de</em></a>)<br>
+<strong>Date:</strong> 2003-03-16 10:39:47
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2792.html">Adam Dunkels: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>In reply to:</strong> <a href="2786.html">Ullrich von Bassewitz: "Re: [cc65] char-copy and interrupts (C64)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2802.html">Ullrich von Bassewitz: "Re: [cc65] char-copy and interrupts (C64)"</a>
+<li><strong>Reply:</strong> <a href="2802.html">Ullrich von Bassewitz: "Re: [cc65] char-copy and interrupts (C64)"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+Ullrich von Bassewitz schrieb:
+
+&gt; On Sat, Mar 15, 2003 at 05:08:34PM +0100, Tim Schürmann wrote:
+&gt; &gt; Now, i have another problem: after switching to the upper memory, cursor(1) has
+&gt; &gt; a strange behavior. On each screen-position it shows a diffrent charcter. Is
+&gt; &gt; this correct or did i something wrong?
+&gt;
+&gt; I cannot really imagine how this error looks, and I don't know which memory
+&gt; area is used for the character set, so I cannot comment on that.
+
+I've done some tests and wrote a little testing-program.
+When you run it, you can see that the chars are correct (in the testphrase; even the
+lower-case charset is there if you switch to it by pressing C= and Shift). But if you
+try to type the letter &quot;t&quot;, the cursor looks not very normal. To see the difference,
+delete the &quot;copy&quot;-part in the beginning.
+It don't matter where you place the charset and the screen (under the kernal): the
+result is the same.
+btw: when i use the memory-configuration from the plasma.c demo (screen at $e000,
+char at $e800), the lower-case charset is gone or messed up. Does anybody know why?
+
+
+----- snipp ----
+
+#include &lt;stdlib.h&gt;
+#include &lt;conio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;6502.h&gt; /* for CLI and SEI-macros */
+
+
+
+/* POKE and PEEK macros */
+#define POKE(A,X) (*(unsigned char *)A) = (X)
+#define PEEK(A) (*(unsigned char *)A)
+
+
+int main (void)
+{
+
+ /* do some colour tings */
+ bordercolor (COLOR_BLACK);
+ bgcolor (COLOR_BLACK);
+ textcolor (COLOR_GRAY3);
+
+ /* move the screen to upper memory */
+
+ /* copy chars to upper memory */
+ SEI (); /* disable interrupts */
+ POKE(1, PEEK(1)&amp;251); /* turn chars on */
+  memcpy((void*)0xe000, (void*)0xd000, ((256*8)*2)); /* copy chaset to $e000*/
+ POKE(1, PEEK(1)|4); /* turn on I/O */
+ CLI (); /* enable interrupts */
+
+ /* tell vic new adresses */
+ POKE(0xdd00, (PEEK(0xdd00)&amp;252)|0 ); /* move VIC-bank to $c000 (bank 3) */
+ POKE(0xd018, (PEEK(0xd018)&amp;15)|192 ); /* screen to $f000 */
+ POKE(648,240); /* tell kernal new screen-adress */
+
+ POKE(0xd018, (PEEK(0xd018)&amp;240)|8 ); /* tell vic where the chars are */
+
+ /* do some input-stuff to show the cursor problems */
+ clrscr();
+ cursor(1);
+
+ cprintf(&quot;testphrase: abcde12345-ABCDE&quot;);
+ gotoxy(0,1);
+
+     while (!0) {
+  cprintf(&quot;%c&quot;, cgetc());
+
+ }
+
+}
+
+--- snap -------------
+
+Bye,
+
+Tim
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20char-copy%20and%20interrupts%20(C64)">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2792.html">Adam Dunkels: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>In reply to:</strong> <a href="2786.html">Ullrich von Bassewitz: "Re: [cc65] char-copy and interrupts (C64)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2802.html">Ullrich von Bassewitz: "Re: [cc65] char-copy and interrupts (C64)"</a>
+<li><strong>Reply:</strong> <a href="2802.html">Ullrich von Bassewitz: "Re: [cc65] char-copy and interrupts (C64)"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-03-16 10:38:49 CET</em>
+</em>
+</small>
+</body>
+</html>

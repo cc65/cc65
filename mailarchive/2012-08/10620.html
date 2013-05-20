@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Filenames for POSIX functi</title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="Re: [cc65] Filenames for POSIX functins on CBM targets" />
+<meta name="Date" content="2012-08-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Filenames for POSIX functins on CBM targets</h1>
+<!-- received="Fri Aug 10 19:22:30 2012" -->
+<!-- isoreceived="20120810172230" -->
+<!-- sent="Fri, 10 Aug 2012 19:23:35 +0200" -->
+<!-- isosent="20120810172335" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="Re: [cc65] Filenames for POSIX functins on CBM targets" -->
+<!-- id="201208101923.35152.groepaz@gmx.net" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="CACT=u71c0bLuLeuJCRhGFjS7JUQn4XNgQPoWWVSXzJFSDioUvA&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10621.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">Next message</a> ]
+[ <a href="10619.html" title="Oliver Schmidt: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">Previous message</a> ]
+[ <a href="10618.html" title="Oliver Schmidt: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10623.html" title="Oliver Schmidt: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20Filenames%20for%20POSIX%20functins%20on%20CBM%20targets">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-08-10 19:23:35</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Friday 10 August 2012, you wrote:
+&gt; &gt; btw, to make clear what i mean.... it should always be possible to
+&gt; &gt; retrieve a filename by readdir, and then opening the file by fopen using
+&gt; &gt; the exact string returned by readdir.
+&gt; 
+&gt; Generally this isn't the case on any OS I know of.
+
+hu? i am doing exactly that in many of my programs. yes you have to assume the 
+concept of &quot;current drive&quot; and/or &quot;current working directory&quot; is present 
+(which it almost certainly is) and that the directory is read from the current 
+drive.
+
+&gt; &gt; that pretty much rules out any solution that requires to
+&gt; &gt; specify the drive and/or device number. and it also rules out any
+&gt; &gt; solution that can not deal with whatever is a valid filename.
+&gt; 
+&gt; I can't follow you at all here. All readir() implementations I know of
+&gt; return the filename only, no relative path, no absolute path.
+&gt; 
+&gt; So what you describe above works this way _only_ if the directory read
+&gt; is &quot;.&quot;. The sample 'multidemo' does exactly this.
+
+yes, see above
+ 
+&gt; But if you read any other directory then it is your task to either
+&gt; - prepend the directory name you read to the file name you want to
+&gt; open (and a path delimiter)
+&gt; or
+&gt; - chdir() to the directory before opening the file
+
+or in the real existing CBM world: always do CHDIR, because opening a file by 
+using the full path can not be done (not on any drive i am aware of at least) 
+:) (and the directory will also always come from the current working directory 
+of the respective drive).
+
+&gt; The only issue is the missing delimiter. If the majority here likes it
+&gt; better I could as well live with opendir()/chdir()/getcwd() omiting
+&gt; the last ':' like in &quot;8:0&quot; so that the colon can be defined as
+&gt; delimiter.
+
+the point i am trying to make is, that in a &quot;standard situation&quot; (which is: 
+one drive, one unit, working from the current directory) it should never be 
+required to bother about adding a drive or device number, especially not 
+prepending something to a string everytime a file is opened.
+
+-- 
+
+<a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    <a href="http://magicdisk.untergrund.net">http://magicdisk.untergrund.net</a>
+<a href="http://www.pokefinder.org">http://www.pokefinder.org</a>        <a href="http://ftp.pokefinder.org">http://ftp.pokefinder.org</a>
+
+Jeden Tag 19 Millionen Euro f�r &quot;unabh�ngiges&quot; Fernsehen?
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Aug 10 19:22:30 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10621.html" title="Next message in the list">silverdr1wfmh.org.pl: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10619.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10618.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10623.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10623.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10626.html" title="Message sent in reply to this message">Kajtár Zsolt: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10620" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10620" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10620" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-08-10 19:22:33 CEST
+</em></small></p>
+</body>
+</html>

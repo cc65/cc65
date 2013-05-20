@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Target BBC - info only</title>
+<meta name="Author" content="Kolja Nikolaus Sträter (k1kollus.de)" />
+<meta name="Subject" content="Re: [cc65] Target BBC - info only" />
+<meta name="Date" content="2005-04-09" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Target BBC - info only</h1>
+<!-- received="Sat Apr  9 14:15:17 2005" -->
+<!-- isoreceived="20050409121517" -->
+<!-- sent="Sat, 09 Apr 2005 14:16:48 +0200" -->
+<!-- isosent="20050409121648" -->
+<!-- name="Kolja Nikolaus Sträter" -->
+<!-- email="k1kollus.de" -->
+<!-- subject="Re: [cc65] Target BBC - info only" -->
+<!-- id="4257C7B0.3040301@kollus.de" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20050405212228.GA19487&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4918.html" title="Ullrich von Bassewitz: &quot;[cc65] IP and server changes&quot;">Next message</a> ]
+[ <a href="4916.html" title="Kolja Nikolaus Sträter: &quot;Re: [cc65] Re: Target BBC - info only&quot;">Previous message</a> ]
+[ <a href="4911.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Target BBC - info only&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Kolja Nikolaus Sträter &lt;<a href="mailto:k1kollus.de?Subject=Re:%20[cc65]%20Target%20BBC%20-%20info%20only">k1kollus.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-04-09 14:16:48</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Uz,
+
+&gt; It's the compiler which has some ugly stuff in it. Casting pointers to longs
+&gt; and encoding them into an array of bytes for example. This one the reason for
+&gt; the problems on some 64 bit platforms. Most of the other stuff should be ok.
+&gt;  
+Oh yes, that sounds pretty nasty... :-)
+No, I'm only joking, I haven't got your experience, I'm just getting 
+back into C programming now, although I've done a fair bit of OO 
+programming (and also 6502 and x86, but that's quite long ago). But I 
+noticed I couldn't compile your code on my AMD64 platform. It just 
+bombed out on some table, which I couldn't quite understand.
+
+&gt; The exact wording is: &quot;It is highly portable.  The only unportable part is the
+&gt; table itself; all real code goes into the common library.&quot;
+&gt; 
+&gt; This means: The table itself is platform dependent. There's one table for the
+&gt; CBMs (because they share PETSCII as charset), there another table for the
+&gt; Atari, one for the Apple, and so on. The code that works with the table (like
+&gt; isupper(), isalpha()) is the same for all platforms.
+Ok yes, well, that was probably quite a dumb question :-)
+Somehow I never associated portability with a pure data table before. If 
+a piece of code is portable, it works with on a number of platforms, 
+with a number of different compilers - these are given from the outside. 
+But your table is interpreted by your own code, which you can change.
+But then again, perhaps I'm thinking too much... :-)
+
+&gt;&gt;(I'm hereby reactivating my alias, I always thought it was too short,
+&gt;&gt;but then seeing your 2-letter one, I guess it's not that bad :-)
+&gt; 
+&gt; 
+&gt; &quot;Uz&quot; is not really an alias, it's a nick. My parents first planned to name me
+&gt; this way, but later decided it may give problems, so they named me &quot;Ullrich&quot;,
+&gt; but called me &quot;Uz&quot;. I've been called this way since my birth. There are some
+&gt; records[*] that were taken when I was between 1 and 2 years old. My my
+&gt; grandfather was reading a book with me. And he was already calling me &quot;Uz&quot;.
+
+That's quite interesting, I always love these little things :-)
+I had a similar problem with my first name. I wish parents would think a 
+bit before they paste these name inventions on their children who have 
+to run around all their life with them producing no end of unforseen 
+complications.
+
+In your case for example (I'm guessing you grew up in Germany) Uz was 
+pronounced Utz. But now in english you're Uzzz - they've turned you into 
+a bee!!!
+
+But of course you also got what is probably the shortest (quasi-)alias 
+in existence. And as we well know, in Unix everything shorter is also 
+much cooler...
+
+All the best,
+
+kol
+
+
+&gt; 
+&gt; Regards
+&gt; 
+&gt; 
+&gt;         Uz
+&gt; 
+&gt; 
+&gt; 
+&gt; [*] Top secrect of course:-)
+&gt; 
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Apr  9 14:15:17 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4918.html" title="Next message in the list">Ullrich von Bassewitz: "[cc65] IP and server changes"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4916.html" title="Previous message in the list">Kolja Nikolaus Sträter: "Re: [cc65] Re: Target BBC - info only"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4911.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Target BBC - info only"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4917" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4917" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4917" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-04-09 14:15:23 CEST
+</em></small></p>
+</body>
+</html>

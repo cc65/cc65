@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: Re[2]: [cc65] Compile problem</title>
+<meta name="Author" content="Adam Dunkels (adam_at_sics.se)">
+<meta name="Subject" content="Re: Re[2]: [cc65] Compile problem">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: Re[2]: [cc65] Compile problem</h1>
+<!-- received="Mon Dec 10 19:10:57 2001" -->
+<!-- isoreceived="20011210181057" -->
+<!-- sent="Mon, 10 Dec 2001 19:11:16 +0100" -->
+<!-- isosent="20011210181116" -->
+<!-- name="Adam Dunkels" -->
+<!-- email="adam_at_sics.se" -->
+<!-- subject="Re: Re[2]: [cc65] Compile problem" -->
+<!-- id="200112101811.TAA15729@color.sics.se" -->
+<!-- inreplyto="13621767607.20011210165402@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Adam Dunkels (<a href="mailto:adam_at_sics.se?Subject=Re:%20Re[2]:%20[cc65]%20Compile%20problem"><em>adam_at_sics.se</em></a>)<br>
+<strong>Date:</strong> 2001-12-10 19:11:16
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0961.html">Ullrich von Bassewitz: "Re: [cc65] Compile problem"</a>
+<li><strong>Previous message:</strong> <a href="0959.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<li><strong>In reply to:</strong> <a href="0959.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0963.html">groepaz: "Re[4]: [cc65] Compile problem"</a>
+<li><strong>Reply:</strong> <a href="0963.html">groepaz: "Re[4]: [cc65] Compile problem"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Monday 10 December 2001 16:54, you wrote:
+&gt; a) regardless whats the current working dir when i type &quot;make&quot;, the
+&gt; stuff should still work =&gt; this renders &quot;searching relative to .&quot;
+&gt; useless.
+
+Being able to type &quot;make&quot; in an arbitrary directory and hope to rebuild the 
+right files for the right just doesn't work. If you use GNU make, you can 
+specify a working directory, however, with &quot;gmake -C /adam/project&quot;. Perhaps 
+this is the closest thing to your needs?
+
+&gt; whatever, all and all these problems can be easily solved by
+&gt; &quot;searching relative to current file&quot; aswell (right after searching
+&gt; pathes given by -I option at best) - and thats actually the kind of
+&gt; behaviour i'd expect from any decent compiler/assembler out there.
+&gt; (except borland turbo-c which suffers from the same problem hehehehe ;D)
+&gt;
+&gt; infact, i was pretty surprised that ca65 did NOT work like this when i
+&gt; first stumbled about it....seems to be another &quot;too easy to let it be
+&gt; unfixed&quot; issue to me ;=)
+
+I think that the behavour that ca65/cc65 exhibits is the more common 
+behaviour. I haven't come across any compilers that lets you specify &quot;include 
+file relative to where this file lives&quot; (but then I haven't come across very 
+many compilers).  The common behaviour is that #include files are searched 
+relative to all -I paths and some default paths (., /usr/include and friends 
+as well as a few others).
+
+Anyway, here is how I solved the problem for the lwIP project. The lwIP 
+TCP/IP stack should compile cleanly for many platforms and it should possible 
+to compile it with either IPv4 or IPv6 support. The code tree is structured 
+in such a way that all makefiles and .o files end up in an project-specific 
+directory (called proj/${PROJNAME}) and the source and includefiles are kept 
+in another directory (src/). 
+
+All include files are #included with an lwip/ path, like this:
+
+#include &quot;lwip/ip.h&quot;
+#include &quot;lwip/debug.h&quot;
+
+(The reason is to avoid clobbering the namespace.)
+
+The are a few different types of include files; those that are lwIP specific, 
+those that are architecture specific and those that are project specific. 
+Each are kept in diffrent directories. The makefiles are used to specify the 
+#include paths with the CFLAGS variable like this:
+
+CFLAGS = -I../src/include -I../src/arch/cc65/include -I../src/include/ipv4
+
+This way, all includes are kept in diffrent directories and the paths are 
+relative to the makefile and not to the root of the filesystem.
+
+/adam
+-- 
+Adam Dunkels &lt;<a href="mailto:adam_at_sics.se?Subject=Re:%20Re[2]:%20[cc65]%20Compile%20problem">adam_at_sics.se</a>&gt;
+<a href="http://www.sics.se/~adam">http://www.sics.se/~adam</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20Re[2]:%20[cc65]%20Compile%20problem">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0961.html">Ullrich von Bassewitz: "Re: [cc65] Compile problem"</a>
+<li><strong>Previous message:</strong> <a href="0959.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<li><strong>In reply to:</strong> <a href="0959.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0963.html">groepaz: "Re[4]: [cc65] Compile problem"</a>
+<li><strong>Reply:</strong> <a href="0963.html">groepaz: "Re[4]: [cc65] Compile problem"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:44 CET</em>
+</em>
+</small>
+</body>
+</html>

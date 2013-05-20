@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Arrays of structs</title>
+<meta name="Author" content="Mike Hawkey (hawk1myplace.net.au)" />
+<meta name="Subject" content="[cc65] Arrays of structs" />
+<meta name="Date" content="2005-08-16" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Arrays of structs</h1>
+<!-- received="Tue Aug 16 14:33:57 2005" -->
+<!-- isoreceived="20050816123357" -->
+<!-- sent="Tue, 16 Aug 2005 22:08:45 +0930" -->
+<!-- isosent="20050816123845" -->
+<!-- name="Mike Hawkey" -->
+<!-- email="hawk1myplace.net.au" -->
+<!-- subject="[cc65] Arrays of structs" -->
+<!-- id="4301DE55.5030106@myplace.net.au" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5166.html" title="Johan Kotlinski: &quot;Re: [cc65] Arrays of structs&quot;">Next message</a> ]
+[ <a href="5164.html" title="Ullrich von Bassewitz: &quot;[cc65] New cl65 options (was: Config file expressions)&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5166.html" title="Johan Kotlinski: &quot;Re: [cc65] Arrays of structs&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Mike Hawkey &lt;<a href="mailto:hawk1myplace.net.au?Subject=Re:%20[cc65]%20Arrays%20of%20structs">hawk1myplace.net.au</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-08-16 14:38:45</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi All,
+
+I've been playing with CC65 for a little while, and am just starting to 
+try and get something more functional.  Anyway, my problem is as follows:
+I get the following error s when I compile the code below
+
+E:\ATARI\DEV\DEMO1\MAP.C(68): Error: `]' expected
+E:\ATARI\DEV\DEMO1\MAP.C(68): Error: Identifier expected
+E:\ATARI\DEV\DEMO1\MAP.C(68): Error: `;' expected
+E:\ATARI\DEV\DEMO1\MAP.C(68): Error: Identifier expected
+
+Now I'm sure I've used this method with other compilers, but that 
+doesn't mean that it's valid for this compiler.
+
+Am I exceeding the limitations of this compiler?
+
+Thanks,
+Mike.
+
+=== Code Start ===
+
+typedef		char		UINT8;
+
+typedef struct sTile
+{
+     UINT8   nw;
+     UINT8   nnw;
+     UINT8   nne;
+     UINT8   ne;
+     UINT8   sw;
+     UINT8   ssw;
+     UINT8   sse;
+     UINT8   se;
+} tTile;
+
+#define NUM_OF_TILES        32
+
+#define MAP_WIDTH_TILES     64
+#define MAP_HEIGHT_TILES    64
+
+tTile   gTile[NUM_OF_TILES];
+UINT8   gMap[MAP_WIDTH_TILES, MAP_HEIGHT_TILES];
+
+=== Code Stop ===
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Aug 16 14:33:57 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5166.html" title="Next message in the list">Johan Kotlinski: "Re: [cc65] Arrays of structs"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5164.html" title="Previous message in the list">Ullrich von Bassewitz: "[cc65] New cl65 options (was: Config file expressions)"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5166.html" title="Next message in this discussion thread">Johan Kotlinski: "Re: [cc65] Arrays of structs"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5166.html" title="Message sent in reply to this message">Johan Kotlinski: "Re: [cc65] Arrays of structs"</a></li>
+<li><dfn>Reply</dfn>:  <a href="5168.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Arrays of structs"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5165" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5165" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5165" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-08-16 14:34:00 CEST
+</em></small></p>
+</body>
+</html>

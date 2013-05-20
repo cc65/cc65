@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] static memory allocation</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] static memory allocation question">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] static memory allocation question</h1>
+<!-- received="Fri Aug 31 15:00:40 2001" -->
+<!-- isoreceived="20010831130040" -->
+<!-- sent="Fri, 31 Aug 2001 15:00:43 +0200" -->
+<!-- isosent="20010831130043" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] static memory allocation question" -->
+<!-- id="20010831150043.A10686@trixie.musoftware.de" -->
+<!-- inreplyto="002301c13218$d6026690$588bef82@xp" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20static%20memory%20allocation%20question"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2001-08-31 15:00:43
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="../2001-09/0711.html">Ullrich von Bassewitz: "[cc65] Appwatch has closed"</a>
+<li><strong>Previous message:</strong> <a href="0709.html">Arvid Norberg: "[cc65] static memory allocation question"</a>
+<li><strong>In reply to:</strong> <a href="0709.html">Arvid Norberg: "[cc65] static memory allocation question"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Fri, Aug 31, 2001 at 02:31:18PM +0200, Arvid Norberg wrote:
+&gt; Right now I just use the memory at 0x3000, but it is not a good idea, as the
+&gt; compiler puts other static data in that memory that gets destroyed by my
+&gt; characters.
+&gt; Is there a way to tell the compiler to leave some memory unused for these
+&gt; kind of things?
+&gt; Or is there another way it should be done?
+
+What I would do is to use a special memory configuration for the linker.
+Probably the easiest way is to place the character data above all other data
+and add an alignment to the memory area, so it will be on a 1K boundary. The
+disadvantage is that further measures, the pad data will also go into the
+output file.
+
+Another possibility would be to allocate $7FF bytes for the character data,
+and place the actual data at the beginning. An area of size $7FF bytes will
+always contain a 1K block on a 1K boundary, so all you have to do is to move
+the 1K of character data inside the (almost 2K) block to the proper address.
+You will waste nearly 1K when doing this, but it avoids changing the linker
+config (and you waste nearly 1K worst case with all other methods as well).
+
+Like this:
+
+chardata.s:
+----------------------------------------------------------------------------
+       	.export	 _chardata_orig
+       	.export	 _chardata
+
+       	; Export symbol for 1K boundary inside this module
+       	_chardata = (_chardata_orig + $3FF) .bitand .bitnot $3FF
+
+       	.data
+chardata_orig:
+        .include &quot;chardata.bin&quot;	 	; The actual character data (1K)
+       	.res	 $3FF	  	 	; Empty space
+----------------------------------------------------------------------------
+
+Your C initialization code would then do something like
+
+----------------------------------------------------------------------------
+   	extern const char chardata_orig[];
+   	extern char chardata[];
+
+   	...
+   	memmove (chardata, chardata_orig, $400);
+   	...
+----------------------------------------------------------------------------
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20static%20memory%20allocation%20question">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20static%20memory%20allocation%20question">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="../2001-09/0711.html">Ullrich von Bassewitz: "[cc65] Appwatch has closed"</a>
+<li><strong>Previous message:</strong> <a href="0709.html">Arvid Norberg: "[cc65] static memory allocation question"</a>
+<li><strong>In reply to:</strong> <a href="0709.html">Arvid Norberg: "[cc65] static memory allocation question"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:42 CET</em>
+</em>
+</small>
+</body>
+</html>

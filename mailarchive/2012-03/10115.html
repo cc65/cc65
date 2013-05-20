@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Debugging with VICE</title>
+<meta name="Author" content="Christopher Pow (christopher.s.pow1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] Debugging with VICE" />
+<meta name="Date" content="2012-03-16" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Debugging with VICE</h1>
+<!-- received="Fri Mar 16 03:02:10 2012" -->
+<!-- isoreceived="20120316020210" -->
+<!-- sent="Thu, 15 Mar 2012 21:02:01 -0500" -->
+<!-- isosent="20120316020201" -->
+<!-- name="Christopher Pow" -->
+<!-- email="christopher.s.pow1gmail.com" -->
+<!-- subject="Re: [cc65] Debugging with VICE" -->
+<!-- id="CAKDufpB6EFsKwwqy_L2rdhwqc0p=+UVUHGD8ZYFr2bVn+ybZgw@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20120315204736.GA22155&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10116.html" title="Groepaz: &quot;Re: [cc65] Debugging with VICE&quot;">Next message</a> ]
+[ <a href="10114.html" title="Gábor Lénárt: &quot;Re: [cc65] Debugging with VICE&quot;">Previous message</a> ]
+[ <a href="10110.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Debugging with VICE&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10118.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Debugging with VICE&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Christopher Pow &lt;<a href="mailto:christopher.s.pow1gmail.com?Subject=Re:%20[cc65]%20Debugging%20with%20VICE">christopher.s.pow1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-03-16 03:02:01</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Ok I'm not getting emails back from the list when I post, so hopefully
+this comes through.  I'm trying to follow the rules.  =]
+
+&gt; I've seen that already and I would really love something similar for the
+&gt; platforms I use most (which are Commodore machines). If it is possible to
+&gt; adapt part of Nesicide for VICE, that would be great. Or maybe it's easier to
+&gt; add the necessary I/O chip emulation to Nesicide, I don't know. Anyway, I
+&gt; would immediately switch emulators if I get one that supports debugging for
+&gt; the Commodores (and runs under Linux).
+
+Well certainly the UI of NESICIDE could be adapted to be an IDE for
+any emulated platform, and will run on any host platform that Qt
+builds for [Linux, OSX, Windows, ...].  As I mentioned in a prior
+reply the emulator is a .dll/.so with a fairly clean-cut API so really
+all that would need to be done would be to replace the NES-emulation
+core with a C=64-emulation core and adapt the necessary APIs to the
+new core.
+
+I've written a wrapper-layer around the CC65 dbginfo APIs for NESICIDE
+that kind of helps 'wade through' the dbginfo data to retrieve what is
+necessary to support things like being able to figure out machine
+addresses from source file name and line number [for supporting
+setting breakpoints] and to do the reverse [for tracing execution
+while stepping].  At the moment that wrapper-layer uses Qt internals
+such as QString and QStringList so it wouldn't be directly exportable
+as a DLL to be used by Vice to get what it needs to get--but it
+probably wouldn't take too long to rework it to use standard library
+stuff instead of Qt stuff.
+
+&gt; Does Nesicide support the current version? How about support for types? I
+&gt; haven't got any feedback since the last bigger change. Especially the support
+&gt; for types is experimental, and I would be glad to know how it works.
+
+I just downloaded the snapshot and the dbinfo.c/.h are no different
+than the one I'd been using since February.  I took a look and, no, I
+have not yet added support for types [that'll come in handy for the
+symbol watch window].  I haven't even added support yet for csym's.  I
+should do that!
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Mar 16 03:02:10 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10116.html" title="Next message in the list">Groepaz: "Re: [cc65] Debugging with VICE"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10114.html" title="Previous message in the list">Gábor Lénárt: "Re: [cc65] Debugging with VICE"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10110.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Debugging with VICE"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10118.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Debugging with VICE"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10118.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Debugging with VICE"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10115" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10115" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10115" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-03-16 03:02:13 CET
+</em></small></p>
+</body>
+</html>

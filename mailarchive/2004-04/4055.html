@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] da65 .org</title>
+<meta name="Author" content="MagerValp (MagerValp1cling.gu.se)" />
+<meta name="Subject" content="[cc65] da65 .org" />
+<meta name="Date" content="2004-04-16" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] da65 .org</h1>
+<!-- received="Fri Apr 16 16:15:04 2004" -->
+<!-- isoreceived="20040416141504" -->
+<!-- sent="Fri, 16 Apr 2004 16:14:28 +0200" -->
+<!-- isosent="20040416141428" -->
+<!-- name="MagerValp" -->
+<!-- email="MagerValp1cling.gu.se" -->
+<!-- subject="[cc65] da65 .org" -->
+<!-- id="16511.59972.19351.209489@panini.cling.gu.se" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4056.html" title="David Holz: &quot;Re: [cc65] .cpu none?&quot;">Next message</a> ]
+[ <a href="4054.html" title="Groepaz: &quot;Re: [cc65] .cpu none?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4062.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] da65 .org&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: MagerValp &lt;<a href="mailto:MagerValp1cling.gu.se?Subject=Re:%20[cc65]%20da65%20.org">MagerValp1cling.gu.se</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-04-16 16:14:28</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I'm disassembling the Final Chesscard roms, and noticed that da65
+doesn't have any support for relocated code. How about
+
+range {
+      name &quot;far_8000&quot;;
+      start $8669;
+      end $8679;
+      type reloccode;	# set type to relocated code
+      addr $0100;	# set actual address
+};
+
+I'm not quite sure how you'd handle labels inside relocated code,
+especially when there are multiple labels for a certain address, but
+I'm sure something could be figured out.
+
+Another feature I'd like to see is the ability to add comments from
+the info file:
+
+label {
+	name &quot;cartinit&quot;;
+	addr $8009;
+	comment &quot;Cartridge initialization&quot;;
+}
+
+Another problem is with address tables. I've defined the range:
+
+range {
+      start $a091;
+      end $a09a;
+      type addrtable;
+};
+
+but the following code:
+
+        asl     a                               ; 9FB9 0A
+        tay                                     ; 9FBA A8
+        lda     LA091,y                         ; 9FBB B9 91 A0
+        tax                                     ; 9FBE AA
+        lda     LA092,y                         ; 9FBF B9 92 A0
+
+breaks up the table like this:
+
+LA091:  .byte   $F6                             ; A091 F6
+LA092:  .word   L119F                           ; A092 9F 11
+        .word   L2AA0                           ; A094 A0 2A
+        .word   L41A0                           ; A096 A0 41
+        .word   L5BA0                           ; A098 A0 5B
+        .byte   $A0                             ; A09A A0
+
+I have to add a label:
+
+label {
+      addr $a091;
+      size 2;
+      name &quot;noidea&quot;;
+};
+
+to get a good table:
+
+noidea: .word   L9FF6                           ; A091 F6 9F
+        .word   LA011                           ; A093 11 A0
+        .word   LA02A                           ; A095 2A A0
+        .word   LA041                           ; A097 41 A0
+        .word   LA05B                           ; A099 5B A0
+
+-- 
+    ___          .     .  .         .       . +  .         .      o   
+  _|___|_   +   .  +     .     +         .  Per Olofsson, arkadspelare
+    o-o    .      .     .   o         +          MagerValp&#64;cling&#46;<!--nospam-->gu.se
+     -       +            +    .     <a href="http://www.cling.gu.se/~cl3polof/">http://www.cling.gu.se/~cl3polof/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Apr 16 16:15:04 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4056.html" title="Next message in the list">David Holz: "Re: [cc65] .cpu none?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4054.html" title="Previous message in the list">Groepaz: "Re: [cc65] .cpu none?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4062.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] da65 .org"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4062.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] da65 .org"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="4068.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] da65 .org"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="4069.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] da65 .org"</a></li>
+<li><dfn>Reply</dfn>:  <a href="4105.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] da65 .org"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4055" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4055" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4055" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-04-16 16:15:10 CEST
+</em></small></p>
+</body>
+</html>

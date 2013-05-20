@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] ca65 for stand-alone asm p</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] ca65 for stand-alone asm projects" />
+<meta name="Date" content="2010-11-07" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] ca65 for stand-alone asm projects</h1>
+<!-- received="Sun Nov  7 12:14:11 2010" -->
+<!-- isoreceived="20101107111411" -->
+<!-- sent="Sun, 7 Nov 2010 12:14:01 +0100" -->
+<!-- isosent="20101107111401" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] ca65 for stand-alone asm projects" -->
+<!-- id="20101107111401.GA28860@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="AANLkTikKtp_kAQ_V8uv4o5_0JokSc6Hk8zzgLLMySFR6&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8796.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Compile with --as-needed patch&quot;">Next message</a> ]
+[ <a href="8794.html" title="Mario Fetka (geos_one): &quot;[cc65] Compile with --as-needed patch&quot;">Previous message</a> ]
+[ <a href="8789.html" title="Daniel Serpell: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8801.html" title="Payton Byrd: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20ca65%20for%20stand-alone%20asm%20projects">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-11-07 12:14:01</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Sat, Nov 06, 2010 at 07:10:26PM -0300, Daniel Serpell wrote:
+&gt; &gt; If I'm getting this right then we could import the symbol _main from
+&gt; &gt; the &quot;usual&quot; (aka non-standalone-asm-program) linker configs :-)
+&gt;
+&gt; Currently, cc65 emits a &quot;.forceimport __STARTUP__&quot; directive in
+&gt; its assembly output if there is a main function defined in the .c file,
+&gt; to force the inclusion of the C startup at link time.
+&gt;
+&gt; This could be replaced by an import of __STARTUP__ from the
+&gt; linker config, and the special case for main removed from cc65.
+
+Yes, that's what I thought, too. If forcing imports from the config is
+available (which has more problems than I initially thought), we can make
+different linker configs that pull in header or initialization stuff. These
+modules would in turn reference _main.
+
+Assumed that I'm able to solve the problems inherent in reading the linker
+config at start, we can separate the different headers (load address, basic
+SYS header, EXE header for other platforms or whatever) and add them by using
+different linker scripts. So the actual format of the output file(s) is
+determined by the linker scripts, and combinations are easily possible without
+source code changes. For example a C program that goes to $8000 and can be
+started with SYS.
+
+A useful suggestion from AgentFriday is probably, to place the headers in
+their own memory area, just to make clear that they're not part of what is
+loaded to RAM.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Nov  7 12:14:11 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8796.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Compile with --as-needed patch"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8794.html" title="Previous message in the list">Mario Fetka (geos_one): "[cc65] Compile with --as-needed patch"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8789.html" title="Message to which this message replies">Daniel Serpell: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8801.html" title="Next message in this discussion thread">Payton Byrd: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8801.html" title="Message sent in reply to this message">Payton Byrd: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8806.html" title="Message sent in reply to this message">Agent Friday: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8795" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8795" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8795" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-11-07 12:14:14 CET
+</em></small></p>
+</body>
+</html>

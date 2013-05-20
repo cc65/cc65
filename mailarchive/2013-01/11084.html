@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: Cursory analyses of CBM readdir b</title>
+<meta name="Author" content="silverdr1wfmh.org.pl (silverdr1wfmh.org.pl)" />
+<meta name="Subject" content="Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)" />
+<meta name="Date" content="2013-01-11" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)</h1>
+<!-- received="Fri Jan 11 03:13:38 2013" -->
+<!-- isoreceived="20130111021338" -->
+<!-- sent="Fri, 11 Jan 2013 03:13:27 +0100" -->
+<!-- isosent="20130111021327" -->
+<!-- name="silverdr1wfmh.org.pl" -->
+<!-- email="silverdr1wfmh.org.pl" -->
+<!-- subject="Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)" -->
+<!-- id="C9744F74-28E8-4964-877E-3DF608D6F5D3@wfmh.org.pl" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="CE943049-C3D9-44CF-BED7-9BACCF909E1F&#64;wfmh.org.pl" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11085.html" title="silverdr1wfmh.org.pl: &quot;Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)&quot;">Next message</a> ]
+[ <a href="11083.html" title="silverdr1wfmh.org.pl: &quot;Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)&quot;">Previous message</a> ]
+[ <a href="11083.html" title="silverdr1wfmh.org.pl: &quot;Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="11086.html" title="Spiro Trikaliotis: &quot;Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:silverdr1wfmh.org.pl?Subject=Re:%20Cursory%20analyses%20of%20CBM%20readdir%20bug%20(was:%20[cc65]%20Re:%20readdir%20bug)">silverdr1wfmh.org.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2013-01-11 03:13:27</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 2013-01-11, at 03:09, silverdr&#64;wfmh&#46;<!--nospam-->org.pl wrote:
+
+&gt;&gt;&gt; Thus, the only way to find out if the OPEN was successfull is to read
+&gt;&gt;&gt; the error channel, or (much easier): read the first byte. If the OPEN
+&gt;&gt;&gt; was not successfull, READST will return 0x42 (0x40 = EOF, 0x02 = time
+&gt;&gt;&gt; out).
+&gt;&gt; 
+&gt;&gt; Then, why this is not done in CC65 lib? (the &quot;read the first byte&quot; thing).
+&gt;&gt; Seems a lot simpler than opening another channel, and you probably
+&gt;&gt; will read at least one byte after opening.
+&gt;&gt; 
+&gt;&gt; Note that I don't know anything about C64 disk access :-)
+&gt; 
+&gt; I think Spiro referred to reading first byte off the status channel. Only '0' as the first character of status string denotes success. All actual errors start from 20 ('2' as first byte) upwards. This means you have to open and read the status channel anyway. Only a bit faster.
+
+Or not - I think I misunderstood reading the first time - it's late already..
+
+-- 
+SD!----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Jan 11 03:13:38 2013</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11085.html" title="Next message in the list">silverdr1wfmh.org.pl: "Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="11083.html" title="Previous message in the list">silverdr1wfmh.org.pl: "Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)"</a></li>
+<li><dfn>In reply to</dfn>: <a href="11083.html" title="Message to which this message replies">silverdr1wfmh.org.pl: "Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="11086.html" title="Next message in this discussion thread">Spiro Trikaliotis: "Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="11086.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#11084" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#11084" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#11084" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2013-01-11 03:13:42 CET
+</em></small></p>
+</body>
+</html>

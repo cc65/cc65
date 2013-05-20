@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] diskcmd.s error</title>
+<meta name="Author" content="silverdr1wfmh.org.pl (silverdr1wfmh.org.pl)" />
+<meta name="Subject" content="Re: [cc65] diskcmd.s error" />
+<meta name="Date" content="2009-07-03" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] diskcmd.s error</h1>
+<!-- received="Fri Jul  3 19:01:36 2009" -->
+<!-- isoreceived="20090703170136" -->
+<!-- sent="Fri, 3 Jul 2009 19:01:27 +0200" -->
+<!-- isosent="20090703170127" -->
+<!-- name="silverdr1wfmh.org.pl" -->
+<!-- email="silverdr1wfmh.org.pl" -->
+<!-- subject="Re: [cc65] diskcmd.s error" -->
+<!-- id="E4F9D8D7-C0DD-4269-9EDB-AC38D37E6F4F@wfmh.org.pl" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="182F4F83-D9B4-4125-8437-DDC130949C3D&#64;wfmh.org.pl" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6599.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] diskcmd.s error&quot;">Next message</a> ]
+[ <a href="6597.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] diskcmd.s error&quot;">Previous message</a> ]
+[ <a href="6596.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] diskcmd.s error&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6600.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] diskcmd.s error&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:silverdr1wfmh.org.pl?Subject=Re:%20[cc65]%20diskcmd.s%20error">silverdr1wfmh.org.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-07-03 19:01:27</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 2009-07-02, at 23:59, silverdr&#64;wfmh&#46;<!--nospam-->org.pl wrote:
+&gt;&gt;&gt;
+&gt;&gt;&gt; I eventually tried to mix and match my old assembler and some C code
+&gt;&gt;&gt; and I receive the following error
+&gt;&gt;&gt;
+&gt;&gt;&gt; ld65: Error: Range error in module `diskcmd.s', line 49
+&gt;&gt;&gt;
+&gt;&gt;&gt; upon linking the c64.lib
+&gt;&gt;&gt;
+&gt;&gt;&gt; The C code is just a test code of: [...]
+
+Hm, when I make it a standalone program, i. e. I replace the name of  
+the function with main() then it links correctly. It just doesn't want  
+to link with my setup as a subroutine.
+
+Might I be missing something obvious in my linker config?
+
+MEMORY
+{
+	RAM: start = $07FF, size = $C801, file = %O, define = yes;
+}
+
+SEGMENTS
+{
+	BASICSTUB:	load = RAM, type = ro;
+	CODE:		load = RAM, type = ro;
+	RODATA:		load = RAM, type = ro;
+	DATA:		load = RAM, type = rw;
+}
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Jul  3 19:01:36 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6599.html" title="Next message in the list">silverdr1wfmh.org.pl: "Re: [cc65] diskcmd.s error"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6597.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] diskcmd.s error"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6596.html" title="Message to which this message replies">silverdr1wfmh.org.pl: "Re: [cc65] diskcmd.s error"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6600.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] diskcmd.s error"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6600.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] diskcmd.s error"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6598" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6598" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6598" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-07-03 19:01:38 CEST
+</em></small></p>
+</body>
+</html>

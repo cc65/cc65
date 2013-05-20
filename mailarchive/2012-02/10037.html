@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] MemBank128: Loading to Bank 1?</title>
+<meta name="Author" content="Joseph Rose (rose.joseph121yahoo.com)" />
+<meta name="Subject" content="[cc65] MemBank128: Loading to Bank 1?" />
+<meta name="Date" content="2012-02-07" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] MemBank128: Loading to Bank 1?</h1>
+<!-- received="Tue Feb  7 20:08:02 2012" -->
+<!-- isoreceived="20120207190802" -->
+<!-- sent="Tue, 7 Feb 2012 11:07:45 -0800 (PST)" -->
+<!-- isosent="20120207190745" -->
+<!-- name="Joseph Rose" -->
+<!-- email="rose.joseph121yahoo.com" -->
+<!-- subject="[cc65] MemBank128: Loading to Bank 1?" -->
+<!-- id="1328641665.95909.YahooMailNeo@web120602.mail.ne1.yahoo.com" -->
+<!-- charset="iso-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10038.html" title="Joseph Rose: &quot;[cc65] OT: Template Creator for DOS 2 Beta&quot;">Next message</a> ]
+[ <a href="10036.html" title="Karri Kaksonen: &quot;Re: [cc65] New stable release ahead&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Joseph Rose &lt;<a href="mailto:rose.joseph121yahoo.com?Subject=Re:%20[cc65]%20MemBank128:%20Loading%20to%20Bank%201?">rose.joseph121yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-02-07 20:07:45</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I am woking on a memory enhancement for the C128 called MemBank128.  It works like Hidden64 and gives the cc65 pogammer 118k+ RAM with which to play.  Right now, I'm in the process of loading files from disk.  The problem is that, whether I'm using the routine supplied with cc65 or my modified version, nothing seems to load.  I looked in the C128 reference, and it told me to use the SETBNK kenal routine.  I did so, but it didn't load.  I rearranged a few functions but to no avail.  I set both the name and load banks to 0.  The data to load is supposed to load at address 0x400 and I was seeing if it would load to the screen.  It didn't.  I even tried to supply a load address, but it didn't work.  I wrote the start address to the file, so that is not the problem.  The following are some of the code files in question:
+ 
+    test.c
+----------------
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;conio.h&gt;
+#include &lt;c128.h&gt;
+#include &quot;membank128.h&quot;
+extern char *s1;//=&quot;Welcome to Mars!\n&quot;;
+extern char s2 [32];
+void main ()
+{
+ puts (&quot;Loading application buffer data...&quot;);
+ //cbm_load (8,&quot;b128low&quot;,0);
+ puts (&quot;Loading Bank 1 data...&quot;);
+ printf (&quot;-%d-\n&quot;,bank1_cbm_load (8,&quot;b128-b1&quot;,0x0400));
+ //printf (&quot;-%d-\n&quot;,cbm_load (8,&quot;b128-b1&quot;,0x0400));
+ puts (&quot;Finished.  Press a key.&quot;);
+cgetc();
+ bgcolor (1);
+ textcolor (2);
+ bordercolor (3);
+ clrscr();
+ bank1_print (s1);
+ putchar ('-');
+cgetc();
+ cbm_open (1,8,CBM_WRITE, &quot;&#64;:marsgreet,s&quot;);
+ bank1_cbm_write (1,s1, strlen(s1));
+ cbm_close (1);
+ cbm_open (2,8,CBM_READ, &quot;marsgreet,s&quot;);
+ bank1_cbm_read (2, s2, 31);
+ cbm_close (2);
+ chline (39); putchar (13);
+ bank1_print (s2);
+}
+----------------------
+b1_cbm_load
+----------------------
+/*
+ * Marc 'BlackJack' Rintsch, 06&#46;<!--nospam-->03.2001
+ *
+ * unsigned int cbm_load(const char* name,
+ *                       unsigned char device,
+ *                       const unsigned char* data);
+ */
+#include &lt;stdio.h&gt;
+#include &lt;cbm.h&gt;
+#include &quot;..\membank128.h&quot;
+/* loads file &quot;name&quot; from given device to given address or to the load address
+ * of the file if &quot;data&quot; is 0
+ */
+unsigned int bank1_cbm_load(const char* name, unsigned char device, void* data)
+{
+ /* LFN is set to 0 but it's not needed for loading.
+  * (BASIC V2 sets it to the value of the SA for LOAD) */
+ static int i;
+putchar ('1');
+ cbm_k_setlfs(0, device, data == 0);
+ cbm_k_setnam(name);
+ cbm_k_setbnk (0, 0);
+putchar ('2');
+ //return (cbm_k_load(0, (unsigned int)data) - (unsigned int)data);
+ //return (cbm_k_load(0, (unsigned int)data));
+ i=(cbm_k_load(0, (unsigned int)data));
+ //cbm_k_setbnk (0, 0);
+putchar ('3');
+putchar (13);
+ return i;
+}
+------------------
+c_setbnk.s
+-----------------------
+; SETBNK c128 kernal routine wrapper for cc65 with the MemBank128 memory 
+; enhancement.
+;
+; by Joseph Rose, a.k.a. Harry Potter
+;-----------------------------------------------------------------------
+        .export         _cbm_k_setbnk
+        .import         SETBNK
+        .import         popa, callkernal
+ .importzp tmp1, tmp2, tmp4
+                              
+.segment &quot;LOWCODE&quot;
+_cbm_k_setbnk:
+sta tmp1
+ jsr popa
+ sta tmp4
+ lda #$68
+ ldx tmp1
+ jmp callkernal-----------------------
+The callkernal funcion delegates a call to the kernal routine in age 255 with the LSB in .A; the contents of .A is assed in tmp4.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Feb  7 20:08:02 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10038.html" title="Next message in the list">Joseph Rose: "[cc65] OT: Template Creator for DOS 2 Beta"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10036.html" title="Previous message in the list">Karri Kaksonen: "Re: [cc65] New stable release ahead"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10037" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10037" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10037" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-02-07 20:08:05 CET
+</em></small></p>
+</body>
+</html>

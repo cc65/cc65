@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] signals</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] signals" />
+<meta name="Date" content="2005-05-26" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] signals</h1>
+<!-- received="Thu May 26 11:27:59 2005" -->
+<!-- isoreceived="20050526092759" -->
+<!-- sent="Thu, 26 May 2005 11:27:52 +0200" -->
+<!-- isosent="20050526092752" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] signals" -->
+<!-- id="20050526092751.GA2489@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="4294A998.2010908&#64;brahms.demon.co.uk" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5017.html" title="dominic beesley: &quot;Re: [cc65] signals&quot;">Next message</a> ]
+[ <a href="5015.html" title="dominic beesley: &quot;[cc65] signals&quot;">Previous message</a> ]
+[ <a href="5015.html" title="dominic beesley: &quot;[cc65] signals&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5017.html" title="dominic beesley: &quot;Re: [cc65] signals&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20signals">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-05-26 11:27:52</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Wed, May 25, 2005 at 05:36:40PM +0100, dominic beesley wrote:
+&gt; When SIG_IGN is set as a handler, to ignore signals, should
+&gt; this not be sticky? i.e. the signal ignored completely. The
+&gt; implementation in 2.10.1 resets it...
+
+That is the old signal handler problme: cc65 implements unreliable signals,
+because this was a lot easier to do. The standard allows this explicitly.
+
+&gt; I've had to change signal.h to declare _sig_ign and _sig_dfl
+&gt; as __fastcall__ is that correct.
+
+You're right, that is an error in the header file. I will fix it.
+
+&gt; I want to override _sig_dfl for BBC micro so that it traps
+&gt; SIGINT and aborts to the OS when Escape is pressed and not
+&gt; captured. What is the best way of doing this? I don't want to move
+&gt; it from common otherwise it'll need redefining for all the other
+&gt; architectures...
+
+I had a discussion with Oliver regarding this topic, and we came to the
+conclusion that - at least for the Apple - it is almost impossible to map an
+asynchronous signal to a signal handler, and terminate the program in this
+case. If the Escape key generates something like an interrupt, you don't know,
+which part of the code has been interrupted. Hard aborting the program is
+possible, but even this may leave the operating system in an unstable state.
+Executing more cc65 code (like flushing disk buffers) is not possible, because
+disk routines may have been interrupted, and most of the code is not
+reentrant.
+
+Moving sigtable.s and the _sig_ign and _sig_dfl functions to the platform
+specific code is possible, but I would suggest to check first if it is really
+possible to catch asynchronous signals. Another way would be to have a table
+with default actions exported by the platform specific code, so _sig_dfl is no
+longer a function, but will fetch a vector from a table. This would make it
+platform specific, and signal specific (default actions can differ for the
+signals).
+
+The current signal stuff was just a first implementation done by me, to make
+cc65 more standards compliant. As far as I know, no one did really use it
+until now, so it is clear that some problems pop up once people start using
+it:-)
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu May 26 11:27:59 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5017.html" title="Next message in the list">dominic beesley: "Re: [cc65] signals"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5015.html" title="Previous message in the list">dominic beesley: "[cc65] signals"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5015.html" title="Message to which this message replies">dominic beesley: "[cc65] signals"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5017.html" title="Next message in this discussion thread">dominic beesley: "Re: [cc65] signals"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5017.html" title="Message sent in reply to this message">dominic beesley: "Re: [cc65] signals"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5016" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5016" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5016" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-05-26 11:28:02 CEST
+</em></small></p>
+</body>
+</html>

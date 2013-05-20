@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-15" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Unresolved external `tosasra0'</title>
+<meta name="Author" content="Mats Andrén (matan3251student.liu.se)" />
+<meta name="Subject" content="[cc65] Unresolved external `tosasra0'" />
+<meta name="Date" content="2004-09-28" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Unresolved external `tosasra0'</h1>
+<!-- received="Tue Sep 28 02:21:43 2004" -->
+<!-- isoreceived="20040928002143" -->
+<!-- sent="Tue, 28 Sep 2004 02:22:47 +0200" -->
+<!-- isosent="20040928002247" -->
+<!-- name="Mats Andrén" -->
+<!-- email="matan3251student.liu.se" -->
+<!-- subject="[cc65] Unresolved external `tosasra0'" -->
+<!-- id="183652049.20040928022247@student.liu.se" -->
+<!-- charset="ISO-8859-15" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4567.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Floating point support?&quot;">Next message</a> ]
+[ <a href="4565.html" title="Mats Andrén: &quot;[cc65] pre processor #define and assembler constants&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4581.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Unresolved external `tosasra0'&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Mats Andrén &lt;<a href="mailto:matan3251student.liu.se?Subject=Re:%20[cc65]%20Unresolved%20external%20`tosasra0'">matan3251student.liu.se</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-09-28 02:22:47</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Sorry to spam this list with questions..
+
+When I try to do either &quot;intvar &gt;&gt; 8&quot; and &quot;intvar / 256&quot; I get the
+following error from the linker:
+
+ Unresolved external `tosasra0' referenced in:
+   tmpsrc/editor_initdata.c.s(62)
+ ld65.exe: Error: 1 unresolved external(s) found - cannot create output file
+------------------------------------
+Linker version:
+ld65 V2.10.1 - (C) Copyright 1998-2002 Ullrich von Bassewitz
+------------------------------------
+..and the libsrc is built from cc65-snapshot-2.10.5.20040918.
+
+The problem occurs in this specific code:
+
+void editor_initdata (void)
+{
+        char i;
+        int address;
+
+        //Init sidtabpointers
+        address = (int)player_sidtab;
+        for (i=0; i&lt;SIDTABSTEPS; i++)
+        {
+                player_sidtabpointers_hi[i] = (char)(address / 256);
+                player_sidtabpointers_lo[i] = (char)(address &amp; 0x00ff);
+                address += SIDTABSTEPSIZE;
+        }
+        
+    return;
+}
+
+I'm not really used to code in c, but as far as i understand, this
+code should at least compile correctly without unresolved references
+to non-existant routines? Division by 2 seems to work though..
+
+I thought maybe I needed to compile the latest snapshot version of
+cc65.exe too, but searching for &quot;tosasra0&quot; among the sourcecode
+revealed only one hit, in &quot;coptsize.c&quot;. This routine really seems to
+be non existant? ...or am I wrong?
+
+/Mats
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Sep 28 02:21:43 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4567.html" title="Next message in the list">Spiro Trikaliotis: "Re: [cc65] Floating point support?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4565.html" title="Previous message in the list">Mats Andrén: "[cc65] pre processor #define and assembler constants"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4581.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Unresolved external `tosasra0'"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4581.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Unresolved external `tosasra0'"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4566" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4566" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4566" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-09-28 02:21:52 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Common macros for dirent.d</title>
+<meta name="Author" content="Payton Byrd (plbyrd1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] Common macros for dirent.d_type" />
+<meta name="Date" content="2012-06-26" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Common macros for dirent.d_type</h1>
+<!-- received="Tue Jun 26 16:48:59 2012" -->
+<!-- isoreceived="20120626144859" -->
+<!-- sent="Tue, 26 Jun 2012 09:48:21 -0500" -->
+<!-- isosent="20120626144821" -->
+<!-- name="Payton Byrd" -->
+<!-- email="plbyrd1gmail.com" -->
+<!-- subject="Re: [cc65] Common macros for dirent.d_type" -->
+<!-- id="CAJm6qqeKn-pAQbonBz3iWvumeECnMFrKDqZ372gODaJw_AZXQg@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="CACT=u70v-Qviqrzz_xz_T5nVJqK-ZfZsmpta993neYRHVjjhXw&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10417.html" title="Oliver Schmidt: &quot;Re: [cc65] C64 Userport Serial Driver&quot;">Next message</a> ]
+[ <a href="10415.html" title="Oliver Schmidt: &quot;Re: [cc65] Common macros for dirent.d_type&quot;">Previous message</a> ]
+[ <a href="10415.html" title="Oliver Schmidt: &quot;Re: [cc65] Common macros for dirent.d_type&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10419.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Common macros for dirent.d_type&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Payton Byrd &lt;<a href="mailto:plbyrd1gmail.com?Subject=Re:%20[cc65]%20Common%20macros%20for%20dirent.d_type">plbyrd1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-06-26 16:48:21</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Tue, Jun 26, 2012 at 9:25 AM, Oliver Schmidt &lt;ol.sc&#64;web&#46;<!--nospam-->de&gt; wrote:
+
+&gt;
+&gt; If we would agree on the getcwd() idea than we could extend it and
+&gt; claim that any return value from readdir() with _DE_ISDIR() being true
+&gt; is _AS-IS_ a valid parameter for chdir() - this implies that chdir()
+&gt; works with relative paths. As you may guess by now I implemented it
+&gt; that way for the Apple II.
+&gt;
+&gt; With these things in place one could already implement a cross-target
+&gt; directoy tree traversal without fiddling with directory separators and
+&gt; alike:
+&gt;
+&gt; ==========
+&gt;
+&gt; dodir() {
+&gt;  char thisdir[FILENAME_MAX];
+&gt;
+&gt;  getcwd(thisdir, sizeof(thisdir));
+&gt;
+&gt;  opendir(thisdir);  // no prefix or postfix or &lt;you name it&gt;
+&gt;  while(...) {
+&gt;    e = readdir(...);
+&gt;    if (_DE_ISDIR(e-&gt;d_type)) {
+&gt;      chdir(e-&gt;d_name);  // no prefix or postfix or &lt;you name it&gt;
+&gt;      dodir();  // recursion
+&gt;    }
+&gt;  }
+&gt;  closedir();
+&gt;
+&gt;  chdir(thisdir);
+&gt; }
+&gt;
+&gt; ==========
+&gt;
+&gt; If we would agree on this then the &quot;only&quot; thing missing would be to
+&gt; set the initial directory to something &quot;outside&quot; the current directory
+&gt; on program startup. While I'm open for any discussion I presume that
+&gt; our targets (and ideas ;-) are just too different to get something
+&gt; cross-target done.
+&gt;
+
+As usual, things are more complicated on the CBM platform.  Directories are
+not part of CBM-DOS and are extensions to be implemented by individual
+drives.  *MOST* devices with directories on the CBM platform follow the
+CMD-DOS &quot;standard&quot;, but this is not always true.  For example, the current
+release version of VICE has a custom file system that does not adhere to
+the CMD-DOS methodology.  Groepaz is working to fix this, but the reality
+is that older versions of VICE will always have this problem.  Another
+major drive system that has this problem is 64HDD which follows a
+Microsoft-like notation for navigating directories.  This is why I
+implemented a custom pathing mechnism in EasyCLI.  A &quot;standard&quot;
+implementation of the directory functions will need to account for all of
+these variations and it will be a nightmare to maintain.  We could aim for
+the greatest common denominator, which would be the CMD-DOS standard, but
+be prepared for XXX program fails when I run it on YYY device.
+
+Although EasyCLI has a custom pathing mechanism it's still far from
+comprehensive.  One thing I've contemplated doing is adding an enum for the
+directory dos type that is applied to a device struct.  This dos type enum
+would drive the behavior of the pathing mechanism and would make the code
+cleaner.
+
+To give you an example of how complex it is to change directories on the
+CBM platform here's a link to the code for the CD command of EasyCLI.  It's
+still too simple as it doesn't handle 64HDD notation.
+
+<a href="http://easycli.codeplex.com/SourceControl/changeset/view/92134#2258510">http://easycli.codeplex.com/SourceControl/changeset/view/92134#2258510</a>
+
+Now, let's make things even MORE complicated and talk about absolute
+paths.  On the CBM platform, there's really no such thing as an absolute
+path because no one standard handles drive picking.  This was the main
+impetus of creating the custom pathing mechanism for EasyCLI.  I've
+documented (somewhat) how the pathing mechanism in EasyCLI works.  I would
+venture to say that it's the most complete pathing mechanism for the CBM
+platform and could be adopted as an alternative to having to set _curunit
+before doing POSIX style file IO.
+
+<a href="http://easycli.codeplex.com/wikipage?title=Pathing&amp;referringTitle=Documentation">http://easycli.codeplex.com/wikipage?title=Pathing&amp;referringTitle=Documentation</a>
+
+
+
+
+&gt; --
+&gt; Payton Byrd
+&gt; &lt;<a href="http://www.paytonbyrd.com">http://www.paytonbyrd.com</a>&gt;
+&gt; &lt;<a href="http://it.toolbox.com/blogs/paytonbyrd">http://it.toolbox.com/blogs/paytonbyrd</a>&gt;
+&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Jun 26 16:48:59 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10417.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] C64 Userport Serial Driver"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10415.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10415.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10419.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10416" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10416" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10416" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-06-26 16:49:02 CEST
+</em></small></p>
+</body>
+</html>

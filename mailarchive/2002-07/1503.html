@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] Another bug... ?</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] Another bug... ?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] Another bug... ?</h1>
+<!-- received="Thu Jul 18 19:14:32 2002" -->
+<!-- isoreceived="20020718171432" -->
+<!-- sent="Thu, 18 Jul 2002 19:14:20 +0200" -->
+<!-- isosent="20020718171420" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] Another bug... ?" -->
+<!-- id="11018878843.20020718191420@gmx.net" -->
+<!-- inreplyto="20020718145431.GA25201@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20Another%20bug...%20?"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2002-07-18 19:14:20
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1502.html">Shawn Jefferson: "Re: [cc65] Strange problem"</a>
+<li><strong>In reply to:</strong> <a href="1499.html">Ullrich von Bassewitz: "Re: [cc65] Another bug... ?"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+Thursday, July 18, 2002, 4:54:31 PM, you wrote:
+
+
+UvB&gt; Hi!
+
+UvB&gt; On Thu, Jul 18, 2002 at 04:05:03PM +0200, groepaz wrote:
+&gt;&gt; look at this, problem is a case value of &quot;0x8000&quot; (min_int) used in a
+&gt;&gt; switch statement where the switch is done by a signed int.
+
+UvB&gt; Ok, I've checked the standard and it says that integer promotions on the
+UvB&gt; controlling variable should be applied. This would mean that the compiler does
+UvB&gt; indeed behave incorrectly - it should convert the variable i instead of
+UvB&gt; complaining.
+
+yeah thought so.... i was surprised actually that it didnt work like
+this (i used turbo-c 2.0 for cross checking -coz it has 16bit ints-
+and it worked there)
+
+UvB&gt; I have to admit that I'm not happy about this. The code is unclean, and doing
+UvB&gt; a type conversion on i for each label that does not have the same type
+UvB&gt; introduces quite some overhead under the hood. But then, the standard is the
+UvB&gt; standard is the standard...:-)
+
+hehe indeed :o)
+
+UvB&gt; Thanks for the report, I will see what I can do about it.
+
+maybe i should tell what i was doing, so its clear why i am actually
+complaining.... i was doing (working on filesystem ;=P) a function
+like...
+
+#define flag1   0x8000
+#define flag2   0x4000
+
+#define parm1   flag1
+#define parm2   (flag2|flag1)
+
+int foo(int parm){
+    switch(parm){
+                 case parm1:
+                      break;
+                 case parm2:
+                      break;
+    }
+}
+
+.... i guess you can see where the problem lies... that is, the
+function in question MUST take an int (standard..hello! :o)) (it would
+have worked with unsigned int or short without problem) although the
+parameter-values are basically constructed &quot;typeless&quot; (or call it
+bitfield or whatever). ofcoz in this case i could have dealt with that
+myself (convert to unsigned before manually etc) but i guess it can
+easily lead into more problems with existing code. (using 16bit-ints
+as bitfields like this is probably not very uncommen across old dos code and
+alike)
+
+however, theres another sweetie:
+
+if( &quot;.\&quot;.&quot;[1] != '&quot;' ) printf(&quot;fixme!&quot;);
+
+:=P
+
+btw there seems to be a problem with promoting ints to longs
+aswell.... ;/ (gotta come up with testcode ;=P)
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20Another%20bug...%20?">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20Another%20bug...%20?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1502.html">Shawn Jefferson: "Re: [cc65] Strange problem"</a>
+<li><strong>In reply to:</strong> <a href="1499.html">Ullrich von Bassewitz: "Re: [cc65] Another bug... ?"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-07-18 19:14:43 CEST</em>
+</em>
+</small>
+</body>
+</html>

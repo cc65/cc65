@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Common macros for dirent.d</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Common macros for dirent.d_type" />
+<meta name="Date" content="2012-07-05" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Common macros for dirent.d_type</h1>
+<!-- received="Thu Jul  5 11:56:05 2012" -->
+<!-- isoreceived="20120705095605" -->
+<!-- sent="Thu, 5 Jul 2012 11:55:53 +0200" -->
+<!-- isosent="20120705095553" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Common macros for dirent.d_type" -->
+<!-- id="CACT=u733-rT1bJNQHfm0nk7m-+mtOoWvYvFAMRMdctgB4-1LCg@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="1341479040.16773.9.camel&#64;katzenrechner" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10459.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Common macros for dirent.d_type&quot;">Next message</a> ]
+[ <a href="10457.html" title="Oliver Schmidt: &quot;Re: [cc65] Common macros for dirent.d_type&quot;">Previous message</a> ]
+[ <a href="10456.html" title="Markus Stehr: &quot;Re: [cc65] Common macros for dirent.d_type&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10462.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Common macros for dirent.d_type&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Common%20macros%20for%20dirent.d_type">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-07-05 11:55:53</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Markus,
+
+&gt; Just my 2 cent. [...]
+
+As a non-CBM insider it seems to me that the arguments run on two
+different levels. One level is about doing it &quot;correctly&quot; along the
+specs. The other level is about meeting expectations and
+compatibility. And you can even mix both levels to create you own
+truth. As an example my two cents:
+
+- I too believe that something non-LOADable and non-RUNable shouldn't
+have the extension PRG. A (probably stupid) example: The downloadable
+Contiki disk images (at least currently) have to contain the file
+'contiki.cfg' (which is read and written by cc65) as first file. If it
+would be a PRG file then LOAD&quot;*&quot;,8,1 wouldn't be possible -&gt; rather
+specs argumentation.
+
+- However according to what you write the most meaningful default for
+cc65 would be USR. But I've learned that the most popular use of the
+USR type was by GEOS for their &quot;non-CBM-standard-files&quot; so that it
+became a common behaviour for file utiliies to stay clear from USR
+files in order to not break GEOS files. But cc65 files are totally
+usual CBM-standard-files so typing them as USR makes things
+unnecessarily complicated. Therefore SEQ is a better choice -&gt; rather
+compatibility argumentation.
+
+If one would want to make it really along the specs one would probably
+want to introduce O_BINARY and O_TEXT for open() and create USR and
+SEQ based on that. That would probably make sense on Apple ProDOS 8
+too allowing to create BIN and TXT files.
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Jul  5 11:56:05 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10459.html" title="Next message in the list">silverdr1wfmh.org.pl: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10457.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10456.html" title="Message to which this message replies">Markus Stehr: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10462.html" title="Next message in this discussion thread">silverdr1wfmh.org.pl: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10462.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10458" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10458" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10458" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-07-05 11:56:09 CEST
+</em></small></p>
+</body>
+</html>

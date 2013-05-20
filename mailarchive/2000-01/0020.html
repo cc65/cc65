@@ -1,0 +1,180 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] cc65 and VICE</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] cc65 and VICE">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] cc65 and VICE</h1>
+<!-- received="Thu Jan 20 19:56:22 2000" -->
+<!-- isoreceived="20000120185622" -->
+<!-- sent="Thu, 20 Jan 2000 19:56:03 +0100 (CET)" -->
+<!-- isosent="20000120185603" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] cc65 and VICE" -->
+<!-- id="200001201856.TAA06221@trixie.musoftware.de" -->
+<!-- inreplyto="001001bf6370$13016a10$0171a8c0@bonn" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%20and%20VICE"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2000-01-20 19:56:03
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0021.html">Groepaz: "Re: [cc65] Back on Track"</a>
+<li><strong>Previous message:</strong> <a href="0019.html">Spiro Trikaliotis: "Re: [cc65] cc65 and VICE"</a>
+<li><strong>In reply to:</strong> <a href="0019.html">Spiro Trikaliotis: "Re: [cc65] cc65 and VICE"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0022.html">Spiro Trikaliotis: "Re: [cc65] cc65 and VICE"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+&gt; But, with VICE, people most often want to keep the various versions
+&gt; 100% compatible with each other, even with the INI files (and so,
+&gt; the symbol files, too), so I'm _sure_ they will not want to make
+&gt; this modification, especially since it's something generated from
+&gt; YACC that complains...
+&gt;
+&gt; Although I'm not very familiar with YACC, I believe the modification
+&gt; of LD is easier than the modification of VICE.
+
+I have worked with the VICE monitor code myself, so I'm pretty sure that the
+YACC grammar has nothing to do with line termination. Even if the YACC
+grammar would describe full lines, all that is needed is to put the CR
+character into the whitespace class in the lexer. But the real solution is
+probably even simpler: ld65 would have to add a &quot;b&quot; mode character when
+calling fopen(), VICE on the other side would have to drop it, so the
+translation CR/LF --&gt; LF is done by the input functions of the C library. As
+a result, the VICE code will never have to emit a CR explicitly, and will
+never see it, when reading files.
+
+&gt; Well, I asked my question about the debug generations because I want
+&gt; to extend the VICE monitor for better debugging.
+
+Ahh! Does that mean that I do not have to bug Daniel requesting new
+monitor features, but send my mails to you instead? :-)
+
+Do you know if the fast breakpoint check is now implemented in VICE? I had
+once written an extension for ld65 that marks write protected segments as
+such in the VICE label file (something like the write protect feature of a
+MMU in software). Unfortunately VICE checks a linked list of breakpoints
+with each instruction referencing memory. With a list of 10 entries this
+made the emulation almost unusable. So I wrote some code that manages a
+shadow bitmap for the breakpoints, that tells for each address if it has a
+breakpoint associated. So when referencing memory, the bitmap has to be
+checked (which is much faster than walking through a linked list checking an
+address range each time), and only if the result is true, the linked list
+has to be searched for the real breakpoint and any associated conditions.
+
+I sent the code to Daniel (there were some misunderstandings on my side, so
+we had a discussion and as a result it was clear that my code could not be
+used as is), but I don't know if it is now in the official code. Maybe you
+have seen something like that when looking through the monitor? Having write
+protected segments makes it much easier to find dangling pointers and other
+memory overwrite conditions (this is why I wanted this feature in the first
+place). If the feature is now in VICE, I will have to update ld65 to use the
+correct syntax.
+
+&gt; Well, if you need some help, at least for the PC part, I have some sources
+&gt; flying around which implement a simple protocol and access the UART
+&gt; directly (under DOS).
+
+My plan was to use spunk (<a href="http://www.von-bassewitz.de/uz/spunk/">http://www.von-bassewitz.de/uz/spunk/</a>). It has
+serial routines for all supported operating systems (DOS, OS/2, Windows and
+several Unices including Linux), code for a turbo vision style text mode
+interface and some more stuff. Text mode interfaces are somewhat outdated,
+but they can be made quite portable which is clearly an advantage.
+
+&gt; Well, I know that optimizations are very bad regarding source level
+&gt; debuggers; but isn't it possible to generate the references at least
+&gt; when compiling w/o any optimizations at all?
+
+I'm not sure if this is really worth the effort, since the compiler
+generated code is really bad without optimization. And, line information is
+only one part. To access local variables, information about the stack offset
+of these variables has to be generated. But since the generated code does
+not use a base pointer (this would be difficult on the 6502 since it does
+only allow positive offsets to an address), stack pointer plus offset is
+used to access local variables. This means that the compiler has to emit
+debug information with every change of the stack pointer - which is quite
+often, since the stack is used in almost any expression that has more than
+one operand.
+
+&gt; To be honest: I first went to VICE wanting to improve the monitor,
+&gt; and I looked for CC65 because I would need an environment that
+&gt; supports the further options (esp. source level debugging) I want
+&gt; to add because else, they would be useless. So, I wanted to check
+&gt; if it could be handled by CC65 before I propose this extension to
+&gt; the VICE group.
+
+The VICE monitor is nice, but in my eyes it is crafted too much after gdb.
+While both (gdb and the VICE monitor) are extremely powerful, one has
+problems to find an interface that is more unfriendly to the user.
+
+What I would like to see is an interface like the one in the old Borland
+Turbo Debugger. Stepping through the code is easy with VICE, but you have to
+enter commands to look at the stack or a memory area after each step. Having
+a fullscreen debugger that allows you to step through the code while stack,
+registers and a selectable memory range are in view would be a *great*
+improvement. Heck, when it comes to user friendlyness, even the cc65
+debugger modules is better than VICE, and I do in fact prefer it in cases
+where I do not need the additional power of the VICE monitor.
+
+Regards
+
+
+	Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%20and%20VICE">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%20and%20VICE">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0021.html">Groepaz: "Re: [cc65] Back on Track"</a>
+<li><strong>Previous message:</strong> <a href="0019.html">Spiro Trikaliotis: "Re: [cc65] cc65 and VICE"</a>
+<li><strong>In reply to:</strong> <a href="0019.html">Spiro Trikaliotis: "Re: [cc65] cc65 and VICE"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0022.html">Spiro Trikaliotis: "Re: [cc65] cc65 and VICE"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:35 CET</em>
+</em>
+</small>
+</body>
+</html>

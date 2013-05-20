@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] A bug?</title>
+<meta name="Author" content="silverdr1inet.com.pl (silverdr1inet.com.pl)" />
+<meta name="Subject" content="Re: [cc65] A bug?" />
+<meta name="Date" content="2008-07-24" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] A bug?</h1>
+<!-- received="Thu Jul 24 12:04:24 2008" -->
+<!-- isoreceived="20080724100424" -->
+<!-- sent="Thu, 24 Jul 2008 12:04:11 +0200" -->
+<!-- isosent="20080724100411" -->
+<!-- name="silverdr1inet.com.pl" -->
+<!-- email="silverdr1inet.com.pl" -->
+<!-- subject="Re: [cc65] A bug?" -->
+<!-- id="24AB5613-172A-4A47-A429-33D6842453CE@inet.com.pl" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="20080723193553.GA13490&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6154.html" title="Oliver Schmidt: &quot;Re: [cc65] A bug?&quot;">Next message</a> ]
+[ <a href="6152.html" title="Oliver Schmidt: &quot;Re: [cc65] A bug?&quot;">Previous message</a> ]
+[ <a href="6151.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] A bug?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6154.html" title="Oliver Schmidt: &quot;Re: [cc65] A bug?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:silverdr1inet.com.pl?Subject=Re:%20[cc65]%20A%20bug?">silverdr1inet.com.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-07-24 12:04:11</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 2008-07-23, at 21:35, Ullrich von Bassewitz wrote:
+
+&gt;&gt; Don't get me wrong but the code in question didn't require any kind
+&gt;&gt; of &quot;special treatment&quot; on any of the compilers/platforms I used in
+&gt;&gt; the past. And the plural here means several times more than two.
+&gt;
+&gt; Once, when C was created, there were a lot of different platforms.  
+&gt; They had
+[...]
+&gt; Just because your program runs on a few of todays systems, that does  
+&gt; not mean
+&gt; it is portable. The 6502 machines cc65 is made for are lot older and  
+&gt; at these
+[...]
+
+Thank you Ullrich. I truly appreciate you taking time to explain  
+things in such clarity. It is still that I didn't concur. That was the  
+part of &quot;don't get me wrong&quot;. It is only that I was very much  
+surprised to learn that \r is not portable (one learns throughout the  
+whole life, right?) because I was taking the whole \whatever set as  
+granted to be part of the &quot;standard&quot; C and therefore portable.  
+Additionally there was no exception to prove me wrong, and not only on  
+the modern machines. The code in question comes from the late eighties  
+or early nineties and processes some - quite big - text files. It ran  
+already on the very old DOS boxes, some ancient HP-UX and others of  
+the era. I wanted to compile it and run some tests using the IDE64  
+(the files to process wouldn't fit on a 1541 floppy, not to mention  
+the time required to read/write it).
+
+&gt;
+&gt;&gt; As I
+&gt;&gt; wrote some time ago - it was the first time I encountered this kind
+&gt;&gt; of problem since shortly after the K&amp;R publication. \r worked as
+&gt;&gt; expected even on non-unix-relative platforms like IBM C/2 compiler
+&gt;&gt; generating binaries to run under DOS (and the OS/2) . I take that the
+&gt;&gt; compiler there had to make &quot;special treatment&quot; for \n as two code
+&gt;&gt; sequence was needed there.
+&gt;
+&gt; The different line endings are the reason why C has a &quot;text mode&quot;  
+&gt; for files.
+&gt; [...]
+&gt;
+
+I lived under the assumption that &quot;text mode&quot; was not only because of  
+line endings but generally because of (various) control sequences  
+being often very much different across the multitude of possible  
+output devices. If that is not true then I learned one more thing today.
+
+&gt; There is no such definition for \r in the standard. This is because  
+&gt; Unix used
+&gt; terminals at that time which and different models had different  
+&gt; characters
+&gt; strings assigned to the &quot;carriage return&quot; capability. For this  
+&gt; reason, the
+&gt; termcap library has its own code named &quot;cr&quot; to define the string for a
+&gt; specific terminal. So using \r might not work on several old Unix  
+&gt; platforms
+&gt; too, depending on the terminal that is in use.
+
+Yes - that is what I eventually understood: termcap without proper  
+sequence for \r = no \r behaviour. It just happened that the 64 was  
+the first I ever encountered, which didn't have this capability. 128  
+supposedly has it but I didn't test yet if \r works there.
+
+Thank you once more for your time spent on this.
+
+Regards,
+
+P.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Jul 24 12:04:24 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6154.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] A bug?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6152.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] A bug?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6151.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] A bug?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6154.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] A bug?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6154.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] A bug?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6153" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6153" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6153" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-07-24 12:04:26 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Changes in Interrupt Handl</title>
+<meta name="Author" content="Greg King (greg.king51verizon.net)" />
+<meta name="Subject" content="Re: [cc65] Changes in Interrupt Handling" />
+<meta name="Date" content="2013-02-14" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Changes in Interrupt Handling</h1>
+<!-- received="Thu Feb 14 16:50:46 2013" -->
+<!-- isoreceived="20130214155046" -->
+<!-- sent="Thu, 14 Feb 2013 10:49:54 -0500" -->
+<!-- isosent="20130214154954" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king51verizon.net" -->
+<!-- subject="Re: [cc65] Changes in Interrupt Handling" -->
+<!-- id="2D5C0F568E014DE28B787741F06B4B9A@Kaiser" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="CACT=u706FQE73s2iD_TLk1m2vOOe=XZA4+qG0=Z86izrkJf-mA&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11195.html" title="Oliver Schmidt: &quot;Re: [cc65] Changes in Interrupt Handling&quot;">Next message</a> ]
+[ <a href="11193.html" title="Oliver Schmidt: &quot;Re: [cc65] Disable KERNAL ROM ?&quot;">Previous message</a> ]
+[ <a href="11174.html" title="Oliver Schmidt: &quot;[cc65] Changes in Interrupt Handling&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="11195.html" title="Oliver Schmidt: &quot;Re: [cc65] Changes in Interrupt Handling&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king51verizon.net?Subject=Re:%20[cc65]%20Changes%20in%20Interrupt%20Handling">greg.king51verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2013-02-14 16:49:54</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: &quot;Oliver Schmidt&quot;; on Wednesday, Feb. 13, 2013; at 7:36 AM -0500
+&gt;
+&gt; I implemented the change for (almost) all targets; but, tested it on only
+&gt; Apple2, C64, and C128. So, if you are familiar with the start-up code of
+&gt; a certain target, it would be great if you could check if I didn't
+&gt; break anything (the new constructors/destructors are implemented in
+&gt; 'irq.s' files in the target directories).
+
+Two things -- a bug report and a suggestion:
+
+1) The actors' priorities are wrong.  They should be the same as they were 
+when the code was in the start-up module:  &quot;irq_init&quot; should run _before_ 
+all other actors; and, &quot;irq_done&quot; should run _after_ all other actors. 
+That order will guarantee that the IRQ trap will handle any IRQs that any 
+other constructors create.  So -- &quot;irq_init&quot; could be set at 32, at least. 
+And, &quot;irq_done&quot; should be set at 1.
+
+2)  In many cases, &quot;initirq&quot; can load the new interrupt pointer into the 
+.XA pseudo-register, then jump into &quot;doneirq&quot;.  That second subroutine can 
+disable interrupts, store the pointer, and re-enable interrupts -- for both 
+subroutines.
+
+
+P.S., I recommend that you create a macro that generates those Apple2 
+byte-table text messages.  It would be similar to the CBM and Atari 
+&quot;scrcode&quot; macroes.  It would reverse the text; and, set the high bit.
+
+P.P.S., Does &quot;libsrc/apple2/irq.s&quot; really need to .include &quot;zeropage.inc&quot;?
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Feb 14 16:50:46 2013</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11195.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Changes in Interrupt Handling"</a></li>
+<li><dfn>Previous message</dfn>: <a href="11193.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Disable KERNAL ROM ?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="11174.html" title="Message to which this message replies">Oliver Schmidt: "[cc65] Changes in Interrupt Handling"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="11195.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Changes in Interrupt Handling"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="11195.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Changes in Interrupt Handling"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#11194" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#11194" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#11194" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2013-02-14 16:50:49 CET
+</em></small></p>
+</body>
+</html>

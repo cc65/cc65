@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] 65816 compiler revisited</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] 65816 compiler revisited" />
+<meta name="Date" content="2005-03-30" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] 65816 compiler revisited</h1>
+<!-- received="Wed Mar 30 21:08:39 2005" -->
+<!-- isoreceived="20050330190839" -->
+<!-- sent="Wed, 30 Mar 2005 21:08:35 +0200" -->
+<!-- isosent="20050330190835" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] 65816 compiler revisited" -->
+<!-- id="20050330190835.GD3382@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="424ADCC3.9060406&#64;i-55.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4864.html" title="Stephen Thomas: &quot;Re: [cc65] Target &quot;BBC&quot;&quot;">Next message</a> ]
+[ <a href="4862.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] printf for ca65&quot;">Previous message</a> ]
+[ <a href="4857.html" title="Chris Cureau: &quot;[cc65] 65816 compiler revisited&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4874.html" title="Oliver Schmidt: &quot;Re: [cc65] 65816 compiler revisited&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%2065816%20compiler%20revisited">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-03-30 21:08:35</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Wed, Mar 30, 2005 at 11:07:15AM -0600, Chris Cureau wrote:
+&gt; I've gone through some past threads on this list regarding the code
+&gt; generation and memory management aspects of the compiler, and how it is
+&gt; specifically targeted to 65xx processors.  It looks like it would be a
+&gt; considerable bit of work to get the compiler to produce 65xx and 65816
+&gt; code from the same executable -- not impossible, but very probably messy
+&gt; work.
+
+Some cleanup and restructuring would be needed.
+
+&gt; My question is whether it would be easier to create a separate compiler
+&gt; (a la cc816) that shares common functions with cc65.  The memory
+&gt; management and code generation could be separate in this way, and should
+&gt; not interfere too much with the way the compiler currently works.
+
+While it would be easier to fork the compiler, it would have severe drawbacks
+in the long run, so if it were me to decide, I would opt for one compiler. The
+compiler would benefit from the restructuring needed to support more than one
+CPU. It is easier to maintain, because you don't have two code bases. And, if
+you just fork the compiler, and then want to add a third CPU, you have to
+start from scratch. If you separate the machine dependent parts, and create a
+clean interface, it is much easier to add another CPU the next time.
+
+Apart from that, it's not just the compiler. The library needs as much work as
+the compiler itself, if you want to do it right.
+
+&gt; Any ideas on this?  Or interest in working on this besides me? :-)
+
+I'm of course interested, but there's not enough time. So don't count on me.
+I've made a few small steps in direction of 816 support (see address sizes in
+the assembler and compiler), but these are actually very small steps.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Mar 30 21:08:39 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4864.html" title="Next message in the list">Stephen Thomas: "Re: [cc65] Target &quot;BBC&quot;"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4862.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] printf for ca65"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4857.html" title="Message to which this message replies">Chris Cureau: "[cc65] 65816 compiler revisited"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4874.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] 65816 compiler revisited"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4874.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] 65816 compiler revisited"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4863" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4863" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4863" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-03-30 21:08:45 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] &quot;overlay&quot; files</title>
+<meta name="Author" content="Per Olofsson (magervalp1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] &quot;overlay&quot; files" />
+<meta name="Date" content="2009-07-06" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] &quot;overlay&quot; files</h1>
+<!-- received="Mon Jul  6 23:16:37 2009" -->
+<!-- isoreceived="20090706211637" -->
+<!-- sent="Mon, 6 Jul 2009 23:16:28 +0200" -->
+<!-- isosent="20090706211628" -->
+<!-- name="Per Olofsson" -->
+<!-- email="magervalp1gmail.com" -->
+<!-- subject="Re: [cc65] &quot;overlay&quot; files" -->
+<!-- id="1b8385e00907061416t78df9230yed3d011e5222eeec@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="B2052152-FBB0-40A6-BFF1-561F5902ED0C&#64;wfmh.org.pl" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6608.html" title="Jakub: &quot;[cc65] Segment EXEHDR does not exist - while using ld65 directly&quot;">Next message</a> ]
+[ <a href="6606.html" title="Oliver Schmidt: &quot;Re: [cc65] &quot;overlay&quot; files&quot;">Previous message</a> ]
+[ <a href="6604.html" title="silverdr1wfmh.org.pl: &quot;[cc65] &quot;overlay&quot; files&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6617.html" title="Groepaz: &quot;Re: [cc65] &quot;overlay&quot; files&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Per Olofsson &lt;<a href="mailto:magervalp1gmail.com?Subject=Re:%20[cc65]%20&amp;quot;overlay&amp;quot;%20files">magervalp1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-07-06 23:16:28</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Sun, Jul 5, 2009 at 10:29 PM, &lt;silverdr&#64;wfmh&#46;<!--nospam-->org.pl&gt; wrote:
+&gt; due to memory limitations, I shall have to use some &quot;overlaying&quot; to load the
+&gt; required code from disk on demand. Now I start wondering what would be the
+&gt; best method to do this. Of course I can do everything &quot;by hand&quot; in assembler
+&gt; but I would prefer to use some of the smart cc65 features if possible. I
+&gt; shall need at least two things:
+&gt;
+&gt; 1. Free the RAM occupied by the startup initialisation routines (mine, not
+&gt; CC65's) as those won't be needed after setting things up.
+&gt;
+&gt; I would like to place those next to a larger data buffer, so that once the
+&gt; code is no longer needed, I would get a continuous memory chunk for the data
+&gt; buffer. I guess this can be done with a smart linker instructions.
+&gt;
+&gt; 2. Load appropriate &quot;drivers&quot; on demand into a static address space.
+&gt;
+&gt; The &quot;drivers&quot; would all implement the same &quot;protocol&quot; (as it is called in
+&gt; Obj-C), i. e. a set of routines serving the same purpose but varying in
+&gt; implementation of course, probably with a jump table at the beginning.
+
+This sounds familiar to the project that I have been playing with
+lately. In order to have as much ram as possible available, I replaced
+the kernal with my ULoad IRQ loader, a custom keyboard scanner and
+console output, and then a barebones crt0.s. I have a small kickstart
+program that initializes the IRQ loader, leaving the resident loader
+code at the top of ram, and then loads the main program (overwriting
+the init code).
+
+It's not exactly what you want, but maybe close enough? Send me a mail
+off the list if you're interested in a copy.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Jul  6 23:16:37 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6608.html" title="Next message in the list">Jakub: "[cc65] Segment EXEHDR does not exist - while using ld65 directly"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6606.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] &quot;overlay&quot; files"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6604.html" title="Message to which this message replies">silverdr1wfmh.org.pl: "[cc65] &quot;overlay&quot; files"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6617.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] &quot;overlay&quot; files"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6607" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6607" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6607" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-07-06 23:16:39 CEST
+</em></small></p>
+</body>
+</html>

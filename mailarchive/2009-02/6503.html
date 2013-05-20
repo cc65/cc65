@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Help!,does anyone know how to </title>
+<meta name="Author" content="zhblue (newsclan) (newsclan1gmail.com)" />
+<meta name="Subject" content="[cc65] Help!,does anyone know how to use NES joystick with cc65" />
+<meta name="Date" content="2009-02-17" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Help!,does anyone know how to use NES joystick with cc65</h1>
+<!-- received="Tue Feb 17 13:40:21 2009" -->
+<!-- isoreceived="20090217124021" -->
+<!-- sent="Tue, 17 Feb 2009 20:40:14 +0800" -->
+<!-- isosent="20090217124014" -->
+<!-- name="zhblue (newsclan)" -->
+<!-- email="newsclan1gmail.com" -->
+<!-- subject="[cc65] Help!,does anyone know how to use NES joystick with cc65" -->
+<!-- id="17e97a5a0902170440j1017fdeft916c15c97a799dbf@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6504.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Help!,does anyone know how to use NES joystick with cc65&quot;">Next message</a> ]
+[ <a href="6502.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Patch for linuxdoc documentation&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6504.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Help!,does anyone know how to use NES joystick with cc65&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: zhblue (newsclan) &lt;<a href="mailto:newsclan1gmail.com?Subject=Re:%20[cc65]%20Help!,does%20anyone%20know%20how%20to%20use%20NES%20joystick%20with%20cc65">newsclan1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-02-17 13:40:14</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>i tried to use NES joystick on cc65
+#include &lt;conio.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;nes.h&gt;
+#include &lt;joystick.h&gt;
+//.....
+void testjoy(){
+   char err=0;
+   const char * stdjoy=&quot;nes-stdjoy.joy&quot;;
+   err=joy_load_driver(stdjoy);
+   cprintf(&quot;%u&quot;,err);
+}
+int main (void)
+{
+   testjoy();
+   while(1){
+   };
+}
+======error reported========
+
+D:\zhblue\cc65&gt;ca65 -t nes hello.s
+
+D:\zhblue\cc65&gt;ld65 -t nes hello.o nes.o nes.lib atmos.lib -o hello.nes
+Unresolved external `_close' referenced in:
+ joy_load.s(18)
+Unresolved external `_open' referenced in:
+ joy_load.s(16)
+Unresolved external `_read' referenced in:
+ joy_load.s(17)
+ld65.exe: Error: 3 unresolved external(s) found - cannot create output file
+======================
+Does anyone can help me, or share some working codes on NES joystick in cc65
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Feb 17 13:40:21 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6504.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Help!,does anyone know how to use NES joystick with cc65"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6502.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Patch for linuxdoc documentation"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6504.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Help!,does anyone know how to use NES joystick with cc65"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6504.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Help!,does anyone know how to use NES joystick with cc65"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6505.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] Help!,does anyone know how to use NES joystick with cc65"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6503" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6503" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6503" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-02-17 13:40:24 CET
+</em></small></p>
+</body>
+</html>

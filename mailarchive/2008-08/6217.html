@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] use ld65 to link in binary dat</title>
+<meta name="Author" content="Mike Harris (atarimike1wavecable.com)" />
+<meta name="Subject" content="[cc65] use ld65 to link in binary data?" />
+<meta name="Date" content="2008-08-08" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] use ld65 to link in binary data?</h1>
+<!-- received="Fri Aug  8 00:42:26 2008" -->
+<!-- isoreceived="20080807224226" -->
+<!-- sent="Thu, 7 Aug 2008 15:42:17 -0700" -->
+<!-- isosent="20080807224217" -->
+<!-- name="Mike Harris" -->
+<!-- email="atarimike1wavecable.com" -->
+<!-- subject="[cc65] use ld65 to link in binary data?" -->
+<!-- id="200808071542.18006.atarimike@wavecable.com" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6218.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] use ld65 to link in binary data?&quot;">Next message</a> ]
+[ <a href="6216.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Passing variables from asm to c and vice versa&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6218.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] use ld65 to link in binary data?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Mike Harris &lt;<a href="mailto:atarimike1wavecable.com?Subject=Re:%20[cc65]%20use%20ld65%20to%20link%20in%20binary%20data?">atarimike1wavecable.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-08-08 00:42:17</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Is there an easy way to get ld65 to link in binary data? I'd like to use it to 
+copy in the CHR-ROM for a NES rom file.
+
+I don't see this in the documentation anywhere. Is it supported?
+
+I plan to have 2 linker configs - one for building a ROM (tacks on a header,  
+PRG-ROM, then CHR-ROM) and one for an actual cartridge (PRG only built to one 
+file, then burn that and the CHR to separate EPROM chips.
+
+Would this CHR-ROM area be better as a memory or segment? It's on a different 
+bus than the main address bus in the NES, so I was thinking make a memory and 
+a segment.
+
+--
+Mike
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Aug  8 00:42:26 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6218.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] use ld65 to link in binary data?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6216.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Passing variables from asm to c and vice versa"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6218.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] use ld65 to link in binary data?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6218.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] use ld65 to link in binary data?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6217" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6217" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6217" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-08-08 00:42:28 CEST
+</em></small></p>
+</body>
+</html>

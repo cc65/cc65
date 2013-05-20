@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] VICE/NESICIDE integration</title>
+<meta name="Author" content="Christopher Pow (christopher.s.pow1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] VICE/NESICIDE integration" />
+<meta name="Date" content="2012-03-28" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] VICE/NESICIDE integration</h1>
+<!-- received="Wed Mar 28 16:00:33 2012" -->
+<!-- isoreceived="20120328140033" -->
+<!-- sent="Wed, 28 Mar 2012 09:00:26 -0500" -->
+<!-- isosent="20120328140026" -->
+<!-- name="Christopher Pow" -->
+<!-- email="christopher.s.pow1gmail.com" -->
+<!-- subject="Re: [cc65] VICE/NESICIDE integration" -->
+<!-- id="CAKDufpA-D=VUJH3mjrTqRjsmsjpVyT0Ez+ZL1rS0Vz+0sEAcFw@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20120328101843.GE10030&#64;vega.lgb.hu" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10220.html" title="Christopher Pow: &quot;Re: [cc65] VICE/NESICIDE integration&quot;">Next message</a> ]
+[ <a href="10218.html" title="Christopher Pow: &quot;Re: [cc65] VICE/NESICIDE integration&quot;">Previous message</a> ]
+[ <a href="10215.html" title="Gábor Lénárt: &quot;Re: [cc65] VICE/NESICIDE integration&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+[ <a href="10218.html" title="Christopher Pow: &quot;Re: [cc65] VICE/NESICIDE integration&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Christopher Pow &lt;<a href="mailto:christopher.s.pow1gmail.com?Subject=Re:%20[cc65]%20VICE/NESICIDE%20integration">christopher.s.pow1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-03-28 16:00:26</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt; Anyway, it seems to be a bit complex solution, maybe it's even similier and
+&gt; faster to extend remote monitor protocol for quering information returned
+&gt; in raw byte stream, it's still true that SHM memory is faster to use, but
+&gt; since you need to know mapping information etc, I am not sure it will be
+&gt; faster than, and at least it's quite complex task then ...
+
+At the moment it's only slow because I have not made it as fast as I
+can.  Once I get to the point of a)having all the logic in place to
+support updating the debugger displays, and b)have made said logic as
+fast as I can without having other options [SHM], then I think it'd be
+a good time to approach this.  When I run &quot;m $0 $ffff&quot; in a telnet
+session connected to the remote monitor the response is quite fast, so
+it's obvious to me that the problem is on my end at the moment.  As I
+stated, I'm using blocking calls...and I'm being rather &quot;dumb&quot; about
+how I'm doing it because at present I only care about the data not the
+expediency.
+
+If there are extensions to the monitor that can be made to make
+memory-regions query/set-able then I'd ask that those take priority
+over this if they're not already there.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Mar 28 16:00:33 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10220.html" title="Next message in the list">Christopher Pow: "Re: [cc65] VICE/NESICIDE integration"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10218.html" title="Previous message in the list">Christopher Pow: "Re: [cc65] VICE/NESICIDE integration"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10215.html" title="Message to which this message replies">Gábor Lénárt: "Re: [cc65] VICE/NESICIDE integration"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10218.html" title="Next message in this discussion thread">Christopher Pow: "Re: [cc65] VICE/NESICIDE integration"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10219" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10219" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10219" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-03-28 16:00:36 CEST
+</em></small></p>
+</body>
+</html>

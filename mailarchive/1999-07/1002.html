@@ -1,0 +1,175 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Re: still need support wi</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Re: still need support with low-level file stuff?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Re: still need support with low-level file stuff?</h1>
+<!-- received="Sat Jul 10 22:34:05 1999" -->
+<!-- isoreceived="19990710203405" -->
+<!-- sent="Sat, 10 Jul 1999 22:33:45 +0200 (MEST)" -->
+<!-- isosent="19990710203345" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Re: still need support with low-level file stuff?" -->
+<!-- id="m1133of-000brTC@wuschel.musoftware.de" -->
+<!-- inreplyto="37876D60.AD20C1EF@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Re:%20still%20need%20support%20with%20low-level%20file%20stuff?"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 1999-07-10 22:33:45
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="1003.html">Groepaz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<li><strong>Previous message:</strong> <a href="1001.html">Groepaz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<li><strong>In reply to:</strong> <a href="1001.html">Groepaz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1003.html">Groepaz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<li><strong>Reply:</strong> <a href="1003.html">Groepaz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+&gt; well.... i dont pretty much agree with you... there is actually NO
+&gt; difference
+&gt; in using PRG, SEQ, USR, REL or whatever files, since direct raw access
+&gt; worx
+&gt; with all of these in the same way. also lseek() and stuff aint a real
+&gt; problem
+&gt; since we could use a thing simelar to what 'crackers' refer to as IFFL.
+&gt; this
+&gt; would probably work without having to seek through the whole file, since
+&gt; it'll
+&gt; work on a 254-bytes block basis, and also the last readen block could be
+&gt; buffered (in the drive). i know that would still cause some problems if
+&gt; you
+&gt; would be lseek()'ing like a mad dog, but it'll still work (however)
+&gt; the other problem (opening several files at once for reading and
+&gt; writing) may
+&gt; be a harder thing to solve, but keeping the above mentioned technique in
+&gt; mind,
+&gt; it will still be possible with a clever drive-code.
+
+It seems you know more about this than I. Maybe you can elaborate this a bit,
+so we can find a possible technical solution. If we have one, the only thing
+left is to find someone who writes the code:-)
+
+&gt; btw, while we are at standards.... your chars that are unsigned by
+&gt; default break
+&gt; the rulez by far more than that non-standard directive would =) whats
+&gt; wrong with having a signed/unsigned keyword, and then just doing a
+
+The C standard says nothing about the signedness of chars. Both signed and
+unsigned chars are allowed. Traditionally, PC compilers tend to use signed
+chars, while Unix compilers often have unsigned chars. The choice to use
+unsigned characters for cc65 does not only give better code, but it is in full
+compliance with the ISO C standard. Programs that depend on the signedness of
+chars are non portable.
+
+If you need a specific character type (signed or unsigned), declare it as
+such. If you don't specify the signedness explicitly, the compiler is free to
+choose.
+
+    signed char sc;    	/* A signed character */
+    unsigned char uc;	/* An unsigned character */
+    char c;		/* Signedness depends on the implementation */
+
+&gt; Also i noticed that you mention the INT datatype in
+&gt; quite some places of the docs, and since you seem to be one of the ppl
+&gt; that like to &quot;follow the rulez&quot; i just wanted to point out that INT is
+&gt; by far
+&gt; not standard, and lots of literature  (ehrm orthograpy sux =)  advices
+&gt; to
+&gt; no more use it, at least not for portable code (use short/u_short
+&gt; instead
+&gt; for example)
+
+I'm not sure what you're refering to. I don't remember mentioning a datatype
+named INT in the docs, and a
+
+	grep INT *
+
+in the doc directory shows no match. If you're talking about int (as opposed
+to INT), this is a standard datatype with well defined semantics. I don't see
+any problems with portability when using ints.
+
+&gt; however, i have noticed there is now
+&gt; also a
+&gt; MAKE-utility for cc65, so i guess that should be no prob now doing that
+&gt; with
+&gt; more sourcefiles.
+
+There is no make utility (you may want to consider GNU make if you need one),
+but the cl65 compile and link utility allows the translation of a multi-file
+project with one command.
+
+&gt; oh, another quick question i was wondering about.... my editor needs to
+&gt; bank out ALL kernal/basic rom and also need access to ram under i/o at
+&gt; certain times... will the runtime library work with that? and, will i
+&gt; need to rewrite lots of the other libs to make them work independent
+&gt; from the roms?! or would it just compile and WORK? 8=) (that'll be very
+&gt; nice really hehe)
+
+The compiler generated code, the runtime library and the standard C library do
+not depend on any ROM code. The startup code uses kernal calls, as well as the
+conio module. Most other C64 specific routines do not call the kernal. The
+BASIC ROM is never used, in fact, it's banked out in the standard
+configuration.
+
+Regards
+
+
+	Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Re:%20still%20need%20support%20with%20low-level%20file%20stuff?">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Re:%20still%20need%20support%20with%20low-level%20file%20stuff?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="1003.html">Groepaz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<li><strong>Previous message:</strong> <a href="1001.html">Groepaz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<li><strong>In reply to:</strong> <a href="1001.html">Groepaz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1003.html">Groepaz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<li><strong>Reply:</strong> <a href="1003.html">Groepaz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:44 CET</em>
+</em>
+</small>
+</body>
+</html>

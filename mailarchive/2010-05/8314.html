@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Why does this work in 128 </title>
+<meta name="Author" content="Mark J. Reed (markjreed1mail.com)" />
+<meta name="Subject" content="Re: [cc65] Why does this work in 128 mode but not 64 mode?" />
+<meta name="Date" content="2010-05-03" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Why does this work in 128 mode but not 64 mode?</h1>
+<!-- received="Mon May  3 16:02:01 2010" -->
+<!-- isoreceived="20100503140201" -->
+<!-- sent="Mon, 3 May 2010 10:01:49 -0400" -->
+<!-- isosent="20100503140149" -->
+<!-- name="Mark J. Reed" -->
+<!-- email="markjreed1mail.com" -->
+<!-- subject="Re: [cc65] Why does this work in 128 mode but not 64 mode?" -->
+<!-- id="y2zf60fe001005030701v43104f79kfd74a1923dd4c95a@mail.gmail.com" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="20100502185639.GP29756&#64;trikaliotis.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8315.html" title="Payton Byrd: &quot;Re: [cc65] Coding style for apps: One huge header file, or a domain  specific header files?&quot;">Next message</a> ]
+[ <a href="8313.html" title="Oliver Schmidt: &quot;Re: [cc65] Difference between __fastcall and __fastcall__ ?&quot;">Previous message</a> ]
+[ <a href="8296.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Why does this work in 128 mode but not 64 mode?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8318.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Why does this work in 128 mode but not 64 mode?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Mark J. Reed &lt;<a href="mailto:markjreed1mail.com?Subject=Re:%20[cc65]%20Why%20does%20this%20work%20in%20128%20mode%20but%20not%2064%20mode?">markjreed1mail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-05-03 16:01:49</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Sun, May 2, 2010 at 2:56 PM, Spiro Trikaliotis
+&lt;ml-cc65&#64;trikaliotis&#46;<!--nospam-->net&gt;wrote:
+
+&gt; Hello Mark,
+&gt;
+&gt; * On Sat, May 01, 2010 at 11:56:34AM -0400 Mark J. Reed wrote:
+&gt;
+&gt; &gt;    Yes, I was about to post that I'd confirmed this as a bug in the C64
+&gt; &gt;    KERNAL code, in both a physical C128 in 64 mode and VICE (which
+&gt; &gt;    dumped core).
+&gt;
+&gt; Dumped core? Which version, which platform, what was the exact
+&gt; command(s) you executed?  This did not happen here!
+
+
+Linux i686 (Ubuntu 9.10), VICE 2.1, cc65 2.13.  But I was mistaken - with a
+simple assembly program to trigger the kernal bug, VICE behaves the same as
+the hardware, just locking up.
+
+it's with the attached C program - which is just Payton's getDriveStatus()
+function and a main() that calls it - that my setup dumps core.
+
+$ cl65 -o getstatus getstatus.c
+$ x64 -autostart getstatus
+
+This works fine (giving me a status of 30,syntax error,00,00).  Then I
+unplug the disk drive by going to to Settings-&gt;Peripheral Settings-&gt;Device
+#8-&gt;Device Type-&gt;None, and run again.  The VICE window disappears, with the
+message &quot;Received signal 11. Exiting...&quot; in the console where I started it.
+ I don't get an actual core file, but signal 11 is SEGV. And it happens
+during the call to cbm_write().
+
+However, I wasn't able to reproduce this with a simple test program coded
+directly in assembly, so my investigation stopped there.  I'll be trying a
+newer version of VICE before I bother tracking it down further.
+
+ --
+Mark J. Reed &lt;markjreed&#64;gmail&#46;<!--nospam-->com&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<div>
+<ul>
+<li>text/x-csrc attachment: <a href="../att-8314/getstatus.c">getstatus.c</a></li>
+</ul>
+<!-- attachment="getstatus.c" -->
+</div>
+<span id="received"><dfn>Received on</dfn> Mon May  3 16:02:01 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8315.html" title="Next message in the list">Payton Byrd: "Re: [cc65] Coding style for apps: One huge header file, or a domain  specific header files?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8313.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Difference between __fastcall and __fastcall__ ?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8296.html" title="Message to which this message replies">Spiro Trikaliotis: "Re: [cc65] Why does this work in 128 mode but not 64 mode?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8318.html" title="Next message in this discussion thread">Spiro Trikaliotis: "Re: [cc65] Why does this work in 128 mode but not 64 mode?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8318.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Re: [cc65] Why does this work in 128 mode but not 64 mode?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8314" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8314" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8314" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-05-03 16:02:03 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Please critique this makef</title>
+<meta name="Author" content="Karri Kaksonen (karri1sipo.fi)" />
+<meta name="Subject" content="Re: [cc65] Please critique this makefile" />
+<meta name="Date" content="2010-04-21" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Please critique this makefile</h1>
+<!-- received="Wed Apr 21 07:15:54 2010" -->
+<!-- isoreceived="20100421051554" -->
+<!-- sent="Wed, 21 Apr 2010 08:15:51 +0300" -->
+<!-- isosent="20100421051551" -->
+<!-- name="Karri Kaksonen" -->
+<!-- email="karri1sipo.fi" -->
+<!-- subject="Re: [cc65] Please critique this makefile" -->
+<!-- id="4BCE8A07.5060901@sipo.fi" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="h2g1adf4c761004201456x71db4132m1ae317ac59f8c013&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8081.html" title="Oliver Schmidt: &quot;Re: [cc65] Please critique this makefile&quot;">Next message</a> ]
+[ <a href="8079.html" title="Payton Byrd: &quot;RE: [cc65] Scalable UI without float?&quot;">Previous message</a> ]
+[ <a href="8075.html" title="Payton Byrd: &quot;[cc65] Please critique this makefile&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8081.html" title="Oliver Schmidt: &quot;Re: [cc65] Please critique this makefile&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Karri Kaksonen &lt;<a href="mailto:karri1sipo.fi?Subject=Re:%20[cc65]%20Please%20critique%20this%20makefile">karri1sipo.fi</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-04-21 07:15:51</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Payton Byrd wrote:
+&gt; I know we have some real GNU experts here.  I by no means am among 
+&gt; that group.  I got my hands on /Managing Projects with GNU Make/ and 
+&gt; after a cursory scan of the first third of it I believe I have a 
+&gt; pretty solid makefile.  Please critique the attached makefile.
+&gt;  
+&gt; Thanks,
+&gt; -- 
+&gt; Payton Byrd
+&gt; &lt;<a href="http://www.paytonbyrd.com">http://www.paytonbyrd.com</a>&gt;
+&gt; &lt;<a href="http://it.toolbox.com/blogs/paytonbyrd">http://it.toolbox.com/blogs/paytonbyrd</a>&gt;
+
+Nice Makefile but I would like to add some cc65 specific things there.
+
+In Program declarations I would add more tools. And you don't need .exe 
+extensions:
+CL := cl65
+CC := cc65
+AS := ca65
+AR := ar65
+SPRPCK := sprpck
+CP := cp
+RM := rm
+ECHO := echo
+TOUCH := touch
+
+cp.exe, rm.exe, echo.exe touch.exe, make.exe can easily be found as 
+native Windows compilations. Using these binaries in addition to cc65 
+takes away all Windows/Linux headaches in Makefiles. Sprite packers 
+(sprpck) may not be relevant except on Lynx targets.
+
+The use of segments for controlling where the code goes:
+CODE_SEGMENT := INTRO_CODE
+DATA_SEGMENT := INTRO_DATA
+RODATA_SEGMENT := INTRO_RODATA
+BSS_SEGMENT := INTRO_BSS
+
+# The name of the final executable
+target := Hello.com
+
+# System libraries needed for linking
+libraries := c128.lib
+
+# Name of the system
+T := c128
+
+In Windows the command line is far too short. We cannot give all the 
+object files as parameters on the command line. So I would go for a 
+different approach and use object files instead of source files for 
+describing what to compile. This technique will make the Makefile 
+scalable to larger projects later.
+
+objects := \
+    Hello.o \
+    Text.o
+
+In order to get these compiled we then need some rules.
+
+# The flag for adding stuff to a library
+ARFLAGS=a
+
+# The flags for compiling C-code
+CFLAGS=-I . -t $(T) --add-source -O -Or -Cl -Os
+SEGMENTS=--code-name $(CODE_SEGMENT) \
+        --rodata-name $(RODATA_SEGMENT) \
+        --bss-name $(BSS_SEGMENT) \
+        --data-name $(DATA_SEGMENT)
+
+# Include paths we may need for compilations
+ifeq ($(CC65_INC),)
+        CC65_INC=/usr/lib/cc65/include
+endif
+ifeq ($(CC65_ASMINC),)
+        CC65_ASMINC=&quot;$(CC65_INC)/../asminc&quot;
+endif
+
+# Rule for making a *.o file out of a *.c file
+%.o: %.c
+        $(CC) $(CFLAGS) $(SEGMENTS) -o $(patsubst %c, %s, $(notdir $&lt;)) $&lt;
+        $(AS) -o $&#64; $(AFLAGS) $(*)&#46;<!--nospam-->s
+        $(RM) $*.s
+
+# Rule for making a *.o file out of a *.s file
+%.o: %.s
+        $(AS) -t $(T) -I $(CC65_ASMINC) -o $&#64; $(AFLAGS) $&lt;
+
+# Bitmap creation may be different for other platforms
+# Rule for making a *.o file out of a *.bmp file
+%.o : %.bmp
+        $(SPRPCK) -t6 -p2 $&lt;
+        $(ECHO) .global _$* &gt; $*.s
+        $(ECHO) .segment \&quot;$(RODATA_SEGMENT)\&quot; &gt;&gt; $*.s
+        $(ECHO) _$*: .incbin \&quot;$*.spr\&quot; &gt;&gt; $*.s
+        $(AS) -t $(T) -o $&#64; $(AFLAGS) $*&#46;<!--nospam-->s
+        $(RM) $*.s
+        $(RM) $*.pal
+        $(RM) $*.spr
+
+all = $(target)
+
+$(target) : $(objects)
+        $(CL) -t $(T) -o $&#64; -m Hello&#46;<!--nospam-->map -C Hello.cfg $(objects) 
+$(libraries)
+
+clean :
+        $(TOUCH) $(objects)
+        $(RM) $(objects)
+        $(TOUCH) target
+        $(RM) target
+
+------------------------------------------------------
+
+This Makefile can easily be modified to become a component of a larger 
+framework.
+
+Just remove the line
+
+all := $(target)
+
+And replace it with
+
+all: $(objects)
+        $(TOUCH) objlist
+        $(RM) objlist
+        for obj in $(objects); do $(ECHO) ../intro/$$obj &gt;&gt; objlist; done
+
+Now the compilation will be as before but instead of linking the stuff 
+together here we just make a list file called &quot;objlist&quot; that can be used 
+for linking later.
+
+In the main Makefile you can easily link all subprojects together by:
+
+objlists = \
+        ../resident/objlist \
+        ../miniloader/objlist \
+        ../abcmusic/objlist \
+        ../soundtool/objlist \
+        ../intro/objlist \
+        ../password/objlist \
+        ../chopperx/objlist \
+        ../parafly/objlist \
+        ../pontiac/objlist \
+        ../blackjack/objlist \
+        ../lsketch/objlist \
+        ../dicee/objlist \
+        ../treasure/objlist \
+        ../music/objlist
+
+others = \
+        &#64;&#46;<!--nospam-->./resident/objlist \
+        &#64;&#46;<!--nospam-->./miniloader/objlist \
+        &#64;&#46;<!--nospam-->./abcmusic/objlist \
+        &#64;&#46;<!--nospam-->./soundtool/objlist \
+        &#64;&#46;<!--nospam-->./intro/objlist \
+        &#64;&#46;<!--nospam-->./password/objlist \
+        &#64;&#46;<!--nospam-->./chopperx/objlist \
+        &#64;&#46;<!--nospam-->./parafly/objlist \
+        &#64;&#46;<!--nospam-->./pontiac/objlist \
+        &#64;&#46;<!--nospam-->./blackjack/objlist \
+        &#64;&#46;<!--nospam-->./lsketch/objlist \
+        &#64;&#46;<!--nospam-->./dicee/objlist \
+        &#64;&#46;<!--nospam-->./treasure/objlist \
+        &#64;&#46;<!--nospam-->./music/objlist
+
+all := $(target)
+
+$(target) : $(objlists)
+        $(CL) -t $(T) -o $&#64; -m Hello&#46;<!--nospam-->map -C Hello.cfg $(others) $(libraries)
+
+------------------------------------------------
+
+If you are using loadable drivers that you want to link statically then 
+you may need to define the inclusion of the drivers separately at the 
+end of the Makefile.
+
+c128-stdjoy.o:
+        $(CP) &quot;$(CC65_INC)/../joy/$*.joy&quot; .
+        $(CO) --code-label _joycode $*.joy
+        $(AS) -t $(T) -o $&#64; $(AFLAGS) $*&#46;<!--nospam-->s
+        $(RM) $*.joy
+        $(RM) $*.s
+
+c128-160-102-16.o:
+        $(CP) &quot;$(CC65_INC)/../tgi/$*.tgi&quot; .
+        $(CO) --code-label _tgicode $*.tgi
+        $(AS) -t $(T) -o $&#64; $(AFLAGS) $*&#46;<!--nospam-->s
+        $(RM) $*.tgi
+        $(RM) $*.s
+
+
+And of course you need to add these objects to the objlist.
+objects := \
+    Hello.o \
+    Text.o \
+    c128-stdjoy.o \
+    c128-160-102-16.o
+
+--
+Regards,
+
+Karri
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Apr 21 07:15:54 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8081.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Please critique this makefile"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8079.html" title="Previous message in the list">Payton Byrd: "RE: [cc65] Scalable UI without float?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8075.html" title="Message to which this message replies">Payton Byrd: "[cc65] Please critique this makefile"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8081.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Please critique this makefile"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8080" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8080" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8080" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-04-21 07:15:56 CEST
+</em></small></p>
+</body>
+</html>

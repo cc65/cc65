@@ -1,0 +1,172 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] how about commercial prgs?</title>
+<meta name="Author" content="Mike McCarty (jmccarty_at_ssd.usa.alcatel.com)">
+<meta name="Subject" content="Re: [cc65] how about commercial prgs?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] how about commercial prgs?</h1>
+<!-- received="Thu Mar 28 17:01:28 2002" -->
+<!-- isoreceived="20020328160128" -->
+<!-- sent="Thu, 28 Mar 2002 10:01:17 -0600 (CST)" -->
+<!-- isosent="20020328160117" -->
+<!-- name="Mike McCarty" -->
+<!-- email="jmccarty_at_ssd.usa.alcatel.com" -->
+<!-- subject="Re: [cc65] how about commercial prgs?" -->
+<!-- id="Pine.SOL.4.10.10203280951090.7088-100000@sun1307.ssd.usa.alcatel.com" -->
+<!-- inreplyto="200203281535.KAA05409@wordstock.com" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Mike McCarty (<a href="mailto:jmccarty_at_ssd.usa.alcatel.com?Subject=Re:%20[cc65]%20how%20about%20commercial%20prgs?"><em>jmccarty_at_ssd.usa.alcatel.com</em></a>)<br>
+<strong>Date:</strong> 2002-03-28 17:01:17
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1191.html">MagerValp: "Re: [cc65] how about commercial prgs?"</a>
+<li><strong>In reply to:</strong> <a href="1189.html">Bryan Pope: "Re: [cc65] how about commercial prgs?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1193.html">MagerValp: "Re: [cc65] how about commercial prgs?"</a>
+<li><strong>Next in thread:</strong> <a href="1191.html">MagerValp: "Re: [cc65] how about commercial prgs?"</a>
+<li><strong>Reply:</strong> <a href="1193.html">MagerValp: "Re: [cc65] how about commercial prgs?"</a>
+<li><strong>Reply:</strong> <a href="1194.html">Bryan Pope: "Re: [cc65] how about commercial prgs?"</a>
+<li><strong>Reply:</strong> <a href="1200.html">Andre Majorel: "Re: [cc65] how about commercial prgs?"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Thu, 28 Mar 2002, Bryan Pope wrote:
+
+&gt; And thusly Stephan Lesch spake:
+&gt; &gt; 
+&gt; &gt; Hi,
+&gt; &gt; 
+&gt; &gt; for a more practical question, we're planning to sell copies of our
+&gt; &gt; adventure game which I'd like to compile using cc65. What's the status of 
+&gt; &gt; the compiled program if it uses a runtime library which comes with the
+&gt; &gt; compiler? 
+&gt; &gt; 
+&gt; &gt; I must admit that I'm a bit confused by the copyright section on the 
+&gt; &gt; webpage... If the original software is GPLed, and Ullrich places
+&gt; &gt; his changes and &quot;other executable sources&quot; under the GPL, too, but on the
+&gt; &gt; other hand puts the tools he's rewritten under a less restrictive license,
+&gt; &gt; what does this mean for a compiled program?
+&gt; &gt; 
+&gt; 
+&gt; SDL, which is a graphics library for many different OSs is licensed under the 
+&gt; Lesser GPL.  This is taken from their website:
+&gt; 
+&gt; ----------------------------------------------
+&gt; Q: Can I use SDL in a commercial application?
+&gt; 
+&gt; A: The simple answer is &quot;Yes&quot;, just dynamically link with SDL and
+&gt; you're fine.
+&gt;
+&gt; Full details are available at: <a href="http://www.libsdl.org/license.html">http://www.libsdl.org/license.html</a>
+
+The simple answer is &quot;No&quot;.
+
+I went and read their full details, and one is absolutely prohibited
+from actually linking their product into a program.
+
+&gt; ---------------------------------------------------------------
+&gt; 
+&gt; Here is a further excerpt from the licensing section:
+&gt; 
+&gt; ----------------------------------------
+&gt; The Simple DirectMedia Layer library is currently available under
+&gt; the GNU Lesser General Public License (LGPL) version 2 or newer.
+&gt; This license allows you to link with the library in such a way that
+&gt; users can modify the library and have your application use the new
+&gt; version.
+
+This, at least, is correct. But if their library actually becomes a
+part of your program, then your program source must also be supplied,
+AIUI.
+
+So, if your platform does not support dynamic linking, then this LGPL
+code cannot be used on it without the GPL virus attaching itself to your
+own code.
+
+This is a deliberate act by the FSF. Their website has deliberate
+misstatements of fact. For example one reads at
+<a href="http://www.gnu.org/copyleft/lgpl.html">http://www.gnu.org/copyleft/lgpl.html</a>:
+
+
+        The licenses for most software are designed to take away your
+        freedom to share and change it.
+
+This is false. Licenses *grant* permission, they do not *deny*
+freedom. A license *cannot* deny anyone any freedom.
+
+        By contrast, the GNU General Public Licenses are intended to
+        guarantee your freedom to share and change free software--to
+        make sure the software is free for all its users. 
+
+This is false. They are designed to ensure that commercial/proprietary
+developers cannot use their code. They are intended to grant license to
+all but commercial/proprietary developers. They are intended to deny
+license to commercial/proprietary developers.
+
+Note the difference in meaning between the words &quot;freedom&quot; and
+&quot;license&quot;. I have freedom to enter my house. You enter my house only by
+my permission and license. If I grant you license to enter my house, but
+only under certain conditions, I have not denied you any freedom at all.
+
+Mike
+-- 
+char *p=&quot;char *p=%c%s%c;main(){printf(p,34,p,34);}&quot;;main(){printf(p,34,p,34);}
+This message made from 100% recycled bits.
+I can explain it for you, but I can't understand it for you.
+I don't speak for Alcatel      &lt;- They make me say that.
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20how%20about%20commercial%20prgs?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1191.html">MagerValp: "Re: [cc65] how about commercial prgs?"</a>
+<li><strong>In reply to:</strong> <a href="1189.html">Bryan Pope: "Re: [cc65] how about commercial prgs?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1193.html">MagerValp: "Re: [cc65] how about commercial prgs?"</a>
+<li><strong>Next in thread:</strong> <a href="1191.html">MagerValp: "Re: [cc65] how about commercial prgs?"</a>
+<li><strong>Reply:</strong> <a href="1193.html">MagerValp: "Re: [cc65] how about commercial prgs?"</a>
+<li><strong>Reply:</strong> <a href="1194.html">Bryan Pope: "Re: [cc65] how about commercial prgs?"</a>
+<li><strong>Reply:</strong> <a href="1200.html">Andre Majorel: "Re: [cc65] how about commercial prgs?"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-03-28 17:01:53 CET</em>
+</em>
+</small>
+</body>
+</html>

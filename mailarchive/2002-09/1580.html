@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Bank Switching</title>
+<meta name="Author" content="Shawn Jefferson (sjefferson_at_sd62.bc.ca)">
+<meta name="Subject" content="Re: [cc65] Bank Switching">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Bank Switching</h1>
+<!-- received="Tue, 24 Sep 2002 16:13:20 -0700" -->
+<!-- isoreceived="20020924231320" -->
+<!-- sent="Tue, 24 Sep 2002 16:13:20 -0700" -->
+<!-- isosent="20020924231320" -->
+<!-- name="Shawn Jefferson" -->
+<!-- email="sjefferson_at_sd62.bc.ca" -->
+<!-- subject="Re: [cc65] Bank Switching" -->
+<!-- id="sd908f3f.013@gwmail.sd62.bc.ca" -->
+<!-- inreplyto="[cc65] Bank Switching" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Shawn Jefferson (<a href="mailto:sjefferson_at_sd62.bc.ca?Subject=Re:%20[cc65]%20Bank%20Switching"><em>sjefferson_at_sd62.bc.ca</em></a>)<br>
+<strong>Date:</strong> 2002-09-25 01:13:20
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1579.html">Christian Groessler: "Re: [cc65] Bank Switching"</a>
+<li><strong>Maybe in reply to:</strong> <a href="1566.html">Shawn Jefferson: "[cc65] Bank Switching"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1581.html">groepaz: "Re[2]: [cc65] Bank Switching"</a>
+<li><strong>Reply:</strong> <a href="1581.html">groepaz: "Re[2]: [cc65] Bank Switching"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+&gt;&gt;&gt; Christian Groessler &lt;<a href="mailto:cpg_at_aladdin.de?Subject=Re:%20[cc65]%20Bank%20Switching">cpg_at_aladdin.de</a>&gt; 09/20/02 04:22PM &gt;&gt;&gt;
+
+&gt;So with some linker and segments fiddling, one should be able to make
+&gt;RAM2 a separate chunk in the file. The AUTOSTRT chunk should be last
+&gt;(unless you know what you do), because I think it's address will be
+&gt;called immediately after being loaded, before the remaining chunks get
+&gt;loaded. 
+
+Ok, I think I succeeded in setting this up with these files:
+
+atari.cfg:
+
+MEMORY {
+    ZP: start = $82, size = $7E, type = rw;
+    HEADER: start = $0000, size = $6, file = %O;
+    RAM1: start = $2000, size = $2000, file = %O;
+    BANK: start = $4000, size = $3FFF, type = ro;   # just to show the memory layout, not used
+    SECHDR: start = $8000, size = $4, file = %O;
+    RAM2: start = $8004, size = $3C1F, file = %O;
+}
+SEGMENTS {
+    EXEHDR: load = HEADER, type = wprot;
+    CODE: load = RAM1, type = wprot, define = yes;
+    BSS: load = RAM1, type = bss, define = yes;
+    CHKHDR: load = SECHDR, type = wprot;
+    RODATA: load = RAM2, type = wprot, define = yes;
+    DATA: load = RAM2, type = rw;
+    ZEROPAGE: load = ZP, type = zp;
+    AUTOSTRT: load = RAM2, type = wprot, define = yes;
+}
+
+and chunk.s:
+
+    .import __RODATA_LOAD__, __AUTOSTRT_LOAD__
+
+; CHUNK HEADER
+    .segment &quot;CHKHDR&quot;
+    .word __RODATA_LOAD__
+    .word __AUTOSTRT_LOAD__ - 1
+    .code
+    .reloc
+
+From looking at the source code for crt0.s in the atari library, the main header uses the values for CODE and BSS - 1 to create the header, so you are sort of stuck with putting the code and bss (what does that stand for?) in the first memory segment.  Unless there is a way to override this without recompiling the library.  The first segment is the smallest segment... but I guess we could split the code segments with some manual stuff in our C files and that should still work properly with the standard library right?
+
+Anyway, this worked quite well and left the $4000-7FFF section alone from what I can tell.  Thanks Ulrich and Chris for all the information so far!
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Bank%20Switching">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1579.html">Christian Groessler: "Re: [cc65] Bank Switching"</a>
+<li><strong>Maybe in reply to:</strong> <a href="1566.html">Shawn Jefferson: "[cc65] Bank Switching"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1581.html">groepaz: "Re[2]: [cc65] Bank Switching"</a>
+<li><strong>Reply:</strong> <a href="1581.html">groepaz: "Re[2]: [cc65] Bank Switching"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-09-25 01:15:43 CEST</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: RE: [cc65] using newline in cprintf</title>
+<meta name="Author" content="Greg Long (cc65_at_maneuveringspeed.com)">
+<meta name="Subject" content="RE: [cc65] using newline in cprintf on c64">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>RE: [cc65] using newline in cprintf on c64</h1>
+<!-- received="Wed Mar  5 17:10:36 2003" -->
+<!-- isoreceived="20030305161036" -->
+<!-- sent="Wed, 5 Mar 2003 08:09:57 -0800" -->
+<!-- isosent="20030305160957" -->
+<!-- name="Greg Long" -->
+<!-- email="cc65_at_maneuveringspeed.com" -->
+<!-- subject="RE: [cc65] using newline in cprintf on c64" -->
+<!-- id="008001c2e331$ab29ef30$8001a8c0@ENDEAVOR" -->
+<!-- inreplyto="15973.6233.935134.320707@panini.cling.gu.se" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Greg Long (<a href="mailto:cc65_at_maneuveringspeed.com?Subject=RE:%20[cc65]%20using%20newline%20in%20cprintf%20on%20c64"><em>cc65_at_maneuveringspeed.com</em></a>)<br>
+<strong>Date:</strong> 2003-03-05 17:09:57
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2587.html">Groepaz: "Re: [cc65] malloc and Sort.c(26): Error: Expression expected"</a>
+<li><strong>In reply to:</strong> <a href="2576.html">MagerValp: "Re: [cc65] using newline in cprintf on c64"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2590.html">MagerValp: "RE: [cc65] using newline in cprintf on c64"</a>
+<li><strong>Reply:</strong> <a href="2590.html">MagerValp: "RE: [cc65] using newline in cprintf on c64"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Still doesn't work - does some VERY creative scrolling and eventually a
+CPU jam.
+
+try it with my code where the integers are output after the sort.
+
+thanks though,
+Greg
+
+-----Original Message-----
+From: <a href="mailto:owner-cc65_at_musoftware.de?Subject=RE:%20[cc65]%20using%20newline%20in%20cprintf%20on%20c64">owner-cc65_at_musoftware.de</a> [mailto:<a href="mailto:owner-cc65_at_musoftware.de?Subject=RE:%20[cc65]%20using%20newline%20in%20cprintf%20on%20c64">owner-cc65_at_musoftware.de</a>] On
+Behalf Of MagerValp
+Sent: Tuesday, March 04, 2003 1:19 PM
+To: <a href="mailto:cc65_at_musoftware.de?Subject=RE:%20[cc65]%20using%20newline%20in%20cprintf%20on%20c64">cc65_at_musoftware.de</a>
+Subject: Re: [cc65] using newline in cprintf on c64
+
+
+&gt;&gt;&gt;&gt;&gt; &quot;GL&quot; == Greg Long &lt;<a href="mailto:greg_at_maneuveringspeed.com?Subject=RE:%20[cc65]%20using%20newline%20in%20cprintf%20on%20c64">greg_at_maneuveringspeed.com</a>&gt; writes:
+
+GL&gt; If I substitute a \r for the \n it runs fine and exits normally, but
+
+GL&gt; of course, only overwrites the same line through the whole loop, and
+
+GL&gt; does not go to the new line. I tried inserting \x0d for a CR and 
+GL&gt; \x11 for a cursor down to no avail.
+
+You have to use \r\n with the conio functions.
+
+-- 
+    ___          .     .  .         .       . +  .         .      o   
+  _|___|_   +   .  +     .     +         .  Per Olofsson, arkadspelare
+    o-o    .      .     .   o         +          <a href="mailto:MagerValp_at_cling.gu.se?Subject=RE:%20[cc65]%20using%20newline%20in%20cprintf%20on%20c64">MagerValp_at_cling.gu.se</a>
+     -       +            +    .     <a href="http://www.cling.gu.se/~cl3polof/">http://www.cling.gu.se/~cl3polof/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=RE:%20[cc65]%20using%20newline%20in%20cprintf%20on%20c64">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=RE:%20[cc65]%20using%20newline%20in%20cprintf%20on%20c64">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2587.html">Groepaz: "Re: [cc65] malloc and Sort.c(26): Error: Expression expected"</a>
+<li><strong>In reply to:</strong> <a href="2576.html">MagerValp: "Re: [cc65] using newline in cprintf on c64"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2590.html">MagerValp: "RE: [cc65] using newline in cprintf on c64"</a>
+<li><strong>Reply:</strong> <a href="2590.html">MagerValp: "RE: [cc65] using newline in cprintf on c64"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-03-05 17:11:34 CET</em>
+</em>
+</small>
+</body>
+</html>

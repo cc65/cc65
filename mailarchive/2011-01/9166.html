@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Conditional assembler question</title>
+<meta name="Author" content="Karri Kaksonen (karri1sipo.fi)" />
+<meta name="Subject" content="[cc65] Conditional assembler question" />
+<meta name="Date" content="2011-01-21" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Conditional assembler question</h1>
+<!-- received="Fri Jan 21 07:36:14 2011" -->
+<!-- isoreceived="20110121063614" -->
+<!-- sent="Fri, 21 Jan 2011 08:36:04 +0200" -->
+<!-- isosent="20110121063604" -->
+<!-- name="Karri Kaksonen" -->
+<!-- email="karri1sipo.fi" -->
+<!-- subject="[cc65] Conditional assembler question" -->
+<!-- id="4D392954.4070209@sipo.fi" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9167.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Conditional assembler question&quot;">Next message</a> ]
+[ <a href="9165.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Fwd: Quick Prayer&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9167.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Conditional assembler question&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Karri Kaksonen &lt;<a href="mailto:karri1sipo.fi?Subject=Re:%20[cc65]%20Conditional%20assembler%20question">karri1sipo.fi</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-01-21 07:36:04</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+I would like to create two different kind of EXEHDR segments.
+
+One would create binaries for a Lynx cart and the other for Lynx RAM.
+
+If it is possible I would like to introduce some keyword that would then 
+include the right kind of header code in the crt0.s like:
+
+#ifdef TARGET_IS_CART
+   .. asm code ..
+#endif
+
+#ifdet TARGET_IS_RAM
+   .. asm code
+#endif
+
+The other way would be to create two different segments like:
+
+EXEHDR for TARGET_IS_CART
+BLLHDR for TARGET_IS_RAM
+
+Somehow I also need to introduce a new file in libstrc/lynx for 
+containing the header code for BLLHDR. And also find out how to force 
+this header to appear in the final output image.
+
+But then the user needs a little more understanding to place the BLLHDR 
+segment in the right place in his config file and re-direct the EXEHDR 
+segment to null.
+
+Advice please :)
+--
+
+Karri
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Jan 21 07:36:14 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9167.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Conditional assembler question"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9165.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Fwd: Quick Prayer"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9167.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Conditional assembler question"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9167.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Conditional assembler question"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9166" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9166" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9166" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-01-21 07:36:18 CET
+</em></small></p>
+</body>
+</html>

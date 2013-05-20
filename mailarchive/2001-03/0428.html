@@ -1,0 +1,145 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: RE: [cc65] Simple PEEK &amp; POKE qu</title>
+<meta name="Author" content="Raj Wurttemberg (raj_at_starbase-01.com)">
+<meta name="Subject" content="RE: [cc65] Simple PEEK &amp; POKE question.">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>RE: [cc65] Simple PEEK &amp; POKE question.</h1>
+<!-- received="Mon Mar  5 23:57:37 2001" -->
+<!-- isoreceived="20010305225737" -->
+<!-- sent="Mon, 5 Mar 2001 17:59:10 -0500" -->
+<!-- isosent="20010305225910" -->
+<!-- name="Raj Wurttemberg" -->
+<!-- email="raj_at_starbase-01.com" -->
+<!-- subject="RE: [cc65] Simple PEEK &amp; POKE question." -->
+<!-- id="000601c0a5c7$e41bb570$d201a8c0@starbase01.com" -->
+<!-- inreplyto="Pine.SOL.4.10.10103051117290.1715-100000@sun1307.ssd.usa.alcatel.com" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Raj Wurttemberg (<a href="mailto:raj_at_starbase-01.com?Subject=RE:%20[cc65]%20Simple%20PEEK%20&amp;%20POKE%20question."><em>raj_at_starbase-01.com</em></a>)<br>
+<strong>Date:</strong> 2001-03-05 23:59:10
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0429.html">Mike McCarty: "RE: [cc65] Simple PEEK &amp; POKE question."</a>
+<li><strong>Previous message:</strong> <a href="0427.html">Mike McCarty: "Re: [cc65] Simple PEEK &amp; POKE question."</a>
+<li><strong>In reply to:</strong> <a href="0425.html">Mike McCarty: "Re: [cc65] Simple PEEK &amp; POKE question."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0429.html">Mike McCarty: "RE: [cc65] Simple PEEK &amp; POKE question."</a>
+<li><strong>Reply:</strong> <a href="0429.html">Mike McCarty: "RE: [cc65] Simple PEEK &amp; POKE question."</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Mike,
+
+I only used that poke statement as an example. I just wanted to know how to
+peek and poke values with cc65. While I understand and agree with your
+statement, &quot;I recommend that people NOT implement PEEK and POKE at all.&quot;
+Unfortunately with the Commodore series or computers many values *have* to
+be peeked and poked because the functions I am trying to do are not machine
+portable. For example if I wanted to create my own character set or create
+sprites on a Commodore 64 I know that code would not be portable to an Apple
+//e.
+
+I do thank you for your input and your stressing of &quot;direct C&quot; makes a lot
+of *good* sense to a PC programmer where sprites, sound, etc. all have well
+documented API calls... but the Commodore never had that luxury. :(
+
+Thanks,
+-Raj
+
+-----Original Message-----
+From: <a href="mailto:owner-cc65_at_musoftware.de?Subject=RE:%20[cc65]%20Simple%20PEEK%20&amp;%20POKE%20question.">owner-cc65_at_musoftware.de</a> [mailto:<a href="mailto:owner-cc65_at_musoftware.de?Subject=RE:%20[cc65]%20Simple%20PEEK%20&amp;%20POKE%20question.">owner-cc65_at_musoftware.de</a>]On
+Behalf Of Mike McCarty
+Sent: Monday, March 05, 2001 12:25 PM
+To: <a href="mailto:cc65_at_musoftware.de?Subject=RE:%20[cc65]%20Simple%20PEEK%20&amp;%20POKE%20question.">cc65_at_musoftware.de</a>
+Subject: Re: [cc65] Simple PEEK &amp; POKE question.
+
+It's wonderful that you've gotten started like that. I take exception
+to your statement
+
+	For better readability you may want to use macros:
+
+	#define POKE(addr,val)	(*(unsigned char *)(addr)=(val))
+
+This definitely REDUCES readability and obscures what the code
+is doing.
+
+Which code is easier for you to read?
+
+(a)	VideoMode = VIDEO_REVERSE;
+
+(b)	POKE(199,1)	/* Set video mode to reverse */
+
+I agree that macros may enhance readability in this area, but not these
+particular macros. The suggested answer I give is:
+
+	#include &quot;video.h&quot;
+	...
+	VideoMode = VIDEO_REVERSE;
+	...
+
+
+and in video.h we have
+
+	#define VIDEO_REVERSE 1
+
+	#define VideoMode (*(unsigned char *)199)
+
+C has the capability to make code readable and understandable.
+Providing macros with names like PEEK and POKE is an undesireable step
+into the past.
+
+I recommend that people NOT implement PEEK and POKE at all. The direct C
+is more readable than the macros. Even better is to implement macros
+which make the code understandable without having to add comments.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=RE:%20[cc65]%20Simple%20PEEK%20&amp;%20POKE%20question.">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0429.html">Mike McCarty: "RE: [cc65] Simple PEEK &amp; POKE question."</a>
+<li><strong>Previous message:</strong> <a href="0427.html">Mike McCarty: "Re: [cc65] Simple PEEK &amp; POKE question."</a>
+<li><strong>In reply to:</strong> <a href="0425.html">Mike McCarty: "Re: [cc65] Simple PEEK &amp; POKE question."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0429.html">Mike McCarty: "RE: [cc65] Simple PEEK &amp; POKE question."</a>
+<li><strong>Reply:</strong> <a href="0429.html">Mike McCarty: "RE: [cc65] Simple PEEK &amp; POKE question."</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:39 CET</em>
+</em>
+</small>
+</body>
+</html>

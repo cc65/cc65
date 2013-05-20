@@ -1,0 +1,160 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Platform specific docs</title>
+<meta name="Author" content="Shawn Jefferson (shawnjefferson_at_24fightingchickens.com)">
+<meta name="Subject" content="Re: [cc65] Platform specific docs">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Platform specific docs</h1>
+<!-- received="Mon Oct 27 21:06:15 2003" -->
+<!-- isoreceived="20031027200615" -->
+<!-- sent="Mon, 27 Oct 2003 12:03:37 -0800" -->
+<!-- isosent="20031027200337" -->
+<!-- name="Shawn Jefferson" -->
+<!-- email="shawnjefferson_at_24fightingchickens.com" -->
+<!-- subject="Re: [cc65] Platform specific docs" -->
+<!-- id="uctqpv8mq220c3mse5sgvusrlso342p0vd@4ax.com" -->
+<!-- inreplyto="20031018053939.GA30712@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Shawn Jefferson (<a href="mailto:shawnjefferson_at_24fightingchickens.com?Subject=Re:%20[cc65]%20Platform%20specific%20docs"><em>shawnjefferson_at_24fightingchickens.com</em></a>)<br>
+<strong>Date:</strong> 2003-10-27 21:03:37
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3660.html">Ullrich von Bassewitz: "Re: [cc65] Signed comparisions"</a>
+<li><strong>In reply to:</strong> <a href="3654.html">Ullrich von Bassewitz: "Re: [cc65] Platform specific docs"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3662.html">Shawn Jefferson: "Re: [cc65] Platform specific docs"</a>
+<li><strong>Next in thread:</strong> <a href="../2003-09/3446.html">Groepaz: "Re: [cc65] Platform specific docs"</a>
+<li><strong>Reply:</strong> <a href="3662.html">Shawn Jefferson: "Re: [cc65] Platform specific docs"</a>
+<li><strong>Reply:</strong> <a href="3663.html">Shawn Jefferson: "Re: [cc65] Platform specific docs"</a>
+<li><strong>Reply:</strong> <a href="3676.html">Shawn Jefferson: "Re: [cc65] Platform specific docs"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Sat, 18 Oct 2003 07:39:39 +0200, Ullric wrote:
+
+&gt;On Fri, Oct 17, 2003 at 01:14:46PM +0200, Christian Groessler wrote:
+&gt;&gt; I've added a atari.sgml file with your docs to the CVS. You can get it
+&gt;&gt; from the daily snapshot. Please take a look and tell me any omissions,
+&gt;&gt; errors, improvements you might see.
+
+Will there be some mention somewhere of the way the heap location is
+calculated?  My writing on this subject was removed from the
+atari.sgml file, I'm guessing because it is not platform specific.
+However, this did trip me up a little when I went about moving
+segments around in memory.
+
+Here is an addition to the binary format section:
+
+You can utilize multiple load segments in a cc65 executable by
+inserting a segment header ($FF $FF &lt;start memory address&gt; &lt;end memory
+address&gt; ).  Since the start address and end address of the first
+segment is calculated in the crt0.s file from the initial load address
+of your program (default is $2E00) and the end of the BSS segment, you
+will either have to write your own crt0.s and link it to your program,
+or reposition the segments in memory so that the default crt0.s
+calculates the correct values.  An example of the later method
+follows:
+
+[segheader.s]:
+    .import __CODE2_LOAD__, __AUTOSTRT_LOAD__
+
+; SEGMENT HEADER
+    .segment &quot;CHKHDR&quot;
+    .word __CODE2_LOAD__
+    .word __AUTOSTRT_LOAD__ - 1
+    .code
+    .reloc
+
+[atari.cfg]:
+MEMORY {
+    ZP: start = $82, size = $7E, type = rw;
+    HEADER: start = $0000, size = $6, file = %O;
+    RAM1: start = $2000, size = $2000, file = %O;
+    BANK: start = $4000, size = $3FFF, type = ro;
+    SEGHDR: start = $0000, size = $4, file = %O;
+    RAM2: start = $8000, size = $3C1F, file = %O;
+}
+SEGMENTS {
+    EXEHDR: load = HEADER, type = wprot;
+    CODE: load = RAM1, type = wprot, define = yes;
+    BSS: load = RAM1, type = bss, define = yes;
+    CHKHDR: load = SEGHDR, type = wprot;
+    CODE2: load = RAM2, type = wprot, define = yes;
+    DATA: load = RAM2, type = rw;
+    RODATA: load = RAM2, type = wprot;
+    ZEROPAGE: load = ZP, type = zp;
+    AUTOSTRT: load = RAM2, type = wprot, define = yes;
+}
+
+With this setup I have two segments in my executable file that DOS
+will load at $2000 and $8000 respectively, leaving the extended bank
+window ($4000-$7FFF) alone.  Using this method you need to be careful
+not to allocate too much memory since the BSS section is in the
+smaller chunk of memory.  By carefully placing mycode into either
+CODE, or CODE2 segments and not using malloc I was able to avoid any
+potential problems.  As you can see, it may be easier to write your
+own crt0.s file with the modified values.
+
+[end]
+
+Feel free to edit this, or change it around.  This was a first draft
+and I probably didn't put things in the most succinct way possible.
+
+Well, there you go.
+
+
+--
+Shawn Jefferson
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Platform%20specific%20docs">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3660.html">Ullrich von Bassewitz: "Re: [cc65] Signed comparisions"</a>
+<li><strong>In reply to:</strong> <a href="3654.html">Ullrich von Bassewitz: "Re: [cc65] Platform specific docs"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3662.html">Shawn Jefferson: "Re: [cc65] Platform specific docs"</a>
+<li><strong>Next in thread:</strong> <a href="../2003-09/3446.html">Groepaz: "Re: [cc65] Platform specific docs"</a>
+<li><strong>Reply:</strong> <a href="3662.html">Shawn Jefferson: "Re: [cc65] Platform specific docs"</a>
+<li><strong>Reply:</strong> <a href="3663.html">Shawn Jefferson: "Re: [cc65] Platform specific docs"</a>
+<li><strong>Reply:</strong> <a href="3676.html">Shawn Jefferson: "Re: [cc65] Platform specific docs"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-10-27 21:06:44 CET</em>
+</em>
+</small>
+</body>
+</html>

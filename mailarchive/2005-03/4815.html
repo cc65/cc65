@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="iso-8859-15"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] cl65 ignoring -I option for as</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="[cc65] cl65 ignoring -I option for assembler files, while ca65 does not?" />
+<meta name="Date" content="2005-03-13" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] cl65 ignoring -I option for assembler files, while ca65 does not?</h1>
+<!-- received="Sun Mar 13 17:22:51 2005" -->
+<!-- isoreceived="20050313162251" -->
+<!-- sent="Sun, 13 Mar 2005 17:22:41 +0100" -->
+<!-- isosent="20050313162241" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="[cc65] cl65 ignoring -I option for assembler files, while ca65 does not?" -->
+<!-- id="20050313162241.GA28257@mail.trikaliotis.net" -->
+<!-- charset="iso-8859-15" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4816.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] cl65 ignoring -I option for assembler files, while ca65 does not?&quot;">Next message</a> ]
+[ <a href="4814.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Problem with 16/32-bit variables and conditions&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4816.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] cl65 ignoring -I option for assembler files, while ca65 does not?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20[cc65]%20cl65%20ignoring%20-I%20option%20for%20assembler%20files,%20while%20ca65%20does%20not?">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-03-13 17:22:41</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello,
+
+I believe cl65 called for assembler files ignores the -I (--include-dir)
+option (line breaks with \ by me), while ca65 does not:
+
+$ ca65  -I ../ --feature labels_without_colons --feature pc_assignment \
+  --feature loose_char_term -o ../  pp1541.tmp ../pp1541.a65
+
+$ cl65  -I ../ -c --feature labels_without_colons --feature pc_assignment \
+  --feature loose_char_term -o ../  pp1541.tmp ../pp1541.a65
+../pp1541.a65(14): Error: Cannot open include file `pp1571.a65': No such file or directory
+
+$ cat ../pp1541.a65
+Drive1541       = 1
+.include &quot;pp1571.a65&quot;
+
+$ cat ../pp1571.a65
+        *=$0500
+        rts
+
+It does not matter if I try different names for the include directories
+(for example, using the full path), the result stays the same. Is this a
+bug, or am I missing something?
+
+Regards,
+   Spiro.
+
+-- 
+Spiro R. Trikaliotis
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>
+<a href="http://cbm4win.sf.net/">http://cbm4win.sf.net/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Mar 13 17:22:51 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4816.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] cl65 ignoring -I option for assembler files, while ca65 does not?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4814.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Problem with 16/32-bit variables and conditions"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4816.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] cl65 ignoring -I option for assembler files, while ca65 does not?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4816.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] cl65 ignoring -I option for assembler files, while ca65 does not?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4815" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4815" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4815" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-03-13 17:22:57 CET
+</em></small></p>
+</body>
+</html>

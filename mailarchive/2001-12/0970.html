@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] Compile problem</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] Compile problem">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] Compile problem</h1>
+<!-- received="Tue Dec 11 20:41:08 2001" -->
+<!-- isoreceived="20011211194108" -->
+<!-- sent="Tue, 11 Dec 2001 20:40:01 +0100" -->
+<!-- isosent="20011211194001" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] Compile problem" -->
+<!-- id="49491957.20011211204001@gmx.net" -->
+<!-- inreplyto="20011211130802.C3801@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20Compile%20problem"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2001-12-11 20:40:01
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0971.html">Marko Mäkelä: "Re: [cc65] Compile problem"</a>
+<li><strong>Previous message:</strong> <a href="0969.html">groepaz: "Re[4]: [cc65] Compile problem"</a>
+<li><strong>In reply to:</strong> <a href="0968.html">Ullrich von Bassewitz: "Re: [cc65] Compile problem"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0971.html">Marko Mäkelä: "Re: [cc65] Compile problem"</a>
+<li><strong>Reply:</strong> <a href="0971.html">Marko Mäkelä: "Re: [cc65] Compile problem"</a>
+<li><strong>Reply:</strong> <a href="0977.html">Ullrich von Bassewitz: "Re: [cc65] Compile problem"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+UvB&gt; While handling of Unix paths is rather easy, since the notification is clean
+UvB&gt; and orthogonal, DOS and Windows paths are a mess. There may be:
+
+UvB&gt;   1. absolute paths without a drive
+
+UvB&gt;   2. absolute paths including a drive
+
+UvB&gt;   3. relative paths without a drive spec
+
+UvB&gt;   4. relative paths including a drive spec
+
+UvB&gt;   5. network paths using the \\server\share\sub\dir notification
+
+UvB&gt; All these need different handling and platform dependent routines that are
+UvB&gt; different from compiler to compiler because they are non standard (e.g. get
+UvB&gt; the current drive, get the current path on another drive, and so on).
+
+mmmmmmh
+
+1) at program start, get current working dir and remember that
+2) whenever you want to access files from the current working dir (as
+in, from where the tool has been launched), or any paths relative to
+it, prepend the path remembered before.
+3) whenever you access (read) a sourcefile, set current working dir to
+directory of that file
+4) to avoid breaking existing code, always search current working directory
+last.
+
+i think that might even work in a portable way (getcwd/setcwd should
+be available everywhere no?) - well except a &quot;collapsepath&quot;
+functionality would be needed for &quot;OSes&quot; like ms-dos...
+
+just an idea that came to my mind (well you know you always think
+about totally unrelated things when supposed to do boring
+work...writing docfiles....*sigh* ;=))
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20Compile%20problem">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20Compile%20problem">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0971.html">Marko Mäkelä: "Re: [cc65] Compile problem"</a>
+<li><strong>Previous message:</strong> <a href="0969.html">groepaz: "Re[4]: [cc65] Compile problem"</a>
+<li><strong>In reply to:</strong> <a href="0968.html">Ullrich von Bassewitz: "Re: [cc65] Compile problem"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0971.html">Marko Mäkelä: "Re: [cc65] Compile problem"</a>
+<li><strong>Reply:</strong> <a href="0971.html">Marko Mäkelä: "Re: [cc65] Compile problem"</a>
+<li><strong>Reply:</strong> <a href="0977.html">Ullrich von Bassewitz: "Re: [cc65] Compile problem"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:44 CET</em>
+</em>
+</small>
+</body>
+</html>

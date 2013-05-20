@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] cl65 -t apple2 works, but </title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't" />
+<meta name="Date" content="2007-09-09" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't</h1>
+<!-- received="Sun Sep  9 16:17:43 2007" -->
+<!-- isoreceived="20070909141743" -->
+<!-- sent="Sun, 9 Sep 2007 16:16:50 +0200" -->
+<!-- isosent="20070909141650" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't" -->
+<!-- id="003001c7f2ec$10fc6ad0$0300a8c0@PC" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="46E3BE6C.7010307&#64;alfter.us" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5861.html" title="Scott Alfter: &quot;Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't&quot;">Next message</a> ]
+[ <a href="5859.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't&quot;">Previous message</a> ]
+[ <a href="5858.html" title="Scott Alfter: &quot;[cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20cl65%20-t%20apple2%20works,%20but%20cl65%20-C%20apple2.cfg%20doesn't">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-09-09 16:16:50</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Scott,
+
+&gt; Unresolved external `__RAM_SIZE__' referenced in:
+&gt;  crt0.s(13)
+&gt; Unresolved external `__RAM_START__' referenced in:
+&gt;  crt0.s(13)
+&gt; ld65: Error: 2 unresolved external(s) found - cannot create output file
+
+As Uz already pointed out some version mismatch.
+
+&gt; it works, and the binary produced works as long as I skip the first four 
+&gt; bytes
+&gt; (which the docs call a &quot;DOS 3.3 header,&quot; but I don't recall such a header 
+&gt; ever
+&gt; being necessary way back when I was still using DOS 3.3,
+
+Fortunately this fact doesn't depend on your memory ;-)
+
+&gt; and I suspect most
+&gt; people coding for the Apple II today are targeting ProDOS).
+
+Maybe, maybe not. However there are two reasons for the header:
+
+1. ProDOS binary files have no &quot;inband&quot; load address attribute. So one would 
+need to remember it when transfering the file to ProDOS and set it correctly 
+in the ProDOS directory manually - quite cumbersome.
+
+2. There are way more Apple2 disk image tools for DOS 3.3 than for ProDOS. 
+Therefore it is popular to first import the binary into a DOS 3.3 image 
+(including the header) and then transfer it into a ProDOS image using some 
+suitable apple2 program (which all know about the header, strip it and set 
+the load address in ProDOS directory automatically) inside an emulator.
+
+As you see the DOS 3.3 header is quite reasoned, even if the primary 
+environment is ProDOS.
+
+Best, Oliver 
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Sep  9 16:17:43 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5861.html" title="Next message in the list">Scott Alfter: "Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5859.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5858.html" title="Message to which this message replies">Scott Alfter: "[cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5860" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5860" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5860" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-09-09 16:17:46 CEST
+</em></small></p>
+</body>
+</html>

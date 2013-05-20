@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] floating point support red</title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="Re: [cc65] floating point support redux" />
+<meta name="Date" content="2010-04-09" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] floating point support redux</h1>
+<!-- received="Fri Apr  9 01:14:53 2010" -->
+<!-- isoreceived="20100408231453" -->
+<!-- sent="Fri, 9 Apr 2010 01:14:25 +0200" -->
+<!-- isosent="20100408231425" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="Re: [cc65] floating point support redux" -->
+<!-- id="201004090114.25773.groepaz@gmx.net" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="20100408190843.GE1405&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8033.html" title="rhurst1bidmc.harvard.edu: &quot;RE: [cc65] cc65 package for RPM Fusion&quot;">Next message</a> ]
+[ <a href="8031.html" title="Kevin Schuetz: &quot;Re: [cc65] floating point support redux&quot;">Previous message</a> ]
+[ <a href="8030.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] floating point support redux&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8196.html" title="Aaron J. Grier: &quot;[cc65] Re: floating point support redux&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20floating%20point%20support%20redux">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-04-09 01:14:25</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Donnerstag 08 April 2010, Ullrich von Bassewitz wrote:
+&gt; On Thu, Apr 08, 2010 at 06:29:47PM +0200, Groepaz wrote:
+&gt; &gt; - the compiler uses ieee754 floats. same calling conventions as for 32bit
+&gt; &gt; longs can be used. (optionally, doubles can be made the same as floats)
+&gt; 
+&gt; I've fiddled with that idea for quite some time and I still do like it. But
+&gt;  it has one crucial problem: The C standard demands a higher precision for
+&gt;  doubles than what 32 bit IEEE floats deliver. So while it has several
+&gt;  advantages (one being that the compiler and runtime already know how to
+&gt;  handle 32 bit values), not being standards compliant is really something
+&gt;  to ponder.
+&gt; 
+&gt; A standards compliant double needs 34 bits in the mantissa (10 digits of
+&gt; precision), so it needs 64 bit IEEE floats or some non standard format.
+
+yes ofcourse ... in case of cc65, i would still mostly ignore actual doubles, 
+and threat them the same as floats, because well... it doesnt matter :) it 
+could just aswell not support doubles at all, simply because they are way to 
+slow, and having a compiler option like above would be a simple convenience 
+thing, saving a typedef or so =P
+
+-- 
+
+<a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    <a href="http://magicdisk.untergrund.net">http://magicdisk.untergrund.net</a>
+<a href="http://www.pokefinder.org">http://www.pokefinder.org</a>        <a href="http://ftp.pokefinder.org">http://ftp.pokefinder.org</a>
+
+The general rule about people on the internet seems to be 'attractive, single, 
+mentally stable'... now,choose two
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Apr  9 01:14:53 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8033.html" title="Next message in the list">rhurst1bidmc.harvard.edu: "RE: [cc65] cc65 package for RPM Fusion"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8031.html" title="Previous message in the list">Kevin Schuetz: "Re: [cc65] floating point support redux"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8030.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] floating point support redux"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8196.html" title="Next message in this discussion thread">Aaron J. Grier: "[cc65] Re: floating point support redux"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8032" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8032" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8032" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-04-09 01:14:56 CEST
+</em></small></p>
+</body>
+</html>

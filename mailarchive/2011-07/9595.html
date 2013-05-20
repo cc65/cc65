@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] TGI bitmap font problem</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="[cc65] TGI bitmap font problem" />
+<meta name="Date" content="2011-07-17" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] TGI bitmap font problem</h1>
+<!-- received="Sun Jul 17 15:29:09 2011" -->
+<!-- isoreceived="20110717132909" -->
+<!-- sent="Sun, 17 Jul 2011 15:29:01 +0200" -->
+<!-- isosent="20110717132901" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="[cc65] TGI bitmap font problem" -->
+<!-- id="20110717132901.GA27564@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9596.html" title="marcas: &quot;[cc65] sizof zp registers&quot;">Next message</a> ]
+[ <a href="9594.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] TGI bitmap fnts revisited&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9599.html" title="Greg King: &quot;Re: [cc65] TGI bitmap font problem&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20TGI%20bitmap%20font%20problem">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-07-17 15:29:01</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>There's a problem with scaled bitmap fonts when using a 8.8 fixed point
+scaling factor: Where does the next character begin?
+
+Assume a text string staring at 100/100 with a scaling of $180 (= 1.5). If the
+width of the font is 9, the character would be scaled using 1.5, which gives a
+width of 9 * 1.5 = 13.5. Does the next character begin at 113.5, 113 or 114?
+
+What if we have a scale factor of $140 (= 1.25). In the example above, the
+width would be 9 * 1.25 = 11.25. 
+
+Assuming we start the next char at the next full pixel, string width
+calculation becomes really complex, because it is not just width*length, but
+for each character, the width has to be added and rounding has to be done.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Jul 17 15:29:09 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9596.html" title="Next message in the list">marcas: "[cc65] sizof zp registers"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9594.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] TGI bitmap fnts revisited"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9599.html" title="Next message in this discussion thread">Greg King: "Re: [cc65] TGI bitmap font problem"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9599.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] TGI bitmap font problem"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9595" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9595" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9595" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-07-17 15:29:13 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Using ptr3 gives range error</title>
+<meta name="Author" content="Stefan Wessels (swessels1email.com)" />
+<meta name="Subject" content="[cc65] Using ptr3 gives range error" />
+<meta name="Date" content="2010-12-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Using ptr3 gives range error</h1>
+<!-- received="Wed Dec 29 07:52:38 2010" -->
+<!-- isoreceived="20101229065238" -->
+<!-- sent="Tue, 28 Dec 2010 22:52:28 -0800" -->
+<!-- isosent="20101229065228" -->
+<!-- name="Stefan Wessels" -->
+<!-- email="swessels1email.com" -->
+<!-- subject="[cc65] Using ptr3 gives range error" -->
+<!-- id="A749A001-AC05-4662-9D4C-826BC7F48DF8@email.com" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9082.html" title="thefox xofeht: &quot;Re: [cc65] Using ptr3 gives range error&quot;">Next message</a> ]
+[ <a href="9080.html" title="Dan Winslow: &quot;RE: [cc65] Re: Patch for reading a 'volatile' pointer&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9082.html" title="thefox xofeht: &quot;Re: [cc65] Using ptr3 gives range error&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Stefan Wessels &lt;<a href="mailto:swessels1email.com?Subject=Re:%20[cc65]%20Using%20ptr3%20gives%20range%20error">swessels1email.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-12-29 07:52:28</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+I am writing some inline assembler and when I compile, I get an &quot;Error: Range error&quot; message on a line that says asm(&quot;sta (ptr3),y&quot;);
+
+Looking in the generated .s file, I see this:
+	.importzp	sp, sreg, regsave, regbank, tmp1, ptr1, ptr2
+No ptr3 listed.  If I now manually add ptr3 to the line and then compile using the generated .s file instead of the .c file, then the compilation goes fine.  I couldn't find anything in the manual about getting ptr3, ptr4, etc. imported.  I tried -u ptr3 (or --force-import ptr3) to no avail.  
+
+Is this a bug, am I not able to use these in my code or am I missing a step somewhere?  Using the 20101223 snapshot.
+
+Thank you
+Stefan
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Dec 29 07:52:38 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9082.html" title="Next message in the list">thefox xofeht: "Re: [cc65] Using ptr3 gives range error"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9080.html" title="Previous message in the list">Dan Winslow: "RE: [cc65] Re: Patch for reading a 'volatile' pointer"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9082.html" title="Next message in this discussion thread">thefox xofeht: "Re: [cc65] Using ptr3 gives range error"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9082.html" title="Message sent in reply to this message">thefox xofeht: "Re: [cc65] Using ptr3 gives range error"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9083.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Using ptr3 gives range error"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9081" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9081" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9081" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-12-29 07:52:41 CET
+</em></small></p>
+</body>
+</html>

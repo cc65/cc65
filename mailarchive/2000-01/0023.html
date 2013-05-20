@@ -1,0 +1,183 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Back on Track</title>
+<meta name="Author" content="Spiro Trikaliotis (Spiro.Trikaliotis_at_gmx.de)">
+<meta name="Subject" content="Re: [cc65] Back on Track">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Back on Track</h1>
+<!-- received="Fri Jan 21 00:06:40 2000" -->
+<!-- isoreceived="20000120230640" -->
+<!-- sent="Fri, 21 Jan 2000 00:03:45 +0100" -->
+<!-- isosent="20000120230345" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="Spiro.Trikaliotis_at_gmx.de" -->
+<!-- subject="Re: [cc65] Back on Track" -->
+<!-- id="000e01bf639a$d724f4a0$0171a8c0@bonn" -->
+<!-- inreplyto="[cc65] Back on Track" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Spiro Trikaliotis (<a href="mailto:Spiro.Trikaliotis_at_gmx.de?Subject=Re:%20[cc65]%20Back%20on%20Track"><em>Spiro.Trikaliotis_at_gmx.de</em></a>)<br>
+<strong>Date:</strong> 2000-01-21 00:03:45
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0024.html">Martin Ancher Holm - Bankdata: "Sv: [cc65] Back on Track"</a>
+<li><strong>Previous message:</strong> <a href="0022.html">Spiro Trikaliotis: "Re: [cc65] cc65 and VICE"</a>
+<li><strong>Maybe in reply to:</strong> <a href="0013.html">Groepaz: "[cc65] Back on Track"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi Groepaz,
+
+let's make a statement to some of your statements...
+
+
+&gt;however, seeking WILL also be supported by the kernal-driver, but will perform
+&gt;awfully bad ofcoz (only way to seek would be to read sequentially from the
+&gt;start,
+
+Well, you could keep a seek pointer with every file, so at least forward
+seeks would be possible w/o going through the _whole_ file.
+
+Another way would be to only read the 2 first bytes from the needed blocks
+from the disc, so you would need need to transfer all the unneeded bytes
+over the serial bus, this should speed up the seek a little. You could
+also keep track of all these link bytes once read (i.e., when the first
+seek is started), so you can make further seeks() much more faster...
+
+
+&gt;there will be, however, a somewhat 'generic' driver for floppy-drives though,
+&gt;that
+&gt;will support real seeking via direkt disc-access.
+
+Hm, it seems you thought about something similar to my thoughts above,
+didn't you?
+
+
+&gt;&gt; The low level functions should handle three file descriptors without any
+&gt;&gt; further action:
+&gt;&gt;         0       stdin
+&gt;&gt;         1       stdout
+&gt;&gt;         2       stderr
+
+&gt;ehrm... /me confused =) ... do you mean that first descriptor my open() returns
+&gt;should be 3
+
+Well, Ullrich obviously means that, yes.
+
+
+&gt;and whenever my read/write routines are called with descriptors 0-2
+&gt;as parameters they should simply map the call to stdin etc ?
+
+No, I don't believe that is meant.
+
+
+The descriptors 0-2 are like any other descriptor.
+
+It's best to think the following way:
+When starting up, your routines should perform something like
+
+open 0,0,0 : rem open keyboard as stdin
+open 1,3,0 : rem open screen as stdout
+open 2,3,0 : rem open screen as stderr
+
+(well, on Unix/DOS/WIN, these are not opened by the startup code
+but rather by the OS.)
+
+So, the special processing of handles 0-2 is not in the i/o routines
+but in the initialization.
+
+&gt;IF so, what is the
+&gt;standard way to SET what IS the, eg, stdin ?! (what c-function ? or should the
+&gt;OS somehow define this?)
+
+Well, under Unices, DOS &amp; WIN, the OS is the one who can redefine them.
+On the other, it is also possible for a program to close a handle
+and re-open it, so that's the standard way to redefine them.
+
+
+&gt;&gt; With this in mind, the current behaviour of printf() makes sense: It
+&gt;&gt; writes to stdout which is mapped to the file handle with the value one.
+
+&gt;well.... ehrm... yes it MAKES some kind of sence, if you would consider the cbm
+&gt;kernal calls beeing standard C-style i/o functions. [...]
+&gt;[....] but if you WANTED to do
+&gt;that, it would mean that printf had to call my filesystem and pass its data
+&gt;through it... making screenoutput via printf unacceptable slow.
+
+Well, couldn't you make a fast check beforehand whether the output will
+go to screen, if so, your routine could use a 'short way', something
+that the C64 kernal does in $F1CA-$F1D2?
+
+
+
+&gt;&gt; It should even be possible to close or reopen the first three file
+&gt;&gt; descriptors, so the best way is probably to open them using the normal
+&gt;&gt; kernal calls at program start.
+
+&gt;now this sentence confuses me again... so CBM_KERNAL file-descriptors 0-2 ????
+&gt;(nonononono that dont make sence ;=P)
+
+Yes, exactly, these three file handles are no different from the others
+disregarding their initialization.
+
+
+&gt;&gt; I have some specification on the 1571 (that I found on the Internet),
+&gt;&gt; that even includes specification on the build-in MFM-controller. A
+&gt;&gt; driver to read PC-disks in 1571 and 1581 can be made.
+
+&gt;in electronic format? gimme! :=P
+
+Me too (at least URL, please)!
+
+
+Spiro.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Back%20on%20Track">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0024.html">Martin Ancher Holm - Bankdata: "Sv: [cc65] Back on Track"</a>
+<li><strong>Previous message:</strong> <a href="0022.html">Spiro Trikaliotis: "Re: [cc65] cc65 and VICE"</a>
+<li><strong>Maybe in reply to:</strong> <a href="0013.html">Groepaz: "[cc65] Back on Track"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:35 CET</em>
+</em>
+</small>
+</body>
+</html>

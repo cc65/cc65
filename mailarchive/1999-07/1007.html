@@ -1,0 +1,168 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Register variables</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Register variables">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Register variables</h1>
+<!-- received="Mon Jul 19 08:35:21 1999" -->
+<!-- isoreceived="19990719063521" -->
+<!-- sent="Mon, 19 Jul 1999 08:35:10 +0200 (MEST)" -->
+<!-- isosent="19990719063510" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Register variables" -->
+<!-- id="m116715-000brTC@wuschel.musoftware.de" -->
+<!-- inreplyto="Pine.OSF.4.10.9907190906540.28537-100000@meripihka.hut.fi" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Register%20variables"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 1999-07-19 08:35:10
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="1008.html">Marko Mäkelä: "Re: [cc65] Register variables"</a>
+<li><strong>Previous message:</strong> <a href="1006.html">Marko Mäkelä: "Re: [cc65] Register variables"</a>
+<li><strong>In reply to:</strong> <a href="1006.html">Marko Mäkelä: "Re: [cc65] Register variables"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1008.html">Marko Mäkelä: "Re: [cc65] Register variables"</a>
+<li><strong>Reply:</strong> <a href="1008.html">Marko Mäkelä: "Re: [cc65] Register variables"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+&gt; Couldn't you forbid the &amp; operator for register variables?
+
+Unfortunately, the standard does not allow that. Forbidding the &amp; operator for
+register variables would be the last resort.
+
+&gt; Or save the
+&gt; register calls on the stack before the function call and pass the address
+&gt; of the stack location?  Note that for the latter, you must handle nested
+&gt; function calls properly, e.g. f(g(&amp;x)) must store x on stack before
+&gt; calling g and restore it after calling x.  And I think the standard would
+&gt; allow you to do f(g(&amp;x),x) in the same way: even if g() modifies x, it is
+&gt; implementation-defined whether f() gets the modified x as its second
+&gt; parameter.
+
+The evaluation order of parameters in a function call is undefined, so the
+latter wouldn't be a problem. Putting the variable into main store temporarily
+is no solution either, since it will break the following code:
+
+ 	static char* p;
+
+	void f1 (char* s)
+	{
+	    p = s;
+	}
+
+	void f2 (char c)
+	{
+	    *p = c;
+	}
+
+	void f (void)
+	{
+	    register char c;
+	    ...
+	    f1 (&amp;c);
+	    ...
+	    f2 (c);
+	}
+	       
+To be really sure, a register variable that has its address taken must not go
+into a register (gcc is doing it this way). Unfortunately, the cc65 parser is
+too stupid to do things like that (when it sees the address operator, the code
+to put the variable into zero page storage has already been generated, and
+there is no way back).
+
+If no one has a better idea, my solution will probably be to disable register
+variables by default. Register variables must be enabled explicitly (-Or or
+something similar) and if you do that, taking the address of a register
+variable will cause a warning. There will be another switch (or a #pragma) to
+disable this warning, in case you're really sure, your code is right (there
+are places in the C library where this is the case). Another option will allow
+the compiler to save the old register variable contents onto the call stack
+(at $100). The space on the call stack is limited, but saving the variables
+onto the call stack is much faster.
+
+&gt; Remember that you will have to store register variables on stack every
+&gt; time you call a function that has register variables or that calls a
+&gt; function that has register variables.  I guess it's easiest to always
+&gt; store the register variables before every function call.  Some life-time
+&gt; analysis could be useful: if a variable is only used in the beginning of
+&gt; a function, you can discard it when doing a function call at the end of
+&gt; the function.
+
+The old values of register variables are of course saved in a function that
+uses register variables. The current parser is very simple, so there is no
+chance to do a life time analysis, the parser does generate assembler code
+directly instead of producing an AST.
+
+&gt; How does it work then?  What kind of a parser is it?  Hand-written
+&gt; top-down or what?
+
+It's a hand written recursive descent parser that generates assembler code
+directly (remember: cc65 is a descendant of Small-C). The optimizer runs
+through the assembler code and searches for specific patterns that are
+generated by the code generator. It does also remove unnecessary load
+instructions.
+
+Regards
+
+
+
+	Uz
+
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Register%20variables">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Register%20variables">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="1008.html">Marko Mäkelä: "Re: [cc65] Register variables"</a>
+<li><strong>Previous message:</strong> <a href="1006.html">Marko Mäkelä: "Re: [cc65] Register variables"</a>
+<li><strong>In reply to:</strong> <a href="1006.html">Marko Mäkelä: "Re: [cc65] Register variables"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1008.html">Marko Mäkelä: "Re: [cc65] Register variables"</a>
+<li><strong>Reply:</strong> <a href="1008.html">Marko Mäkelä: "Re: [cc65] Register variables"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:44 CET</em>
+</em>
+</small>
+</body>
+</html>

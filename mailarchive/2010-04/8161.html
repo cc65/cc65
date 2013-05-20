@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] How to prototype an assemb</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] How to prototype an assembler function?" />
+<meta name="Date" content="2010-04-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] How to prototype an assembler function?</h1>
+<!-- received="Sun Apr 25 10:00:42 2010" -->
+<!-- isoreceived="20100425080042" -->
+<!-- sent="Sun, 25 Apr 2010 10:00:34 +0200" -->
+<!-- isosent="20100425080034" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] How to prototype an assembler function?" -->
+<!-- id="20100425080034.GA19953@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="u2h1adf4c761004241710jfc8d00f1vad4bca96bcbf578f&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8162.html" title="Payton Byrd: &quot;Re: [cc65] OT: Where to get some help?&quot;">Next message</a> ]
+[ <a href="8160.html" title="Groepaz: &quot;Re: [cc65] Commodore PET keyboard scanning&quot;">Previous message</a> ]
+[ <a href="8157.html" title="Payton Byrd: &quot;[cc65] How to prototype an assembler function?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8163.html" title="Payton Byrd: &quot;Re: [cc65] How to prototype an assembler function?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20How%20to%20prototype%20an%20assembler%20function?">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-04-25 10:00:34</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Sat, Apr 24, 2010 at 07:10:58PM -0500, Payton Byrd wrote:
+&gt; I've read the CA65 docs and cannot find an example of this.  What I want to
+&gt; do is call the following assembler functions from C code.  So I've written
+&gt; this code as PlatformSpecific.s and it compiles fine:
+[...]
+
+Please try the following: Write separate C module with a small C function that
+matches the requirements. Be sure to use the parameters, so the compiler
+generates access code for them. Example:
+
+        static char r, v;
+
+        void WriteVDC (unsigned char reg, unsigned char val)
+        {
+            /* Use the parameters */
+            r = reg;
+            v = val;
+        }
+
+Then compile the source using &quot;-g -T&quot; on the command line. Have a look at the
+resulting code. This will show you, how the values are passed and used.
+
+As an alternative, have a look at the assembler functions in the sources of
+the library. For example the ones you have already used, like textcolor(),
+_sys() or cputs(). There's a lot of valuable information in there.
+
+With this information, you can change your VDC access functions so they're C
+callable.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Apr 25 10:00:42 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8162.html" title="Next message in the list">Payton Byrd: "Re: [cc65] OT: Where to get some help?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8160.html" title="Previous message in the list">Groepaz: "Re: [cc65] Commodore PET keyboard scanning"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8157.html" title="Message to which this message replies">Payton Byrd: "[cc65] How to prototype an assembler function?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8163.html" title="Next message in this discussion thread">Payton Byrd: "Re: [cc65] How to prototype an assembler function?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8163.html" title="Message sent in reply to this message">Payton Byrd: "Re: [cc65] How to prototype an assembler function?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8161" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8161" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8161" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-04-25 10:00:45 CEST
+</em></small></p>
+</body>
+</html>

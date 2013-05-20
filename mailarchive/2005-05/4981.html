@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="iso-8859-15"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] New .IDENT function</title>
+<meta name="Author" content="42Bastian Schick (bastian421monlynx.de)" />
+<meta name="Subject" content="Re: [cc65] New .IDENT function" />
+<meta name="Date" content="2005-05-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] New .IDENT function</h1>
+<!-- received="Tue May 10 08:34:58 2005" -->
+<!-- isoreceived="20050510063458" -->
+<!-- sent="Tue, 10 May 2005 08:34:49 +0200" -->
+<!-- isosent="20050510063449" -->
+<!-- name="42Bastian Schick" -->
+<!-- email="bastian421monlynx.de" -->
+<!-- subject="Re: [cc65] New .IDENT function" -->
+<!-- id="opsqjq8bki4jhyy0@smtp.monlynx.de" -->
+<!-- charset="iso-8859-15" -->
+<!-- inreplyto="opsqjqdcmc4jhyy0&#64;smtp.monlynx.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4982.html" title="Karri Kaksonen: &quot;Re: [cc65] New .IDENT function&quot;">Next message</a> ]
+[ <a href="4980.html" title="42Bastian Schick: &quot;Re: [cc65] New .IDENT function&quot;">Previous message</a> ]
+[ <a href="4980.html" title="42Bastian Schick: &quot;Re: [cc65] New .IDENT function&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4982.html" title="Karri Kaksonen: &quot;Re: [cc65] New .IDENT function&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: 42Bastian Schick &lt;<a href="mailto:bastian421monlynx.de?Subject=Re:%20[cc65]%20New%20.IDENT%20function">bastian421monlynx.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-05-10 08:34:49</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>42Bastian Schick &lt;bastian42&#64;monlynx&#46;<!--nospam-->de&gt; schrieb am Tue, 10 May 2005 
+08:16:14 +0200:
+
+&gt; Ullrich
+&gt;
+&gt;&gt; I've added a new pseudo function named .ident. Its purpose is to make an
+&gt;&gt; identifier from a string. Example:
+&gt;&gt;
+&gt;&gt;         .macro  makelabel       arg1, arg2
+&gt;&gt;                 .ident (.concat (arg1, arg2)):
+&gt;&gt;         .endmacro
+&gt;&gt;
+&gt;&gt;                 makelabel       &quot;foo&quot;, &quot;bar&quot;
+&gt;&gt;
+&gt;&gt;                 .word           foobar          ; Valid label
+&gt;&gt;
+&gt;&gt; If the argument of .ident starts with the current .localchar, it is 
+&gt;&gt; converted
+&gt;&gt; into a cheap local identifer.
+&gt;
+&gt; Nice new feature.
+&gt;
+&gt; Actually it would be interessing if following works (using .set as 
+&gt; variable :-)
+&gt;
+&gt; nesting .set 0
+&gt; elseuse .set 0
+&gt; 	.macro IFEQ arg
+&gt; nesting .set nesting + 1
+&gt; 	cmp	#arg
+&gt; 	bne	.ident(.concat(&quot;_else&quot;,.STRING(nesting)))
+&gt; 	.endmacro
+&gt;
+&gt; 	.macro ELSE
+&gt; elseuse .set elseuse + 1
+&gt; 	bra	.indent(.concat(&quot;_endif&quot;,.STRING(nesting)))
+&gt; .indent(&quot;_else&quot;,.STRING(nesting)):
+&gt; 	.endmacro
+&gt;
+&gt;
+&gt; 	.macro ENDIF
+&gt;    .if elseuse == nesting
+&gt; elseuse .set elseuse - 1
+&gt;    .else
+&gt; .indent(&quot;_else&quot;,.STRING(nesting))
+&gt;    .endif
+&gt; .indent(&quot;_endif&quot;,.STRING(nesting)):
+&gt; nesting .set nesting - 1
+&gt; 	.endmacro
+&gt;
+&gt; Now:
+&gt; 	IFEQ 10
+&gt; 	lda test
+&gt; 	ELSE
+&gt; 	lda game
+&gt; 	ENDIF
+&gt;
+&gt; would be possible.
+&gt;
+&gt; But it seems it is not possible to build a string out of a number...
+
+With a small change in FuncString:
+     if ( Tok == TOK_EQ ){
+      	/* Numeric expression containing identifiers* /
+         long Val;
+	NextTok ();
+	Val = ConstExpression ();
+      	sprintf (Buf, &quot;%ld&quot;, Val);
+     } else  if (Tok == TOK_IDENT || Tok == TOK_LOCAL_IDENT) {
+
+following works:
+q = 10
+  .ident(.concat(&quot;a&quot;,.string(=q))):
+	.byte .string(=q) ; &quot;10&quot;
+	.byte .string(q)  ; &quot;q&quot;
+	.byte .string(=q+10) &quot;20&quot;
+	jmp	a10
+
+BTW: Sorry for putting hands on the sources, but they are simply inviting 
+...
+
+-- 
+42Bastian Schick
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue May 10 08:34:58 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4982.html" title="Next message in the list">Karri Kaksonen: "Re: [cc65] New .IDENT function"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4980.html" title="Previous message in the list">42Bastian Schick: "Re: [cc65] New .IDENT function"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4980.html" title="Message to which this message replies">42Bastian Schick: "Re: [cc65] New .IDENT function"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4982.html" title="Next message in this discussion thread">Karri Kaksonen: "Re: [cc65] New .IDENT function"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4982.html" title="Message sent in reply to this message">Karri Kaksonen: "Re: [cc65] New .IDENT function"</a></li>
+<li><dfn>Reply</dfn>:  <a href="4985.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] New .IDENT function"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4981" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4981" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4981" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-05-10 08:35:01 CEST
+</em></small></p>
+</body>
+</html>

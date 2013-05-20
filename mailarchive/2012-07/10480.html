@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Common macros for dirent.d</title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="Re: [cc65] Common macros for dirent.d_type" />
+<meta name="Date" content="2012-07-07" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Common macros for dirent.d_type</h1>
+<!-- received="Sat Jul  7 12:21:09 2012" -->
+<!-- isoreceived="20120707102109" -->
+<!-- sent="Sat, 7 Jul 2012 12:20:57 +0200" -->
+<!-- isosent="20120707102057" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="Re: [cc65] Common macros for dirent.d_type" -->
+<!-- id="201207071220.57974.groepaz@gmx.net" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="D3576AD5-1E74-46C4-A3EA-671589B2D479&#64;wfmh.org.pl" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10481.html" title="A. Fachat: &quot;Re: [cc65] Common macros for dirent.d_type&quot;">Next message</a> ]
+[ <a href="10479.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Common macros for dirent.d_type&quot;">Previous message</a> ]
+[ <a href="10479.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Common macros for dirent.d_type&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10481.html" title="A. Fachat: &quot;Re: [cc65] Common macros for dirent.d_type&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20Common%20macros%20for%20dirent.d_type">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-07-07 12:20:57</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Saturday 07 July 2012, you wrote:
+&gt; On 2012-07-07, at 05:13, Groepaz wrote:
+&gt; &gt; On Friday 06 July 2012, you wrote:
+&gt; &gt;&gt; CBM DOS filetypes are similar in function to beloved msdos filename
+&gt; &gt;&gt; extensions, aren't they?
+&gt; &gt; 
+&gt; &gt; not at ALL.
+&gt; 
+&gt; Why? They are both part of metadata of the file. They both suggest what the
+&gt; content may be. They both suggest what you might do with the file. They
+&gt; both impose some restrictions on how they are handled by default...
+
+yet every program i remember that determines what files on a disk it can use 
+for whatever, does that by looking at the filename (except geos maybe? :)). 
+the filetype is always implied.
+
+&gt; &gt;&gt; Why then examples in the books about programming data access using
+&gt; &gt;&gt; sequential files uses SEQ files? Do you think the authors were stupid?
+&gt; &gt; 
+&gt; &gt; they were making examples for TEXT files.
+&gt; 
+&gt; Which might be the most common / easiest to explain type of use. Yet I
+&gt; don't recall any of them saying &quot;don't use SEQ for anything else than
+&gt; textual data&quot;. It is rather just plain natural to use SEQ when it comes to
+&gt; sequential DATA. Which is BTW the same what CBM DOS does when opening file
+&gt; for writing with appropriate secondary address! I admit that for a long
+&gt; moment I was fooled by your argument that &quot;BASIC creates PRG by default&quot;.
+&gt; This is not true as Andre pointed out. It happens only when you use
+&gt; channel# 1 (aka sec addr 1), using which is against the rules set in 1541
+&gt; manual for example:
+&gt; 
+&gt; FORMAT FOR OPENING A SEQUENTIAL FILE:
+&gt;    OPEN file#, device#, channel#, &quot;0:name,type,direction&quot;
+&gt; [...] The channel# is a data channel, number 2 through 14 [...]
+&gt; 
+&gt; Which IMHO takes away the only valid point I thought you had but - OK -
+&gt; seems that we keep having different opinions on this matter.
+
+well, as i said, its not so much about what is specified somewhere, but what 
+ppl did since 1985. and as for that, &quot;SEQ file&quot; has even become a synonym for 
+&quot;petsci text, maybe with C/G graphics&quot; in large parts of the commodore world. 
+there is a reason for why eg jiffy dos even has a wedge command to display seq 
+files as text - it was incredibly common at some point.
+
+-- 
+
+<a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    <a href="http://magicdisk.untergrund.net">http://magicdisk.untergrund.net</a>
+<a href="http://www.pokefinder.org">http://www.pokefinder.org</a>        <a href="http://ftp.pokefinder.org">http://ftp.pokefinder.org</a>
+
+Gerade in einem Land, in dem in den kommenden Wochen die größte offene 
+Drogenszene der Welt, nämlich das Münchener Oktoberfest, stattfindet, ist eine 
+Liberalisierung weicher Drogen dringend notwendig. 
+&lt;Claudia Roth, Bündnis 90/Die Grünen&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Jul  7 12:21:09 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10481.html" title="Next message in the list">A. Fachat: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10479.html" title="Previous message in the list">silverdr1wfmh.org.pl: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10479.html" title="Message to which this message replies">silverdr1wfmh.org.pl: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10481.html" title="Next message in this discussion thread">A. Fachat: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10481.html" title="Message sent in reply to this message">A. Fachat: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10480" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10480" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10480" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-07-07 12:21:12 CEST
+</em></small></p>
+</body>
+</html>

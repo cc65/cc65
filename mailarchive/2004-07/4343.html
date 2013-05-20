@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Apple2 file io - here: memory </title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] Apple2 file io - here: memory management questions" />
+<meta name="Date" content="2004-07-30" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Apple2 file io - here: memory management questions</h1>
+<!-- received="Fri Jul 30 00:25:50 2004" -->
+<!-- isoreceived="20040729222550" -->
+<!-- sent="Fri, 30 Jul 2004 00:26:21 +0200" -->
+<!-- isosent="20040729222621" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] Apple2 file io - here: memory management questions" -->
+<!-- id="001a01c475bb$18dfc9b0$0200a8c0@pc" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="20040729075411.GG29100&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4344.html" title="Greg King: &quot;Re: [cc65] assembly subroutine return value&quot;">Next message</a> ]
+[ <a href="4342.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] assembly subroutine return value&quot;">Previous message</a> ]
+[ <a href="4324.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Apple2 Libraries - Current status of file io ?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4346.html" title="jim: &quot;Re: [cc65] Apple2 file io - here: memory management questions&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Apple2%20file%20io%20-%20here:%20memory%20management%20questions">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-07-30 00:26:21</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+as memory is always a very precious resource on the Apple2 I'd like to shed
+some light on the memory management side of file io...
+
+The Apple2 has lower memory from $0000 to $BFFF (48 k). At least for text
+mode programs $0800 to $BFFF (46 k) is available. Then there is a memory
+mapped io area from $C000 to $CFFF (4 k). From $D000 to $FFFF (12 k) we have
+upper memory.
+
+
+1. scenario: DOS 3.3
+
+DOS 3.3 normally occupies $9600 to $BFFF (10,5 k). This includes buffers for
+the default of three concurrently opened files. Reducing this to one file
+(&quot;MAXFILES 1&quot;) results in $9AA6 to $BFFF (9,3 k). A program calling DOS 3.3
+may reuse those buffers or supply memory for file i/o on its own. I'd opt
+for supplying own buffers for two reasons:
+
+- The maximum number of concurrently opend files is dynamic.
+- In scenario 2. described below reuse of buffers is very difficult.
+
+If the calling program doesn't reuse DOS 3.3 buffers it can destroy them all
+after loading and rebuild them on exit. Without any buffers DOS 3.3 uses
+$9D00-$BFFF (8,7 k).
+
+
+2. scenario: DOS 3.3 in upper memory
+
+Several DOS 3.3 variants may be moved into upper memory. There they occupy
+all of the upper memory (12 k) and a little amount of lower memory from
+$BF00 to $BFFF (0,25 k) or $BE00 to $BFFF (0,5 k). The number of buffers of
+concurrently opend files is typically fixed to five. Unfortunately there's
+no &quot;official&quot; standard for accessing the buffers so a program is better off
+supplying its own buffers.
+
+
+Results for DOS 3.3
+
+Sceanrio 1. gives an text mode application a total of 49,2 k (37,2 k + 12 k)
+memory but unfortunately the current cc65 linker isn't able to span a
+segment accross several memory areas. Therefore it's impossible to make use
+of the upper memory in a generic way. Therefore we have to stick to scenario
+2. with ~ 45,6 k of _CONTIGIOUS_ memory left for the application. BTW: This
+does _NOT_ mean that we become incompatible scenario 1. It just means that a
+memory intensive application won't use it.
+
+Pro's:
+- No special startup/cleanup code
+- Bank switching to ROM is done by moved DOS 3.3
+
+Con's:
+- ~ 3,6 k less memory
+- User needs movable DOS 3.3 (not too popular)
+
+
+3. scenario: ProDOS 8 with command interpreter
+
+The ProDOS 8 kernel uses the same memory as DOS 3.3 being moved into upper
+memory: The whole upper memory (12 k) plus $BF00 to $BFFF (0,25 k) of lower
+memory. The ProDOS 8 command interpreter additionally occupies $9600 to
+$BEFF (10,2 k). These values don't include any buffers so they have always
+to be provided by the application.
+
+A word on these buffers: While a DOS 3.3 file buffer occupies only 557 bytes
+a ProDOS 8 file buffer needs 1024 bytes of memory _ALIGNED_TO_A_PAGE
+BOUNDARY_. Assuming that file buffers are allocated on the cc65 heap and
+that there is no &quot;aligned malloc&quot; this makes up 1024 + 255 = 1279 bytes per
+file buffer !
+
+&#64;Jim: Do you agree with this or did I miss a point?
+&#64;Ullrich: Do you see an option to provide some memory allocation mechanism
+suitable for ProDOS 8 file buffers?
+
+This scenario is compatible with DOS 3.3 for all application that don't do
+file i/o themselves. This means that:
+
+- The application binary is loaded directly to its target location
+(typically $0800 for text mode programs)
+- The application simply quits with a JMP to DOS (which means the command
+interpreter for ProDOS 8)
+
+
+4. scenario: ProDOS 8 without command interpreter
+
+The assembly language file io APIs of ProDOS 8 are part of the ProDOS 8
+kernel thus there is no need for the command interpreter to be present while
+an application is running. In fact all &quot;profesional&quot; ProDOS 8 programs use
+this scenario. Unfortunately - but not surprisingly - this doesn't come for
+free:
+
+- The application binary is always loaded at $2000. The application has
+basically two options a) move the loaded binary to its target location or b)
+provide a small loader to load the &quot;real&quot; binary directly to the target
+location using the file i/o API.
+
+- The application has to call a special quit API on exit. The called quit
+routine will then allow the user to load the next application (for example
+the command interpreter).
+
+
+Results for ProDOS 8
+
+As scenario 3. leaves only 35,5 k for a text mode program it is desirable to
+support scenario 4. with 45,7 k of available memory. For applications with
+large amounts of CODE + RODATA + DATA (in other words a large binary file)
+it may simply be impossible to load the file at $2000. Therefore the
+approach with a small loader seems to be appropriate.
+
+The major part of this loader could be written in C and use the new file io
+library to load the main binary at $0800 and jump to it. It would have a
+custom startup code relocating the loader from $2000 to let's say $B000.
+This area would then wiped out later by the BSS, heap or stack of the main
+executable.
+
+The loader would be identical for all cc65 applications and just have a
+different name. ProDOS 8 supports &quot;argv[0]&quot; so the loader could detect from
+that the path of the main binary with a pattern like MYAPP.SYSTEM for the
+loader and MYAPP.BINARY for the main binary.
+
+A benefit of this approach would be that the startup code for DOS 3.3
+binaries and ProDOS 8 main binaries could be shared. Just the last call at
+the very end of the startup code would have to go into the file i/o
+libraries instead of being hardcoded in crt0.s. A destructor which never
+returns doesn't look like a clean solution - does it?
+
+Setting up a RESET handler for closing files (as requested by the ProDOS 8
+tech ref manual) could be done from a constructor in the ProDOS 8 file i/o
+library. This handler would call exit() after doing its job. Or we decide
+that we generally (for all kind of Apple2 binaries) want a RESET handler
+only calling exit(). Then the ProDOS 8 file i/o library would just need an
+atexit() hook...
+
+Oliver
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Jul 30 00:25:50 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4344.html" title="Next message in the list">Greg King: "Re: [cc65] assembly subroutine return value"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4342.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] assembly subroutine return value"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4324.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4346.html" title="Next message in this discussion thread">jim: "Re: [cc65] Apple2 file io - here: memory management questions"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4346.html" title="Message sent in reply to this message">jim: "Re: [cc65] Apple2 file io - here: memory management questions"</a></li>
+<li><dfn>Reply</dfn>:  <a href="../2004-09/4442.html" title="Message sent in reply to this message">Oliver Schmidt: "[cc65] Apple2 file io"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4343" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4343" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4343" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-07-30 00:25:59 CEST
+</em></small></p>
+</body>
+</html>

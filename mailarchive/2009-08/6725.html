@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Chicken and Egg Problem (?</title>
+<meta name="Author" content="Greg King (greg.king41verizon.net)" />
+<meta name="Subject" content="Re: [cc65] Chicken and Egg Problem (?)" />
+<meta name="Date" content="2009-08-24" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Chicken and Egg Problem (?)</h1>
+<!-- received="Mon Aug 24 19:14:05 2009" -->
+<!-- isoreceived="20090824171405" -->
+<!-- sent="Mon, 24 Aug 2009 12:05:17 -0400" -->
+<!-- isosent="20090824160517" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king41verizon.net" -->
+<!-- subject="Re: [cc65] Chicken and Egg Problem (?)" -->
+<!-- id="004401ca24de$25ba81c0$443efea9@monarch" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="f97798c20908230101o75ab4714q5fbc2925a9c70ae6&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6726.html" title="Groepaz: &quot;Re: [cc65] two little bugs&quot;">Next message</a> ]
+[ <a href="6724.html" title="Greg King: &quot;Re: [cc65] two little bugs&quot;">Previous message</a> ]
+[ <a href="6712.html" title="Oliver Schmidt: &quot;Re: [cc65] Chicken and Egg Problem (?)&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6727.html" title="Oliver Schmidt: &quot;Re: [cc65] Chicken and Egg Problem (?)&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king41verizon.net?Subject=Re:%20[cc65]%20Chicken%20and%20Egg%20Problem%20(?)">greg.king41verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-08-24 18:05:17</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: &quot;Oliver Schmidt&quot;; on Sunday, August 23, 2009; at 04:01 AM -0400
+&gt;
+&gt; &gt; From my perspective, it seems reasonable to presume that the linker,
+&gt; &gt; together with the C/run-time library, does &quot;somehow make sure&quot; that
+&gt; &gt; main() is referred.
+&gt; &gt; I understand that the linker, for sure, isn't limited to C programs;
+&gt; &gt; so, it doesn't make sense to hard-code such a reference.  But, what
+&gt; &gt; about extending the linker config. syntax/functionality to allow
+&gt; &gt; something analogous to .forceimport (being kind of the &quot;opposite&quot; of
+&gt; &gt; SYMBOLS {}, maybe called IMPORT {}).  The built-in linker configs.
+&gt; &gt; then could use that functionality for the symbol _main.
+&gt;
+&gt; Just imagine forgetting or misspelling main().  Wouldn't you expect the
+&gt; linker (called with -t &lt;target&gt;) to complain about not being able to
+&gt; resolve the symbol '_main'?
+
+2) No, because the built-in configure-code _is_ &quot;hard-wiring&quot;.  We do not
+want the &quot;-t&quot; option to force people to stuff an artificial &quot;_main:&quot; label
+into their purely assembly-coded programs.  But, it is a nice idea for
+custom configure-files.
+
+1) Look at the FORMAT section of &quot;lunix.cfg&quot;; it shows a hint of this idea.
+And, the beginning of &quot;atari.cfg&quot; shows the export part of this idea.
+
+Instead of IMPORT {}, an &quot;import&quot; attribute can be added to the SYMBOLS
+section.  It would be the opposite of the &quot;value&quot; attribute.
+SYMBOLS {
+    __STACKSIZE__: value = $800;
+    _main: import;
+}
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Aug 24 19:14:05 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6726.html" title="Next message in the list">Groepaz: "Re: [cc65] two little bugs"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6724.html" title="Previous message in the list">Greg King: "Re: [cc65] two little bugs"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6712.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] Chicken and Egg Problem (?)"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6727.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Chicken and Egg Problem (?)"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6727.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Chicken and Egg Problem (?)"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6725" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6725" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6725" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-08-24 19:14:08 CEST
+</em></small></p>
+</body>
+</html>

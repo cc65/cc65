@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Struct union</title>
+<meta name="Author" content="Stefan (vorsichtphysiker1gmx.net)" />
+<meta name="Subject" content="[cc65] Struct union" />
+<meta name="Date" content="2013-02-01" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Struct union</h1>
+<!-- received="Fri Feb  1 07:42:04 2013" -->
+<!-- isoreceived="20130201064204" -->
+<!-- sent="Fri, 01 Feb 2013 07:41:51 +0100" -->
+<!-- isosent="20130201064151" -->
+<!-- name="Stefan" -->
+<!-- email="vorsichtphysiker1gmx.net" -->
+<!-- subject="[cc65] Struct union" -->
+<!-- id="20130201064151.4820@gmx.net" -->
+<!-- charset="utf-8" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11169.html" title="Stefan: &quot;[cc65] struct union [2]&quot;">Next message</a> ]
+[ <a href="../2013-01/11167.html" title="Greg King: &quot;Re: [cc65] linker config Qs..&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="11170.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Struct union&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Stefan &lt;<a href="mailto:vorsichtphysiker1gmx.net?Subject=Re:%20[cc65]%20Struct%20union">vorsichtphysiker1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2013-02-01 07:41:51</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Is it normal, that this works??
+There are many similarities between structs and unions, but there are also differences. So this shouldn't work, or am i wrong.
+
+struct a 
+{
+	int x;
+	int y;
+};
+
+union b
+{
+	int x;
+	int y;
+};
+
+void main(void)
+{
+	struct a c = {100,200};
+	union a d;
+	struct b e;
+	union b f;
+}
+
+struct a 
+{
+	int x;
+	int y;
+};
+
+union b
+{
+	int x;
+	int y;
+};
+
+&gt; Executing: C:\Program Files (x86)\ConTEXT\ConExec.exe &quot;cl65&quot; -Oirs -tc64 -l struniontest.lst -m struniontest.map -Ln struniontest.lbl &quot;struniontest.c&quot; -o struniontest_c64.run
+
+struniontest.c(19): Warning: `d' is defined but never used
+struniontest.c(19): Warning: `e' is defined but never used
+struniontest.c(19): Warning: `f' is defined but never used
+&gt; Execution finished.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Feb  1 07:42:04 2013</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11169.html" title="Next message in the list">Stefan: "[cc65] struct union [2]"</a></li>
+<li><dfn>Previous message</dfn>: <a href="../2013-01/11167.html" title="Previous message in the list">Greg King: "Re: [cc65] linker config Qs.."</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="11170.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Struct union"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="11170.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Struct union"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#11168" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#11168" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#11168" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2013-02-01 07:42:08 CET
+</em></small></p>
+</body>
+</html>

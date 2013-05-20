@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Koala Bitmap load</title>
+<meta name="Author" content="Carlos (shangri-la1teleline.es)" />
+<meta name="Subject" content="[cc65] Koala Bitmap load" />
+<meta name="Date" content="2009-02-04" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Koala Bitmap load</h1>
+<!-- received="Wed Feb  4 14:03:34 2009" -->
+<!-- isoreceived="20090204130334" -->
+<!-- sent="Wed, 4 Feb 2009 14:03:33 +0100" -->
+<!-- isosent="20090204130333" -->
+<!-- name="Carlos" -->
+<!-- email="shangri-la1teleline.es" -->
+<!-- subject="[cc65] Koala Bitmap load" -->
+<!-- id="4421526645B247189E58206286AEAAAB@keops" -->
+<!-- charset="iso-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6458.html" title="Christian Krüger: &quot;[cc65] Re: Koala Bitmap load&quot;">Next message</a> ]
+[ <a href="6456.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] compile fix for --as-needed&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6458.html" title="Christian Krüger: &quot;[cc65] Re: Koala Bitmap load&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Carlos &lt;<a href="mailto:shangri-la1teleline.es?Subject=Re:%20[cc65]%20Koala%20Bitmap%20load">shangri-la1teleline.es</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-02-04 14:03:33</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+This is my first message in the list, i'm also a newbie about c64 graphics programming and c64 programming with cc65 in general.
+
+After do some sprite stuff with cc65, now i'm trying to show a bitmap. I have a Koala paint picture that's ok (i have viewed it with an image viewer) and i want to use it in my program.
+
+To display it i have done the next steps:
+
+define in my data.s the next code: 
+
+.export _img_data 
+
+.segment &quot;DATA&quot; 
+
+_img_data: 
+    .incbin &quot;ninja3.koa&quot; 
+
+and my main program looks like: 
+
+extern unsigned char img_data[10000]; 
+
+// set bitmap mode 
+VIC.ctrl1 = 0x3b; 
+
+// set multicolor mode 
+VIC.ctrl2 = 0x18; 
+
+// set addresses (screen and bitmap) 
+VIC.addr = 0x18; 
+
+// copy bitmap, screen, and color 
+memcpy(0x2000, img_data, 8000); 
+memcpy(0x0400, img_data + 8000, 1000); 
+memcpy(0xd800, img_data + 9000, 1000); 
+
+But the result is a bit weird (<a href="http://xs436.xs.to/xs436/09062/ln3118.png">http://xs436.xs.to/xs436/09062/ln3118.png</a>) and is not exactly the Last Ninja 3 intro picture that's supposed to be  
+
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<div>
+<img src="../att-6457/icon_confused.gif" alt="icon_confused.gif" />
+<!-- attachment="icon_confused.gif" -->
+</div>
+<span id="received"><dfn>Received on</dfn> Wed Feb  4 14:03:34 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6458.html" title="Next message in the list">Christian Krüger: "[cc65] Re: Koala Bitmap load"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6456.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] compile fix for --as-needed"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6458.html" title="Next message in this discussion thread">Christian Krüger: "[cc65] Re: Koala Bitmap load"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6458.html" title="Message sent in reply to this message">Christian Krüger: "[cc65] Re: Koala Bitmap load"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6459.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Koala Bitmap load"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6457" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6457" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6457" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-02-04 14:03:35 CET
+</em></small></p>
+</body>
+</html>

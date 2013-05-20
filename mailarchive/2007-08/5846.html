@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Linking [s]printf breaks c</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Linking [s]printf breaks cbm_open?" />
+<meta name="Date" content="2007-08-26" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Linking [s]printf breaks cbm_open?</h1>
+<!-- received="Sun Aug 26 20:05:27 2007" -->
+<!-- isoreceived="20070826180527" -->
+<!-- sent="Sun, 26 Aug 2007 20:05:11 +0200" -->
+<!-- isosent="20070826180511" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Linking [s]printf breaks cbm_open?" -->
+<!-- id="20070826180511.GB22090@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="20070826164451.2a3092dc&#64;marathon.haufe" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5847.html" title="Jakob Haufe: &quot;Re: [cc65] Linking [s]printf breaks cbm_open?&quot;">Next message</a> ]
+[ <a href="5845.html" title="Jakob Haufe: &quot;[cc65] Linking [s]printf breaks cbm_open?&quot;">Previous message</a> ]
+[ <a href="5845.html" title="Jakob Haufe: &quot;[cc65] Linking [s]printf breaks cbm_open?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5847.html" title="Jakob Haufe: &quot;Re: [cc65] Linking [s]printf breaks cbm_open?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Linking%20[s]printf%20breaks%20cbm_open?">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-08-26 20:05:11</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Sun, Aug 26, 2007 at 04:44:51PM +0200, Jakob Haufe wrote:
+&gt; As soon as [s]printf is linked to the program, cbm_open always return
+&gt; oserror=2 (file open). This happens even if [s]printf gets never
+&gt; executed.
+
+You cannot use standard file i/o and cbm file i/o together without problems.
+Both need file handles, and there is no way to allocate these handles when
+using standard file i/o invisible to the user.
+
+You can however use sprintf - if it does not work (as you're claiming above),
+please send me a short example program via private mail.
+
+Please consider using either just the standard file i/o functions
+(fopen/fread/fwrite/fclose) or use direct console functions for output to the
+screen.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Aug 26 20:05:27 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5847.html" title="Next message in the list">Jakob Haufe: "Re: [cc65] Linking [s]printf breaks cbm_open?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5845.html" title="Previous message in the list">Jakob Haufe: "[cc65] Linking [s]printf breaks cbm_open?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5845.html" title="Message to which this message replies">Jakob Haufe: "[cc65] Linking [s]printf breaks cbm_open?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5847.html" title="Next message in this discussion thread">Jakob Haufe: "Re: [cc65] Linking [s]printf breaks cbm_open?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5847.html" title="Message sent in reply to this message">Jakob Haufe: "Re: [cc65] Linking [s]printf breaks cbm_open?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5846" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5846" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5846" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-08-26 20:05:30 CEST
+</em></small></p>
+</body>
+</html>

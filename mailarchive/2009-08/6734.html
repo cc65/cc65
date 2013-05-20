@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Mouse API Proposals</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] Mouse API Proposals" />
+<meta name="Date" content="2009-08-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Mouse API Proposals</h1>
+<!-- received="Tue, 25 Aug 2009 15:31:03 +0200" -->
+<!-- isoreceived="20090825133103" -->
+<!-- sent="Tue, 25 Aug 2009 15:31:03 +0200" -->
+<!-- isosent="20090825133103" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] Mouse API Proposals" -->
+<!-- id="f97798c20908250631l7844c43eyf917826a20bfe740@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6735.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] two little bugs&quot;">Next message</a> ]
+[ <a href="6733.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] two little bugs&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6736.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Mouse API Proposals&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Mouse%20API%20Proposals">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-08-25 15:31:03</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+I'd like to suggest three (at least from my perspective) improvements
+to the mouse API:
+
+
+1. Default bounding box
+
+The mouse API allows to set a bounding box using mouse_box(). There's
+however no way to determine the default/inital/start value for this
+box allowing to set the box to &quot;the half of the screen&quot; or to reset
+the box to it's original value. There may be very well an educated
+guess like &quot;the full graphics resolution&quot;, but:
+
+a) a portable program doesn't know that
+b) there might be several graphics modes with different resolutions
+
+From my perspective there's no need for a full blown function to
+retrieve the current bounding box. Rather I would consider some
+target-specific macros be sufficient - given that the initial bounding
+box is an attribute of the target and not the individual drivers for
+that platform.
+
+
+2. Coordinate mapping
+
+Creating a responsive user interface in graphics mode requires more
+sophisticated graphics routines than TGI gives, so I believe my
+presumption holds true that user interfaces for cc65 programs are
+typically implemented in text mode - most likely using the conio API.
+Based on this presumption it is very likely that the mouse API is
+primairly used in conjunction with the conio API. In this scenario a
+program has to map the &quot;graphics&quot; mouse coordinates to &quot;character&quot;
+screen coordinates in order to determine the user interface element
+manipulated with the mouse.
+
+One might think implementing my proposal 1.) above is already
+sufficient as one can use the default bounding box in conjunction with
+the conio API screensize() to determine that mapping. But things can
+become quite easily more complicated: The Apple II default bounding
+box is [0..279,0..191] (which is the default graphics resolution
+provided by the TGI driver) so the horizontal mapping factor for the
+80 col. display is 3.5 - not good without float support (or way to
+slow for potential float support). The obvious solution is &quot;&lt;cursor
+pos&gt; * 2 / 7 = &lt;char pos&gt;&quot; but how should a portable program know
+that?
+
+Given the likeyhood of the scenario &quot;mouse with conio&quot; I propose an
+API specific to this need allowing to determine the character
+coordinate (in the current screen resolution) for a cursor coordinate.
+Independent from the way it is presented to the user the API should in
+my opinion be implemented in the mouse callback routines.
+
+
+3. Cursor display
+
+How the default mouse callbacks actually draw the cursor should be as
+transparent as possible to program because:
+
+a) using conio it would have a very hard time to deal with redrawing or whatever
+b) any interaction with the mouse callbacks would tend to be way too
+target specific for a portable program
+
+From that point of view it doesn't seem correct to have the program
+load and configure sprite 0 for use by the mouse callbacks. I strongly
+believe that the program shouldn't be required to know anything about
+sprites at all. Rather the (default) mouse callbacks should do this
+internally. Given the fact that the mouse is initially hidden a CBM
+specific program would still have the option to override the default
+cursor with direct sprite operations after initializing the mouse but
+before showing it.
+
+For that purpose the mouse callbacks should have an init and exit
+entry point called by the mouse kernel. This would in general be
+beneficial as i.e. currently the Apple II default callback use a
+constructor to determine the text screen resolution - an approach
+failing for sure a soon as the screen mode becomes switchable...
+
+
+Best, Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue, 25 Aug 2009 15:31:03 +0200</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6735.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] two little bugs"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6733.html" title="Previous message in the list">silverdr1wfmh.org.pl: "Re: [cc65] two little bugs"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6736.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Mouse API Proposals"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6736.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Mouse API Proposals"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6734" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6734" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6734" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-08-25 15:31:13 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] C64 fast-loader suggestion</title>
+<meta name="Author" content="Gábor Lénárt (lgb1lgb.hu)" />
+<meta name="Subject" content="Re: [cc65] C64 fast-loader suggestion?" />
+<meta name="Date" content="2011-12-16" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] C64 fast-loader suggestion?</h1>
+<!-- received="Fri Dec 16 12:40:41 2011" -->
+<!-- isoreceived="20111216114041" -->
+<!-- sent="Fri, 16 Dec 2011 12:40:32 +0100" -->
+<!-- isosent="20111216114032" -->
+<!-- name="Gábor Lénárt" -->
+<!-- email="lgb1lgb.hu" -->
+<!-- subject="Re: [cc65] C64 fast-loader suggestion?" -->
+<!-- id="20111216114032.GI10343@vega.lgb.hu" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="EC9CBD67-54E8-47D3-AC82-1A610738DE2C&#64;wfmh.org.pl" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9813.html" title="Oliver Schmidt: &quot;Re: [cc65] C64 fast-loader suggestion?&quot;">Next message</a> ]
+[ <a href="9811.html" title="Gábor Lénárt: &quot;Re: [cc65] C64 fast-loader suggestion?&quot;">Previous message</a> ]
+[ <a href="9810.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] C64 fast-loader suggestion?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9813.html" title="Oliver Schmidt: &quot;Re: [cc65] C64 fast-loader suggestion?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Gábor Lénárt &lt;<a href="mailto:lgb1lgb.hu?Subject=Re:%20[cc65]%20C64%20fast-loader%20suggestion?">lgb1lgb.hu</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-12-16 12:40:32</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Wed, Dec 14, 2011 at 03:12:20PM +0100, silverdr&#64;wfmh&#46;<!--nospam-->org.pl wrote:
+&gt; 
+&gt; On 2011-12-14, at 14:13, Gábor Lénárt wrote:
+&gt; 
+&gt; &gt; 2. fastloaders usually accelerates LOAD not CHRIN (however I can be wrong
+&gt; &gt;   here: as 'file' $ is not a real one, but created by the drive as a
+&gt; &gt;   &quot;virtual&quot; file containing the directory as a BASIC-like program, maybe
+&gt; &gt;   fastloaders can't accelerate the loading of $: am I wrong here?)
+&gt; 
+&gt; It depends. Good, especially hardware supported speeders DO accelerate
+&gt; LOAD, CHRIN reads and &quot;$&quot; directory reading.  Still - as I wrote earlier -
+&gt; in any case LOAD is always faster.  So, yes this can be sped up but
+&gt; generally it is not so important.  The amount of data when reading a
+&gt; directory is small and when output directly to the screen, it may even be
+&gt; a sort of advantage when the speed of the output gives you more time to
+&gt; read it ;-)
+
+Btw, one more question. I'm using KERNAL's LOAD to load files now into a
+dedicated buffer.  First, I need the disk's directory to I load file $
+there, I can parse it then.  It's nice and works now.  However while I
+watched the hexdump of a directory (to code my routine) I discovered that
+there is a +2 offset difference.  I guess it's because KERNAL does not put
+the first two bytes into the buffer, which would be the load address.  I use
+secondary address 0 when calling LOAD, so I can specify where I want to load
+the program, instead of using the address stored in the file itself.  The
+missing two bytes does not mean any problem with directory, since I don't
+need that information.  However now I see a problem: I also want to use LOAD
+to load the selected file then (from directory list, by user).  And that is
+not a program for real but data file so I _need_ the first two bytes too! 
+However according to my experience LOAD won't store that at all.  So,
+&quot;loading&quot; a data file (which does not have real loading address stored) is a
+situation when I can't use LOAD at all, and my only choice is to do it
+myself calling BASIN/CHRIN myself for every bytes?  :( It does not sound
+good, as some fastloaders only accelerates LOAD, if I am correct .......
+
+Also, I am not sure it would work with SEQ file, and not PRG.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Dec 16 12:40:41 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9813.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] C64 fast-loader suggestion?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9811.html" title="Previous message in the list">Gábor Lénárt: "Re: [cc65] C64 fast-loader suggestion?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9810.html" title="Message to which this message replies">silverdr1wfmh.org.pl: "Re: [cc65] C64 fast-loader suggestion?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9813.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] C64 fast-loader suggestion?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9813.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] C64 fast-loader suggestion?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9812" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9812" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9812" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-12-16 12:40:46 CET
+</em></small></p>
+</body>
+</html>

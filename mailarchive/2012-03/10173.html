@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Why crashing attempting to</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Why crashing attempting to free this struct?" />
+<meta name="Date" content="2012-03-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Why crashing attempting to free this struct?</h1>
+<!-- received="Sun Mar 25 10:50:50 2012" -->
+<!-- isoreceived="20120325085050" -->
+<!-- sent="Sun, 25 Mar 2012 10:48:55 +0200" -->
+<!-- isosent="20120325084855" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Why crashing attempting to free this struct?" -->
+<!-- id="CACT=u70TpU6U0wy5SS=9FHZkWOwYbBAFoGENhKd-BFY5fxDs9w@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="CAJm6qqdOr5_q27nhUem4Utn3MUdACjqpZtB9uS3JgtBLiF_BFw&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10174.html" title="Christopher Pow: &quot;Re: [cc65] VICE file formats&quot;">Next message</a> ]
+[ <a href="10172.html" title="Payton Byrd: &quot;Re: [cc65] Why crashing attempting to free this struct?&quot;">Previous message</a> ]
+[ <a href="10168.html" title="Payton Byrd: &quot;[cc65] Why crashing attempting to free this struct?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10180.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Why crashing attempting to free this struct?&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Why%20crashing%20attempting%20to%20free%20this%20struct?">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-03-25 10:48:55</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Payton,
+
+&gt; I get a CPU jam whenever I attempt to free an instance of DirectoryListReuBlock.  I've got no idea what's causing this, but they have to be freed or I'll have memory leaks galore.
+&gt;
+&gt;
+The &quot;nice&quot; thing about heap programming is that the root cause of such an
+issue might be in about every place of your program that handles pointers.
+The usual way to find out if this is the case is:
+
+1. printf() the pointer right after malloc() and right before free() and
+check for identity.
+
+2. Get some knowledge about the internal heap structures. I already did
+this for you ;-) Below is a sentence from a comment in _heapblocksize.s:
+
+&quot;Below the user data is a pointer that points to the start of the
+real (raw) memory block. The first word of this block is the size.&quot;
+
+So do the following again right after malloc() and before free() and check
+for identity:
+
+2.a Decrease your pointer by two bytes and printf() two bytes found there.
+2.b Interpret those two bytes as pointer and printf() two bytes at the
+location it points to.
+
+Regards,
+Oliver
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Mar 25 10:50:50 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10174.html" title="Next message in the list">Christopher Pow: "Re: [cc65] VICE file formats"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10172.html" title="Previous message in the list">Payton Byrd: "Re: [cc65] Why crashing attempting to free this struct?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10168.html" title="Message to which this message replies">Payton Byrd: "[cc65] Why crashing attempting to free this struct?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10180.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Why crashing attempting to free this struct?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10173" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10173" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10173" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-03-25 10:50:54 CEST
+</em></small></p>
+</body>
+</html>

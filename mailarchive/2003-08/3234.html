@@ -1,0 +1,152 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] linker cfg files</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] linker cfg files">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] linker cfg files</h1>
+<!-- received="Sat Aug 16 11:09:32 2003" -->
+<!-- isoreceived="20030816090932" -->
+<!-- sent="Sat, 16 Aug 2003 11:09:28 +0200" -->
+<!-- isosent="20030816090928" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] linker cfg files" -->
+<!-- id="20030816090928.GB14806@trixie.musoftware.de" -->
+<!-- inreplyto="000001c363b3$e189b4e0$da672c42@palace" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20linker%20cfg%20files"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-08-16 11:09:28
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3233.html">Greg King: "Re: [cc65] linker cfg files"</a>
+<li><strong>In reply to:</strong> <a href="3232.html">Greg King: "Re: [cc65] linker cfg files"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3233.html">Greg King: "Re: [cc65] linker cfg files"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Sat, Aug 16, 2003 at 12:40:14AM -0400, Greg King wrote:
+&gt; The LUnix library does not use my idea, anyway.  It is like the GEOS
+&gt; library:  it does some things differently, so that it can take advantage
+&gt; of OS features.  It gets its stack and heap from LUnix's dynamic memory.
+
+While it's ok to have machine specific stuff, and I've tried to make it
+possible to replace standard files from the cc65 library easily, there is one
+really, really big problem with it: More platform specific stuff means that
+the sources become much harder to maintain. This is the reason why I'm trying
+hard to put as much code as possible into the common libraries. If I have it
+there, it is used by all platforms, and changes can be tested by using
+testcode on one, arbitrary choosen platform. Having 10 different
+implementations for 10 different platforms is a maintenance nightmare, and
+each platform specific file increases the chance that there will be undetected
+bugs, and that one platform starts to lag behind others.
+
+&gt; I think that it would be useful to many of the targets if you added
+&gt; another address option:  %S, %E (or maybe, more than two).  They could
+&gt; be used to change the lower- and upper-bounds of the memory that a program
+&gt; normally would use (STARTADDRESS would set the standard locations
+&gt; [maybe it should be &quot;ADDRESS: start=$xxxx, end=$xxxx;&quot; ]).
+
+I have to admit that I don't like that idea. It adds a special solution for a
+special problem. It is my experience that once you start with special
+solutions like that, you end piling up more and more features each solving
+just one very special problem. Having a more general solution is what I would
+prefer. This could be adding expressions to the linker configs as I had
+already mentioned when the discussion started. Being able to calculate things
+within a linker script would solve a lot of problems including the one we have
+now: One can easily calculate the size of the RAM memory area if the start
+address is given, so there's no need for %E. The location of the heap and
+stack could be based on the location of any of the segments, so it would also
+solve the problem we have on systems with non contignous memory (like the
+NES). And so on...
+
+The reason why I wanted to avoid adding expressions is that it is work for me,
+and I do really have enough unfinished things within this project.
+
+&gt; Darn!  I had been _very_ proud of my &quot;invention.&quot;  (I guess that I should
+&gt; have known -- nothing in life ever truly is perfect.) :-/
+
+Your idea was definitely a good one! I liked it and wanted to use it (in fact,
+I have new versions of almost all linker configs lying around). The big
+advantage of your idea is that it saves me a lot of work, because I don't need
+to add expressions to the linker:-)
+
+&gt; A first -- very crude -- attempt:  move the original constructor out of the
+&gt; common file, and into files in each target directory.  It would compute
+&gt; from the stack-pointer, on &quot;run-set&quot; targets.  It would use
+&gt; __HEAPEND_RUN__, on pre-set targets.
+
+Yes, I also had this idea when thinking about the problem. But for now, my
+suggestion would be to leave it as it is, until things have settled. I have
+a list of &quot;to do&quot; things for the current development branch, and I would
+really like to get them done before adding new &quot;big&quot; things.
+
+&gt; [Of course, those musings come from a person who does not know how you
+&gt; have changed my original proposal. :-) ]
+
+I didn't change much of it. For one I've renamed STK to STACK:-) The other
+thing was that I didn't like to use labels as immediate values, so I would
+have left the __heapend and other variables in place. This did in fact remove
+the need for the constructor alltogether, since these variables could be
+initialized by linker calculated expressions.
+
+Regards
+
+
+	Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20linker%20cfg%20files">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20linker%20cfg%20files">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3233.html">Greg King: "Re: [cc65] linker cfg files"</a>
+<li><strong>In reply to:</strong> <a href="3232.html">Greg King: "Re: [cc65] linker cfg files"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3233.html">Greg King: "Re: [cc65] linker cfg files"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-08-16 11:09:53 CEST</em>
+</em>
+</small>
+</body>
+</html>

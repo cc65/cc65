@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] faulty random generator</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] faulty random generator">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] faulty random generator</h1>
+<!-- received="Thu Mar  9 22:36:56 2000" -->
+<!-- isoreceived="20000309213656" -->
+<!-- sent="Thu, 9 Mar 2000 22:36:34 +0100 (CET)" -->
+<!-- isosent="20000309213634" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] faulty random generator" -->
+<!-- id="200003092136.WAA17463@trixie.musoftware.de" -->
+<!-- inreplyto="Pine.LNX.3.96.1000309215731.29536B-100000@janis.pds.twi.tudelft.nl" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20faulty%20random%20generator"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2000-03-09 22:36:34
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0073.html">cpg_at_aladdin.de: "RE: [cc65] Atari port of cc65"</a>
+<li><strong>Previous message:</strong> <a href="0071.html">Sidney Cadot: "[cc65] faulty random generator"</a>
+<li><strong>In reply to:</strong> <a href="0071.html">Sidney Cadot: "[cc65] faulty random generator"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+&gt; This is in part due to a bug in the rand() function: the author (Ullrich
+&gt; or Steve Judds, I don't know who is to blame ;-)) intended to do this:
+
+The original code already has the error you mention. I have to admit that I
+just used the code without doing an analysis of the generated random number
+sequences. If I had to do this, using existing code would be worthless, since
+I could just as well use one of the generators from the Knuth book and
+implement it in 6502 assembly (it would be the same amount of work).
+
+Apart from that, I don't think that this code was written by Steve Judd. Steve
+is writing almost perfect code and he is a genius when it comes to math (and,
+besides that, he is a very nice guy :-). I'm sure he would not write and post
+a routine with such an obvious error.
+
+&gt; I will implement a better (high-period) random function soon. I would like
+&gt; it to have a period &gt; 2^16, however this would mean that the state would
+&gt; have to be more than one word. In principle, that's no problem: the
+&gt; srand() call could clear the high-order state bits.
+
+I would be glad to add your code to the library. But please keep in mind that
+for most purposes (programming games or similar) it is better to have a short
+routine that produces slightly worse random numbers than a perfect random
+number generator that has a large memory footprint. This is the reason why I
+did choose the current algorithm instead of the other (larger) one that is
+also available from The Fridge.
+
+If you have a really good algorithm that is large, I would suggest to use a
+shorter one for the standard rand() C function, and add your code as an
+extension. Unix C libraries usually have rand() (ANSI C) and random() (BSD).
+The latter is often slower and larger but produces better random number
+sequences. We could use a similar approach for cc65.
+
+Regards
+
+
+	Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20faulty%20random%20generator">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20faulty%20random%20generator">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0073.html">cpg_at_aladdin.de: "RE: [cc65] Atari port of cc65"</a>
+<li><strong>Previous message:</strong> <a href="0071.html">Sidney Cadot: "[cc65] faulty random generator"</a>
+<li><strong>In reply to:</strong> <a href="0071.html">Sidney Cadot: "[cc65] faulty random generator"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:35 CET</em>
+</em>
+</small>
+</body>
+</html>

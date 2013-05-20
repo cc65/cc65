@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Memory impact of Atari lib</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Memory impact of Atari library compile time defines" />
+<meta name="Date" content="2009-11-26" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Memory impact of Atari library compile time defines</h1>
+<!-- received="Thu Nov 26 18:18:40 2009" -->
+<!-- isoreceived="20091126171840" -->
+<!-- sent="Thu, 26 Nov 2009 18:18:29 +0100" -->
+<!-- isosent="20091126171829" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Memory impact of Atari library compile time defines" -->
+<!-- id="20091126171829.GA25701@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="f97798c20911260856x480a3b99sf9b4c40af03a10f0&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7644.html" title="Oliver Schmidt: &quot;Re: [cc65] Memory impact of Atari library compile time defines&quot;">Next message</a> ]
+[ <a href="7642.html" title="Oliver Schmidt: &quot;Re: [cc65] Memory impact of Atari library compile time defines&quot;">Previous message</a> ]
+[ <a href="7642.html" title="Oliver Schmidt: &quot;Re: [cc65] Memory impact of Atari library compile time defines&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7644.html" title="Oliver Schmidt: &quot;Re: [cc65] Memory impact of Atari library compile time defines&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Memory%20impact%20of%20Atari%20library%20compile%20time%20defines">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-11-26 18:18:29</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Thu, Nov 26, 2009 at 05:56:11PM +0100, Oliver Schmidt wrote:
+&gt; How does one make sure that the second one doesn't get linked even if
+&gt; -u &lt;symbol&gt; isn't given? I thought that it is generally a bad idea to
+&gt; have symbols defined twice inside a library - and that we &quot;invented&quot;
+&gt; the 'extra' stuff for that reason...
+
+Both will be linked in, but the default one is really small. No symbols are
+used twice, instead a vector will be changed by a constructor defined in the
+second module. This is a few bytes overhead, but since we're talking about
+0.5KB for the uppercasing code, having another 20 bytes won't kill anybody.
+
+------------------------------- default module -----------------------------
+.export ucase, ucase_jmpvec
+.code
+ucase:  jmp     (jmpvec)
+
+ucase_dummy:
+        rts
+
+.data
+ucase_jmpvec:
+        .addr   ucase_dummy
+----------------------------------------------------------------------------
+
+----------------------------- uppercasing module ---------------------------
+        .export         __ATARI_UPCASE_FILENAME__ = 1
+        .import         jmpvec
+        .constructor    init_ucase
+
+.code
+init_ucase:
+        lda     #&lt;ucase_doit
+        sta     ucase_jmpvec
+        lda     #&gt;ucase_doit
+        sta     ucase_jmpvec+1
+        rts
+
+ucase_doit:
+        ; uppercasing code here
+        rts
+
+----------------------------------------------------------------------------
+
+When linked with &quot;-u __ATARI_UPCASE_FILENAME__&quot;, the second module will get
+linked in, and the constructor will overwrite the jump vector. The total
+overhead is 19 bytes (including the two bytes in the constructor table).
+
+I have also another idea, which is cheaper, but requires changes to the
+linker. I must sleep over it a night or two ...
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Nov 26 18:18:40 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7644.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Memory impact of Atari library compile time defines"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7642.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Memory impact of Atari library compile time defines"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7642.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] Memory impact of Atari library compile time defines"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7644.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Memory impact of Atari library compile time defines"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7644.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Memory impact of Atari library compile time defines"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7643" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7643" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7643" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-11-26 18:18:42 CET
+</em></small></p>
+</body>
+</html>

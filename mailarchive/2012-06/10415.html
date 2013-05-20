@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Common macros for dirent.d</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Common macros for dirent.d_type" />
+<meta name="Date" content="2012-06-26" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Common macros for dirent.d_type</h1>
+<!-- received="Tue Jun 26 16:25:27 2012" -->
+<!-- isoreceived="20120626142527" -->
+<!-- sent="Tue, 26 Jun 2012 16:25:08 +0200" -->
+<!-- isosent="20120626142508" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Common macros for dirent.d_type" -->
+<!-- id="CACT=u70v-Qviqrzz_xz_T5nVJqK-ZfZsmpta993neYRHVjjhXw@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="09DC7890CCC441409279818449D198D6&#64;ORANGE2" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10416.html" title="Payton Byrd: &quot;Re: [cc65] Common macros for dirent.d_type&quot;">Next message</a> ]
+[ <a href="10414.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Common macros for dirent.d_type&quot;">Previous message</a> ]
+[ <a href="10413.html" title="Shawn Jefferson: &quot;RE: [cc65] Common macros for dirent.d_type&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10416.html" title="Payton Byrd: &quot;Re: [cc65] Common macros for dirent.d_type&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Common%20macros%20for%20dirent.d_type">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-06-26 16:25:08</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Shawn,
+
+&gt; The Atari *does* have subdirectories, so there may be a d_type field there
+&gt; (or should be?)
+
+That depends on what is to be archived with the whole opendir()
+thingy. Here's my (as always lengthy) take...
+
+It's about cross-target directory access. There are two primary usecases:
+
+
+1. Find potential candidates for open() / fopen()
+
+If all return values from readdir() are (at least potential)
+candidates for open() / fopen() then there's no real need for a d_type
+field. However for the sake of easy cross-target programming there
+should be a _DE_ISREG() that always returns true.
+
+I understand that i.e. on CBMs not all &quot;regular&quot; files are equal
+(<a href="http://www.cc65.org/snapshot-doc/funcref-53.html">http://www.cc65.org/snapshot-doc/funcref-53.html</a>) but at least that's
+the general idea.
+
+
+2. Find potential candidates for opendir()
+
+When starting to think about this you inevitably need to think about
+the parameter for your initial call to opendir(). I presume we agree
+that &quot;.&quot; is the lowest common denominator. Looking at the Apple II,
+Atari and CBM code this is fortunately true :-) For the Lynx I can't
+find an opendir() implementation ?!?
+
+Anything beyond &quot;.&quot; seems to be problematic. I personally would claim
+that the return value of getcwd() is _AS-IS_ a valid parameter for
+opendir(). I implemented it that way for the Apple II. Looking at the
+Atari and CBM initcwd code I can't tell what's the approach there.
+
+If we would agree on the getcwd() idea than we could extend it and
+claim that any return value from readdir() with _DE_ISDIR() being true
+is _AS-IS_ a valid parameter for chdir() - this implies that chdir()
+works with relative paths. As you may guess by now I implemented it
+that way for the Apple II.
+
+With these things in place one could already implement a cross-target
+directoy tree traversal without fiddling with directory separators and
+alike:
+
+==========
+
+dodir() {
+  char thisdir[FILENAME_MAX];
+
+  getcwd(thisdir, sizeof(thisdir));
+
+  opendir(thisdir);  // no prefix or postfix or &lt;you name it&gt;
+  while(...) {
+    e = readdir(...);
+    if (_DE_ISDIR(e-&gt;d_type)) {
+      chdir(e-&gt;d_name);  // no prefix or postfix or &lt;you name it&gt;
+      dodir();  // recursion
+    }
+  }
+  closedir();
+
+  chdir(thisdir);
+}
+
+==========
+
+If we would agree on this then the &quot;only&quot; thing missing would be to
+set the initial directory to something &quot;outside&quot; the current directory
+on program startup. While I'm open for any discussion I presume that
+our targets (and ideas ;-) are just too different to get something
+cross-target done.
+
+I'd be by the way willing to write a cc65 sample program along the
+lines of the pseudo code above if there should be at least two targets
+it could run on (one being the Apple II). Here's already a similiar
+one (specific for the Apple II):
+<a href="http://wiki.cc65.org/doku.php?id=cc65:apple2:files">http://wiki.cc65.org/doku.php?id=cc65:apple2:files</a>
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Jun 26 16:25:27 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10416.html" title="Next message in the list">Payton Byrd: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10414.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10413.html" title="Message to which this message replies">Shawn Jefferson: "RE: [cc65] Common macros for dirent.d_type"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10416.html" title="Next message in this discussion thread">Payton Byrd: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10416.html" title="Message sent in reply to this message">Payton Byrd: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10419.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10415" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10415" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10415" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-06-26 16:25:31 CEST
+</em></small></p>
+</body>
+</html>

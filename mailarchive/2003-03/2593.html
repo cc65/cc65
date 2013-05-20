@@ -1,0 +1,193 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Finished product:  FAST S</title>
+<meta name="Author" content="Spiro Trikaliotis (spiro_at_ivs.cs.uni-magdeburg.de)">
+<meta name="Subject" content="Re: [cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?</h1>
+<!-- received="Wed Mar  5 17:30:19 2003" -->
+<!-- isoreceived="20030305163019" -->
+<!-- sent="Wed, 5 Mar 2003 16:57:23 +0100" -->
+<!-- isosent="20030305155723" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="spiro_at_ivs.cs.uni-magdeburg.de" -->
+<!-- subject="Re: [cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?" -->
+<!-- id="01c401c2e334$d2e2aaf0$8043cad4@cs.unimagdeburg.de" -->
+<!-- inreplyto="006801c2e2c4$a96ee640$8001a8c0@ENDEAVOR" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Spiro Trikaliotis (<a href="mailto:spiro_at_ivs.cs.uni-magdeburg.de?Subject=Re:%20[cc65]%20Finished%20product:%20%20FAST%20ShellSort%20demo%20for%20c64%20(working%20:)%20)%20-%20feedback?"><em>spiro_at_ivs.cs.uni-magdeburg.de</em></a>)<br>
+<strong>Date:</strong> 2003-03-05 16:57:23
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2592.html">Maciej Witkowiak: "Re: [cc65] using newline in cprintf on c64"</a>
+<li><strong>In reply to:</strong> <a href="2577.html">Greg Long: "[cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2595.html">Ullrich von Bassewitz: "Re: [cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?"</a>
+<li><strong>Reply:</strong> <a href="2595.html">Ullrich von Bassewitz: "Re: [cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?"</a>
+<li><strong>Reply:</strong> <a href="2598.html">Greg Long: "RE: [cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello,
+
+adding to what Uz said:
+
+Greg Long wrote:
+
+&gt; The Merge and Quick sort algorithms
+&gt; are faster, but waste memory...up to twice the ammount of the original
+&gt; array.
+
+Well, where do they waste memory? In the needed stack size, or elsewhere?
+
+&gt; (Now how do I overload the &lt; and &gt; operators in C?)
+
+You can't. Overloading in general and overloading built-in operations
+in particular are C++-specific extensions not available to C.
+
+&gt; Known bugs:
+&gt; -----------
+&gt; 1) cprintf does not appear to work properly :  replace \r with \n and
+&gt; watch the results.
+
+MV already told you what you have to do: Use \r\n instead.
+
+&gt; //Code below
+
+&gt; void stopwatch_reset();
+[...]
+&gt; unsigned long stopwatch();
+[...]
+&gt; int main()
+
+Although not really necessary, I suggest using a void parameter instead of
+an empty parameter list. In C++, this is the same, but it is not in C. In
+C, it means the function can take any parameter, which seems not to be the
+thing you meant, did you?
+
+&gt; //bank out BASIC interpreter
+&gt; a = PEEK(1);
+&gt; POKE(1,a&amp;254);
+
+I rather would code it something like:
+
+unsigned char *pP6510IO = 1;
+
+and then 
+
+*pP6510IO &amp;= 0xFE;
+
+This looks much more &quot;C-like&quot; (or &quot;C++-like&quot;) to me.
+
+
+&gt; //stores # of seconds in locations 1020-1021
+&gt; POKEW(1020,secs);
+
+Here, something similar like above applies.
+
+&gt; //re-enable BASIC interpreter
+&gt; a = PEEK(1);
+&gt; POKE(1,a|1);
+
+*pP6510IO |= 0x01;
+
+&gt; unsigned long stopwatch()
+&gt; {
+&gt; unsigned long sw_time = 0;
+&gt; 
+&gt; sw_time += ((unsigned long)PEEK(160)) * 0x10000;
+&gt; sw_time += ((unsigned long)PEEK(161)) * 0x100;
+&gt; sw_time += (unsigned long)PEEK(162);
+&gt; 
+&gt; return sw_time;
+&gt; }
+
+Is the counter really in this order (160 = high byte, 162 = low byte)?
+If yes, what about:
+
+unsigned char *pTimer = 160;
+
+sw_time = (((unsigned long)pTimer[0]) &lt;&lt; 16) 
+        | (((unsigned long)pTimer[1]) &lt;&lt; 8) 
+        |                  pTimer[2];
+
+On many architectures, this results in much faster code. I'm not sure
+about CC65 (haven't tested it).
+
+If the counter were in the order 160 = low byte, 162 = high byte, I even
+suggest:
+
+unsigned long *pTimer = 160;
+
+sw_time = (*pTimer) &amp; 0xFFFFFFl;
+
+
+&gt; char quit=0;
+&gt; 
+&gt; while(!quit)
+[...]
+
+Since the condition is true on first invocation, I would suggest rewriting
+the loop to
+
+char quit = 0;
+
+do {
+...
+} while (!quit);
+
+This way, it is more understandable what your intention was.
+
+Spiro.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Finished%20product:%20%20FAST%20ShellSort%20demo%20for%20c64%20(working%20:)%20)%20-%20feedback?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2592.html">Maciej Witkowiak: "Re: [cc65] using newline in cprintf on c64"</a>
+<li><strong>In reply to:</strong> <a href="2577.html">Greg Long: "[cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2595.html">Ullrich von Bassewitz: "Re: [cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?"</a>
+<li><strong>Reply:</strong> <a href="2595.html">Ullrich von Bassewitz: "Re: [cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?"</a>
+<li><strong>Reply:</strong> <a href="2598.html">Greg Long: "RE: [cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-03-05 17:30:22 CET</em>
+</em>
+</small>
+</body>
+</html>

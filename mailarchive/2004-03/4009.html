@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="iso-8859-15"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Assembler code in C</title>
+<meta name="Author" content="Spiro Trikaliotis (trik-news1gmx.de)" />
+<meta name="Subject" content="Re: [cc65] Assembler code in C" />
+<meta name="Date" content="2004-03-20" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Assembler code in C</h1>
+<!-- received="Sat Mar 20 15:24:50 2004" -->
+<!-- isoreceived="20040320142450" -->
+<!-- sent="Sat, 20 Mar 2004 15:23:53 +0100" -->
+<!-- isosent="20040320142353" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="trik-news1gmx.de" -->
+<!-- subject="Re: [cc65] Assembler code in C" -->
+<!-- id="20040320142353.GJ22112@mail" -->
+<!-- charset="iso-8859-15" -->
+<!-- inreplyto="20040319175952.GC11625&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4010.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65 .if statement&quot;">Next message</a> ]
+[ <a href="4008.html" title="carlos: &quot;[cc65] ca65 .if statement&quot;">Previous message</a> ]
+[ <a href="4007.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Assembler code in C&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4011.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Assembler code in C&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:trik-news1gmx.de?Subject=Re:%20[cc65]%20Assembler%20code%20in%20C">trik-news1gmx.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-03-20 15:23:53</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Uz,
+
+* On Fri, Mar 19, 2004 at 06:59:52PM +0100 Ullrich von Bassewitz wrote:
+ 
+&gt;    	void Int0 (void)
+&gt;    	{
+&gt;    	    asm (&quot;cld&quot;);
+&gt;    	    {
+&gt;    		unsigned char status;
+&gt;    		status = foo (bar);
+&gt;    		...
+&gt;    	    }
+&gt;    	}
+&gt; 
+&gt;    Since the variables are placed on the stack, this type of function is still
+&gt;    reentrant (the one from 1. is not).
+
+I'm surprised about this behaviour, so I just did some quick test (see
+attached file).
+
+I would have thought that function a() would generate almost the same
+code as function b(), but &quot;reuse&quot; the memory for variable b with
+variable c. As I see in the assembler output, this is not the case.
+Instead, the stack is manipulated twice, once when a block is left and 
+once when the new block is entered.
+
+I know other C compilers (a &quot;little&quot; bit bigger than cc65, like MSVC)
+analyse the full function, reserve enough memory for *every* block
+inside at the beginning of the function, and just dynamically adapt the
+usage of this memory when entering and leaving blocks. This way, the
+stack has to be manipulated only once. Isn't this possible with CC65?
+Does it need too much analysis?
+
+Best regards,
+   Spiro.
+
+-- 
+Spiro R. Trikaliotis
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<div>
+<ul>
+<li>text/x-csrc attachment: <a href="../att-4009/test.c">test.c</a></li>
+</ul>
+<!-- attachment="test.c" -->
+</div>
+<span id="received"><dfn>Received on</dfn> Sat Mar 20 15:24:50 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4010.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] ca65 .if statement"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4008.html" title="Previous message in the list">carlos: "[cc65] ca65 .if statement"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4007.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Assembler code in C"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4011.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Assembler code in C"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4011.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Assembler code in C"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4009" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4009" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4009" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-03-20 15:24:56 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Probable bug: subroutines miss</title>
+<meta name="Author" content="Sidney Cadot (cadot1science-and-technology.nl)" />
+<meta name="Subject" content="[cc65] Probable bug: subroutines misshing from runtime lib." />
+<meta name="Date" content="2005-11-27" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Probable bug: subroutines misshing from runtime lib.</h1>
+<!-- received="Sun Nov 27 20:19:09 2005" -->
+<!-- isoreceived="20051127191909" -->
+<!-- sent="Sun, 27 Nov 2005 20:18:55 +0100" -->
+<!-- isosent="20051127191855" -->
+<!-- name="Sidney Cadot" -->
+<!-- email="cadot1science-and-technology.nl" -->
+<!-- subject="[cc65] Probable bug: subroutines misshing from runtime lib." -->
+<!-- id="B4B74488-C22A-4B3C-9CC1-BDB214C67ADF@science-and-technology.nl" -->
+<!-- charset="US-ASCII" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5303.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Need help getting started with cc65 NES&quot;">Next message</a> ]
+[ <a href="5301.html" title="PH: &quot;Re: [cc65] Need help getting started with cc65 NES&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5304.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Probable bug: subroutines misshing from runtime lib.&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Sidney Cadot &lt;<a href="mailto:cadot1science-and-technology.nl?Subject=Re:%20[cc65]%20Probable%20bug:%20subroutines%20misshing%20from%20runtime%20lib.">cadot1science-and-technology.nl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-11-27 20:18:55</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+It seems that a couple of routines are not included in the runtime  
+library of v2.11 that are needed by the compiler for some generated  
+code, e.g.:
+
+
+sidney&#64;pollux:~$ cat bugz&#46;<!--nospam-->c
+
+int main(void)
+{
+     1L ? 1 : 0;
+     1UL ? 1 : 0;
+     return 0;
+}
+
+sidney&#64;pollux:~$ cl65 bugz&#46;<!--nospam-->c -o bugz
+
+Unresolved external `tsteax' referenced in:
+   bugz.s(28)
+Unresolved external `utsteax' referenced in:
+   bugz.s(40)
+ld65: Error: 2 unresolved external(s) found - cannot create output file
+
+
+
+Regards,
+
+   Sidney
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Nov 27 20:19:09 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5303.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Need help getting started with cc65 NES"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5301.html" title="Previous message in the list">PH: "Re: [cc65] Need help getting started with cc65 NES"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5304.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Probable bug: subroutines misshing from runtime lib."</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5304.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Probable bug: subroutines misshing from runtime lib."</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5302" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5302" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5302" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-11-27 20:19:12 CET
+</em></small></p>
+</body>
+</html>

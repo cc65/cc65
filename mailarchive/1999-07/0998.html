@@ -1,0 +1,159 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: still need support with low-level fi</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="still need support with low-level file stuff?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>still need support with low-level file stuff?</h1>
+<!-- received="Sat Jul 10 03:18:37 1999" -->
+<!-- isoreceived="19990710011837" -->
+<!-- sent="Sat, 10 Jul 1999 03:18:23 +0200" -->
+<!-- isosent="19990710011823" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="still need support with low-level file stuff?" -->
+<!-- id="37869F5F.F7EC2FB8@gmx.net" -->
+<!-- inreplyto="m112i6b-000brTC@wuschel.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20still%20need%20support%20with%20low-level%20file%20stuff?"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 1999-07-10 03:18:23
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0999.html">Ullrich von Bassewitz: "[cc65] Version 2.2.1 released"</a>
+<li><strong>Previous message:</strong> <a href="0997.html">Ullrich von Bassewitz: "Re: compiler bug?"</a>
+<li><strong>In reply to:</strong> <a href="0997.html">Ullrich von Bassewitz: "Re: compiler bug?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1000.html">Ullrich von Bassewitz: "[cc65] Re: still need support with low-level file stuff?"</a>
+<li><strong>Reply:</strong> <a href="1000.html">Ullrich von Bassewitz: "[cc65] Re: still need support with low-level file stuff?"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+&gt; I will try to get it done this weekend, maybe tomorrow. I will post a short
+&gt; note to the list when the new binaries are available.
+
+mmmh, will there be windoze binaries as well? still no linux here, bah
+=(
+
+Whatever, i am wondering if the filesupport is still missing in the
+libraries... i am working on a real big project atm (music editor with
+some never-seen-before features that is) and i would really like to
+move the editor crap to C code, since all the pointer and variable shit
+is driving me nuts in ASM. well, and obviously there is no sence in an
+editor that can't save =)
+
+however, i dont know what the current version of the compiler looks
+like,
+but the one i looked at (half a year ago or sth) handled inline assembly
+in a quite annoying way (using the asm keyword that is). 
+
+to make it straight... i WILL be able to implement the few missing file
+routines, its not quite hard stuff anyway... BUT i cant be arsed to work
+with this way of assembly. Also, for testing purposes, it sucks bigtime
+to have different sourcefiles that have to be linked etc etc. 
+
+So, good solution for that purpose would be having another compiler-
+directive that switches assembly on/off like
+
+#asm
+	lda #$00
+	sta $d020
+#endasm
+
+this should be both very easy to implement in the compiler (since it
+just would copy the shit inside the directives to the generated asm
+file) and it will be *very* handy for decent developing.
+
+another thing is, that i was missing a 'dummy' implementation of
+a library function in ASM, that is how to get the params passed to
+the routine and how to pass them back. i suppose its like 1st 3 args
+are passed in a,x,y and more args on stack... and same thing for
+returning them, is that rite ?! Maybe its a good idea to supply a
+short example that takes a few args, prints them or sth, and then
+returns some other args.
+
+ok, so far so good... just tell me what you think.
+
+regards
+
+gpz/hit
+
+-- 
+........................................................
+
+		            /^\
+                            \ /  
+      ASCII RIBBON CAMPAIGN  X  AGAINST HTML MAIL
+                            / \  
+
+........................................................
+
+             .--.--.--.----..--.--.--.-----.----.
+   C=64     /  /  /  /  .  /  .  .  /  .  /  .  /\
+           /  /  /__/  /__/  /  /  /  /  /  /  / /
+   PC     /     /  /  /\_/  /  /  /  __ /  /  / /
+         /  /  /  /  / //  /  /  /  /  /  /  / /
+   PSX  /  /  /  /  / //  /  /  /  /  /  /  / /
+       /__/__/__/__/ //__/__/__/_____/__/__/ / 
+       \__\__\__\__\/ \__\__\__\_____\__\__\/  Groepaz
+
+........................................................
+.. <a href="http://fly.to/hitmen-c64">http://fly.to/hitmen-c64</a> ............................
+..... the hitmen c64 home page .........................
+.. <a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a> .......................
+..... hitmen psx section ...............................
+.. <a href="http://start.at/hitnav64">http://start.at/hitnav64</a> ............................
+..... biggest c64 link collection around ...............
+.. <a href="http://fly.to/hitmen-groepaz">http://fly.to/hitmen-groepaz</a> ........................
+..... my little personal page ..........................
+........................................................
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20still%20need%20support%20with%20low-level%20file%20stuff?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0999.html">Ullrich von Bassewitz: "[cc65] Version 2.2.1 released"</a>
+<li><strong>Previous message:</strong> <a href="0997.html">Ullrich von Bassewitz: "Re: compiler bug?"</a>
+<li><strong>In reply to:</strong> <a href="0997.html">Ullrich von Bassewitz: "Re: compiler bug?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1000.html">Ullrich von Bassewitz: "[cc65] Re: still need support with low-level file stuff?"</a>
+<li><strong>Reply:</strong> <a href="1000.html">Ullrich von Bassewitz: "[cc65] Re: still need support with low-level file stuff?"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:44 CET</em>
+</em>
+</small>
+</body>
+</html>

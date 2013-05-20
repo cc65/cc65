@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Apple2 Libraries - Current</title>
+<meta name="Author" content="Greg King (gngking1erols.com)" />
+<meta name="Subject" content="Re: [cc65] Apple2 Libraries - Current status of file io ?" />
+<meta name="Date" content="2004-07-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Apple2 Libraries - Current status of file io ?</h1>
+<!-- received="Thu Jul 29 05:50:00 2004" -->
+<!-- isoreceived="20040729035000" -->
+<!-- sent="Wed, 28 Jul 2004 23:48:08 -0400" -->
+<!-- isosent="20040729034808" -->
+<!-- name="Greg King" -->
+<!-- email="gngking1erols.com" -->
+<!-- subject="Re: [cc65] Apple2 Libraries - Current status of file io ?" -->
+<!-- id="000201c4751f$5dc14640$db662c42@palace" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="[cc65] Apple2 Libraries - Current status of file io ?" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4316.html" title="Oliver Schmidt: &quot;Re: [cc65] Apple2 Libraries - Current status of file io ?&quot;">Next message</a> ]
+[ <a href="4314.html" title="Greg King: &quot;Re: [cc65] Apple2 Libraries - Current status of file io ?&quot;">Previous message</a> ]
+[ <a href="4294.html" title="jim: &quot;[cc65] Apple2 Libraries - Current status of file io ?&quot;">Maybe in reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4316.html" title="Oliver Schmidt: &quot;Re: [cc65] Apple2 Libraries - Current status of file io ?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:gngking1erols.com?Subject=Re:%20[cc65]%20Apple2%20Libraries%20-%20Current%20status%20of%20file%20io%20?">gngking1erols.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-07-29 05:48:08</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: Oliver Schmidt; on Date: Wednesday, July 28, 2004, at 10:00 AM -0400
+&gt;
+&gt; Ullrich von Bassewitz asked:
+&gt; &gt;
+&gt; &gt; Uhm, can you explain that for a non-apple-literate?  It seems that the
+&gt; &gt; Apple does come in quite some different configurations. :-)
+&gt;
+&gt; Okay, the Apple2 universe consists of several hardware platforms,
+&gt; as well as several OS platforms:
+&gt;
+&gt; - The oldest Apple2 are the ][ / ][+ with a 6502 and typically 48k to
+&gt; 64k.  It typically runs Apple DOS 3.3 (or less common, ProDOS 8).
+&gt;
+&gt; - The most widely used Apple2 is the (enhanced) Apple //e with a 65C02
+&gt; and typically 64k to 128k.  It runs Apple DOS 3.3 or ProDOS 8.
+&gt;
+&gt; - The latest Apple2 is the Apple // GS with some 65816-like CPU.
+&gt; It natively runs GS/OS for GUI, memory management, etc.; and, ProDOS 16
+&gt; for disk access.  It can boot into an 8-bit emulation-mode, running
+&gt; Apple DOS 3.3 or ProDOS 8.
+
+
+From: Oliver Schmidt; on Date: Wednesday, July 28, 2004, at 10:04 AM -0400
+&gt;
+&gt; Ullrich von Bassewitz asked:
+&gt; &gt;
+&gt; &gt; Does this mean there are several different file-I/O libraries needed
+&gt; &gt; for the Apple?  If so, would it be possible to find a common
+&gt; &gt; denominator for all of them?
+&gt;
+&gt; As far as I know, there are three different environments for disc
+&gt; access:
+&gt;
+&gt; - Apple DOS 3.3 has an originally internal -- afterwards weakly
+&gt; documented by a third party -- interface usable by 6502 assembly
+&gt; programs.  Anyway, looking back from 2004, this interface can be
+&gt; considered stable. ;-)
+&gt;
+&gt; - ProDOS 8 has an official 6502/65C02 assembly program interface which
+&gt; is totaly different from DOS 3.3, in all aspects.  From a certain
+&gt; version on, ProDOS 8 uses 65C02 statements internally.
+&gt;
+&gt; - I don't know details about ProDOS 16, but I'd assume that it has a
+&gt; 65816 assembly interface, at least to some degree, logically compatible
+&gt; with the one of ProDOS 8.
+
+That info. suggests that an easy division of the code would be:
+o  put DOS 3 file-functions into the &quot;apple2/&quot; sub-directory;
+o  put ProDOS file-functions into the &quot;apple2enh/&quot; sub-directory.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Jul 29 05:50:00 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4316.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4314.html" title="Previous message in the list">Greg King: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<li><dfn>Maybe in reply to</dfn>: <a href="4294.html" title="Message to which this message replies">jim: "[cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4316.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4316.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="4323.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4315" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4315" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4315" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-07-29 05:50:09 CEST
+</em></small></p>
+</body>
+</html>

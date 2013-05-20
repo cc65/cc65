@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] need help getting external</title>
+<meta name="Author" content="Marc Rintsch (marc1rintsch.de)" />
+<meta name="Subject" content="Re: [cc65] need help getting external long from asm" />
+<meta name="Date" content="2011-11-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] need help getting external long from asm</h1>
+<!-- received="Wed Nov 23 13:04:30 2011" -->
+<!-- isoreceived="20111123120430" -->
+<!-- sent="Wed, 23 Nov 2011 12:57:09 +0100" -->
+<!-- isosent="20111123115709" -->
+<!-- name="Marc Rintsch" -->
+<!-- email="marc1rintsch.de" -->
+<!-- subject="Re: [cc65] need help getting external long from asm" -->
+<!-- id="201111231257.09368.marc@rintsch.de" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="4ECCB627.9020805&#64;groessler.org" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9707.html" title="Joseph Rose: &quot;[cc65] TempC Small/DOS?&quot;">Next message</a> ]
+[ <a href="9705.html" title="Christian Grössler: &quot;Re: [cc65] need help getting external long from asm&quot;">Previous message</a> ]
+[ <a href="9705.html" title="Christian Grössler: &quot;Re: [cc65] need help getting external long from asm&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Marc Rintsch &lt;<a href="mailto:marc1rintsch.de?Subject=Re:%20[cc65]%20need%20help%20getting%20external%20long%20from%20asm">marc1rintsch.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-11-23 12:57:09</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Wednesday 23 November 2011 10:00:23 you wrote:
+&gt; On 23.11.11 01:56, Egan Ford wrote:
+&gt; &gt; _timer: LDA     KBDCR           ; cycles 4      got key?
+&gt; &gt; 
+&gt; &gt;          BMI     DONE            ; cycles 2      if neg, got key goto
+&gt; &gt;          DONE CLC                     ; cycles 2      clear carry
+&gt; &gt;          LDA     #1              ; cycles 2      A = 1
+&gt; &gt;          ADC     _count          ; cycles 4      LSB += A
+&gt; &gt;          STA     _count          ; cycles 4
+&gt; &gt;          LDA     #0              ; cycles 2      A = 0
+&gt; &gt;          ROL     A               ; cycles 2      A = carry, carry = 0
+&gt; &gt;          ADC     _count+1        ; cycles 4
+&gt; &gt;          STA     _count+1        ; cycles 4
+&gt; &gt;          LDA     #0              ; cycles 2      A = 0
+&gt; &gt;          ROL     A               ; cycles 2      A = carry, carry = 0
+&gt; &gt;          ADC     _count+2        ; cycles 4
+&gt; &gt;          STA     _count+2        ; cycles 4
+&gt; &gt;          LDA     #0              ; cycles 2      A = 0
+&gt; &gt;          ROL     A               ; cycles 2      A = carry, carry = 0
+&gt; &gt;          ADC     _count+3        ; cycles 4
+&gt; &gt;          STA     _count+3        ; cycles 4
+&gt; &gt;          CLC                     ; cycles 2      clear carry
+&gt; &gt;          BCC     _timer          ; cycles 2 + 1  back to checking for key
+&gt; &gt;          
+&gt; &gt;                                  ; total = 59
+&gt; &gt; 
+&gt; &gt; DONE:   LDA     KBDDATA         ; get key value
+&gt; &gt; 
+&gt; &gt;          STA     _key            ; store in _key
+&gt; &gt;          RTS
+&gt; 
+&gt; A small optimization, you can remove the &quot;ROL A&quot; instructions.
+
+Even more optimization: All ``adc``/``sta`` can be replaced by 
+``inc``/``bne``:
+
+_timer: lda KBDCR
+        bmi DONE
+        inc _count
+        bne _timer
+        inc _count+1
+        bne _timer
+        inc _count+2
+        bne _timer
+        inc _count+3
+        jmp _timer
+
+DONE:   lda KBDDATA
+        sta _key
+        rts
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Nov 23 13:04:30 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9707.html" title="Next message in the list">Joseph Rose: "[cc65] TempC Small/DOS?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9705.html" title="Previous message in the list">Christian Grössler: "Re: [cc65] need help getting external long from asm"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9705.html" title="Message to which this message replies">Christian Grössler: "Re: [cc65] need help getting external long from asm"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9706" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9706" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9706" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-11-23 13:04:33 CET
+</em></small></p>
+</body>
+</html>

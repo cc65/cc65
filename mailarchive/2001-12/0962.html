@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] Compile problem</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] Compile problem">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] Compile problem</h1>
+<!-- received="Mon Dec 10 19:58:38 2001" -->
+<!-- isoreceived="20011210185838" -->
+<!-- sent="Mon, 10 Dec 2001 19:57:26 +0100" -->
+<!-- isosent="20011210185726" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] Compile problem" -->
+<!-- id="276412622.20011210195726@gmx.net" -->
+<!-- inreplyto="20011210192703.A30443@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20Compile%20problem"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2001-12-10 19:57:26
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0963.html">groepaz: "Re[4]: [cc65] Compile problem"</a>
+<li><strong>Previous message:</strong> <a href="0961.html">Ullrich von Bassewitz: "Re: [cc65] Compile problem"</a>
+<li><strong>In reply to:</strong> <a href="0961.html">Ullrich von Bassewitz: "Re: [cc65] Compile problem"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0968.html">Ullrich von Bassewitz: "Re: [cc65] Compile problem"</a>
+<li><strong>Reply:</strong> <a href="0968.html">Ullrich von Bassewitz: "Re: [cc65] Compile problem"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+UvB&gt; This is not correct. -I may be used for your own files and it may even be used
+UvB&gt; within a project. In fact, cc65 itself uses -I to point to header files that
+UvB&gt; are shared between the binary tools, it does *not* use relative paths.
+
+UvB&gt; And, since directory handling is often non portable (there may be platforms
+UvB&gt; with a different path separator, without a concept for a &quot;subdirectory&quot;, or
+UvB&gt; with a different notation for &quot;parent directory&quot;) many guidelines for writing
+UvB&gt; portable code say *not* to use a path in an include statement (the coding
+UvB&gt; guidelines for the Mozilla project are an example).
+
+ok, for that reason, i could maybe understand (although practically a
+straight compile works fine for me for dos/win/linux/macos/amiga
+targets with liiiiiiiiiiiiiiiitle modification for each version - a
+handfull related functions for path-handling etc encapsulated in
+seperate files does the trick pretty well .... win/linux/macos should
+work without modification whatsoever)
+
+what do these guidelines say about how to name include files then? (it
+kinda makes having several files with the same name a lottery ..... hu
+which one will be included this time? ;=))
+
+UvB&gt; So I have to admit that I'm not really convinced. While it is possible to
+UvB&gt; change the current behaviour, and it wouldn't be too much work, it
+
+UvB&gt;   * will increase code size and make the search routines more complex,
+
+yes surely will :O) just like shooting the lightbulb results in
+darkness ;D
+
+UvB&gt;   * will change the current behaviour and may break existing code,
+
+mmmh break existing code? how? wouldnt old code work just the same?
+(oh no, the &quot;having several files with same name&quot; problem hitting
+again right?)
+
+UvB&gt;   * may not meet other peoples expectations about the search algorithm.
+
+well i dont think so, really :=) most people probably wouldnt notice
+the difference anyway - except those who expect that kinda behaviour
+'coz they knew it from the compiler they used before ;=)
+
+UvB&gt; There are other details that will complicate the implementation: By using the
+UvB&gt; path to an include file as the new search path for new include files, paths
+UvB&gt; may &quot;add up&quot;, getting longer and longer, eventually growing outside of some
+UvB&gt; operating system limits (DOS for example has just about 60 characters for a
+UvB&gt; path available). So special code would be required to cleanup path elements,
+UvB&gt; and this code will require platform dependent knowledge - something I've
+UvB&gt; managed to keep outside of the cc65 source until today.
+
+yes, surely, for a clean working implementation you need &quot;expandpath&quot;
+and &quot;collapsepath&quot; - which kinda need to be target-specific (well
+they'd have a handfull minor tweaks in #ifdef 's i'd say ;=))
+
+UvB&gt; For C compilers, the standard does not specify any search algorithm, it does
+UvB&gt; not even talk about search paths or paths in include statements, and all this
+UvB&gt; for a reason: It would be non portable to do so.
+                 
+yes maybe... but its still the way it is, all and every compiler i
+have tried (probably every &quot;major&quot; one there is plus tons of
+target-specific ones) behaves like this - except some really really
+old ones which do exactly behave like cc65 :o)
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20Compile%20problem">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20Compile%20problem">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0963.html">groepaz: "Re[4]: [cc65] Compile problem"</a>
+<li><strong>Previous message:</strong> <a href="0961.html">Ullrich von Bassewitz: "Re: [cc65] Compile problem"</a>
+<li><strong>In reply to:</strong> <a href="0961.html">Ullrich von Bassewitz: "Re: [cc65] Compile problem"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0968.html">Ullrich von Bassewitz: "Re: [cc65] Compile problem"</a>
+<li><strong>Reply:</strong> <a href="0968.html">Ullrich von Bassewitz: "Re: [cc65] Compile problem"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:44 CET</em>
+</em>
+</small>
+</body>
+</html>

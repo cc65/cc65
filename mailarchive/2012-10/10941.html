@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Goodbye _curunit, Hello ch</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Goodbye _curunit, Hello chdir()" />
+<meta name="Date" content="2012-10-20" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Goodbye _curunit, Hello chdir()</h1>
+<!-- received="Sat Oct 20 16:31:06 2012" -->
+<!-- isoreceived="20121020143106" -->
+<!-- sent="Sat, 20 Oct 2012 16:30:25 +0200" -->
+<!-- isosent="20121020143025" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Goodbye _curunit, Hello chdir()" -->
+<!-- id="CACT=u71=2_toAMmJqkLJmr=0LAoQv1WBQSU+AnCUtsmSby0LEw@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="CAJm6qqeF5ZHWoQXH9Ji+p=oeEMi4kCuAydXMdrXz1aGd6iy6Pg&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10942.html" title="Marc 'BlackJack' Rintsch: &quot;Re: [cc65] Goodbye _curunit, Hello chdir()&quot;">Next message</a> ]
+[ <a href="10940.html" title="Shawn Jefferson: &quot;RE: [cc65] dio_query_sectcount() on Atari ?&quot;">Previous message</a> ]
+[ <a href="10939.html" title="Payton Byrd: &quot;Re: [cc65] Goodbye _curunit, Hello chdir()&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10942.html" title="Marc 'BlackJack' Rintsch: &quot;Re: [cc65] Goodbye _curunit, Hello chdir()&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Goodbye%20_curunit,%20Hello%20chdir()">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-10-20 16:30:25</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt; That means I'll have to carry the weight of both the CBM specific library,
+&gt; which I cannot escape, and the posix stuff too for CBM-Command.
+
+In general calling one function from a certain area of functionality
+doesn't mean you pull in _all_ the &quot;stuff&quot; as great care has been
+taken to provide a modular design.
+
+&gt;  Why did
+&gt; _curunit HAVE to go away completely?
+
+I hoped I did explain well why _curunit can't stay around: Write
+access to it causes inconsistencies inside he C library.
+
+The good news - at least I hope so - are however that there's no
+reason against read access. In fact I believe one can presume that
+every target with a notion of device numbers has some &quot;current&quot; device
+number meaning that providing read access to that current device
+number is possible in a target-independent way:
+
+unsigned char getcurrentdevice (void);
+
+There are in fact other scenarios beside yours which could benefit from this:
+- dio_open(getcurrentdevice()): Open current device for low level I/O.
+- getdevicedir(getcurrentdevice(), ..., ...): Find the name of the
+root directory of the current device.
+
+As getcurrentdevice() adds only 6 (?) bytes to a program I believe
+that this solves your issue. I'll provide feedback here when it is
+available.
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Oct 20 16:31:06 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10942.html" title="Next message in the list">Marc 'BlackJack' Rintsch: "Re: [cc65] Goodbye _curunit, Hello chdir()"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10940.html" title="Previous message in the list">Shawn Jefferson: "RE: [cc65] dio_query_sectcount() on Atari ?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10939.html" title="Message to which this message replies">Payton Byrd: "Re: [cc65] Goodbye _curunit, Hello chdir()"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10942.html" title="Next message in this discussion thread">Marc 'BlackJack' Rintsch: "Re: [cc65] Goodbye _curunit, Hello chdir()"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10942.html" title="Message sent in reply to this message">Marc 'BlackJack' Rintsch: "Re: [cc65] Goodbye _curunit, Hello chdir()"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10943.html" title="Message sent in reply to this message">thefox xofeht: "Re: [cc65] Goodbye _curunit, Hello chdir()"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10950.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Goodbye _curunit, Hello chdir()"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10941" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10941" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10941" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-10-20 16:31:10 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Atari Disk Image Tool ?</title>
+<meta name="Author" content="Christian Grössler (chris1groessler.org)" />
+<meta name="Subject" content="Re: [cc65] Atari Disk Image Tool ?" />
+<meta name="Date" content="2010-09-26" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Atari Disk Image Tool ?</h1>
+<!-- received="Sun Sep 26 13:41:41 2010" -->
+<!-- isoreceived="20100926114141" -->
+<!-- sent="Sun, 26 Sep 2010 13:41:18 +0200" -->
+<!-- isosent="20100926114118" -->
+<!-- name="Christian Grössler" -->
+<!-- email="chris1groessler.org" -->
+<!-- subject="Re: [cc65] Atari Disk Image Tool ?" -->
+<!-- id="4C9F315E.9010704@groessler.org" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="AANLkTikKa5b_ZK9AjFi38eoPdrbxpCMKjVZ6st_U33qB&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8620.html" title="Christian Grössler: &quot;Re: [cc65] Atari Memory Layout&quot;">Next message</a> ]
+[ <a href="8618.html" title="Oliver Schmidt: &quot;[cc65] Atari Memory Layout&quot;">Previous message</a> ]
+[ <a href="8617.html" title="Oliver Schmidt: &quot;Re: [cc65] Atari Disk Image Tool ?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8621.html" title="Oliver Schmidt: &quot;Re: [cc65] Atari Disk Image Tool ?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Christian Grössler &lt;<a href="mailto:chris1groessler.org?Subject=Re:%20[cc65]%20Atari%20Disk%20Image%20Tool%20?">chris1groessler.org</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-09-26 13:41:18</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+On 26.09.10 12:32, Oliver Schmidt wrote:
+&gt; There seem to be quite some disk formats and DOSes around. I'd like to
+&gt; create an .ATR file wich can easily converted back to a real floppy
+&gt; disk by most Atari users. Which format and DOS should I use for that
+&gt; purpose.
+
+You should use 90k single density or 130k enhanced density format.
+Which version of DOS shouldn't matter, but the &quot;standard&quot; is
+Atari DOS 2.5.
+
+&gt; All questions below refer to whatever DOS is &quot;the right&quot; for me:
+&gt;
+&gt; In order to create a bootable .ATR file I seem to need to have DOS.SYS
+&gt; around. Where should I get it?
+
+You can get DOS versions from <a href="http://ftp.pigwa.net/stuff/collections/atari_forever/Dos/">http://ftp.pigwa.net/stuff/collections/atari_forever/Dos/</a>
+To make it bootable the first 3 sectors should contain boot code. unix2atr writes
+it (at least DOS 2 any MyDOS compatible, I don't know if it's dependent on the
+DOS used). DIR2ATR probably write it, too, but I haven't checked.
+
+&gt; Should the cc65 binary I created have a name with a certain extension?
+&gt; What is the maximum filename length?
+
+8.3 file names like in MSDOS. Extension doesn't matter, but .COM is
+convenient for SpartaDOS users, they can type the file name without
+extension on the command line to load the file.
+
+&gt; If I have just one binary (and some support files to be loaded by it)
+&gt; on a disk then I presume it can be autoloaded by giving it a certain
+&gt; name. Which one?
+
+This depends on the DOS used. For DOS 2.5 it's AUTORUN.SYS.
+
+&gt; If I have several binaries on a disk the user should be able to easily
+&gt; choose from do I have to do something special to meet Atari user
+&gt; expectations?
+
+Write a menu loader? :-)
+Or you can try MyPicoDOS (<a href="http://www.horus.com/~hias/atari/">http://www.horus.com/~hias/atari/</a>) which is tiny and
+boots into a menu showing all files and the user can highlight one and start it.
+
+Are you by chance trying to port contiki 2 to the Atari? If yes, I did the
+Contiki 1 port. If you need assistance. please contact me off-list.
+
+regards,
+chris
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Sep 26 13:41:41 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8620.html" title="Next message in the list">Christian Grössler: "Re: [cc65] Atari Memory Layout"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8618.html" title="Previous message in the list">Oliver Schmidt: "[cc65] Atari Memory Layout"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8617.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] Atari Disk Image Tool ?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8621.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Atari Disk Image Tool ?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8621.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Atari Disk Image Tool ?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8619" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8619" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8619" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-09-26 13:41:43 CEST
+</em></small></p>
+</body>
+</html>

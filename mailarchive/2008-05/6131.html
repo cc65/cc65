@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Re: Macro naming</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Re: Macro naming" />
+<meta name="Date" content="2008-05-30" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Re: Macro naming</h1>
+<!-- received="Fri May 30 11:10:00 2008" -->
+<!-- isoreceived="20080530091000" -->
+<!-- sent="Fri, 30 May 2008 11:09:51 +0200" -->
+<!-- isosent="20080530090951" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Re: Macro naming" -->
+<!-- id="20080530090951.GA3166@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="080529225502&#64;arcade.demon.co.uk" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6132.html" title="Jonathan Graham Harston: &quot;[cc65] Re: Macro naming&quot;">Next message</a> ]
+[ <a href="6130.html" title="Jonathan Graham Harston: &quot;[cc65] Re: Macro naming&quot;">Previous message</a> ]
+[ <a href="6130.html" title="Jonathan Graham Harston: &quot;[cc65] Re: Macro naming&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Re:%20Macro%20naming">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-05-30 11:09:51</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Thu, May 29, 2008 at 09:58:46PM +0100, Jonathan Graham Harston wrote:
+&gt; I'm updating a C compiler[1] and trying to ensure that it
+&gt; consistantly predefines certain macros so that source code can be
+&gt; written to take advantage of that and compile differently for
+&gt; different targets. It happens all the time. Look at the source for
+&gt; gcc or infozip or zmodem or kermit or cZ80Tube or loads of code
+&gt; that is compilable on different platforms, eg:
+&gt;
+&gt; #ifdef __riscos__
+&gt;   setfileattr(fn, load, exec, attr);
+&gt; #elif __win32__
+&gt;   writeattr(fn, mdateoff, ro);
+&gt; #elif __macos__
+&gt;   filer_setinf(fn, macfdate(mdateoff));
+&gt; #endif
+&gt; etc...
+
+This is an example for a very bad idea. Sources with this type of #ifdefs are
+becoming unmanageable very quickly. Instead of adjusting your code in every
+place where &quot;setfileattr&quot; is needed, write your own function with semantics
+defined by you and use this function. This means a lot less #ifdefs and code
+that is easier to read and to maintain. I know that it is common practice to
+clutter code with #ifdef, but does not mean it is a good practice.
+
+&gt; So, if code wants to be compilable with both cc65 and gcc, then
+&gt; code has to test for both macros:
+&gt;
+&gt; #if (__ATARI__ || __atari__)
+
+Again: Bad idea. Using these identifiers is inherently non portable, because
+you rely on something the compiler maker says. It may change every day and if
+it does, you have to touch many source files.
+
+Instead, use your own #defines with your own semantics. For example, use
+
+#ifdef ATARI
+
+in your code. You can either set this #define in the makefile when calling the
+preprocessor. Or you can use your own header file, for example machine.h which
+does something like this:
+
+#if defined(__CC65__)
+#  if defined(__ATARI__)
+#    define ATARI
+#  elif defined(__C64__)
+...
+#  else
+#    error &quot;Undefined target system&quot;
+#  endif
+#else
+#  error &quot;Unknown compiler&quot;
+#endif
+
+With such a file, if compiler semantics change, or if you want to support a
+new compiler, you have to change ONE file, and not every file.
+
+Regarding code like this:
+
+&gt; #ifdef __riscos__
+&gt;   setfileattr(fn, load, exec, attr);
+&gt; #elif __win32__
+&gt;   writeattr(fn, mdateoff, ro);
+&gt; #elif __macos__
+&gt;   filer_setinf(fn, macfdate(mdateoff));
+&gt; #endif
+&gt; etc...
+
+Don't do it. Instead, supply your own set_file_attr() function with semantics
+defined by you.
+
+&gt; Either cc65 and my Small-C should use __platform__, or we behalf
+&gt; should petition the gcc authors to change gcc to use __PLATFORM__.
+
+No. There is no guarantee that there is even something like __PLATFORM__.
+
+&gt; Even worse, infozip source code refers to MACOS, MSDOS, UNIX,
+&gt; etc., but also to __human86k__ and __IBMPC__.
+
+Yeah. That's the bad thing with #ifdefs - one looses the overview very
+quickly. Even worse: A simple change may break code using #ifdefs, because it
+is very difficult to oversee the effects. And if you aren't testing all the
+branches of the #ifdef, you cannot be sure it does still work. I've seen code
+made portable by #ifdefs several times that didn't work because of such
+problems.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri May 30 11:10:00 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6132.html" title="Next message in the list">Jonathan Graham Harston: "[cc65] Re: Macro naming"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6130.html" title="Previous message in the list">Jonathan Graham Harston: "[cc65] Re: Macro naming"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6130.html" title="Message to which this message replies">Jonathan Graham Harston: "[cc65] Re: Macro naming"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6131" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6131" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6131" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-05-30 11:10:02 CEST
+</em></small></p>
+</body>
+</html>

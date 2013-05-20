@@ -1,0 +1,153 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] preprocessor hazzle...</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="[cc65] preprocessor hazzle...">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] preprocessor hazzle...</h1>
+<!-- received="Fri Jul 26 19:49:12 2002" -->
+<!-- isoreceived="20020726174912" -->
+<!-- sent="Fri, 26 Jul 2002 19:48:59 +0200" -->
+<!-- isosent="20020726174859" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="[cc65] preprocessor hazzle..." -->
+<!-- id="11514220389.20020726194859@gmx.net" -->
+<!-- inreplyto="000201c2340f$16cd43e0$fb312c42@palace" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20preprocessor%20hazzle..."><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2002-07-26 19:48:59
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1536.html">Greg King: "Re: [cc65] Alignment"</a>
+<li><strong>In reply to:</strong> <a href="1536.html">Greg King: "Re: [cc65] Alignment"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1538.html">Ullrich von Bassewitz: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Next in thread:</strong> <a href="1506.html">Shawn Jefferson: "Re: Re: [cc65] Strange problem"</a>
+<li><strong>Reply:</strong> <a href="1538.html">Ullrich von Bassewitz: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Reply:</strong> <a href="1539.html">Christian Groessler: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Reply:</strong> <a href="1547.html">Greg King: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Reply:</strong> <a href="1549.html">Greg King: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Reply:</strong> <a href="../2002-09/1590.html">Ullrich von Bassewitz: "[cc65] #pragma"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+hyho...
+
+i've been trying to port &quot;small&quot; (which is a quite nice embedded
+scripting language very useful for creating games logic and simelar
+stuff, funny enough its compiler is also originated from the small-c
+compiler) to cc65, and encountered some problems ....
+
+1)
+shouldnt the compiler ignore #pragmas that it doesnt support? (instead
+of issuing an error).... sorry if thats a dumb question, i've never
+used pragmas myself in a portable program before, and didnt stumble
+about any that would cause problems until now either ;=P
+
+and, if the errors are correct, more #ifdef voodoo is the logical
+conclusion? :=/ (infect i guess that all compilers ever used to
+compile that code support the &quot;pack&quot; pragma in question so they
+probably didnt care about possible hazzle with it ;/)
+
+2)
+i remember that theres some problem with the preprocessor, but i am
+unsure if this here is related to those or if its just an unrelated
+bug :o)
+that code uses an expression like
+
+#if !defined __STDC_VERSION__ || __STDC_VERSION__ &lt; 199901L
+
+to figure out if certain C99 types are available.... cc65 gives me an
+error on the second part of the expression.... i tried to work around
+this by doing sth like
+
+#if !defined __STDC_VERSION__
+# define bingo
+#endif
+#if defined __STDC_VERSION__
+# if __STDC_VERSION__ &lt; 199901L
+#  define bingo
+# endif
+#endif
+#ifdef bingo
+
+but strange enough, although __STDC_VERSION__ is not defined, cc65
+gives me an error on the &quot;# if __STDC_VERSION__ &lt; 199901L&quot; line ?!
+(shouldnt it really completely ignore everything until next #endif here ?!)
+
+this kind of beats me ;=P please gimme a hint on how to work around this
+without having to add a tons of additional #ifdef voodoo to the
+original source :)
+
+tjam.... would be great to get help with this asap, since i am really
+curious to see if &quot;small&quot; might actually be useful on a c64 (or any
+other cc65 target for that matter) :o)
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20preprocessor%20hazzle...">groepaz_at_gmx.net</a>
+
+btw as a sidenote.... i noticed the cc65.org frontpage doesnt mention
+&quot;cygwin&quot; in the list of working hosts.... so you can add that it works
+like a charm in win9x-hosted (prolly nt/2000/xp aswell then) cygwin,
+with really minor changes in the gcc-makefiles (some pathes if i
+remember right, eg to let it find perl). compiles without a single
+warning (-O2 -Wall) btw, good job :O)
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20preprocessor%20hazzle...">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1536.html">Greg King: "Re: [cc65] Alignment"</a>
+<li><strong>In reply to:</strong> <a href="1536.html">Greg King: "Re: [cc65] Alignment"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1538.html">Ullrich von Bassewitz: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Next in thread:</strong> <a href="1506.html">Shawn Jefferson: "Re: Re: [cc65] Strange problem"</a>
+<li><strong>Reply:</strong> <a href="1538.html">Ullrich von Bassewitz: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Reply:</strong> <a href="1539.html">Christian Groessler: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Reply:</strong> <a href="1547.html">Greg King: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Reply:</strong> <a href="1549.html">Greg King: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Reply:</strong> <a href="../2002-09/1590.html">Ullrich von Bassewitz: "[cc65] #pragma"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-07-26 19:54:28 CEST</em>
+</em>
+</small>
+</body>
+</html>

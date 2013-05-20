@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] C64 web server</title>
+<meta name="Author" content="Adam Dunkels (adam_at_sics.se)">
+<meta name="Subject" content="Re: [cc65] C64 web server">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] C64 web server</h1>
+<!-- received="Wed Oct 17 16:16:55 2001" -->
+<!-- isoreceived="20011017141655" -->
+<!-- sent="Wed, 17 Oct 2001 16:16:56 +0200" -->
+<!-- isosent="20011017141656" -->
+<!-- name="Adam Dunkels" -->
+<!-- email="adam_at_sics.se" -->
+<!-- subject="Re: [cc65] C64 web server" -->
+<!-- id="200110171416.QAA08614@color.sics.se" -->
+<!-- inreplyto="Pine.OSF.4.10.10110171628041.14760-100000@meripihka.hut.fi" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Adam Dunkels (<a href="mailto:adam_at_sics.se?Subject=Re:%20[cc65]%20C64%20web%20server"><em>adam_at_sics.se</em></a>)<br>
+<strong>Date:</strong> 2001-10-17 16:16:56
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0867.html">Adam Dunkels: "Re: [cc65] C64 web server"</a>
+<li><strong>Previous message:</strong> <a href="0865.html">Spiro Trikaliotis: "Re: [cc65] C64 web server"</a>
+<li><strong>In reply to:</strong> <a href="0862.html">Marko Mäkelä: "RE: [cc65] C64 web server"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0871.html">Spiro Trikaliotis: "Re: [cc65] C64 web server"</a>
+<li><strong>Reply:</strong> <a href="0871.html">Spiro Trikaliotis: "Re: [cc65] C64 web server"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Wednesday 17 October 2001 15:36, you wrote:
+&gt; On Wed, 17 Oct 2001, Keates, Mark wrote:
+&gt; &gt; Forgive my non-familiarity of the C64 disk drive but
+&gt; &gt; how would the server running from its ROM know about
+&gt; &gt; the filesystem layout?
+&gt;
+&gt; Actually, the drive contains the disk operating system and does know about
+&gt; the file system layout.  But I'd adopt a simpler file system for such an
+&gt; application, since the HTTP server does not need to write anything to the
+&gt; disk (no log files).  The file system could be implemented by one sector
+&gt; that is initially loaded from the disk to memory.  That sector would
+&gt; contain file names and disk addresses (linear addressing, maybe with a
+&gt; fixed interleave factor).
+&gt;
+&gt; Each page would occupy an integer amount of sectors, and each sector would
+&gt; hold 256 bytes of data (instead of the normal 254).  The end of a file
+&gt; could be marked with a zero byte, or if you want to serve binary files,
+&gt; the file lengths could be stored in the directory.  In that case, the
+&gt; starting disk address of a document could be determined by adding the file
+&gt; lengths of preceding documents (rounded up to 256-byte boundaries)
+&gt; together.
+
+I wouldn't adopt a new file system for such a web server for a number of 
+reasons. First, it is much harder to write/modify a disk with a custom 
+filesystem; it wouldn't be possible to use existing tools such as the 1541 
+ROM routines to do this. Second, the 1541 filesystem isn't that hard to work 
+with - the directory layout is very simple. Third, the &quot;next block&quot; pointers 
+in the data blocks are well suited for an application such as this since less 
+connection state would have to be used. I.e., there would be no need to hold 
+the length of the file that is being sent is when the &quot;next block&quot; pointer 
+stuff is used.
+
+The fact that 254 bytes are used instead of 256 wouldn't really matter since 
+the TCP maxium segment size (MSS, the number of bytes per TCP packet) would 
+be configured to be well below 256 bytes anyway. 
+
+I think the advantages of using the standard filesystem would outweigh the 
+small savings that can be made by having a custom filesystem.
+
+/adam
+-- 
+Adam Dunkels &lt;<a href="mailto:adam_at_sics.se?Subject=Re:%20[cc65]%20C64%20web%20server">adam_at_sics.se</a>&gt;
+<a href="http://www.sics.se/~adam">http://www.sics.se/~adam</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20C64%20web%20server">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0867.html">Adam Dunkels: "Re: [cc65] C64 web server"</a>
+<li><strong>Previous message:</strong> <a href="0865.html">Spiro Trikaliotis: "Re: [cc65] C64 web server"</a>
+<li><strong>In reply to:</strong> <a href="0862.html">Marko Mäkelä: "RE: [cc65] C64 web server"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0871.html">Spiro Trikaliotis: "Re: [cc65] C64 web server"</a>
+<li><strong>Reply:</strong> <a href="0871.html">Spiro Trikaliotis: "Re: [cc65] C64 web server"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:43 CET</em>
+</em>
+</small>
+</body>
+</html>

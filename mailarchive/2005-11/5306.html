@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] bug report: pass-by-value of s</title>
+<meta name="Author" content="Sidney Cadot (cadot1science-and-technology.nl)" />
+<meta name="Subject" content="[cc65] bug report: pass-by-value of structs destroys stack" />
+<meta name="Date" content="2005-11-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] bug report: pass-by-value of structs destroys stack</h1>
+<!-- received="Tue Nov 29 22:56:47 2005" -->
+<!-- isoreceived="20051129215647" -->
+<!-- sent="Tue, 29 Nov 2005 22:56:40 +0100" -->
+<!-- isosent="20051129215640" -->
+<!-- name="Sidney Cadot" -->
+<!-- email="cadot1science-and-technology.nl" -->
+<!-- subject="[cc65] bug report: pass-by-value of structs destroys stack" -->
+<!-- id="08A5EF1F-6ABE-4CDF-8669-1E3B951B3EDE@science-and-technology.nl" -->
+<!-- charset="US-ASCII" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5307.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] bug report: pass-by-value of structs destroys stack&quot;">Next message</a> ]
+[ <a href="5305.html" title="Ullrich von Bassewitz: &quot;[cc65] DTV extended memory driver&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5307.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] bug report: pass-by-value of structs destroys stack&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Sidney Cadot &lt;<a href="mailto:cadot1science-and-technology.nl?Subject=Re:%20[cc65]%20bug%20report:%20pass-by-value%20of%20structs%20destroys%20stack">cadot1science-and-technology.nl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-11-29 22:56:40</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Uz,
+
+.... Passing a struct as a function parameter destroys the stack -  
+probably a simple offset problem.
+
+Below is a program that manifests the problem in v2.11.0.
+
+Best regards, Sidney
+
+/********* code starts here *******/
+
+#include &lt;stdio.h&gt;
+
+struct TestStruct {
+   int a;
+   int b;
+};
+
+void testfunc(struct TestStruct ts)
+{
+     printf(&quot;ts.a = %d, ts.b = %d\n&quot;, ts.a, ts.b);
+}
+
+struct TestStruct tm;
+
+int main(void)
+{
+     int x;
+
+     x = 1;
+
+     tm.a = 2;
+     tm.b = 3;
+
+     /* remove the following line to make the bug disappear. */
+     testfunc(tm);
+
+     printf(&quot;x = %d\n&quot;, x);
+
+     while(1);
+     return 0;
+}
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Nov 29 22:56:47 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5307.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] bug report: pass-by-value of structs destroys stack"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5305.html" title="Previous message in the list">Ullrich von Bassewitz: "[cc65] DTV extended memory driver"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5307.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] bug report: pass-by-value of structs destroys stack"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5307.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] bug report: pass-by-value of structs destroys stack"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="../2005-12/5329.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] bug report: pass-by-value of structs destroys stack"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5306" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5306" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5306" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-11-29 22:56:51 CET
+</em></small></p>
+</body>
+</html>

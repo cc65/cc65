@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Atari Memory Layout</title>
+<meta name="Author" content="Christian Grössler (chris1groessler.org)" />
+<meta name="Subject" content="Re: [cc65] Atari Memory Layout" />
+<meta name="Date" content="2010-09-26" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Atari Memory Layout</h1>
+<!-- received="Sun Sep 26 13:53:39 2010" -->
+<!-- isoreceived="20100926115339" -->
+<!-- sent="Sun, 26 Sep 2010 13:53:18 +0200" -->
+<!-- isosent="20100926115318" -->
+<!-- name="Christian Grössler" -->
+<!-- email="chris1groessler.org" -->
+<!-- subject="Re: [cc65] Atari Memory Layout" -->
+<!-- id="4C9F342E.7010000@groessler.org" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="AANLkTikNJ8-1WFSjfadXhW-8Hx_nwrDX=OgLmKcFTh_v&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8621.html" title="Oliver Schmidt: &quot;Re: [cc65] Atari Disk Image Tool ?&quot;">Next message</a> ]
+[ <a href="8619.html" title="Christian Grössler: &quot;Re: [cc65] Atari Disk Image Tool ?&quot;">Previous message</a> ]
+[ <a href="8618.html" title="Oliver Schmidt: &quot;[cc65] Atari Memory Layout&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8622.html" title="Oliver Schmidt: &quot;Re: [cc65] Atari Memory Layout&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Christian Grössler &lt;<a href="mailto:chris1groessler.org?Subject=Re:%20[cc65]%20Atari%20Memory%20Layout">chris1groessler.org</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-09-26 13:53:18</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+On 26.09.10 12:58, Oliver Schmidt wrote:
+&gt; The cc65 Atari docs say:
+&gt;
+&gt; &quot;... This gives a usable memory range from $2E00 - $BC1F. ... The load
+&gt; address of $2E00 was chosen to accommodate having a DOS loaded and a
+&gt; driver that resides in low memory such as the 850 R: handler. ...&quot;
+&gt;
+&gt; I saw a (seemingly working) linker config defining $1F00 - $FFFF:
+&gt; <a href="http://ataricc65lib.svn.sourceforge.net/viewvc/ataricc65lib/contiki-2.1/platform/atari/linker.cfg?view=markup">http://ataricc65lib.svn.sourceforge.net/viewvc/ataricc65lib/contiki-2.1/platform/atari/linker.cfg?view=markup</a>
+&gt;
+&gt; Is it possible to explain with a reasonable effort, when it is
+&gt; plausible to lower the start address from $2E00? Is $1F00 a meaningful
+&gt; value? If yes, for which scenario?
+
+In the Atari memory map DOS (if present) and the RS232 driver (if present) load into
+low memory.
+So depending on the DOS version used, the lowest available memory address for the
+program may vary. The $2E00 value is chosen very chosen conservatively to work in
+(hopefully) all scenarios.
+
+If you know the DOS version used (since you prepare a whole boot disk where the
+program is supposed to be started from), you can adjust the lower memory accordingly.
+
+For example in my Contiki 1 port I used MyPicoDOS, since it was the one with the
+lowest memory footprint I could find.
+
+I don't know right now how to find the lowest free memory address after DOS has
+loaded. I've moved and all my Ataris and documentation is in storage.
+I can check later online but I have to go now...
+
+
+&gt; I presume the RAM end $FFFF was choosen to not restrict the linker
+&gt; &quot;unnecesarily&quot; in the case MEMTOP turns out to be very &quot;high&quot;. I
+&gt; presume $BC1F was choosen as a reasonable default. If MEMTOP actually
+&gt; is somewhere different is it expected to be lower and/or higher than
+&gt; the default? Which scenarios / values are plausible?
+
+I don't know why $FFFF was chosen in the cited config file. I chose $BC1F since
+it's the value for a 48k+ Atari. For Ataris with less than 48k the startup code
+adjusts stack and heap accordlingly.
+
+regards,
+chris
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Sep 26 13:53:39 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8621.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Atari Disk Image Tool ?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8619.html" title="Previous message in the list">Christian Grössler: "Re: [cc65] Atari Disk Image Tool ?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8618.html" title="Message to which this message replies">Oliver Schmidt: "[cc65] Atari Memory Layout"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8622.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Atari Memory Layout"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8622.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Atari Memory Layout"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8620" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8620" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8620" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-09-26 13:53:41 CEST
+</em></small></p>
+</body>
+</html>

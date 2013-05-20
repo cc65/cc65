@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] linking to o65</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] linking to o65" />
+<meta name="Date" content="2012-01-19" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] linking to o65</h1>
+<!-- received="Thu Jan 19 18:54:10 2012" -->
+<!-- isoreceived="20120119175410" -->
+<!-- sent="Thu, 19 Jan 2012 18:53:56 +0100" -->
+<!-- isosent="20120119175356" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] linking to o65" -->
+<!-- id="20120119175356.GD20418@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="20120119160215.GE16578&#64;vega.lgb.hu" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9911.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Macros in inline assembler&quot;">Next message</a> ]
+[ <a href="9909.html" title="Andreas Rückert: &quot;Re: [cc65] Macros in inline assembler&quot;">Previous message</a> ]
+[ <a href="9903.html" title="Gábor Lénárt: &quot;Re: [cc65] linking to o65&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9920.html" title="A. Fachat: &quot;Re: [cc65] linking to o65&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20linking%20to%20o65">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-01-19 18:53:56</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Thu, Jan 19, 2012 at 05:02:15PM +0100, GÃ¡bor LÃ©nÃ¡rt wrote:
+&gt; Thanks for the answer, I guess I start with the lunix target (of ld65), as
+&gt; it seems ld65 generates o65 for that, so the situation can be somewhat
+&gt; similar.
+
+There have been people successfully generating o65 output for Lunix using
+ld65, so I do assume that it works up to some degree. If you want your own OS
+id, you ask Andre Fachat for one and add it as a number in the linker config
+file (specifying &quot;os = 5&quot; instead of &quot;os = lunix&quot;).
+
+&gt; Btw, I am not really sure if it's sane what I want. If I compile a C program
+&gt; with cc65 I can see references like these in the generated asm:
+&gt;
+&gt; jsr     pushax
+&gt; jsr     incax2
+&gt; jsr     _printf
+&gt;
+&gt; I would like not only _printf() call is implemented &quot;by my own&quot; but also
+&gt; internal stuffs like pushax and incax2. I have the hope with this that
+&gt; loaded programs (in o65 format) can be as small as possible, since the
+&gt; described functionality is implemented by the &quot;loader&quot; and anyway they are
+&gt; common in all code, so why would I store them again and agin in every
+&gt; programs? Just for information: my ultimate goal is to write some &quot;hobby OS&quot;
+&gt; by my own (for DTV, where there is enough RAM, relocatable stack/zero page,
+&gt; etc, so a multitask OS can be implemented more easily than with a stock C64
+&gt; for example), even with multitasking. The &quot;loader stuff&quot; is just the first
+&gt; step to test some of my ideas, no multitask, and other similar features yet.
+
+While I can see your point, there are facts that will make a separate
+implementation difficult: The compiler knows about many of the internal
+functions. It knows which registers pass values, which ones are destroyed, and
+which ones have known values on exit. In the examples above:
+
+    pushax
+        Uses the register values passed in A/X, retains these register values,
+        destroys Y, doesn't modify zeropage locations.
+
+    incax2
+        Uses the register values passed in A/X, has an output in A/X but
+        doesn't touch the Y register and zero page locations.
+
+For the compiler, this knowledge means for example: A load of the Y register
+before calling pushax is useless and can be removed, because the Y register is
+destroyed anyway. Or: A known value in the Y register may be reused after
+incax2 was called, since it didn't change.
+
+So your implementation would not only need to implement these functions, but
+would also make the behaviour identical when it comes to register usage. Which
+might change at any time, so this is an almost impossible task.
+
+But you can use a similar approach as contiki did. Compile as many of the
+runtime functions into your &quot;loader&quot;. Use the map file to determine the
+addresses of these functions. Use some perl magic to generate a file with the
+addresses of the functions:
+
+        .export pushax  := $38FE
+        .export incax2  := $3925
+        ...
+
+Generate an object file from this source by feeding it to the assembler, then
+link this object file to your applications. As a result, the applications will
+use the copies of the runtime functions already present in your loader.
+Without any overhead when loading.
+
+The drawback of this solution is, that you will have to regenerate the address
+list and recompile your applications whenever any of the addresses will
+change.
+
+&gt; What made me a bit unsure: how &quot;stable&quot; the &quot;internal ABI/API&quot;? I mean about
+&gt; pushax, etc. Is it common to have a new function like this with a new cc65
+&gt; version? Since if I implement those by my own, I will have problem with a
+&gt; newer cc65 if it uses things differently, or new stuff is introduced etc.
+
+It is not uncommon that new functions are added and sometimes existing ones
+will change. But for the reasons outlined above, I will advise against your
+own implementation anyway.
+
+&gt; Well, if lunix target works well, it will be ok, I can create a
+&gt; configuration similar to the lunix starting with the linker config file
+&gt; dumped with ld65 (ld65 --dump-config lunix) and modified for my needs. I guess :)
+
+That is probably the best idea until you have some stuff running. You can ask
+Andre for your own OS id later.
+
+&gt; &gt; There's also a reason not to rely on imports: The string table for the names
+&gt; &gt; of the symbols may get rather big. This is the reason why loadable drivers
+&gt; &gt; (which a in o65 format) use a jump table instead of imports by name.
+&gt;
+&gt; That's an important point.
+
+... and probably the reason why neither cc65 modules nor Lunix do really use
+o65 imported symbols. Just have a look into a cc65 generated map file and add
+up the lengths of all the external names. Lunix uses just one symbol that is
+the address of a jump table over which all API functions can be reached.
+
+&gt; Just I had the dream that there can be an OS
+&gt; which has programs compatible with any computers which can run that OS and
+&gt; use the same CPU, but the exact type of the computer is not important.
+
+That's a very ambitious goal. You might get further with a target that's
+easier to achieve.
+
+&gt; I see. I would not use the .o format of cc65 directly as I guess it's not
+&gt; designed for this purpose (maybe not so easy to handle on a pre-PC era based
+&gt; system with limited resources, and also it's for internal use, as far as I
+&gt; can guess it's not even always &quot;stable&quot; in the sense that the format can
+&gt; change, while o65 is quite simple and has a well-defined structure by a
+&gt; documentation. If I am wrong, execuse me).
+
+Yes. o65 is what you're looking for. It has been designed by Andre with
+6502/816 operating systems in mind. It is less qualified for more complex
+applications, this is why I didn't use it as an intermediate format for cc65.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Jan 19 18:54:10 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9911.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Macros in inline assembler"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9909.html" title="Previous message in the list">Andreas Rückert: "Re: [cc65] Macros in inline assembler"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9903.html" title="Message to which this message replies">Gábor Lénárt: "Re: [cc65] linking to o65"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9920.html" title="Next message in this discussion thread">A. Fachat: "Re: [cc65] linking to o65"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9920.html" title="Message sent in reply to this message">A. Fachat: "Re: [cc65] linking to o65"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9910" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9910" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9910" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-01-19 18:54:13 CET
+</em></small></p>
+</body>
+</html>

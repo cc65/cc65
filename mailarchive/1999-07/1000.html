@@ -1,0 +1,168 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] Re: still need support with l</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="[cc65] Re: still need support with low-level file stuff?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] Re: still need support with low-level file stuff?</h1>
+<!-- received="Sat Jul 10 09:55:34 1999" -->
+<!-- isoreceived="19990710075534" -->
+<!-- sent="Sat, 10 Jul 1999 09:55:24 +0200 (MEST)" -->
+<!-- isosent="19990710075524" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="[cc65] Re: still need support with low-level file stuff?" -->
+<!-- id="m112rym-000brTC@wuschel.musoftware.de" -->
+<!-- inreplyto="37869F5F.F7EC2FB8@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Re:%20still%20need%20support%20with%20low-level%20file%20stuff?"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 1999-07-10 09:55:24
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="1001.html">Groepaz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<li><strong>Previous message:</strong> <a href="0999.html">Ullrich von Bassewitz: "[cc65] Version 2.2.1 released"</a>
+<li><strong>In reply to:</strong> <a href="0998.html">Groepaz: "still need support with low-level file stuff?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1001.html">Groepaz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<li><strong>Reply:</strong> <a href="1001.html">Groepaz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+&gt; mmmh, will there be windoze binaries as well? still no linux here, bah
+
+I've created binaries for all supported platforms as usual.
+
+&gt; Whatever, i am wondering if the filesupport is still missing in the
+&gt; libraries... i am working on a real big project atm (music editor with
+&gt; some never-seen-before features that is) and i would really like to
+&gt; move the editor crap to C code, since all the pointer and variable shit
+&gt; is driving me nuts in ASM. well, and obviously there is no sence in an
+&gt; editor that can't save =)
+
+No, there's no low level file support. But then, there's also no low level
+file support if you write your stuff in assembler, so at least you don't loose
+anything:-)
+
+More seriously: This topic is not quite as easy as it looks on the first
+glance. It seems that there is no easy way to support files in a standard
+conform way. One reason is, that you may open a file for reading and writing
+in C, and this is not possible with the CBM disk drives, at least not with
+sequential files. The second reason is that things like fseek() must be
+implemented by closing and reopening the file, then skipping all the bytes
+from the beginning (things like SEEK_END are even more ugly). This makes the
+routine almost useless.
+
+An alternative would be to use relative files, but these are far more complex
+to handle, and are not very well supported by many software tools available.
+In addition, relative files may not be used for some type of data: If you
+write a program in C that outputs a program file (assembler for example), this
+program file may not go into a relative file, otherwise it won't be executed
+by the kernal.
+
+So, until I have a good idea how to handle this problem, the easiest way is
+probably to write a short specialized assembler that reads or writes your data
+files. If you write your programs in assembler you would also need such a
+routine, so just make it C callable and use it from the high level code.
+
+&gt; however, i dont know what the current version of the compiler looks
+&gt; like,
+&gt; but the one i looked at (half a year ago or sth) handled inline assembly
+&gt; in a quite annoying way (using the asm keyword that is).
+
+Well, some people (including me) seem to have a different opinion about what
+is annoying and what isn't. In fact, the original compiler had a #asm
+directive that worked the way you described. The reason for replacing it were:
+
+  1. #asm is in no way standard conform. C++ specifies an asm() keyword like
+     the one used in cc65.
+
+  2. asm() is more flexible, since it allows parametrized assembly instructions
+     similar to what gcc implements.
+
+  3. #asm was implemented as a preprocessor directive (like all others
+     starting with #). Since the parser works with a two token lookahead, an
+     absolutely ugly hack was needed to implement #asm (since it is executed
+     by the preprocessor, however, it must be in sync with the parser, so that
+     the emitted code gets in the right place).
+
+Apart from that, #asm (and asm()) was never thought to write anything more
+than two lines of assembly. ca65 is a full featured macro assembler, so why
+not use it?
+
+&gt; another thing is, that i was missing a 'dummy' implementation of
+&gt; a library function in ASM, that is how to get the params passed to
+&gt; the routine and how to pass them back. i suppose its like 1st 3 args
+&gt; are passed in a,x,y and more args on stack... and same thing for
+&gt; returning them, is that rite ?! Maybe its a good idea to supply a
+&gt; short example that takes a few args, prints them or sth, and then
+&gt; returns some other args.
+
+Admitted, there is no &quot;dummy&quot; implementation of a C callable assembler
+function. Instead, there are lots of &quot;real&quot; assembly functions called by the C
+code with full source code. The lib/ subdirectory contains all sorts of
+functions that are used in a C program. Examples are strcat(), atol(),
+isdigit()... Just have a look at the supplied sources.
+
+&gt; ok, so far so good... just tell me what you think.
+
+Done:-)
+
+Regards
+
+
+	Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Re:%20still%20need%20support%20with%20low-level%20file%20stuff?">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Re:%20still%20need%20support%20with%20low-level%20file%20stuff?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="1001.html">Groepaz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<li><strong>Previous message:</strong> <a href="0999.html">Ullrich von Bassewitz: "[cc65] Version 2.2.1 released"</a>
+<li><strong>In reply to:</strong> <a href="0998.html">Groepaz: "still need support with low-level file stuff?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1001.html">Groepaz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<li><strong>Reply:</strong> <a href="1001.html">Groepaz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:44 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-15" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] C64: local block variables</title>
+<meta name="Author" content="Greg King (greg.king41verizon.net)" />
+<meta name="Subject" content="Re: [cc65] C64: local block variables corrupting stack" />
+<meta name="Date" content="2008-10-15" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] C64: local block variables corrupting stack</h1>
+<!-- received="Wed, 15 Oct 2008 05:35:26 -0400" -->
+<!-- isoreceived="20081015093526" -->
+<!-- sent="Wed, 15 Oct 2008 05:35:26 -0400" -->
+<!-- isosent="20081015093526" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king41verizon.net" -->
+<!-- subject="Re: [cc65] C64: local block variables corrupting stack" -->
+<!-- id="000001c92eee$e818bfc0$443efea9@monarch" -->
+<!-- charset="ISO-8859-15" -->
+<!-- inreplyto="48DD48CC.9050609&#64;cubic.org" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6271.html" title="Jason Duerstock: &quot;[cc65] Atari 8-bit disassembly using cc65 tools&quot;">Next message</a> ]
+[ <a href="6269.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] new to list&quot;">Previous message</a> ]
+[ <a href="../2008-09/6252.html" title="Dirk Jagdmann: &quot;[cc65] C64: local block variables corrupting stack&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king41verizon.net?Subject=Re:%20[cc65]%20C64:%20local%20block%20variables%20corrupting%20stack">greg.king41verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-10-15 11:35:26</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From &quot;Dirk Jagdmann&quot;; on Friday, September 26, 2008; at 04:40 PM -0400
+&gt; 
+&gt; I've stumbled accross an issue with local-block-scoped variables.  The
+&gt; following test program should loop indefinitely, because variable &quot;a&quot;
+&gt; should be 8 all the time.  However, when compiling with cc65 2.12.0,
+&gt; on the second loop, &quot;a&quot; is 16.
+&gt; 
+&gt; #include &lt;conio.h&gt;
+&gt; int main()
+&gt; {
+&gt;   unsigned char a=8;
+&gt;  jump_to_top:
+&gt;   cprintf(&quot;a should be eight: %u\r\n&quot;, a);
+&gt;   if(a==8)
+&gt;     {
+&gt;       unsigned char XXX;
+&gt;       goto jump_to_top;
+&gt;     }
+&gt;   return 0;
+&gt; }
+&gt; 
+&gt; If I remove the XXX variable from the inner block,
+&gt; or move it to the main block, the program behaves correctly.
+
+This programming trick, which fakes a &quot;goto&quot;, does work properly!
+
+#include &lt;conio.h&gt;
+int main(void)
+{
+  unsigned char a=8;
+
+  for (;;)
+  {
+    cprintf(&quot;a should be eight: %hhu\r\n&quot;, a);
+    if (a == 8)
+    {
+      unsigned char XXX;
+      continue;    /* This takes advantage of the loop; ... */
+    }
+    break;    /* ... while this cancels the loop. */
+  }
+  return 0;
+}
+
+Use &quot;continue&quot; to jump backward; use &quot;break&quot; to jump forward.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed, 15 Oct 2008 05:35:26 -0400</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6271.html" title="Next message in the list">Jason Duerstock: "[cc65] Atari 8-bit disassembly using cc65 tools"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6269.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] new to list"</a></li>
+<li><dfn>In reply to</dfn>: <a href="../2008-09/6252.html" title="Message to which this message replies">Dirk Jagdmann: "[cc65] C64: local block variables corrupting stack"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6270" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6270" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6270" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-10-15 19:53:47 CEST
+</em></small></p>
+</body>
+</html>

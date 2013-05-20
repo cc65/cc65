@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Incompatible pointer types</title>
+<meta name="Author" content="dominic beesley (dominic1brahms.demon.co.uk)" />
+<meta name="Subject" content="[cc65] Incompatible pointer types" />
+<meta name="Date" content="2005-06-15" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Incompatible pointer types</h1>
+<!-- received="Wed Jun 15 15:09:40 2005" -->
+<!-- isoreceived="20050615130940" -->
+<!-- sent="Wed, 15 Jun 2005 13:38:30 +0100" -->
+<!-- isosent="20050615123830" -->
+<!-- name="dominic beesley" -->
+<!-- email="dominic1brahms.demon.co.uk" -->
+<!-- subject="[cc65] Incompatible pointer types" -->
+<!-- id="42B02146.5040205@brahms.demon.co.uk" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5077.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] CVS and snapshots&quot;">Next message</a> ]
+[ <a href="5075.html" title="42Bastian Schick: &quot;Re: [cc65] CVS and snapshots&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5078.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Incompatible pointer types&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: dominic beesley &lt;<a href="mailto:dominic1brahms.demon.co.uk?Subject=Re:%20[cc65]%20Incompatible%20pointer%20types">dominic1brahms.demon.co.uk</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-06-15 14:38:30</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Dear all,
+
+I'm not sure whether this is a bug or not but it compiles ok in 
+gcc.4.0.0 and 2.95.3 and AcornC/C++ on RISC OS and the code seems to 
+perform as I intend.
+
+I'm trying to take a pointer to a typedef'd array item.
+
+It only seems to happen if the typedef'd thing is itself an array, i.e. 
+I don't get this problem with structures, so to get by I can put my 
+array inside a structure but that seems a bodge to me!
+
+============test code============
+typedef unsigned char bob[10];
+
+bob a[100];
+
+void doit(bob *x) {
+        x[0][0]=1;
+}
+
+int main(void) {
+        doit(&amp;a[1]);
+
+}
+==============================
+
+cl65 gives me: bugtest.c(12): Error: Incompatible pointer types
+
+I'm using 2.10.5, 20050523 at the moment, but same problem in 2.10.1
+
+Cheers
+
+Dom
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Jun 15 15:09:40 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5077.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] CVS and snapshots"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5075.html" title="Previous message in the list">42Bastian Schick: "Re: [cc65] CVS and snapshots"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5078.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Incompatible pointer types"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5078.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Incompatible pointer types"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5076" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5076" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5076" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-06-15 15:09:45 CEST
+</em></small></p>
+</body>
+</html>

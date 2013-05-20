@@ -1,0 +1,197 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] code generation</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] code generation">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] code generation</h1>
+<!-- received="Thu Sep 11 19:18:11 2003" -->
+<!-- isoreceived="20030911171811" -->
+<!-- sent="Thu, 11 Sep 2003 16:27:14 +0200" -->
+<!-- isosent="20030911142714" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] code generation" -->
+<!-- id="200309111627.14901.groepaz@gmx.net" -->
+<!-- inreplyto="20030911095225.GA23209@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20code%20generation"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2003-09-11 16:27:14
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3382.html">Ullrich von Bassewitz: "Re: [cc65] code generation"</a>
+<li><strong>In reply to:</strong> <a href="3382.html">Ullrich von Bassewitz: "Re: [cc65] code generation"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3384.html">Ullrich von Bassewitz: "Re: [cc65] code generation"</a>
+<li><strong>Next in thread:</strong> <a href="3377.html">Maciej Witkowiak: "Re: [cc65] Optimizing C code"</a>
+<li><strong>Reply:</strong> <a href="3384.html">Ullrich von Bassewitz: "Re: [cc65] code generation"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Thursday 11 September 2003 11:52, Ullrich von Bassewitz wrote:
+&gt; There's always a situation where the compiler won't spot a chance to
+&gt; improve the code.
+
+well yes ofcoz, but thats no reason not to improve it :=P at this point i am 
+wondering that (and why) opt65 doesnt catch this one either ('coz its a 
+really simple one) - working on that :=P
+
+&gt; &gt; 2) it maybe a nice possible
+&gt; &gt; optimisation to use a branch/increment type of code for the highbyte when
+&gt; &gt; adding an unsigned char to an unsigned short.
+&gt;
+&gt; There is no separate code generation for characters in most cases.
+&gt; According to the C rules, for arithmetic operations on integers, the usual
+&gt; integer promotions apply, which means that the addition works with
+&gt; integers, not with chars. The compiler is not smart enough to find possible
+&gt; exceptions. The optimizer will sometimes remove high byte operations, but
+&gt; since the compiler doesn't build a parse tree in memory, but generates code
+&gt; on the fly, there's no chance to spot this in the parser.
+
+mmmh.... bad :( need to find a solution to teach it to opt65 then :=P (my 
+pattern based approach catches it, but due to its brute-force nature its 
+kindof slowish :=P)
+
+&gt; &gt; 1) for the heck of it, i cant find out how to make the branch work :=P
+&gt; &gt; neither a local label, nor a &quot;*+3&quot; or anything else i could think of
+&gt; &gt; would do the trick...any ideas? :) (sth to generate a unique local label
+&gt; &gt; could be a solution)
+&gt;
+&gt; There is no easy way to work around this, and I don't think it's really
+&gt; worth the effort.
+
+mmmmh... i've stumbled about a handful cases now where a branch could have 
+been really handy.... mmmh. could a possible workaround be using a macro like 
+this...
+
+.macro inc_cc foo
+	.proc
+	bcs @l:
+	inc foo
+@l:
+	.endproc
+.endmacro
+
+and then use that in my C inline macro? mmmh..... the question then would be, 
+how to include that macro in the generated asm without manually patching it?
+
+whats the problem at this point anyway? i reckon that it does work with a 
+local label and with the macro used only once - so is it really just that? 
+shouldnt a simple feature to generate unique names for labels solve it then?
+
+&gt; &gt; 2) if any of the arguments passed to the macro are register variables,
+&gt; &gt; the resulting code will be all wrong - it generates references to bogus
+&gt; &gt; memory locations instead of the register variables :=P
+&gt;
+&gt; Fixed, thanks!
+
+greaaat.... it'll help a lot with speeding up that thingy :)
+
+&gt; &gt; 1) additional pseudo-variables for the X and Y registers so that kinda
+&gt; &gt; macro can be written more efficiantly
+
+&gt; There is simply no way for the compiler to load one register without a high
+&gt; chance for using some other. This is the reason why there are no __Y__ and
+&gt; __X__ pseudo variables.
+
+mmmmh :(
+
+even something that loads AX with swapped byte order would be cool :=P (coz 
+when working with 8.8 fixedpoint, which is pretty common, you often need just 
+the highbyte for certain operations - and the optimizer seems to miss the now 
+needed ldx/txa sometimes (however it always removes the unneeded lda))
+
+&gt; &gt; 2) i am wondering why the optimizer doesnt change the lda/tay into ldy
+&gt;
+&gt; Maybe because it's not perfect:-)
+
+must be.... opt65 catches this one fine :o) (and its far from perfect too :=P)
+
+&gt; The use of __AX__ in macros together with the comma operator means that you
+&gt; can use this macro in expressions. If you don't do it this way, it will
+&gt; also work, but the compiler may not accept the macro in an expression.
+&gt; Since all optimzations take place in the back end, removal of unused code
+&gt; does not depend on using __AX__ vs. inline assembly.
+
+yeah i noticed that already.... one time it was even smart enough to spot a 
+&quot;peephole&quot; in my handwritten asm (shame on me :=P). however my main concern 
+was if not using __AX__ could potentially break something, resulting in wrong 
+code...
+
+&gt; &gt; - i'd like to page-align some global arrays (since that saves some cycles
+&gt; &gt; for free on 0x100 byte tables, avoiding crossing page-boundaries) ... is
+&gt; &gt; that possible in C somehow?
+&gt;
+&gt; Nope.
+
+tjam... it is :o) well not really, but the workaround i am using is like a) 
+declare those arrays &quot;const&quot; and b) align the .rodata segment properly - 
+works fine so far :) i'd like a somewhat cleaner solution though :=P
+
+&gt; &gt; - how much do the c64 libraries depend on the system interupt, ie $ea31
+&gt; &gt; beeing called frequently? will it for example affect the clock() call if
+&gt; &gt; i use my own interupt handler? (i'd like to skip the kernel stuff
+&gt; &gt; alltogether and just do some simple joystick stuff)...i need a working
+&gt; &gt; clock/time for syncing :)
+&gt;
+&gt; It will affect the clock, the mouse, the rs232 interface and maybe some
+&gt; others. You can work around that by not using the mouse, and others and
+&gt; updating the clock stuff in your own interrupt handler.
+
+mmmmh.... i'm planning to use the joystick stuff and the clock call, dont 
+think i need anything else there.... mmmmh gotta lock at it more closer :)
+
+gpz
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20code%20generation">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3382.html">Ullrich von Bassewitz: "Re: [cc65] code generation"</a>
+<li><strong>In reply to:</strong> <a href="3382.html">Ullrich von Bassewitz: "Re: [cc65] code generation"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3384.html">Ullrich von Bassewitz: "Re: [cc65] code generation"</a>
+<li><strong>Next in thread:</strong> <a href="3377.html">Maciej Witkowiak: "Re: [cc65] Optimizing C code"</a>
+<li><strong>Reply:</strong> <a href="3384.html">Ullrich von Bassewitz: "Re: [cc65] code generation"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-09-11 19:18:33 CEST</em>
+</em>
+</small>
+</body>
+</html>

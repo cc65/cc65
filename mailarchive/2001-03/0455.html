@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] c64 question</title>
+<meta name="Author" content="Mike McCarty (jmccarty_at_ssd.usa.alcatel.com)">
+<meta name="Subject" content="Re: [cc65] c64 question">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] c64 question</h1>
+<!-- received="Mon Mar 19 21:45:10 2001" -->
+<!-- isoreceived="20010319204510" -->
+<!-- sent="Mon, 19 Mar 2001 14:45:05 -0600 (CST)" -->
+<!-- isosent="20010319204505" -->
+<!-- name="Mike McCarty" -->
+<!-- email="jmccarty_at_ssd.usa.alcatel.com" -->
+<!-- subject="Re: [cc65] c64 question" -->
+<!-- id="Pine.SOL.4.10.10103191439590.16438-100000@sun1307.ssd.usa.alcatel.com" -->
+<!-- inreplyto="20010319213436.A10814@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Mike McCarty (<a href="mailto:jmccarty_at_ssd.usa.alcatel.com?Subject=Re:%20[cc65]%20c64%20question"><em>jmccarty_at_ssd.usa.alcatel.com</em></a>)<br>
+<strong>Date:</strong> 2001-03-19 21:45:05
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0456.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<li><strong>Previous message:</strong> <a href="0454.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<li><strong>In reply to:</strong> <a href="0454.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0456.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<li><strong>Reply:</strong> <a href="0456.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Mon, 19 Mar 2001, Ullrich von Bassewitz wrote:
+
+&gt; 
+&gt; On Mon, Mar 19, 2001 at 02:26:24PM -0600, Mike McCarty wrote:
+&gt; &gt; Well, some implementations don't use a stack unless necessary, but
+&gt; &gt; rather implement arguments to routines which do not *need* to be
+&gt; &gt; re-entrant (most of them, in my experience) as statically allocated
+&gt; &gt; locations. In this case, there is no stack manipulation, hence no need
+&gt; &gt; to disable interrupts.
+&gt; 
+&gt; This is not only difficult to check (because the compiler cannot see if a
+&gt; function is called from somewhere outside the module), but does also violate
+
+Certainly it can. The gnu C compiler does this automatically as an
+optimization even for machines which have a reasonable (read 16 bit)
+stack pointer. If a routine is declared &quot;static&quot; then the compiler
+knows, and  can check for aliased pointers. Especially it can know if
+it is told by the programmer by...
+
+&gt; the ISO C standard. So it's not really an option in my eyes, even if cc65
+
+using an ISO C Standard compliant #pragma.
+
+&gt; allows it (at least for local variables).
+
+
+&gt; &gt; Well, that enters into a whole other realm of questioning. I saw
+&gt; &gt; questions about feasibility and run time cycles, not preferences.
+&gt; 
+&gt; It's not preferences, it's &quot;advantages&quot; :-)
+
+I have reasons, you have preferences, he has biasses.
+
+;-)
+
+Ultimately: You support the compiler. You don't like that solution, so
+it won't exist.
+
+Which is ok.
+
+Mike
+----
+char *p=&quot;char *p=%c%s%c;main(){printf(p,34,p,34);}&quot;;main(){printf(p,34,p,34);}
+This message made from 100% recycled bits.
+I can explain it for you, but I can't understand it for you.
+I don't speak for Alcatel      &lt;- They make me say that.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20c64%20question">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0456.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<li><strong>Previous message:</strong> <a href="0454.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<li><strong>In reply to:</strong> <a href="0454.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0456.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<li><strong>Reply:</strong> <a href="0456.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:39 CET</em>
+</em>
+</small>
+</body>
+</html>

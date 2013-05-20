@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] HEAP from here to there</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] HEAP from here to there" />
+<meta name="Date" content="2009-05-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] HEAP from here to there</h1>
+<!-- received="Fri May 29 23:03:46 2009" -->
+<!-- isoreceived="20090529210346" -->
+<!-- sent="Fri, 29 May 2009 23:00:04 +0200" -->
+<!-- isosent="20090529210004" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] HEAP from here to there" -->
+<!-- id="20090529210004.GA21236@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="083C07D9051B0D120A381&#64;directbox.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="../2009-06/6584.html" title="Greg King: &quot;Re: [cc65] HEAP from here to there&quot;">Next message</a> ]
+[ <a href="6582.html" title="Christian Groessler: &quot;Re: [cc65] Config files and heap space&quot;">Previous message</a> ]
+[ <a href="6581.html" title="Thomas Giesel: &quot;Re: Re: [cc65] HEAP from here to there&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20HEAP%20from%20here%20to%20there">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-05-29 23:00:04</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Good evening and sorry for the delay. I had to investigate the issue further.
+
+First, please do not reply to the list *and* to my personal mail address. I do
+read the list, so there's no reason to clutter my mailbox.
+
+Regarding the heap segment: The current state of the sources seem to say that
+something like what you were suggesting was planned and not finished.
+Unfortunately, I'm so old that I cannot remember:-)
+
+Most but not all platforms have a HEAP segment that is located at top of the
+RAM (or similar) area, but this segment is nowhere defined.  
+
+I think (but I'm not sure) that the plan was to mark the start of the heap
+with this segment to make it independent of BSS. Using the size of the heap
+segment won't work with the current linker, because what we usually want is to
+use the complete remainder of the memory area that contains the BSS and STACK
+for the heap. Since segments have fixed sizes, your suggestion is not
+satisfactory. A fixed size heap segment is to small or too large for &gt; 99% of
+all programs:-) Maybe this is the reason why the current solution is still in
+place: It works quite well for most platforms and programs, and if you need
+something else, the hooks are in place to change the behaviour to your liking.
+
+Regards
+
+
+        Uz      (out of town until monday)
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri May 29 23:03:46 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="../2009-06/6584.html" title="Next message in the list">Greg King: "Re: [cc65] HEAP from here to there"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6582.html" title="Previous message in the list">Christian Groessler: "Re: [cc65] Config files and heap space"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6581.html" title="Message to which this message replies">Thomas Giesel: "Re: Re: [cc65] HEAP from here to there"</a></li>
+<!-- lnextthread="start" -->
+<li><a name="replies" id="replies"></a>
+<dfn>Maybe reply</dfn>: <a href="6581.html" title="Message sent in reply to this message">Thomas Giesel: "Re: Re: [cc65] HEAP from here to there"</a></li>
+<li><dfn>Reply</dfn>:  <a href="../2009-06/6584.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] HEAP from here to there"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6583" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6583" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6583" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-05-29 23:03:49 CEST
+</em></small></p>
+</body>
+</html>

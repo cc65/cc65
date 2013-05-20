@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] abc music specification</title>
+<meta name="Author" content="Karri Kaksonen (karri1sipo.fi)" />
+<meta name="Subject" content="Re: [cc65] abc music specification" />
+<meta name="Date" content="2004-12-27" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] abc music specification</h1>
+<!-- received="Mon Dec 27 06:36:48 2004" -->
+<!-- isoreceived="20041227053648" -->
+<!-- sent="Mon, 27 Dec 2004 07:36:30 +0200 (EET)" -->
+<!-- isosent="20041227053630" -->
+<!-- name="Karri Kaksonen" -->
+<!-- email="karri1sipo.fi" -->
+<!-- subject="Re: [cc65] abc music specification" -->
+<!-- id="Pine.LNX.4.58.0412270714360.29430@kosh.sipo.fi" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="200412240142.29806.groepaz&#64;gmx.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="../2005-01/4766.html" title="Oliver Schmidt: &quot;[cc65] Überarbeitete Apple2 C-Library&quot;">Next message</a> ]
+[ <a href="4764.html" title="Groepaz: &quot;Re: [cc65] abc music specification&quot;">Previous message</a> ]
+[ <a href="4764.html" title="Groepaz: &quot;Re: [cc65] abc music specification&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Karri Kaksonen &lt;<a href="mailto:karri1sipo.fi?Subject=Re:%20[cc65]%20abc%20music%20specification">karri1sipo.fi</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-12-27 06:36:30</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Fri, 24 Dec 2004, Groepaz wrote:
+&gt; what about a tune that uses 3 voices and is about 2 minutes long?
+
+I have a very sweet kantele-tune that I used as a background for my
+Othello port. It looks like this. Sorry about the asm-syntax. It was
+written for the early cc65 compiler that had severe limitations in
+string handling. So I used asm defines at that time.
+In this tune all channels need a clear string sound, a bit like a
+harp. The kantele is a Finnish national instrument.
+The length is about 2 minutes when played at tempo 18 frames/note.
+
+Voice 1
+            db &quot;e&quot;,&quot;d&quot;,&quot;e&quot;,&quot;5&quot;,&quot;A&quot;,&quot;f&quot;,&quot;e&quot;,&quot;f&quot;,&quot;5&quot;,&quot;e&quot;,&quot;d&quot;,&quot;c&quot;
+            db &quot;B&quot;,&quot;3&quot;,&quot;A&quot;,&quot;G&quot;,&quot;2&quot;,&quot;e&quot;,&quot;d&quot;,&quot;e&quot;,&quot;5&quot;,&quot;e&quot;,&quot;d&quot;,&quot;c&quot;
+            db &quot;c&quot;,&quot;3&quot;,&quot;A&quot;,&quot;c&quot;,&quot;2&quot;,&quot;e&quot;,&quot;2&quot;,&quot;d&quot;,&quot;5&quot;,&quot;c&quot;,&quot;B&quot;,&quot;A&quot;
+            db &quot;A&quot;,&quot;4&quot;,&quot;A&quot;,&quot;c&quot;,&quot;B&quot;,&quot;A&quot;,&quot;B&quot;,&quot;4&quot;,&quot;z&quot;,&quot;2&quot;,&quot;c&quot;,&quot;B&quot;
+            db &quot;c&quot;,&quot;3&quot;,&quot;B&quot;,&quot;c&quot;,&quot;d&quot;,&quot;e&quot;,&quot;f&quot;,&quot;g&quot;,&quot;5&quot;,&quot;g&quot;,&quot;f&quot;,&quot;e&quot;
+            db &quot;f&quot;,&quot;3&quot;,&quot;d&quot;,&quot;c&quot;,&quot;B&quot;,&quot;c&quot;,&quot;d&quot;,&quot;e&quot;,&quot;6&quot;,&quot;e&quot;,&quot;d&quot;
+            db &quot;e&quot;,&quot;5&quot;,&quot;A&quot;,&quot;f&quot;,&quot;e&quot;,&quot;f&quot;,&quot;5&quot;,&quot;e&quot;,&quot;d&quot;,&quot;c&quot;
+            db &quot;B&quot;,&quot;3&quot;,&quot;A&quot;,&quot;G&quot;,&quot;2&quot;,&quot;e&quot;,&quot;d&quot;,&quot;e&quot;,&quot;5&quot;,&quot;e&quot;,&quot;d&quot;,&quot;c&quot;
+            db &quot;c&quot;,&quot;3&quot;,&quot;A&quot;,&quot;c&quot;,&quot;2&quot;,&quot;e&quot;,&quot;2&quot;,&quot;d&quot;,&quot;5&quot;,&quot;f&quot;,&quot;e&quot;,&quot;d&quot;
+            db &quot;c&quot;,&quot;2&quot;,&quot;d&quot;,&quot;e&quot;,&quot;E&quot;,&quot;2&quot;,&quot;E&quot;,&quot;2&quot;,&quot;A&quot;,&quot;6&quot;,&quot;z&quot;,&quot;P&quot;,0
+
+Voice 2
+            db &quot;z&quot;,&quot;2&quot;,&quot;A&quot;,&quot;8&quot;,&quot;D&quot;,&quot;8&quot;,&quot;G&quot;,&quot;8&quot;,&quot;C&quot;,&quot;8&quot;
+            db &quot;F&quot;,&quot;8&quot;,&quot;D&quot;,&quot;8&quot;,&quot;D&quot;,&quot;8&quot;,&quot;E&quot;,&quot;8&quot;
+            db &quot;F&quot;,&quot;8&quot;,&quot;F&quot;,&quot;8&quot;,&quot;D&quot;,&quot;8&quot;,&quot;E&quot;,&quot;8&quot;
+            db &quot;A&quot;,&quot;8&quot;,&quot;D&quot;,&quot;8&quot;,&quot;G&quot;,&quot;8&quot;,&quot;C&quot;,&quot;8&quot;
+            db &quot;F&quot;,&quot;8&quot;,&quot;D&quot;,&quot;8&quot;,&quot;A&quot;,&quot;4&quot;,&quot;E&quot;,&quot;4&quot;,&quot;A&quot;,&quot;6&quot;,&quot;z&quot;,&quot;P&quot;,0
+
+Voice 3
+
+            db &quot;z&quot;,&quot;2&quot;,&quot;A&quot;,&quot;c&quot;,&quot;e&quot;,&quot;c&quot;,&quot;A&quot;,&quot;c&quot;,&quot;e&quot;,&quot;c&quot;
+            db &quot;D&quot;,&quot;F&quot;,&quot;A&quot;,&quot;F&quot;,&quot;D&quot;,&quot;F&quot;,&quot;A&quot;,&quot;F&quot;
+            db &quot;G&quot;,&quot;B&quot;,&quot;d&quot;,&quot;B&quot;,&quot;G&quot;,&quot;B&quot;,&quot;d&quot;,&quot;B&quot;
+            db &quot;C&quot;,&quot;E&quot;,&quot;G&quot;,&quot;E&quot;,&quot;C&quot;,&quot;E&quot;,&quot;G&quot;,&quot;E&quot;
+            db &quot;F&quot;,&quot;A&quot;,&quot;c&quot;,&quot;A&quot;,&quot;F&quot;,&quot;A&quot;,&quot;c&quot;,&quot;A&quot;
+            db &quot;D&quot;,&quot;F&quot;,&quot;A&quot;,&quot;F&quot;,&quot;D&quot;,&quot;F&quot;,&quot;A&quot;,&quot;F&quot;
+            db &quot;D&quot;,&quot;F&quot;,&quot;A&quot;,&quot;F&quot;,&quot;D&quot;,&quot;F&quot;,&quot;A&quot;,&quot;F&quot;
+            db &quot;E&quot;,&quot;G&quot;,&quot;B&quot;,&quot;G&quot;,&quot;E&quot;,&quot;z&quot;,&quot;3&quot;
+            db &quot;F&quot;,&quot;A&quot;,&quot;c&quot;,&quot;A&quot;,&quot;F&quot;,&quot;A&quot;,&quot;c&quot;,&quot;A&quot;
+            db &quot;E&quot;,&quot;G&quot;,&quot;B&quot;,&quot;G&quot;,&quot;E&quot;,&quot;G&quot;,&quot;B&quot;,&quot;G&quot;
+            db &quot;D&quot;,&quot;F&quot;,&quot;A&quot;,&quot;F&quot;,&quot;D&quot;,&quot;F&quot;,&quot;A&quot;,&quot;F&quot;
+            db &quot;E&quot;,&quot;=&quot;,&quot;G&quot;,&quot;B&quot;,&quot;=&quot;,&quot;G&quot;,&quot;E&quot;,&quot;=&quot;,&quot;G&quot;,&quot;B&quot;,&quot;=&quot;,&quot;G&quot;
+            db &quot;A&quot;,&quot;c&quot;,&quot;E&quot;,&quot;c&quot;,&quot;A&quot;,&quot;c&quot;,&quot;e&quot;,&quot;c&quot;
+            db &quot;D&quot;,&quot;F&quot;,&quot;A&quot;,&quot;F&quot;,&quot;D&quot;,&quot;F&quot;,&quot;A&quot;,&quot;F&quot;
+            db &quot;G&quot;,&quot;B&quot;,&quot;d&quot;,&quot;B&quot;,&quot;G&quot;,&quot;B&quot;,&quot;d&quot;,&quot;B&quot;
+            db &quot;C&quot;,&quot;E&quot;,&quot;G&quot;,&quot;E&quot;,&quot;C&quot;,&quot;E&quot;,&quot;G&quot;,&quot;E&quot;
+            db &quot;F&quot;,&quot;A&quot;,&quot;c&quot;,&quot;A&quot;,&quot;F&quot;,&quot;A&quot;,&quot;c&quot;,&quot;A&quot;
+            db &quot;D&quot;,&quot;F&quot;,&quot;A&quot;,&quot;F&quot;,&quot;D&quot;,&quot;F&quot;,&quot;A&quot;,&quot;F&quot;
+            db &quot;A&quot;,&quot;c&quot;,&quot;e&quot;,&quot;c&quot;,&quot;E&quot;,&quot;=&quot;,&quot;G&quot;,&quot;B&quot;,&quot;=&quot;,&quot;G&quot;
+            db &quot;A&quot;,&quot;c&quot;,&quot;e&quot;,&quot;c&quot;,&quot;A&quot;,&quot;c&quot;,&quot;e&quot;,&quot;c&quot;,&quot;z&quot;,&quot;P&quot;,0
+
+In a real abc syntac you can specify voices as
+
+V: 1
+ABCDEFG...
+V: 2
+ABC...
+V: Drums
+ABC...
+
+So the parameter after V: can be anything.
+
+&gt; mmmh...doesnt that abc format involve some kind of &quot;generic instruments&quot; which need to
+&gt; be &quot;emulated&quot; by the driver? i would think that this is the part where things might
+&gt; get complicated and slow.
+
+The abc format does not have any instruments. It is really up to us if we
+want to have a concept of a flute or drums. The abc just deals with
+melodies.
+
+In the Lynx I divided the sound into 3 parts. &quot;Attack&quot; while I increment
+the volume in steps until the desired volume is reached. &quot;Hold&quot; while I
+keep the volume steady. &quot;Fade&quot; while I decrease the volume in steps until
+it reaches zero. This brings just a few lines of extra code there.
+
+--
+Cheers,
+
+Karri
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Dec 27 06:36:48 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="../2005-01/4766.html" title="Next message in the list">Oliver Schmidt: "[cc65] Überarbeitete Apple2 C-Library"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4764.html" title="Previous message in the list">Groepaz: "Re: [cc65] abc music specification"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4764.html" title="Message to which this message replies">Groepaz: "Re: [cc65] abc music specification"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4765" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4765" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4765" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-12-27 06:36:59 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] simple assembly interrupt </title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] simple assembly interrupt handler" />
+<meta name="Date" content="2006-01-03" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] simple assembly interrupt handler</h1>
+<!-- received="Tue Jan  3 21:11:04 2006" -->
+<!-- isoreceived="20060103201104" -->
+<!-- sent="Tue, 3 Jan 2006 21:10:51 +0100" -->
+<!-- isosent="20060103201051" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] simple assembly interrupt handler" -->
+<!-- id="20060103201051.GA6629@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="43BAAB2B.5070808&#64;alpinecom.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5388.html" title="Groepaz: &quot;Re: [cc65] simple assembly interrupt handler&quot;">Next message</a> ]
+[ <a href="5386.html" title="Christian Groessler: &quot;Re: [cc65] Reading Directory on Atari&quot;">Previous message</a> ]
+[ <a href="5385.html" title="PH: &quot;Re: [cc65] simple assembly interrupt handler&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5388.html" title="Groepaz: &quot;Re: [cc65] simple assembly interrupt handler&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20simple%20assembly%20interrupt%20handler">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2006-01-03 21:10:51</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Tue, Jan 03, 2006 at 10:49:47AM -0600, PH wrote:
+&gt; Which means that he started the vectors at $fff6 instead of $fffa (I
+&gt; think).  I can't find any documents anywhere that say $fff6-$fffa is
+&gt; used as interrupt vectors.  So, I assume this is a mistake?  (I hope
+&gt; groepaz is listening and can enlighten me)
+
+Just look at the source. From libsrc/nes/crt0.s:
+---------------------------------------------------------------------------
+.segment &quot;VECTORS&quot;
+
+        .word   irq2        ; $fff4 ?
+        .word   irq1        ; $fff6 ?
+        .word   timerirq    ; $fff8 ?
+        .word   nmi         ; $fffa vblank nmi
+        .word   start       ; $fffc reset
+        .word   irq         ; $fffe irq / brk
+---------------------------------------------------------------------------
+
+Not only there are questionmarks after the vectors, all of the labels do also
+point to an &quot;rti&quot; instruction.
+
+&gt; Also, when I try running the linker on the code, it says:
+&gt;
+&gt; ld65.exe: Warning: Memory area overflow in `ROMV', segment `VECTORS' (6
+&gt; bytes)
+&gt; ld65.exe: Error: Cannot generate output due to memory area overflow
+&gt;
+&gt; I'm using your code as your wrote it.  Any ideas why it is complaining
+&gt; about an overflow?
+
+You are probably linking against the nes.o and nes.lib files that come with
+cc65. The startup file does already contain vector definitions, so the linker
+will try to pack both into the memory area - and fails.
+
+Since you were talking about example code from somewhere, I didn't assume that
+you are using the cc65 NES library. If you use it, some or all functionality
+is already in place. You may want to have a look at the library sources.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Jan  3 21:11:04 2006</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5388.html" title="Next message in the list">Groepaz: "Re: [cc65] simple assembly interrupt handler"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5386.html" title="Previous message in the list">Christian Groessler: "Re: [cc65] Reading Directory on Atari"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5385.html" title="Message to which this message replies">PH: "Re: [cc65] simple assembly interrupt handler"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5388.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] simple assembly interrupt handler"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5388.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] simple assembly interrupt handler"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5387" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5387" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5387" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2006-01-03 21:11:07 CET
+</em></small></p>
+</body>
+</html>

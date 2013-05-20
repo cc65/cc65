@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Structure assignment</title>
+<meta name="Author" content="Dan Winslow (DWinslow1aiminstitute.org)" />
+<meta name="Subject" content="[cc65] Structure assignment" />
+<meta name="Date" content="2009-05-15" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Structure assignment</h1>
+<!-- received="Fri May 15 16:08:44 2009" -->
+<!-- isoreceived="20090515140844" -->
+<!-- sent="Fri, 15 May 2009 09:08:34 -0500" -->
+<!-- isosent="20090515140834" -->
+<!-- name="Dan Winslow" -->
+<!-- email="DWinslow1aiminstitute.org" -->
+<!-- subject="[cc65] Structure assignment" -->
+<!-- id="F276036850359C4D8F93F7B19189838203AF2C3F@exchmbox.omaha.org" -->
+<!-- charset="iso-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6576.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Structure assignment&quot;">Next message</a> ]
+[ <a href="6574.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] cbm_dir not compiled into libs&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6576.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Structure assignment&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Dan Winslow &lt;<a href="mailto:DWinslow1aiminstitute.org?Subject=Re:%20[cc65]%20Structure%20assignment">DWinslow1aiminstitute.org</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-05-15 16:08:34</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Is there an issue with structure assignment or am I doing something really dumb? The following program produces the output
+
+22 23 24
+0 0 0
+
+rather than
+
+22 23 24
+22 23 24 as I would have expected. I am using 2.12.0 on an Atari platform.
+
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+struct point_struct {
+  unsigned char x;
+  unsigned char y;
+};
+
+struct rectangle_struct
+{
+  struct point_struct p1;
+  struct point_struct p2;
+  unsigned char width;
+  unsigned char height;
+};
+
+struct rectangle_struct r1;
+struct rectangle_struct r2;
+
+void copy_rect( struct rectangle_struct *r )
+{
+  r2=*r;
+}
+
+void main(void )
+{
+  r1.p1.x=22;
+  r1.p2.x=23;
+  r1.height=24;
+  copy_rect(&amp;r1);
+  printf(&quot;%i %i %i\n&quot;,r1.p1.x,r1.p2.x,r1.height);
+  printf(&quot;%i %i %i\n&quot;,r2.p1.x,r2.p2.x,r2.height);
+}
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri May 15 16:08:44 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6576.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Structure assignment"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6574.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] cbm_dir not compiled into libs"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6576.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Structure assignment"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6576.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Structure assignment"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6575" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6575" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6575" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-05-15 16:08:47 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Difference between __fastc</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Difference between __fastcall and __fastcall__ ?" />
+<meta name="Date" content="2010-05-03" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Difference between __fastcall and __fastcall__ ?</h1>
+<!-- received="Mon May  3 11:12:13 2010" -->
+<!-- isoreceived="20100503091213" -->
+<!-- sent="Mon, 3 May 2010 11:12:07 +0200" -->
+<!-- isosent="20100503091207" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Difference between __fastcall and __fastcall__ ?" -->
+<!-- id="20100503091207.GA25115@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="t2t1adf4c761005021811u1d641f76h44cbb7ea97beb22&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8308.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Relative paths during compilation&quot;">Next message</a> ]
+[ <a href="8306.html" title="Oliver Schmidt: &quot;[cc65] Universal Makefile: Some advanced magic wanted?&quot;">Previous message</a> ]
+[ <a href="8304.html" title="Payton Byrd: &quot;[cc65] Difference between __fastcall and __fastcall__ ?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8309.html" title="Oliver Schmidt: &quot;Re: [cc65] Difference between __fastcall and __fastcall__ ?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Difference%20between%20__fastcall%20and%20__fastcall__%20?">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-05-03 11:12:07</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Sun, May 02, 2010 at 08:11:40PM -0500, Payton Byrd wrote:
+&gt; I'm using Visual Studio 2010 as my IDE and for the most part it's totally
+&gt; cool with the cc65 specific source files.  The only that that trips it up is
+&gt; the __fastcall__ convention with two trailing underscores.  VS 2010 actually
+&gt; recognizes __fastcall as a keyword and colors it appropriately so long as it
+&gt; doesn't have the trailing spaces.  Is __fastcall a standard convention that
+&gt; means the same thing as __fastcall__ in cc65?
+
+Actually I don't know. I assume it's something else, but even if not, that
+doesn't make a real difference.
+
+&gt; The reason I ask is that Intellisense for VS 2010 does a great job with my
+&gt; sources, but not so much with the header files in the cc65/include folder.
+&gt;  The reason why is that it thinks that the __fastcall__ macro is an error
+&gt; and so each and every function defined in the include files parses as an
+&gt; error and there are literally over 100 intellisense errors reported on the
+&gt; header files.  It's nothing *important* for this to work, but it would be
+&gt; nice if it did.  If cc65 could accept __fastcall as the same thing as
+&gt; __fastcall__ then the header files could be updated to the __fastcall
+&gt; convention and intellisense would be happy which would make VS just that
+&gt; much more awesome for cc65 development (which it is already pretty awesome).
+
+And if the next vendor flags __fastcall as an error and only accepts
+__satanarchäolügenialkohöllisch then I would add that one, too? Sorry, but I'm
+definitely not going to adjust cc65 to the syntax highlighting of some
+compiler vendor.
+
+The correct way is of course to adjust intellisense. While I'm using VS almost
+daily, I don't know it good enough to have a complete solution. A quick search
+using Google finds this page for example:
+
+  <a href="http://www.catch22.net/tuts/vctips">http://www.catch22.net/tuts/vctips</a>
+
+There's probably more information out in the net. You can also have a look at
+other tools like Eclipse, which may be easier extendible.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon May  3 11:12:13 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8308.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Relative paths during compilation"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8306.html" title="Previous message in the list">Oliver Schmidt: "[cc65] Universal Makefile: Some advanced magic wanted?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8304.html" title="Message to which this message replies">Payton Byrd: "[cc65] Difference between __fastcall and __fastcall__ ?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8309.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Difference between __fastcall and __fastcall__ ?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8309.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Difference between __fastcall and __fastcall__ ?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8307" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8307" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8307" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-05-03 11:12:15 CEST
+</em></small></p>
+</body>
+</html>

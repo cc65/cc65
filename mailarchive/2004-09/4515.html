@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Porting cc65 to embedded syste</title>
+<meta name="Author" content="Ormund Williams (ormundw1panix.com)" />
+<meta name="Subject" content="[cc65] Porting cc65 to embedded system that has no OS, boot ROM or monitor" />
+<meta name="Date" content="2004-09-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Porting cc65 to embedded system that has no OS, boot ROM or monitor</h1>
+<!-- received="Thu Sep 23 23:37:04 2004" -->
+<!-- isoreceived="20040923213704" -->
+<!-- sent="23 Sep 2004 17:36:59 -0400" -->
+<!-- isosent="20040923213659" -->
+<!-- name="Ormund Williams" -->
+<!-- email="ormundw1panix.com" -->
+<!-- subject="[cc65] Porting cc65 to embedded system that has no OS, boot ROM or monitor" -->
+<!-- id="1095975417.4504.2322.camel@station1.ormlab.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4516.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Porting cc65 to embedded system that has no OS, boot ROM or monitor&quot;">Next message</a> ]
+[ <a href="4514.html" title="MagerValp: &quot;[cc65] RLE Toolkit&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4516.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Porting cc65 to embedded system that has no OS, boot ROM or monitor&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ormund Williams &lt;<a href="mailto:ormundw1panix.com?Subject=Re:%20[cc65]%20Porting%20cc65%20to%20embedded%20system%20that%20has%20no%20OS,%20boot%20ROM%20or%20monitor">ormundw1panix.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-09-23 23:36:59</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi All
+
+I am using cc65 to maintain the code for an old embedded system based on
+the 65c02, I have reverse-engineered the system and this is what I have:
+
+  65C02 1MHz
+  32k byte EPROM, 27C256
+  32K byte RAM Battery-backed, DS1230Y Dallas
+  Real time Clock, DS12887 Dallas
+  3 ACIAs, 65C51
+  2 8bit input ports, 74LS240
+  3 8bit output ports, 74LS374
+
+There is no memory banking, half of the RAM is unused.  The chip selects
+are generated from address lines A8 to A15.  The memory map looks like
+this:
+  0x0000 --&gt; 0x3fff  RAM 16kB
+  0x6700 --&gt; 0x6fff  IO
+  0x8000 --&gt; 0xffff  ROM 32kB
+
+The board is named CC64, (just coincidence, the name was chosen back in
+the '80s) it is a controller for automatic carwashes.  I created a
+linker config file but my understanding of the zeropage segment must be
+incorrect.  Here is the cc64.cfg file:
+
+--------****cc64.cfg****--------
+
+MEMORY {
+    RAM: start = $0, size = $2000, define = yes;
+    NVRAM: start = $2000, size = $2000, define = yes;
+    ROM: start = $8000, size = $8000, file = %O;
+}
+SEGMENTS {
+    CODE:        load = ROM, type = ro;
+    RODATA:      load = ROM, type = ro;
+    VECTORS:     load = ROM, type = ro, start = $FFFA;
+    DATA:        load = ROM, run = RAM, type = rw, define = yes;
+    BSS:         load = RAM, type = bss, define = yes;
+    ZEROPAGE:    load = RAM, type = zp, start = $0, size = $100, define
+= yes;
+}
+FEATURES {
+    CONDES: segment = RODATA,
+            type = constructor,
+            label = __CONSTRUCTOR_TABLE__,
+            count = __CONSTRUCTOR_COUNT__;
+    CONDES: segment = RODATA,
+            type = destructor,
+            label = __DESTRUCTOR_TABLE__,
+            count = __DESTRUCTOR_COUNT__;
+}
+
+--------****cc64.cfg****--------
+
+When I try to compile and link an empty main() the linker camplains:
+
+[ormund&#64;station1 src]$ ld65 -C cc64&#46;<!--nospam-->cfg cc64.o interrupts.o main.o \
+cc64.lib -m test.map -o test.bin
+ld65: Error: cc64.cfg(12): Range error
+
+Every thing up to this point has been smooth sailing, any ideas?
+
+-- 
+Ormund Williams &lt;ormundw&#64;panix&#46;<!--nospam-->com&gt;
+ORMLAB
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Sep 23 23:37:04 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4516.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Porting cc65 to embedded system that has no OS, boot ROM or monitor"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4514.html" title="Previous message in the list">MagerValp: "[cc65] RLE Toolkit"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4516.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Porting cc65 to embedded system that has no OS, boot ROM or monitor"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4516.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Porting cc65 to embedded system that has no OS, boot ROM or monitor"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4515" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4515" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4515" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-09-23 23:37:12 CEST
+</em></small></p>
+</body>
+</html>

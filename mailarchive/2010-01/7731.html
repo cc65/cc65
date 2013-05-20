@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Problem with cc65 v2.13.9</title>
+<meta name="Author" content="Shawn Jefferson (sjefferson1shaw.ca)" />
+<meta name="Subject" content="[cc65] Problem with cc65 v2.13.9" />
+<meta name="Date" content="2010-01-06" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Problem with cc65 v2.13.9</h1>
+<!-- received="Wed Jan  6 07:32:47 2010" -->
+<!-- isoreceived="20100106063247" -->
+<!-- sent="Tue, 5 Jan 2010 22:32:39 -0800" -->
+<!-- isosent="20100106063239" -->
+<!-- name="Shawn Jefferson" -->
+<!-- email="sjefferson1shaw.ca" -->
+<!-- subject="[cc65] Problem with cc65 v2.13.9" -->
+<!-- id="0E3EEFACE5474180A492F5213EDE7CDD@ORANGE2" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7732.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] CREDITS file&quot;">Next message</a> ]
+[ <a href="7730.html" title="Dan Winslow: &quot;RE: [cc65] Atari linker problem 2.13&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7737.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Problem with cc65 v2.13.9&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Shawn Jefferson &lt;<a href="mailto:sjefferson1shaw.ca?Subject=Re:%20[cc65]%20Problem%20with%20cc65%20v2.13.9">sjefferson1shaw.ca</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-01-06 07:32:39</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I have some code that used to compile and run fine, but now is returning the
+wrong result. I've attached the generated assembly listing for the code.
+I've also included the previous calculation for completeness.
+
+ 
+
+This is the code that is causing the problem:
+
+ 
+
+max_images = (image_table_cyl - (myide_config.imagecyl_hi * 256));
+
+max_images = max_images / myide_config.imagesize_cyl;
+
+ 
+
+image_table_cyl is unsigned int on zeropage, value is 4090 at runtime
+
+myide_config is a struct on zeropage
+
+myide_config.imagecyl_hi is unsigned char, value is 3 at runtime
+
+myide_config.imagesize_cyl is unsignec char, value is 2 at runtime
+
+ 
+
+result for the two max_images calculations are:
+
+ 
+
+-1286
+
+31125
+
+ 
+
+But should be:
+
+ 
+
+2554
+
+1277
+
+ 
+
+Looking at the code generated, it looks to my uneducated eye that this may
+indicate the problem: (??)
+
+ 
+
+0003A0r 1  85 rr             sta     _image_table_cyl
+
+0003A2r 1  86 rr             stx     _image_table_cyl+1
+
+0003A4r 1               ;
+
+0003A4r 1               ; max_images = (image_table_cyl -
+(myide_config.imagecyl_hi * 256));
+
+0003A4r 1               ;
+
+0003A4r 1  A2 00           ldx     #$00
+
+ 
+
+The x register shouldn't be loaded with zero here I don't think.  It should
+have the value stored from the calculation above I think?
+
+ 
+
+-- 
+
+Shawn
+
+ 
+
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<div>
+<ul>
+<li>text/plain attachment: <a href="../att-7731/problem.txt">problem.txt</a></li>
+</ul>
+<!-- attachment="problem.txt" -->
+</div>
+<span id="received"><dfn>Received on</dfn> Wed Jan  6 07:32:47 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7732.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] CREDITS file"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7730.html" title="Previous message in the list">Dan Winslow: "RE: [cc65] Atari linker problem 2.13"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7737.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Problem with cc65 v2.13.9"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7737.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Problem with cc65 v2.13.9"</a></li>
+<li><dfn>Reply</dfn>:  <a href="7759.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Problem with cc65 v2.13.9"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7731" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7731" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7731" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-01-06 07:32:50 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] non-ANSI extensions and i</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] non-ANSI extensions and initialized structures">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] non-ANSI extensions and initialized structures</h1>
+<!-- received="Sat Mar 15 14:01:17 2003" -->
+<!-- isoreceived="20030315130117" -->
+<!-- sent="Sat, 15 Mar 2003 14:01:13 +0100" -->
+<!-- isosent="20030315130113" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] non-ANSI extensions and initialized structures" -->
+<!-- id="20030315130113.GA1095@trixie.musoftware.de" -->
+<!-- inreplyto="20030314222653.GA5914@spektr.localdomain" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20non-ANSI%20extensions%20and%20initialized%20structures"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-03-15 14:01:13
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2780.html">David Holz: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>In reply to:</strong> <a href="2778.html">Maciej Witkowiak: "[cc65] non-ANSI extensions and initialized structures"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2784.html">Maciej Witkowiak: "Re: [cc65] non-ANSI extensions and initialized structures"</a>
+<li><strong>Reply:</strong> <a href="2784.html">Maciej Witkowiak: "Re: [cc65] non-ANSI extensions and initialized structures"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Fri, Mar 14, 2003 at 11:26:54PM +0100, Maciej Witkowiak wrote:
+&gt; As you see the commented-out part allowed for easy initialization of
+&gt; structures while the current one requires lots of unnecessary names
+&gt; (myIcon1, myIcon2 and myIconTable won't be used anymore).
+
+And the worst thing is that it doesn't even work:-)
+
+&gt; Is it possible to code in that commented-out way with current cc65? I don't
+&gt; know if it was a bug or support for it was removed at certain point and what
+&gt; standards it violated but it seemed useful.
+
+The problem in this case is not with the compiler but with the struct
+declarations. What the GEOS DoIcon routine expects is an equivalent of the
+following:
+
+        struct icontab {
+            char number;
+            struct pixel mousepos;
+            struct icondef tab[];
+        };
+
+However, what is declared in the header file is this:
+
+        struct icontab {
+            char number;
+            struct pixel mousepos;
+            struct icondef* tab;
+        };
+
+As you can see, you're mixing up an array of structures, and a pointer to such
+a structure (or an array of structures).
+
+The initialization data you are using is data to initialize the first
+(correct) struct. An error in older compiler version caused it to not
+distinguish between compound types (arrays and structures) and pointers to
+these types. This is the reason why the compiler didn't detect the mismatch
+between the initialization data and the actual struct definition. Because the
+data type was wrong but the initialization data was correct, and the GEOS
+routine called didn't care about the data type, only about the actual data,
+the code worked.
+
+Now, since the error in the compiler is fixed, the compiler complains
+(correctly) about the mismatch between the struct and the data used to
+initialize it. The obvious solution is to fix the struct definition in
+gstruct.h.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20non-ANSI%20extensions%20and%20initialized%20structures">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20non-ANSI%20extensions%20and%20initialized%20structures">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2780.html">David Holz: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>In reply to:</strong> <a href="2778.html">Maciej Witkowiak: "[cc65] non-ANSI extensions and initialized structures"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2784.html">Maciej Witkowiak: "Re: [cc65] non-ANSI extensions and initialized structures"</a>
+<li><strong>Reply:</strong> <a href="2784.html">Maciej Witkowiak: "Re: [cc65] non-ANSI extensions and initialized structures"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-03-15 14:02:04 CET</em>
+</em>
+</small>
+</body>
+</html>

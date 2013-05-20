@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Playing a PSID file</title>
+<meta name="Author" content="Payton Byrd (plbyrd1gmail.com)" />
+<meta name="Subject" content="[cc65] Playing a PSID file" />
+<meta name="Date" content="2011-11-05" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Playing a PSID file</h1>
+<!-- received="Sat Nov  5 00:23:12 2011" -->
+<!-- isoreceived="20111104232312" -->
+<!-- sent="Fri, 4 Nov 2011 18:22:41 -0500" -->
+<!-- isosent="20111104232241" -->
+<!-- name="Payton Byrd" -->
+<!-- email="plbyrd1gmail.com" -->
+<!-- subject="[cc65] Playing a PSID file" -->
+<!-- id="CAJm6qqdTO9w3hQoEjDSZH7uSFHL2JF4dvQr7oEoKefX+Z+qrdg@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9665.html" title="Marc 'BlackJack' Rintsch: &quot;Re: [cc65] Playing a PSID file&quot;">Next message</a> ]
+[ <a href="9663.html" title="mog: &quot;Re: [cc65] ca65/cl65 hello example for Apple II&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9665.html" title="Marc 'BlackJack' Rintsch: &quot;Re: [cc65] Playing a PSID file&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Payton Byrd &lt;<a href="mailto:plbyrd1gmail.com?Subject=Re:%20[cc65]%20Playing%20a%20PSID%20file">plbyrd1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-11-05 00:22:41</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I've done some initial googling and haven't found anything, so I want to
+pose a general question &quot;What's the best way to play a PSID file from cc65&quot;
+and to expand on what I believe the steps to be and the issues that I need
+to understand.
+
+1) Assume I have a PSID that has loads at $1000 through $1900.  It inits at
+$1000 and plays at $1003.
+2) I need to load that PSID into memory.  I'm assuming I can simply put the
+bytes of the data into an ASM file and it will get linked into the program
+at $1000.  However, I do need to understand if there will need to be any
+custom memory mappings for this and exactly what syntax to use in the ASM
+file to accomplish setting the bytes at a specific memory location.
+3) I need to create an ASM method to set up the IRQ to another ASM that
+plays the PSID and allows for other IRQ based activities.
+
+Am I on the right track here?
+
+Thanks
+
+-- 
+Payton Byrd
+&lt;<a href="http://www.paytonbyrd.com">http://www.paytonbyrd.com</a>&gt;
+&lt;<a href="http://it.toolbox.com/blogs/paytonbyrd">http://it.toolbox.com/blogs/paytonbyrd</a>&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Nov  5 00:23:12 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9665.html" title="Next message in the list">Marc 'BlackJack' Rintsch: "Re: [cc65] Playing a PSID file"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9663.html" title="Previous message in the list">mog: "Re: [cc65] ca65/cl65 hello example for Apple II"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9665.html" title="Next message in this discussion thread">Marc 'BlackJack' Rintsch: "Re: [cc65] Playing a PSID file"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9665.html" title="Message sent in reply to this message">Marc 'BlackJack' Rintsch: "Re: [cc65] Playing a PSID file"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9664" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9664" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9664" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-11-05 00:23:15 CET
+</em></small></p>
+</body>
+</html>

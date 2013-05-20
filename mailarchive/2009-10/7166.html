@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] 3dmaze portability</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] 3dmaze portability" />
+<meta name="Date" content="2009-10-18" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] 3dmaze portability</h1>
+<!-- received="Sun Oct 18 19:28:25 2009" -->
+<!-- isoreceived="20091018172825" -->
+<!-- sent="Sun, 18 Oct 2009 19:28:15 +0200" -->
+<!-- isosent="20091018172815" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] 3dmaze portability" -->
+<!-- id="f97798c20910181028r4a4b6829s6a5e8033db5e85e0@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20091018154929.GA23192&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7167.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] return vs. exit()&quot;">Next message</a> ]
+[ <a href="7165.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] return vs. exit()&quot;">Previous message</a> ]
+[ <a href="7163.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] 3dmaze portability&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7180.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] 3dmaze portability&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%203dmaze%20portability">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-10-18 19:28:15</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Uz,
+
+&gt; As far as I remember, the plan was to put clipping into the wrapper, because
+&gt; it's target independent and this way, clipping must only coded once.
+
+I see, so the drivers are _not_ supposed to do it.
+
+&gt; But since
+&gt; I didn't come up with a pixel exact algorithm immediately, I postponed it and
+&gt; so it never made it into the library.
+
+I see.
+
+In general I think this is a difficult decision. AFAIK computing the
+position of the pixel at the edge of the screen is from the algo
+perspective as expensive as actually drawing the line (at least with
+Bresenham). So if a driver explicitly implements the line drawing code
+then it would be way more effective to let the driver do the clipping.
+If however the driver rather calls some external function to draw the
+line (which doesn't clip) then the clipping code is additional
+overhead anyway - and sould therefore go into the wrapper in order to
+have it only once. Most likely a quick test if clipping is necessary
+at all, and then do it if necessary in the wrapper is the most
+promising approach...
+
+&gt; But this is only true for lines - other
+&gt; primitives (like circles) must do their own clipping.
+
+I see. So could you please comment on the comment below replicated
+into most drivers?
+
+; SETPIXEL: Draw one pixel at X1/Y1 = ptr1/ptr2 with the current drawing
+; color. The coordinates passed to this function are never outside the
+; visible screen area, so there is no need for clipping inside this function.
+
+&gt; The reason why the C64 driver has clipping is that it was derived from Stephen
+&gt; Judds GRLIB code, which clips when drawing pixels.
+
+Thanks for the background info :-)
+
+Best, Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Oct 18 19:28:25 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7167.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] return vs. exit()"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7165.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] return vs. exit()"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7163.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] 3dmaze portability"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7180.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] 3dmaze portability"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7180.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] 3dmaze portability"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7166" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7166" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7166" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-10-18 19:28:27 CEST
+</em></small></p>
+</body>
+</html>

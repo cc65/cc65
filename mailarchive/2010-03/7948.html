@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="ISO-8859-2"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-2" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] some patches</title>
+<meta name="Author" content="Kajtár Zsolt (kajtarzsolt1googlemail.com)" />
+<meta name="Subject" content="Re: [cc65] some patches" />
+<meta name="Date" content="2010-03-15" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] some patches</h1>
+<!-- received="Mon Mar 15 20:58:25 2010" -->
+<!-- isoreceived="20100315195825" -->
+<!-- sent="Mon, 15 Mar 2010 20:56:11 +0100" -->
+<!-- isosent="20100315195611" -->
+<!-- name="Kajtár Zsolt" -->
+<!-- email="kajtarzsolt1googlemail.com" -->
+<!-- subject="Re: [cc65] some patches" -->
+<!-- id="4B9E90DB.9030604@googlemail.com" -->
+<!-- charset="ISO-8859-2" -->
+<!-- inreplyto="201003152019.03251.groepaz&#64;gmx.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7949.html" title="Oliver Schmidt: &quot;Re: [cc65] some patches&quot;">Next message</a> ]
+[ <a href="7947.html" title="Oliver Schmidt: &quot;Re: [cc65] some patches&quot;">Previous message</a> ]
+[ <a href="7946.html" title="Groepaz: &quot;Re: [cc65] some patches&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7949.html" title="Oliver Schmidt: &quot;Re: [cc65] some patches&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Kajtár Zsolt &lt;<a href="mailto:kajtarzsolt1googlemail.com?Subject=Re:%20[cc65]%20some%20patches">kajtarzsolt1googlemail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-03-15 20:56:11</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+&gt; On Sonntag 14 März 2010, you wrote:
+&gt; 
+&gt;&gt; ide64-read-write.patch
+&gt;&gt; # Add blockread/write support if IDE64 is present.
+&gt;&gt; # This makes a big difference in I/O speed.
+&gt;&gt; # Only for C64, to not bloat the other archs.
+&gt;&gt;
+&gt;&gt; This last patch makes a copy of read.s, write.s and rwcommon.s to the c64
+&gt;&gt; directory. This is not nice, but I haven't found an easy way to not have
+&gt;&gt;  the IDE64 code compiled in for other cbm machines.
+&gt; 
+&gt; urks. that means every c64 program would get this - normally unneeded - ide64 
+&gt; stuff compiled in? rather looks to me as if this should go in a seperate 
+&gt; library.
+
+Only if they are using read/write. But if it's a separate library, normal
+programs using read/write (fread/fwrite) will not be accelerated without
+modification.
+
+Is it a good idea to create some header file, which would redefine
+read/write/fread/fwrite when included? (something like #define read(a,b,c)
+read_ide64(a,b,c) ) But then I have to make a copy from fread/fwrite as well...
+
+By the way is it possible to get rid of the interrupt handling stuff in crt0
+if I'm not using any interrupts in a program? I've tried to put .if there, but
+unfortunately __INTERRUPTOR_COUNT__ is imported and not defined, so it was not
+working.
+
+- --
+						    -soci-
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAkuekNsACgkQyBOVYiJltRYVDwCfToDI32sWh5W0vPJVP770sjq+
+AfgAnRBxvobFvBaS0b55wuB7yZ+mkieM
+=yP+r
+-----END PGP SIGNATURE-----
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Mar 15 20:58:25 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7949.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] some patches"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7947.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] some patches"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7946.html" title="Message to which this message replies">Groepaz: "Re: [cc65] some patches"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7949.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] some patches"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7949.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] some patches"</a></li>
+<li><dfn>Reply</dfn>:  <a href="7950.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] some patches"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7948" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7948" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7948" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-03-15 20:58:27 CET
+</em></small></p>
+</body>
+</html>

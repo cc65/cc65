@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Multi-purpose memory layou</title>
+<meta name="Author" content="Gábor Lénárt (lgb1lgb.hu)" />
+<meta name="Subject" content="Re: [cc65] Multi-purpose memory layout, ca65, ld65" />
+<meta name="Date" content="2011-01-12" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Multi-purpose memory layout, ca65, ld65</h1>
+<!-- received="Wed Jan 12 16:10:21 2011" -->
+<!-- isoreceived="20110112151021" -->
+<!-- sent="Wed, 12 Jan 2011 16:10:07 +0100" -->
+<!-- isosent="20110112151007" -->
+<!-- name="Gábor Lénárt" -->
+<!-- email="lgb1lgb.hu" -->
+<!-- subject="Re: [cc65] Multi-purpose memory layout, ca65, ld65" -->
+<!-- id="20110112151007.GP30819@vega.lgb.hu" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="4D2DBE9D.9060508&#64;sipo.fi" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9142.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Multi-purpose memory layout, ca65, ld65&quot;">Next message</a> ]
+[ <a href="9140.html" title="Karri Kaksonen: &quot;Re: [cc65] Multi-purpose memory layout, ca65, ld65&quot;">Previous message</a> ]
+[ <a href="9140.html" title="Karri Kaksonen: &quot;Re: [cc65] Multi-purpose memory layout, ca65, ld65&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9142.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Multi-purpose memory layout, ca65, ld65&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Gábor Lénárt &lt;<a href="mailto:lgb1lgb.hu?Subject=Re:%20[cc65]%20Multi-purpose%20memory%20layout,%20ca65,%20ld65">lgb1lgb.hu</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-01-12 16:10:07</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+On Wed, Jan 12, 2011 at 04:45:49PM +0200, Karri Kaksonen wrote:
+&gt; The config file can be used for this purpose.
+&gt; 
+&gt; Put that large amount of data into a segment
+&gt; 
+&gt; .segment &quot;MYDATA_RODATA&quot;
+&gt; 
+&gt; In the cfg file place this segment to some address
+&gt; MEMORY {
+&gt;   GRAPHICS_DATA: start = $200, size = $200, define = yes, file =%O;
+&gt;   BSS_DATA: start = $200, size = $400, define = yes, file =%O;
+&gt; }
+&gt; SEGMENTS {
+&gt;   MYDATA_RODATA: load = GRAPHICS_DATA, type = ro, define = yes;
+&gt; }
+&gt; 
+&gt; When you later want to use this for BSS you can write:
+&gt; 
+&gt; SEGMENTS {
+&gt;   BSS: load = BSS_DATA, type = bss, define = yes;
+&gt; }
+&gt; 
+&gt; Now GRAPHICS_DATA and BSS_DATA segments overlap. Does this help?
+
+Yes, kiitos [ok my basic level Finnish knowledge is off-topic here I guess]
+:) However, my problem that it's a bit uncomfortable to generate the proper
+linker config file this way, if it's not only an example (or maybe only I am
+the one who can't understand it too much).  Let me explain the situation a
+bit.  I have a program which can be loaded&amp;run on C64, with the usual 'basic
+stub' solution.  So I have got segment called BASICSTUB as the first item
+inside SEGMENTS.  It's a must, since it must be at the beginning.  But since
+I don't know the exact size of that segment as a constant value, it's hard
+to use numbers for &quot;start&quot; inside MEMORY, and I guess I can't use it in a
+tricky way that I put __SEGXYZ_[SIZE|LOAD|RUN]__ and similar things after
+&quot;start =&quot; in part &quot;MEMORY&quot; of the linker config file.  Of course, I can say,
+that I can count the size of the basic stub, so I can use a value, but I
+would like to know if there is an &quot;elegant&quot; solution for this, without _ANY_
+hard coded addresses in the linker file, other than the start of the &quot;RAM&quot;
+which is something depends on the CBM target ($7FF on C64, if you put the
+load addr as word into it too as the first word).
+
+Your example is great, but it lacks the &quot;real environment&quot; when you don't
+know the exact starting address of GRAPHICS_DATA, since basic stub must be
+the first (well, if there is no better solution I can use the basic stub
+itself too as BSS, just then I can't rerun my program if I &quot;exit&quot; to basic
+(overwriting graphics_data is not a problem since it's copied to a place
+which is consistent then, and I signal with a byte in the zero page, that
+I've already copied that if someone issue &quot;RUN&quot; command again after exiting.
+Though it's not _that_ serious problem, I can live with this issue)
+
+I'm sorry if I misunderstood something ...
+
+- Gábor
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Jan 12 16:10:21 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9142.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Multi-purpose memory layout, ca65, ld65"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9140.html" title="Previous message in the list">Karri Kaksonen: "Re: [cc65] Multi-purpose memory layout, ca65, ld65"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9140.html" title="Message to which this message replies">Karri Kaksonen: "Re: [cc65] Multi-purpose memory layout, ca65, ld65"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9142.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Multi-purpose memory layout, ca65, ld65"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9142.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Multi-purpose memory layout, ca65, ld65"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9141" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9141" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9141" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-01-12 16:10:23 CET
+</em></small></p>
+</body>
+</html>

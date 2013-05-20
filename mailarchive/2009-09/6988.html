@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Secondary linker configura</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Secondary linker configurations" />
+<meta name="Date" content="2009-09-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Secondary linker configurations</h1>
+<!-- received="Fri Sep 25 12:05:07 2009" -->
+<!-- isoreceived="20090925100507" -->
+<!-- sent="Fri, 25 Sep 2009 12:03:49 +0200" -->
+<!-- isosent="20090925100349" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Secondary linker configurations" -->
+<!-- id="20090925100349.GA975@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="200909251017.38240.groepaz&#64;gmx.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6989.html" title="Groepaz: &quot;Re: [cc65] Secondary linker configurations&quot;">Next message</a> ]
+[ <a href="6987.html" title="Groepaz: &quot;Re: [cc65] Secondary linker configurations&quot;">Previous message</a> ]
+[ <a href="6987.html" title="Groepaz: &quot;Re: [cc65] Secondary linker configurations&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6989.html" title="Groepaz: &quot;Re: [cc65] Secondary linker configurations&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Secondary%20linker%20configurations">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-09-25 12:03:49</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Fri, Sep 25, 2009 at 10:17:37AM +0200, Groepaz wrote:
+&gt; i dont quite understand what the problem is with linking additional libraries
+&gt; though :) except that it would require splitting the lib into several libs
+&gt; and not put everything into one - which IMHO isnt the optimal approach, as it
+&gt; is kinda limiting.
+
+cc65 cannot be everything for everyone. Trying to integrate each and every
+user project into cc65 will make it unmaintainable in the long run. Once stuff
+is integrated into cc65, I'm the one who gets the complaints and will have to
+maintain it. As an example, see the discussion about the master makefile. I
+never wanted this thing, but people complain here if it doesn't work, and I
+have to spend my time discussing it and explain why it broke.
+
+My suggestions for projects like this is: Make it a contrib project that
+compiles into a few replacement modues. As an option, offer a command file
+that takes the cc65 standard library for the platform and generates a copy by
+replacing the modules in question. If dozens of people start using the contrib
+project, there is time enough to check if an integration makes sense.
+
+Regards
+
+
+	Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Sep 25 12:05:07 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6989.html" title="Next message in the list">Groepaz: "Re: [cc65] Secondary linker configurations"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6987.html" title="Previous message in the list">Groepaz: "Re: [cc65] Secondary linker configurations"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6987.html" title="Message to which this message replies">Groepaz: "Re: [cc65] Secondary linker configurations"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6989.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] Secondary linker configurations"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6989.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] Secondary linker configurations"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6988" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6988" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6988" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-09-25 12:05:10 CEST
+</em></small></p>
+</body>
+</html>

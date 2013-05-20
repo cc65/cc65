@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Filenames for POSIX functins o</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] Filenames for POSIX functins on CBM targets" />
+<meta name="Date" content="2012-08-09" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Filenames for POSIX functins on CBM targets</h1>
+<!-- received="Thu Aug  9 14:20:57 2012" -->
+<!-- isoreceived="20120809122057" -->
+<!-- sent="Thu, 9 Aug 2012 14:20:02 +0200" -->
+<!-- isosent="20120809122002" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] Filenames for POSIX functins on CBM targets" -->
+<!-- id="CACT=u738tTpFKf-pv0y6R7TU6MR1ZrkmC6JwPBfK64kdwS9icw@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10561.html" title="Egan Ford: &quot;[cc65] .xmatch/.match how to match a double quote?&quot;">Next message</a> ]
+[ <a href="10559.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] inline union def.&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10563.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Filenames%20for%20POSIX%20functins%20on%20CBM%20targets">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-08-09 14:20:02</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+I'm not sure if this is an exceptionally bad or an exceptionally good
+time to bring up that topic (coming from my cc65 todo list) so please
+excuse if the former is true...
+
+As far as I understand on CBM targets currently one can prepend a
+filename to be given to open() with &quot;0#&quot; or &quot;1#&quot; to select the &quot;drive
+number&quot; (whatever that acually is). However there's no way to select
+the 'unit number' and that seems a big issue to me.
+
+Imagine some editor asking you for the filename to to save the current
+content to. In my opinion it should be possible to denote any possible
+location in the string entered by the user. Or to describe it more
+generally: A single string should be enough to describe the absolute
+location of a file in the system.
+
+I understand very well that the syntax of such a filename description
+is specific to a certain target. I'm just arguing that it should exist
+for every target. If there's already a syntax well known to users on a
+certain target then it is of course desirable to re-use it. But if
+there isn't one or if there are good reason to divert from it then
+cc65 should define its own syntax and document it.
+
+After having taken care of open() (and things like rename() /
+remove()) the potential next step would be to allow opendir() to be
+parametrized with the &quot;unit/drive part&quot; of the filename syntax defined
+before.
+
+And finally I'd like to at least discuss the option to implement
+getcwd() and chdir() in a way that they provide/take the same
+&quot;unit/drive part&quot; of the filename. Optionally one could then even
+remove _curunit altogether.
+
+Surely a &quot;directory&quot; isn't the same as a &quot;unit number&quot; but if I think
+i.e. of Windows where chdir(&quot;C:\\&quot;) is something ordninary it isn't
+far to a hypothetical CP/M chdir(&quot;A:&quot;) and from there it isn't far to
+some CBM chdir(&quot;&lt;?&gt;8&lt;?&gt;&quot;).
+
+Please note that I'm intentionally trying to not open up a discussion
+on supporting IDE64 / CMD / &lt;you name them&gt; filename extensions for
+filesystems with subdirectories. I'm just looking for a consistent way
+to describe all file locations on a plain vanilla CBM DOS system.
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Aug  9 14:20:57 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10561.html" title="Next message in the list">Egan Ford: "[cc65] .xmatch/.match how to match a double quote?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10559.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] inline union def."</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10563.html" title="Next message in this discussion thread">silverdr1wfmh.org.pl: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10563.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10566.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="10567.html" title="Message sent in reply to this message">A.Fachat: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10581.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="10591.html" title="Message sent in reply to this message">A.Fachat: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="10671.html" title="Message sent in reply to this message">A.Fachat: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10560" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10560" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10560" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-08-09 14:21:00 CEST
+</em></small></p>
+</body>
+</html>

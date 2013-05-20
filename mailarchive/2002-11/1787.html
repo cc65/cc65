@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Inserting Assembly Routin</title>
+<meta name="Author" content="MagerValp (MagerValp_at_cling.gu.se)">
+<meta name="Subject" content="Re: [cc65] Inserting Assembly Routines">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Inserting Assembly Routines</h1>
+<!-- received="Mon Nov 25 15:10:10 2002" -->
+<!-- isoreceived="20021125141010" -->
+<!-- sent="Mon, 25 Nov 2002 15:09:28 +0100" -->
+<!-- isosent="20021125140928" -->
+<!-- name="MagerValp" -->
+<!-- email="MagerValp_at_cling.gu.se" -->
+<!-- subject="Re: [cc65] Inserting Assembly Routines" -->
+<!-- id="15842.12056.923948.765734@panini.cling.gu.se" -->
+<!-- inreplyto="132423968.20021125130756@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> MagerValp (<a href="mailto:MagerValp_at_cling.gu.se?Subject=Re:%20[cc65]%20Inserting%20Assembly%20Routines"><em>MagerValp_at_cling.gu.se</em></a>)<br>
+<strong>Date:</strong> 2002-11-25 15:09:28
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1786.html">groepaz: "Re: [cc65] Inserting Assembly Routines"</a>
+<li><strong>In reply to:</strong> <a href="1786.html">groepaz: "Re: [cc65] Inserting Assembly Routines"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1793.html">Ullrich von Bassewitz: "Re: [cc65] Inserting Assembly Routines"</a>
+<li><strong>Next in thread:</strong> <a href="1792.html">Ullrich von Bassewitz: "Re: [cc65] Inserting Assembly Routines"</a>
+<li><strong>Reply:</strong> <a href="1793.html">Ullrich von Bassewitz: "Re: [cc65] Inserting Assembly Routines"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+&gt;&gt;&gt;&gt;&gt; &quot;g&quot; == groepaz  &lt;<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Inserting%20Assembly%20Routines">groepaz_at_gmx.net</a>&gt; writes:
+
+g&gt; if you want to create a library in assembler, just take the cc65
+g&gt; runtime library as an example.... basically nothing more than
+g&gt; putting the asm code into seperate source files, assemble them to
+g&gt; an object file and making a library from them.
+
+This is easier said than done though. It takes a while to figure out
+argument passing, and there's no nice reference of what all the small
+runtime routines are and what they do. My solution to this was:
+
+void CopyFromSuperRAM(void *dest, unsigned char sourcebank, void
+*source, unsigned int length) {
+  *(unsigned char *)0x005f = dest;
+  *(unsigned char *)0x0061 = sourcebank;
+  *(unsigned char *)0x0062 = source;
+  *(unsigned char *)0x0064 = length;
+
+  __asm__ (&quot;ldy #0&quot;);      /* just some dummy code */
+  __asm__ (&quot;lda ($62),y&quot;);
+  __asm__ (&quot;sta ($5f),y&quot;);
+}
+
+and assemble with cc65 -O -t c64 test.c. Then I cut and paste the
+generated source to my library file and use that as the base for the
+function. This way cc65 automatically inserts all the necessary jsr
+popax and whatnot.
+
+-- 
+    ___          .     .  .         .       . +  .         .      o   
+  _|___|_   +   .  +     .     +         .  Per Olofsson, arkadspelare
+    o-o    .      .     .   o         +          <a href="mailto:MagerValp_at_cling.gu.se?Subject=Re:%20[cc65]%20Inserting%20Assembly%20Routines">MagerValp_at_cling.gu.se</a>
+     -       +            +    .     <a href="http://www.cling.gu.se/~cl3polof/">http://www.cling.gu.se/~cl3polof/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Inserting%20Assembly%20Routines">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1786.html">groepaz: "Re: [cc65] Inserting Assembly Routines"</a>
+<li><strong>In reply to:</strong> <a href="1786.html">groepaz: "Re: [cc65] Inserting Assembly Routines"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1793.html">Ullrich von Bassewitz: "Re: [cc65] Inserting Assembly Routines"</a>
+<li><strong>Next in thread:</strong> <a href="1792.html">Ullrich von Bassewitz: "Re: [cc65] Inserting Assembly Routines"</a>
+<li><strong>Reply:</strong> <a href="1793.html">Ullrich von Bassewitz: "Re: [cc65] Inserting Assembly Routines"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-11-25 15:10:25 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] The Contiki Desktop OS fo</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] The Contiki Desktop OS for cc65">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] The Contiki Desktop OS for cc65</h1>
+<!-- received="Fri Mar 14 17:44:44 2003" -->
+<!-- isoreceived="20030314164444" -->
+<!-- sent="Fri, 14 Mar 2003 17:44:39 +0100" -->
+<!-- isosent="20030314164439" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] The Contiki Desktop OS for cc65" -->
+<!-- id="20030314164439.GA19981@trixie.musoftware.de" -->
+<!-- inreplyto="se7192f1.062@gwmail.sd62.bc.ca" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20The%20Contiki%20Desktop%20OS%20for%20cc65"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-03-14 17:44:39
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2767.html">Shawn Jefferson: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>In reply to:</strong> <a href="2767.html">Shawn Jefferson: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2769.html">Shawn Jefferson: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Next in thread:</strong> <a href="2720.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Maybe reply:</strong> <a href="2720.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Maybe reply:</strong> <a href="2721.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Maybe reply:</strong> <a href="2742.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Fri, Mar 14, 2003 at 08:29:13AM -0800, Shawn Jefferson wrote:
+&gt; Does the C64 really have that much more RAM than the Atari?  We may have to
+&gt; get a little more creative in using space from the OS... although I don't know
+&gt; how much more there is to take?  The C: routines?
+
+I think the reason is that the C64 is a very simple device when it comes to
+the builtin software. It has full 64K of memory. 8K are shadowed by the kernal
+ROM and not usable from the current cc65 setup. Another 4K are shadowed by the
+I/O area and also unusable (this memory will get used by the C64 tgi driver).
+The kernal needs 1K for variables and another 1K for screen memory - that's
+it. So you have 64 - 8 - 4 - 1 - 1 = 50K of memory available. Since there's no
+need to load any OS, drivers or whatever, the compiled code can use all of
+this memory.
+
+It is interesting that the C128 (a somewhat more advanced machine) has less
+memory available. For one, because the builtin kernal needs more space, and
+second, because the ROM reserves another 8K for variables and screen memory.
+           
+On many Commodore machines it is possible to bank out the ROMs to get access
+to the underlying RAM. So with some overhead in space and runtime effiency
+(wrappers are needed when calling ROM functions), even more memory can be made
+available. This is what the Plus/4 library currently does, leading to a
+whooping 60K of memory usable for C programs.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20The%20Contiki%20Desktop%20OS%20for%20cc65">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20The%20Contiki%20Desktop%20OS%20for%20cc65">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2767.html">Shawn Jefferson: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>In reply to:</strong> <a href="2767.html">Shawn Jefferson: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2769.html">Shawn Jefferson: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Next in thread:</strong> <a href="2720.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Maybe reply:</strong> <a href="2720.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Maybe reply:</strong> <a href="2721.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Maybe reply:</strong> <a href="2742.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-03-14 17:44:49 CET</em>
+</em>
+</small>
+</body>
+</html>

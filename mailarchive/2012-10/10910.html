@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Specific Memory Addresses </title>
+<meta name="Author" content="Karri Kaksonen (karri1sipo.fi)" />
+<meta name="Subject" content="Re: [cc65] Specific Memory Addresses at Compilation" />
+<meta name="Date" content="2012-10-15" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Specific Memory Addresses at Compilation</h1>
+<!-- received="Mon Oct 15 06:37:58 2012" -->
+<!-- isoreceived="20121015043758" -->
+<!-- sent="Mon, 15 Oct 2012 07:37:41 +0300" -->
+<!-- isosent="20121015043741" -->
+<!-- name="Karri Kaksonen" -->
+<!-- email="karri1sipo.fi" -->
+<!-- subject="Re: [cc65] Specific Memory Addresses at Compilation" -->
+<!-- id="507B9315.6030605@sipo.fi" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="CAHsKwE-A7hqim9QZQRJ3m=sAvJY-wqOm3H_8bfhVVnHqkmKhxg&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10911.html" title="Uffe Jakobsen: &quot;[cc65] svn repo seems down ?&quot;">Next message</a> ]
+[ <a href="10909.html" title="Brad Smith: &quot;Re: [cc65] Specific Memory Addresses at Compilation&quot;">Previous message</a> ]
+[ <a href="10906.html" title="Zen Tom: &quot;[cc65] Specific Memory Addresses at Compilation&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10917.html" title="Oliver Schmidt: &quot;Re: [cc65] Specific Memory Addresses at Compilation&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Karri Kaksonen &lt;<a href="mailto:karri1sipo.fi?Subject=Re:%20[cc65]%20Specific%20Memory%20Addresses%20at%20Compilation">karri1sipo.fi</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-10-15 06:37:41</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 14.10.2012 12:49, Zen Tom wrote:
+&gt; Hi,
+&gt;
+&gt; I wonder if someone can help - I'm writing a game using cc65 for the C64.
+&gt;
+&gt; I have a whole bunch of graphics data (charmaps and sprites) that I 
+&gt; need to load into very specific data-locations in graphics bank 1 
+&gt; between $4000 and $8000.
+&gt; Previously, I've just loaded that data directly into my machine code 
+&gt; monitor as a single operation, and then loaded my compiled program 
+&gt; into memory.
+&gt; Now my program is getting larger, it's starting to eat into my 
+&gt; reserved memory area.
+&gt; How do I avoid this?
+&gt; I can either move my graphics data into code and get cc65 to include 
+&gt; it at compile time - perhaps by genarating a large flat array - but I 
+&gt; need to put it at a specific memory location for that to work. How do 
+&gt; I do that?
+&gt; Alternately, is there a way to get the linker to recognise a 
+&gt; particular file - perhaps even of &quot;raw&quot; data and to load it into 
+&gt; memory at a specific address?
+&gt; Presumably this is a common scenario - how have people dealt with it 
+&gt; in the past?
+&gt;
+&gt; Any pointers much appreciated.
+&gt; Kind regards,
+&gt; Tom
+
+I had the same problem with an Elite clone. When the code gets bigger 
+the best solution is to split both the code and the graphics into 
+segments that can be loaded in when needed.
+
+In Elite there is separate places in the game:
+- flying needs 3D math, stars, planets, spaceships
+- docked at a space station needs buying, selling, starmaps, storyline stuff
+
+Swapping with two or more modes using segments will actually double the 
+available memory. Of course you need to split the code into multiple 
+files also. One file contains common code, one code that is needed in 
+flying mode, one file with code for docked mode.
+
+--
+Karri
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Oct 15 06:37:58 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10911.html" title="Next message in the list">Uffe Jakobsen: "[cc65] svn repo seems down ?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10909.html" title="Previous message in the list">Brad Smith: "Re: [cc65] Specific Memory Addresses at Compilation"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10906.html" title="Message to which this message replies">Zen Tom: "[cc65] Specific Memory Addresses at Compilation"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10917.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Specific Memory Addresses at Compilation"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10917.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Specific Memory Addresses at Compilation"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10910" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10910" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10910" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-10-15 06:38:02 CEST
+</em></small></p>
+</body>
+</html>

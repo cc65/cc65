@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] TGI aspect ratio values in the</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] TGI aspect ratio values in the drivers" />
+<meta name="Date" content="2011-05-03" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] TGI aspect ratio values in the drivers</h1>
+<!-- received="Tue May  3 18:35:21 2011" -->
+<!-- isoreceived="20110503163521" -->
+<!-- sent="Tue, 3 May 2011 18:35:13 +0200" -->
+<!-- isosent="20110503163513" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] TGI aspect ratio values in the drivers" -->
+<!-- id="BANLkTi=J5w9V-trfiUAE1Y-TvHA1Jc5vTw@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9384.html" title="Greg King: &quot;Re: [cc65] Re: TGI colors revisited&quot;">Next message</a> ]
+[ <a href="9382.html" title="Oliver Schmidt: &quot;Re: [cc65] Re: TGI colors revisited&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20TGI%20aspect%20ratio%20values%20in%20the%20drivers">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-05-03 18:35:13</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+Another aspect of TGI we discussed then was the handling of aspect
+ratios. Uz introduced an aspect ratio field in the TGI driver header
+but up to now this field was simply set to an aspect ratio of 1:1 for
+all drivers (apart from some Atari drivers which set it to 2:1 or 4:1
+to indicate half or quarter of the normal x resolution).
+
+I wanted to set the aspect ratio field in the drivers to some
+resonable values and discussed with Uz the options for determining the
+values. He proposed to approximate them by just presuming a classic
+CRT with an aspect ration of 4:3.
+
+I still remember that there were quite some misunderstandings in our
+discsion so I'll try to be as exact as possible this time sticking to
+the terminology used i.e. here:
+<a href="http://en.wikipedia.org/wiki/Pixel_aspect_ratio">http://en.wikipedia.org/wiki/Pixel_aspect_ratio</a> :
+- pixel aspect ratio (PAR)
+- display aspect ratio (DAR)
+- storage aspect ratio (SAR)
+
+The three values are related by the identity SAR × PAR = DAR.
+
+DAR is presumed as 4:3.
+SAR is defined as the x resolution divided by y resolution of the TGI driver.
+PAR is what we want in the TGI driver header field.
+
+So I changed the PAR in all TGI driver headers to the (rounded) result
+derived from the the above DAR and SAR.
+
+Two remarks:
+
+1. I'm well aware that especially the C64 community has more accurate
+ways to determine the PAR (dependent on PAL or NTSC display). However
+I felt that using the formula above for all TGI drivers in a
+homogenous way is preferable. If someone else nevertheless feels that
+it is necessary to finetune the C64 value I'd ask to change the C128
+and GEOS values in the same way for consistency reasons.
+
+2. According to my research the Lynx LCD display has in fact square
+pixels so I left the PAR in the Lynx driver header to 1:1.
+
+Some words on the usage of the PAR in the TGI driver headers:
+
+The TGI kernel does *not* use the PAR to justify graphics primitives
+(especially circles). The two primary reasons are:
+- The TGI Kernel doesn't know if it should shrink graphics primitives
+one dimension or rather expand them in the other dimension.
+- If a TGI application i.e. draws an (imperfect) square from four
+individual lines with equal length and then a circle in the center it
+is entitled to presume that the circle touches the square on all four
+sides - even if that means the circle is imperfect too.
+
+The one exception from the statement above might be in the future the
+text output using vector fonts - because there the application can't
+make presumptions on the actual pixel size anyway.
+
+So the PAR in the TGI driver headers is rather to be used by the TGI
+application. Two new functions have been introduced by Uz for access:
+
+unsigned __fastcall__ tgi_getaspectratio (void);
+/* Returns the aspect ratio for the loaded driver. The aspect ratio is an
+ * 8.8 fixed point value.
+ */
+
+void __fastcall__ tgi_setaspectratio (unsigned aspectratio);
+/* Set a new aspect ratio for the loaded driver. The aspect ratio is an
+ * 8.8 fixed point value.
+ */
+
+The final helper functions to simplify working with the 8.8 fix point
+values are still to come. However Uz already provided a preliminary
+one. I used it in the DoCircle routine in the TGI demo program in
+order to facilitate some first visual experience of the changed PAR in
+the TGI driver headers.
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue May  3 18:35:21 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9384.html" title="Next message in the list">Greg King: "Re: [cc65] Re: TGI colors revisited"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9382.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Re: TGI colors revisited"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9383" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9383" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9383" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-05-03 18:35:24 CEST
+</em></small></p>
+</body>
+</html>

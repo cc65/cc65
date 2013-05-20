@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] two little bugs</title>
+<meta name="Author" content="Greg King (greg.king41verizon.net)" />
+<meta name="Subject" content="Re: [cc65] two little bugs" />
+<meta name="Date" content="2009-08-24" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] two little bugs</h1>
+<!-- received="Mon Aug 24 19:13:25 2009" -->
+<!-- isoreceived="20090824171325" -->
+<!-- sent="Mon, 24 Aug 2009 12:00:13 -0400" -->
+<!-- isosent="20090824160013" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king41verizon.net" -->
+<!-- subject="Re: [cc65] two little bugs" -->
+<!-- id="004301ca24de$2555cc80$443efea9@monarch" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="20090821111432.GA31114&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6725.html" title="Greg King: &quot;Re: [cc65] Chicken and Egg Problem (?)&quot;">Next message</a> ]
+[ <a href="6723.html" title="Oliver Schmidt: &quot;Re: [cc65] Chicken and Egg Problem (?)&quot;">Previous message</a> ]
+[ <a href="6702.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] two little bugs&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6726.html" title="Groepaz: &quot;Re: [cc65] two little bugs&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king41verizon.net?Subject=Re:%20[cc65]%20two%20little%20bugs">greg.king41verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-08-24 18:00:13</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: &quot;Ullrich von Bassewitz&quot;; on Friday, Aug. 21, 2009; at 07:14 AM -0400
+&gt;
+&gt; Here is a short test-snippet.  It reads the time from the TOD clock
+&gt; directly, and via time().  With the write to tod_10 disabled, the clock
+&gt; does not run.  It looks like someone/something has stopped the clock
+&gt; by writing to tod_hour before, because the program works OK
+&gt; when the write is enabled.
+&gt; -------------------------------------------------------------------------
+&gt; #include &lt;stdio.h&gt;
+&gt; #include &lt;time.h&gt;
+&gt; #include &lt;cbm.h&gt;
+&gt;
+&gt; static unsigned char bcdtoa (unsigned char x)
+&gt; {
+&gt;     return (x &amp; 0x0F) + (x &gt;&gt; 4) * 10;
+&gt; }
+&gt;
+&gt; int main(void)
+&gt; {
+&gt;     time_t T;
+&gt;     unsigned char hour, min, sec, sec10;
+&gt;
+&gt;     /* CIA1.tod_10 = 0; */
+&gt;     while (1) {
+&gt;         hour = CIA1.tod_hour;
+&gt;         min  = CIA1.tod_min;
+&gt;         sec  = CIA1.tod_sec;
+&gt;         sec10 = CIA1.tod_10;
+&gt;         printf (&quot;%02d:%02d:%02d\n&quot;,
+&gt;                   bcdtoa (hour), bcdtoa (min), bcdtoa (sec));
+&gt;
+&gt;         T = time (0);
+&gt;         printf (&quot;%s\n&quot;, asctime (localtime (&amp;T)));
+&gt;     }
+&gt; }
+
+(As Spiro hinted ...)
+A hardware-reset stops all of the timers in the CIA chip.  After that, the
+Time-Of-Day clock will not run until you have written a time into it.  The
+firmware does not write into those registers.  [Even though BASIC's rnd(0)
+reads some of  those registers in CIA1 -- see the entry for location 57495
+in the &quot;MAPPING THE Commodore 64&quot; book.]
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Aug 24 19:13:25 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6725.html" title="Next message in the list">Greg King: "Re: [cc65] Chicken and Egg Problem (?)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6723.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Chicken and Egg Problem (?)"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6702.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] two little bugs"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6726.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] two little bugs"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6726.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] two little bugs"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6728.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] two little bugs"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6724" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6724" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6724" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-08-24 19:13:27 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Please critique this makef</title>
+<meta name="Author" content="silverdr1wfmh.org.pl (silverdr1wfmh.org.pl)" />
+<meta name="Subject" content="Re: [cc65] Please critique this makefile" />
+<meta name="Date" content="2010-04-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Please critique this makefile</h1>
+<!-- received="Sun Apr 25 22:01:25 2010" -->
+<!-- isoreceived="20100425200125" -->
+<!-- sent="Sun, 25 Apr 2010 22:01:15 +0200" -->
+<!-- isosent="20100425200115" -->
+<!-- name="silverdr1wfmh.org.pl" -->
+<!-- email="silverdr1wfmh.org.pl" -->
+<!-- subject="Re: [cc65] Please critique this makefile" -->
+<!-- id="BD00A911-BE8A-4F5A-B11C-766AA111F3F6@wfmh.org.pl" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="r2w1002edb71004241526j9e9cdac9z655c58f226f8384b&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8182.html" title="Groepaz: &quot;Re: [cc65] Zero page, C stack, and interrupts&quot;">Next message</a> ]
+[ <a href="8180.html" title="Groepaz: &quot;Re: [cc65] Commodore PET keyboard scanning&quot;">Previous message</a> ]
+[ <a href="8156.html" title="Oliver Schmidt: &quot;Re: [cc65] Please critique this makefile&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8183.html" title="Oliver Schmidt: &quot;Re: [cc65] Please critique this makefile&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:silverdr1wfmh.org.pl?Subject=Re:%20[cc65]%20Please%20critique%20this%20makefile">silverdr1wfmh.org.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-04-25 22:01:15</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 2010-04-25, at 00:26, Oliver Schmidt wrote:
+
+&gt;&gt; Cygwin uses GNU Sed;
+&gt;&gt; it knows that &quot;\t&quot; means TAB.  But apparently, the Sed program on
+&gt;&gt; silverdr's machine doesn't know it.
+
+It is a BSD sed, which doesn't present itself as GNU. Surely I could  
+install GNU sed but until now I didn't have to ;-)
+
+&gt;&gt; ( <a href="http://www.grymoire.com/Unix/Sed.html">http://www.grymoire.com/Unix/Sed.html</a> says that &quot;\t&quot; started its  
+&gt;&gt; life
+&gt;&gt; as a &quot;PERL Regular Expression&quot; extension.)
+&gt;
+&gt; Okay...
+&gt;
+&gt;&gt; Therefore, that command must be alterred:
+&gt;&gt;        &#64;sed -e&quot;s!$(&lt;:c=s)!$&#64;!p&quot; -e&quot;s![^:]*:&#46;<!--nospam-->\(.*\)!\1:!&quot; &lt; $(&lt;:c=u) \
+&gt;&gt;        &gt; $(&#64;:o=d)
+&gt;
+&gt; Thanks :-) Two remarks
+&gt;
+&gt; 1. The non-fluent sed readers might be interested to know that the
+&gt; code above reads up to the ':' (known to just preceed the tab) and
+&gt; than a single char whatever it may be.
+&gt;
+&gt; 2. While $(&lt;:c=s) (and the other two substitution references)
+&gt; certainly works I intentionally prefer including the '.'  like this
+&gt; $(&lt;:.c=.s) as it nicely resembles the file name extensions in the rule
+
+Yes - I like it better to. It much more easily tells the reader what  
+are we dealing with.
+
+Now - with the line:
+
+&#64;sed -e&quot;s!$(&lt;:&#46;<!--nospam-->c=.s)!$&#64;!p&quot; -e&quot;s![^:]*:&#46;<!--nospam-->\(.*\)!\1:!&quot; &lt; $(&lt;:.c=.u) &gt; $ 
+(&#64;:&#46;<!--nospam-->o=.d)
+
+I get what is expected:
+
+obj/main.o:	src/main.c /usr/local/lib/cc65/include/stdio.h /usr/local/ 
+lib/cc65/include/stddef.h /usr/local/lib/cc65/include/stdarg.h
+src/main.c /usr/local/lib/cc65/include/stdio.h /usr/local/lib/cc65/ 
+include/stddef.h /usr/local/lib/cc65/include/stdarg.h:
+
+:-)
+
+-- 
+SD!
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Apr 25 22:01:25 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8182.html" title="Next message in the list">Groepaz: "Re: [cc65] Zero page, C stack, and interrupts"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8180.html" title="Previous message in the list">Groepaz: "Re: [cc65] Commodore PET keyboard scanning"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8156.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] Please critique this makefile"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8183.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Please critique this makefile"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8183.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Please critique this makefile"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8181" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8181" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8181" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-04-25 22:01:27 CEST
+</em></small></p>
+</body>
+</html>

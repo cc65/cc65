@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Oric: Segment `TAPEHDR' d</title>
+<meta name="Author" content="Andre Majorel (amajorel_at_teaser.fr)">
+<meta name="Subject" content="Re: [cc65] Oric: Segment `TAPEHDR' does not exist">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Oric: Segment `TAPEHDR' does not exist</h1>
+<!-- received="Tue Jul 15 19:16:30 2003" -->
+<!-- isoreceived="20030715171630" -->
+<!-- sent="Tue, 15 Jul 2003 19:17:33 +0200" -->
+<!-- isosent="20030715171733" -->
+<!-- name="Andre Majorel" -->
+<!-- email="amajorel_at_teaser.fr" -->
+<!-- subject="Re: [cc65] Oric: Segment `TAPEHDR' does not exist" -->
+<!-- id="20030715171733.GD1621@teaser.fr" -->
+<!-- inreplyto="20030715161007.GA14614@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Andre Majorel (<a href="mailto:amajorel_at_teaser.fr?Subject=Re:%20[cc65]%20Oric:%20Segment%20`TAPEHDR'%20does%20not%20exist"><em>amajorel_at_teaser.fr</em></a>)<br>
+<strong>Date:</strong> 2003-07-15 19:17:33
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3183.html">Ullrich von Bassewitz: "Re: [cc65] Oric: Segment `TAPEHDR' does not exist"</a>
+<li><strong>In reply to:</strong> <a href="3183.html">Ullrich von Bassewitz: "Re: [cc65] Oric: Segment `TAPEHDR' does not exist"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3185.html">Ullrich von Bassewitz: "Re: [cc65] Oric: Segment `TAPEHDR' does not exist"</a>
+<li><strong>Reply:</strong> <a href="3185.html">Ullrich von Bassewitz: "Re: [cc65] Oric: Segment `TAPEHDR' does not exist"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On 2003-07-15 18:10 +0200, Ullrich von Bassewitz wrote:
+
+&gt; &gt; If I explicitly add atmos.o, I get this :
+&gt; &gt;
+&gt; &gt;   $ ./src/ld65/ld65 -S 0x8000 -C src/ld65/cfg/atmos.cfg lib/atmos.o toto.o\
+&gt; &gt; 							lib/atmos.lib
+&gt; &gt;   Unresolved external `callmain' referenced in:
+&gt; &gt;     crt0.s(11)
+&gt; &gt;   Error: 1 unresolved external(s) found - cannot create output file
+&gt; 
+&gt; I can only guess that you're using some old version or non matching sources.
+
+This is a brand new installation on a machine where cc65 was never
+installed before. I'm using :
+
+  <a href="ftp://ftp.musoftware.de/pub/uz/cc65/cc65-atmos-2.9.1.zip">ftp://ftp.musoftware.de/pub/uz/cc65/cc65-atmos-2.9.1.zip</a>
+  <a href="ftp://ftp.musoftware.de/pub/uz/cc65/cc65-sources-2.9.1.tar.bz2">ftp://ftp.musoftware.de/pub/uz/cc65/cc65-sources-2.9.1.tar.bz2</a>
+
+ld65 opens all the right files :
+
+  $ strace -e open src/ld65/ld65 -t atmos libsrc/atmos.o toto.o libsrc/atmos.lib
+  open(&quot;/etc/ld.so.preload&quot;, O_RDONLY)   = -1 ENOENT (No such file or directory)
+  open(&quot;/etc/ld.so.cache&quot;, O_RDONLY)     = 3
+  open(&quot;/lib/libc.so.6&quot;, O_RDONLY)       = 3
+  open(&quot;libsrc/atmos.o&quot;, O_RDONLY)       = 3
+  open(&quot;toto.o&quot;, O_RDONLY)               = 3
+  open(&quot;libsrc/atmos.lib&quot;, O_RDONLY)     = 3
+  Unresolved external `callmain' referenced in:
+    crt0.s(11)
+  Error: 1 unresolved external(s) found - cannot create output file
+
+If I'm guessing correctly, callmain is supposed to be defined by
+atmos.lib. The string does appear in atmos.lib but for some reason
+ld65 doesn't see it.
+
+In case you're into that sort of thing, I put an ltrace of ld65 at
+&lt;URL:<a href="http://www.teaser.fr/~amajorel/misc/ld65.ltrace.bz2">http://www.teaser.fr/~amajorel/misc/ld65.ltrace.bz2</a>&gt;. It
+doesn't tell me much because it goes directly from qsort() to
+fprintf(xxx, &quot;Unresolved external `%s' referen&quot;..., &quot;callmain&quot;) !
+
+-- 
+André Majorel &lt;<a href="mailto:amajorel_at_teaser.fr?Subject=Re:%20[cc65]%20Oric:%20Segment%20`TAPEHDR'%20does%20not%20exist">amajorel_at_teaser.fr</a>&gt;
+<a href="http://www.teaser.fr/~amajorel/">http://www.teaser.fr/~amajorel/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Oric:%20Segment%20`TAPEHDR'%20does%20not%20exist">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3183.html">Ullrich von Bassewitz: "Re: [cc65] Oric: Segment `TAPEHDR' does not exist"</a>
+<li><strong>In reply to:</strong> <a href="3183.html">Ullrich von Bassewitz: "Re: [cc65] Oric: Segment `TAPEHDR' does not exist"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3185.html">Ullrich von Bassewitz: "Re: [cc65] Oric: Segment `TAPEHDR' does not exist"</a>
+<li><strong>Reply:</strong> <a href="3185.html">Ullrich von Bassewitz: "Re: [cc65] Oric: Segment `TAPEHDR' does not exist"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-07-15 19:16:46 CEST</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Goodbye _curunit, Hello chdir(</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] Goodbye _curunit, Hello chdir()" />
+<meta name="Date" content="2012-10-18" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Goodbye _curunit, Hello chdir()</h1>
+<!-- received="Thu Oct 18 14:28:33 2012" -->
+<!-- isoreceived="20121018122833" -->
+<!-- sent="Thu, 18 Oct 2012 14:27:28 +0200" -->
+<!-- isosent="20121018122728" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] Goodbye _curunit, Hello chdir()" -->
+<!-- id="CACT=u71m2q=-Rder-bC2hfGFYuhtZMqxQifx+6cUsFvPCHG8ow@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10933.html" title="Shawn Jefferson: &quot;RE: [cc65] dio_query_sectcount() on Atari ?&quot;">Next message</a> ]
+[ <a href="10931.html" title="Marc Rintsch: &quot;Re: [cc65] dio_query_sectcount() on Atari ?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10935.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Goodbye _curunit, Hello chdir()&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Goodbye%20_curunit,%20Hello%20chdir()">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-10-18 14:27:28</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+As discussed in the thread &quot;Uniform mass storage device discovery and
+file locations&quot; and as coordinated with Uz I've implemented some new
+stuff. Here's a brief overview:
+
+
+unsigned char getfirstdevice (void);
+unsigned char __fastcall__ getnextdevice (unsigned char device);
+
+Enumerate the the mass storage devices present and returns their
+numbers. The numbers should be meaningful to users i.e. for choosing
+in a list built from the result. On the CBMs the numbers are 8, 9, ...
+The numbers can be used as parameter to dio_open(). Disk drives are
+not turned on.
+
+
+char* __fastcall__ getdevicedir (unsigned char device, char* buf, size_t size);
+
+Given a device number provides a directory name that can be used as
+parameter to chdir() in order to access the root directory of the
+device. The name should be meaningful to users i.e. for choosing in a
+list built from the result. On the CBMs the names are &quot;8&quot;, &quot;9&quot;, ...
+Disk drives are checked for a formatted disk. If there's none the
+return value is NULL instead of a pointer to the directory name.
+
+
+int __fastcall__ chdir (const char* name);
+
+Makes the directory provided the current one. The only directories
+supported on CBMs are the root directories of the devices named &quot;8&quot;,
+&quot;9&quot;, ... Disk drives are checked for a formatted disk. If there's none
+the return value is -1.
+
+
+char* __fastcall__ getcwd (char* buf, size_t size);
+
+Provides the name of the current directory. On CBMs this is just the
+name given to chdir() (or the default - usually &quot;8&quot;).
+
+
+Important note: Because getcwd() just returns a string cached inside
+the C library all changes to the current directory have to be made
+through C library functions which are aware of that cache and update
+it. Usually the only one doing so is chdir(). Obviously setting the
+current device by changing the value of _curunit is incompatible with
+this approach. Therefore _curunit had to be removed so coding like
+
+  _curunit = 9;
+
+has to be replaced with
+
+  chdir(&quot;9&quot;);
+
+Sorry for the inconvenience.
+
+
+With this new stuff it is now possible to enumerate (and access) all
+devices, directories and files in a target-independent way - which was
+my original goal in thread mentioned above :-) So it's time to say
+thanks to all who contributed there!
+
+I've written a new samples program called 'enumdevdir' that works on
+(most) CBMs and on the Apple II without any #ifdef. On the latter it
+processes subdirectories too. Please find its source code below this
+message.
+
+Another more simple target-independent scenario is to ask the user not
+only for a &quot;File Name&quot; but also for a &quot;File Location&quot; and doing a
+chdir() to that location before accessing the file.
+
+Final remark: I'm very optimistic that the new functions described
+above can be implemented in a reasonable way on other targets too. The
+obvious candidate here is the Atari. I'm looking forward to see
+enumdevdir running there too...
+
+Regards,
+Oliver
+
+
+========================================
+/*
+ * Enumerate devices, directories and files.
+ *
+ * 2012-10-15, Oliver Schmidt (ol.sc&#64;web&#46;<!--nospam-->de)
+ *
+ */
+
+
+
+#include &lt;stdio.h&gt;
+#include &lt;conio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;device.h&gt;
+#include &lt;dirent.h&gt;
+
+
+void printdir (char *newdir)
+{
+    char olddir[FILENAME_MAX];
+    char curdir[FILENAME_MAX];
+    DIR *dir;
+    struct dirent *ent;
+    char *subdirs = NULL;
+    unsigned dirnum = 0;
+    unsigned num;
+
+    getcwd (olddir, sizeof (olddir));
+    if (chdir (newdir)) {
+
+        /* If chdir() fails we just print the
+         * directory name - as done for files.
+         */
+        printf (&quot;  Dir  %s\n&quot;, newdir);
+        return;
+    }
+
+    /* We call getcwd() in order to print the
+     * absolute pathname for a subdirectory.
+     */
+    getcwd (curdir, sizeof (curdir));
+    printf (&quot; Dir %s:\n&quot;, curdir);
+
+    /* Calling opendir() always with &quot;.&quot; avoids
+     * fiddling around with pathname separators.
+     */
+    dir = opendir (&quot;.&quot;);
+    while (ent = readdir (dir)) {
+
+        if (_DE_ISREG (ent-&gt;d_type)) {
+            printf (&quot;  File %s\n&quot;, ent-&gt;d_name);
+            continue;
+        }
+
+        /* We defer handling of subdirectories until we're done with the
+         * current one as several targets don't support other disk i/o
+         * while reading a directory (see cc65 readdir() doc for more).
+         */
+        if (_DE_ISDIR (ent-&gt;d_type)) {
+            subdirs = realloc (subdirs, FILENAME_MAX * (dirnum + 1));
+            strcpy (subdirs + FILENAME_MAX * dirnum++, ent-&gt;d_name);
+        }
+    }
+    closedir (dir);
+
+    for (num = 0; num &lt; dirnum; ++num) {
+        printdir (subdirs + FILENAME_MAX * num);
+    }
+    free (subdirs);
+
+    chdir (olddir);
+}
+
+
+void main (void)
+{
+    unsigned char device;
+    char devicedir[FILENAME_MAX];
+
+    /* Calling getfirstdevice()/getnextdevice() does _not_ turn on the motor
+     * of a drive-type device and does _not_ check for a disk in the drive.
+     */
+    device = getfirstdevice ();
+    while (device != INVALID_DEVICE) {
+        printf (&quot;Device %d:\n&quot;, device);
+
+        /* Calling getdevicedir() _does_ check for a (formatted) disk in a
+         * floppy-disk-type device and returns NULL if that check fails.
+         */
+        if (getdevicedir (device, devicedir, sizeof (devicedir))) {
+            printdir (devicedir);
+        } else {
+            printf (&quot; N/A\n&quot;);
+        }
+
+        device = getnextdevice (device);
+    }
+
+    cgetc ();
+}
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Oct 18 14:28:33 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10933.html" title="Next message in the list">Shawn Jefferson: "RE: [cc65] dio_query_sectcount() on Atari ?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10931.html" title="Previous message in the list">Marc Rintsch: "Re: [cc65] dio_query_sectcount() on Atari ?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10935.html" title="Next message in this discussion thread">silverdr1wfmh.org.pl: "Re: [cc65] Goodbye _curunit, Hello chdir()"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10935.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] Goodbye _curunit, Hello chdir()"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10936.html" title="Message sent in reply to this message">Payton Byrd: "Re: [cc65] Goodbye _curunit, Hello chdir()"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10952.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Goodbye _curunit, Hello chdir()"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10932" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10932" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10932" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-10-18 14:28:36 CEST
+</em></small></p>
+</body>
+</html>

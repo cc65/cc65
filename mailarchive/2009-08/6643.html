@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Fwd: Reading / writing use</title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="Re: [cc65] Fwd: Reading / writing userport on C128?" />
+<meta name="Date" content="2009-08-02" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Fwd: Reading / writing userport on C128?</h1>
+<!-- received="Sun Aug  2 21:08:07 2009" -->
+<!-- isoreceived="20090802190807" -->
+<!-- sent="Sun, 2 Aug 2009 21:08:12 +0200" -->
+<!-- isosent="20090802190812" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="Re: [cc65] Fwd: Reading / writing userport on C128?" -->
+<!-- id="200908022108.13002.groepaz@gmx.net" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="20090802171149.GA31839&#64;trikaliotis.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6644.html" title="Scott Hutter: &quot;[cc65] Inline assembly question&quot;">Next message</a> ]
+[ <a href="6642.html" title="Scott Hutter: &quot;Re: [cc65] Fwd: Reading / writing userport on C128?&quot;">Previous message</a> ]
+[ <a href="6641.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Fwd: Reading / writing userport on C128?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20Fwd:%20Reading%20/%20writing%20userport%20on%20C128?">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-08-02 21:08:12</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Sonntag 02 August 2009, Spiro Trikaliotis wrote:
+
+&gt; For C64 and VIC20, the KERNAL uses 2 * 256 byte buffers (256 byte read,
+&gt; 256 byte write) at the top of memory. I.e., on the C64, it reserves
+&gt; $9E00-$9FFF for this. That is, reserves in the meaning of: Deletes
+&gt; everything there with its own buffer content.
+&gt;
+&gt; Groepaz, if this made you pull your hair, you should have tried reading
+&gt; the documentation in the first place. ;)
+
+uh, that was like... back in the days... when basic by itself was a mystery to 
+me, let alone memory ranges or whatever =D
+
+and indeed, it didnt make only me pull some hair - because this rs232 actually 
+doesnt play nicely with basic, so if you simply use it via open/get etc and 
+expect it to work like it works with disk.... you'll get funny surprises due 
+to the trashed memory (programs crashing and self-destroying are really WTF 
+to a basic novice i can tell ya =D)
+
+and to come back to the original problem (which i suspect is indeed caused by 
+those buffers) ... i also remember that you could infact move that buffer in 
+memory to another location by setting up some pointers before. guess thats 
+worth a try (what those pointers are should be easy to tell from a kernal 
+listing).
+
+-- 
+
+<a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    <a href="http://magicdisk.untergrund.net">http://magicdisk.untergrund.net</a>
+<a href="http://www.pokefinder.org">http://www.pokefinder.org</a>        <a href="http://ftp.pokefinder.org">http://ftp.pokefinder.org</a>
+
+Adults are obsolete children
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Aug  2 21:08:07 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6644.html" title="Next message in the list">Scott Hutter: "[cc65] Inline assembly question"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6642.html" title="Previous message in the list">Scott Hutter: "Re: [cc65] Fwd: Reading / writing userport on C128?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6641.html" title="Message to which this message replies">Spiro Trikaliotis: "Re: [cc65] Fwd: Reading / writing userport on C128?"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6643" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6643" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6643" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-08-02 21:08:09 CEST
+</em></small></p>
+</body>
+</html>

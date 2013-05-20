@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] &quot;software&quot; stack</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] &quot;software&quot; stack?" />
+<meta name="Date" content="2010-10-30" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] &quot;software&quot; stack?</h1>
+<!-- received="Sat Oct 30 22:31:46 2010" -->
+<!-- isoreceived="20101030203146" -->
+<!-- sent="Sat, 30 Oct 2010 22:31:39 +0200" -->
+<!-- isosent="20101030203139" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] &quot;software&quot; stack?" -->
+<!-- id="20101030203139.GA31054@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="20101030074916.GA19648&#64;vega.lgb.hu" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8732.html" title="Groepaz: &quot;Re: [cc65] &quot;software&quot; stack?&quot;">Next message</a> ]
+[ <a href="8730.html" title="P‰r Moberg: &quot;Re: [cc65] Zip Archiver?&quot;">Previous message</a> ]
+[ <a href="8728.html" title="G·bor LÈn·rt: &quot;Re: [cc65] &quot;software&quot; stack?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8732.html" title="Groepaz: &quot;Re: [cc65] &quot;software&quot; stack?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20&amp;quot;software&amp;quot;%20stack?">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-10-30 22:31:39</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Sat, Oct 30, 2010 at 09:49:16AM +0200, G√°bor L√©n√°rt wrote:
+&gt; Ahaa, thanks a lot, it was useful for me! I was thought on replace RTS, JSR
+&gt; and other opcodes on the generated asm source by cc65 into my own solutions,
+&gt; which uses the &quot;parameter stack&quot; as well, so I would have a single stack,
+&gt; not the &quot;return&quot; (6502 hw) and the &quot;parameter&quot;.  Then I would no need to
+&gt; save/restore the 6502 hw stack on context switching at all.  Thanks for the
+&gt; information!
+
+You can do that, but it is really slow and generates big code. As a
+comparison,
+
+        pha             (push on hardware stack)
+
+is 3 cycles, while
+
+        jsr     pusha   (push on software stack)
+
+is 31 cycles when called and 19/22 (best/worst) when inlined. Please note that
+it uses &quot;jsr&quot; to place the return address on the hardware stack, so if you
+don't want to inline, you have another penalty to avoid the &quot;jsr&quot;.
+
+The hardwired stack makes multithreading on the 6502 really slow. You can
+speedup things by either limiting the stack and the number of threads as
+suggested by Oliver (e.g. 4 threads can use 64 bytes stack each), or by adding
+hardware support. A commodore REU allows fast stack swapping. The C128 can
+switch the stack page. Some other platforms may offer other hardware support.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Oct 30 22:31:46 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8732.html" title="Next message in the list">Groepaz: "Re: [cc65] &quot;software&quot; stack?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8730.html" title="Previous message in the list">P‰r Moberg: "Re: [cc65] Zip Archiver?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8728.html" title="Message to which this message replies">G·bor LÈn·rt: "Re: [cc65] &quot;software&quot; stack?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8732.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] &quot;software&quot; stack?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8732.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] &quot;software&quot; stack?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8731" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8731" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8731" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-10-30 22:31:50 CEST
+</em></small></p>
+</body>
+</html>

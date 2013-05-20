@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] DA65 GEOS Disassembly?</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] DA65 GEOS Disassembly?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] DA65 GEOS Disassembly?</h1>
+<!-- received="Sat Oct 11 16:47:40 2003" -->
+<!-- isoreceived="20031011144740" -->
+<!-- sent="Sat, 11 Oct 2003 16:42:30 +0200" -->
+<!-- isosent="20031011144230" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] DA65 GEOS Disassembly?" -->
+<!-- id="200310111642.30588.groepaz@gmx.net" -->
+<!-- inreplyto="20031011114529.GB31604@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20DA65%20GEOS%20Disassembly?"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2003-10-11 16:42:30
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3627.html">Ullrich von Bassewitz: "Re: [cc65] Overflows in signed comparisions"</a>
+<li><strong>In reply to:</strong> <a href="3625.html">Ullrich von Bassewitz: "Re: [cc65] DA65 GEOS Disassembly?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3635.html">Ullrich von Bassewitz: "Re: [cc65] DA65 GEOS Disassembly?"</a>
+<li><strong>Next in thread:</strong> <a href="3620.html">Todd Elliott: "Re: [cc65] DA65 GEOS Disassembly?"</a>
+<li><strong>Reply:</strong> <a href="3635.html">Ullrich von Bassewitz: "Re: [cc65] DA65 GEOS Disassembly?"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Saturday 11 October 2003 13:45, Ullrich von Bassewitz wrote:
+&gt; On Fri, Oct 10, 2003 at 06:37:14PM +0200, Groepaz wrote:
+&gt; &gt; i think whats needed is &quot;scatter loading&quot; support in the linker (and
+&gt; &gt; other parts of the toolchain that deal with accessing binary files)
+&gt;
+&gt; What do you mean with &quot;scatter loading&quot;? Loading an application in more
+&gt; than one chunk? 
+
+yes and no :o) &quot;loading application in more than one chunk&quot; is just one of
+the things &quot;scatter loading&quot; could be used for :o) [note: i am using the
+term &quot;scatterloading&quot; as ARM uses it in their docs, for the lack of a better
+wording/description]
+
+so with &quot;scatter-loading support&quot; i mean linker support for the following:
+
+&gt;ability to construct &quot;random&quot; layouted binary files&lt; which would maybe mean
+another stage in the linking process (or even an additional tool, but this
+would mean duplicating a lot of work already done in the linker). this feature
+should allow to configure the linker to do produce any of the following:
+
+- binaries with &quot;holes&quot; in them (like the atari machines can use for eg)
+- &quot;scrambled&quot; binaries of any sort (for example, split the binary into 254-bytes
+chunks and interleave them in a way that they can be put on raw sectors of
+a 1541 disc and then can be read back extra-fast) [this would allow to create
+&quot;iffl&quot; type of files with cc65 on the fly - very useful imho :=P]
+- &quot;scattered&quot; binaries of any sort (aka &quot;spreaded code&quot;), for example to 
+create programs which need to use several small chunks of memory at a fixed
+location for data, and use the remaining space for code. (all kinds of FPP
+effects on the c64 are the prime example here, but i am sure there are
+other uses aswell, like programs using the videobank at $4000 or so)
+- &quot;chunky&quot; binaries of any sort. for example all .o65 support would be in a
+config file aswell. (geos vlir files fall into this cathegory, aswell as some
+emulator image formats others)
+
+and ofcourse, any combination of the above.
+
+i know this means adding several not yet supported features in the linker (like
+solving expressions, sorting symbols into blocks/sections of memory, creating
+tables for relocation or cross reference.
+
+&gt; If so, I don't think support for this should go into the
+&gt; linker, because it's highly platform dependent. Instead, a special startup
+&gt; file could be used, together with (minimal) linker support.
+
+the startup file isnt really the point here (although admitted, it might need
+some customization for certain setups anyway)... and well, i'm fine with 
+&quot;minimal&quot; linker support - anything platform dependend should go into the
+linker config file ofcourse :o)
+
+gpz
+
+ps: regardless of the above.... it would be cool if the linker could filter
+any input/output files through an external tool (which could be configured per
+file in the linker config) ... that way one could easily add some of the 
+above mentioned functionality himself if other tools to do the job do exist
+already.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20DA65%20GEOS%20Disassembly?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3627.html">Ullrich von Bassewitz: "Re: [cc65] Overflows in signed comparisions"</a>
+<li><strong>In reply to:</strong> <a href="3625.html">Ullrich von Bassewitz: "Re: [cc65] DA65 GEOS Disassembly?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3635.html">Ullrich von Bassewitz: "Re: [cc65] DA65 GEOS Disassembly?"</a>
+<li><strong>Next in thread:</strong> <a href="3620.html">Todd Elliott: "Re: [cc65] DA65 GEOS Disassembly?"</a>
+<li><strong>Reply:</strong> <a href="3635.html">Ullrich von Bassewitz: "Re: [cc65] DA65 GEOS Disassembly?"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-10-11 16:47:46 CEST</em>
+</em>
+</small>
+</body>
+</html>

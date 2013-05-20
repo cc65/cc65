@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] GEOS Reloaded</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] GEOS Reloaded" />
+<meta name="Date" content="2012-02-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] GEOS Reloaded</h1>
+<!-- received="Wed Feb 29 16:33:02 2012" -->
+<!-- isoreceived="20120229153302" -->
+<!-- sent="Wed, 29 Feb 2012 16:32:51 +0100" -->
+<!-- isosent="20120229153251" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] GEOS Reloaded" -->
+<!-- id="CACT=u70Ksz=RSy8kNg_Lv9VshSJ4s87YCdf2jhGDhLfAGayrHw@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10072.html" title="Joseph Rose: &quot;[cc65] MemBank128: Problem with clrscr() translation?&quot;">Next message</a> ]
+[ <a href="10070.html" title="Groepaz: &quot;Re: [cc65] inlining details&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10073.html" title="Payton Byrd: &quot;Re: [cc65] GEOS Reloaded&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20GEOS%20Reloaded">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-02-29 16:32:51</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+I've been improving the cc65 support for GEOS and would like to let
+you know about it...
+
+1. VLIR (aka overlay) programs
+
+Up to now VLIR support was limited to assembler programs. Now it works
+for C programs too.
+Up to now building a VLIR program was quite complex:
+<a href="http://www.cc65.org/doc/grc-5.html">http://www.cc65.org/doc/grc-5.html</a>
+Now it is a simple one step process:
+<a href="http://www.cc65.org/snapshot-doc/grc65-5.html">http://www.cc65.org/snapshot-doc/grc65-5.html</a>
+Up to now you had to provide many details in the 'VLIR section' of
+your resource file:
+<a href="http://www.cc65.org/doc/grc-3.html#ss3.3">http://www.cc65.org/doc/grc-3.html#ss3.3</a>
+Now you just set set size and numbers of your overlays in the 'memory
+section' of your resource file:
+<a href="http://www.cc65.org/snapshot-doc/grc65-3.html#ss3.3">http://www.cc65.org/snapshot-doc/grc65-3.html#ss3.3</a>
+
+Code is assigned via #pragma's to the individual overlays (like in any
+non-GEOS scenario). The overlay area is automatically placed at the
+end of the available memory. Overlays are simply loaded via
+ReadRecord(OVERLAY_ADDR, OVERLAY_SIZE);
+using two predefined macros. There's a sample program showing
+everything mentioned above.
+
+2. Optional release of screen backbuffer
+
+Usually a GEOS program can use 23kB RAM ($0400-$6000). But if a
+program avoids the use of the background screen buffer it can use 31kB
+RAM ($0400-$8000). Building a program for this setup requires simply a
+'backbuffer no' in the 'memory section' of your resource file. This
+works with VLIR programs too.
+
+3. Custom application icon
+
+Now you can replace the default application icon (an empty frame) with
+a custom icon with something like 'icon &quot;sprite.raw&quot;' in the 'header
+section' of your resource file:
+<a href="http://www.cc65.org/snapshot-doc/grc65-3.html#ss3.2">http://www.cc65.org/snapshot-doc/grc65-3.html#ss3.2</a>
+
+4. 'geos' becomes 'geos-cbm'
+
+The cc65 target 'geos' was renamed to 'geos-cbm' (with 'geos' as alias
+'geos-cbm'). This was done due to the upcoming support of Apple GEOS,
+which will allow you to target both GEOS 64/128 and Apple GEOS with a
+single set of C sources - cc65 at its best :-)
+
+5. Lookout
+
+1.) and 2.) now allow to create rather complex GEOS programs in C.
+Just in case you feel motivated to implement one but happen to not
+have a great idea here's my take:
+
+I was looking for something highly interactive but not an actual
+productivity tool. Rather something entertaining but not an actual
+game. Something that really benefits from the mouse over keyboard-only
+input. And something that can be done withe our 1 MHz 64kB beast. What
+I came up with is a &quot;Sudoku Assistant&quot; - not to be mixed up with a
+Sudoku Solver. The typical UI for such a Sudoku Assistant looks like
+<a href="http://img278.imagevenue.com/loc33/th_526594469_candidats_122_33lo.jpg">http://img278.imagevenue.com/loc33/th_526594469_candidats_122_33lo.jpg</a>.
+I've already checked out if it is feasable to reproduce that type of
+grid on the C64 (and Apple II) display - which works out nicely as it
+requires a height of 185 pixels
+(<a href="http://img182.imagevenue.com/loc32/th_26262_grid_122_32lo.jpg">http://img182.imagevenue.com/loc32/th_26262_grid_122_32lo.jpg</a>).
+
+There's a lot of Sudoku literature describing usual algorithms in
+interactive Sudoku solving. Just search i.e. for the term &quot;sudoku
+naked single&quot;. A cool Sudoku Assistant is able to apply these
+algorithms on user request to make suggestions. I haven't search for
+existing open C source code implementing these things but I'm pretty
+optimistic that there's some stuff to find - if needed ;-)
+
+And as a cool add-on one could integrate a real Sudoku Solver. I don't
+know if you are aware of the &quot;Sudoku Solver v2.0 for the Apple II&quot;
+(<a href="http://home.comcast.net/~mjmahon/Sudoku.html">http://home.comcast.net/~mjmahon/Sudoku.html</a>)? It's a higly optimized
+6502 assembly language Sudoku Solver - people were pretty amazed by it
+(<a href="http://groups.google.com/group/comp.sys.apple2/browse_frm/thread/3b09e33f1f6f991d/3782ec4fa293fdcc?hl=en&amp;tvc=1&amp;q=apple2+sudoku+solver">http://groups.google.com/group/comp.sys.apple2/browse_frm/thread/3b09e33f1f6f991d/3782ec4fa293fdcc?hl=en&amp;tvc=1&amp;q=apple2+sudoku+solver</a>).
+I had a brief look into the source code and it doesn't seem to create
+large RAM tables or alike that could hinder it from integration into a
+GEOS application. And it would be a nice showcase of using ca65 to
+integrate assembler with C for hotspot optimization - while staying
+cross-target.
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Feb 29 16:33:02 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10072.html" title="Next message in the list">Joseph Rose: "[cc65] MemBank128: Problem with clrscr() translation?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10070.html" title="Previous message in the list">Groepaz: "Re: [cc65] inlining details"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10073.html" title="Next message in this discussion thread">Payton Byrd: "Re: [cc65] GEOS Reloaded"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10073.html" title="Message sent in reply to this message">Payton Byrd: "Re: [cc65] GEOS Reloaded"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10075.html" title="Message sent in reply to this message">Markus Stehr: "Re: [cc65] GEOS Reloaded"</a></li>
+<li><dfn>Reply</dfn>:  <a href="../2012-03/10077.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] GEOS Reloaded"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10071" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10071" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10071" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-02-29 16:33:07 CET
+</em></small></p>
+</body>
+</html>

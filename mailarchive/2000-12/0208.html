@@ -1,0 +1,210 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] bug?</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] bug?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] bug?</h1>
+<!-- received="Tue Dec 12 10:51:15 2000" -->
+<!-- isoreceived="20001212095115" -->
+<!-- sent="Tue, 12 Dec 2000 10:51:11 +0100" -->
+<!-- isosent="20001212095111" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] bug?" -->
+<!-- id="20001212105111.C24606@trixie.musoftware.de" -->
+<!-- inreplyto="3A355032.8E06807E@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20bug?"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2000-12-12 10:51:11
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0209.html">Sidney Cadot: "[cc65] Announcement: Atari 8-bit ROM source in CC65 format, third revision"</a>
+<li><strong>Previous message:</strong> <a href="0207.html">Groepaz: "Re: [cc65] bug?"</a>
+<li><strong>In reply to:</strong> <a href="0207.html">Groepaz: "Re: [cc65] bug?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0210.html">Groepaz: "Re: [cc65] bug?"</a>
+<li><strong>Reply:</strong> <a href="0210.html">Groepaz: "Re: [cc65] bug?"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+						   
+Hi!
+
+On Mon, Dec 11, 2000 at 11:07:46PM +0100, Groepaz wrote:
+&gt; other than that, i think there might be a pretty easy fix actually, provided
+&gt; you could 'overload' one of the builtin mnemonics with a 'traditional' macro.
+
+Giving a macro preference over a mnemonic is no technical problem. It may give
+all sort of strange errors and makes sources hard to understand (ANY
+instruction may be a macro), so I decided to disallow it.
+
+&gt; well, uhm.... no this would NOT work.... look at my example again ... i am
+&gt; gonna write it down like i would have expected it to work in ca65:
+
+You're right, I didn't realize this.
+
+&gt; a) like you said, one isnt allow to modify constants (which generally is a good
+&gt; thing ofcoz ;=D) - the bad thing is, that as a consequence, there's no other
+&gt; kind of symbol whose value can be controlled (as in 'modified') at compile-
+&gt; time. that fact makes a lot of stuff impossible, that's used frequently in
+&gt; code written for eg. turbo-asm.
+&gt; if you dont have some kind of these symbols, you also take most of the power
+&gt; away from the .rept thing you wanna introduce ;/
+
+The .repeat command does have a loop counter. See my example posted earlier to
+the list.
+
+&gt; b) c-style macros cannot have multiple statements/lines - this is one thing
+&gt; were i just ask myself 'WHY THE HELL?!' - since a lot of useful stuff can
+&gt; be done in a very convinient way using c-macros that have multiple lines.
+&gt; (and yes, many of them can't be done using traditional macros)
+
+C style macros were invented to allow translating sources written for some
+other assembler. I was payed to do this, and I didn't want to add all sorts of
+duplicate stuff to ca65. However, C style macros ignore scoping rules and do
+in general work on a very low level. So these macros have the same problems as
+their C counterparts. In other words: They are evil:-) Try to avoid them if
+you can.
+
+&gt; d) c-style macros aren't exactly operating at 'scanner level'... again the
+&gt; rgbasm handles this very nicely. i would expect them to really work as
+&gt; &quot;find and replace&quot; - since this would again allow some nice stuff....
+
+C style macros *are* operating at the scanner level. They are working with
+tokens, not strings. This is the reason why you you cannot do anything with C
+style macros that works on or creates invalid tokens. For example:
+
+
+	.define	'a	'b 		; ILLEGAL!
+
+Neither 'a, not 'b are legal tokens, so this will not work. If you need
+anything more C like, you're free to run your favorite C preprocessor over the
+sources before passing them to ca65.
+
+
+&gt; e) traditional macros can't take strings as arguments - this again makes
+&gt; various stuff impossible, for eg i wanted to create a macro that takes a
+&gt; string and which would convert the argument (string) byte-per-byte to
+&gt; eg petsci format. - right now i can do that for a single byte like intended,
+&gt; but once you got more that a few words of text, you want real strings aswell ;=)
+
+Traditional macros *can* take string arguments, and the example for the new
+functions in 2.6 (example posted to the list a few days ago) did exactly what
+you're describing here: Working on each of the characters of a string passed
+as argument to the macro.
+
+&gt; f) if you enclose a block using .proc / .endproc, other global symbols
+&gt; become invisible to this block ?!? HU?! ;=D should i include my global header
+&gt; files in each of these blocks ?!? nononono this can only be a bug ;)
+
+This seems to be a misinformation or I don't understand it correctly.
+
+Variables from inside the block are not visible to the outside, but variables
+from all enclosing lexical blocks are visible in the inside. So there's no
+need to include any global headers in a block, including them outside the
+block makes the variables visible inside, too. In general, .proc/.endproc work
+something like PROCEDUREs in pascal.
+
+&gt; some more stuff.... (more like nice things i've seen elsewhere....) ;=D
+
+I'm very cautious when adding things. Featurism causes code bloat and more
+bugs. Adding complex stuff that one person needs once in a year is usually not
+a good idea. So I'm quite sceptic about new feature proposals, at least until
+I know, the feature is really needed, and it has the most generic form.
+
+&gt; - extend the .incbin directive to work like
+&gt;
+&gt; 	.incbin &quot;filename&quot;,start,end,step
+
+Someone else had proposed this feature, but I have never seen it used. As long
+as usage is quite rare, it may be emulated by &quot;dd&quot; in the makefile.
+
+&gt; - add a simelar directive for use in macros, that works like
+&gt;
+&gt;  	.readbin &quot;filename&quot;,pos
+
+This shouldn't be needed any longer with the new macro features (hopefully).
+
+&gt; - introduce &quot;compiler variables&quot; as a new kind of symbols. these could live
+&gt; in their own seperated namespace, or even coexist with other global symbols
+&gt; in the top-level namespace. compiler variables may be 16bit integers (wether
+&gt; signed or unsigned may depend on how the user works with them) that can be
+&gt; modified at any time and multiple times at compile time.
+
+These will be in the next version (the one after 2.6). I fact, after my last
+mail to the list (stating that constants may not be modified), I had almost
+the same idea than what you're describing here.
+
+&gt; - make some basic math/trig functions available ... democoders will
+&gt;   love you for ever ;=D
+
+While the addition may be useful, as long as there is no support for floats in
+the assembler, adding this feature would always be a hack.
+
+Regards
+
+
+   	Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20bug?">uz_at_musoftware.de</a>
+
+
+</pre>
+<hr noshade>
+<ul>
+<li>application/pgp-signature attachment: <a href="../att-0208/01-part">stored</a>
+</ul>
+<!-- attachment="01-part" -->
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20bug?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0209.html">Sidney Cadot: "[cc65] Announcement: Atari 8-bit ROM source in CC65 format, third revision"</a>
+<li><strong>Previous message:</strong> <a href="0207.html">Groepaz: "Re: [cc65] bug?"</a>
+<li><strong>In reply to:</strong> <a href="0207.html">Groepaz: "Re: [cc65] bug?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0210.html">Groepaz: "Re: [cc65] bug?"</a>
+<li><strong>Reply:</strong> <a href="0210.html">Groepaz: "Re: [cc65] bug?"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:37 CET</em>
+</em>
+</small>
+</body>
+</html>

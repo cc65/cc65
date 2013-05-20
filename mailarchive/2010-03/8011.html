@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] CBM POSIX I/O - USR Files</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] CBM POSIX I/O - USR Files" />
+<meta name="Date" content="2010-03-30" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] CBM POSIX I/O - USR Files</h1>
+<!-- received="Tue Mar 30 10:31:31 2010" -->
+<!-- isoreceived="20100330083131" -->
+<!-- sent="Tue, 30 Mar 2010 10:31:23 +0200" -->
+<!-- isosent="20100330083123" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] CBM POSIX I/O - USR Files" -->
+<!-- id="f97798c21003300131u1b6db54bw151be04b1edbeed0@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="16F7BB25-8655-490C-AA75-4C80084A19F5&#64;wfmh.org.pl" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8012.html" title="Groepaz: &quot;Re: [cc65] CBM POSIX I/O - USR Files&quot;">Next message</a> ]
+[ <a href="8010.html" title="Oliver Schmidt: &quot;Re: [cc65] CBM POSIX I/O - USR Files&quot;">Previous message</a> ]
+[ <a href="8007.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] CBM POSIX I/O - USR Files&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8013.html" title="Groepaz: &quot;Re: [cc65] CBM POSIX I/O - USR Files&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20CBM%20POSIX%20I/O%20-%20USR%20Files">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-03-30 10:31:23</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt;&gt; What happens if I type
+&gt;&gt; LOAD on an USR file? The same?
+&gt;
+&gt; More or less ;-) The difference is that you have to specify that you want to load USR file. Otherwise you get FILE TYPE MISMATCH error. Other than that - the same (AFAIR).
+
+I tried that yesterday evening using VICE 1.21 on Win32 and could
+_not_ reproduce that error. I saved a file using C1541 using &quot;,u&quot; and
+verified that it showed up as USR. Then I entered
+
+LOAD &quot;MYFILE&quot;, 8
+
+and experienced the same behaviour with a PRG file of the same conent:
+The system prints READY but I don't get a prompt anymore. I understand
+thios behaviour as the file in question doesn't have a valid load
+address in the first two bytes.
+
+&gt;&gt; And what about LOAD,* ? Does it load the first PRG file or load the
+&gt;&gt; first &lt;whatever&gt; file?
+&gt;
+&gt; Depends. It either loads the most recently accessed file or - if you are freshly initialised - the first PRG file.
+&gt; To make sure you actually load the very first file, you put a colon before the asterisk. But then the file must be PRG or you get the familiar (already) error, unless you specify the type.
+
+Again I was _not_ able to reproduce that. Putting an USR file first on
+.D64 image and using the 'Autostart image' feature of VICE (which
+prints 'LOAD &quot;*,8,1') the system was obviously trying to load the
+(bogus) USR file instead of a (valid) PRG file being the second in the
+image.
+
+I'd be happy if I could really understand these things for a reason
+beside pure curiosity: I need to put a data file first on a image (for
+certain reasons) and would like to keep the users (and especially the
+VICE autostart feature) from trying to load it and thus locking up
+their machine.
+
+Regards, Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Mar 30 10:31:31 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8012.html" title="Next message in the list">Groepaz: "Re: [cc65] CBM POSIX I/O - USR Files"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8010.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] CBM POSIX I/O - USR Files"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8007.html" title="Message to which this message replies">silverdr1wfmh.org.pl: "Re: [cc65] CBM POSIX I/O - USR Files"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8013.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] CBM POSIX I/O - USR Files"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8013.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] CBM POSIX I/O - USR Files"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8011" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8011" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8011" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-03-30 10:31:33 CEST
+</em></small></p>
+</body>
+</html>

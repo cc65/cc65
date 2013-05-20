@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] cc65/C questions</title>
+<meta name="Author" content="Tom Watt (tom1awhost.biz)" />
+<meta name="Subject" content="[cc65] cc65/C questions" />
+<meta name="Date" content="2006-09-07" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] cc65/C questions</h1>
+<!-- received="Fri Sep  8 14:22:19 2006" -->
+<!-- isoreceived="20060908122219" -->
+<!-- sent="Thu, 7 Sep 2006 10:00:17 -0600" -->
+<!-- isosent="20060907160017" -->
+<!-- name="Tom Watt" -->
+<!-- email="tom1awhost.biz" -->
+<!-- subject="[cc65] cc65/C questions" -->
+<!-- id="F6A4B27866404E2A8742A4064C2A5424@tommy" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5569.html" title="Johan Kotlinski: &quot;Re: [cc65] cc65/C questions&quot;">Next message</a> ]
+[ <a href="../2006-08/5567.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] relocatable code in da65&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5569.html" title="Johan Kotlinski: &quot;Re: [cc65] cc65/C questions&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Tom Watt &lt;<a href="mailto:tom1awhost.biz?Subject=Re:%20[cc65]%20cc65/C%20questions">tom1awhost.biz</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2006-09-07 18:00:17</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello,
+
+ 
+
+I am working on a project with cc65 and I am both learning cc65 and
+re-learning C at the same time and have some questions.  Maybe someone has
+some code examples or can point me to some functions that will help?
+
+ 
+
+1. Is there a function that will separate a string into an array of strings
+based on spaces?
+
+ 
+
+Example:  Starting string: &quot;one two three&quot;   is converted into &quot;one&quot; in
+element 0, &quot;two&quot; in element 1, &quot;three&quot; in element 2
+
+ 
+
+2. I'm using the following function to get text at a prompt.  It works fine
+except if you backspace too much the cursor keeps going and will go up to
+the next line.  Is there an easy way to fix that?
+
+ 
+
+char* getline(void)
+
+{
+
+            static char linetext[40];
+
+            unsigned len;
+
+            fgets(linetext, sizeof(linetext), stdin);
+
+            len = strlen(linetext);
+
+            if (len &gt;= 1 &amp;&amp; linetext[len - 1] == '\n') linetext[len - 1] =
+'\0';
+
+            return linetext;
+
+}
+
+ 
+
+3. Is there an existing cc65 source for a full screen Commodore SEQ file
+editor that I can freely (public domain) use to include in my program?
+
+ 
+
+Thanks,
+
+ 
+
+Tom
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Sep  8 14:22:19 2006</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5569.html" title="Next message in the list">Johan Kotlinski: "Re: [cc65] cc65/C questions"</a></li>
+<li><dfn>Previous message</dfn>: <a href="../2006-08/5567.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] relocatable code in da65"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5569.html" title="Next message in this discussion thread">Johan Kotlinski: "Re: [cc65] cc65/C questions"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5569.html" title="Message sent in reply to this message">Johan Kotlinski: "Re: [cc65] cc65/C questions"</a></li>
+<li><dfn>Reply</dfn>:  <a href="5570.html" title="Message sent in reply to this message">Bryan Pope: "Re: [cc65] cc65/C questions"</a></li>
+<li><dfn>Reply</dfn>:  <a href="5571.html" title="Message sent in reply to this message">Shawn Jefferson: "Re: [cc65] cc65/C questions"</a></li>
+<li><dfn>Reply</dfn>:  <a href="5572.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] cc65/C questions"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5568" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5568" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5568" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2006-09-08 14:22:23 CEST
+</em></small></p>
+</body>
+</html>

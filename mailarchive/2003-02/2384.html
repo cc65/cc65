@@ -1,0 +1,152 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Another wish: Unsized Arr</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Another wish: Unsized Arrays in Structures">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Another wish: Unsized Arrays in Structures</h1>
+<!-- received="Sat Feb  1 21:55:10 2003" -->
+<!-- isoreceived="20030201205510" -->
+<!-- sent="Sat, 1 Feb 2003 21:55:06 +0100" -->
+<!-- isosent="20030201205506" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Another wish: Unsized Arrays in Structures" -->
+<!-- id="20030201205506.GA15888@trixie.musoftware.de" -->
+<!-- inreplyto="DCE2904C62EF104F9B2C76252D63EDB1032FB2@paceserver1.pace.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Another%20wish:%20Unsized%20Arrays%20in%20Structures"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-02-01 21:55:06
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2383.html">Christian Krüger: "Re: [cc65] const/volatile"</a>
+<li><strong>In reply to:</strong> <a href="2382.html">Christian Krüger: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2399.html">Christian Krüger: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Sat, Feb 01, 2003 at 04:05:45PM +0100, Christian Krüger wrote:
+&gt; In your case (with dynamic memory) 'sizeof' delivers also an 'untrue'
+&gt; value, taking your array allways with one byte into account...
+
+There's a difference between the two: I'm explicitly cheating around the type
+system of the compiler, while in your case, you expect the compiler to support
+what you're doing.
+
+&gt; &gt;Another problem is, that one can initialize single struct instances, but
+&gt; &gt;not
+&gt; &gt;arrays of structs:
+&gt;
+&gt; Won't work with dynamic allocation either...
+
+Works easily:
+                                                        
+        /* Allocate space for two structures */
+        struct foo* f = malloc (sizeof (foo) * 2 +
+                                strlen (name1) + 
+                                strlen (name2));
+
+&gt; It's not only convenience. As I wrote above, I won't use dynamic
+&gt; memory, so I helped myself with ugly casts and initialize the data
+&gt; in ca65 and let cc65 point on it, telling that this is the structure.
+&gt;
+&gt; The way of defining an unsized array seems much more 'portable' than
+&gt; relying upon the allocation principle of static data by a
+&gt; specific compilier:
+&gt;
+&gt; --8&lt;----
+&gt;
+&gt; struct foo = {10,20,'T'};
+&gt; char addtionalData[] = &quot;his is the name&quot;;
+&gt;
+&gt; --8&lt;----
+&gt;
+&gt; ...hoping that the compiler will put the data exactly in this
+&gt; sequence into memory.
+
+There's no need for assembler modules or questionable C code:
+
+        struct foo {
+            char x, y;
+            char name[1];
+        };
+
+        static struct {
+            char x, y;
+            char name[4];
+        } bar = {
+            0, 0, &quot;bar&quot;
+        };
+
+        void func (struct foo* f)
+        {
+            ...
+        }
+
+        func ((struct foo*) &amp;bar);
+
+&gt; Maybe you know a solution of defining static data of various length
+&gt; which is accessible by a structure, but I don't know how to handle
+&gt; this... (any solution would be better than none..)
+
+See above. You can also use void variables. See the manual for more
+information. 
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Another%20wish:%20Unsized%20Arrays%20in%20Structures">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Another%20wish:%20Unsized%20Arrays%20in%20Structures">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2383.html">Christian Krüger: "Re: [cc65] const/volatile"</a>
+<li><strong>In reply to:</strong> <a href="2382.html">Christian Krüger: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2399.html">Christian Krüger: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-02-01 21:58:07 CET</em>
+</em>
+</small>
+</body>
+</html>

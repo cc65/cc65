@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Segment EXEHDR does not exist </title>
+<meta name="Author" content="Jakub (debski.jakub1wp.pl)" />
+<meta name="Subject" content="[cc65] Segment EXEHDR does not exist - while using ld65 directly" />
+<meta name="Date" content="2009-07-07" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Segment EXEHDR does not exist - while using ld65 directly</h1>
+<!-- received="Tue Jul  7 16:59:59 2009" -->
+<!-- isoreceived="20090707145959" -->
+<!-- sent="Tue, 7 Jul 2009 16:59:49 +0200" -->
+<!-- isosent="20090707145949" -->
+<!-- name="Jakub" -->
+<!-- email="debski.jakub1wp.pl" -->
+<!-- subject="[cc65] Segment EXEHDR does not exist - while using ld65 directly" -->
+<!-- id="FC5F7FA559AE41EC94CF1AB2033B185E@pl.eset.com" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="B49BC864-0F3B-4288-97A5-15A4291BA548&#64;wfmh.org.pl" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6609.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Segment EXEHDR does not exist - while using ld65 directly&quot;">Next message</a> ]
+[ <a href="6607.html" title="Per Olofsson: &quot;Re: [cc65] &quot;overlay&quot; files&quot;">Previous message</a> ]
+[ <a href="6601.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] diskcmd.s error&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6609.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Segment EXEHDR does not exist - while using ld65 directly&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Jakub &lt;<a href="mailto:debski.jakub1wp.pl?Subject=Re:%20[cc65]%20Segment%20EXEHDR%20does%20not%20exist%20-%20while%20using%20ld65%20directly">debski.jakub1wp.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-07-07 16:59:49</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+I'm using CC55 V2.12.0.
+
+When I try to link some code with ld65 I receive &quot;Segment EXEHDR does not exist&quot; error.
+However it works when I use cl65 tool.
+
+Example - test.c:
+
+#include &lt;stdio.h&gt;
+int main(void)
+{
+  for (;;) { printf(&quot;Test\n&quot;);  };
+  return 0;
+}
+
+Test 1:
+cl65 -Osir -t atari -o test1.xex test.c
+
+works fine.
+
+Test 2:
+cc65 -T -Osir --cpu 6502 -t atari test.c 
+ca65 -l -t atari test.s
+ld65 -t atari test.o atari.lib -o test2.xex
+ld65.exe: Warning: [builtin config](15): Segment `EXEHDR' does not exist
+ld65.exe: Warning: [builtin config](25): Segment `AUTOSTRT' does not exist
+
+What is strange after adding function call without a prototype (which generates warning) it works:
+
+#include &lt;stdio.h&gt;
+int main(void)
+{
+  printf(&quot;Test\n&quot;);
+  exit(0); // &lt;- without a prototype. xex file is generated fine!
+  return 0;
+}
+
+C:\cc65-test&gt;cc65 -T -Osir --cpu 6502 -t atari test3.c
+test3.c(6): Warning: Function call without a prototype
+C:\cc65-test&gt;ca65 -l -t atari test3.s
+C:\cc65-test&gt;ld65 -t atari test3.o atari.lib -o test3.xex
+
+Tests are available here:
+<a href="http://www.alamak0ta.republika.pl/cc65-test.zip">http://www.alamak0ta.republika.pl/cc65-test.zip</a>
+
+Can anyone help?
+
+regards,
+Jakub
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Jul  7 16:59:59 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6609.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Segment EXEHDR does not exist - while using ld65 directly"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6607.html" title="Previous message in the list">Per Olofsson: "Re: [cc65] &quot;overlay&quot; files"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6601.html" title="Message to which this message replies">silverdr1wfmh.org.pl: "Re: [cc65] diskcmd.s error"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6609.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Segment EXEHDR does not exist - while using ld65 directly"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6609.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Segment EXEHDR does not exist - while using ld65 directly"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6608" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6608" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6608" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-07-07 17:00:02 CEST
+</em></small></p>
+</body>
+</html>

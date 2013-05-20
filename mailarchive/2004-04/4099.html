@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] start adress</title>
+<meta name="Author" content="carlos (carlosofcascade1gmx.net)" />
+<meta name="Subject" content="[cc65] start adress" />
+<meta name="Date" content="2004-04-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] start adress</h1>
+<!-- received="Thu Apr 29 10:06:32 2004" -->
+<!-- isoreceived="20040429080632" -->
+<!-- sent="Thu, 29 Apr 2004 10:05:38 +0200" -->
+<!-- isosent="20040429080538" -->
+<!-- name="carlos" -->
+<!-- email="carlosofcascade1gmx.net" -->
+<!-- subject="[cc65] start adress" -->
+<!-- id="002c01c42dc0$c3148850$4c0906d5@acer5j0jdwij8z" -->
+<!-- charset="iso-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4100.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Support for the EMMA II system?&quot;">Next message</a> ]
+[ <a href="4098.html" title="Mats Byggmastar: &quot;Re: [cc65] Support for the EMMA II system?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4101.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] start adress&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: carlos &lt;<a href="mailto:carlosofcascade1gmx.net?Subject=Re:%20[cc65]%20start%20adress">carlosofcascade1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-04-29 10:05:38</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello,
+
+as i'm porting some old code, which was written with turbo assembler on the c64, i don't want always to use the linker config file.
+there is the command line option for ld65 -S xxxx, with which you can pass a start adress. it works only with cpu type none, which is correct. if you use ld65 --start-addr xxxx it won't work. if you use cl65 --start-addr it won't be passed to the linker. 
+this is ok for now, because you can work around with using seperate calls to ca65 and ld65. 
+
+then i have problems with the c style macros of ca65. in c you can define macros which take parameters this way:
+
+#define a(b) f(b), where f(b) is any mathematical expression using b. 
+
+this doesn't conflict with using brackes as part of the macro, like this:
+
+#define a (y*40+x), so you don't get conflicts with precedence when using the macro.
+
+but in ca65, the second version, where there is a space between the macro name and the first bracket will be interpreted like the first one of the #define macros. so the assembler complains about not closed brackets and so on.
+if often use the defines likethis:
+
+.define scrw 40
+.define scrn $400
+.define x ??
+.define y ??; any numbers ok
+.define adr y*scrw+x+scrn
+
+ldx #&lt;(adr)
+ldy #&gt;(adr)
+jsr ....;some routine which takes x and y as parameters
+
+but is would prefer using this:
+ldx #&lt;adr
+ldy #&gt;adr, so the brackets should be included in the macro definition, which is not possible at the moment.
+
+Greetings Carlos
+
+
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Apr 29 10:06:32 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4100.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Support for the EMMA II system?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4098.html" title="Previous message in the list">Mats Byggmastar: "Re: [cc65] Support for the EMMA II system?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4101.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] start adress"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4101.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] start adress"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4099" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4099" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4099" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-04-29 10:06:38 CEST
+</em></small></p>
+</body>
+</html>

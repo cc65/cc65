@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] ld65 Config Question</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] ld65 Config Question">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] ld65 Config Question</h1>
+<!-- received="Sat Feb 19 14:11:40 2000" -->
+<!-- isoreceived="20000219131140" -->
+<!-- sent="Sat, 19 Feb 2000 14:11:25 +0100 (CET)" -->
+<!-- isosent="20000219131125" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] ld65 Config Question" -->
+<!-- id="200002191311.OAA24943@trixie.musoftware.de" -->
+<!-- inreplyto="20000219035113.A2403@mad" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20ld65%20Config%20Question"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2000-02-19 14:11:25
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0057.html">Tim Vanderhoek: "Re: [cc65] ld65 Config Question"</a>
+<li><strong>Previous message:</strong> <a href="0055.html">Ullrich von Bassewitz: "Re: [cc65] ld65 Config Question"</a>
+<li><strong>In reply to:</strong> <a href="0054.html">Tim Vanderhoek: "[cc65] ld65 Config Question"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0058.html">Tim Vanderhoek: "Re: [cc65] ld65 Config Question"</a>
+<li><strong>Reply:</strong> <a href="0058.html">Tim Vanderhoek: "Re: [cc65] ld65 Config Question"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+I have a first solution for putting LOAD and RUN both in one memory area.
+However, the patch leads to several questions that I want to discuss:
+
+  * Is there a need to specify which one goes into the memory area first, LOAD
+    or RUN? Currently LOAD goes first, then RUN. Specifying an additional
+    order would need an extension for the config file syntax. One could
+    imagine even more weird things: Separating the two completely so that
+    there are additional segments between the two.
+
+  * Currently the RUN range is never written to the output file, it is not even
+    written using fill bytes when FILL is set. This is usually ok with the old
+    assumptions in place, since the RUN area was assumed to be initialized at
+    runtime. With the new feature this may lead to &quot;holes&quot; in the output file,
+    since there may be initialized segments after the one with the duplicate
+    LOAD and RUN areas.
+    What would be the correct behaviour for a segment with both LOAD and RUN
+    specified? Should the output space for the RUN area be filled if FILL is
+    given for the memory area? Would it be helpful to write the segment data
+    a second time into the RUN space?
+
+  * Similar: BSS segments are never written to the output file. Is this needed
+    to make use of the duplicate LOAD and RUN area feature? Assume this:
+
+    	MEMORY {
+       	    RAM: start = $1000, size = $1000, file = %O;
+    	}
+    	SEGMENTS {
+    	    BSS:    load = RAM, type = bss, define = yes;
+    	    CODE:   load = RAM, run = RAM, type = ro, define = yes;
+    	    RODATA: load = RAM, type = ro;
+    	    DATA:   load = RAM, run = RAM, type = rw, define = yes;
+    	}
+
+    Since BSS is never written to the output file, the following segment has
+    the wrong starting address in the image. Same for CODE, since the RUN code
+    is never written to a file. I don't know if this is a realistic setup for
+    the BSS segment, but people seem to do all sort of things I have never
+    imagined, so someone may actually need it;-)
+
+Suggestions, anyone?
+
+Regards
+
+
+	Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20ld65%20Config%20Question">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20ld65%20Config%20Question">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0057.html">Tim Vanderhoek: "Re: [cc65] ld65 Config Question"</a>
+<li><strong>Previous message:</strong> <a href="0055.html">Ullrich von Bassewitz: "Re: [cc65] ld65 Config Question"</a>
+<li><strong>In reply to:</strong> <a href="0054.html">Tim Vanderhoek: "[cc65] ld65 Config Question"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0058.html">Tim Vanderhoek: "Re: [cc65] ld65 Config Question"</a>
+<li><strong>Reply:</strong> <a href="0058.html">Tim Vanderhoek: "Re: [cc65] ld65 Config Question"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:35 CET</em>
+</em>
+</small>
+</body>
+</html>

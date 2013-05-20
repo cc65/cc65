@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] drive code with shared seg</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] drive code with shared segments" />
+<meta name="Date" content="2005-04-19" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] drive code with shared segments</h1>
+<!-- received="Tue Apr 19 15:00:25 2005" -->
+<!-- isoreceived="20050419130025" -->
+<!-- sent="Tue, 19 Apr 2005 15:00:15 +0200" -->
+<!-- isosent="20050419130015" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] drive code with shared segments" -->
+<!-- id="20050419130015.GA13507@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="16996.64477.208659.236091&#64;panini.cling.gu.se" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4936.html" title="MagerValp: &quot;Re: [cc65] drive code with shared segments&quot;">Next message</a> ]
+[ <a href="4934.html" title="MagerValp: &quot;Re: [cc65] drive code with shared segments&quot;">Previous message</a> ]
+[ <a href="4934.html" title="MagerValp: &quot;Re: [cc65] drive code with shared segments&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4936.html" title="MagerValp: &quot;Re: [cc65] drive code with shared segments&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20drive%20code%20with%20shared%20segments">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-04-19 15:00:15</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Tue, Apr 19, 2005 at 02:38:53PM +0200, MagerValp wrote:
+&gt; How do I get 4 overlapping SPECIFIC segments?
+
+Ok, I think I understand the problem now. You want one file with the shared
+and the four specific segments, but each one of the specific segments should
+be relocated to the same start address.
+
+There is no easy solution for the problem. If you could live with generating
+more than one output file and concatenating them together, you could generate
+four binary files by running the linker four times:
+
+# Linker config for shared + specific1
+MEMORY {
+  RAM: start = $0500, size = $0300, file = &quot;file1.bin&quot;;
+}
+SEGMENTS {
+    SHARED:     load = RAM, type = ro;
+    SPECIFIC1:  load = RAM, type = ro;
+}
+
+# Linker config for specific2
+MEMORY {
+  RAM: start = $0500, size = $0300, file = &quot;file2.bin&quot;;
+}
+SEGMENTS {
+    SHARED:     load = RAM, type = bss;
+    SPECIFIC2:  load = RAM, type = ro;
+}
+
+...
+
+Later: cat file1.bin file2.bin file3.bin file4.bin &gt; file.bin
+
+Declaring the SHARED segment as type bss will discard the data but increase
+the program counter. It will give warnings about &quot;bss segment contains
+initialized data&quot;, but you can ignore these warnings (or filter them out).
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Apr 19 15:00:25 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4936.html" title="Next message in the list">MagerValp: "Re: [cc65] drive code with shared segments"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4934.html" title="Previous message in the list">MagerValp: "Re: [cc65] drive code with shared segments"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4934.html" title="Message to which this message replies">MagerValp: "Re: [cc65] drive code with shared segments"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4936.html" title="Next message in this discussion thread">MagerValp: "Re: [cc65] drive code with shared segments"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4936.html" title="Message sent in reply to this message">MagerValp: "Re: [cc65] drive code with shared segments"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4935" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4935" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4935" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-04-19 15:00:27 CEST
+</em></small></p>
+</body>
+</html>

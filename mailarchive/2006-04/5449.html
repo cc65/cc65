@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] More on the prototype bug</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] More on the prototype bug" />
+<meta name="Date" content="2006-04-01" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] More on the prototype bug</h1>
+<!-- received="Sat Apr  1 13:56:03 2006" -->
+<!-- isoreceived="20060401115603" -->
+<!-- sent="Sat, 1 Apr 2006 13:55:52 +0200" -->
+<!-- isosent="20060401115552" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] More on the prototype bug" -->
+<!-- id="20060401115552.GA1068@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="200604010911.k319BkDF020290&#64;dr.ea.ms" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5450.html" title="Andrew J. Kroll: &quot;Re: [cc65] More on the prototype bug&quot;">Next message</a> ]
+[ <a href="5448.html" title="Andrew J. Kroll: &quot;Re: [cc65] More on the prototype bug&quot;">Previous message</a> ]
+[ <a href="5448.html" title="Andrew J. Kroll: &quot;Re: [cc65] More on the prototype bug&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5450.html" title="Andrew J. Kroll: &quot;Re: [cc65] More on the prototype bug&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20More%20on%20the%20prototype%20bug">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2006-04-01 13:55:52</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Sat, Apr 01, 2006 at 04:11:46AM -0500, Andrew J. Kroll wrote:
+&gt; Here is the small patch that seems to fix the bug. I hope I did the right
+&gt; thing, but it does seem to fix the problem.
+
+Not really. Your patch considers any K&amp;R function equal to any new style
+prototype, which is not, what should happen. From ISO/IEC 9899:1999 (E),
+&quot;6.7.5.3 Function declarators (including prototypes)&quot;, paragraph 15:
+
+    If one type has a parameter type list and the other type is
+    specified by a function definition that contains a (possibly
+    empty) identifier list, both shall agree in the number of
+    parameters, and the type of each prototype parameter shall be
+    compatible with the type that results from the application of the
+    default argument promotions to the type of the corresponding
+    identifier. (In the determination of type compatibility and of a
+    composite type, each parameter declared with function or array
+    type is taken as having the adjusted type and each parameter
+    declared with qualified type is taken as having the unqualified
+    version of its declared type.)
+
+The place is right, and the change will work around the problem, but as a side
+effect, it accepts invalid code. It is ok to make your code compile, but it is
+not sufficient as a general solution for cc65.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Apr  1 13:56:03 2006</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5450.html" title="Next message in the list">Andrew J. Kroll: "Re: [cc65] More on the prototype bug"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5448.html" title="Previous message in the list">Andrew J. Kroll: "Re: [cc65] More on the prototype bug"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5448.html" title="Message to which this message replies">Andrew J. Kroll: "Re: [cc65] More on the prototype bug"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5450.html" title="Next message in this discussion thread">Andrew J. Kroll: "Re: [cc65] More on the prototype bug"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5450.html" title="Message sent in reply to this message">Andrew J. Kroll: "Re: [cc65] More on the prototype bug"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5449" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5449" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5449" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2006-04-01 13:56:06 CEST
+</em></small></p>
+</body>
+</html>

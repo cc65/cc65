@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] proper linking for c128's EXTR</title>
+<meta name="Author" content="Chris Cureau (cmcureau1gmail.com)" />
+<meta name="Subject" content="[cc65] proper linking for c128's EXTROM" />
+<meta name="Date" content="2011-10-18" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] proper linking for c128's EXTROM</h1>
+<!-- received="Tue Oct 18 19:05:44 2011" -->
+<!-- isoreceived="20111018170544" -->
+<!-- sent="Tue, 18 Oct 2011 12:05:34 -0500" -->
+<!-- isosent="20111018170534" -->
+<!-- name="Chris Cureau" -->
+<!-- email="cmcureau1gmail.com" -->
+<!-- subject="[cc65] proper linking for c128's EXTROM" -->
+<!-- id="CAL0fNgX0SHB+vuj2qi6kT1Ci4QVx66ODQ6vcJ3TKT9BxLJG9Tw@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9658.html" title="Groepaz: &quot;Re: [cc65] proper linking for c128's EXTROM&quot;">Next message</a> ]
+[ <a href="9656.html" title="Joseph Rose: &quot;[cc65] ld65: _exit redefined warning?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9658.html" title="Groepaz: &quot;Re: [cc65] proper linking for c128's EXTROM&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Chris Cureau &lt;<a href="mailto:cmcureau1gmail.com?Subject=Re:%20[cc65]%20proper%20linking%20for%20c128's%20EXTROM">cmcureau1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-10-18 19:05:34</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I'm pretty sure this is just a case of &quot;you're doing it wrong&quot;, but...
+
+A group of friends and I have been working on a program that fits into
+EXTROM on a 128.  Of course, to get it to autostart, we need some magic
+bytes (&quot;CBM&quot;, rom version 01, etc.) as the first few bytes of the file.  Our
+assembly accounts for this:
+
+        .ORG $8000;
+
+        ; c128 Option ROM trickery
+
+        jmp initcold    ; Cold start vector
+        jmp initwarm    ; Warm start vector
+        .byte &quot;$01&quot;     ; '01' for Autostart
+        .byte &quot;$43,$42,$4d&quot; ; &quot;CBM&quot;
+        ...
+
+linker config looks like this:
+
+        MEMORY {
+          ZP: start = $0002, size = $001A;
+          OPTROM: start = $8000, size = $2000, file = &quot;optrom.bin&quot;;
+          RAM1: start = $1Bff, size = $6401;
+        }
+
+        SEGMENTS {
+          CODE: load = OPTROM, type = ro;
+          RODATA: load = OPTROM, type = ro;
+          DATA: load = OPTROM, run = RAM1, type = rw, define = yes;
+          BSS: load = RAM1, type = bss, define = yes;
+      }
+
+When we attempt to assemble and link, we get weird results...
+
+00000000  4c 14 80 4c 15 80 24 30  31 24 34 33 2c 24 34 32
+ |L..L..$01$43,$42|
+00000010  2c 24 34 64 60 a5 01 05  83 85 01 ad 0b d0 05 31
+ |,$4d`..........1|
+00000020  8d 0b d0 ad 1e d0 05 00  8d 1e d0 20 6e 80 20 86  |........... n.
+.|
+00000030  80 20 a3 80 20 ae 80 20  b7 80 20 d0 80 20 86 80  |. .. .. .. ..
+..|
+00000040  ad 00 10 a2 ff 9d 00 10  20 a3 80 20 ae 80 ad 01  |........ ..
+....|
+00000050  81 e6 01 f0 0b 8d 01 81  a6 10 9d e9 80 4c 3d 80
+ |.............L=.|
+00000060  20 d7 80 ad 00 10 e6 04  8d 00 10 4c 00 10 a9 03  |
+..........L....|
+00000070  a2 e6 a0 80 20 bd ff a5  02 a6 08 a4 02 20 ba ff  |.... ........
+..|
+00000080  20 c0 ff b0 5d 60 a9 0a  a2 e9 a0 80 20 bd ff a5  | ...]`......
+...|
+00000090  0f a6 08 a4 0f 20 ba ff  20 c0 ff b0 45 a6 02 20  |..... .. ...E..
+|
+000000a0  c6 ff 60 a9 00 85 ae a9  10 85 af a4 00 60 20 cf  |..`..........`
+.|
+000000b0  ff 91 ae c8 d0 f8 60 ad  00 10 cd f3 80 d0 23 ad
+ |......`.......#.|
+000000c0  01 10 cd f4 80 d0 1b ad  02 10 cd f5 80 d0 13 60
+ |...............`|
+000000d0  ad 03 10 8d fe 80 60 a5  0f 20 c3 ff a5 02 20 c3  |......`.. ....
+.|
+000000e0  ff 60 20 d7 80 60 24 31  37 55 31 20 32 20 38 20  |.` ..`$17U1 2 8
+|
+000000f0  31 20 30 24 43 30 2c 24  46 46 2c 24 45 45 24 30  |1
+0$C0,$FF,$EE$0|
+00000100  30 24 30 30                                       |0$00|
+00000104
+
+I don't even see CBM in here...what's the issue?
+
+Thanks,
+Chris
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Oct 18 19:05:44 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9658.html" title="Next message in the list">Groepaz: "Re: [cc65] proper linking for c128's EXTROM"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9656.html" title="Previous message in the list">Joseph Rose: "[cc65] ld65: _exit redefined warning?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9658.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] proper linking for c128's EXTROM"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9658.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] proper linking for c128's EXTROM"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9657" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9657" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9657" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-10-18 19:05:48 CEST
+</em></small></p>
+</body>
+</html>

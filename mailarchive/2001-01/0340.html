@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] meaning of &quot;bss&quot</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] meaning of &quot;bss&quot; and &quot;data&quot; in the library files">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] meaning of &quot;bss&quot; and &quot;data&quot; in the library files</h1>
+<!-- received="Mon Jan  8 10:15:28 2001" -->
+<!-- isoreceived="20010108091528" -->
+<!-- sent="Mon, 8 Jan 2001 10:15:25 +0100" -->
+<!-- isosent="20010108091525" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] meaning of &quot;bss&quot; and &quot;data&quot; in the library files" -->
+<!-- id="20010108101525.A26479@trixie.musoftware.de" -->
+<!-- inreplyto="20010108085306.1087.qmail@web11302.mail.yahoo.com" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20meaning%20of%20&quot;bss&quot;%20and%20&quot;data&quot;%20in%20the%20library%20files"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2001-01-08 10:15:25
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0341.html">MagerValp: "Re: [cc65]zero page"</a>
+<li><strong>Previous message:</strong> <a href="0339.html">tony fu: "[cc65] meaning of &quot;bss&quot; and &quot;data&quot; in the library files"</a>
+<li><strong>In reply to:</strong> <a href="0339.html">tony fu: "[cc65] meaning of &quot;bss&quot; and &quot;data&quot; in the library files"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Mon, Jan 08, 2001 at 04:53:06PM +0800, tony fu wrote:
+&gt; Could you explain the meaning of &quot;bss&quot; and &quot;data&quot; in
+&gt; the library files?
+
+BSS is an uninitialized segment, it is not written to the output file but
+cleared (zeroed out) on program startup (for C programs only!). &quot;.bss&quot; is the
+assembler command that makes the BSS segment the current segment.
+
+DATA is the segment for initialized data. &quot;.data&quot; is the assembler command
+that makes the DATA segment the current segment.
+
+Uninitialized static variables go into the BSS segment, initialized static
+variables go to the DATA segment, static const variables go into the RODATA
+segment:
+
+	static int i;	       	    		/* --&gt; BSS */
+	static int i = 3;      	    		/* --&gt; DATA */
+	static const int i = 3;	    		/* --&gt; RODATA */
+	static const char hello[] = &quot;hello&quot;;	/* --&gt; RODATA */
+
+&gt; What are these two words meaning?
+&gt;       1: 	.word  	__BSS_RUN__+__BSS_SIZE__
+&gt;       2:	ldx	#&gt;__BSS_SIZE__
+
+These are linker defined symbols related to the BSS segment. They are
+explained in more detail in the linker documentation (see there). In short:
+
+	__BSS_RUN__	is the run address of the BSS segment	
+	__BSS_SIZE__	is the size of the BSS segment
+
+&gt; Where are can I get details about assembler directives
+&gt;  such as &quot;.word	.import.  export.  importzp&quot;?
+
+The assembler documentation explains these directives in detail.
+
+Regards
+
+
+	Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20meaning%20of%20&quot;bss&quot;%20and%20&quot;data&quot;%20in%20the%20library%20files">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20meaning%20of%20&quot;bss&quot;%20and%20&quot;data&quot;%20in%20the%20library%20files">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0341.html">MagerValp: "Re: [cc65]zero page"</a>
+<li><strong>Previous message:</strong> <a href="0339.html">tony fu: "[cc65] meaning of &quot;bss&quot; and &quot;data&quot; in the library files"</a>
+<li><strong>In reply to:</strong> <a href="0339.html">tony fu: "[cc65] meaning of &quot;bss&quot; and &quot;data&quot; in the library files"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:38 CET</em>
+</em>
+</small>
+</body>
+</html>

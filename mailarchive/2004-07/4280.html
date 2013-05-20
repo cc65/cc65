@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] stack corruption</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] stack corruption" />
+<meta name="Date" content="2004-07-21" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] stack corruption</h1>
+<!-- received="Wed Jul 21 17:50:28 2004" -->
+<!-- isoreceived="20040721155028" -->
+<!-- sent="Wed, 21 Jul 2004 17:50:24 +0200" -->
+<!-- isosent="20040721155024" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] stack corruption" -->
+<!-- id="20040721155024.GC24784@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="16638.28542.895368.653091&#64;panini.cling.gu.se" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4281.html" title="Groepaz: &quot;[cc65] opt65&quot;">Next message</a> ]
+[ <a href="4279.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] stack corruption&quot;">Previous message</a> ]
+[ <a href="4275.html" title="MagerValp: &quot;Re: [cc65] stack corruption&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4281.html" title="Groepaz: &quot;[cc65] opt65&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20stack%20corruption">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-07-21 17:50:24</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Wed, Jul 21, 2004 at 03:28:30PM +0200, MagerValp wrote:
+&gt; &gt;&gt;&gt;&gt;&gt; &quot;UvB&quot; == Ullrich von Bassewitz &lt;uz&#64;musoftware&#46;<!--nospam-->de&gt; writes:
+&gt;
+&gt; UvB&gt; This is what I get:
+&gt;
+&gt; UvB&gt; test.c(5): Error: Conflicting types for `DrawEntryDiskID'
+&gt;
+&gt; UvB&gt; Are you sure, both declarations were visible to the compiler?
+&gt;
+&gt; drawentry.c does not include drawentry.h itself, so when the function
+&gt; is compiled it's not visible.
+
+It's a golden rule that each C module should include it's corresponding header
+file to catch errors like this.
+
+The reason why the code works with gcc and not with cc65 is that gcc passes
+characters as ints. This keeps the stack aligned, gives faster code, and works
+even in the absence if a prototype. For cc65, passing all characters as ints
+would be a big performance penalty, so if a prototype is in sight, char
+parameters are actually pushed as characters. If you have different prototypes
+(or no prototype at all), it will give slightly unexpected results:-)
+
+&gt; Implicit ints wouldn't (well, shouldn't) break any of my code at
+&gt; least, but maybe a --implicit-ints could be added.
+
+--standard c89 will enable implicit ints.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Jul 21 17:50:28 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4281.html" title="Next message in the list">Groepaz: "[cc65] opt65"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4279.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] stack corruption"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4275.html" title="Message to which this message replies">MagerValp: "Re: [cc65] stack corruption"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4281.html" title="Next message in this discussion thread">Groepaz: "[cc65] opt65"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4281.html" title="Message sent in reply to this message">Groepaz: "[cc65] opt65"</a></li>
+<li><dfn>Reply</dfn>:  <a href="4286.html" title="Message sent in reply to this message">MagerValp: "Re: [cc65] stack corruption"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4280" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4280" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4280" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-07-21 17:50:38 CEST
+</em></small></p>
+</body>
+</html>

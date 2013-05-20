@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] C64, Interrupt and in need</title>
+<meta name="Author" content="Greg King (greg.king41verizon.net)" />
+<meta name="Subject" content="Re: [cc65] C64, Interrupt and in need of an example" />
+<meta name="Date" content="2008-03-05" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] C64, Interrupt and in need of an example</h1>
+<!-- received="Wed Mar  5 16:02:31 2008" -->
+<!-- isoreceived="20080305150231" -->
+<!-- sent="Wed, 05 Mar 2008 09:32:46 -0500" -->
+<!-- isosent="20080305143246" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king41verizon.net" -->
+<!-- subject="Re: [cc65] C64, Interrupt and in need of an example" -->
+<!-- id="000401c87ed1$aa7ad360$443efea9@monarch" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="1204159191.31864.25.camel&#64;katzenlinux" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6048.html" title="Oliver Schmidt: &quot;Re: [cc65] Questions for CBM guys&quot;">Next message</a> ]
+[ <a href="6046.html" title="Greg King: &quot;Re: [cc65] Questions for CBM guys&quot;">Previous message</a> ]
+[ <a href="../2008-02/5988.html" title="Markus Stehr: &quot;[cc65] C64, Interrupt and in need of an example&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king41verizon.net?Subject=Re:%20[cc65]%20C64,%20Interrupt%20and%20in%20need%20of%20an%20example">greg.king41verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-03-05 15:32:46</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: &quot;Markus Stehr&quot; on Wednesday, February 27, 2008; at 07:39 PM -0500
+&gt;
+&gt; Could someone please provide me with an usable example for an interrupt
+&gt; handler for the C64?  I have been reading the manual, and asked Google
+&gt; for 2 hours now; and, I am as clueless as I was 2 hours ago.
+&gt;
+&gt; I need this for the BunkerParty Invitro [nobody else volunteered, so I
+&gt; am doing it again, but this time in C and not ASM. ;) ]; and, I need that
+&gt; IRQ for the music.
+
+Here is almost exactly what you need:
+    <a href="http://mysite.verizon.net/vze4nxfk/cc65-interruptor.zip">http://mysite.verizon.net/vze4nxfk/cc65-interruptor.zip</a>
+
+My code is similar to MagerValp's code, but I use CC65's actors
+(constructor, destructor, and interruptor).  That archive has C-language
+versions of two of the example programs in the Goattracker2 music editor
+package.
+
+(I say &quot;almost&quot; because the code actually is designed for a modification
+that I did to an old revision of Goattracker.  It can create CA65
+source-code files of its songs.  They can be assembled and linked directly
+into a program -- there is no need to worry about where to put the song in
+RAM, and the player is a group of &quot;standard&quot; CC65 functions.  So, you would
+need to change my code into a form that can use the binary files that
+published music-editors produce.)
+
+By the way, my code originally used &quot;--VIC.irr;&quot; to acknowledge the
+interrupt; MagerValp's code uses an assignment.  After thinking about it for
+awhile, I realized that my code would not work on a SuperCPU (because it
+exploits a 6502 defect that does not exist in the 65SC816).  Thanks for
+alerting me, MagerValp.
+
+&gt;
+&gt; And, a second question, how can I deactivate the charset change at
+&gt; startup?
+&gt; Even with a &quot;VIC.addr = 20;&quot; at the start, you still can see the change
+&gt; for a split second.
+&gt; I am using my own charset later on, but I am clearing the screen in some
+&gt; non-standard way, and I need the screen in its original form.
+
+There is no easy way to do it!  That &quot;flip&quot; is built into the start-up code
+[it is the second thing that the program does -- long before it runs
+main()].  You would need to get the source-code file (&quot;libsrc/c64/crt0.s&quot;),
+remove the two lines that switch to lower-/upper-case, assemble it, and then
+link it to your program, in place of &quot;c64.o&quot; -- use ld65 instead of cl65
+when you link them.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Mar  5 16:02:31 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6048.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Questions for CBM guys"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6046.html" title="Previous message in the list">Greg King: "Re: [cc65] Questions for CBM guys"</a></li>
+<li><dfn>In reply to</dfn>: <a href="../2008-02/5988.html" title="Message to which this message replies">Markus Stehr: "[cc65] C64, Interrupt and in need of an example"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6047" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6047" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6047" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-03-05 16:02:34 CET
+</em></small></p>
+</body>
+</html>

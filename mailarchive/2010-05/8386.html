@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] cc65 on MacOS</title>
+<meta name="Author" content="silverdr1wfmh.org.pl (silverdr1wfmh.org.pl)" />
+<meta name="Subject" content="Re: [cc65] cc65 on MacOS" />
+<meta name="Date" content="2010-05-13" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] cc65 on MacOS</h1>
+<!-- received="Thu May 13 23:18:32 2010" -->
+<!-- isoreceived="20100513211832" -->
+<!-- sent="Thu, 13 May 2010 23:18:25 +0200" -->
+<!-- isosent="20100513211825" -->
+<!-- name="silverdr1wfmh.org.pl" -->
+<!-- email="silverdr1wfmh.org.pl" -->
+<!-- subject="Re: [cc65] cc65 on MacOS" -->
+<!-- id="5ED1C1B4-09DA-40FA-847A-A58959E75C96@wfmh.org.pl" -->
+<!-- charset="UTF-8" -->
+<!-- inreplyto="86FF8FBE-D1C1-4CF7-B43D-1B2C1FBC1C95&#64;gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8387.html" title="Kevin Schuetz: &quot;Re: [cc65] Question about linking assembler to specific address&quot;">Next message</a> ]
+[ <a href="8385.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Question about linking assembler to specific address&quot;">Previous message</a> ]
+[ <a href="8381.html" title="Tachdaun: &quot;Re: [cc65] cc65 on MacOS&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+[ <a href="8377.html" title="Mark J. Reed: &quot;Re: [cc65] cc65 on MacOS&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:silverdr1wfmh.org.pl?Subject=Re:%20[cc65]%20cc65%20on%20MacOS">silverdr1wfmh.org.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-05-13 23:18:25</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 2010-05-12, at 14:49, Tachdaun wrote:
+
+&gt; Ok, I don't know why everyone keeps telling me that my XCode paths  
+&gt; are wrong,
+
+Maybe that is because they believe this to be the primary suspect in  
+case of your problems?
+
+&gt; I'm reinstalling XCode 3.2.2, it doesn't give you any choice of  
+&gt; where installing anything, you just get to choose the partition  
+&gt; where it will be installed.
+&gt; The readme and several message during the installation say:
+&gt;
+&gt; Installation
+&gt; The Xcode and iPhone SDK installer provides six options for  
+&gt; configuring the installation from the “Customize...” button:
+&gt; •	System Tools. Includes CHUD performance tools. Its components are  
+&gt; always placed in /Developer.
+&gt; ---
+&gt; Installs system-wide tools such as Shark (part of the CHUD  
+&gt; performance tools), DTrace components used by Instruments, and  
+&gt; distributed build processes.
+&gt; There can be only one, newest set of System Tools per Mac OS X  
+&gt; installation at a time, and are always installed into /Developer on  
+&gt; the boot volume.
+&gt; ---
+&gt; Optional content to allow command-line development from the boot  
+&gt; volume. Installs a duplicate of the GCC compiler and command line  
+&gt; tools included with the core Xcode developer tools package into the  
+&gt; boot volume. It also installs header files, libraries, and other  
+&gt; resources for developing software using Mac OS X into the boot  
+&gt; volume.  This package is provided for compatibility with shell  
+&gt; scripts and makefiles that require access to the developer tools in  
+&gt; specific system locations. This content is not relocatable and will  
+&gt; only be installed onto the boot volume.
+
+When I read the Xcode 3.2.2's about_xcode_3.2.2 doc, it says:
+
+The Xcode and iPhone SDK installer provides six options for  
+conﬁguring the installation
+from the “Customize...” button:
+• Essentials. Contains the essential components of Xcode, installed  
+by default
+in  /Developer or another directory of your choice, including external  
+volumes.
+• iPhone SDK. Contains the iPhone SDK, tools, and iPhone Simulator
+• System Tools. Includes CHUD performance tools. Its components are  
+always
+placed in /Developer.
+• UNIX Development. Command-line tools used for UNIX-based  
+development. Its
+components are always placed in /usr - only one version installed at a  
+time.
+• [...]
+
+Let me copy-paste it again:
+
+• UNIX Development. Command-line tools used for UNIX-based  
+development. Its
+components are always placed in /usr - only one version installed at a  
+time.
+
+Does that mean that when you want to do regular unix development (but  
+also compiling unix tools from sources) you might want to have this  
+option checked?
+
+&gt; What version of Xcode did you install and where are your gcc, make  
+&gt; and header files?
+
+3.2.1, 3.1.2, ...
+
+Where my make/gnumake is I already wrote in my previous message.
+
+gcc is of course also in the same place:
+
+NanJing:~ silverdr$ which gcc
+/usr/bin/gcc
+
+headers are in /usr/include
+
+etc.
+
+so - HTH.
+
+-- 
+SD!
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu May 13 23:18:32 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8387.html" title="Next message in the list">Kevin Schuetz: "Re: [cc65] Question about linking assembler to specific address"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8385.html" title="Previous message in the list">silverdr1wfmh.org.pl: "Re: [cc65] Question about linking assembler to specific address"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8381.html" title="Message to which this message replies">Tachdaun: "Re: [cc65] cc65 on MacOS"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8377.html" title="Next message in this discussion thread">Mark J. Reed: "Re: [cc65] cc65 on MacOS"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8386" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8386" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8386" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-05-13 23:18:35 CEST
+</em></small></p>
+</body>
+</html>

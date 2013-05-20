@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Conflict in headers</title>
+<meta name="Author" content="Marc 'BlackJack' Rintsch (marc1rintsch.de)" />
+<meta name="Subject" content="[cc65] Conflict in headers" />
+<meta name="Date" content="2011-11-05" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Conflict in headers</h1>
+<!-- received="Sat Nov  5 10:14:59 2011" -->
+<!-- isoreceived="20111105091459" -->
+<!-- sent="Sat, 5 Nov 2011 10:13:37 +0100" -->
+<!-- isosent="20111105091337" -->
+<!-- name="Marc 'BlackJack' Rintsch" -->
+<!-- email="marc1rintsch.de" -->
+<!-- subject="[cc65] Conflict in headers" -->
+<!-- id="201111051013.43250.marc@rintsch.de" -->
+<!-- charset="utf-8" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9667.html" title="Payton Byrd: &quot;Re: [cc65] Playing a PSID file&quot;">Next message</a> ]
+[ <a href="9665.html" title="Marc 'BlackJack' Rintsch: &quot;Re: [cc65] Playing a PSID file&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9668.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Conflict in headers&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Marc 'BlackJack' Rintsch &lt;<a href="mailto:marc1rintsch.de?Subject=Re:%20[cc65]%20Conflict%20in%20headers">marc1rintsch.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-11-05 10:13:37</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi *,
+
+I just ran into a conflict in the header files.  Both `stdlib.h` and 
+`inttypes.h` define an `ldiv_t` structure and cc65 (current SVN version) 
+stops with an error:
+
+bj&#64;s8n:~$ cl65 test&#46;<!--nospam-->c -o test.prg
+/usr/local/lib/cc65/include/inttypes.h(59): Error: Multiple definition 
+for `ldiv_t'
+
+bj&#64;s8n:~/src/cc65/include$ ack-grep -C 5 ldiv_t
+stdlib.h
+56-
+57-/* Return type of the ldiv function (which currently doesn't exist) 
+*/
+58-typedef struct {
+59-    long rem;
+60-    long quot;
+61:} ldiv_t;
+62-
+63-/* Memory management */
+64-void* __fastcall__ malloc (size_t size);
+65-void* __fastcall__ calloc (size_t count, size_t size);
+66-void* __fastcall__ realloc (void* block, size_t size);
+
+inttypes.h
+54-
+55-/* Return type of the imaxdiv function (which currently doesn't 
+exist) */
+56-typedef struct {
+57-    intmax_t rem;
+58-    intmax_t quot;
+59:} ldiv_t;
+60-
+61-
+62-/* Standard functions */
+63-intmax_t __fastcall__ imaxabs (intmax_t val);
+64-intmax_t __fastcall__ strtoimax (const char* nptr, char** endptr, int 
+base);
+
+Ciao,
+	Marc 'BlackJack' Rintsch
+-- 
+ Beware the Four Horsemen of the Information Apocalypse: terrorists,
+ drug dealers, kidnappers, and child pornographers.  Seems like you
+ can scare any public into allowing the government to do anything
+ with those four.”                                 -- Bruce Schneier
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<div>
+<ul>
+<li>application/pgp-signature attachment: <a href="../att-9666/signature.asc_">This is a digitally signed message part.</a></li>
+</ul>
+<!-- attachment="signature.asc_" -->
+</div>
+<span id="received"><dfn>Received on</dfn> Sat Nov  5 10:14:59 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9667.html" title="Next message in the list">Payton Byrd: "Re: [cc65] Playing a PSID file"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9665.html" title="Previous message in the list">Marc 'BlackJack' Rintsch: "Re: [cc65] Playing a PSID file"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9668.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Conflict in headers"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9668.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Conflict in headers"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9666" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9666" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9666" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-11-05 10:15:02 CET
+</em></small></p>
+</body>
+</html>

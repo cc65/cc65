@@ -1,0 +1,191 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] Floating point support</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] Floating point support">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] Floating point support</h1>
+<!-- received="Thu May 23 00:39:18 2002" -->
+<!-- isoreceived="20020522223918" -->
+<!-- sent="Thu, 23 May 2002 00:39:03 +0200" -->
+<!-- isosent="20020522223903" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] Floating point support" -->
+<!-- id="4812921321.20020523003903@gmx.net" -->
+<!-- inreplyto="20020522210135.B27678@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20Floating%20point%20support"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2002-05-23 00:39:03
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1388.html">groepaz: "Re[2]: [cc65] statics in zero page"</a>
+<li><strong>In reply to:</strong> <a href="1383.html">Ullrich von Bassewitz: "Re: [cc65] Floating point support"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1390.html">Ullrich von Bassewitz: "Re: [cc65] Floating point support"</a>
+<li><strong>Next in thread:</strong> <a href="1360.html">Christian Krüger: "Re: [cc65] statics in zero page"</a>
+<li><strong>Reply:</strong> <a href="1390.html">Ullrich von Bassewitz: "Re: [cc65] Floating point support"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+Wednesday, May 22, 2002, 9:01:35 PM, you wrote:
+
+
+UvB&gt; Hi!
+
+UvB&gt; On Wed, May 22, 2002 at 03:15:01PM +0200, groepaz wrote:
+&gt;&gt; so you are saying that for example a grafics-library should contain
+&gt;&gt; only portable routines, and one target-specific setpixel routine?
+&gt;&gt; and if not, please explain whats different between that and the floats
+&gt;&gt; coz i just dont get it.
+
+UvB&gt; The difference is that the graphics interface is not covered by a standard
+UvB&gt; while floating point arithmetic is.
+
+so thats the accuracy argument again? or what else? errno? ;=P
+
+&gt;&gt; we arent talking about writing a portable program (and yes i agree to
+&gt;&gt; what you were saying when it comes to that), we are talking about
+&gt;&gt; writing libraries used to compile the portable program =&gt; totally
+&gt;&gt; different thing.
+
+UvB&gt; When talking about C, portability means adhering to the standard. If libraries
+UvB&gt; differ from the standard they are not portable.
+
+yes, and like mentioned before - if you really ever need standard
+compliance you could always drop in your own standard-compliant
+routines. i am just saying that for most reallife programs (those you
+could compile using cc65 atleast) wont really suffer from the little
+differences. its just the same as using file i/o that cannot seek or
+termio that cant handle all attributes (or substitutes them for that
+matter). it will perfectly work for a lot, if not most, applications -
+and these applications will even be (well can be, theres always a way
+to screw things up ;)) perfectly portable. problems arise when you try
+to port a program originally written for a full standard compliant
+lib, and which additionally excessivly uses its features. seeking to
+fileend to get filesize is just as bad as rather trivial code that
+relies on the least significant bit of some float number :=)
+
+UvB&gt; [writing a fp library]
+&gt;&gt; yeah, a theoretically nice, but practically unuseable solution. slow
+&gt;&gt; and large.... sounds like windoze(tm) to me ;=P
+
+UvB&gt; So where is the proof that the ROM routines are faster than something written
+UvB&gt; by someone else? Steve Judd once mentioned that he was writing a floating
+UvB&gt; point library, and I would bet a craddle of beer against a bottle of mineral
+UvB&gt; water that his routines would blow the C64 ROM routines to pieces (speedwise).
+UvB&gt; The space argument is more valid, but I will not judge about that before I've
+UvB&gt; seen how large such floating point routines would be.
+
+common logic: kernal routines are VERY large. for once, you dont ever
+want routines that are even larger (well actually, you dont even want
+routines in ram that are half their size). like i said, the kernal
+pulls a dozen stunts already to keep the code short (and ofcoz,these
+stunts are what makes the code sloooow). there's no doubt someone could
+write an fp-emulator that is faster than the rom - but for damn sure
+even those eat-math-for-breakfast guys like stephen can't make them
+faster and at the same time not make them (a lot) larger :) the only way
+to make those faster (without making them larger) is to remove the
+unnecessary overhead from packed basic-variables, and to remove
+accuracy.
+
+&gt;&gt; the point is, theres no point in makeing _the library_ portable -
+&gt;&gt; except for the heck of it.
+
+UvB&gt; A portable library means that the interface is portable. A portable interface
+UvB&gt; means an interface that adheres to the C standard. And the ROM routines do NOT
+UvB&gt; adhere to the C standard, so they are NOT portable.
+
+well yes and no :o)
+
+thats why i suggested using &quot;real&quot; (IEEE) floats in the compiler
+internally, and use IEEE for internal conversion and arithmetics, but
+apart from that let the assembler know about different targets formats
+(and also IEEE for that matter) - and then simply spill calls to a
+standard fp-emulator interface.... this way the compiler doesnt even
+need to know about how floats are implemented. (and it always
+simplifies internal calculations to be standard compliant). done that,
+one could probably come up with modules like that 2-bytes floats i
+used once, or also a full IEEE float/double emulator.
+
+and yes, standard compliant programs that expect floats to work as in
+IEEE could maybe fail to work at all with the kernal-float module -
+fully aware of that.
+
+UvB&gt; Maybe you can explain how you come to these numbers? I hear you talking, but I
+UvB&gt; start wondering if we are talking about the same thing :-)
+
+same for me ;=P as far as i understand we are both concerned about
+different things at all
+
+- you want your compiler to act standard-compliant, and by all means
+to work as one would expect from any other &quot;big&quot; compiler
+- i want the compiler to spit out the best possible code, and i prefer
+non standard compliant, but existant solutions over no solution at
+all.
+
+so the real question is, how can the user (me) use his non-standard
+libraries with your compiler without the need of adding &quot;ugly&quot; stuff
+to the compiler that potentially breaks the standard ? well i am
+repeating myself - the compiler should basically not even need to
+know, the assembler would. (and target specific float support in
+the assembler should really be neither &quot;ugly&quot; nor hard to do.)
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20Floating%20point%20support">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20Floating%20point%20support">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1388.html">groepaz: "Re[2]: [cc65] statics in zero page"</a>
+<li><strong>In reply to:</strong> <a href="1383.html">Ullrich von Bassewitz: "Re: [cc65] Floating point support"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1390.html">Ullrich von Bassewitz: "Re: [cc65] Floating point support"</a>
+<li><strong>Next in thread:</strong> <a href="1360.html">Christian Krüger: "Re: [cc65] statics in zero page"</a>
+<li><strong>Reply:</strong> <a href="1390.html">Ullrich von Bassewitz: "Re: [cc65] Floating point support"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-05-23 00:39:33 CEST</em>
+</em>
+</small>
+</body>
+</html>

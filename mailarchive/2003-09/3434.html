@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Supervision support</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] Supervision support">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Supervision support</h1>
+<!-- received="Mon Sep 22 16:08:54 2003" -->
+<!-- isoreceived="20030922140854" -->
+<!-- sent="Mon, 22 Sep 2003 16:04:15 +0200" -->
+<!-- isosent="20030922140415" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] Supervision support" -->
+<!-- id="200309221604.16187.groepaz@gmx.net" -->
+<!-- inreplyto="3F6EC94F.2010701@utanet.at" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Supervision%20support"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2003-09-22 16:04:15
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3433.html">Todd Elliott: "Re: [cc65] CRC-32"</a>
+<li><strong>In reply to:</strong> <a href="3427.html">Peter Trauner: "[cc65] Supervision support"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3448.html">Peter Trauner: "Re: [cc65] Supervision support"</a>
+<li><strong>Next in thread:</strong> <a href="3436.html">Ullrich von Bassewitz: "Re: [cc65] Supervision support"</a>
+<li><strong>Reply:</strong> <a href="3448.html">Peter Trauner: "Re: [cc65] Supervision support"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Monday 22 September 2003 12:05, Peter Trauner wrote:
+
+&gt; a few weeks ago I started to use ca65 for a few simple test programs
+&gt; for the supervision handheld.
+
+care to explain what it is? never heard of that one :o)
+
+&gt; I looked a little bit on the compiler and started to add supervision c
+&gt; support.
+&gt;
+&gt; Since this is a console and the program is in ROM, how do I
+&gt; initialize/handle
+&gt; non const global variables?
+
+write a linker config that puts everything into rom, except the .bss and .data 
+sections (which should be in ram) (if you dont have any ram at all - you have 
+problems :=P)
+
+you may want to look at the NES port (which is available in the development 
+version) - looking at the code/linkerconfig might solve some of your 
+questions.
+
+&gt; Is it possible to prevent read only accesses from write only io ports?
+
+no - just don't read them :)
+
+&gt; Is it safe to call c functions from irq, nmi?
+
+no - (not entire true, its very &quot;hard&quot; and features lot of overhead)... the 
+general rule is to write that stuff in assembler.
+
+if you really think you want to do this in C (you dont, believe me :=)), look 
+at the code of the debug library....somewhere in there is a brk-handler that 
+calls a C function.
+
+&gt; I have 4 linker configuration files for 16, 32, 64, 128kbyte cartridges
+&gt; (64, 128kbyte are bankswitched).
+
+its almost the same with the NES.... in that case i decided to supply a 
+linkerconfig for the smallest possible (or - the most commonly used, which 
+happens to be the same ;=P) config, the user may then edit the linkerconfig 
+for his needs (maybe put some variations in comments)
+
+&gt; Is it allowed to support several supervision targets?
+
+maybe you also want to look at the atari stuff and see how they support 
+several different targets with just one config? having several configs for 
+the same target (ie, computer) would probably be kinda overkill... (offhand, 
+i could probably come up with 10+ configs just for the c64 :=))
+
+&gt; PS: I attached my work files
+&gt; (how must I deliver/integrate supervision support in cc65?)
+
+just bring it to useable state and then get in touch with UZ....worked for me 
+so far :o) 
+
+&gt; (some remarks about my first cc65 usage?)
+
+after a quick look.... seems to be ok overall... some tips though
+
+- have a look at the conio-interface and design your screen i/o stuff like 
+that... might make some things easier in the future
+- use seperate files for each function, that will reduce the overhead when 
+linking a larger library 
+
+
+gpz
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Supervision%20support">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3433.html">Todd Elliott: "Re: [cc65] CRC-32"</a>
+<li><strong>In reply to:</strong> <a href="3427.html">Peter Trauner: "[cc65] Supervision support"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3448.html">Peter Trauner: "Re: [cc65] Supervision support"</a>
+<li><strong>Next in thread:</strong> <a href="3436.html">Ullrich von Bassewitz: "Re: [cc65] Supervision support"</a>
+<li><strong>Reply:</strong> <a href="3448.html">Peter Trauner: "Re: [cc65] Supervision support"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-09-22 16:08:59 CEST</em>
+</em>
+</small>
+</body>
+</html>

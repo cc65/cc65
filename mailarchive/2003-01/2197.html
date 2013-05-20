@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-2">
+<title>cc65 mailing list archive: Re: [cc65] LUnix</title>
+<meta name="Author" content="Maciej Witkowiak (ytm_at_elysium.pl)">
+<meta name="Subject" content="Re: [cc65] LUnix">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] LUnix</h1>
+<!-- received="Thu Jan  2 23:40:25 2003" -->
+<!-- isoreceived="20030102224025" -->
+<!-- sent="Thu, 2 Jan 2003 23:40:17 +0100" -->
+<!-- isosent="20030102224017" -->
+<!-- name="Maciej Witkowiak" -->
+<!-- email="ytm_at_elysium.pl" -->
+<!-- subject="Re: [cc65] LUnix" -->
+<!-- id="20030102224017.GA18387@spektr.localdomain" -->
+<!-- charset="iso-8859-2" -->
+<!-- inreplyto="200301022311.49877.groepaz@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Maciej Witkowiak (<a href="mailto:ytm_at_elysium.pl?Subject=Re:%20[cc65]%20LUnix"><em>ytm_at_elysium.pl</em></a>)<br>
+<strong>Date:</strong> 2003-01-02 23:40:17
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2196.html">Groepaz: "Re: [cc65] LUnix"</a>
+<li><strong>In reply to:</strong> <a href="2196.html">Groepaz: "Re: [cc65] LUnix"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2199.html">Groepaz: "Re: [cc65] LUnix"</a>
+<li><strong>Reply:</strong> <a href="2199.html">Groepaz: "Re: [cc65] LUnix"</a>
+<li><strong>Reply:</strong> <a href="2212.html">Ullrich von Bassewitz: "Re: [cc65] LUnix"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Groepaz dnia 02 sty 2003 o 23:11 +0100 napisał:
+&gt; &gt; I have never tried that myself (I'm just the programmer:-), but &quot;main&quot; is
+&gt; &gt; an export, which means that it is your program that needs to export a label
+&gt; &gt; called &quot;main&quot;.
+&gt; eh... obvious :=P adding a label &quot;main&quot; at the start of crt0.s did the trick, 
+&gt; thanx for the hint :)
+
+It works for having assembly completed but will not work on LUnix anyway. This
+is for future use, currently the first byte in CODE segment is the program
+entry point.
+
+&gt; &gt; If I understand that correctly, &quot;main&quot; is the label called by the Lunix
+&gt; &gt; loader to start a program. So just add a label &quot;main&quot; to the beginning of
+&gt; &gt; your startup code, export it, and things should start working.
+&gt; yep :) lemme see if i can come up with a working hello world :o)
+
+Not with C. Some low level part is missing: stack - crt0.s has to
+allocate some memory and setup C stack there. Probably something will have to
+be changed in malloc/heap functions. Information about other segments
+(data+bss) is contained in o65 file and handled correctly.
+
+Download LUnix from CVS, the last release was quite some time ago and there
+were some changes, like adding a sample application for ca65 and o65 file
+format.
+
+If you want your Silver Surfer code be included in LUnix, please send it me so
+I can upload it to CVS.
+
+(to Uz)
+Looking at lunix.cfg for ld65 I see that ZEROPAGE segment
+begins at $80 - are zeropage locations in o65 put with
+$80+offset_in_zp_segment or just offset_in_zp_segment and it is up to loader
+to relocate them using zp base address from header?
+Current loader for LUnix does not relocate zp (it is silently assumed that
+base address of zp is 0) because applications have to have access to system
+data in $02-$80 range.
+
+ytm
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20LUnix">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2196.html">Groepaz: "Re: [cc65] LUnix"</a>
+<li><strong>In reply to:</strong> <a href="2196.html">Groepaz: "Re: [cc65] LUnix"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2199.html">Groepaz: "Re: [cc65] LUnix"</a>
+<li><strong>Reply:</strong> <a href="2199.html">Groepaz: "Re: [cc65] LUnix"</a>
+<li><strong>Reply:</strong> <a href="2212.html">Ullrich von Bassewitz: "Re: [cc65] LUnix"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-01-02 23:40:31 CET</em>
+</em>
+</small>
+</body>
+</html>

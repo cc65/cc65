@@ -1,0 +1,146 @@
+diff -Naur cc65-snapshot-2.12.9.20090923/make/gcc.mak cc65-snapshot-2.12.9.20090923-paths/make/gcc.mak
+--- cc65-snapshot-2.12.9.20090923/make/gcc.mak	2009-08-05 16:31:33.000000000 +0200
++++ cc65-snapshot-2.12.9.20090923-paths/make/gcc.mak	2009-09-24 16:34:28.000000000 +0200
+@@ -22,12 +22,14 @@
+ docdir		= $(datadir)/doc
+ libdir		= $(exec_prefix)/lib
+ 
+-CC65DATA	= $(libdir)/cc65
++CC65HOME	= $(libdir)/cc65
+ CC65DOC		= $(docdir)/cc65
+ 
+-CC65ASM		= $(CC65DATA)/asminc
+-CC65INC		= $(CC65DATA)/include
+-CC65LIB		= $(CC65DATA)/lib
++LD65_LIB	= $(CC65HOME)/lib
++LD65_OBJ	= $(CC65HOME)/lib
++LD65_CFG	= $(CC65HOME)/cfg
++CC65_INC	= $(CC65HOME)/include
++CC65_ASM	= $(CC65HOME)/asminc
+ 
+ # Programs
+ 
+@@ -55,7 +57,13 @@
+ all:	bins libs docs $(SYS:%=samples tests)
+ 
+ bins:
+-	@$(MAKE) -C src -f make/gcc.mak CC65_INC=\\\"${CC65INC}/\\\" CC65_LIB=\\\"${CC65LIB}/\\\"
++	@$(MAKE) -C src -f make/gcc.mak \
++	  CC65HOME=${CC65HOME} \
++	  LD65_LIB=${LD65_LIB} \
++	  LD65_OBJ=${LD65_OBJ} \
++	  LD65_CFG=${LD65_CFG} \
++	  CC65_INC=${CC65_INC} \
++	  CC65_ASM=${CC65_ASM}
+ 
+ libs:
+ 	@$(MAKE) -C libsrc
+@@ -87,14 +95,14 @@
+ uninstall:	install-test
+ 	cd $(bindir) && $(RM) ar65${EXT} ca65${EXT} cc65${EXT} cl65${EXT} \
+ 	  co65${EXT} da65${EXT} ld65${EXT} od65${EXT} grc${EXT} ca65html
+-	$(RM) -R $(CC65DATA) $(CC65DOC)
++	$(RM) -R $(CC65HOME) $(CC65DOC)
+ 
+ install:	install-test install-dirs install-bins install-libs install-docs
+ 	@echo
+-	@echo 'You can export some shell environment variables:'
++	@echo 'If you put the files to a non-standard directory,'
++	@echo 'you may need to export some shell environment variables:'
+ 	@echo
+-	@echo 'CC65_INC=$(CC65INC)'
+-	@echo 'CC65_LIB=$(CC65LIB)'
++	@echo 'CC65HOME=$(CC65HOME)'
+ 	@echo
+ 
+ .PHONY:	install-test
+@@ -114,21 +122,21 @@
+ 	[ -d $(docdir) ] || $(MKDIR) $(docdir)
+ 	[ -d $(libdir) ] || $(MKDIR) $(libdir)
+ 	[ -d $(CC65DOC) ] || $(MKDIR) $(CC65DOC)
+-	[ -d $(CC65DATA) ] || $(MKDIR) $(CC65DATA)
+-	[ -d $(CC65ASM) ] || $(MKDIR) $(CC65ASM)
+-	[ -d $(CC65LIB) ] || $(MKDIR) $(CC65LIB)
+-	[ -d $(CC65INC) ] || $(MKDIR) $(CC65INC)
+-	[ -d $(CC65INC)/em ] || $(MKDIR) $(CC65INC)/em
+-	[ -d $(CC65INC)/geos ] || $(MKDIR) $(CC65INC)/geos
+-	[ -d $(CC65INC)/joystick ] || $(MKDIR) $(CC65INC)/joystick
+-	[ -d $(CC65INC)/mouse ] || $(MKDIR) $(CC65INC)/mouse
+-	[ -d $(CC65INC)/sys ] || $(MKDIR) $(CC65INC)/sys
+-	[ -d $(CC65INC)/tgi ] || $(MKDIR) $(CC65INC)/tgi
+-	[ -d $(CC65DATA)/emd ] || $(MKDIR) $(CC65DATA)/emd
+-	[ -d $(CC65DATA)/joy ] || $(MKDIR) $(CC65DATA)/joy
+-	[ -d $(CC65DATA)/mou ] || $(MKDIR) $(CC65DATA)/mou
+-	[ -d $(CC65DATA)/ser ] || $(MKDIR) $(CC65DATA)/ser
+-	[ -d $(CC65DATA)/tgi ] || $(MKDIR) $(CC65DATA)/tgi
++	[ -d $(CC65HOME) ] || $(MKDIR) $(CC65HOME)
++	[ -d $(CC65_ASM) ] || $(MKDIR) $(CC65_ASM)
++	[ -d $(LD65_LIB) ] || $(MKDIR) $(LD65_LIB)
++	[ -d $(CC65_INC) ] || $(MKDIR) $(CC65_INC)
++	[ -d $(CC65_INC)/em ] || $(MKDIR) $(CC65_INC)/em
++	[ -d $(CC65_INC)/geos ] || $(MKDIR) $(CC65_INC)/geos
++	[ -d $(CC65_INC)/joystick ] || $(MKDIR) $(CC65_INC)/joystick
++	[ -d $(CC65_INC)/mouse ] || $(MKDIR) $(CC65_INC)/mouse
++	[ -d $(CC65_INC)/sys ] || $(MKDIR) $(CC65_INC)/sys
++	[ -d $(CC65_INC)/tgi ] || $(MKDIR) $(CC65_INC)/tgi
++	[ -d $(CC65HOME)/emd ] || $(MKDIR) $(CC65HOME)/emd
++	[ -d $(CC65HOME)/joy ] || $(MKDIR) $(CC65HOME)/joy
++	[ -d $(CC65HOME)/mou ] || $(MKDIR) $(CC65HOME)/mou
++	[ -d $(CC65HOME)/ser ] || $(MKDIR) $(CC65HOME)/ser
++	[ -d $(CC65HOME)/tgi ] || $(MKDIR) $(CC65HOME)/tgi
+ 
+ install-bins:
+ 	for f in ar65 ca65 cc65 cl65 co65 da65 ld65 od65 grc; \
+@@ -138,22 +146,22 @@
+ 
+ install-libs:
+ 	for f in asminc/*.inc; \
+-	  do $(INSTALL_DATA) $$f $(CC65ASM) || exit 1; \
++	  do $(INSTALL_DATA) $$f $(CC65_ASM) || exit 1; \
+ 	  done
+ 	for f in include/*.h; \
+-	  do $(INSTALL_DATA) $$f $(CC65INC) || exit 1; \
++	  do $(INSTALL_DATA) $$f $(CC65_INC) || exit 1; \
+ 	  done
+ 	for d in em geos joystick mouse sys tgi; \
+ 	  do for f in include/$$d/*.h; \
+-	    do $(INSTALL_DATA) $$f $(CC65INC)/$$d || exit 1; \
++	    do $(INSTALL_DATA) $$f $(CC65_INC)/$$d || exit 1; \
+ 	    done || exit 1; \
+ 	  done
+ 	for f in libsrc/*.lib; \
+-	  do $(INSTALL_DATA) $$f $(CC65LIB) || exit 1; \
++	  do $(INSTALL_DATA) $$f $(LD65_LIB) || exit 1; \
+ 	  done
+ 	for d in emd joy mou ser tgi; \
+ 	  do for f in libsrc/*.$$d; \
+-	    do $(INSTALL_DATA) $$f $(CC65DATA)/$$d || exit 1; \
++	    do $(INSTALL_DATA) $$f $(CC65HOME)/$$d || exit 1; \
+ 	    done || exit 1; \
+ 	  done
+ 
+diff -Naur cc65-snapshot-2.12.9.20090923/src/cc65/make/gcc.mak cc65-snapshot-2.12.9.20090923-paths/src/cc65/make/gcc.mak
+--- cc65-snapshot-2.12.9.20090923/src/cc65/make/gcc.mak	2009-08-31 19:17:18.000000000 +0200
++++ cc65-snapshot-2.12.9.20090923-paths/src/cc65/make/gcc.mak	2009-09-24 16:14:37.000000000 +0200
+@@ -18,7 +18,7 @@
+ CC65_INC = \"/usr/lib/cc65/include/\"
+ 
+ #
+-CFLAGS = -O2 -g -Wall -W -std=c89 -I$(COMMON) -DCC65_INC=$(CC65_INC)
++CFLAGS = -O2 -g -Wall -W -std=c89 -I$(COMMON) -DCC65_INC=\"$(CC65_INC)\"
+ CC=gcc
+ EBIND=emxbind
+ LDFLAGS=-lm
+diff -Naur cc65-snapshot-2.12.9.20090923/src/ld65/make/gcc.mak cc65-snapshot-2.12.9.20090923-paths/src/ld65/make/gcc.mak
+--- cc65-snapshot-2.12.9.20090923/src/ld65/make/gcc.mak	2009-09-18 21:00:24.000000000 +0200
++++ cc65-snapshot-2.12.9.20090923-paths/src/ld65/make/gcc.mak	2009-09-24 16:15:40.000000000 +0200
+@@ -17,7 +17,7 @@
+ 
+ #
+ CFLAGS = -g -O2 -Wall -W -std=c89 -I$(COMMON) 
+-CFLAGS += -DLD65_LIB=$(LD65_LIB) -DLD65_OBJ=$(LD65_OBJ) -DLD65_CFG=$(LD65_CFG)
++CFLAGS += -DLD65_LIB=\"$(LD65_LIB)\" -DLD65_OBJ=\"$(LD65_OBJ)\" -DLD65_CFG=\"$(LD65_CFG)\"
+ CC=gcc
+ EBIND=emxbind
+ LDFLAGS=
+

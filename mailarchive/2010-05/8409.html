@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Universal Makefile: Some a</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Universal Makefile: Some advanced magic wanted?" />
+<meta name="Date" content="2010-05-18" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Universal Makefile: Some advanced magic wanted?</h1>
+<!-- received="Tue May 18 21:21:35 2010" -->
+<!-- isoreceived="20100518192135" -->
+<!-- sent="Tue, 18 May 2010 21:21:28 +0200" -->
+<!-- isosent="20100518192128" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Universal Makefile: Some advanced magic wanted?" -->
+<!-- id="AANLkTikJmaiWqKFCyDYdXyNygtWs3h9OiccvJOJCPXFV@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="819DBD03-1D4A-4E2B-91F7-E108086DF55A&#64;wfmh.org.pl" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8410.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Universal Makefile: Some advanced magic wanted?&quot;">Next message</a> ]
+[ <a href="8408.html" title="maspethrose71aol.com: &quot;[cc65] TempC Last Try&quot;">Previous message</a> ]
+[ <a href="8328.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Universal Makefile: Some advanced magic wanted?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8410.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Universal Makefile: Some advanced magic wanted?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Universal%20Makefile:%20Some%20advanced%20magic%20wanted?">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-05-18 21:21:28</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt;&gt; After all it's just a proposal.
+
+&gt; And an interesting and tempting one, especially knowing that you can do such stuff with little finger of your left hand ;-) Let me try be more clear now: the answet is &quot;yes, please - only have the two points in head when structuring and commenting it&quot;.
+
+Here you go: <a href="http://www.pascalschmidt.de/Makefile">http://www.pascalschmidt.de/Makefile</a>
+
+Beside the structuring and commenting asked for I added another (and
+from my perspective final) &quot;magic&quot; of allowing to save and load the
+&quot;abstract&quot; options.
+
+Apart from leveraging Uz' soon-to-come new relative-include-path
+semantics this could be the final thing - at least when it's about
+making use of &quot;GNU make magic&quot;...
+
+Regards,
+Oliver
+
+-------------------------------------------------------------------------------------------
+
+PROGRAM :=
+CC65_TARGET :=
+
+SRCDIR :=
+OBJDIR :=
+
+CFLAGS  =
+ASFLAGS =
+LDFLAGS =
+
+EMULATOR := x64
+EMUFLAGS = -kernal kernal -VICIIdsize -keymap 1 +autostart-warp
+-soundsync 2 -autoload $(PROGRAM)
+
+###############################################################################
+### Abstract options and their mapping to cc65 (2.14.x) options             ###
+###############################################################################
+
+# Optimize for speed.
+define _optspeed_
+  CFLAGS += -Oris
+endef
+
+# Optimize for size.
+define _optsize_
+  CFLAGS += -Or
+endef
+
+# Generate assembler listings.
+define _listing_
+  CFLAGS += -l
+  REMOVES += $$(SRCDIR)/*.lst
+endef
+
+# Generate map file.
+define _mapfile_
+  LDFLAGS += -m $$&#64;&#46;<!--nospam-->map
+  REMOVES += $$(PROGRAM).map
+endef
+
+# Generate VICE label file.
+define _labelfile_
+  LDFLAGS += -Ln $$&#64;&#46;<!--nospam-->lbl
+  REMOVES += $$(PROGRAM).lbl
+endef
+
+### DO NOT EDIT BELOW THIS LINE, UNLESS YOU REALLY KNOW WHAT YOU ARE DOING! ###
+###############################################################################
+### Defaults to be used if nothing defined above                            ###
+###############################################################################
+
+# Presume we're in a project directory so name the program like the current
+# directory. Just set PROGRAM to override.
+ifeq ($(PROGRAM),)
+  PROGRAM := $(notdir $(CURDIR))
+endif
+
+# Presume the C64 target like the cl65 compile &amp; link utility does. Just set
+# CC65_TARGET to override.
+ifeq ($(CC65_TARGET),)
+  CC65_TARGET := c64
+endif
+
+# Presume the C and asm source files to be located in the subdirectory 'src'.
+# Just set SRCDIR to override.
+ifeq ($(SRCDIR),)
+  SRCDIR := src
+endif
+
+# Presume the object and dependency files to be located in the subdirectory
+# 'obj' (which will be created). Just set OBJDIR to override.
+ifeq ($(OBJDIR),)
+  OBJDIR := obj
+endif
+
+# On Windows it is mandatory to have CC65_HOME set. So do not unnecessarily
+# rely on cl65 being added to the PATH in this scenario.
+ifdef $(CC65_HOME)
+  CC := $(CC65_HOME)/bin/cl65
+else
+  CC := cl65
+endif
+
+###############################################################################
+### The magic begins                                                        ###
+###############################################################################
+
+# Set SOURCES to something like 'src/foo.c src/bar.s'.
+SOURCES := $(wildcard $(SRCDIR)/*.c)
+SOURCES += $(wildcard $(SRCDIR)/*.s)
+
+# Set OBJECTS to something like 'obj/foo.o obj/bar.o'.
+OBJECTS := $(addsuffix .o,$(basename $(SOURCES:$(SRCDIR)%=$(OBJDIR)%)))
+
+# Set DEPENDS to something like 'obj/foo.d obj/bar.d'.
+DEPENDS := $(OBJECTS:.o=.d)
+
+# Read saved OPTIONS from Makefile.options if none are set so far.
+ifeq ($(OPTIONS),)
+  -include Makefile.options
+  ifneq ($(OPTIONS),)
+    $(info Using saved OPTIONS=$(OPTIONS))
+  endif
+endif
+
+# Transform the abstract OPTIONS to the actual cc65 options.
+COMMA := ,
+SPACE := $(N/A) $(N/A)
+$(foreach o,$(subst $(COMMA),$(SPACE),$(OPTIONS)),$(eval $(_$o_)))
+
+.SUFFIXES:
+.PHONY: all clean save love
+all: $(PROGRAM)
+
+ifneq ($(MAKECMDGOALS),clean)
+  -include $(DEPENDS)
+endif
+
+$(OBJDIR):
+	mkdir $&#64;
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.c | $(OBJDIR)
+	$(CC) -t $(CC65_TARGET) -c --create-dep $(&#64;:&#46;<!--nospam-->o=.d) --include-dir
+$(SRCDIR) $(CFLAGS) -o $&#64; $&lt;
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.s | $(OBJDIR)
+	$(CC) -t $(CC65_TARGET) -c --create-dep $(&#64;:&#46;<!--nospam-->o=.d) --asm-include-dir
+$(SRCDIR) --asm-args --bin-include-dir,$(SRCDIR) $(ASFLAGS) -o $&#64; $&lt;
+
+$(PROGRAM): $(OBJECTS)
+	$(CC) -t $(CC65_TARGET) $(LDFLAGS) -o $&#64; $^
+
+test: $(PROGRAM)
+	$(EMULATOR) $(EMUFLAGS)
+
+clean:
+	rm -f $(OBJECTS) $(DEPENDS) $(PROGRAM) $(REMOVES)
+	rmdir $(OBJDIR)
+
+save:
+	-&#64;rm -f Makefile&#46;<!--nospam-->options
+	&#64;echo &quot;Saving OPTIONS=$(OPTIONS)&quot;
+	&#64;echo &quot;OPTIONS=$(OPTIONS)&quot; &gt; Makefile&#46;<!--nospam-->options
+
+love:
+	&#64;echo &quot;Not war, eh?&quot;
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue May 18 21:21:35 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8410.html" title="Next message in the list">silverdr1wfmh.org.pl: "Re: [cc65] Universal Makefile: Some advanced magic wanted?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8408.html" title="Previous message in the list">maspethrose71aol.com: "[cc65] TempC Last Try"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8328.html" title="Message to which this message replies">silverdr1wfmh.org.pl: "Re: [cc65] Universal Makefile: Some advanced magic wanted?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8410.html" title="Next message in this discussion thread">silverdr1wfmh.org.pl: "Re: [cc65] Universal Makefile: Some advanced magic wanted?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8410.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] Universal Makefile: Some advanced magic wanted?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8409" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8409" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8409" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-05-18 21:21:37 CEST
+</em></small></p>
+</body>
+</html>

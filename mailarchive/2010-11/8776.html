@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] ca65 for stand-alone asm p</title>
+<meta name="Author" content="Agent Friday (64subnet1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] ca65 for stand-alone asm projects" />
+<meta name="Date" content="2010-11-05" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] ca65 for stand-alone asm projects</h1>
+<!-- received="Fri Nov  5 22:34:42 2010" -->
+<!-- isoreceived="20101105213442" -->
+<!-- sent="Fri, 5 Nov 2010 14:34:33 -0700" -->
+<!-- isosent="20101105213433" -->
+<!-- name="Agent Friday" -->
+<!-- email="64subnet1gmail.com" -->
+<!-- subject="Re: [cc65] ca65 for stand-alone asm projects" -->
+<!-- id="AANLkTimYguk4UkwghmxxtV3_WCL08mk+=yGFZLzABMoM@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20101105212318.GB24357&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8777.html" title="Agent Friday: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">Next message</a> ]
+[ <a href="8775.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">Previous message</a> ]
+[ <a href="8775.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8777.html" title="Agent Friday: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Agent Friday &lt;<a href="mailto:64subnet1gmail.com?Subject=Re:%20[cc65]%20ca65%20for%20stand-alone%20asm%20projects">64subnet1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-11-05 22:34:33</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Fri, Nov 5, 2010 at 2:23 PM, Ullrich von Bassewitz wrote:
+&gt; On Fri, Nov 05, 2010 at 01:59:27PM -0700, Agent Friday wrote:
+&gt;&gt; As I see it, providing the load address really is about making
+&gt;&gt; sense as well.  The proper file format for a PRG type file on the
+&gt;&gt; Commodores machines--a loadable, executable file-- *always* includes
+&gt;&gt; a load address.  Without it, you can't really do anything with a
+&gt;&gt; machine language program file.
+&gt;
+&gt; You can make an EPROM out of it, load it into the floppy, use it as an overlay
+&gt; (Elite128 uses this technique a lot) or a driver and probably many more
+&gt; things.
+
+Yes, but it relies on the user providing the missing information.  It is
+inherently incomplete because, with rare exception, the code is only
+valid when loaded at the intended address.  Unless you enforce the
+(non-existent) rule that every object-form code segment be assembled
+to an origin of 0000, you don't even have enough info. to relocate or
+link it.  Technically, you could omit the first opcode byte and ask the
+user to supply it later (similar to undeleting a FAT file on a PC, I
+guess) and still be able to make use of it... but to me it makes no
+sense.
+
+I don't know anything about Elite 128, but I'm thinking that it can
+probably also deal with files containing the address.
+
+// Agent Friday
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Nov  5 22:34:42 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8777.html" title="Next message in the list">Agent Friday: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8775.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8775.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8777.html" title="Next message in this discussion thread">Agent Friday: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8777.html" title="Message sent in reply to this message">Agent Friday: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8776" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8776" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8776" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-11-05 22:34:45 CET
+</em></small></p>
+</body>
+</html>

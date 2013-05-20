@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: RE: [cc65] structure bug?</title>
+<meta name="Author" content="Mike McCarty (jmccarty_at_ssd.usa.alcatel.com)">
+<meta name="Subject" content="RE: [cc65] structure bug?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>RE: [cc65] structure bug?</h1>
+<!-- received="Fri May 25 15:22:13 2001" -->
+<!-- isoreceived="20010525132213" -->
+<!-- sent="Fri, 25 May 2001 08:21:49 -0500 (CDT)" -->
+<!-- isosent="20010525132149" -->
+<!-- name="Mike McCarty" -->
+<!-- email="jmccarty_at_ssd.usa.alcatel.com" -->
+<!-- subject="RE: [cc65] structure bug?" -->
+<!-- id="Pine.SOL.4.10.10105250811310.6033-100000@sun1307.ssd.usa.alcatel.com" -->
+<!-- inreplyto="1D2B2C77C9CF964EB1331ABEB51562E10271CD@ukntsvr2.uk.drte.com" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Mike McCarty (<a href="mailto:jmccarty_at_ssd.usa.alcatel.com?Subject=RE:%20[cc65]%20structure%20bug?"><em>jmccarty_at_ssd.usa.alcatel.com</em></a>)<br>
+<strong>Date:</strong> 2001-05-25 15:21:49
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0509.html">Ullrich von Bassewitz: "[cc65] Segments and banking"</a>
+<li><strong>Previous message:</strong> <a href="0507.html">shubel, paul: "RE: [cc65] structure bug?"</a>
+<li><strong>In reply to:</strong> <a href="0506.html">Mark Keates: "RE: [cc65] structure bug?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0507.html">shubel, paul: "RE: [cc65] structure bug?"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Fri, 25 May 2001, Mark Keates wrote:
+
+&gt; Hi,
+&gt; 
+&gt; &gt; In addition, ANSI disallows calculating pointers that 
+&gt; &gt; point outside of objects, so your code is not standard 
+&gt; &gt; compliant anyway.
+&gt; 
+&gt; True, just me being lazy I guess, I have a multi segment
+
+[snip]
+
+Not completely true. ANSI allows calculating pointers which point one
+element past the end of an array.
+
+I quote the Standard
+
+        6.3.6 Additive operators
+
+        ...
+
+        Moreover, if the expression P points to the last element of an
+        array object, the expression (P)+1 points one past the last
+        element of the array object, and if the expression Q points one
+        past the last element of an array object, the expression (Q)-1
+        points to the last element of the object.
+
+        ...
+
+        [When subtracting one pointer from another] Unless both
+        pointers point to elements of the same array object, or one
+        past the last element of the array object, the behavior is
+        undefined. [footnote 46: Another way to approach pointer
+        arithmetic is first to convert the pointer(s) to character
+        pointer(s): In this scheme the integral expression added to or
+        subtracted from the converted pointer is first multiplied by
+        the size of the object originally pointed to, and the resulting
+        pointer is converted back to the original type. For pointer
+        subtraction, the result of the difference between the original
+        character pointers is similarly divided by the size of the
+        object originally pointed to.
+
+        When viewed in this way, an implementation need only provide
+        one extra byte (which may overlap another object in the
+        program) just after the end of the object in order to satisfy
+        the &quot;one past the last element&quot; requirements.]
+
+Similar language occurs multiple times in the Standard.
+
+I realize that this may not apply in your circumstance (for some
+reason, this is the first message on this topic I have seen, others did
+not reach me), but it is important for understanding how the language
+works.
+
+Mike
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=RE:%20[cc65]%20structure%20bug?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0509.html">Ullrich von Bassewitz: "[cc65] Segments and banking"</a>
+<li><strong>Previous message:</strong> <a href="0507.html">shubel, paul: "RE: [cc65] structure bug?"</a>
+<li><strong>In reply to:</strong> <a href="0506.html">Mark Keates: "RE: [cc65] structure bug?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0507.html">shubel, paul: "RE: [cc65] structure bug?"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:40 CET</em>
+</em>
+</small>
+</body>
+</html>

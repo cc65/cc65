@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Please be patient... More </title>
+<meta name="Author" content="Payton Byrd (plbyrd1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] Please be patient... More questions" />
+<meta name="Date" content="2010-04-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Please be patient... More questions</h1>
+<!-- received="Fri Apr 23 00:30:51 2010" -->
+<!-- isoreceived="20100422223051" -->
+<!-- sent="Thu, 22 Apr 2010 17:30:06 -0500" -->
+<!-- isosent="20100422223006" -->
+<!-- name="Payton Byrd" -->
+<!-- email="plbyrd1gmail.com" -->
+<!-- subject="Re: [cc65] Please be patient... More questions" -->
+<!-- id="p2t1adf4c761004221530p669ad30bp97d0bdfc1ce9d3bc@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="l2y1adf4c761004221516w2632ede0s97c44c6b13d7d76&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8108.html" title="Steve Davison: &quot;[cc65] declaring variables after code&quot;">Next message</a> ]
+[ <a href="8106.html" title="Payton Byrd: &quot;Re: [cc65] Please be patient... More questions&quot;">Previous message</a> ]
+[ <a href="8106.html" title="Payton Byrd: &quot;Re: [cc65] Please be patient... More questions&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8129.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Please be patient... More questions&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Payton Byrd &lt;<a href="mailto:plbyrd1gmail.com?Subject=Re:%20[cc65]%20Please%20be%20patient...%20More%20questions">plbyrd1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-04-23 00:30:06</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Thu, Apr 22, 2010 at 5:16 PM, Payton Byrd &lt;plbyrd&#64;gmail&#46;<!--nospam-->com&gt; wrote:
+
+&gt; OK, I got Uz's example working and now I'm trying to push the envelope a
+&gt; big.  The SCRORG routine sets the X and Y registers with the dimensions of
+&gt; the screen in addition to setting the width in the Accumulator.  So, I've
+&gt; updated my method signature to:
+&gt;
+&gt; unsigned char getScreenSize(
+&gt; unsigned char* x,
+&gt; unsigned char* y)
+&gt;
+&gt; After calling the kernel routine, what is the preferred method for reading
+&gt; the values of the registers into variables (in this case the x and y
+&gt; parameters)?  I found the *regs* struct but it doesn't seem to be used in
+&gt; any of the examples, so I'm not quite sure what's the best way to use it.
+&gt;  My initial attempts have failed (I'll save posting the code to avoid
+&gt; massive embarrassment at the complete fail).
+&gt;
+
+I've managed to figure this out using the _sys function.  Just for
+posterity's sake, here's my solution:
+
+#if defined(__C128__)
+unsigned char getScreenSize(
+ unsigned char* x,
+unsigned char* y)
+{
+ struct regs r;
+r.pc = SCRORG;
+
+_sys(&amp;r);
+ (*x) = r.x + 1;
+(*y) = r.y + 1;
+
+return r.a;
+}
+#endif
+
+-- 
+Payton Byrd
+&lt;<a href="http://www.paytonbyrd.com">http://www.paytonbyrd.com</a>&gt;
+&lt;<a href="http://it.toolbox.com/blogs/paytonbyrd">http://it.toolbox.com/blogs/paytonbyrd</a>&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Apr 23 00:30:51 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8108.html" title="Next message in the list">Steve Davison: "[cc65] declaring variables after code"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8106.html" title="Previous message in the list">Payton Byrd: "Re: [cc65] Please be patient... More questions"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8106.html" title="Message to which this message replies">Payton Byrd: "Re: [cc65] Please be patient... More questions"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8129.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Please be patient... More questions"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8107" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8107" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8107" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-04-23 00:30:53 CEST
+</em></small></p>
+</body>
+</html>

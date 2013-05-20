@@ -1,0 +1,242 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Another wish: Unsized Arr</title>
+<meta name="Author" content="Spiro Trikaliotis (trik-news_at_gmx.de)">
+<meta name="Subject" content="Re: [cc65] Another wish: Unsized Arrays in Structures">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Another wish: Unsized Arrays in Structures</h1>
+<!-- received="Thu Jan 23 10:42:07 2003" -->
+<!-- isoreceived="20030123094207" -->
+<!-- sent="Thu, 23 Jan 2003 10:42:06 +0100" -->
+<!-- isosent="20030123094206" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="trik-news_at_gmx.de" -->
+<!-- subject="Re: [cc65] Another wish: Unsized Arrays in Structures" -->
+<!-- id="013b01c2c2c3$b11e7610$a3192c8d@cs.unimagdeburg.de" -->
+<!-- inreplyto="3E2FB32B.9C1248E@web.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Spiro Trikaliotis (<a href="mailto:trik-news_at_gmx.de?Subject=Re:%20[cc65]%20Another%20wish:%20Unsized%20Arrays%20in%20Structures"><em>trik-news_at_gmx.de</em></a>)<br>
+<strong>Date:</strong> 2003-01-23 10:42:06
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2335.html">Tim Schürmann: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<li><strong>In reply to:</strong> <a href="2335.html">Tim Schürmann: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2337.html">Tim Schürmann: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<li><strong>Next in thread:</strong> <a href="2333.html">David Holz: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<li><strong>Reply:</strong> <a href="2337.html">Tim Schürmann: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hallo Tim,
+
+Tim Schürmann schrieb:
+
+&gt; Spiro Trikaliotis schrieb:
+&gt;
+&gt; &gt; Groepaz: There is a difference. In your code, TestStruct contains
+&gt; &gt; a pointer to some area. This is not true with Christian's wanted
+&gt; &gt; solution.
+&gt; &gt;
+&gt; &gt; Look at this:
+&gt; &gt;
+&gt; &gt; TestStruct *a = malloc(sizeof(TestStruct)+sizeof(unsigned char)*100);
+&gt;
+&gt; &gt; With this, you get a TestStruct which contains 100 elements (0..99)
+&gt; &gt; [in case the 0 does not work, and David's suggestion has to be applied,
+&gt; &gt; it is 101, ie., 0..100].
+&gt;
+&gt;
+&gt; Sorry, but i don't understand your argumentation.
+&gt; What you got there is, that TestStruct points to a beginning of the
+&gt; allocated memory of 1 TestStruct (why do you &quot;malloc&quot; the TestStruct?
+&gt; TestStruct already exist)
+
+well, the type TestStruct exists, but there isn't memory for it.
+
+Look at my definition:
+
+&gt; &gt; TestStruct *a = malloc(sizeof(TestStruct)+sizeof(unsigned char)*100);
+
+I only define a pointer to a TestStruct (TestStruct *) named a. For this,
+I reserve the memory for the TestStruct plus 100 bytes at the end.
+
+This is not true for Groepaz solution: Here, you reserve memory for the
+TestStruct (which contains x Bytes for a pointer to a buffer of chars!)
+plus the 100 bytes at the end. This is x bytes more.
+
+&gt; plus 100 Elements of unsigned char. So, does data
+&gt; point automaticly to the right allocated &quot;char-Memory&quot;? If this is true,
+&gt; the same line should work with Groepaz solution.
+
+No, there is no pointer to the right allocated &quot;char-memory&quot;. In fact,
+you do not need anymore pointer.
+
+Look at this:
+
+With my solution, the TestStruct looks like
+
+ +-----------------------+
+ | unsigned char width   |
+ +-----------------------+
+ | unsigned char height  |
+ +-----------------------+
+ | unsigned char data[0] |
+ +-----------------------+
+ | unsigned char data[1] |
+ +-----------------------+
+ | unsigned char data[2] |
+ +-----------------------+
+ | ...      ...  ...     |
+ .                       .
+ .                       .
+ .                       .
+ | ...      ...  ...     |
+ +-----------------------+
+ | unsigned char data[99]|
+ +-----------------------+
+}
+
+With groepaz' solution, you have
+
+ +-----------------------+
+ | unsigned char width   |
+ +-----------------------+
+ | unsigned char height  |
+ +-----------------------+
+ | unsigned char *data   |    ----------------------------+
+ +-----------------------+                                |
+                                                          |
+You have to reserve memory for data separately, so        |
+you get some more memory:                                 |
+                                                          |
+ +-----------------------+                                |
+ | unsigned char _[0]    |   &lt;----------------------------+
+ +-----------------------+
+ | unsigned char _[1]    |
+ +-----------------------+
+ | unsigned char _[2]    |
+ +-----------------------+
+ | ...      ...  ...     |
+ .                       .
+ .                       .
+ .                       .
+ | ...      ...  ...     |
+ +-----------------------+
+ | unsigned char _[99]   |
+ +-----------------------+
+
+&gt; My C-Standard book (german version of Kernighan and Richie) says, that
+&gt;
+&gt; char a[];
+&gt; and
+&gt; char *a;
+&gt;
+&gt; are the same. Arrays acts like pointers (btw: are arrays realised as
+&gt; pointers?). That's why you could write a[i] or *(a+i) and if pa is a
+&gt; pointer and a the array you can do
+&gt; pa=a
+&gt; and
+&gt; pa++
+&gt; to get the next element.
+
+*sigh* The old array vs. pointer discussion...
+
+No, pointer and arrays are not (always) the same. In this case, the are not.
+They appear to be the same because C defines an implicit cast from
+an array to a pointer.
+
+1. char a[];
+and
+2. char *a;
+
+seem to be the same, yes. Both defined something named &quot;a&quot; where I can
+put something into. Both don't reserve memory for the things to store -
+it seems, but this is not true! While 1. doesn't reserve any memory,
+with 2., there is memory reserved for one pointer. So, while the
+compiler just knows at compile time where the storage (none) for a is
+located , it doesn't for a in 2. With 2, whenever a is used, the compiled
+program has to dereference the pointer. It does not have to do so with
+a, since it does know where the storage for a is.
+
+One has to remark that with 1., the programme has to make sure that there
+is enough memory after a for something to be stored. You cannot be sure
+if you use automatic or global variables, but in the case of the structs,
+you can be (well, almost...)
+
+Another example which might help:
+
+Look at this:
+
+struct {
+   char is_byte[0];
+   int  is_int;
+};
+
+Although this is *not* good programming practice, you can use it to
+get each byte of an int (I assume 32 bit ints here).
+
+Assume we have a low-endian machine, then
+is_byte[0] is the lowest        byte of is_int
+is_byte[1] is the lower-middle  byte of is_int
+is_byte[2] is the higher-middle byte of is_int
+is_byte[3] is the highest       byte of is_int
+
+This assumes that the fields of the struct are not rearranged, and there
+is no padding involved, this is the reason I would call it bad programming
+practice. But it works (at least, on most machines/compilers)!
+
+I hope this clarifies a little bit,
+   Spiro.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Another%20wish:%20Unsized%20Arrays%20in%20Structures">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2335.html">Tim Schürmann: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<li><strong>In reply to:</strong> <a href="2335.html">Tim Schürmann: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2337.html">Tim Schürmann: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<li><strong>Next in thread:</strong> <a href="2333.html">David Holz: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<li><strong>Reply:</strong> <a href="2337.html">Tim Schürmann: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-01-23 10:42:12 CET</em>
+</em>
+</small>
+</body>
+</html>

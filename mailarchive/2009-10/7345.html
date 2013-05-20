@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Colormania (was: TGI summary)</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] Colormania (was: TGI summary)" />
+<meta name="Date" content="2009-10-27" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Colormania (was: TGI summary)</h1>
+<!-- received="Tue, 27 Oct 2009 12:55:10 +0100" -->
+<!-- isoreceived="20091027115510" -->
+<!-- sent="Tue, 27 Oct 2009 12:55:10 +0100" -->
+<!-- isosent="20091027115510" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] Colormania (was: TGI summary)" -->
+<!-- id="f97798c20910270455q33d6f698jf56baf649730beb3@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7346.html" title="Oliver Schmidt: &quot;Re: [cc65] Re: TGI summary (Atari update)&quot;">Next message</a> ]
+[ <a href="7344.html" title="Karri Kaksonen: &quot;Re: [cc65] Atari __RESERVED_MEMORY__&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7348.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Colormania (was: TGI summary)&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Colormania%20(was:%20TGI%20summary)">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-10-27 12:55:10</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Daniel,
+
+&gt; I think some conventions could be enforced:
+&gt;
+&gt; * The default palette should be (approximately) the same in all drivers:
+&gt;  0 = black
+&gt;  1 = white
+&gt;  2 = ....
+&gt;
+&gt; * If the driver has no palette, it can emulate the above by replacing the
+&gt;  indexes in setcolor.
+&gt;
+&gt; This should made the program output to look similar if the palette is not
+&gt; changed.
+
+After thinking about this for a while I see some potential in the approach:
+
+
+1. The TGI kernel presumes that color values run from 0 to
+num-of-colors -1. This poses a problem if a single platform has
+several drivers with different color depth - especially because white
+is alwasy present, often used but tends to be the color with the
+highest values for each driver.
+
+Such a platform can define their color macros starting with black = 0
+and white = 1 for monochrome drivers, then assign the values 2 - 7 to
+the remaining colors of 3-bit drivers and then assign the values 8 -
+15 to the remaining colors of 4-bit drivers.
+
+Then the macros can work for all drivers of that platform :-)
+
+From the driver perspective this means that a non-palette
+non-monochrome driver does a table lookup in SETCOLOR (and GETPIXEL).
+
+A palette driver sets a default palette according to the values.
+Additionally - and this seems to me the important aspect missing in
+the OP above - the driver does a table lookup for every palette entry
+in SETPALETTE (and GETPALETTE) !
+
+An example: A 4-bit driver uses value $F for white. COLOR_WHITE is
+defined as 1. Now we want to set an &quot;inverse&quot; monochrome palette (like
+tgidemo does) using:
+
+    unsigned char Palette[2] = { COLOR_WHITE, COLOR_BLACK };
+
+Then SETPALETTE needs to convert i.e. Palette[0] from '1' to '$F'
+because here the ambivalence of the color macros being both indexes
+and color values shows up.
+
+
+2. Under 1.) I was explicitly talking about a single platform with
+several drivers. But if the approach is extended to all TGI drivers
+then we can have a shared set of color macros - but what's the actual
+benefit?
+
+If a program sets the palette (again from tgidemo):
+
+    unsigned char Palette[2] = { COLOR_WHITE, COLOR_ORANGE };
+
+then with shared color macros it can use those two colors with
+tgi_setcolor (COLOR_BLACK) for white and with tgi_setcolor
+(COLOR_WHITE) for orange because it is guaranteed that the two macros
+have the values 0 and 1. But is this really useful? I don't think so.
+A program setting a palette should then just use tgi_setcolor (0) and
+tgi_setcolor (1) to adress the two palette entries it has set before.
+
+
+Conclusion:
+
+- Platforms with issues due to conflicting TGI driver (and proably
+conio) color values can decide to do a &quot;runtime color mapping&quot; a laid
+out above.
+
+- At least I personally don't see an addional benefit of aligning the
+color values of all platforms (although it would be nice to have a
+large set of aligned color _names_).
+
+- I personally will likely implement the &quot;runtime color mapping&quot; in
+the Apple2 lores driver to get rid of the LORES_XX macros.
+
+
+And what about tgidemo?
+
+- The original code just presumed palettes to be available.
+
+- I modified the code to have it run on non-palette drivers, although
+the code then just falls back to black and white (which is btw good
+for non-palette nonochrome drivers).
+
+- If we wanted color support on non-palette drivers it would look
+something like:
+
+unsigned char bg = COLOR_WHITE;
+unsigned char fg = COLOR_ORANGE;
+
+unsigned char pal[2] = { bg, fg };
+tgi_setpalette (pal);
+if (! tgi_geterror ()) {
+  bg = 0;
+  fg = 1;
+}
+...
+tgi_setcolor(bg);
+...
+tgi_setcolor(fg);
+
+
+Comments?
+
+Best, Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue, 27 Oct 2009 12:55:10 +0100</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7346.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Re: TGI summary (Atari update)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7344.html" title="Previous message in the list">Karri Kaksonen: "Re: [cc65] Atari __RESERVED_MEMORY__"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7348.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Colormania (was: TGI summary)"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7348.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Colormania (was: TGI summary)"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7345" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7345" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7345" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-10-27 12:55:21 CET
+</em></small></p>
+</body>
+</html>

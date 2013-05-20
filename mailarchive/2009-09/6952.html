@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Secondary linker configuration</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="[cc65] Secondary linker configurations" />
+<meta name="Date" content="2009-09-21" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Secondary linker configurations</h1>
+<!-- received="Mon Sep 21 14:13:57 2009" -->
+<!-- isoreceived="20090921121357" -->
+<!-- sent="Mon, 21 Sep 2009 14:12:19 +0200" -->
+<!-- isosent="20090921121219" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="[cc65] Secondary linker configurations" -->
+<!-- id="20090921121219.GA32675@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6953.html" title="Karri Kaksonen: &quot;Re: [cc65] Secondary linker configurations&quot;">Next message</a> ]
+[ <a href="6951.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Problem compiling Fields 1.2.1/C64 on snapshot 2009-09-19&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6953.html" title="Karri Kaksonen: &quot;Re: [cc65] Secondary linker configurations&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Secondary%20linker%20configurations">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-09-21 14:12:19</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+Based on an idea from Oliver, there may now be &quot;secondary&quot; linker configs for
+a platform. Actually, the implementation had mostly been in the linker, but
+Oliver had the idea to use it this way.
+
+What this means: There are quite a few platforms that could make use of more
+linker scripts for other configurations. Think of a 32KB VIC20 config, or a
+C64 config without the SYS header that may be used to load programs to $C000
+or whatever.
+
+While it was easily possible to create and use a custom linker script, and
+some even came with cc65, it was a barrier for inexperienced or new users.
+Having additional linker configurations that feel like they're built into the
+linker would simplify things.
+
+So the linker will now come with a separate directory for linker config files,
+and has the search path for config files set to this directory (for platforms
+where the installer is capable of doing so). You can then use additional
+config files that come with cc65 like they were builtin. Just call the linker
+with &quot;-C config-file&quot; and all other tools with &quot;-t platform&quot;. 
+
+cl65 does also support this feature: You can call it with both, -t and -C and
+it will pass -C to the linker and -t to all other tools. All secondary config
+files are named platform-something.cfg, so they're easily identifyable. To
+build a program using the (hypothetical) vic20-32k.cfg file, use
+
+        cl65 -O -t vic20 -C vic20-32k.cfg hello.c
+
+An important difference to the state before is that the additional linker
+config files are part of cc65, so they're maintained and adjusted for new
+versions if necessary.
+
+To make this work, the linker has an additional enviroment variable LD65_CFG
+that points to the config directory. The linux RPMs will come with a compiled
+in directory, the windows .exe installer will set that variable for you, so in
+most cases you won't notice it's there. Depending on how you install cc65, you
+may need to set that variable to make the feature work.
+
+In the past, I've usually rejected additional linker config files, because
+their use was difficult. Now, this is not necessarily true any longer. So I
+would like to invite you to send me your custom linker configs, provided that
+they cover an often used case. I would especially be interested in the 32K
+config for the VIC20 - I remember that someone talked about it or even sent it
+to me, but I don't have it.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Sep 21 14:13:57 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6953.html" title="Next message in the list">Karri Kaksonen: "Re: [cc65] Secondary linker configurations"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6951.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Problem compiling Fields 1.2.1/C64 on snapshot 2009-09-19"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6953.html" title="Next message in this discussion thread">Karri Kaksonen: "Re: [cc65] Secondary linker configurations"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6953.html" title="Message sent in reply to this message">Karri Kaksonen: "Re: [cc65] Secondary linker configurations"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6962.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] Secondary linker configurations"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6952" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6952" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6952" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-09-21 14:13:59 CEST
+</em></small></p>
+</body>
+</html>

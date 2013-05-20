@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] c64 question</title>
+<meta name="Author" content="Mike McCarty (jmccarty_at_ssd.usa.alcatel.com)">
+<meta name="Subject" content="Re: [cc65] c64 question">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] c64 question</h1>
+<!-- received="Mon Mar 19 21:27:12 2001" -->
+<!-- isoreceived="20010319202712" -->
+<!-- sent="Mon, 19 Mar 2001 14:26:24 -0600 (CST)" -->
+<!-- isosent="20010319202624" -->
+<!-- name="Mike McCarty" -->
+<!-- email="jmccarty_at_ssd.usa.alcatel.com" -->
+<!-- subject="Re: [cc65] c64 question" -->
+<!-- id="Pine.SOL.4.10.10103191420400.16438-100000@sun1307.ssd.usa.alcatel.com" -->
+<!-- inreplyto="20010319211608.B10504@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Mike McCarty (<a href="mailto:jmccarty_at_ssd.usa.alcatel.com?Subject=Re:%20[cc65]%20c64%20question"><em>jmccarty_at_ssd.usa.alcatel.com</em></a>)<br>
+<strong>Date:</strong> 2001-03-19 21:26:24
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0454.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<li><strong>Previous message:</strong> <a href="0452.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<li><strong>In reply to:</strong> <a href="0452.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0454.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<li><strong>Reply:</strong> <a href="0454.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Mon, 19 Mar 2001, Ullrich von Bassewitz wrote:
+
+&gt; 
+&gt; On Mon, Mar 19, 2001 at 01:25:43PM -0600, Mike McCarty wrote:
+&gt; &gt; &gt; But that's another 4 cycles for each and every stack operation. C is
+&gt; &gt; &gt; quite stack intensive.
+&gt; &gt;
+&gt; &gt; Depends on how it is implemented.
+&gt; 
+&gt; I remember having discussed this some time ago. Anyway...
+
+Yes, I was on vacation last week.
+
+&gt; 4 cycles is the time needed to execute a cli/sei pair. So it would be really
+&gt; interesting to see an implementation needing less than this. And a &quot;perfect&quot;
+
+Well, some implementations don't use a stack unless necessary, but
+rather implement arguments to routines which do not *need* to be
+re-entrant (most of them, in my experience) as statically allocated
+locations. In this case, there is no stack manipulation, hence no need
+to disable interrupts.
+
+&gt; implementation would not assume that interrupts are enabled on entry, so the
+&gt; flags register has to be saved and restored later, which makes it 9 cycles
+&gt; instead of just 4.
+
+Yes, I thought as much.
+
+&gt; &gt; Also, one could use a pragma to turn on/off the extra code.
+&gt; 
+&gt; Since the code is buried in the library, a #pragma would not work. One would
+
+I don't see why not. The compiler could emit code to jump/call
+different library entry points.
+
+&gt; have to generate and maintain two different libraries to link against. Each
+&gt; platform would need an additional library file.
+
+Err? Two different libraries? If the linker is capable of linking in
+only routines actually used, then separate entry points with different
+names are all that is necessary. And both of the entry points could be
+built by conditional assembly/compilation from a single source.
+
+&gt; Maybe I would give it a second thought if there weren't a better solution.
+&gt; I've already suggested to use a wrapper function, and there's already an
+&gt; implementation of it. Ok, it's for the BRK stuff instead of IRQ, but this is
+&gt; really similar. The wrapper solution has none of the disadvantages mentioned,
+&gt; and it is easy to use and to maintain. So why not use it?
+
+Well, that enters into a whole other realm of questioning. I saw
+questions about feasibility and run time cycles, not preferences.
+
+Mike
+----
+char *p=&quot;char *p=%c%s%c;main(){printf(p,34,p,34);}&quot;;main(){printf(p,34,p,34);}
+This message made from 100% recycled bits.
+I can explain it for you, but I can't understand it for you.
+I don't speak for Alcatel      &lt;- They make me say that.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20c64%20question">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0454.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<li><strong>Previous message:</strong> <a href="0452.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<li><strong>In reply to:</strong> <a href="0452.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0454.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<li><strong>Reply:</strong> <a href="0454.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:39 CET</em>
+</em>
+</small>
+</body>
+</html>

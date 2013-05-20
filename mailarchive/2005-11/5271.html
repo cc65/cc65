@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Strange things happen with</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Strange things happen with segments after BSS" />
+<meta name="Date" content="2005-11-18" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Strange things happen with segments after BSS</h1>
+<!-- received="Fri Nov 18 17:47:09 2005" -->
+<!-- isoreceived="20051118164709" -->
+<!-- sent="Fri, 18 Nov 2005 17:46:57 +0100" -->
+<!-- isosent="20051118164657" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Strange things happen with segments after BSS" -->
+<!-- id="20051118164657.GA19768@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="17277.56140.147972.14327&#64;panini.cling.gu.se" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5272.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] &quot;--feature labels_without_colons&quot; not always working with 2.11.0?&quot;">Next message</a> ]
+[ <a href="5270.html" title="MagerValp: &quot;[cc65] Strange things happen with segments after BSS&quot;">Previous message</a> ]
+[ <a href="5270.html" title="MagerValp: &quot;[cc65] Strange things happen with segments after BSS&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5273.html" title="MagerValp: &quot;Re: [cc65] Strange things happen with segments after BSS&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Strange%20things%20happen%20with%20segments%20after%20BSS">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-11-18 17:46:57</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Fri, Nov 18, 2005 at 02:46:52PM +0100, MagerValp wrote:
+&gt; ld65 bug? The workaround is simple (change BSS to type = rw), but it
+&gt; took me a while to figure out what the problem was the first time it
+&gt; bit me.
+
+That sounds strange and I cannot reproduce anything like that here. The only
+difference between the &quot;bss&quot; and &quot;rw&quot; types is that &quot;bss&quot; is not written to
+the file. Since the memory area is filled afterwards, and bss is the last
+segment, this should have an identical effect.
+
+Are the differences in the output file also in the map file?
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Nov 18 17:47:09 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5272.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] &quot;--feature labels_without_colons&quot; not always working with 2.11.0?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5270.html" title="Previous message in the list">MagerValp: "[cc65] Strange things happen with segments after BSS"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5270.html" title="Message to which this message replies">MagerValp: "[cc65] Strange things happen with segments after BSS"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5273.html" title="Next message in this discussion thread">MagerValp: "Re: [cc65] Strange things happen with segments after BSS"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5273.html" title="Message sent in reply to this message">MagerValp: "Re: [cc65] Strange things happen with segments after BSS"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5271" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5271" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5271" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-11-18 17:47:14 CET
+</em></small></p>
+</body>
+</html>

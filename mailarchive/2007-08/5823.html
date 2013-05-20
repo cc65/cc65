@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Java VM built with cc65</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] Java VM built with cc65" />
+<meta name="Date" content="2007-08-08" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Java VM built with cc65</h1>
+<!-- received="Wed Aug  8 01:28:32 2007" -->
+<!-- isoreceived="20070807232832" -->
+<!-- sent="Wed, 8 Aug 2007 01:28:12 +0200" -->
+<!-- isosent="20070807232812" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] Java VM built with cc65" -->
+<!-- id="f97798c20708071628iac5ee68o66d67150b21dc300@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5824.html" title="Dan: &quot;Re: [cc65] Java VM built with cc65&quot;">Next message</a> ]
+[ <a href="5822.html" title="stefan: &quot;Re: [cc65] Unresolved external 'utsteax' referenced&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5824.html" title="Dan: &quot;Re: [cc65] Java VM built with cc65&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Java%20VM%20built%20with%20cc65">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-08-08 01:28:12</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+I just posted the usenet article further below. Here some additional
+inside information for you:
+
+The NanoVM of course isn't a certifyable Java SE implementation.
+Instead it has some interesting properties for a cc65 project:
+
+- All float/math stuff can be configured away.
+- All datatypes can be configured to be 15/16 bit instead of 31/32 bit.
+- There's no recursion so 'static-locals' can be used project-wide.
+- One Java program can optionally be &quot;built&quot; into the VM so file I/O
+isn't obligatory.
+
+Performance currently isn't that great so the NanoVM could be a nice
+vehicle for testing cc65 optimization improvements...
+
+I was granted write access to the NanoVM CVS repository for doing the
+cc65 port and could therefore commit all necessary changes into the
+main codeline. The NanoVM owner Till Harbaum has built his own C64
+Ethernet card to use with Contiki
+(<a href="http://www.harbaum.org/till/c64/index.shtml">http://www.harbaum.org/till/c64/index.shtml</a>). So my presumption is
+that the cc65 support in NanoVM is here to stay (aka maintained).
+
+I could imagine that the NanoVM would be a nice new entry in the
+&quot;Projects&quot; section of the cc65 web site - wouldn't it?
+
+BTW: The Contiki URL should be changed from
+- <a href="http://www.sics.se/~adam/contiki/">http://www.sics.se/~adam/contiki/</a>
+to
+- <a href="http://www.sics.se/contiki/">http://www.sics.se/contiki/</a>
+
+Best, Oliver
+
+----------
+
+Hi,
+
+I successfully ported the NanoVM (www.harbaum.org/till/nanovm/) to the
+cc65 toolchain (www.cc65.org).
+
+It's a very minimalistic Java implementation written in portable C.
+The binary built with cc65 is only 16kB.
+
+The NanoVM source is available via anonymous CVS access at
+SourceForge.net (sourceforge.net/projects/nanovm/).
+
+To allow you easy access I created a zip file
+(www.jantzer-schmidt.de/nanovm-cc65.zip) containing:
+
+1. The tool necessary to convert .class files into an .nvm file to be
+loaded by the NanoVM in case you want to create your own Java
+programs.
+
+2. An Apple2 .dsk image file containing the NanoVM binary together
+with some samples. Type 'EXEC &lt;TXT File&gt; to run one of the sample Java
+programs.
+
+3. A C64 .d64 image file containing the NanoVM binary together with
+some samples. Type 'RUN:REM &lt;NVM File&gt; to run one of the sample Java
+programs.
+
+The source of the sample Java programs can be viewed  via CVS
+repository browsing
+(nanovm.cvs.sourceforge.net/nanovm/nanovm/java/examples/).
+
+Best, Oliver
+
+----------
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Aug  8 01:28:32 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5824.html" title="Next message in the list">Dan: "Re: [cc65] Java VM built with cc65"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5822.html" title="Previous message in the list">stefan: "Re: [cc65] Unresolved external 'utsteax' referenced"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5824.html" title="Next message in this discussion thread">Dan: "Re: [cc65] Java VM built with cc65"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5824.html" title="Message sent in reply to this message">Dan: "Re: [cc65] Java VM built with cc65"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5823" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5823" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5823" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-08-08 01:28:43 CEST
+</em></small></p>
+</body>
+</html>

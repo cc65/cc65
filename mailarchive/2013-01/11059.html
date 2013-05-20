@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] ca65, 65816 and far label poin</title>
+<meta name="Author" content="Vince Weaver (vince1deater.net)" />
+<meta name="Subject" content="[cc65] ca65, 65816 and far label pointers" />
+<meta name="Date" content="2013-01-08" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] ca65, 65816 and far label pointers</h1>
+<!-- received="Tue Jan  8 21:55:18 2013" -->
+<!-- isoreceived="20130108205518" -->
+<!-- sent="Tue, 8 Jan 2013 15:49:21 -0500 (EST)" -->
+<!-- isosent="20130108204921" -->
+<!-- name="Vince Weaver" -->
+<!-- email="vince1deater.net" -->
+<!-- subject="[cc65] ca65, 65816 and far label pointers" -->
+<!-- id="alpine.DEB.2.02.1301081544330.26270@pianoman.cluster.toy" -->
+<!-- charset="US-ASCII" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11060.html" title="silverdr1wfmh.org.pl: &quot;Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)&quot;">Next message</a> ]
+[ <a href="11058.html" title="Brad Smith: &quot;Re: [cc65] Request for feature: Compression of RODATA Segment&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="11064.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65, 65816 and far label pointers&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Vince Weaver &lt;<a href="mailto:vince1deater.net?Subject=Re:%20[cc65]%20ca65,%2065816%20and%20far%20label%20pointers">vince1deater.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2013-01-08 21:49:21</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello
+
+I'm a long time user of the ca65 assembler for Apple II work (thanks!).
+
+Recently I've started some SNES 65816 assembly programming using ca65.
+
+I'm trying to use the &quot;LDA&quot; instruction with the Absolute Long Indexed, X
+addressing mode.  I can't seem to get it to work.  It would look something 
+like this:
+
+          lda     logo_begin,x
+
+where logo_begin was forced to be a 24-bit value.
+
+Does ca65 have some sort of syntax for &quot;forcing&quot; a 24-bit label in an 
+instruction like this?
+
+Currently I am using
+ 
+        .byte $bf
+        .faraddr logo_begin
+
+which works but obviously doesn't look as nice.
+
+Thanks,
+Vince Weaver
+vince&#64;deater&#46;<!--nospam-->net
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Jan  8 21:55:18 2013</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11060.html" title="Next message in the list">silverdr1wfmh.org.pl: "Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="11058.html" title="Previous message in the list">Brad Smith: "Re: [cc65] Request for feature: Compression of RODATA Segment"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="11064.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] ca65, 65816 and far label pointers"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="11064.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] ca65, 65816 and far label pointers"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#11059" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#11059" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#11059" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2013-01-08 21:55:23 CET
+</em></small></p>
+</body>
+</html>

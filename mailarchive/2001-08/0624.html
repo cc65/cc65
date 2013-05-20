@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] Graphics library</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] Graphics library">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] Graphics library</h1>
+<!-- received="Mon Aug 13 21:31:52 2001" -->
+<!-- isoreceived="20010813193152" -->
+<!-- sent="Mon, 13 Aug 2001 21:31:05 +0200" -->
+<!-- isosent="20010813193105" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] Graphics library" -->
+<!-- id="1144265328.20010813213105@gmx.net" -->
+<!-- inreplyto="20010813211100.A1163@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20Graphics%20library"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2001-08-13 21:31:05
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0625.html">Ullrich von Bassewitz: "Re: [cc65] Graphics library"</a>
+<li><strong>Previous message:</strong> <a href="0623.html">Ullrich von Bassewitz: "Re: [cc65] Graphics library"</a>
+<li><strong>In reply to:</strong> <a href="0623.html">Ullrich von Bassewitz: "Re: [cc65] Graphics library"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0625.html">Ullrich von Bassewitz: "Re: [cc65] Graphics library"</a>
+<li><strong>Reply:</strong> <a href="0625.html">Ullrich von Bassewitz: "Re: [cc65] Graphics library"</a>
+<li><strong>Reply:</strong> <a href="0645.html">daniel pralle: "Re: Re[2]: [cc65] Graphics library"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+UvB&gt; To be honest, I don't expect too many programs that are able to adjust to
+UvB&gt; different graphics modes at runtime, since the overhead for such a program
+UvB&gt; (different maxx, maxy, color count, aspect ratio) will usually be too high for
+UvB&gt; a 6502 machine. The C64 (and maybe some other machines) has additional
+UvB&gt; limitations, for example in the 4 color mode, one of the four colors cannot
+UvB&gt; change within a 8x8 character cell. It is quite difficult to write portable
+UvB&gt; programs with these limitations.
+
+UvB&gt; I'm currently writing a first version of the graphics.h header file. If you
+UvB&gt; have any more suggestions, please keep them coming. I will leave for a few
+UvB&gt; days tomorrow and finish the API when I'm back, using your comments.
+
+i think a function to query all available modes would be nice to
+have... any gfx-app written in C and using a standard-gfx lib will
+turn out to be slow as hell anyways ;=D
+
+as for me, i'd like to implement 2 additional gfx-modes besides
+standard hires (320x200 b/w that is) ... 80x50x4 colors (simelar to
+the 4x4 fli mode often used in demos, but a lot faster) and 40x25x256
+shades of grey (fastest mode possible on a c64... this one should
+perform somewhat fast even when wrapped into clumsy c-code ;=))
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20Graphics%20library">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20Graphics%20library">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0625.html">Ullrich von Bassewitz: "Re: [cc65] Graphics library"</a>
+<li><strong>Previous message:</strong> <a href="0623.html">Ullrich von Bassewitz: "Re: [cc65] Graphics library"</a>
+<li><strong>In reply to:</strong> <a href="0623.html">Ullrich von Bassewitz: "Re: [cc65] Graphics library"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0625.html">Ullrich von Bassewitz: "Re: [cc65] Graphics library"</a>
+<li><strong>Reply:</strong> <a href="0625.html">Ullrich von Bassewitz: "Re: [cc65] Graphics library"</a>
+<li><strong>Reply:</strong> <a href="0645.html">daniel pralle: "Re: Re[2]: [cc65] Graphics library"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:41 CET</em>
+</em>
+</small>
+</body>
+</html>

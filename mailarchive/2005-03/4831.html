@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] printf for ca65</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] printf for ca65" />
+<meta name="Date" content="2005-03-24" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] printf for ca65</h1>
+<!-- received="Thu Mar 24 11:29:55 2005" -->
+<!-- isoreceived="20050324102955" -->
+<!-- sent="Thu, 24 Mar 2005 11:29:52 +0100" -->
+<!-- isosent="20050324102952" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] printf for ca65" -->
+<!-- id="20050324102952.GA13735@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="16961.17580.166047.997515&#64;panini.cling.gu.se" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4832.html" title="MagerValp: &quot;Re: [cc65] printf for ca65&quot;">Next message</a> ]
+[ <a href="4830.html" title="Shawn Jefferson: &quot;[cc65] Atari executables w/ AtariMax flashcart&quot;">Previous message</a> ]
+[ <a href="4829.html" title="MagerValp: &quot;Re: [cc65] printf for ca65&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4832.html" title="MagerValp: &quot;Re: [cc65] printf for ca65&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20printf%20for%20ca65">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-03-24 11:29:52</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Wed, Mar 23, 2005 at 11:27:56AM +0100, MagerValp wrote:
+&gt; Thanks! I don't suppose 2.10.2 or 2.11 is on the horizon?
+
+Actually, 3.0 has been on the horizon for quite some time now:-) I'm waiting
+for myself to make some final changes to the preprocessor, but it seems I'm
+too lazy. Seriously: There's not much left, and once I hit the road it should
+be done in a weekend or so. There are also contributions, which are not quite
+finished.
+
+&gt; What about using .define:s? Or can't they be redefined inside macros?
+
+No, unfortunately not. Even if they could, they could not be redefined twice,
+and something like this would be needed.
+
+&gt; There are a number of solutions for this (longbranch, change
+&gt; &#64;error to the non-local checkgeomerror, and so on), but some way of
+&gt; saying &quot;any &#64;error, I don't care which one&quot; (%error? #error? :) would
+&gt; make the source prettier, and generate shorter code.
+&gt;
+&gt; Crazy idea?
+
+How about adding a new opcode
+
+    BAA - BRANCH AS APPROPRIATE
+
+in the style of
+
+    <a href="http://www.geocities.com/HotSprings/Spa/8672/light/gflops.htm">http://www.geocities.com/HotSprings/Spa/8672/light/gflops.htm</a>
+
+:-)
+
+IMHO it is a dangerous feature. Adding new code could break independent old
+code, and this is usually a very good reason against a new feature. Assume
+that you don't touch your code for a year or so, and then need to add new
+code. You add another subroutine, but forget that there are some &quot;branch to
+the nearest XXX&quot; instructions in the existing code. Unfortunately, your new
+code uses the same label names (&quot;&#64;error&quot; is a quite common label name) and
+*boom* - the old code stops working.
+
+When using real scopes instead of cheap local labels, you can access the error
+labels within such a scope:
+
+  .proc checkgeom
+        ...
+        clc
+        rts
+
+  error:
+        sec
+        rts
+
+  .endproc
+
+  .proc findrootdir
+        lda vol_fatsize
+        cmp #32
+        beq findroot32
+
+  findroot16:
+        asl io_buf + $16        ; multiply fatsize by two
+        rol io_buf + $17        ; possible overflow?
+-&gt;      bcs checkgeom::error    ; Because findrootdir::error is out of reach
+
+        ...
+
+  .endproc
+
+It would be possible to make &#64;-labels accessible the same way&#46;<!--nospam--> I've considered
+that when extending the scoping rules some time ago, but decided against it,
+because it breaks the meaning of &quot;cheap local symbols&quot; somehow. If &#64;-labels
+have the same features as other scoped symbols, the question why they're
+necessary is unavoidable:-) If there is a really good reason, the feature
+could be added without much hazzle, so your error labels could be accessed
+like this:
+
+        bcs checkgeom::&#64;error
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Mar 24 11:29:55 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4832.html" title="Next message in the list">MagerValp: "Re: [cc65] printf for ca65"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4830.html" title="Previous message in the list">Shawn Jefferson: "[cc65] Atari executables w/ AtariMax flashcart"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4829.html" title="Message to which this message replies">MagerValp: "Re: [cc65] printf for ca65"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4832.html" title="Next message in this discussion thread">MagerValp: "Re: [cc65] printf for ca65"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4832.html" title="Message sent in reply to this message">MagerValp: "Re: [cc65] printf for ca65"</a></li>
+<li><dfn>Reply</dfn>:  <a href="4856.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Re: [cc65] printf for ca65"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4831" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4831" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4831" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-03-24 11:30:12 CET
+</em></small></p>
+</body>
+</html>

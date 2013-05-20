@@ -1,0 +1,38 @@
+#
+# Same function, only shorter.
+#
+# <soci@c64.rulez.org> Kajtar Zsolt 14.03.2010
+#
+diff -urN cc65-snapshot-2.13.9.20100309/libsrc/cbm/filename.s cc65-snapshot-2.13.9.20100309.new/libsrc/cbm/filename.s
+--- cc65-snapshot-2.13.9.20100309/libsrc/cbm/filename.s	2009-02-22 15:11:34.000000000 +0100
++++ cc65-snapshot-2.13.9.20100309.new/libsrc/cbm/filename.s	2010-03-14 11:30:39.979074369 +0100
+@@ -158,13 +158,13 @@
+ 
+ fncomplete:
+ 	pha	   		; Save mode
+-        jsr     fnaddcomma      ; Add a comma
+         lda     __filetype
+-        jsr     fnadd           ; Add the type
++        jsr     fnaddmode       ; Add the type
+         pla
+ fnaddmode:
+         pha
+-        jsr     fnaddcomma
++        lda     #','
++        jsr     fnadd
+         pla
+ 
+ fnadd:  ldx     fnlen
+@@ -172,10 +172,6 @@
+         sta     fnbuf,x
+         rts
+ 
+-fnaddcomma:
+-        lda     #','
+-        bne     fnadd
+-
+ ;--------------------------------------------------------------------------
+ ; Data
+ 
+
+

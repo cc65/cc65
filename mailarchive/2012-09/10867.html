@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] ld65 warning</title>
+<meta name="Author" content="Payton Byrd (plbyrd1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] ld65 warning" />
+<meta name="Date" content="2012-09-17" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] ld65 warning</h1>
+<!-- received="Mon Sep 17 18:14:40 2012" -->
+<!-- isoreceived="20120917161440" -->
+<!-- sent="Mon, 17 Sep 2012 11:14:08 -0500" -->
+<!-- isosent="20120917161408" -->
+<!-- name="Payton Byrd" -->
+<!-- email="plbyrd1gmail.com" -->
+<!-- subject="Re: [cc65] ld65 warning" -->
+<!-- id="CAJm6qqeFXP_H48vffgPXB8LRF-KLMp+9fUF9DP5hZf4QCbjOag@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="CAOQ5ps63xVx8yVq7T=TKRP8_ku41TobkaTbLoKzkA=q5T3i7YA&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10868.html" title="Sandro Mestre: &quot;Re: [cc65] ld65 warning&quot;">Next message</a> ]
+[ <a href="10866.html" title="Sandro Mestre: &quot;[cc65] ld65 warning&quot;">Previous message</a> ]
+[ <a href="10866.html" title="Sandro Mestre: &quot;[cc65] ld65 warning&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10868.html" title="Sandro Mestre: &quot;Re: [cc65] ld65 warning&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Payton Byrd &lt;<a href="mailto:plbyrd1gmail.com?Subject=Re:%20[cc65]%20ld65%20warning">plbyrd1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-09-17 18:14:08</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Mon, Sep 17, 2012 at 11:07 AM, Sandro Mestre &lt;san.mes&#64;gmail&#46;<!--nospam-->com&gt; wrote:
+
+&gt; Can someone help me understand what this warning means: ld65.exe: Warning:
+&gt; Segment `CODE' in module `v2.obj' requires larger alignment . What I am
+&gt; doing that prompts this warning?
+&gt;
+&gt; My CODE segment is taking memory from $800 to $dff.
+&gt;
+&gt; This is my cfg file:
+&gt;
+&gt; MEMORY {
+&gt;&gt;     ZP:  start = $0002, size = $00fe, type = rw;
+&gt;&gt;     RAM: start = $07fe, size = $f801, fill = yes, file = %O;
+&gt;&gt; }
+&gt;&gt;
+&gt;
+You're telling the linker to create a single file with $f801 bytes because
+of the fill = yes.  If you don't want all of the memory in that range in
+the file then make that fill = no.  If you need segments filled, you will
+need to define multiple memory segments and output them to the same file,
+but fill them as necessary.
+
+
+
+&gt;
+&gt;&gt; SEGMENTS {
+&gt;&gt;     CABECEIRAPRG: load = RAM, type = ro;
+&gt;&gt;     CODE:     load = RAM,type = ro;
+&gt;&gt;     ECRAS: load RAM, start = $3000, type = ro;
+&gt;&gt;     STILES: load RAM, start = $4000, type = ro;
+&gt;&gt;
+&gt;&gt;
+&gt;&gt;     BORDADURA: load = RAM, start = $7000, type = ro;
+&gt;&gt;     BORDADURASRAM: load = RAM, start = $7900, type = ro;
+&gt;&gt;     BORDADURACRAM: load = RAM, start = $7c00, type = ro;
+&gt;&gt;     TILES: load = RAM, start = $8400, type = ro;
+&gt;&gt;     TILESCRAM: load = RAM, start = $8c00, type = ro;
+&gt;&gt;     TILESSRAM: load = RAM, start = $8d00, type = ro;
+&gt;&gt;
+&gt;&gt;     SRAM: load = RAM, start = $c000, type = ro;
+&gt;&gt;
+&gt;&gt;     SPR: load = RAM, start = $d000, type = ro;
+&gt;&gt;     SPR2: load = RAM, start = $d080, type = ro;
+&gt;&gt;
+&gt;&gt;     BITMAP: load = RAM, start = $e000, type = ro;
+&gt;&gt;
+&gt;&gt;
+&gt;&gt;     #ZEROPAGE: load = ZP,  type = zp;
+&gt;&gt;     #RODATA:   load = RAM, type = ro;
+&gt;&gt;     #DATA:     load = RAM, type = rw;
+&gt;&gt;
+&gt;&gt; }
+&gt;&gt;
+&gt;
+&gt; Thx
+&gt;
+
+
+
+-- 
+Payton Byrd
+&lt;<a href="http://www.paytonbyrd.com">http://www.paytonbyrd.com</a>&gt;
+&lt;<a href="http://it.toolbox.com/blogs/paytonbyrd">http://it.toolbox.com/blogs/paytonbyrd</a>&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Sep 17 18:14:40 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10868.html" title="Next message in the list">Sandro Mestre: "Re: [cc65] ld65 warning"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10866.html" title="Previous message in the list">Sandro Mestre: "[cc65] ld65 warning"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10866.html" title="Message to which this message replies">Sandro Mestre: "[cc65] ld65 warning"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10868.html" title="Next message in this discussion thread">Sandro Mestre: "Re: [cc65] ld65 warning"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10868.html" title="Message sent in reply to this message">Sandro Mestre: "Re: [cc65] ld65 warning"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10867" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10867" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10867" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-09-17 18:14:43 CEST
+</em></small></p>
+</body>
+</html>

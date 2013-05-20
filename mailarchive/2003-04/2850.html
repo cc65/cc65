@@ -1,0 +1,175 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] RS232 question</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] RS232 question">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] RS232 question</h1>
+<!-- received="Sun Apr 13 13:16:05 2003" -->
+<!-- isoreceived="20030413111605" -->
+<!-- sent="Sun, 13 Apr 2003 13:16:01 +0200" -->
+<!-- isosent="20030413111601" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] RS232 question" -->
+<!-- id="20030413111601.GA25768@trixie.musoftware.de" -->
+<!-- inreplyto="20030412210624.GA27699@spektr.localdomain" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20RS232%20question"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-04-13 13:16:01
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2849.html">Robert Steinmetz: "Re: [cc65] RS232 question"</a>
+<li><strong>In reply to:</strong> <a href="2847.html">Maciej Witkowiak: "Re: [cc65] RS232 question"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2849.html">Robert Steinmetz: "Re: [cc65] RS232 question"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi,
+
+thanks for all the comments!
+
+On Sat, Apr 12, 2003 at 11:06:24PM +0200, Maciej Witkowiak wrote:
+&gt; Anyway, I'd opt for having only one driver at a time, but with option for more
+&gt; than one port (two for simplicity). E.g. only DUART on IDE64 or only 16551
+&gt; (AFAIR it has two ports) or only two 6551s (at different I/O base addresses).
+
+Passing a port number to the driver is exactly what causes the overhead
+described in my last mail. So if I want to avoid the overhead, I have to
+
+  * either drop the option for multiple ports,
+
+  * or find another solution for passing the port number.
+
+And as a sidenote: The 16551 has one just port, but there are similar and more
+modern chips that have more ports, larger FIFOs and higher baud rates.
+
+On Sun, Apr 13, 2003 at 12:43:50AM +0200, Groepaz wrote:
+&gt; the question is ... isnt the case that one would want to use two ports at a
+&gt; time so special that it is desireable to pollute the library with it...
+
+Good point. I would hate to introduce overhead that doesn't give any benefits
+for almost 100% of all applications.
+
+On Sat, Apr 12, 2003 at 06:47:06PM -0500, Robert Steinmetz wrote:
+&gt; Since I mentioned the Apple ][, and since the Apple ][ generally uses
+&gt; smart serial ports and since there appears to be no rs232 support in the
+&gt; cc65 libraries for the Apple ][, does the Apple ][ case need to be
+&gt; considered?
+
+Of course I could ignore the Apple (or other machines) when making decisions
+that have a considerable impact. But it's not a good idea. The goal of making
+the RS232 driver a module is to
+
+  * simplify writing drivers,
+
+  * allow third parties to supply drivers for special hardware,
+
+  * allow program authors to support hardware that isn't even known when
+    the program gets written, and
+
+  * to allow users to replace/add drivers, so new hardware can be used with an
+    application without special application support.
+
+As you can see, the concept of loadable drivers contains nothing that is
+machine specific. So it's a good idea to at least consider the capabilities of
+all supported machines to avoid ruling out something that may limit someone
+later.
+
+&gt; It also seems that if the libraries for the Apple][ could allow 2 (or
+&gt; more) instances of the drivers could be loaded or the multiple support
+&gt; be implemented in the Apple ][ library, then the problem is reduced to a
+&gt; specific architecture.
+
+There won't be any special Apple libraries besides the actual driver. If you
+look at the existing libraries, you will notice that the machine dependent
+library parts are as small as possible. While this needs more brain work when
+doing the design, it has several advantages:
+
+  * The differences between the platforms are minimized, so porting programs
+    between platforms becomes easier.
+
+  * Less code has to be written, tested and maintained. I'm no longer able to
+    test the complete library, simply because I don't have the knowledge about
+    the different platforms, the hardware or whatever. If most of the code is
+    shared between the platforms, the chance to break one specific platform
+    library is quite small, because most of the code is tested when testing
+    another platform. If one platform has a huge platform specific library,
+    chances are that some change elsewhere breaks this library without anyone
+    taking notice.
+
+What this means is that any feature that is not in the API now, may not be
+supported by any of the platforms later. If the serial API doesn't support
+more than one port at the same time, this is true for *all* platforms.
+
+----------------------------------------------------------------------------
+
+I do agree with Maciej that higher port speeds are more important than support
+for more than one port. So what I will do now is to allow just one driver with
+support for one port. From what was said, it is clear that passing a port
+number to the get and put functions has too much overhead, so another solution
+is needed. The only other solution with almost zero overhead I can see now is
+to add separate functions for the different ports (for example rs232_get2,
+rs232_put2). Fortunately, adding a second port in this way will not break
+existing code, so this can be added later if necessary.
+
+Thanks again for your comments!
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20RS232%20question">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20RS232%20question">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2849.html">Robert Steinmetz: "Re: [cc65] RS232 question"</a>
+<li><strong>In reply to:</strong> <a href="2847.html">Maciej Witkowiak: "Re: [cc65] RS232 question"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2849.html">Robert Steinmetz: "Re: [cc65] RS232 question"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-04-13 13:16:27 CEST</em>
+</em>
+</small>
+</body>
+</html>

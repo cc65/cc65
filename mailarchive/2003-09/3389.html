@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] code generation</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] code generation">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] code generation</h1>
+<!-- received="Mon Sep 15 11:59:11 2003" -->
+<!-- isoreceived="20030915095911" -->
+<!-- sent="Mon, 15 Sep 2003 11:59:08 +0200" -->
+<!-- isosent="20030915095908" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] code generation" -->
+<!-- id="20030915095908.GB20030@trixie.musoftware.de" -->
+<!-- inreplyto="200309150105.01669.groepaz@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20code%20generation"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-09-15 11:59:08
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3388.html">Groepaz: "Re: [cc65] code generation"</a>
+<li><strong>In reply to:</strong> <a href="3388.html">Groepaz: "Re: [cc65] code generation"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3393.html">Groepaz: "Re: [cc65] code generation"</a>
+<li><strong>Next in thread:</strong> <a href="3377.html">Maciej Witkowiak: "Re: [cc65] Optimizing C code"</a>
+<li><strong>Reply:</strong> <a href="3393.html">Groepaz: "Re: [cc65] code generation"</a>
+<li><strong>Reply:</strong> <a href="3394.html">Groepaz: "Re: [cc65] code generation"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Mon, Sep 15, 2003 at 01:05:01AM +0200, Groepaz wrote:
+&gt; a real true
+&gt; recursive macro expansion can probably do the job though :)
+
+Your proposal will work with some efforts provided that macros are implemented
+recursively - which they currently aren't.
+
+&gt; mmmh well... IMHO every optimization that does both decrease codesize and
+&gt; increase execution speed at the same time (as the immidiate lda/ora etc
+&gt; merging does) is worth the trouble. yes it probably does only save a few
+&gt; bytes, admittedly it even saves only a few bytes in code where i exploit
+&gt; certain special cases.
+
+You will have to live with non perfect code if you're using a C compiler. And
+if I add several hundred lines of C code to the compiler just to remove 5
+bytes out of an 8K project written for a 6502 platform, the disadvantages are
+far greater than the advantages.
+
+&gt; tjam, and i find it kinda hard to make any figures about how &quot;worthy&quot; a
+&gt; certain optimization is :=P
+
+&gt; it really depends on your testprogram what kind
+&gt; of possibly optimizations you will even spot - and even then the value of a
+&gt; removed instruction may raise and fall with that particular instruction
+&gt; beeing in the most inner loop of your program or not :)
+
+cc65 is not a highly optimizing compiler and it will never be one (at least
+not in the next few years). One reason is the implementation of the compiler
+(generating explicit parse trees and intermediate code would be needed), the
+second one is the strange architecture of the 6502. So you will have to live
+with the fact that cc65 generated code will always be suboptimal. I know this
+is hard, I'm myself working with (other) compilers where I have to avoid
+looking at the generated code because this makes me very unhappy:-)
+
+&gt; some of the things that happen here may be really specific, i dont know....but
+&gt; actually i dont really think so - i am just copying some techniques that i am
+&gt; used to from assembler coding :) (and amazingly lot of the compiler generated
+&gt; code looks like what i would probably write when doing plain asm....after a
+&gt; peephole run with opt65 that is :=P)
+
+So why not send me an example of this code snippet together with the generated
+assembler code and a few numbers that say something like &quot;26 occurences in a
+626 line real world program, 513 bytes saved&quot;? It is not that I refuse to add
+additional peephole steps, I just want to have a reason for doing so.
+
+&gt; ouch! i wouldnt have expected that here really.... uhmz :=P the assignment
+&gt; somehow suggests that it doesnt touch Y at all (even if in reality it cant
+&gt; really avoid using it)
+
+Which is the reason why there is no __Y__ and __X__:-) If you need explicit
+loads of these registers, use inline assembly, so you are in control of all
+the code.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20code%20generation">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20code%20generation">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3388.html">Groepaz: "Re: [cc65] code generation"</a>
+<li><strong>In reply to:</strong> <a href="3388.html">Groepaz: "Re: [cc65] code generation"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3393.html">Groepaz: "Re: [cc65] code generation"</a>
+<li><strong>Next in thread:</strong> <a href="3377.html">Maciej Witkowiak: "Re: [cc65] Optimizing C code"</a>
+<li><strong>Reply:</strong> <a href="3393.html">Groepaz: "Re: [cc65] code generation"</a>
+<li><strong>Reply:</strong> <a href="3394.html">Groepaz: "Re: [cc65] code generation"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-09-15 11:59:38 CEST</em>
+</em>
+</small>
+</body>
+</html>

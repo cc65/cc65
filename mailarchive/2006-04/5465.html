@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Bug with cputc('\n&quot;); or </title>
+<meta name="Author" content="Markus Stehr (bastetfurry1ircnet.de)" />
+<meta name="Subject" content="[cc65] Bug with cputc('\n&quot;); or my dumbness ;) [scanned]" />
+<meta name="Date" content="2006-04-05" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Bug with cputc('\n&quot;); or my dumbness ;) [scanned]</h1>
+<!-- received="Wed Apr  5 23:04:54 2006" -->
+<!-- isoreceived="20060405210454" -->
+<!-- sent="Wed, 05 Apr 2006 23:04:34 +0200" -->
+<!-- isosent="20060405210434" -->
+<!-- name="Markus Stehr" -->
+<!-- email="bastetfurry1ircnet.de" -->
+<!-- subject="[cc65] Bug with cputc('\n&quot;); or my dumbness ;) [scanned]" -->
+<!-- id="1144271074.21971.5.camel@localhost.localdomain" -->
+<!-- inreplyto="20060405183052.GB10064&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5466.html" title="Groepaz: &quot;Re: [cc65] Optimization for size&quot;">Next message</a> ]
+[ <a href="5464.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Optimization for size&quot;">Previous message</a> ]
+[ <a href="5464.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Optimization for size&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5467.html" title="Groepaz: &quot;Re: [cc65] Bug with cputc('\n&quot;); or my dumbness ;) [scanned]&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Markus Stehr &lt;<a href="mailto:bastetfurry1ircnet.de?Subject=Re:%20[cc65]%20Bug%20with%20cputc('\n&amp;quot;);%20or%20my%20dumbness%20;)%20[scanned]">bastetfurry1ircnet.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2006-04-05 23:04:34</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+Either i discovered a bug or i am just stupid.
+
+Code:
+  for(y=0;y&lt;MAPMAX_Y+1;y++)
+    {
+    for(x=0;x&lt;MAPMAX_X+1;x++)
+      cputc(x+0x30);
+    cputc('\n');
+    }
+
+This 'should' output a nice 20x20 cube with some stuff, but &quot;\n&quot; in
+cputc doesnt seem to reset the collumn.
+So he happily prints in the next line but still on the same x-position.
+
+Any ideas?
+
+Markus
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Apr  5 23:04:54 2006</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5466.html" title="Next message in the list">Groepaz: "Re: [cc65] Optimization for size"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5464.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Optimization for size"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5464.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Optimization for size"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5467.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] Bug with cputc('\n&quot;); or my dumbness ;) [scanned]"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5467.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] Bug with cputc('\n&quot;); or my dumbness ;) [scanned]"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5465" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5465" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5465" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2006-04-05 23:04:58 CEST
+</em></small></p>
+</body>
+</html>

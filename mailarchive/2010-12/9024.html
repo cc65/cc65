@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] String Literal Segment in </title>
+<meta name="Author" content="Greg King (greg.king41verizon.net)" />
+<meta name="Subject" content="Re: [cc65] String Literal Segment in C code" />
+<meta name="Date" content="2010-12-03" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] String Literal Segment in C code</h1>
+<!-- received="Fri Dec  3 10:29:11 2010" -->
+<!-- isoreceived="20101203092911" -->
+<!-- sent="Fri, 03 Dec 2010 02:33:51 -0500" -->
+<!-- isosent="20101203073351" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king41verizon.net" -->
+<!-- subject="Re: [cc65] String Literal Segment in C code" -->
+<!-- id="007101cb92cc$83ac9360$6803bf47@monarch" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="AANLkTi=SswK8WNyELribG4xBNbXuyaU15SPhXCHau2WY&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9025.html" title="Greg King: &quot;Re: [cc65] Forced imports by linker config&quot;">Next message</a> ]
+[ <a href="9023.html" title="Groepaz: &quot;Re: [cc65] C64: CKOUT followed by printf&quot;">Previous message</a> ]
+[ <a href="9021.html" title="Agent Friday: &quot;Re: [cc65] String Literal Segment in C code&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9039.html" title="Agent Friday: &quot;Re: [cc65] String Literal Segment in C code&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king41verizon.net?Subject=Re:%20[cc65]%20String%20Literal%20Segment%20in%20C%20code">greg.king41verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-12-03 08:33:51</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: &quot;Agent Friday&quot;; on Thurs., Dec. 02, 2010; at 09:19 PM -0500
+&gt;
+&gt;&gt; On Thu, Dec 2, 2010 at 8:18 AM, Greg King wrote:
+&gt;&gt; The reason for that need is that strings aren't put into the output
+&gt;&gt; until the entire source file has been compiled. Then, all of the
+&gt;&gt; strings are merged and dumped, as a block. In your example, you had
+&gt;&gt; _two_ #pragma rodataseg() lines; cc65 used the last one!
+&gt;
+&gt; Wow!  So, rodataseg is a module-wide setting.  Good to know.
+&gt;
+&gt; Almost seems like the second use of that pragma within a module
+&gt; should generate a warning, since it's not likely doing what the
+&gt; author intended.
+
+Only strings work that way!  Other const data is put into the output, as
+soon as it is seen.  So, multiple pragmas can be useful.  Also, Uz
+recently added a &quot;#pragma local-strings()&quot; to cc65.  It can generate
+strings in the same immediate way that other const data is handled.  I
+didn't mention it because modularity is a much more useful method, in
+Joseph's case.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Dec  3 10:29:11 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9025.html" title="Next message in the list">Greg King: "Re: [cc65] Forced imports by linker config"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9023.html" title="Previous message in the list">Groepaz: "Re: [cc65] C64: CKOUT followed by printf"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9021.html" title="Message to which this message replies">Agent Friday: "Re: [cc65] String Literal Segment in C code"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9039.html" title="Next message in this discussion thread">Agent Friday: "Re: [cc65] String Literal Segment in C code"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9039.html" title="Message sent in reply to this message">Agent Friday: "Re: [cc65] String Literal Segment in C code"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9024" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9024" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9024" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-12-03 10:29:14 CET
+</em></small></p>
+</body>
+</html>

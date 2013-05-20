@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Atari Disk Image Tool ?</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Atari Disk Image Tool ?" />
+<meta name="Date" content="2010-09-28" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Atari Disk Image Tool ?</h1>
+<!-- received="Tue Sep 28 13:20:47 2010" -->
+<!-- isoreceived="20100928112047" -->
+<!-- sent="Tue, 28 Sep 2010 13:20:37 +0200" -->
+<!-- isosent="20100928112037" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Atari Disk Image Tool ?" -->
+<!-- id="AANLkTingNLOR2oZpxOEcVZXn_e5qM31Yek9hCgB2VfKL@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="9D3BA49E9CF24FF0A76D5BF9C3EA020F&#64;ORANGE2" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8630.html" title="Dan Winslow: &quot;RE: [cc65] Atari Disk Image Tool ?&quot;">Next message</a> ]
+[ <a href="8628.html" title="Oliver Schmidt: &quot;Re: [cc65] Atari Memory Layout&quot;">Previous message</a> ]
+[ <a href="8623.html" title="Shawn Jefferson: &quot;RE: [cc65] Atari Disk Image Tool ?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8631.html" title="Christian Grössler: &quot;Re: [cc65] Atari Disk Image Tool ?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Atari%20Disk%20Image%20Tool%20?">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-09-28 13:20:37</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt;&gt; If I have several binaries on a disk the user should be able to easily
+&gt;&gt; choose from do I have to do something special to meet Atari user
+&gt;&gt; expectations?
+
+&gt; Loading programs from disk with DOS is well-known... same as the LOAD
+&gt; &quot;*&quot;,8,1 thing the C64 folks do.  You can put all sorts of menu's, etc.. but
+&gt; there's no need.  The savvy users will build their own, or put your program
+&gt; on hard drive anyway.
+
+Just to make sure I'm not getting this wrong. The &quot;standard&quot; way to
+run a cc65 program using DOS 2.5 is the L option from the &quot;DOS menu&quot; -
+correct? If the program ends then a message 'need mem.sav to load this
+file' is printed and then the DOS menu comes up again. Is this the
+expected experience?
+
+If I omit DUP.SYS from a DOS 2.5 disk then the emulator tells me that
+the Atari crashed. If I omit DUP.SYS from a disk containing a
+STARTUP.SYS, then that program gets successufully loaded. However when
+the program ends, there's again the crash. From that I deduct that
+(beside DOS.SYS) DUP.SYS is more or less obligatory (at least for DOS
+2.5) - correct?
+
+For the Apple2 I've created a C library function named
+rebootafterexit(). If it is called at some time then exiting the cc65
+program some time later will not try to get back into DOS but will
+rather reboot the machine. Maybe something like this would be feasable
+/ would makes sense for the Atari too. Then omitting DUP.SYS would
+work - but maybe I'm missing some point...
+
+Thanks,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Sep 28 13:20:47 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8630.html" title="Next message in the list">Dan Winslow: "RE: [cc65] Atari Disk Image Tool ?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8628.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Atari Memory Layout"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8623.html" title="Message to which this message replies">Shawn Jefferson: "RE: [cc65] Atari Disk Image Tool ?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8631.html" title="Next message in this discussion thread">Christian Grössler: "Re: [cc65] Atari Disk Image Tool ?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8631.html" title="Message sent in reply to this message">Christian Grössler: "Re: [cc65] Atari Disk Image Tool ?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8629" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8629" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8629" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-09-28 13:20:51 CEST
+</em></small></p>
+</body>
+</html>

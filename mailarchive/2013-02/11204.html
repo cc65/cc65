@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Banking out Kernal</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Banking out Kernal" />
+<meta name="Date" content="2013-02-16" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Banking out Kernal</h1>
+<!-- received="Sat Feb 16 14:48:08 2013" -->
+<!-- isoreceived="20130216134808" -->
+<!-- sent="Sat, 16 Feb 2013 14:47:59 +0100" -->
+<!-- isosent="20130216134759" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Banking out Kernal" -->
+<!-- id="CACT=u71WWgQ5R3o=eON85yJGO0F-Put7aRVgy=ZmGjeA=wvPRA@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20130216125803.104810&#64;gmx.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11205.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Banking out Kernal&quot;">Next message</a> ]
+[ <a href="11203.html" title="Stefan: &quot;[cc65] Banking out Kernal&quot;">Previous message</a> ]
+[ <a href="11203.html" title="Stefan: &quot;[cc65] Banking out Kernal&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="11205.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Banking out Kernal&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Banking%20out%20Kernal">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2013-02-16 14:47:59</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt; I would prefer a header file with two forward declarations
+
+Prefer over what? I'd help if you were somewhat more specific ;-)
+
+&gt; void switch_rom_off (void) and
+&gt; void switch_rom_on (void) (or even macros)
+&gt; so that the programmer can decide by himself when to switch the memory configuration.
+
+That's so far part of one of my proposals.
+
+&gt; This way one could design the program so, that all functions which call kernal routines are side by side eachother and one needs only to switch memory configuration before all these calls and after.
+
+How is a C programmer supposed to know which function calls Kernal
+routines? How is the fact that a function calls Kernal routines to
+stay fixed over cc65 releases - otherwise programs which used to work
+start to break when built with later releases? How is Uz supposed to
+handle the questions regarding this magic?
+
+&gt; Anything else would bloat the library unnecessary.
+
+1. How do you define &quot;bloat&quot; ?
+2. Why is size increase of the library in order to gain access to the
+full 64kB RAM unnecessary?
+
+BTW:
+
+1.  Presuming that's you'd like to have interrupts working while the
+&quot;ROM is off&quot; you'd need some part of the &quot;bloat&quot; nevertheless.
+
+2. How do you want to make use of the RAM behind the Kernal? For
+dynamically generated data? Then you're into double buffering in case
+it needs to be accessed by the Kernal. For code? Then the code needs
+to be moved there so you'd some more of the &quot;bloat&quot;.
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Feb 16 14:48:08 2013</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11205.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Banking out Kernal"</a></li>
+<li><dfn>Previous message</dfn>: <a href="11203.html" title="Previous message in the list">Stefan: "[cc65] Banking out Kernal"</a></li>
+<li><dfn>In reply to</dfn>: <a href="11203.html" title="Message to which this message replies">Stefan: "[cc65] Banking out Kernal"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="11205.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Banking out Kernal"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#11204" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#11204" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#11204" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2013-02-16 14:48:11 CET
+</em></small></p>
+</body>
+</html>

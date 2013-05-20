@@ -1,0 +1,163 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] Version 2.6.1 released</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="[cc65] Version 2.6.1 released">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] Version 2.6.1 released</h1>
+<!-- received="Thu Mar 22 19:46:04 2001" -->
+<!-- isoreceived="20010322184604" -->
+<!-- sent="Thu, 22 Mar 2001 19:46:08 +0100" -->
+<!-- isosent="20010322184608" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="[cc65] Version 2.6.1 released" -->
+<!-- id="20010322194608.A3595@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Version%202.6.1%20released"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2001-03-22 19:46:08
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0470.html">MagerValp: "Re: [cc65] Version 2.6.1 released"</a>
+<li><strong>Previous message:</strong> <a href="0468.html">Ullrich von Bassewitz: "[cc65] lcc65 compiler"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0470.html">MagerValp: "Re: [cc65] Version 2.6.1 released"</a>
+<li><strong>Reply:</strong> <a href="0470.html">MagerValp: "Re: [cc65] Version 2.6.1 released"</a>
+<li><strong>Reply:</strong> <a href="0472.html">Mirco Miranda: "Re: [cc65] Version 2.6.1 released"</a>
+<li><strong>Maybe reply:</strong> <a href="0473.html">Arvid Norberg: "Re: [cc65] Version 2.6.1 released"</a>
+<li><strong>Maybe reply:</strong> <a href="0482.html">Arvid Norberg: "Re: [cc65] Version 2.6.1 released"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+I've found the time to make packages for version 2.6.1 this evening. There are
+no new features in this version, just bug fixes. The announcement follows
+below.
+
+Have fun!
+
+
+	Uz
+
+									       
+
+-------------------------------------------------------------------------------
+
+I'm proud to announce version 2.6.1 of CC65, a C crosscompiler /
+crossassembler combo for 6502 systems.
+
+CC65 has C and runtime library support for many of the old 6502 machines,
+including
+
+  - The Commodore C64, C128 and the C16, C116, Plus/4 machines.
+  - The CBM 600/700 family (programs run in bank 1).
+  - Newer PET machines (not 2001)
+  - The Apple ][ (library support by Kevin Ruland &lt;<a href="mailto:kevin_at_rodin.wustl.edu?Subject=Re:%20[cc65]%20Version%202.6.1%20released">kevin_at_rodin.wustl.edu</a>&gt;)
+  - The Atari 8 bit machines (thanks to the Atari team)
+  - GEOS for the C64 and C128 (GEOSLib by Maciej Witkowiak &lt;<a href="mailto:ytm_at_elysium.pl?Subject=Re:%20[cc65]%20Version%202.6.1%20released">ytm_at_elysium.pl</a>&gt;)
+
+The libraries are fairly portable, so creating a version for other 6502s
+shouldn't be too much work.
+
+
+New in this version:
+
+  * All bugs mentioned on the bugs web page for version 2.6 are fixed.
+							   
+  * Several changes for better source code portability.
+
+There is still no support for the following features:
+
+  * Floats and bit fields.
+
+  * File routines on most systems. The 8 bit Ataris are the first
+    machines that do have full file I/O support (besides the ACE port
+    which was dropped some time ago). Please note that the complete CBM
+    family doesn't have file I/O support!
+
+  * The 80 column mode on the C128 is not supported by the conio library.
+
+
+Available packages:
+
+As usual I will provide the complete sources and several binary packages,
+including RPMs for RedHat Linux. Linux is the primary development platform,
+so the sources do compile out of the box on Linux machines.
+
+Please note that there are now separate RPMs for the compiler proper and
+the target specific libraries. To develop for one of the predefined target
+systems you need the compiler RPM package *and* one of the target machine
+packages.
+
+Binaries for DOS and and Windows will follow or may already be available at
+the time you read this. OS/2 packages will again be available, but since
+there are almost no downloads for OS/2, so the host platform may get
+dropped in the near future (again).
+
+
+Download:
+
+More information information and a download link, please visit the cc65 web
+page at
+
+	<a href="http://www.cc65.org/">http://www.cc65.org/</a>
+
+
+Thanks to all who sent feedback and suggestions and of course to anyone who
+helped developing cc65!
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Version%202.6.1%20released">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Version%202.6.1%20released">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0470.html">MagerValp: "Re: [cc65] Version 2.6.1 released"</a>
+<li><strong>Previous message:</strong> <a href="0468.html">Ullrich von Bassewitz: "[cc65] lcc65 compiler"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0470.html">MagerValp: "Re: [cc65] Version 2.6.1 released"</a>
+<li><strong>Reply:</strong> <a href="0470.html">MagerValp: "Re: [cc65] Version 2.6.1 released"</a>
+<li><strong>Reply:</strong> <a href="0472.html">Mirco Miranda: "Re: [cc65] Version 2.6.1 released"</a>
+<li><strong>Maybe reply:</strong> <a href="0473.html">Arvid Norberg: "Re: [cc65] Version 2.6.1 released"</a>
+<li><strong>Maybe reply:</strong> <a href="0482.html">Arvid Norberg: "Re: [cc65] Version 2.6.1 released"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:39 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,824 @@
+#!/bin/bash
+#
+# Create a snapshot of the current cc65 sources and put it onto the
+# musoftware ftp server.
+#
+
+# Programs
+MAILER=/usr/sbin/sendmail
+
+SVNROOT="svn://svn.cc65.org/cc65/"
+MODULE="cc65"
+BRANCH="trunk"
+RESOURCE="cc65-snapshot"
+FTPHOST="ftp.musoftware.de"
+LASTRUN="${HOME}/.cc65-snapshot-lastrun"
+
+# RPM directories
+RPMROOTDIR="${HOME}/packages"
+RPMSPECDIR="${RPMROOTDIR}/SPECS"
+RPMSRCDIR="${RPMROOTDIR}/SOURCES"
+RPMDIR="${RPMROOTDIR}/RPMS/i386"
+SRPMDIR="${RPMROOTDIR}/SRPMS"
+
+# List of targets and hosts
+TARGETLIST="apple2 apple2enh atari atmos c16 c64 c128 cbm510 cbm610 geos lynx nes pet plus4 supervision vic20"
+
+
+
+##############################################################################
+#                                 Environment                                #
+##############################################################################
+
+
+
+WINEDEBUG=fixme-all
+
+
+
+##############################################################################
+#                      Error handling and similar stuff                      #
+##############################################################################
+
+
+
+usage()
+{
+    echo "Usage: ${PROGNAME} [options]"
+    echo "Possible options:"
+    echo "  --announce file     Use this announcement file"
+    echo "  --branch br         Use SVN branch br (default: ${BRANCH})"
+    echo "  --help              This text"
+    echo "  --ifmodified        No action if sources not modifed since last run"
+    echo "  --keep-inno         Keep inno config"
+    echo "  --keep-output file  Keep program output"
+    echo "  --mail addr         Send mail to addr in case of problems"
+    echo "  --no-dos32          Don't build the DOS package"
+    echo "  --no-os2            Don't build the OS/2 package"
+    echo "  --no-rpms           Don't build RPM packages"
+    echo "  --no-sources        Don't build source package"
+    echo "  --no-win32          Don't build the win32 package"
+    echo "  --release number    Set the release (default is 1)"
+    echo "  --snapshot          Build snapshot packages"
+    echo "  --testing           Don't move snapshot packages to the FTP server"
+    echo "  --tmpdir dir        Specify the temp directory"
+    exit 0
+}
+
+
+
+cleanup()
+# Leave the temp directory and remove it
+{
+    cd /
+    rm -rf "${TMPDIR}"
+}
+
+
+
+send_mail ()
+# Send a mail about problems if mail is configured
+{
+    # Only if mail is configured
+    if [ "${MAILTO}" ]; then
+        (
+            echo "From: bounce@musoftware.de"
+            echo "To: ${MAILTO}"
+            echo "Subject: Problem with cc65 build"
+            echo ""
+            echo ""
+            echo "There's a problem with the cc65 build."
+            if [ -z "${OUTPUT}" ]; then
+                echo "Please check the generated packages."
+            else
+                echo "Please see the following logfile:"
+                echo "------------------------------------------------------------------------"
+                if [ -f ${OUTPUT} ]; then
+                    cat ${OUTPUT}
+                fi
+                echo "------------------------------------------------------------------------"
+            fi
+            echo ""
+            echo "Regards, your friendly ${PROGNAME} script"
+            echo ""
+        ) | ${MAILER} ${MAILTO}
+    fi
+}
+
+
+
+error()
+# Log an error to output, send mail and terminate
+{
+    echo "${PROGNAME}: $1" >&2
+    send_mail
+    exit 1
+}
+
+
+
+needarg()
+{
+    error "Option $1 requires an argument"
+}
+
+
+
+##############################################################################
+#                            Generation functions                            #
+##############################################################################
+
+
+
+make_inc_files()
+# Make the .inc files (the non linux versions cannot build them)
+{
+    make -s -C ${MODULE}/src/ld65 -f make/gcc.mak inc
+    make -s -C ${MODULE}/src/ca65 -f make/gcc.mak inc
+}
+
+
+
+inno_gen_header ()
+# Generate the inno setup script header
+{
+    (
+        echo "[Setup]"
+        echo "AppId={{2260F380-0D8B-11DD-8D87-0050045543B4}"
+        echo "AppName=${BASENAME}"
+        echo "AppVerName=${MODULE}"
+        echo "AppPublisher=Ullrich von Bassewitz"
+        echo "AppPublisherURL=http://www.cc65.org/"
+        echo "AppSupportURL=http://www.cc65.org/"
+        echo "AppUpdatesURL=http://www.cc65.org/"
+        echo "DefaultDirName={code:GetProgramFolder}\\${BASENAME}"
+        echo "DefaultGroupName=${BASENAME}"
+        echo "OutputBaseFilename=${MODULE}-${RELEASE}"
+        echo "Compression=lzma"
+        echo "SolidCompression=yes"
+        echo "ChangesEnvironment=yes"
+        echo "MinVersion=0,5.0"
+        echo ""
+        echo "[Languages]"
+        echo "Name: \"english\"; MessagesFile: \"compiler:Default.isl\""
+        echo ""
+        echo "[Types]"
+        echo "Name: \"full\"; Description: \"Full installation\""
+        echo "Name: \"custom\"; Description: \"Custom installation\"; Flags: iscustom"
+        echo ""
+        echo "[Components]"
+        echo "Name: \"main\"; Description: \"Main Files\"; Types: custom full; Flags: fixed"
+        echo "Name: \"docs\"; Description: \"Documentation\"; Types: full"
+        echo "Name: \"samples\"; Description: \"Examples programs\"; Types: full"
+        echo "Name: \"apple2\"; Description: \"Apple ][ specific files\"; Types: full"
+        echo "Name: \"apple2enh\"; Description: \"Apple //e specific files\"; Types: full"
+        echo "Name: \"atari\"; Description: \"Atari specific files\"; Types: full"
+        echo "Name: \"atmos\"; Description: \"Oric Atmos specific files\"; Types: full"
+        echo "Name: \"c16\"; Description: \"Commodore 16 specific files\"; Types: full"
+        echo "Name: \"c64\"; Description: \"Commodore 64 specific files\"; Types: full"
+        echo "Name: \"c128\"; Description: \"Commodore 128 specific files\"; Types: full"
+        echo "Name: \"cbm510\"; Description: \"Commodore 510 specific files\"; Types: full"
+        echo "Name: \"cbm610\"; Description: \"Commodore 610 specific files\"; Types: full"
+        echo "Name: \"geos\"; Description: \"GEOS specific files\"; Types: full"
+        echo "Name: \"lynx\"; Description: \"Atari Lynx specific files\"; Types: full"
+        echo "Name: \"nes\"; Description: \"NES specific files\"; Types: full"
+        echo "Name: \"pet\"; Description: \"Commodore PET specific files\"; Types: full"
+        echo "Name: \"plus4\"; Description: \"Commodore Plus/4 specific files\"; Types: full"
+        echo "Name: \"supervision\"; Description: \"Supervision specific files\"; Types: full"
+        echo "Name: \"vic20\"; Description: \"Commodore VIC20 specific files\"; Types: full"
+        echo ""
+        echo "[Tasks]"
+        echo "Name: \"addpath\"; Description: \"Add cc65 to PATH (recommended)\"; GroupDescription: \"Environment\";"
+        echo "Name: \"addenv\"; Description: \"Add lib and include directories to the environment (recommended)\"; GroupDescription: \"Environment\";"
+        echo "Name: \"addconsole\"; Description: \"Add console entry to start menu\"; GroupDescription: \"Start Menu\"; Flags: Unchecked;"
+        echo ""
+        echo "[Registry]"
+        echo "Root: HKLM; Subkey: \"SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment\"; ValueType: expandsz; ValueName: Path; Tasks: addpath; Check: IsAdmin; Flags: createvalueifdoesntexist preservestringtype"
+        echo "Root: HKLM; Subkey: \"SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment\"; ValueType: string; ValueName: CA65_INC; ValueData: \"{app}\\asminc\"; Check: IsAdmin; Tasks: addenv; Flags: deletevalue uninsdeletevalue"
+        echo "Root: HKLM; Subkey: \"SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment\"; ValueType: string; ValueName: CC65_INC; ValueData: \"{app}\\include\"; Check: IsAdmin; Tasks: addenv; Flags: deletevalue uninsdeletevalue"
+        echo "Root: HKLM; Subkey: \"SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment\"; ValueType: string; ValueName: LD65_CFG; ValueData: \"{app}\\cfg\"; Check: IsAdmin; Tasks: addenv; Flags: deletevalue uninsdeletevalue"
+        echo "Root: HKLM; Subkey: \"SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment\"; ValueType: string; ValueName: LD65_LIB; ValueData: \"{app}\\lib\"; Check: IsAdmin; Tasks: addenv; Flags: deletevalue uninsdeletevalue"
+        echo "Root: HKLM; Subkey: \"SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment\"; ValueType: string; ValueName: LD65_OBJ; ValueData: \"{app}\\obj\"; Check: IsAdmin; Tasks: addenv; Flags: deletevalue uninsdeletevalue"
+        echo "Root: HKCU; Subkey: \"Environment\"; ValueType: expandsz; ValueName: Path; Tasks: addpath; Check: IsAdmin; Flags: createvalueifdoesntexist preservestringtype"
+        echo "Root: HKCU; Subkey: \"Environment\"; ValueType: string; ValueName: CA65_INC; ValueData: \"{app}\\asminc\"; Check: IsAdmin; Tasks: addenv; Flags: deletevalue uninsdeletevalue"
+        echo "Root: HKCU; Subkey: \"Environment\"; ValueType: string; ValueName: CC65_INC; ValueData: \"{app}\\include\"; Check: IsAdmin; Tasks: addenv; Flags: deletevalue uninsdeletevalue"
+        echo "Root: HKCU; Subkey: \"Environment\"; ValueType: string; ValueName: LD65_CFG; ValueData: \"{app}\\cfg\"; Check: IsAdmin; Tasks: addenv; Flags: deletevalue uninsdeletevalue"
+        echo "Root: HKCU; Subkey: \"Environment\"; ValueType: string; ValueName: LD65_LIB; ValueData: \"{app}\\lib\"; Check: IsAdmin; Tasks: addenv; Flags: deletevalue uninsdeletevalue"
+        echo "Root: HKCU; Subkey: \"Environment\"; ValueType: string; ValueName: LD65_OBJ; ValueData: \"{app}\\obj\"; Check: IsAdmin; Tasks: addenv; Flags: deletevalue uninsdeletevalue"
+        echo ""
+        echo "[Icons]"
+        echo "Name: \"{group}\\www.cc65.org\"; Filename: \"http://www.cc65.org/\""
+        echo "Name: \"{group}\\Frequently asked questions\"; Filename: \"http://www.cc65.org/faq.php\""
+        echo "Name: \"{group}\\Documentation\"; Filename: \"{app}\\doc\\index.html\"; Components: docs"
+        echo "Name: \"{group}\\Console\"; Filename: \"{%COMSPEC}\"; Parameters: \"/k \"\"{app}\\bin\\cc65-env.cmd\"\"\"; Tasks: addconsole"
+        echo "Name: \"{group}\\{cm:UninstallProgram,cc65}\"; Filename: \"{uninstallexe}\""
+        echo ""
+        echo "[UninstallDelete]"
+        echo "Type: files; Name: \"{app}\\bin\\cc65-env.cmd\""
+        echo ""
+        echo "[Code]"
+        echo "FUNCTION IsAdmin (): BOOLEAN;"
+        echo "BEGIN"
+        echo "  Result := IsAdminLoggedOn;"
+        echo "END;"
+        echo ""
+        echo "FUNCTION IsUser (): BOOLEAN;"
+        echo "BEGIN"
+        echo "  Result := NOT IsAdminLoggedOn;"
+        echo "END;"
+        echo ""
+        echo "FUNCTION GetProgramFolder (Unsed: STRING): STRING;"
+        echo "BEGIN"
+        echo "  IF (IsAdminLoggedOn) THEN BEGIN"
+        echo "    Result := ExpandConstant ('{pf}');"
+        echo "  END ELSE BEGIN"
+        echo "    Result := ExpandConstant ('{localappdata}');"
+        echo "  END;"
+        echo "END;"
+        echo ""
+        echo "PROCEDURE ModifyPath (Add: BOOLEAN; Dir: STRING);"
+        echo "VAR"
+        echo "  Path    : STRING;"
+        echo "  Element : STRING;"
+        echo "  OldPath : STRING;"
+        echo "  NewPath : STRING;"
+        echo "  P       : INTEGER;"
+        echo "BEGIN"
+        echo "  IF (IsAdmin) THEN BEGIN"
+        echo "    RegQueryStringValue (HKEY_LOCAL_MACHINE, 'SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment', 'Path', Path);"
+        echo "  END ELSE BEGIN"
+        echo "    RegQueryStringValue (HKEY_CURRENT_USER, 'Environment', 'Path', Path);"
+        echo "  END;"
+        echo "  OldPath := Path;"
+        echo "  NewPath := '';"
+        echo "  WHILE (Length (Path) > 0) DO BEGIN"
+        echo "    P := Pos (';', Path);"
+        echo "    IF (P <= 0) THEN BEGIN"
+        echo "      Element := Path;"
+        echo "      Path := '';"
+        echo "    END ELSE BEGIN"
+        echo "      Element := Copy (Path, 1, P-1);"
+        echo "      Delete (Path, 1, P);"
+        echo "    END;"
+        echo "    IF (Element <> Dir) THEN BEGIN"
+        echo "      NewPath := NewPath + Element + ';';"
+        echo "    END ELSE BEGIN"
+        echo "      IF (Add) THEN EXIT;"
+        echo "    END;"
+        echo "  END;"
+        echo "  IF (Add) THEN BEGIN"
+        echo "    IF (Length (NewPath) > 0) THEN BEGIN"
+        echo "      IF (NewPath[Length (NewPath)] <> ';') THEN NewPath := NewPath + ';';"
+        echo "    END;"
+        echo "    NewPath := NewPath + Dir + ';';"
+        echo "  END;"
+        echo "  IF (IsAdmin) THEN BEGIN"
+        echo "    RegWriteStringValue (HKEY_LOCAL_MACHINE, 'SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment', 'Path', NewPath);"
+        echo "  END ELSE BEGIN"
+        echo "    RegWriteStringValue (HKEY_CURRENT_USER, 'Environment', 'Path', NewPath);"
+        echo "  END;"
+        echo "END;";
+        echo ""
+        echo "PROCEDURE CreateEnvFile (Name: STRING);"
+        echo "BEGIN"
+        echo "  SaveStringToFile (Name, '@echo off' + #13#10, FALSE);"
+        echo "  SaveStringToFile (Name, 'SET PATH=%PATH%;' + ExpandConstant ('{app}\\bin') + #13#10, TRUE);"
+        echo "  SaveStringToFile (Name, 'SET CA65_INC=' + ExpandConstant ('{app}\\asminc') + #13#10, TRUE);"
+        echo "  SaveStringToFile (Name, 'SET CC65_INC=' + ExpandConstant ('{app}\\include') + #13#10, TRUE);"
+        echo "  SaveStringToFile (Name, 'SET LD65_CFG=' + ExpandConstant ('{app}\\cfg') + #13#10, TRUE);"
+        echo "  SaveStringToFile (Name, 'SET LD65_LIB=' + ExpandConstant ('{app}\\lib') + #13#10, TRUE);"
+        echo "  SaveStringToFile (Name, 'SET LD65_OBJ=' + ExpandConstant ('{app}\\obj') + #13#10, TRUE);"
+        echo "END;"
+        echo ""
+        echo "PROCEDURE CurStepChanged (CurStep: TSetupStep);"
+        echo "BEGIN"
+        echo "  IF (CurStep = ssPostInstall) THEN BEGIN"
+        echo "    IF (IsTaskSelected ('addpath')) THEN BEGIN"
+        echo "      ModifyPath (TRUE, ExpandConstant ('{app}') + '\\bin');"
+        echo "    END;"
+        echo "    IF (IsTaskSelected ('addconsole')) THEN BEGIN"
+        echo "      CreateEnvFile (ExpandConstant ('{app}\\bin\\cc65-env.cmd'));"
+        echo "    END;"
+        echo "  END;"
+        echo "END;";
+        echo ""
+        echo "PROCEDURE CurUninstallStepChanged (CurStep: TUninstallStep);"
+        echo "BEGIN"
+        echo "  IF (CurStep = usPostUninstall) AND (UsingWinNT ()) THEN BEGIN"
+        echo "    ModifyPath (FALSE, ExpandConstant ('{app}') + '\\bin');"
+        echo "  END;"
+        echo "END;"
+        echo ""
+        echo "[Files]"
+        echo "Source: ${MODULE}\\announce.txt; DestDir: {app}; Components: main; Flags: ignoreversion isreadme"
+    ) > ${INNOCFG}
+}
+
+
+
+inno_add_dir ()
+# Append the list of file in the given directory to the inno setup script
+#
+#  $1: Add contents of this directory
+#  $2: Use this target prefix directory
+#  $3: Component
+{
+    (
+        cd $1
+        find . -type f -printf "Source: ${1}/%P; DestDir: {app}/${2}/%h; Components: ${3}; Flags: ignoreversion\n" |
+            sed 's/\//\\/g' >> ${INNOCFG}
+    )
+}
+
+
+
+copy_wild ()
+# Copy files using wildcards to a destination directory
+#
+#  $1: Source mask
+#  $2: Destination directory
+{
+    # We could use nullglob here, but this is a bashism, so check for the
+    # file to see if the source pattern was actually expanded
+    for FILE in $1; do
+        if [ -f "${FILE}" ]; then
+            cp "${FILE}" "$2"
+        fi
+    done
+}
+
+
+
+##############################################################################
+#                            Command line parsing                            #
+##############################################################################
+
+
+
+# Get the program name without a path
+PROGNAME=`basename $0`
+
+# Parse the command line
+while [ $# -gt 0 ]; do
+    case "$1" in
+
+        --announce)
+            if [ -z "$2" ]; then
+                needarg $1
+            fi
+            ANNOUNCE="$2"
+            shift
+            shift
+            ;;
+
+        --branch)
+            if [ -z "$2" ]; then
+                needarg $1
+            fi
+            BRANCH="$2"
+            shift
+            shift
+            ;;
+
+        --help)
+            usage
+            ;;
+
+        --ifmodified)
+            IFMODIFIED=1
+            shift
+            ;;
+
+        --keep-inno)
+            KEEPINNO=1
+            shift
+            ;;
+
+        --keep-output)
+            if [ -z "$2" ]; then
+                needarg $1
+            fi
+            OUTPUT="$2"
+            shift
+            shift
+            ;;
+
+        --mail)
+            if [ -z "$2" ]; then
+                needarg $1
+            fi
+            MAILTO="$2"
+            shift
+            shift
+            ;;
+
+        --no-docs)
+            NODOCS=1
+            shift
+            ;;
+
+        --no-dos32)
+            NODOS32=1
+            shift
+            ;;
+
+        --no-os2)
+            NOOS2=1
+            shift
+            ;;
+
+        --no-rpms)
+            NORPMS=1
+            shift
+            ;;
+
+        --no-sources)
+            NOSOURCES=1
+            shift
+            ;;
+
+        --no-win32)
+            NOWIN32=1
+            shift
+            ;;
+
+        --release)
+            if [ -z "$2" ]; then
+                needarg $1
+            fi
+            RELEASE="$2"
+            shift
+            shift
+            ;;
+
+        --snapshot)
+            SNAPSHOT=1
+            shift
+            ;;
+
+        --testing)
+            TESTING=1
+            shift
+            ;;
+
+        --tmpdir)
+            if [ -z "$2" ]; then
+                needarg $1
+            fi
+            TMPDIR="$2"
+            shift
+            shift
+            ;;
+
+        *)
+            error "${PROGNAME}: Unknown command line option: $1"
+            ;;
+
+    esac
+done
+
+#echo "ANNOUNCE=${ANNOUNCE}"
+#echo "BRANCH=${BRANCH}"
+#echo "IFMODIFIED=${IFMODIFIED}"
+#echo "OUTPUT=\"${OUTPUT}\""
+#echo "SNAPSHOT=${SNAPSHOT}"
+#echo "TMPDIR=${TMPDIR}"
+#echo "MAILTO=${MAILTO}"
+
+# Check arguments: If this is not a snapshot, we need an announcement file
+if [ -z "${ANNOUNCE}" ]; then
+    if [ -z "${SNAPSHOT}" ]; then
+        error "Final release needs an announcement file"
+    fi
+else
+    if [ \! -f ${ANNOUNCE} ]; then
+        error "Announcement file \"${ANNOUNCE}\" does not exist"
+    fi
+fi
+
+# If we should not keep the output, redirect it to /dev/null, otherwise delete
+# the output file
+if [ -z "${OUTPUT}" ]; then
+    exec > /dev/null
+else
+    exec > ${OUTPUT} 2>&1
+fi
+
+# If no release was given, use 1
+if [ -z "${RELEASE}" ]; then
+    RELEASE=1
+fi
+
+
+
+##############################################################################
+#                              Code preparation                              #
+##############################################################################
+
+
+
+# Create a temporary directory and make it the current dir
+if [ -z ${TMPDIR} ]; then
+    TEMPLATE=
+    TMPDIR=`mktemp -d -q "/tmp/${PROGNAME}.XXXXXX"`
+else
+    mkdir ${TMPDIR} 2>/dev/null
+fi
+if [ $? -ne 0 ]; then
+    error "Can't create temp directory, exiting..."
+fi
+cd ${TMPDIR}
+
+
+# If requested, check if there have been changes since the last run
+if [ -n "${IFMODIFIED}" -a -f ${LASTRUN} ]; then
+    OUTFILE="${TMPDIR}/diff.out"
+    DATE=`date -r "${LASTRUN}" "+%Y-%m-%d %T"`
+    svn diff -r "{${DATE}}:HEAD" "${SVNROOT}/${BRANCH}" > "${OUTFILE}"
+    if [ \! -s "${OUTFILE}" ]; then
+        # There are no changes, cleanup and bail out
+        echo "No changes!"
+        cleanup
+        exit 0
+    fi
+    rm "${OUTFILE}"
+    echo "Found changes"
+fi
+
+# Checkout the sources
+svn export -q "${SVNROOT}/${BRANCH}" "${MODULE}"
+
+# Get the compiler version and setup the archive and new module names. They
+# are different depending if we're building a snapshot or a release version.
+VERSION=`cat ${MODULE}/src/common/version.c |
+         perl -nle 'if ($_ =~ /^#define VER_MAJOR\s+(\d+)U/) { $major=$1; }
+                    if ($_ =~ /^#define VER_MINOR\s+(\d+)U/) { $minor=$1; }
+                    if ($_ =~ /^#define VER_PATCH\s+(\d+)U/) { $patch=$1; }
+                    if ($_ =~ /^#define VER_RC\s+(\d+)U/)    { $rc=$1;    }
+                    END { printf ("%d.%d.%d", $major, $minor, $patch);
+                          if ($rc > 0) { printf (".rc%d", $rc); } }'`
+if [ -n "${SNAPSHOT}" ]; then
+    VERSION="${VERSION}."`date +%Y%m%d`
+    BASENAME="${MODULE}-snapshot"
+else
+    BASENAME="${MODULE}"
+fi
+ARCHIVE="${BASENAME}-sources-${VERSION}.tar.bz2"
+NEWNAME="${BASENAME}-${VERSION}"
+mv ${MODULE} ${NEWNAME}
+MODULE=${NEWNAME}
+
+# Create a dummy announcement file for the snapshot, copy the announcement
+# file for the final release.
+if [ -z "${ANNOUNCE}" ]; then
+    (
+        echo "THIS IS A DEVELOPMENT SNAPSHOT OF CC65!"
+        echo
+        echo "This version may or may not work for you. Please see"
+        echo
+        echo "      http://www.cc65.org/"
+        echo
+        echo "for more information and stable builds."
+        echo
+    ) | iso2dos - > ${MODULE}/announce.txt
+else
+    iso2dos - < ${ANNOUNCE} >${MODULE}/announce.txt
+fi
+
+# Build the host list
+HOSTLIST=
+if [ -z "${NODOS32}" ]; then
+    HOSTLIST="${HOSTLIST} dos32"
+fi
+if [ -z "${NOOS2}" ]; then
+    HOSTLIST="${HOSTLIST} os2"
+fi
+if [ -z "${NOWIN32}" ]; then
+    HOSTLIST="${HOSTLIST} win32"
+fi
+
+
+
+##############################################################################
+#                                    Build                                   #
+##############################################################################
+
+
+
+# Name of the inno setup file
+INNOCFG="${TMPDIR}/cc65.iss"
+
+# Generate the inno setup file header
+inno_gen_header
+
+# Create the .inc files so they are included in the archive
+make_inc_files
+
+# Build the source archive
+if [ -z "${NOSOURCES}" ]; then
+    tar -cf - ${MODULE} | bzip2 -c9 > ${ARCHIVE}
+fi
+
+# Build the executables, so we can make the libraries later
+make -s -C ${MODULE}/src/common -f make/gcc.mak
+make -s -C ${MODULE}/src/ar65 -f make/gcc.mak
+make -s -C ${MODULE}/src/ca65 -f make/gcc.mak
+make -s -C ${MODULE}/src/ld65 -f make/gcc.mak
+make -s -C ${MODULE}/src/cc65 -f make/gcc.mak
+make -s -C ${MODULE}/src/cl65 -f make/gcc.mak
+
+# Create the target platform packages for non Linux operating systems
+for TARGET in ${TARGETLIST}; do
+    echo "Creating ${TARGET} files ..."
+
+    # Make the target library
+    make -s -C ${MODULE}/libsrc clean "${TARGET}lib"
+
+    # Create the target directory structure and copy library files
+    mkdir -p ${TARGET}/{cfg,doc,emd,joy,lib,mou,obj,ser,tgi}
+    cp ${MODULE}/libsrc/${TARGET}.lib ${TARGET}/lib
+
+    # Copy extra object files
+    copy_wild "${MODULE}/libsrc/${TARGET}-*.o" "${TARGET}/obj"
+
+    # Copy extra config files
+    copy_wild "${MODULE}/src/ld65/cfg/${TARGET}-*.cfg" "${TARGET}/cfg"
+
+    # Determine the driver name prefix
+    case ${TARGET} in
+       	apple2)
+       	    PREFIX="a2."
+       	    ;;
+       	apple2enh)
+       	    PREFIX="a2e."
+       	    ;;
+       	atari)
+       	    PREFIX="atari"
+       	    ;;
+       	*)
+       	    PREFIX="${TARGET}-"
+    esac
+
+    # Copy the drivers
+    copy_wild "${MODULE}/libsrc/${PREFIX}*.emd" "${TARGET}/emd"
+    copy_wild "${MODULE}/libsrc/${PREFIX}*.joy" "${TARGET}/joy"
+    copy_wild "${MODULE}/libsrc/${PREFIX}*.mou" "${TARGET}/mou"
+    copy_wild "${MODULE}/libsrc/${PREFIX}*.ser" "${TARGET}/ser"
+    copy_wild "${MODULE}/libsrc/${PREFIX}*.tgi" "${TARGET}/tgi"
+
+    # Create the ZIP file for this target system
+    (cd ${TARGET}; zip -q9r "../${BASENAME}-${TARGET}-${VERSION}-${RELEASE}.zip" .)
+
+    # Add all files to the inno setup file
+    for DIR in cfg emd joy lib mou obj ser tgi; do
+        inno_add_dir ${TARGET}/${DIR} ${DIR} ${TARGET}
+    done
+done
+
+# Create the host directories and files
+for HOST in ${HOSTLIST}; do
+    echo "Packaging ${HOST} ..."
+    mkdir -p ${HOST}/{asminc,bin,include}
+    cp ${MODULE}/announce.txt ${HOST}
+    cp -dR ${MODULE}/asminc ${MODULE}/include ${HOST}
+    # First clear all, then make the inc files, then the stripped targets
+    TERM=console make -s -C ${MODULE}/src -f make/watcom.mak zap
+    make_inc_files
+    TERM=console make -s -C ${MODULE}/src -f make/watcom.mak ${HOST} strip
+    if [ $? -ne 0 ]; then
+        # We had a problem with the build
+        error "Error building target ${HOST} - aborting"
+    fi
+    # Since we do not know if the exit code are propagated correctly via
+    # Wine, we will check for the presence of the executables here.
+    for DIR in ca65 cc65 co65 da65 ld65 od65 ar65 cl65; do
+        EXE="${MODULE}/src/${DIR}/${DIR}.exe"
+        if [ \! -s ${EXE} ]; then
+            error "${EXE} does not exist for target ${HOST} - aborting"
+        fi
+    done
+    copy_wild "${MODULE}/src/*/*.exe" "${HOST}/bin"
+done
+
+# Copy the DOS extender
+if [ -z "${NODOS32}" ]; then
+    cp /home/uz/.wine/c/watcom/binw/dos4gw.exe dos32/bin
+fi
+
+# Add the windows files to the inno setup file
+inno_add_dir win32/asminc asminc main
+inno_add_dir win32/bin bin main
+inno_add_dir win32/include include main
+
+# Pack the host archives
+for HOST in ${HOSTLIST}; do
+    echo ${HOST}
+    (cd ${HOST}; zip -q9r "../${BASENAME}-${HOST}-${VERSION}-${RELEASE}.zip" .)
+done
+
+# Create the documentation package if not suppressed
+if [ -z "${NODOCS}" ]; then
+
+    # Build the documentation
+    make -s -C ${MODULE}/doc html
+
+    # Create the target directory structure
+    mkdir -p docs/doc
+
+    # Copy the doc files
+    copy_wild "${MODULE}/doc/*.html" docs/doc
+    cp ${MODULE}/doc/BUGS docs/doc
+    cp ${MODULE}/doc/CREDITS docs/doc
+    cp ${MODULE}/doc/compile.txt docs/doc
+    cp ${MODULE}/doc/internal.txt docs/doc
+    cp ${MODULE}/doc/newvers.txt docs/doc
+    cp ${MODULE}/announce.txt docs/doc
+    cp -a ${MODULE}/samples docs
+
+    # Make the ZIP file containing the docs
+    (cd docs; zip -q9r "../${BASENAME}-doc-${VERSION}-${RELEASE}.zip" .)
+
+    # Add the doc files to the inno setup
+    inno_add_dir docs/doc doc docs
+    inno_add_dir docs/samples samples samples
+fi
+
+# Create the inno setup file, then delete the config
+if [ -z "${NOWIN32}" ]; then
+    wine "c:\\Program Files\\Inno Setup 5\\ISCC.exe" /O. "cc65.iss"
+fi
+if [ -z "${KEEPINNO}" ]; then
+    rm "${INNOCFG}"
+fi
+
+# Remove all the stuff since we have all packages
+for DIR in ${HOSTLIST} ${TARGETLIST} docs; do
+    rm -r "${DIR}"
+done
+
+# Build the RPMs if this was not suppressed
+if [ -z "${NORPMS}" ]; then
+
+    # Copy the spec file to the RPM build directory changing version, release,
+    # and name in case of the snapshot
+    if [ -z "${SNAPSHOT}" ]; then
+        perl -pe "s/^(%define version) .*\$/\$1 ${VERSION}/;
+                  s/^(Release:) .*\$/\$1 ${RELEASE}/;"          \
+                  < ${MODULE}/packages/rpm/redhat/cc65.spec     \
+                  > ${RPMSPECDIR}/cc65.spec
+    else
+        perl -pe "s/^(%define name) .*\$/\$1 cc65-snapshot/;
+                  s/^(%define version) .*\$/\$1 ${VERSION}/;
+                  s/^(Release:) .*\$/\$1 ${RELEASE}/;"          \
+                  < ${MODULE}/packages/rpm/redhat/cc65.spec     \
+                  > ${RPMSPECDIR}/cc65.spec
+    fi
+
+    # Delete the checked out files
+    rm -r ${MODULE}
+
+    # Copy the sources to the RPM source directory
+    cp ${ARCHIVE} ${RPMSRCDIR}
+
+    # Build the RPMs but ignore any errors here
+    cd ${RPMSPECDIR}
+    rpmbuild -ba --clean cc65.spec
+
+    # Remove the sources
+    rm ${RPMSRCDIR}/${ARCHIVE}
+
+    # Check if the RPMs were actually built. Since RPM will build either all
+    # or none, we can just check a few
+    RPM="${RPMDIR}/${BASENAME}-${VERSION}-${RELEASE}.i386.rpm"
+    if [ \! -s "${RPM}" ]; then
+        error "${RPM} does not exist after build - aborting"
+    fi
+
+    # Move any RPMs we may have created into the temp directory
+    mv ${RPMDIR}/${BASENAME}*${VERSION}*.rpm ${TMPDIR}
+    mv ${SRPMDIR}/${BASENAME}*${VERSION}*.rpm ${TMPDIR}
+
+else
+
+    # Delete the checked out files
+    rm -r ${MODULE}
+
+fi
+
+# For the snapshot, tar all files in the temp dir, write them to the
+# backup host, and remove the temp dir
+if [ \( -n "${SNAPSHOT}" \) -a \( -z "${TESTING}" \) ]; then
+    tar -C ${TMPDIR} -cf - . | bzip2 -c9 | backupc -h ${FTPHOST} -w ${RESOURCE}
+    cleanup
+fi
+
+# If we did a conditional build, touch the time file
+if [ -n "${IFMODIFIED}" ]; then
+    touch ${LASTRUN}
+fi
+
+# Done
+exit 0
+
+
+

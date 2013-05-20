@@ -1,0 +1,169 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: RE: [cc65] PPP and TCP/IP</title>
+<meta name="Author" content="Chris (chris_at_CosmicWolf.com)">
+<meta name="Subject" content="RE: [cc65] PPP and TCP/IP">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>RE: [cc65] PPP and TCP/IP</h1>
+<!-- received="Wed Dec 18 02:01:01 2002" -->
+<!-- isoreceived="20021218010101" -->
+<!-- sent="Tue, 17 Dec 2002 20:01:39 -0500" -->
+<!-- isosent="20021218010139" -->
+<!-- name="Chris" -->
+<!-- email="chris_at_CosmicWolf.com" -->
+<!-- subject="RE: [cc65] PPP and TCP/IP" -->
+<!-- id="EMEGJNIONNDMKFEMNKLOEEPACAAA.chris@CosmicWolf.com" -->
+<!-- inreplyto="1040168857.1388.147.camel@localhost" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Chris (<a href="mailto:chris_at_CosmicWolf.com?Subject=RE:%20[cc65]%20PPP%20and%20TCP/IP"><em>chris_at_CosmicWolf.com</em></a>)<br>
+<strong>Date:</strong> 2002-12-18 02:01:39
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2086.html">Adam Dunkels: "Re: [cc65] PPP and TCP/IP"</a>
+<li><strong>In reply to:</strong> <a href="2084.html">Adam Dunkels: "RE: [cc65] PPP and TCP/IP"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2088.html">Raj Wurttemberg: "RE: [cc65] PPP and TCP/IP"</a>
+<li><strong>Next in thread:</strong> <a href="2083.html">Tommy Watt: "Re: RE: [cc65] PPP and TCP/IP"</a>
+<li><strong>Maybe reply:</strong> <a href="2083.html">Tommy Watt: "Re: RE: [cc65] PPP and TCP/IP"</a>
+<li><strong>Reply:</strong> <a href="2088.html">Raj Wurttemberg: "RE: [cc65] PPP and TCP/IP"</a>
+<li><strong>Reply:</strong> <a href="2089.html">Adam Dunkels: "RE: [cc65] PPP and TCP/IP"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Adam,
+
+Thanks a lot for the links.  Aside from the online resources (which
+are good, once you find them), I thought I would try to find
+a good book on the subject, if one was available.  I heard mixed
+reviews of &quot;TCP/IP Lean&quot; (1st ed), but decided to try it anyhow with
+the 2nd edition &amp; it's extra coverage and updates.
+
+Marinetti is a TCP/IP stack with PPP support for the Apple // GS;
+though I haven't looked at the source code.  To do that, requires
+a real system or an emulator.  It's all written in 65816 assembler,
+so it's pretty &quot;tight&quot;, though I don't know the actual code size.
+The // GS has 256k memory *minimum*, and usually 1 to 8 megs. At
+some point I will look at the code, though.
+
+TCP/IP on an 128k Apple //e will be a challenge, but that is what
+my ultimate goal is.  I have already resigned myself to the fact
+that it will take a couple months of reading and testing before
+I'll be comfortable enough to really implement something.  The
+code for the //e will most likely be for use with cc65, and then
+eventually hand-optimized where possible.
+
+Thanks again!
+// CHRIS
+
+
+&gt; -----Original Message-----
+&gt; From: <a href="mailto:owner-cc65_at_musoftware.de?Subject=RE:%20[cc65]%20PPP%20and%20TCP/IP">owner-cc65_at_musoftware.de</a> [mailto:<a href="mailto:owner-cc65_at_musoftware.de?Subject=RE:%20[cc65]%20PPP%20and%20TCP/IP">owner-cc65_at_musoftware.de</a>]On
+&gt; Behalf Of Adam Dunkels
+&gt; Sent: Tuesday, December 17, 2002 6:48 PM
+&gt; To: <a href="mailto:cc65_at_musoftware.de?Subject=RE:%20[cc65]%20PPP%20and%20TCP/IP">cc65_at_musoftware.de</a>
+&gt; Subject: RE: [cc65] PPP and TCP/IP
+&gt;
+&gt;
+&gt; Hi Chris!
+&gt;
+&gt; On Tue, 2002-12-17 at 22:10, Chris wrote:
+&gt; &gt; What is your target O/S / Machine?  I've been trying to learn
+&gt; &gt; about TCP/IP and SLIP/PPP, for use on an Apple // machine. (Ack!)
+&gt; &gt; I've been looking at uIP and I just got a good book called &quot;TCP/IP Lean&quot;
+&gt; &gt; which has a chapter on PPP.  I still have a bunch of learning
+&gt; to do, tho'..
+&gt;
+&gt; You might also be interested in this: Volvo Technology just released an
+&gt; early development release of their open source PPP code for lwIP:
+&gt;
+&gt;    <a href="http://www.sics.se/mailing-lists/lwip.html/msg01876.html">http://www.sics.se/mailing-lists/lwip.html/msg01876.html</a>
+&gt;
+&gt; Lawrence Chitty also has some links about PPP that could be useful:
+&gt;
+&gt; <a href="http://www.lawrencechitty.uklinux.net/wizardwiki/index.php?TCP%2FI">http://www.lawrencechitty.uklinux.net/wizardwiki/index.php?TCP%2FI</a>
+&gt; P%20Project
+&gt;
+&gt; Personally, I found the first edition of Jeremy Bentham's &quot;TCP/IP Lean&quot;
+&gt; book quite dissapointing. I had definately expected more, as the author
+&gt; has posted quite a few insightful posts to comp.arch.embedded. I didn't
+&gt; think that the book provided any deeper insights into the protocols and
+&gt; tradeoffs involved, unfortunately.
+&gt;
+&gt; A better book on TCP/IP is Steven's &quot;TCP/IP Illustrated Volume 1&quot;. It is
+&gt; really good and very extensive, although a bit dated in a few areas.
+&gt;
+&gt; I don't know if this is worth much, but I did myself write some
+&gt; introductory text on TCP/IP as part of my master's thesis:
+&gt;
+&gt;    <a href="http://www.sics.se/~adam/thesis.pdf">http://www.sics.se/~adam/thesis.pdf</a>
+&gt;
+&gt; Finally, for TCP/IP in smallish systems, this could perhaps be of
+&gt; interest:
+&gt;
+&gt;    <a href="http://www.sics.se/~adam/full-tcpip-in-8-bits.ps">http://www.sics.se/~adam/full-tcpip-in-8-bits.ps</a>
+&gt;
+&gt; Cheers,
+&gt;
+&gt; /adam
+&gt; --
+&gt; Adam Dunkels &lt;<a href="mailto:adam_at_sics.se?Subject=RE:%20[cc65]%20PPP%20and%20TCP/IP">adam_at_sics.se</a>&gt;
+&gt; <a href="http://www.sics.se/~adam/">http://www.sics.se/~adam/</a>
+&gt;
+&gt; ----------------------------------------------------------------------
+&gt; To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=RE:%20[cc65]%20PPP%20and%20TCP/IP">majordomo_at_musoftware.de</a> with
+&gt; the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=RE:%20[cc65]%20PPP%20and%20TCP/IP">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2086.html">Adam Dunkels: "Re: [cc65] PPP and TCP/IP"</a>
+<li><strong>In reply to:</strong> <a href="2084.html">Adam Dunkels: "RE: [cc65] PPP and TCP/IP"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2088.html">Raj Wurttemberg: "RE: [cc65] PPP and TCP/IP"</a>
+<li><strong>Next in thread:</strong> <a href="2083.html">Tommy Watt: "Re: RE: [cc65] PPP and TCP/IP"</a>
+<li><strong>Maybe reply:</strong> <a href="2083.html">Tommy Watt: "Re: RE: [cc65] PPP and TCP/IP"</a>
+<li><strong>Reply:</strong> <a href="2088.html">Raj Wurttemberg: "RE: [cc65] PPP and TCP/IP"</a>
+<li><strong>Reply:</strong> <a href="2089.html">Adam Dunkels: "RE: [cc65] PPP and TCP/IP"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-12-18 02:01:15 CET</em>
+</em>
+</small>
+</body>
+</html>

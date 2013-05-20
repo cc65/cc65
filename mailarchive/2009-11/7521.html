@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] bank switching/retro repla</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] bank switching/retro replay?" />
+<meta name="Date" content="2009-11-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] bank switching/retro replay?</h1>
+<!-- received="Tue Nov 10 13:05:19 2009" -->
+<!-- isoreceived="20091110120519" -->
+<!-- sent="Tue, 10 Nov 2009 13:05:11 +0100" -->
+<!-- isosent="20091110120511" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] bank switching/retro replay?" -->
+<!-- id="20091110120511.GA29554@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="cd8e9e6a1e442.4af84241&#64;shaw.ca" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7522.html" title="Oliver Schmidt: &quot;Re: [cc65] bank switching/retro replay?&quot;">Next message</a> ]
+[ <a href="7520.html" title="Groepaz: &quot;Re: [cc65] bank switching/retro replay?&quot;">Previous message</a> ]
+[ <a href="7519.html" title="SHAWN JEFFERSON: &quot;Re: [cc65] bank switching/retro replay?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7529.html" title="Groepaz: &quot;Re: [cc65] bank switching/retro replay?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20bank%20switching/retro%20replay?">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-11-10 13:05:11</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Mon, Nov 09, 2009 at 04:24:33PM -0800, SHAWN JEFFERSON wrote:
+&gt; I could see something like that being useful.  How does it deal with the
+&gt; library runtime code?  Do you have to load it into a portion of memory that
+&gt; doesn't get banked out?
+
+I wouldn't bank out the runtime library, since that leads to all sorts of
+problems. Many runtime library routine call each otheror do other things that
+interfer with banking.
+
+&gt; Ullrich, Is there currently any way at compile time to output what segment a
+&gt; piece of code is in, that could be used in a function to automate the banking?
+&gt; ie. so I could write a function that takes this argument and then switches to
+&gt; the correct bank without having to rebuild the banking table all the time...
+
+No, there is not. And, while I see that having an interface for bank switching
+routines would be useful, I cannot currently see how it could be implemented
+without too much overhead. What would be possible is some additional function
+attribute like
+
+        __attribute__ ((banked, 0x01))
+
+where 0x01 is the bank number or some other information related to the target
+bank. It would then be the problem of the bank switching code to make proper
+use of the information. But writing such code that covers all cases is rather
+difficult. Especially if the caller needs to get banked out, before the callee
+is invoked.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Nov 10 13:05:19 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7522.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] bank switching/retro replay?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7520.html" title="Previous message in the list">Groepaz: "Re: [cc65] bank switching/retro replay?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7519.html" title="Message to which this message replies">SHAWN JEFFERSON: "Re: [cc65] bank switching/retro replay?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7529.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] bank switching/retro replay?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7529.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] bank switching/retro replay?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7521" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7521" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7521" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-11-10 13:05:21 CET
+</em></small></p>
+</body>
+</html>

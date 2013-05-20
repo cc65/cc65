@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] Compile problem</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] Compile problem">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] Compile problem</h1>
+<!-- received="Wed Dec 12 16:13:29 2001" -->
+<!-- isoreceived="20011212151329" -->
+<!-- sent="Wed, 12 Dec 2001 16:12:23 +0100" -->
+<!-- isosent="20011212151223" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] Compile problem" -->
+<!-- id="1242619386.20011212161223@gmx.net" -->
+<!-- inreplyto="Pine.OSF.4.10.10112120840250.7963-100000@meripihka.hut.fi" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20Compile%20problem"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2001-12-12 16:12:23
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0973.html">¡˙–•æ≈ÃÏ: "[cc65] I want to see all the old message on CC65 maillist.How can i do?"</a>
+<li><strong>Previous message:</strong> <a href="0971.html">Marko M‰kel‰: "Re: [cc65] Compile problem"</a>
+<li><strong>In reply to:</strong> <a href="0971.html">Marko M‰kel‰: "Re: [cc65] Compile problem"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0975.html">Marko M‰kel‰: "Re: Re[2]: [cc65] Compile problem"</a>
+<li><strong>Reply:</strong> <a href="0975.html">Marko M‰kel‰: "Re: Re[2]: [cc65] Compile problem"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Marko,
+
+MM&gt; POSIX defines chdir(const char* path) and fchdir(int fd), but in Unix,
+MM&gt; there's no system call or even a library call for determining the current
+MM&gt; working directory.  As far as I know, the pwd(3) program guesses the
+MM&gt; current working directory by following the &quot;../../..&quot; chain and doing
+MM&gt; something like opendir/readdir/stat to find out a matching subdirectory of
+MM&gt; the &quot;..&quot; directory, and to find out when &quot;..&quot; is the same as &quot;.&quot; (in the
+MM&gt; root directory, it is).  BTW, at least on Sun Solaris 7, the pwd(3)
+MM&gt; program fails if one of the parent directories doesn't have read
+MM&gt; permissions.
+
+sounds odd to me ;=D unix fails to do something right that ms-dos can
+do perfectly fine ??? =&gt; shame :o)
+
+&gt;&gt; - well except a &quot;collapsepath&quot; functionality would be needed for
+&gt;&gt; &quot;OSes&quot; like ms-dos...
+
+MM&gt; Potentially, the maximum path name length can be a problem on any system
+MM&gt; when you have very long directory hierarchies.
+
+well yeah... practically the only one where you really run into
+trouble would be ms-dos though ;=) unix-pathes should be long enough
+for most stuff ;=)
+
+MM&gt; I guess you're referring
+MM&gt; to removing &quot;./&quot; or &quot;somedir/..&quot; parts from the path names.
+
+no not exactly.... i was referring to a function that 'simplifies'
+complex path specs, eg convert
+
+lib/beta/1/../../../include/../bin/ (nonsence? *G*)
+
+to
+
+bin/
+
+MM&gt; Or writing &quot;doctor files&quot; (PhD thesis). :-)
+
+eeeks, i knew why i quit studying ,=) haha
+
+MM&gt; To get back on the topic, I agree with Ullrich and would rather keep
+MM&gt; platform-specific stuff out of the compiler.  There are tools like GNU
+MM&gt; autoconf and automake that allow the creation of &quot;portable Makefiles&quot;.
+MM&gt; Maybe you should have a look at them.  Perhaps you don't want to use these
+MM&gt; tools as such, but you could get some ideas.  The source files (in a broad
+MM&gt; sense; including C files and Makefiles) do not need to be exactly
+MM&gt; identical on all platform; the main thing is that you can eliminate the
+MM&gt; need for manually editing them.
+
+yeah, just autoconf and friends would be another tools to learn and
+fight with for some weeks until i get it right.... dont like that idea
+to be honest ;=P
+
+MM&gt; Also, you could perhaps use a set of platform-specific Makefiles, like
+MM&gt; Makefile.`uname` where `uname` is replaced by Linux, OSF1, SunOS, etc.
+MM&gt; These files would include a common Makefile that'd contain the
+MM&gt; platform-independent rules.  I used this approach for a large C++ program
+MM&gt; I've written.  (GNU autoconf and automake ease the porting of C programs
+MM&gt; to various compilers, but for C++ there are very few compilers that would 
+MM&gt; compile the code.  I've only found two.)
+
+i use different makefiles for that matter already... well however :o)
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20Compile%20problem">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20Compile%20problem">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0973.html">¡˙–•æ≈ÃÏ: "[cc65] I want to see all the old message on CC65 maillist.How can i do?"</a>
+<li><strong>Previous message:</strong> <a href="0971.html">Marko M‰kel‰: "Re: [cc65] Compile problem"</a>
+<li><strong>In reply to:</strong> <a href="0971.html">Marko M‰kel‰: "Re: [cc65] Compile problem"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0975.html">Marko M‰kel‰: "Re: Re[2]: [cc65] Compile problem"</a>
+<li><strong>Reply:</strong> <a href="0975.html">Marko M‰kel‰: "Re: Re[2]: [cc65] Compile problem"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:44 CET</em>
+</em>
+</small>
+</body>
+</html>

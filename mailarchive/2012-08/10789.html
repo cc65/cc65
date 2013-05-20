@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] ca65 Users Guide Errors?</title>
+<meta name="Author" content="Michael Bazzinotti (mbazzinotti1gmail.com)" />
+<meta name="Subject" content="[cc65] ca65 Users Guide Errors?" />
+<meta name="Date" content="2012-08-30" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] ca65 Users Guide Errors?</h1>
+<!-- received="Thu Aug 30 18:01:43 2012" -->
+<!-- isoreceived="20120830160143" -->
+<!-- sent="Thu, 30 Aug 2012 12:01:33 -0400" -->
+<!-- isosent="20120830160133" -->
+<!-- name="Michael Bazzinotti" -->
+<!-- email="mbazzinotti1gmail.com" -->
+<!-- subject="[cc65] ca65 Users Guide Errors?" -->
+<!-- id="CAGuiMHjH93m9uKwZLwrjvujTr8X4tL+4KTYK0S5SPF3tB782EQ@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10790.html" title="Spiro Trikaliotis: &quot;[cc65] [ld65] Overwriting fillval for one segment only?&quot;">Next message</a> ]
+[ <a href="10788.html" title="thefox xofeht: &quot;Re: [cc65] computed labels witih .repeat&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="../2012-09/10792.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65 Users Guide Errors?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Michael Bazzinotti &lt;<a href="mailto:mbazzinotti1gmail.com?Subject=Re:%20[cc65]%20ca65%20Users%20Guide%20Errors?">mbazzinotti1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-08-30 18:01:33</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi everyone, I am switching from WLA DX to CA65 for 65816 programming ^__^
+Anyways, I have been reading up on the ca65 documentation, and I think
+I am spotting some needed corrections. I also have a question on C
+Macros. Please take a look at the following sections with me.
+
+12.6 .LOCAL
+-------------
+Look at the last macro in this section:
+<a href="http://www.cc65.org/doc/ca65-12.html#ss12.6">http://www.cc65.org/doc/ca65-12.html#ss12.6</a>
+
+The comment says that label Skip: is not visible outside. However, the
+doc explans one of the purposes to using .local over .proc is so that
+these labels will be visible outside. Therefore, I think this is a
+typo, and in actuality, Skip: is visible outside.
+
+11.48 .IFBLANK
+---------------
+2nd paragraph
+<a href="http://www.cc65.org/doc/ca65-11.html#ss11.48">http://www.cc65.org/doc/ca65-11.html#ss11.48</a>
+
+I quote:
+...Since an empty macro parameter will evaluate to nothing, the
+condition will evaluate to FALSE if an empty parameter was given.
+
+This appears to be copied directly from .ifnblank section, without
+modification (and therefore incorrect).
+Shouldn't the doc say that the condition will evaluate to TRUE if an
+empty parameter was given????
+
+12.7 C Macros
+-----------
+End of 12.7 I have a question.
+I quote:
+Beware: Since the assembler cannot detect the end of one parameter,
+only the first token is used. If you don't like that, use classic
+macros instead:
+
+         .macro  message
+                .out    message
+        .endmacro
+
+1st question: How is .macro working correctly?? Its name is message,
+but there is no parameter message??? so if i call it.. how does it
+work correctly????
+
+2nd question: If the assembler cannot detect the end of one parameter
+in C macros, how does it detect &gt; 1 parameter?? and by saying only the
+first token is used, does that mean if my parameter is &quot;message&quot;, the
+only the &quot;m&quot; is used???
+
+
+
+-bazz
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Aug 30 18:01:43 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10790.html" title="Next message in the list">Spiro Trikaliotis: "[cc65] [ld65] Overwriting fillval for one segment only?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10788.html" title="Previous message in the list">thefox xofeht: "Re: [cc65] computed labels witih .repeat"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="../2012-09/10792.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] ca65 Users Guide Errors?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="../2012-09/10792.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] ca65 Users Guide Errors?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10789" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10789" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10789" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-08-30 18:01:47 CEST
+</em></small></p>
+</body>
+</html>

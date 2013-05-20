@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Contiki on the Atari</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] Contiki on the Atari" />
+<meta name="Date" content="2010-10-04" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Contiki on the Atari</h1>
+<!-- received="Mon Oct  4 17:48:04 2010" -->
+<!-- isoreceived="20101004154804" -->
+<!-- sent="Mon, 4 Oct 2010 17:47:53 +0200" -->
+<!-- isosent="20101004154753" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] Contiki on the Atari" -->
+<!-- id="AANLkTik5rLH7Wu4hC+7hCjWQ9K0id6p0FG4vFpmbN_AX@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8663.html" title="Daniel Pralle: &quot;[cc65] RedHat Specfile&quot;">Next message</a> ]
+[ <a href="8661.html" title="Payton Byrd: &quot;Re: [cc65] Text Color Scheme on C64 (and Atari) ?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8663.html" title="Daniel Pralle: &quot;[cc65] RedHat Specfile&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Contiki%20on%20the%20Atari">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-10-04 17:47:53</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+I just wanted to tell you that I received today positive feedback from
+Dan Winslow regarding my port of Contiki to the Atari :-) That means
+that beside the C64, C128 and Apple II now the Atari is the fourth
+machine supported by the official Contiki code base.
+
+First of all thanks to all who helped me getting up to speed regarding
+Atari knowledge!
+
+For me personally it was yet again a great experience to see how easy
+it is with cc65 (and its C libraries) to re-target a quite large
+project to a new machine. The productivity cc65 (together with free
+emulators, free disk image tools and knowlege on the net in general)
+makes possible today is really amazing...
+
+Some additional remarks on the on the port of Contiki to the Atari:
+
+- I noticed once more that the POSIX interactive input functions (i.e.
+gets() ) are the ones with the biggest deviation in functionality on
+the different targets: Is a cursor displayed? Is &lt;Backspace&gt; possible?
+What happens on &lt;Backspace&gt; if there's nothing to delete? Does on
+&lt;Enter&gt; get a \n printed? ...?
+
+- Even with a modified start address of $2000 (instead of the default
+$2E00) the builtin linker config has a RAM memory area even smaller
+than the C128 one (which was so far the Contiki target with the
+smallest RAM memory area). As there's however on the Atari &quot;only&quot; one
+Ethernet solution there's no need to load the Ethernet driver
+dynamically. So I use on the Atari co65 &quot;productively&quot; to link the
+Ethernet driver statically. Because Contiki itself doesn't use the C
+heap that change means that not only the module loader but also the
+heap manager is omitted. Together with some minor Contiki config
+changes this approach made it fit.
+
+BTW: There might be scenarios which could benefit from the module
+loader not being hardwired to the C heap but allowing to provide an
+alternative memory manager (either at link time or as callback like
+the read callback). Just think of an application that doesn't use the
+heap at all but wants to load a single module (let's say a tgi
+driver). With the module loader not being tied to the heap manager one
+could provide a naive memory &quot;manager&quot; just returning on every call a
+pointer to the first byte behind the end of BSS.
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Oct  4 17:48:04 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8663.html" title="Next message in the list">Daniel Pralle: "[cc65] RedHat Specfile"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8661.html" title="Previous message in the list">Payton Byrd: "Re: [cc65] Text Color Scheme on C64 (and Atari) ?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8663.html" title="Next message in this discussion thread">Daniel Pralle: "[cc65] RedHat Specfile"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8663.html" title="Message sent in reply to this message">Daniel Pralle: "[cc65] RedHat Specfile"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8662" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8662" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8662" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-10-04 17:48:08 CEST
+</em></small></p>
+</body>
+</html>

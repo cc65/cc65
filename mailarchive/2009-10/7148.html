@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] return vs. exit()</title>
+<meta name="Author" content="Maspethrose71aol.com (Maspethrose71aol.com)" />
+<meta name="Subject" content="Re: [cc65] return vs. exit()" />
+<meta name="Date" content="2009-10-17" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] return vs. exit()</h1>
+<!-- received="Sat Oct 17 03:27:56 2009" -->
+<!-- isoreceived="20091017012756" -->
+<!-- sent="Fri, 16 Oct 2009 21:27:34 EDT" -->
+<!-- isosent="20091017012734" -->
+<!-- name="Maspethrose71aol.com" -->
+<!-- email="Maspethrose71aol.com" -->
+<!-- subject="Re: [cc65] return vs. exit()" -->
+<!-- id="cda.543e1a50.380a7786@aol.com" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="[cc65] return vs. exit()" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7149.html" title="Maspethrose71aol.com: &quot;[cc65] Creating Atari 8-bit Programs on Altirra 1.3?&quot;">Next message</a> ]
+[ <a href="7147.html" title="silverdr1wfmh.org.pl: &quot;[cc65] return vs. exit()&quot;">Previous message</a> ]
+[ <a href="7147.html" title="silverdr1wfmh.org.pl: &quot;[cc65] return vs. exit()&quot;">Maybe in reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7165.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] return vs. exit()&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:Maspethrose71aol.com?Subject=Re:%20[cc65]%20return%20vs.%20exit()">Maspethrose71aol.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-10-17 03:27:34</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>exit() is technically a function, but it should  be easy for the compiler 
+to detect its usage.  Simply detect if the  function is used the same way 
+that return is  detected.
+
+------------
+Joseph Rose, a.k.a. Harry Potter
+Working  magic in the computer community...or at least striving to! :(
+
+In a  message dated 10/16/2009 8:32:28 P.M. Eastern Daylight Time,  
+silverdr&#64;wfmh&#46;<!--nospam-->org.pl writes:
+A small thing - the warnings about control  reaching the end of non- 
+void function are now issued also when the control  terminates via  
+exit(). AFAIR it cc65 only checks whether there is any  return  
+statement, which in this case doesn't work as expected. I am  only  
+flagging this as I don't know whether it is easy to correct /  take  
+into account.
+
+Regards,
+
+-- 
+SD!
+
+
+P.  S.
+
+ShangHai:cc65_2.13 silverdr$ cc65 --version
+cc65 V2.13.0
+SVN  version:  4371
+
+----------------------------------------------------------------------
+To  unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the  string &quot;unsubscribe cc65&quot; in the body(!) of the mail.  
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Oct 17 03:27:56 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7149.html" title="Next message in the list">Maspethrose71aol.com: "[cc65] Creating Atari 8-bit Programs on Altirra 1.3?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7147.html" title="Previous message in the list">silverdr1wfmh.org.pl: "[cc65] return vs. exit()"</a></li>
+<li><dfn>Maybe in reply to</dfn>: <a href="7147.html" title="Message to which this message replies">silverdr1wfmh.org.pl: "[cc65] return vs. exit()"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7165.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] return vs. exit()"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7148" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7148" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7148" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-10-17 03:27:58 CEST
+</em></small></p>
+</body>
+</html>

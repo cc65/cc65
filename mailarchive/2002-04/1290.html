@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Atari file i/o functions</title>
+<meta name="Author" content="Christian Groessler (cpg_at_aladdin.de)">
+<meta name="Subject" content="Re: [cc65] Atari file i/o functions">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Atari file i/o functions</h1>
+<!-- received="Wed Apr 24 12:41:38 2002" -->
+<!-- isoreceived="20020424104138" -->
+<!-- sent="24 Apr 2002 12:40:37 +0200" -->
+<!-- isosent="20020424104037" -->
+<!-- name="Christian Groessler" -->
+<!-- email="cpg_at_aladdin.de" -->
+<!-- subject="Re: [cc65] Atari file i/o functions" -->
+<!-- id="87adrtcrbu.fsf@panther.aladdin.de" -->
+<!-- inreplyto="[cc65] Atari file i/o functions" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Christian Groessler (<a href="mailto:cpg_at_aladdin.de?Subject=Re:%20[cc65]%20Atari%20file%20i/o%20functions"><em>cpg_at_aladdin.de</em></a>)<br>
+<strong>Date:</strong> 2002-04-24 12:40:37
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1289.html">Ullrich von Bassewitz: "Re: [cc65] Atari file i/o functions"</a>
+<li><strong>Maybe in reply to:</strong> <a href="1286.html">Shawn Jefferson: "[cc65] Atari file i/o functions"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1291.html">groepaz: "Re[2]: [cc65] Atari file i/o functions"</a>
+<li><strong>Reply:</strong> <a href="1291.html">groepaz: "Re[2]: [cc65] Atari file i/o functions"</a>
+<li><strong>Reply:</strong> <a href="1292.html">Ullrich von Bassewitz: "Re: [cc65] Atari file i/o functions"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi,
+
+On 04/23/2002 01:08:28 PM MST &quot;Shawn Jefferson&quot; wrote:
+&gt;
+&gt;I was doing some programming on the Atari with the C file i/o
+&gt;functions and I noticed that fseek and ftell, and fopen with append
+&gt;are not implemented.
+
+Correct.
+
+&gt;
+&gt;I took a look at the source for the atari library and I figured that
+&gt;fseek and ftell could be implemented for SpartaDOS fairly easily,
+&gt;since SpartaDOS implements a sane NOTE and POINT functions in the
+&gt;FMS.  POINT is XIO#37 and NOTE is XIO #38.  AtariDOS is another story
+&gt;since it doesn't use an offset from the beginning of the file like
+&gt;SpartaDOS... it uses sector and byte!  Ugh!
+
+I don't know about SpartaDOS, but since I'm using it all the time and
+if it has &quot;sane&quot; NOTE and POINT, it'd be worthwile to implement
+fseek/ftell for it.
+
+
+On 04/23/2002 02:01:17 PM MST &quot;Shawn Jefferson&quot; wrote:
+&gt;
+&gt;Ok.  We will have to do a bunch of stuff in the lseek function to
+&gt;implement it properly, in assembly... ugh.  The Atari has the fseek
+&gt;and ftell functions built into the DOS, called POINT and NOTE.  We
+&gt;have to call point after working out the offset from whence, call CIO
+&gt;with the command for point and then call CIO again with the command
+&gt;for note to return the file position.  All in assembly... not my
+&gt;forte unfortunately.. I will have to do some quick learning! ;)
+
+I had the idea to implementing fseek and ftell (that's the reason
+there is the lseek.s file), but it appeared as rather difficult.
+
+The NOTE call returns the sector number on disk and the offset inside
+the sector of the current file position. This can then later be given
+to the POINT command to set the file ptr to the same position.
+
+I order to provide a generic fseek function which uses the file
+offset, one whould have to re-read the whole file to get to the
+correct position, since there is no easy way to find the sector
+number from file offset. An optimization idea I had, was to modify the
+read/write functions to always split the read/write sizes to sector
+sizes and make a NOTE call after every read/write and generate a file
+offset &lt;-&gt; sector table in RAM. But this will further reduce
+read/write speed.
+
+This is for Atari DOS, if SpartaDOS provides NOTE and POINT functions
+which use the file offset, it should be easy to implement there.
+
+regards,
+chris
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Atari%20file%20i/o%20functions">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1289.html">Ullrich von Bassewitz: "Re: [cc65] Atari file i/o functions"</a>
+<li><strong>Maybe in reply to:</strong> <a href="1286.html">Shawn Jefferson: "[cc65] Atari file i/o functions"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1291.html">groepaz: "Re[2]: [cc65] Atari file i/o functions"</a>
+<li><strong>Reply:</strong> <a href="1291.html">groepaz: "Re[2]: [cc65] Atari file i/o functions"</a>
+<li><strong>Reply:</strong> <a href="1292.html">Ullrich von Bassewitz: "Re: [cc65] Atari file i/o functions"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-04-24 12:41:57 CEST</em>
+</em>
+</small>
+</body>
+</html>

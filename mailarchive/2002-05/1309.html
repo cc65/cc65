@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] 65(S)C02 and additional t</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] 65(S)C02 and additional target...">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] 65(S)C02 and additional target...</h1>
+<!-- received="Tue May 14 13:43:16 2002" -->
+<!-- isoreceived="20020514114316" -->
+<!-- sent="Tue, 14 May 2002 13:43:19 +0200" -->
+<!-- isosent="20020514114319" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] 65(S)C02 and additional target..." -->
+<!-- id="20020514134319.A31672@trixie.musoftware.de" -->
+<!-- inreplyto="10DF6DB2771A934086EF4B4DD03AD76F0AB463@pacemail.pace.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%2065(S)C02%20and%20additional%20target..."><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-05-14 13:43:19
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1308.html">Christian Krüger: "Re: [cc65] 65(S)C02 and additional target..."</a>
+<li><strong>In reply to:</strong> <a href="1308.html">Christian Krüger: "Re: [cc65] 65(S)C02 and additional target..."</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Tue, May 14, 2002 at 11:13:23AM +0200, Christian Krüger wrote:
+&gt; I'll try. Because I'm interested in developing also commercial programms
+&gt; for the Lynx, I have no problem supporting the patch policy. I noticed
+&gt; (maling list archive) that there was a tiff... ;-)
+
+Please note that the policy is also important if you're using code from other
+people (in your case, maybe code from the existing Lynx libraries). You need
+permission from the original authors to do so.
+
+&gt; So why not pointing this fact out by renaming the -cpu switch
+&gt; to '65SC02'? It's a little bit confusing for newbies and the
+&gt; further development when have to know that the 65C02 switch
+&gt; is / should be 65SC02 compatible...
+
+I admit it's confusing. There are some hints in the ca65 manual (it talks
+about the 65C02 half of the time, and about the 65SC02 the other half), but a
+clear statement is missing. I've never considered this a problem because no
+one complained, and the additional instructions are not of much use anyway
+(the speed/size advantage gained when switching cc65 to 65C02 mode is
+neglectible for most applications). But you're of course correct, I will have
+a look at it and fix the docs.
+
+&gt; If the assembler supports BBR/BBS/RMB/SMB you need the 65SC02
+&gt; switch anyway...
+
+Or a set of macros.
+
+&gt; One more thing:
+&gt; How can I manipulate the linker to build a program header which tooks the
+&gt; startaddress, length of the program into account? (Or how I have to build
+&gt; the startupcode, so that the linker can put these infos into the header?)
+
+Just have a look at the startup files of the other platforms, most of them
+define some sort of executable header. In short: The header itself is defined
+in the startup file, sometimes using a special segment that is placed as first
+segment into the output file by the linker config. If the header needs special
+information that is only available in the linking stage (the program size for
+example), the linker is instructed to make this information available as
+external references at link time.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%2065(S)C02%20and%20additional%20target...">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%2065(S)C02%20and%20additional%20target...">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1308.html">Christian Krüger: "Re: [cc65] 65(S)C02 and additional target..."</a>
+<li><strong>In reply to:</strong> <a href="1308.html">Christian Krüger: "Re: [cc65] 65(S)C02 and additional target..."</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-05-14 13:43:35 CEST</em>
+</em>
+</small>
+</body>
+</html>

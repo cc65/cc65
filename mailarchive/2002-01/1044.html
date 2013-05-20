@@ -1,0 +1,154 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Compile problem</title>
+<meta name="Author" content="Mike McCarty (jmccarty_at_ssd.usa.alcatel.com)">
+<meta name="Subject" content="Re: [cc65] Compile problem">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Compile problem</h1>
+<!-- received="Tue Jan  8 01:42:07 2002" -->
+<!-- isoreceived="20020108004207" -->
+<!-- sent="Mon, 7 Jan 2002 18:41:11 -0600 (CST)" -->
+<!-- isosent="20020108004111" -->
+<!-- name="Mike McCarty" -->
+<!-- email="jmccarty_at_ssd.usa.alcatel.com" -->
+<!-- subject="Re: [cc65] Compile problem" -->
+<!-- id="Pine.SOL.4.10.10201071826150.6337-100000@sun1307.ssd.usa.alcatel.com" -->
+<!-- inreplyto="20011212181845.A13418@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Mike McCarty (<a href="mailto:jmccarty_at_ssd.usa.alcatel.com?Subject=Re:%20[cc65]%20Compile%20problem"><em>jmccarty_at_ssd.usa.alcatel.com</em></a>)<br>
+<strong>Date:</strong> 2002-01-08 01:41:11
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="../2001-12/1043.html">Ullrich von Bassewitz: "Re: [cc65] Problems with cbm.h"</a>
+<li><strong>In reply to:</strong> <a href="../2001-12/0977.html">Ullrich von Bassewitz: "Re: [cc65] Compile problem"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="../2001-12/0957.html">Jason Robertson: "Re: [cc65] Compile problem"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Been on vacation, so sorry this is late. I thought this might help the
+OP. 
+
+On Wed, 12 Dec 2001, Ullrich von Bassewitz wrote:
+
+&gt; Hi!
+&gt; 
+&gt; On Tue, Dec 11, 2001 at 08:40:01PM +0100, groepaz wrote:
+&gt; &gt; 1) at program start, get current working dir and remember that
+&gt; 
+&gt; It's not as simple as that, since DOS has a current directory per drive.
+&gt; Things like
+&gt; 
+&gt;         d:..\..\include
+&gt; 
+&gt; are completely legal. The example above would be a path relative to the
+&gt; current directory on drive d:
+
+[snip]
+
+&gt; Path handling in Windows/DOS is a mess, especially of you start to add UNC
+&gt; network paths (which are also legal paths).
+&gt; 
+&gt; So I would be really glad if you could find another solution for your
+&gt; problem :-)
+
+Another way to solve this is to make part of the path come from
+ENVIRONMENT VARIABLES, which most MAKE programs can read. One executes
+a command to set a given build environment, which sets the environment
+variables. These are read by the make program, and get put into the -I
+paths. I have used this technique regularly. It keeps path names out of
+my source (where it is a major pain), and allows my makefiles to be
+generic as well (where the pain is a little less acute, but still
+present).
+
+As an example, one could have
+
+   -I$(INCLPATH1)/ -I$(INCLPATH2)/
+
+The environment variables for a DOS machine with target 1 might be
+
+INCLPATH1=D:\CC65\INCLUDE\SYSTEM1
+INCLPATH2=F:\COMPILERS\MYSTUFF\SYSTEM1
+
+and for target 2 (or debug environment 2)
+
+INCLPATH1=D:\CC65\INCLUDE\SYSTEM2
+INCLPATH2=F:\COMPILERS\MYSTUFF\SYSTEM2
+
+whereas on a Unix machine they might be
+
+INCLPATH1=/cc65/include/system1
+INCLPATH2=/compilers/mystuff/system1
+
+and
+
+INCLPATH1=/cc65/include/system2
+INCLPATH2=/compilers/mystuff/system2
+
+
+Note that 
+
+#include &lt;../debug.h&gt;
+
+Works just fine using this technique.
+
+Naturally, one would pick different names for the paths, indicating
+their use. They might be DEBUG_INCLUDE_PATH and MY_STANDARD_STUFF_PATH.
+
+Mike
+--  
+char *p=&quot;char *p=%c%s%c;main(){printf(p,34,p,34);}&quot;;main(){printf(p,34,p,34);}
+This message made from 100% recycled bits.
+I can explain it for you, but I can't understand it for you.
+I don't speak for Alcatel      &lt;- They make me say that.
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Compile%20problem">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="../2001-12/1043.html">Ullrich von Bassewitz: "Re: [cc65] Problems with cbm.h"</a>
+<li><strong>In reply to:</strong> <a href="../2001-12/0977.html">Ullrich von Bassewitz: "Re: [cc65] Compile problem"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="../2001-12/0957.html">Jason Robertson: "Re: [cc65] Compile problem"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-01-08 01:43:27 CET</em>
+</em>
+</small>
+</body>
+</html>

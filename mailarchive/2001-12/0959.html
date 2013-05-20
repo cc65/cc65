@@ -1,0 +1,200 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] Compile problem</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] Compile problem">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] Compile problem</h1>
+<!-- received="Mon Dec 10 16:54:30 2001" -->
+<!-- isoreceived="20011210155430" -->
+<!-- sent="Mon, 10 Dec 2001 16:54:02 +0100" -->
+<!-- isosent="20011210155402" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] Compile problem" -->
+<!-- id="13621767607.20011210165402@gmx.net" -->
+<!-- inreplyto="20011210111926.A27661@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20Compile%20problem"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2001-12-10 16:54:02
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0960.html">Adam Dunkels: "Re: Re[2]: [cc65] Compile problem"</a>
+<li><strong>Previous message:</strong> <a href="0958.html">Ullrich von Bassewitz: "Re: [cc65] Compile problem"</a>
+<li><strong>In reply to:</strong> <a href="0958.html">Ullrich von Bassewitz: "Re: [cc65] Compile problem"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0960.html">Adam Dunkels: "Re: Re[2]: [cc65] Compile problem"</a>
+<li><strong>Reply:</strong> <a href="0960.html">Adam Dunkels: "Re: Re[2]: [cc65] Compile problem"</a>
+<li><strong>Reply:</strong> <a href="0961.html">Ullrich von Bassewitz: "Re: [cc65] Compile problem"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+Monday, December 10, 2001, 11:19:26 AM, you wrote:
+
+
+UvB&gt; Hi!
+
+UvB&gt; On Sun, Dec 09, 2001 at 05:01:03PM +0100, groepaz wrote:
+&gt;&gt; oh btw UZ.... there's a little flaw in the assembler (maybe in the
+&gt;&gt; compiler aswell) related to the &quot;include&quot; directive and relative
+&gt;&gt; paths... looks like always uses the location of the directory where
+&gt;&gt; ca65 has been run to complete relative pathes in any files (rather
+&gt;&gt; than the location of the file were the include occurs) ... this kinda
+&gt;&gt; makes it annoying to write general include files (which in turn,
+&gt;&gt; include other files etc) except you use absolute pathes.
+
+UvB&gt; You may want to use the &quot;-I directory&quot; option to add an include search path.
+UvB&gt; Include files with relative paths are searched relative to any given include
+UvB&gt; directory and relative to the current directory (because &quot;.&quot; is added to the
+UvB&gt; search path when the compiler/assembler starts).
+
+UvB&gt; I think both options (searching relative to the directory where the include
+UvB&gt; file resides vs. searching relative to the current directory) may be confusing
+UvB&gt; sometimes. And there is even a third option: Search relative to the directory
+UvB&gt; where the main source file is located.
+
+
+UvB&gt; Using -I should solve all these troubles.
+
+err... sorry, no :o) using -I is not a &quot;clean&quot; solution.... for once
+it would mean that each .inc file has to have a unique filename (which
+is not an option for me since i have &quot;config.inc&quot; etc in various
+directories) and nonetheless it makes it impossible to write code (and
+makefiles etc) that is totally independent of absolute local paths.
+from my understanding &quot;-I&quot; should be used to tell the assembler where
+to find &quot;common&quot; includes (such as common libraries of your &quot;OS&quot;) but
+NOT where to find includefiles that are selfcontained within the code
+you are trying to compile.
+
+!
++-cc65
+!  +-bin                  this dir added to exe-search path
+!  +-lib                  this dir added to include path with &quot;-I&quot;
+!  +-include              this dir added to include path with &quot;-I&quot;
+!
++-c64
+   +-dev
+   !  +-bin               this dir added to exe-search path
+   !  +-lib               this dir added to include path with &quot;-I&quot;
+   !  +-include           this dir added to include path with &quot;-I&quot;
+   !
+   +-projects
+      +-work1             makefile for exe1,exe2 lives here
+      !  +-exe1
+      !  +-exe2
+      !  +-common         common code for exe1,ex2 lives here
+      !     +-test
+      +-work2
+      
+(before you ask, i add &quot;lib&quot; directories to include path so i can
+include them .s files for some quick'n'dirty testing - its ofcoz not
+necessary usually)
+
+ok, now let me explain.....
+
+in /work1 ,/work2 etc are some different projects, that is code that
+belongs together and is selfcontained except common system libraries
+which live in cc65/lib, cc65/include, (libs that come with the
+compiler) and c64/dev/lib, c64/dev/include (my own libs, just to keep
+them seperated).
+
+now lets say /common keeps a couple of .inc files which are beeing
+used by both /exe1 and /exe2 .... to make things more obvious, also in
+/common/test there is some code that uses those files.
+
+in /common lives a file &quot;global.inc&quot; that looks like
+
+.include &quot;config.inc&quot;
+.include &quot;more.inc&quot;
+.include &quot;etc.inc&quot;
+
+... all included files live in the same directory as global.inc
+
+
+soooooo to make a point, the behaviour i'd expect would be like:
+
+a) regardless whats the current working dir when i type &quot;make&quot;, the
+stuff should still work =&gt; this renders &quot;searching relative to .&quot;
+useless.
+b) the same (unmodified) files in /common should work for all /exe1,
+/exe2 and /test .... =&gt; this renders &quot;searching relative to main
+sourcefile&quot; useless.
+
+(a+b are pretty related to each other as you can see)
+
+c) code should compile (assemble) without change regardless of its
+location in the local filesystem =&gt; this forbids using &quot;-I&quot; option in
+the makefile for adding all and every directory that keeps .inc files
+(apart from this would be a really ugly solution for big projects - i
+tend to split my stuff in lotta small files)
+
+whatever, all and all these problems can be easily solved by
+&quot;searching relative to current file&quot; aswell (right after searching
+pathes given by -I option at best) - and thats actually the kind of
+behaviour i'd expect from any decent compiler/assembler out there.
+(except borland turbo-c which suffers from the same problem hehehehe ;D)
+
+infact, i was pretty surprised that ca65 did NOT work like this when i
+first stumbled about it....seems to be another &quot;too easy to let it be
+unfixed&quot; issue to me ;=)
+
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20Compile%20problem">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20Compile%20problem">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0960.html">Adam Dunkels: "Re: Re[2]: [cc65] Compile problem"</a>
+<li><strong>Previous message:</strong> <a href="0958.html">Ullrich von Bassewitz: "Re: [cc65] Compile problem"</a>
+<li><strong>In reply to:</strong> <a href="0958.html">Ullrich von Bassewitz: "Re: [cc65] Compile problem"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0960.html">Adam Dunkels: "Re: Re[2]: [cc65] Compile problem"</a>
+<li><strong>Reply:</strong> <a href="0960.html">Adam Dunkels: "Re: Re[2]: [cc65] Compile problem"</a>
+<li><strong>Reply:</strong> <a href="0961.html">Ullrich von Bassewitz: "Re: [cc65] Compile problem"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:44 CET</em>
+</em>
+</small>
+</body>
+</html>

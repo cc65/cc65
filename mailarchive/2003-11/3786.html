@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] Buggy code (was: testsuite up</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="[cc65] Buggy code (was: testsuite updated)">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] Buggy code (was: testsuite updated)</h1>
+<!-- received="Thu Nov 20 17:04:11 2003" -->
+<!-- isoreceived="20031120160411" -->
+<!-- sent="Thu, 20 Nov 2003 17:04:07 +0100" -->
+<!-- isosent="20031120160407" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="[cc65] Buggy code (was: testsuite updated)" -->
+<!-- id="20031120160407.GA23014@trixie.musoftware.de" -->
+<!-- inreplyto="00dd01c3af68$e5800da0$500906d5@acer5j0jdwij8z" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Buggy%20code%20(was:%20testsuite%20updated)"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-11-20 17:04:07
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3785.html">carlos: "Re: [cc65] testsuite updated"</a>
+<li><strong>In reply to:</strong> <a href="3785.html">carlos: "Re: [cc65] testsuite updated"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3787.html">Groepaz: "Re: [cc65] Buggy code (was: testsuite updated)"</a>
+<li><strong>Reply:</strong> <a href="3787.html">Groepaz: "Re: [cc65] Buggy code (was: testsuite updated)"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Thu, Nov 20, 2003 at 02:19:04PM +0100, carlos wrote:
+&gt;     the randomnumber generator which i sent to the list some days ago,
+&gt; output 16bit numbers instead of 32
+&gt;     bit ones. That seems to result from a missing &quot;int&quot; in the expression
+&gt;     &quot;long unsigned&quot;  at the top of the function genrand(). It seems to be
+&gt; intepreted just as &quot;unsigned int&quot;.
+
+Have you really tried to change the declaration? If so, you would have noticed
+that the change doesn't have any effect.
+
+Since you are using DJGPP (which is actually a special version of gcc), why
+not have a look at the warnings it generates? This is what gcc says when
+compiling your sources:
+
+----------------------------------------------------------------------------
+gcc -Wall -O2 -o mt19937int mt19937int.c
+mt19937int.c:101: warning: return type defaults to `int'
+mt19937int.c: In function `main':
+mt19937int.c:106: warning: unsigned int format, long unsigned int arg (arg 2)
+mt19937int.c:110: warning: control reaches end of non-void function
+----------------------------------------------------------------------------
+
+It is a good idea to fix compiler warnings instead of ignoring them.
+Especially when there seem to be problems with a given source. In your case,
+the solution for your problem is exactly outlined in the warnings shown above.
+On the i86 platform, &quot;long&quot; and &quot;int&quot; have the same size (32 bit). This is not
+true for cc65, where an &quot;int&quot; has 16 bit, while a &quot;long&quot; has 32. So a wrong
+format specifier in printf will work on one platform but not on the other. If
+you fix the format specifier in line 106 of your sources, you will notice that
+the sources start working when compiled with cc65.
+
+&gt;     Is this something, which different compilers treat differently? Is this
+&gt; the reason that you never should
+&gt;     write just &quot;unsigned&quot; without &quot;int&quot;?
+
+I don't know who made up this rule, but it's plain wrong. &quot;unsigned&quot; and
+&quot;unsigned int&quot; are the same type, and the C standard explicitly allows both.
+The same is true for &quot;long unsigned&quot;, &quot;unsigned long&quot;, &quot;long unsigned int&quot; and
+&quot;unsigned long int&quot;.
+
+&gt;     Just want to tell about this. Please don't think i want you to track
+&gt; bugs of other people.
+&gt;     It's just, that you can't think about it, if i don't inform you about
+&gt; these things.
+
+One side is that I'm glad when people send me comments and bug reports. On the
+other side, having to look at sources that are obviously buggy needs time I
+could have spend better. In your case it is more the latter than the former.
+Please don't get me wrong: Any reports are still welcome, especially when
+programs do not seem to compile correctly with cc65. Often enough this is a
+problem with cc65. But you can save me quite some work if you double check
+that the problematic sources are portable and don't have obvious errors. The
+latter includes compiling on all platforms with warnings enabled *and* fix the
+code that produces the warnings.
+
+You can even make a more general rule out of this: Always use
+
+        -Wall -Werror
+
+when compiling with gcc.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Buggy%20code%20(was:%20testsuite%20updated)">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Buggy%20code%20(was:%20testsuite%20updated)">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3785.html">carlos: "Re: [cc65] testsuite updated"</a>
+<li><strong>In reply to:</strong> <a href="3785.html">carlos: "Re: [cc65] testsuite updated"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3787.html">Groepaz: "Re: [cc65] Buggy code (was: testsuite updated)"</a>
+<li><strong>Reply:</strong> <a href="3787.html">Groepaz: "Re: [cc65] Buggy code (was: testsuite updated)"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-11-20 17:05:12 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="iso-8859-15"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] cfg-files and the linker a</title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="Re: [cc65] cfg-files and the linker and so on.." />
+<meta name="Date" content="2004-09-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] cfg-files and the linker and so on..</h1>
+<!-- received="Sat Sep 25 17:10:55 2004" -->
+<!-- isoreceived="20040925151055" -->
+<!-- sent="Sat, 25 Sep 2004 17:09:48 +0200" -->
+<!-- isosent="20040925150948" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="Re: [cc65] cfg-files and the linker and so on.." -->
+<!-- id="200409251709.48767.groepaz@gmx.net" -->
+<!-- charset="iso-8859-15" -->
+<!-- inreplyto="908840349.20040925165512&#64;student.liu.se" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4530.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Get user input?&quot;">Next message</a> ]
+[ <a href="4528.html" title="Mats Andrén: &quot;[cc65] cfg-files and the linker and so on..&quot;">Previous message</a> ]
+[ <a href="4528.html" title="Mats Andrén: &quot;[cc65] cfg-files and the linker and so on..&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4536.html" title="Mats Andrén: &quot;Re[2]: [cc65] cfg-files and the linker and so on..&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20cfg-files%20and%20the%20linker%20and%20so%20on..">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-09-25 17:09:48</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Saturday 25 September 2004 16:55, Mats Andrén wrote:
+&gt; This works nicely, but the RAM area after the startupcode
+&gt; ($08xx-$0fff) is now unused since the editor code segment currently
+&gt; starts at $2000. Now let's say that I'd like to be able to simply
+&gt; relocate the asm-player-code to some other adress, like $6000 or
+&gt; whatever, then I'd obviously like to have some of the editor-code
+&gt; going before that segment and some of it after it since the memory
+&gt; after the player-code would be to small to hold the complete editor code.
+&gt; Is that possible somehow, or am I asking too much? Perhaps I have to
+&gt; do this by myself, by changing here and there in my C code where
+&gt; different parts of the C code should go, so some of it ends up before
+&gt; the player and some of it ends up after it?
+&gt; 
+&gt; Also, the size of the asm-player-code is not really known, but changes
+&gt; as I do changes to the player-code. Could the linker (or something
+&gt; else) somehow detect where the playercode ends and automatically make
+&gt; the C code start right after it, without me having to explicitly
+&gt; define beforehand how big the asm-player-code-segment should be in the
+&gt; cfg-file?
+&gt; 
+&gt; Also, should I really be required to have that &quot;fill = yes&quot;-snippet in
+&gt; the cfg-file to make the linker understand that I don't want a binary
+&gt; that only contains the code I've actually written, but that I actually
+&gt; want it to automatically end up at those places in memory that I have
+&gt; specified in the cfg-file, with chunks of empty space in between? I
+&gt; thought &quot;load = $xxxx&quot; was supposed to take care of that?
+&gt; 
+&gt; I am really new to cc65 (even though I have used ca65 a bit before),
+&gt; so please bear with me if I'm just confused and do not make sense.
+&gt; 
+&gt; Any suggestion for a better cfg-file for me?
+
+you are thinking to complicated :) you dont need a special config at all...
+write your player like this:
+
+	.export play,init
+
+	.code
+
+init:
+	jmp realinit
+play:
+	jmp realplay
+
+	&lt;playercode here&gt;
+
+	.rodata
+
+	.byte 1,2,3
+
+	&lt;constant data for player&gt;
+
+	.data
+
+	.byte 1,2,3
+
+	&lt;initialized variables for player&gt;
+
+	.bss
+
+	.res 3
+
+	&lt;non initialized variables for player&gt;
+
+note: you probably dont want to use the .data section, since that
+would require a startup code later
+
+assemble that, and link it to your c-program...the linker will take
+care of relocating it and placing it memory so it fits.
+
+then if you later want to create a &quot;standalone&quot; version of your player
+(and music data) -traditionally starting at $1000-, then use a simple
+config file that places stuff at $1000 (and dont link the startup code
+ofcourse).
+
+mmmh...hope that helps :)
+
+gpz
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Sep 25 17:10:55 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4530.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Get user input?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4528.html" title="Previous message in the list">Mats Andrén: "[cc65] cfg-files and the linker and so on.."</a></li>
+<li><dfn>In reply to</dfn>: <a href="4528.html" title="Message to which this message replies">Mats Andrén: "[cc65] cfg-files and the linker and so on.."</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4536.html" title="Next message in this discussion thread">Mats Andrén: "Re[2]: [cc65] cfg-files and the linker and so on.."</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4536.html" title="Message sent in reply to this message">Mats Andrén: "Re[2]: [cc65] cfg-files and the linker and so on.."</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4529" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4529" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4529" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-09-25 17:11:03 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] OT: Question about Power C</title>
+<meta name="Author" content="Karri Kaksonen (karri1sipo.fi)" />
+<meta name="Subject" content="Re: [cc65] OT: Question about Power C and C128" />
+<meta name="Date" content="2005-07-05" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] OT: Question about Power C and C128</h1>
+<!-- received="Tue Jul  5 06:45:42 2005" -->
+<!-- isoreceived="20050705044542" -->
+<!-- sent="Tue, 05 Jul 2005 08:18:47 +0300" -->
+<!-- isosent="20050705051847" -->
+<!-- name="Karri Kaksonen" -->
+<!-- email="karri1sipo.fi" -->
+<!-- subject="Re: [cc65] OT: Question about Power C and C128" -->
+<!-- id="42CA1837.3050106@sipo.fi" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20050705035747.70368.qmail&#64;web40604.mail.yahoo.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5091.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] gloal __fastcall__&quot;">Next message</a> ]
+[ <a href="5089.html" title="Payton Byrd: &quot;[cc65] OT: Question about Power C and C128&quot;">Previous message</a> ]
+[ <a href="5089.html" title="Payton Byrd: &quot;[cc65] OT: Question about Power C and C128&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5092.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] OT: Question about Power C and C128&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Karri Kaksonen &lt;<a href="mailto:karri1sipo.fi?Subject=Re:%20[cc65]%20OT:%20Question%20about%20Power%20C%20and%20C128">karri1sipo.fi</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-07-05 07:18:47</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Payton Byrd wrote:
+
+&gt;I know this is off topic, but I figured it's the most
+&gt;likely place for someone to have run across my
+&gt;scenario.
+&gt;
+&gt;I am writing a game in Power C for the 128.  I'm
+&gt;having a problem enumerating a two dimensional char*
+&gt;array declared like this:
+&gt;
+&gt;char* _sVerbs =
+&gt;{
+&gt;    { &quot;n&quot;, &quot;N&quot;, &quot;orth&quot; },
+&gt;    { &quot;s&quot;, &quot;S&quot;, &quot;outh&quot; },
+&gt; /** etc. **/
+&gt;};
+&gt;
+&gt;No matter what I do, I can only get the first row of
+&gt;data which always returns back &quot;n&quot;, &quot;N&quot;, and &quot;orth&quot;. 
+&gt;I've tried directly indexing the array like this:
+&gt;
+&gt;_sVerbs[i][0] where i is the row I want.
+&gt;
+&gt;I've tried indexing the pointer:
+&gt;
+&gt;*(_sVerbs + (i * sizeof(char*))[0]
+&gt;
+&gt;I've tried getting a pointer to the inner array:
+&gt;
+&gt;char** sLine = _sVerbs[i];
+&gt;s = sLine[0];
+&gt;
+&gt;No matter what I do I always get back the first row of
+&gt;the array regardless of the value of i.
+&gt;
+&gt;Is this a known problem with Power C that I should
+&gt;avoid, or am I just being completely stupid?
+&gt;
+&gt;  
+&gt;
+I can not answer the last question, but I believe C arrays should work
+like this:
+
+char *_sVerbs[][3] =
+{
+    { &quot;n&quot;, &quot;N&quot;, &quot;orth&quot; },
+    { &quot;s&quot;, &quot;S&quot;, &quot;outh&quot; },
+    etc...
+};
+th = _sVerbs[i][0];
+
+--
+Cheers,
+
+Karri
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Jul  5 06:45:42 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5091.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] gloal __fastcall__"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5089.html" title="Previous message in the list">Payton Byrd: "[cc65] OT: Question about Power C and C128"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5089.html" title="Message to which this message replies">Payton Byrd: "[cc65] OT: Question about Power C and C128"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5092.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] OT: Question about Power C and C128"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5090" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5090" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5090" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-07-05 06:45:44 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] possible error, tertiary o</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] possible error, tertiary on cbm_save return value" />
+<meta name="Date" content="2009-08-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] possible error, tertiary on cbm_save return value</h1>
+<!-- received="Sun Aug 23 23:37:07 2009" -->
+<!-- isoreceived="20090823213707" -->
+<!-- sent="Sun, 23 Aug 2009 23:34:07 +0200" -->
+<!-- isosent="20090823213407" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] possible error, tertiary on cbm_save return value" -->
+<!-- id="20090823213407.GA14494@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="200908232331.50029.groepaz&#64;gmx.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6722.html" title="David A. Lyons: &quot;Re: [cc65] Profiling, timing on the Apple //e&quot;">Next message</a> ]
+[ <a href="6720.html" title="Groepaz: &quot;Re: [cc65] possible error, tertiary on cbm_save return value&quot;">Previous message</a> ]
+[ <a href="6720.html" title="Groepaz: &quot;Re: [cc65] possible error, tertiary on cbm_save return value&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20possible%20error,%20tertiary%20on%20cbm_save%20return%20value">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-08-23 23:34:07</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Sun, Aug 23, 2009 at 11:31:48PM +0200, Groepaz wrote:
+&gt; btw that said, a small section in the docs that outline the cc65 calling
+&gt; conventions (plus the fact you mention) would be very useful ... i recently
+&gt; took the last zoomania release (<a href="http://noname.c64.org/csdb/release/?id=74653">http://noname.c64.org/csdb/release/?id=74653</a>)
+&gt; and looked at it (mostly because onslaught screwed up their ntsc fixed
+&gt; version - <a href="http://noname.c64.org/csdb/release/?id=74715">http://noname.c64.org/csdb/release/?id=74715</a> ) and noticed that
+&gt; indeed one very obscure bug has been triggered because hannenz (who
+&gt; originally wrote it) didnt exactly understand that returning just A in a
+&gt; function that returns char isnt enough... and appearently none of the guys
+&gt; who worked on it till now knew it either :)
+
+Yes. That is even true for cbm_k_save (on which cbm_save is based): It does
+not clear the X register, so the problem, Johan was experiencing may have been
+caused by this error. I will fix it.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Aug 23 23:37:07 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6722.html" title="Next message in the list">David A. Lyons: "Re: [cc65] Profiling, timing on the Apple //e"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6720.html" title="Previous message in the list">Groepaz: "Re: [cc65] possible error, tertiary on cbm_save return value"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6720.html" title="Message to which this message replies">Groepaz: "Re: [cc65] possible error, tertiary on cbm_save return value"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6721" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6721" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6721" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-08-23 23:37:08 CEST
+</em></small></p>
+</body>
+</html>

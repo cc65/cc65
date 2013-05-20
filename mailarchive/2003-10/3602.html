@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] [very OT] KVM</title>
+<meta name="Author" content="Adam Dunkels (adam_at_sics.se)">
+<meta name="Subject" content="Re: [cc65] [very OT] KVM">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] [very OT] KVM</h1>
+<!-- received="Thu Oct  9 22:46:43 2003" -->
+<!-- isoreceived="20031009204643" -->
+<!-- sent="Thu, 09 Oct 2003 22:44:36 +0200" -->
+<!-- isosent="20031009204436" -->
+<!-- name="Adam Dunkels" -->
+<!-- email="adam_at_sics.se" -->
+<!-- subject="Re: [cc65] [very OT] KVM" -->
+<!-- id="1065732275.236.92.camel@localhost" -->
+<!-- inreplyto="20031009202703.GD7924@trikaliotis.hn.org" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Adam Dunkels (<a href="mailto:adam_at_sics.se?Subject=Re:%20[cc65]%20[very%20OT]%20KVM"><em>adam_at_sics.se</em></a>)<br>
+<strong>Date:</strong> 2003-10-09 22:44:36
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3601.html">Spiro Trikaliotis: "Re: [cc65] [very OT] KVM"</a>
+<li><strong>In reply to:</strong> <a href="3601.html">Spiro Trikaliotis: "Re: [cc65] [very OT] KVM"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3603.html">Ullrich von Bassewitz: "Re: [cc65] [very OT] KVM"</a>
+<li><strong>Next in thread:</strong> <a href="3600.html">Spiro Trikaliotis: "Re: [cc65] [very OT] KVM"</a>
+<li><strong>Reply:</strong> <a href="3603.html">Ullrich von Bassewitz: "Re: [cc65] [very OT] KVM"</a>
+<li><strong>Reply:</strong> <a href="3604.html">Spiro Trikaliotis: "Re: [cc65] [very OT] KVM"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Thu, 2003-10-09 at 22:27, Spiro Trikaliotis wrote:
+&gt; &gt; Spiro and I have actually been in contact quite regularly during his
+&gt; 
+&gt; well, yes. If I remember correctly, you were the first one being told what I
+&gt; had in mind. :-)
+
+Cool :-)
+
+&gt; &gt; porting the TFE emulation to *nix. The problem with the tap device is
+&gt; &gt; that it doesn't exactly provide the same functionality as the pcap
+&gt; &gt; libraries. The tap device basically creates a virtual LAN, while the
+&gt; &gt; pcap gives direct access to the physical LAN (the one on which the PC is
+&gt; &gt; connected to).
+&gt; 
+&gt; Adam, Uz proposed using RAW Sockets and gave me some hints for this. Do you
+&gt; know of *BSD has these, too?
+
+Ok, great! Yes they are in BSD, but I wouldn't be surprised if there
+were a few differences between Linux and BSD though... Uz: is it
+possible to send raw Ethernet frames using raw sockets? I quickly
+checked the BSD TCP/IP stack bible yesterday (TCP/IP Illustrated volume
+2 / Stevens, amazing book!) and I didn't see anything obvious, but the
+book is a couple of years old and I just looked quickly.
+
+&gt; &gt; Under FreeBSD it might be possible to use the BPF (Berkeley Packet
+&gt; &gt; Filter) to get the same kind of access as the pcap library under
+&gt; &gt; Windows, but I don't know if this is available under Linux.
+&gt; 
+&gt; BPF are not available natively. Anyway, libpcap uses them and &quot;ports&quot; them
+&gt; to Linux.
+
+Ok - then is probably isn't possible to send frames using Linux BPF
+either :-(
+
+&gt; &gt; I think that most old-school *nix gui developers actually hate the term &quot;user&quot; ;-)
+&gt; 
+&gt; &quot;User? We don't need any user.&quot; :-)
+
+Allright - GI developers perhaps is a better name then ;-)
+
+/adam
+-- 
+Adam Dunkels &lt;<a href="mailto:adam_at_sics.se?Subject=Re:%20[cc65]%20[very%20OT]%20KVM">adam_at_sics.se</a>&gt;
+<a href="http://www.sics.se/~adam/">http://www.sics.se/~adam/</a>
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20[very%20OT]%20KVM">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3601.html">Spiro Trikaliotis: "Re: [cc65] [very OT] KVM"</a>
+<li><strong>In reply to:</strong> <a href="3601.html">Spiro Trikaliotis: "Re: [cc65] [very OT] KVM"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3603.html">Ullrich von Bassewitz: "Re: [cc65] [very OT] KVM"</a>
+<li><strong>Next in thread:</strong> <a href="3600.html">Spiro Trikaliotis: "Re: [cc65] [very OT] KVM"</a>
+<li><strong>Reply:</strong> <a href="3603.html">Ullrich von Bassewitz: "Re: [cc65] [very OT] KVM"</a>
+<li><strong>Reply:</strong> <a href="3604.html">Spiro Trikaliotis: "Re: [cc65] [very OT] KVM"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-10-09 22:46:57 CEST</em>
+</em>
+</small>
+</body>
+</html>

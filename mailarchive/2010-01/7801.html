@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Question on 1351 mouse</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Question on 1351 mouse" />
+<meta name="Date" content="2010-01-31" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Question on 1351 mouse</h1>
+<!-- received="Sun Jan 31 14:16:51 2010" -->
+<!-- isoreceived="20100131131651" -->
+<!-- sent="Sun, 31 Jan 2010 14:16:22 +0100" -->
+<!-- isosent="20100131131622" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Question on 1351 mouse" -->
+<!-- id="f97798c21001310516o541ed1b8n9bd349079b715e30@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="4CC3CE18-5ECF-4E36-A6DC-9E6D96BF561D&#64;wfmh.org.pl" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7802.html" title="Greg King: &quot;Re: [cc65] Question on 1351 mouse&quot;">Next message</a> ]
+[ <a href="7800.html" title="Christian Krüger: &quot;Re: [cc65] Export symbols out of 'proc'-scope to file scope?&quot;">Previous message</a> ]
+[ <a href="7799.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Question on 1351 mouse&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7802.html" title="Greg King: &quot;Re: [cc65] Question on 1351 mouse&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Question%20on%201351%20mouse">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-01-31 14:16:22</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt;&gt; Based on your hints I played around somewhat more and found that
+&gt;&gt; moving the mouse while pressing the primary mouse button can generate
+&gt;&gt; the phantom keycode 62
+&gt;
+&gt; Hmm... are you using the mouse in its native mode? Or in the joystick emulation mode? Memory might not serve well but AFAIR in the native mode the movements do not go over the CIA lines at all, and therefore should not interfere. Only the buttons do...
+
+Maybe it wasn't moving the mouse but some other reason...
+
+I extended the cc65 sample program 'mousedemo' to display the code of
+keys coming through cgetc(). And I notice that now an then I get
+others than 160 (i.e. 62) when playing with the mouse - at least with
+VICE on Windows.
+
+However I now have yet another much more severe issue: Originally I
+thought that only the keyboard entry 'Shift-Space' would trigger a
+&quot;phantom mouse click&quot;. Now I found out that many keyboard keys do so
+(i.e. the Space and the number keys). With all those &quot;phantom mouse
+clicks&quot; Contiki obviously isn't usable at all :-((
+
+So after having now the Contiki 2.x web browser working fine I can't
+activate the Contiki mouse support on the C64 - which was sort of the
+idea behind the whole effort :-(((
+
+I'll won't commit the workaround code posted previously as it leads to
+nowhere...
+
+As soon as a &quot;working as expected (by me)&quot; mouse support is avialable
+for the C64 I'll build the Contiki 2.x web browser (and other apps)
+with mouse support on C64 and publish them! Maybe this prospect
+motivates &quot;the right one&quot; ;-)
+
+Again thanks for your help, Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Jan 31 14:16:51 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7802.html" title="Next message in the list">Greg King: "Re: [cc65] Question on 1351 mouse"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7800.html" title="Previous message in the list">Christian Krüger: "Re: [cc65] Export symbols out of 'proc'-scope to file scope?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7799.html" title="Message to which this message replies">silverdr1wfmh.org.pl: "Re: [cc65] Question on 1351 mouse"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7802.html" title="Next message in this discussion thread">Greg King: "Re: [cc65] Question on 1351 mouse"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7802.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] Question on 1351 mouse"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7801" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7801" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7801" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-01-31 14:16:53 CET
+</em></small></p>
+</body>
+</html>

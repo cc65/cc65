@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] TGI palettes (was: TGI col</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] TGI palettes (was: TGI colors revisited)" />
+<meta name="Date" content="2011-05-15" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] TGI palettes (was: TGI colors revisited)</h1>
+<!-- received="Sun, 15 May 2011 18:54:35 +0200" -->
+<!-- isoreceived="20110515165435" -->
+<!-- sent="Sun, 15 May 2011 18:54:35 +0200" -->
+<!-- isosent="20110515165435" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] TGI palettes (was: TGI colors revisited)" -->
+<!-- id="BANLkTinBYSoDZT1RaGeccK8-dA1o51cdxA@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="001701cc12e4$5107a240$bc0ebf47&#64;monarch" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9431.html" title="Greg King: &quot;Re: [cc65] TGI palettes (was: TGI colors revisited)&quot;">Next message</a> ]
+[ <a href="9429.html" title="Greg King: &quot;Re: [cc65] TGI palettes (was: TGI colors revisited)&quot;">Previous message</a> ]
+[ <a href="9429.html" title="Greg King: &quot;Re: [cc65] TGI palettes (was: TGI colors revisited)&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9431.html" title="Greg King: &quot;Re: [cc65] TGI palettes (was: TGI colors revisited)&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20TGI%20palettes%20(was:%20TGI%20colors%20revisited)">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-05-15 18:54:35</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt;&gt; Hmm, do we really want to go into color approximation? What is the
+&gt;&gt; metric for similarity? I'd rather go for a simple &quot;Either I have what
+&gt;&gt; you ask for, or I don't&quot;. The additional function allocating colors
+&gt;&gt; from RGB values (see above) maybe could allow for approximation.
+
+&gt; An obvious metric is &quot;use the dark color when the light/bright version
+&gt; isn't available&quot;.
+
+Hm, &quot;obvious&quot; might easily be sort of subjective... The Apple II
+perspective: The hires mode allows beside black and white for orange,
+blue, green and violet - no palette. You see - it's especially
+annoying that red is missing. From that perspective a hue based
+approximation would be most useful. It would return the orange color
+handle when asking for red and thus allow to run programs asking for
+red, green and blue...
+
+&gt;  But, a program might need to know when it must use
+&gt; some method, other than a bright color, to highlight a graphics figure.
+&gt; Therefore, _automatic_ approximation is a bad idea.
+
+Full ACK.
+
+&gt;&gt; However, I somehow feel that the background color is somewhat special.
+&gt;&gt; What exactly is the description of tgi_clear()? Maybe, the color
+&gt;&gt; allocator should return one color less than the driver can display, to
+&gt;&gt; keep the background -- and thus, the behaviour of tgi_clear() --
+&gt;&gt; consistent (and, to avoid the re-colorring of the background)?
+&gt;&gt; But, that would allow for only one single color allocation
+&gt;&gt; on monochrome drivers.
+
+&gt; And, we could not use the background color to erase pixels.
+
+Okay, I'll give it a try:
+
+From a technical perspective tgi_clear() sets the frame buffer to the
+value zero. But the the collor allocation approach means that colors
+are opaque handles - so zero has no special meaning. The app has no
+way to handle interaction between color allocation on paletted drivers
+and the result of tgi_clear(). The only outcome of this issue can be
+that tgi_clear() has to go. It needs to be replaced by
+tgi_fill(unsigend char color). With that change all (?) drawing TGI
+primitives would work with some explicitly given color value.
+
+Another somewhat related aspect is the semantics of tgi_init(). In the
+current cc65 release it does an internal tgi_clear(). However after a
+discussion I initiated we decided to drop that functionality from
+tgi_init() - which is the case in the current snapshot. But what is
+still left is that tgi_init() does an internal
+tgi_setcolor(TGI_COLOR_WHITE). I see two options:
+
+1. Remove that tgi_setcolor(TGI_COLOR_WHITE) from tgi_init(). That
+means the app needs to take full control over allocating the color
+handles it needs.
+
+2. Have tgi_init() do an internal tgi_alloccolor(TGI_COLOR_WHITE) -
+and for consistency probably tgi_alloccolor(TGI_COLOR_BLACK) too - and
+then the tgi_setcolor(white). Most likely that would mean to introduce
+something like two &quot;standard color handles&quot; sort of similiar to the
+three standard file i/o handles. Apps interested in black&amp;white only
+could use those standard handles and get along without any explicit
+color allocation calls.
+
+Probably 2.) is preferable because b&amp;w apps would look like today with
+the one exception of tgi_clear() being replaced by
+tgi_fill(TGI_STD_BLACK). I don't know if a wrapper to that call named
+tgi_clear() would actually be beneficial or rather confusing...
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun, 15 May 2011 18:54:35 +0200</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9431.html" title="Next message in the list">Greg King: "Re: [cc65] TGI palettes (was: TGI colors revisited)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9429.html" title="Previous message in the list">Greg King: "Re: [cc65] TGI palettes (was: TGI colors revisited)"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9429.html" title="Message to which this message replies">Greg King: "Re: [cc65] TGI palettes (was: TGI colors revisited)"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9431.html" title="Next message in this discussion thread">Greg King: "Re: [cc65] TGI palettes (was: TGI colors revisited)"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9431.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] TGI palettes (was: TGI colors revisited)"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9444.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] TGI palettes (was: TGI colors revisited)"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9430" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9430" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9430" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-05-15 18:55:15 CEST
+</em></small></p>
+</body>
+</html>

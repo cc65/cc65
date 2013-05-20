@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Platform specific docs</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Platform specific docs">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Platform specific docs</h1>
+<!-- received="Tue Sep 23 23:00:20 2003" -->
+<!-- isoreceived="20030923210020" -->
+<!-- sent="Tue, 23 Sep 2003 23:00:15 +0200" -->
+<!-- isosent="20030923210015" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Platform specific docs" -->
+<!-- id="20030923210015.GA26044@trixie.musoftware.de" -->
+<!-- inreplyto="16240.45084.386559.832662@panini.cling.gu.se" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Platform%20specific%20docs"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-09-23 23:00:15
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3439.html">MagerValp: "Re: [cc65] Platform specific docs"</a>
+<li><strong>In reply to:</strong> <a href="3439.html">MagerValp: "Re: [cc65] Platform specific docs"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3441.html">MagerValp: "Re: [cc65] Platform specific docs"</a>
+<li><strong>Reply:</strong> <a href="3441.html">MagerValp: "Re: [cc65] Platform specific docs"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Tue, Sep 23, 2003 at 10:42:04PM +0200, MagerValp wrote:
+&gt; you might want to mention that the ram under the kernal is used for
+&gt; bitmap graphics.
+
+It's in the graphics driver section, but yes, I can add it also to section 3.
+
+&gt; 4.1
+&gt;
+&gt; I can't find get_ostype funcref.html
+&gt; I can't find cbm_* in funcref.html either
+
+The function reference is incomplete. I've asked for help here in the list,
+but I'm still the only one working on it, so it will take some time. Writing
+detailed information for all standard C functions plus all platform dependent
+functions is a *real* lot of work.
+
+And there seems to be a misunderstanding: I know that the docs are incomplete
+with regard to the actual information contained in it. My question was aimed
+on the structure, not on the actual content. Once the structure is ok, others
+can (and hopefully will) start to use it as a template for the Atari, Apple or
+whatever. Missing content can be filled in later without problems, but
+starting with a bad structure means that new sections will have to be added
+later so the docs will start to differ from platform to platform.
+
+&gt; Some information (or links to information) on how you use the expanded
+&gt; memory functions would be nice.
+
+Since the extended memory API is not platform specific, the c64 document is
+the wrong place. Yes, it would be nice to have another document describing the
+non standard but portable (within cc65) APIs. Most of the functions are
+described in the function reference, however.
+
+&gt; And I thought there was a mouse driver?
+
+Yes, but it's not a loadable driver. The idea is to convert all drivers into
+loadable ones (which can also get linked statically if required), so I haven't
+added a section about statically linked drivers.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Platform%20specific%20docs">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Platform%20specific%20docs">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3439.html">MagerValp: "Re: [cc65] Platform specific docs"</a>
+<li><strong>In reply to:</strong> <a href="3439.html">MagerValp: "Re: [cc65] Platform specific docs"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3441.html">MagerValp: "Re: [cc65] Platform specific docs"</a>
+<li><strong>Reply:</strong> <a href="3441.html">MagerValp: "Re: [cc65] Platform specific docs"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-09-23 23:00:26 CEST</em>
+</em>
+</small>
+</body>
+</html>

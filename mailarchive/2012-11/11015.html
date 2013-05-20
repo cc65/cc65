@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] calloc() not failing</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] calloc() not failing" />
+<meta name="Date" content="2012-11-13" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] calloc() not failing</h1>
+<!-- received="Tue Nov 13 11:43:53 2012" -->
+<!-- isoreceived="20121113104353" -->
+<!-- sent="Tue, 13 Nov 2012 11:43:41 +0100" -->
+<!-- isosent="20121113104341" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] calloc() not failing" -->
+<!-- id="CACT=u72vEHALmQj0mKc7W2ZRqW+NtPgE0JrSH+2e8_xZo9Mg3w@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20121112231410.GA7714&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11016.html" title="Marc 'BlackJack' Rintsch: &quot;Re: [cc65] calloc() not failing&quot;">Next message</a> ]
+[ <a href="11014.html" title="Oliver Schmidt: &quot;Re: [cc65] calloc() not failing&quot;">Previous message</a> ]
+[ <a href="11010.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] calloc() not failing&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20calloc()%20not%20failing">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-11-13 11:43:41</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt; If you prefer not to be able to run your program again, you may
+&gt; choose to terminate your program by jumping to the coldstart vector or
+&gt; whatever. This is what most games do.
+
+That doesn't seem a real solution in general as it doesn't run the destructors.
+
+Therefore the Apple2 C library contains the function rebootafterexit()
+which does a coldstart in a clean way. The function itself does
+nothing but it comes with a constructor that patches the destination
+of the final JMP in the startup (and shutdown) code.
+
+The nice thing is that the exec() implementation on the Apple2 uses
+the very same technique (patching that final JMP destination) to have
+the loader called that it has set up before. After setting everything
+up exec() just calls exit() so all things are shut down cleanly before
+JMPing to the temporary loader.
+
+Maybe such an approach makes sense for other targets too...
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Nov 13 11:43:53 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11016.html" title="Next message in the list">Marc 'BlackJack' Rintsch: "Re: [cc65] calloc() not failing"</a></li>
+<li><dfn>Previous message</dfn>: <a href="11014.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] calloc() not failing"</a></li>
+<li><dfn>In reply to</dfn>: <a href="11010.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] calloc() not failing"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#11015" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#11015" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#11015" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-11-13 11:43:57 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Platform specific docs</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] Platform specific docs">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Platform specific docs</h1>
+<!-- received="Thu Sep 25 23:21:05 2003" -->
+<!-- isoreceived="20030925212105" -->
+<!-- sent="Thu, 25 Sep 2003 23:16:02 +0200" -->
+<!-- isosent="20030925211602" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] Platform specific docs" -->
+<!-- id="200309252316.02114.groepaz@gmx.net" -->
+<!-- inreplyto="20030925181937.GA11688@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Platform%20specific%20docs"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2003-09-25 23:16:02
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3463.html">Groepaz: "Re: [cc65] feature questions..."</a>
+<li><strong>In reply to:</strong> <a href="3458.html">Ullrich von Bassewitz: "Re: [cc65] Platform specific docs"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3465.html">Groepaz: "[cc65] testsuite"</a>
+<li><strong>Next in thread:</strong> <a href="3461.html">Groepaz: "Re: [cc65] Platform specific docs"</a>
+<li><strong>Reply:</strong> <a href="3465.html">Groepaz: "[cc65] testsuite"</a>
+<li><strong>Reply:</strong> <a href="3469.html">Ullrich von Bassewitz: "Re: [cc65] Platform specific docs"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Thursday 25 September 2003 20:19, Ullrich von Bassewitz wrote:
+
+&gt; My plan was to use the old uip web server. But I need real hardware for the
+&gt; test which is the reason, it is not done yet.
+
+maybe you want to contact jens schönfeld (<a href="mailto:jens_at_ami.ga?Subject=Re:%20[cc65]%20Platform%20specific%20docs">jens_at_ami.ga</a>) and tell him you need 
+hardware to create/test/support/whatnot rr/silversurfer/rr-net drivers... 
+with some luck you might get stuff sponsored (i did :o))
+
+&gt; I would prefer an interrupt driven driver. But to my suprise, I found that
+&gt; the silversurfer uses the NMI, not the IRQ line - in my eyes a wrong design
+&gt; decision, because using the IRQ would have removed a lot of problems with
+&gt; disk routines and is uncritical for a device that has a 16 byte builtin
+&gt; buffer. So maybe there's really a use for the polling driver.
+
+actually the use of NMI for this is more or less a &quot;tradition&quot;.... also most 
+software that uses the swithlink (or any other serial cart for that matter) 
+uses NMI. i think there are other reasons aswell... the latency involved in a 
+&quot;normal&quot; IRQ vs NMI (routed over $0314 etc vectors) may make a difference.
+
+&gt; &gt; ok i'll have a look at them... as far as i remember they where more or
+&gt; &gt; less finished but need to be made loadable modules.... gotta check that
+&gt; &gt; :)
+&gt;
+&gt; Please keep in mind that variables must be initialized in INIT, because
+&gt; otherwise the driver may not work correctly when statically linked.
+
+ok
+
+gpz
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Platform%20specific%20docs">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3463.html">Groepaz: "Re: [cc65] feature questions..."</a>
+<li><strong>In reply to:</strong> <a href="3458.html">Ullrich von Bassewitz: "Re: [cc65] Platform specific docs"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3465.html">Groepaz: "[cc65] testsuite"</a>
+<li><strong>Next in thread:</strong> <a href="3461.html">Groepaz: "Re: [cc65] Platform specific docs"</a>
+<li><strong>Reply:</strong> <a href="3465.html">Groepaz: "[cc65] testsuite"</a>
+<li><strong>Reply:</strong> <a href="3469.html">Ullrich von Bassewitz: "Re: [cc65] Platform specific docs"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-09-25 23:21:24 CEST</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] optimizations</title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="Re: [cc65] optimizations" />
+<meta name="Date" content="2007-08-01" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] optimizations</h1>
+<!-- received="Wed Aug  1 11:12:05 2007" -->
+<!-- isoreceived="20070801091205" -->
+<!-- sent="Wed, 1 Aug 2007 11:11:51 +0200" -->
+<!-- isosent="20070801091151" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="Re: [cc65] optimizations" -->
+<!-- id="200708011111.52629.groepaz@gmx.net" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="46B04D78.9070202&#64;gmx.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5821.html" title="Andreas Koch: &quot;[cc65] Unresolved external 'utsteax' referenced&quot;">Next message</a> ]
+[ <a href="5819.html" title="stefan: &quot;Re: [cc65] optimizations&quot;">Previous message</a> ]
+[ <a href="5819.html" title="stefan: &quot;Re: [cc65] optimizations&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5821.html" title="Andreas Koch: &quot;[cc65] Unresolved external 'utsteax' referenced&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20optimizations">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-08-01 11:11:51</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Wednesday 01 August 2007 11:08, stefan wrote:
+&gt; I'm aware, that i could solve the problem this way, but than the rest of
+&gt; the function has
+&gt; also unoptimized code, which i don't want.
+&gt; Anyway thank you for your attention.
+
+mmmh, not sure if cc65 actually honors the volatile keyword, but the usual 
+solution for this with gcc is to write &quot;volatile asm&quot; to tell the compiler to 
+not touch the asm part.
+
+-- 
+
+<a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>
+<a href="http://www.gc-linux.org/docs/yagcd.html">http://www.gc-linux.org/docs/yagcd.html</a>
+<a href="http://www.pokefinder.org">http://www.pokefinder.org</a>
+<a href="http://ftp.pokefinder.org">http://ftp.pokefinder.org</a>
+
+...the best way to prepare [to be a programmer] is to write programs, and to 
+study great programs that other people have written. In my case, I went to 
+the garbage cans at the Computer Science Center and fished out listings of 
+their operating system. 
+&lt;Bill Gates&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Aug  1 11:12:05 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5821.html" title="Next message in the list">Andreas Koch: "[cc65] Unresolved external 'utsteax' referenced"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5819.html" title="Previous message in the list">stefan: "Re: [cc65] optimizations"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5819.html" title="Message to which this message replies">stefan: "Re: [cc65] optimizations"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5821.html" title="Next message in this discussion thread">Andreas Koch: "[cc65] Unresolved external 'utsteax' referenced"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5821.html" title="Message sent in reply to this message">Andreas Koch: "[cc65] Unresolved external 'utsteax' referenced"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5820" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5820" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5820" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-08-01 11:12:07 CEST
+</em></small></p>
+</body>
+</html>

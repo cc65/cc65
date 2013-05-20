@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] linker cfg files</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] linker cfg files">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] linker cfg files</h1>
+<!-- received="Mon Aug 11 21:59:29 2003" -->
+<!-- isoreceived="20030811195929" -->
+<!-- sent="Mon, 11 Aug 2003 21:59:23 +0200" -->
+<!-- isosent="20030811195923" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] linker cfg files" -->
+<!-- id="20030811195923.GA1321@trixie.musoftware.de" -->
+<!-- inreplyto="000f01c31f0c$5741bb20$6d6b2c42@palace" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20linker%20cfg%20files"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-08-11 21:59:23
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3208.html">Rafal: "[cc65] Newer win32 installer"</a>
+<li><strong>In reply to:</strong> <a href="../2003-05/3031.html">Greg King: "Re: [cc65] linker cfg files"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3211.html">Maciej Witkowiak: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="3211.html">Maciej Witkowiak: "Re: [cc65] linker cfg files"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+[Three months later...
+
+Just for reference, the mail I'm replying to is available as
+
+        <a href="http://www.cc65.org/mailarchive/2003-05/3031.html">http://www.cc65.org/mailarchive/2003-05/3031.html</a>
+
+]
+
+On Tue, May 20, 2003 at 04:11:22PM -0400, Greg King wrote:
+&gt; I recognize a challenge when I see one.  I believe that I have discovered
+&gt; a way to do it:
+
+I've started to change the heap using your idea with small modifications, but
+when doing so, I found a few problems. Maybe you (or someone else) can help me
+solving them.
+
+  1. The suggested solution does not work for configurations where the start
+     address is passed via the command line using %S in the linker config.
+     Configurations that have this problem are: lunix/osa65 and none.
+
+  2. There are some configurations that do actually cover systems with
+     different amounts of memory available. One system is the C16 (which
+     supports 16 and 32KB of memory) and the PET, which comes with 4, 8, 16
+     and 32K of memory. Currently, the startup code determines how much memory
+     is available and adjusts the stackpointer accordingly. With the old heap
+     routines this worked, since they calculated the heap end from the
+     stackpointer. Using your idea, this does no longer work. While the old
+     code was not perfect (the linker would not detect a program too large to
+     fit into memory), having 4 different memory configurations just for the
+     PET machines sounds even worse.
+
+  3. [This is only loosely related to your idea] I don't have access to
+     anything Lunix related but the linker config, so I do not even know how
+     the startup code must be changed to support a new configuration. Wouldn't
+     it be a good idea to make at least the Lunix startup code part of cc65?
+     Otherwise it doesn't make much sense to have a builtin Lunix linker
+     config, since both must always match, or programs will not work
+     correctly.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20linker%20cfg%20files">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20linker%20cfg%20files">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3208.html">Rafal: "[cc65] Newer win32 installer"</a>
+<li><strong>In reply to:</strong> <a href="../2003-05/3031.html">Greg King: "Re: [cc65] linker cfg files"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3211.html">Maciej Witkowiak: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="3211.html">Maciej Witkowiak: "Re: [cc65] linker cfg files"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-08-11 22:00:56 CEST</em>
+</em>
+</small>
+</body>
+</html>

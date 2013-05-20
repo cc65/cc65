@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] library search path</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] library search path">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] library search path</h1>
+<!-- received="Tue May 27 15:56:52 2003" -->
+<!-- isoreceived="20030527135652" -->
+<!-- sent="Tue, 27 May 2003 15:41:43 +0200" -->
+<!-- isosent="20030527134143" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] library search path" -->
+<!-- id="200305271541.43250.groepaz@gmx.net" -->
+<!-- inreplyto="20030525215717.GC16533@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20library%20search%20path"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2003-05-27 15:41:43
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3036.html">Ullrich von Bassewitz: "Re: [cc65] library search path"</a>
+<li><strong>In reply to:</strong> <a href="3036.html">Ullrich von Bassewitz: "Re: [cc65] library search path"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3038.html">Ullrich von Bassewitz: "Re: [cc65] library search path"</a>
+<li><strong>Next in thread:</strong> <a href="3033.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="3038.html">Ullrich von Bassewitz: "Re: [cc65] library search path"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Sunday 25 May 2003 23:57, Ullrich von Bassewitz wrote:
+
+&gt; There are several methods to influence the search order. cc65 manages two
+&gt; search lists: One for system header files (delimited by &lt;&gt;) and one for
+&gt; user includes (delimited by &quot;&quot;). On startup, the search path list for user
+&gt; includes is initialized by the current directory, while the search list for
+&gt; the system includes is initialized by &quot;include&quot; and a precompiled value
+&gt; (/usr/lib/cc65/include for linux). So by using
+&gt;
+&gt;         #include &lt;conio.h&gt;
+&gt;
+&gt; the compiler will always find the conio.h from the system include directory
+&gt; first, provided that it is in one of the directories mentioned above
+&gt; (should be the default on unix systems).
+&gt;
+&gt; In addition to that, the compiler will add the value of the environment
+&gt; variable CC65_INC (if it exists) to both search lists, as well as any path
+&gt; given on the command line with -I. While additional paths are placed into
+&gt; both lists, you can give them in any order. If you add the cc65 include
+&gt; directory first, it will find the conio.h there.
+
+so -I always adds the given path at the start of the existing search list?
+
+also where is the CC65_INC added, at the start or the end of the search list?
+
+and in which order does all the above take place? 1) init with builtin pathes 
+2) add CC65_INC 3) add pathes given with -I ?!
+
+that would be the info i was looking for basically :=)
+
+&gt; So I cannot see why this doesn't work for you. Have you used the correct
+&gt; include file delimiters and tried changing the order of the -I command line
+&gt; options?
+
+i'm pretty sure i tried whatever is possible :=P anyway see above, maybe it 
+could clear up some things for me :)
+
+gpz
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20library%20search%20path">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3036.html">Ullrich von Bassewitz: "Re: [cc65] library search path"</a>
+<li><strong>In reply to:</strong> <a href="3036.html">Ullrich von Bassewitz: "Re: [cc65] library search path"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3038.html">Ullrich von Bassewitz: "Re: [cc65] library search path"</a>
+<li><strong>Next in thread:</strong> <a href="3033.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="3038.html">Ullrich von Bassewitz: "Re: [cc65] library search path"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-05-27 15:57:56 CEST</em>
+</em>
+</small>
+</body>
+</html>

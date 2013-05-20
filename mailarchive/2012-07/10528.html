@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] C64 POSIX dirent stuff act</title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="Re: [cc65] C64 POSIX dirent stuff actually working?" />
+<meta name="Date" content="2012-07-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] C64 POSIX dirent stuff actually working?</h1>
+<!-- received="Sun Jul 29 15:35:51 2012" -->
+<!-- isoreceived="20120729133551" -->
+<!-- sent="Sun, 29 Jul 2012 15:36:27 +0200" -->
+<!-- isosent="20120729133627" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="Re: [cc65] C64 POSIX dirent stuff actually working?" -->
+<!-- id="201207291536.27437.groepaz@gmx.net" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="20120729132834.GA3706&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10529.html" title="Andre Fachat: &quot;[cc65] bug or feature: unnamed labels across scopes&quot;">Next message</a> ]
+[ <a href="10527.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] C64 POSIX dirent stuff actually working?&quot;">Previous message</a> ]
+[ <a href="10527.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] C64 POSIX dirent stuff actually working?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10530.html" title="Oliver Schmidt: &quot;Re: [cc65] C64 POSIX dirent stuff actually working?&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20C64%20POSIX%20dirent%20stuff%20actually%20working?">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-07-29 15:36:27</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Sunday 29 July 2012, Ullrich von Bassewitz wrote:
+&gt; On Sat, Jul 28, 2012 at 03:10:14PM +0200, Groepaz wrote:
+&gt; &gt; &gt; Sorry for not remembering your remark there. You seem to look for
+&gt; &gt; &gt; feedback regarding this design decision. I'd propose to not skip it.
+&gt; &gt; 
+&gt; &gt; does it show the disk label on a *nix system? i see no sense in getting
+&gt; &gt; it to be honest - usually you only want to see the files.
+&gt; 
+&gt; The disk label doesn't show up on unix systems, because it's not part of
+&gt; the directory. On CBM disks, it is.
+
+sure? i remember seeing it in DOS for example. what makes it part of the 
+directory anyway? :) isnt it &quot;whats returned by the directory read function&quot; ? 
+=P
+
+&gt; It's similar with deleted files: For the CBMs the directory entries might
+&gt; still be present, so readdir returns them. On a Unix system, deleted
+&gt; entries are actually that, so they won't show up.
+
+? that pretty much depends (only) on the filesystem in use, doesnt it? in FAT 
+you can still see deleted files at least :)
+ 
+&gt; If you want to do anything with the entries returned by readdir besides
+&gt; just displaying them, you will have to pass them through a filter that
+&gt; uses the _DE_ISXXX macros. And if you do that, there's no harm done when
+&gt; returning the disk label.
+&gt; 
+&gt; So I will probably change the code and return the disk label. I cannot see
+&gt; anything harmful when returning it, and some programs may benefit.
+
+yeah you are right.... i am just wondering. i have used ISDIR a lot, but never 
+had to filter a volume name. (but then again, maybe that code of mine just 
+breaks spectacular on DOS - cant say i do care =D)
+
+-- 
+
+<a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    <a href="http://magicdisk.untergrund.net">http://magicdisk.untergrund.net</a>
+<a href="http://www.pokefinder.org">http://www.pokefinder.org</a>        <a href="http://ftp.pokefinder.org">http://ftp.pokefinder.org</a>
+
+Trotzdem bin ich sehr dafr, dass moeglichst viele Parlamentarier nach 
+Afghanistan fahren. 
+&lt;Peter Struck, SPD&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Jul 29 15:35:51 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10529.html" title="Next message in the list">Andre Fachat: "[cc65] bug or feature: unnamed labels across scopes"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10527.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] C64 POSIX dirent stuff actually working?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10527.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] C64 POSIX dirent stuff actually working?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10530.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] C64 POSIX dirent stuff actually working?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10528" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10528" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10528" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-07-29 15:35:54 CEST
+</em></small></p>
+</body>
+</html>

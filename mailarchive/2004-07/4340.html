@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Atari: Loading code with D</title>
+<meta name="Author" content="Shawn Jefferson (jefferson_shawn_a8bit1yahoo.com)" />
+<meta name="Subject" content="Re: [cc65] Atari: Loading code with DOS 2.0 help?" />
+<meta name="Date" content="2004-07-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Atari: Loading code with DOS 2.0 help?</h1>
+<!-- received="Thu Jul 29 19:00:31 2004" -->
+<!-- isoreceived="20040729170031" -->
+<!-- sent="Thu, 29 Jul 2004 10:00:26 -0700 (PDT)" -->
+<!-- isosent="20040729170026" -->
+<!-- name="Shawn Jefferson" -->
+<!-- email="jefferson_shawn_a8bit1yahoo.com" -->
+<!-- subject="Re: [cc65] Atari: Loading code with DOS 2.0 help?" -->
+<!-- id="20040729170027.69454.qmail@web52203.mail.yahoo.com" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="3BEAE8F834936647A2D11E7BA875236EA94308&#64;dlee2k07.ent.ti.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4341.html" title="Groepaz: &quot;Re: [cc65] assembly subroutine return value&quot;">Next message</a> ]
+[ <a href="4339.html" title="Shawn Jefferson: &quot;Re: [cc65] assembly subroutine return value&quot;">Previous message</a> ]
+[ <a href="4338.html" title="Martin, Chris: &quot;[cc65] Atari: Loading code with DOS 2.0 help?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4345.html" title="Greg King: &quot;Re: [cc65] Atari: Loading code with DOS 2.0 help?&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Shawn Jefferson &lt;<a href="mailto:jefferson_shawn_a8bit1yahoo.com?Subject=Re:%20[cc65]%20Atari:%20Loading%20code%20with%20DOS%202.0%20help?">jefferson_shawn_a8bit1yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-07-29 19:00:26</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Chris,
+
+--- &quot;Martin, Chris&quot; &lt;cmartin&#64;ti&#46;<!--nospam-->com&gt; wrote:
+
+&gt; Hi all, 
+&gt; 
+&gt; I have a piece of code that I have written and
+&gt; compiled with cc65 and am
+&gt; having trouble getting it to load from DOS 2.0. It
+&gt; loads fine from
+&gt; SpartaDOS 3.2, but I receive an ERROR 136 from DOS
+&gt; 2.0. The code is
+&gt; supposed to load to 0x3400-0x3c30 and to
+&gt; 0x6000-0xa3d0. 
+
+Error 136 is End of File, right?  Is there something
+wrong with your second header?  The size maybe?
+ 
+&gt; It looks like DOS 2.0 has some code loaded all the
+&gt; way up to 0x33xx, so
+&gt; I modified my code to load past this.  I also
+&gt; adjusted the HEADER
+&gt; location to no avail.
+
+That should only be the DOS menu up that high, and I
+think it will get overwritten by your program and
+reloaded on exit of your program.
+
+Changing the load address of the header won't do
+anything.
+
+&gt;     HEADER: start = $33f0, size = $6, file = %O;
+&gt;     RAM: start = $6000, size = $5c1f, file = %O;   
+&gt;     BANK: start = $4000, size = $4000, type = ro;
+&gt;     SECHDR: start = $33f6, size = $4, file = %O;
+&gt;     RAM28: start = $3400, size = $1800,  file = %O; 
+ 
+&gt;     EXEHDR: load = HEADER, type = wprot;
+&gt;     CODE: load = RAM, type = wprot, define = yes;
+&gt;     BSS: load = RAM, type = bss, define = yes;
+&gt;     CHKHDR: load = SECHDR, type = wprot;
+&gt;     CODE2: load = RAM28, type = wprot, define = yes;
+&gt;     DATA: load = RAM28, type = rw;
+&gt;     RODATA: load = RAM28, type = wprot;
+&gt;     ZEROPAGE: load = ZP, type = zp;
+&gt;     AUTOSTRT: load = RAM, type = wprot, define =
+yes;
+
+Hmmm, what does your CHKHDR look like?
+
+I think it is a size thing.  DOS 2.0 is returning End
+of File, so maybe you aren't calculating the size
+properly (or rather, since I think this is based on
+some code I gave you.. I'm not calculating it
+properly! LOL!)
+
+--
+Shawn Jefferson
+
+
+
+	
+		
+__________________________________
+Do you Yahoo!?
+New and Improved Yahoo! Mail - 100MB free storage!
+<a href="http://promotions.yahoo.com/new_mail">http://promotions.yahoo.com/new_mail</a> 
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Jul 29 19:00:31 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4341.html" title="Next message in the list">Groepaz: "Re: [cc65] assembly subroutine return value"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4339.html" title="Previous message in the list">Shawn Jefferson: "Re: [cc65] assembly subroutine return value"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4338.html" title="Message to which this message replies">Martin, Chris: "[cc65] Atari: Loading code with DOS 2.0 help?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4345.html" title="Next message in this discussion thread">Greg King: "Re: [cc65] Atari: Loading code with DOS 2.0 help?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4340" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4340" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4340" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-07-29 19:00:39 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] o65 generation bug?</title>
+<meta name="Author" content="Greg King (greg.king41verizon.net)" />
+<meta name="Subject" content="Re: [cc65] o65 generation bug?" />
+<meta name="Date" content="2012-05-17" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] o65 generation bug?</h1>
+<!-- received="Thu May 17 19:21:55 2012" -->
+<!-- isoreceived="20120517172155" -->
+<!-- sent="Thu, 17 May 2012 12:15:37 -0400" -->
+<!-- isosent="20120517161537" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king41verizon.net" -->
+<!-- subject="Re: [cc65] o65 generation bug?" -->
+<!-- id="002401cd3449$24c59d40$443efea9@monarch" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="CACb6e79FNyVV3RbKuT7R6Mq7KbkA0HJ=E-bOpQO3W+nquLqKpA&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10290.html" title="Agent Friday: &quot;Re: [cc65] o65 generation bug?&quot;">Next message</a> ]
+[ <a href="10288.html" title="Oliver Schmidt: &quot;Re: ***SPAM*** Re: [cc65] o65 generation bug?&quot;">Previous message</a> ]
+[ <a href="10284.html" title="Agent Friday: &quot;Re: [cc65] o65 generation bug?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10290.html" title="Agent Friday: &quot;Re: [cc65] o65 generation bug?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king41verizon.net?Subject=Re:%20[cc65]%20o65%20generation%20bug?">greg.king41verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-05-17 18:15:37</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: &quot;Agent Friday&quot;; on Monday, May 14, 2012; at 06:19 AM -0400
+&gt;
+&gt; I removed the LDADDR segment from the code, and that seemed to clear up the
+&gt; discrepancies.  (Well, almost.)  It appears that some of the calculations
+&gt; rely on the assumption that the code segment will be the first thing
+&gt; specified to go into the file; and, if it's not so, then things get thrown
+&gt; off.  The tbase value of 0000 in the original output probably came directly
+&gt; from the (don't care) start address I specified for the HEADER memory area.
+&gt;
+&gt; Instead of actually removing the .WORD __CODE_LOAD__ directive, I moved it
+&gt; into the DATA segment to see what got generated.  LD65 actually generated a
+&gt; text-relative fix-up entry in the data seg. relocation table, which is good,
+&gt; but the actual value generated for __CODE_LOAD__ was still 0.  That seems
+&gt; odd.  Are the &quot;define=yes&quot; settings meant to be rendered invalid by
+&gt; choosing .o65 as the output format?
+&gt;
+&gt; I guess I'm left with a couple of questions now...
+&gt;
+&gt; 1.  I'd like some nice way to be able to switch between .o65 and binary
+&gt; file formats w/o having to make temporary edits to my code.  It would be
+&gt; nice if I could do that by specifying something on the command-line, but I
+&gt; haven't looked too deep into the possibilities.
+&gt;
+&gt; 2.  Are the __segment_LOAD__ symbols supposed to still work?
+
+1. You can tell ld65 to drop a memory area by giving that area an empty
+file-name:
+
+MEMORY {
+   HEADER: start = $0000, size = $02,   type = ro, file=&quot;&quot;;
+   HIRAM:  start = $CC00, size = $0400, type = rw, file=&quot;tools.o65&quot;;
+}
+
+You can make two configuration files, one that writes HEADER, and one
+that doesn't.  Then, your command-lines choose which cfg. file to give
+to ld65.
+
+2. The output format has no effect on the &quot;define=&quot; attribute.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu May 17 19:21:55 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10290.html" title="Next message in the list">Agent Friday: "Re: [cc65] o65 generation bug?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10288.html" title="Previous message in the list">Oliver Schmidt: "Re: ***SPAM*** Re: [cc65] o65 generation bug?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10284.html" title="Message to which this message replies">Agent Friday: "Re: [cc65] o65 generation bug?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10290.html" title="Next message in this discussion thread">Agent Friday: "Re: [cc65] o65 generation bug?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10290.html" title="Message sent in reply to this message">Agent Friday: "Re: [cc65] o65 generation bug?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10289" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10289" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10289" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-05-17 19:21:58 CEST
+</em></small></p>
+</body>
+</html>

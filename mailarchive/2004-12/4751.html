@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Help, bug making me insane</title>
+<meta name="Author" content="Shawn Jefferson (jefferson_shawn_a8bit1yahoo.com)" />
+<meta name="Subject" content="[cc65] Help, bug making me insane" />
+<meta name="Date" content="2004-12-15" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Help, bug making me insane</h1>
+<!-- received="Wed Dec 15 19:33:42 2004" -->
+<!-- isoreceived="20041215183342" -->
+<!-- sent="Wed, 15 Dec 2004 10:33:37 -0800 (PST)" -->
+<!-- isosent="20041215183337" -->
+<!-- name="Shawn Jefferson" -->
+<!-- email="jefferson_shawn_a8bit1yahoo.com" -->
+<!-- subject="[cc65] Help, bug making me insane" -->
+<!-- id="20041215183337.76669.qmail@web52207.mail.yahoo.com" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4752.html" title="Shawn Jefferson: &quot;Re: [cc65] Help, bug making me insane&quot;">Next message</a> ]
+[ <a href="4750.html" title="Johan Kotlinski: &quot;[cc65] Re: abc music specification&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4752.html" title="Shawn Jefferson: &quot;Re: [cc65] Help, bug making me insane&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Shawn Jefferson &lt;<a href="mailto:jefferson_shawn_a8bit1yahoo.com?Subject=Re:%20[cc65]%20Help,%20bug%20making%20me%20insane">jefferson_shawn_a8bit1yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-12-15 19:33:37</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>For some reason, this routine that did work previously
+doesn't seem to now after making some changes to my
+program.  Thinking to forestall my descent into
+complete madness I hoped that someone here could look
+it over and see if there were any obvious mistakes
+that I am overlooking.
+
+unsigned int __fastcall__ copy_image(unsigned char
+modify)
+{
+  dhandle_t dh;
+  register unsigned int sector;
+  register unsigned int cyl;
+  register unsigned char ret;
+  register unsigned char i;
+  unsigned char retry;
+
+
+  //--- Initialize ---//
+  dh = dio_open(0);
+  if (!dh) return(0);
+
+  cyl = (myide_config.imagecyl_hi &lt;&lt; 8);
+  if (modify)
+    cyl += (images[sel_part].slot *
+myide_config.imagesize_cyl);
+  else
+    cyl += (im_config.next_image_entry *
+myide_config.imagesize_cyl); 
+
+  myide_flags-&gt;optionbyte &amp;= ~0x01;         // screen
+activity on
+
+  //--- Sector copy ---//
+  for(sector=1; sector&lt;=1040; sector+=SBUFSIZ) {
+    for(i=0; i&lt;SBUFSIZ; ++i) {
+      retry = 3;                                  // 3
+retries
+      while (retry) {
+	ret = dio_read(dh, sector+i, &amp;buffer[256 * i]);     
+// read disk sector
+
+	if (ret)                              // 0 on success
+
+	  --retry;
+	else
+	  break;
+      }
+
+      if (ret) {                                //
+error reading
+	retry = i;                              // set to
+sectors read
+	break;                                  // break read
+loop
+      }
+    }
+
+    if (!ret)                                   //
+read all sectors, no err
+      retry = 0;                                //
+don't break sector loop
+
+    for(i=0; i&lt;SBUFSIZ; ++i) {
+      ret = set_chs(cyl, sector+i);
+      if (!ret) {
+	dio_close(dh);
+	return(0);
+      }
+      ret = write_sector(&amp;buffer[256 * i]);
+      if (!ret) {
+	dio_close(dh);
+	return(0);
+      }
+    }
+    if (retry) {                                // did
+we error out on read?
+      myide_flags-&gt;optionbyte |= 0x01;          //
+screen activity off
+      return(sector+retry-1);                   //
+return actual sectors read 
+    }
+  }
+
+  dio_close(dh);
+  myide_flags-&gt;optionbyte |= 0x01;              //
+screen activity off
+  return(1040);                                 //
+read full 1040 sectors
+} 
+
+Thanks!
+Shawn
+
+__________________________________________________
+Do You Yahoo!?
+Tired of spam?  Yahoo! Mail has the best spam protection around 
+<a href="http://mail.yahoo.com">http://mail.yahoo.com</a> 
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Dec 15 19:33:42 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4752.html" title="Next message in the list">Shawn Jefferson: "Re: [cc65] Help, bug making me insane"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4750.html" title="Previous message in the list">Johan Kotlinski: "[cc65] Re: abc music specification"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4752.html" title="Next message in this discussion thread">Shawn Jefferson: "Re: [cc65] Help, bug making me insane"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4752.html" title="Message sent in reply to this message">Shawn Jefferson: "Re: [cc65] Help, bug making me insane"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4751" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4751" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4751" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-12-15 19:33:53 CET
+</em></small></p>
+</body>
+</html>

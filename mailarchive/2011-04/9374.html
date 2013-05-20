@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] TGI User Contribution Upda</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] TGI User Contribution Updates" />
+<meta name="Date" content="2011-04-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] TGI User Contribution Updates</h1>
+<!-- received="Fri Apr 29 18:33:03 2011" -->
+<!-- isoreceived="20110429163303" -->
+<!-- sent="Fri, 29 Apr 2011 18:32:55 +0200" -->
+<!-- isosent="20110429163255" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] TGI User Contribution Updates" -->
+<!-- id="20110429163255.GC11374@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="20110429071920.114800&#64;gmx.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="../2011-05/9375.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] fatal linker bug&quot;">Next message</a> ]
+[ <a href="9373.html" title="Oliver Schmidt: &quot;Re: [cc65] TGI User Contribution Updates&quot;">Previous message</a> ]
+[ <a href="9372.html" title="Stefan: &quot;Re: [cc65] TGI User Contribution Updates&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="../2011-05/9421.html" title="Greg King: &quot;Re: [cc65] TGI User Contribution Updates&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20TGI%20User%20Contribution%20Updates">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-04-29 18:32:55</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Fri, Apr 29, 2011 at 09:19:20AM +0200, Stefan wrote:
+&gt; On the other hand I would appreciate keeping the old versions and add
+&gt; the new ones with just an increased version number.
+
+I'm sorry but the contrib area is not an archive. I've always deleted old
+versions when new ones were added. If this is not the case for some files,
+then it is an accident that should be corrected. The contrib directory is a
+place to store larger programs to help people to get into cc65. There is no
+good reason to keep versions that won't work any longer with the current cc65
+version.
+
+&gt; I could not exactly follow the changes Oliver has done, because i don't have
+&gt; the sources anymore.
+
+What Oliver has done is to make sure that the programs do compile with the
+current development snapshot, because there have been some changes that break
+programs on the source level. He has also made some of the programs run on
+more platforms by removing platform specific assumptions about the grahpics
+mode. He has not in any case changed the logic of the programs itself, so your
+Sierpinski routine is at it was before.
+
+&gt;    At last the info files of the routines should state the original author,
+&gt;    which is only the case for the dragon routine, and also the author
+&gt;    corresponding for the adaption to the new tgi driver.
+&gt;    I also did not find my Handle in the info file to the sierpinski code,
+&gt;    probably not intentionally.
+
+Your handle has never been there. I just unpacked the backup from 2011-04-03
+and this is sierpinski-1.0.txt:
+
+-------------------------------------------------------------------------
+Sierpinski Triangle V1 C64 version
+compiled with CC65 V 2.13.9
+Free to use for any purpose.
+
+How to compile?
+
+Invoke &quot;cl65 -tc64 -Oirs sier.c&quot; and
+assure, that the right version of
+&quot;c64-hi.tgi&quot; is in the same directory as
+the executable. Then simply drag the File
+&quot;sier&quot; into vice or copy both executable
+and &quot;c64-hi.tgi&quot; onto a disk to run on a
+real machine.
+Admittely some of the code was copied out
+of the tgi demo delivered with cc65.
+-------------------------------------------------------------------------
+
+Oliver added information about his changes but - as with the sources itself -
+he didn't touch other parts and especially didn't remove anything. As I see
+it, he behaved absolutely correct in this respect.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Apr 29 18:33:03 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="../2011-05/9375.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] fatal linker bug"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9373.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] TGI User Contribution Updates"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9372.html" title="Message to which this message replies">Stefan: "Re: [cc65] TGI User Contribution Updates"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="../2011-05/9421.html" title="Next message in this discussion thread">Greg King: "Re: [cc65] TGI User Contribution Updates"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9374" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9374" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9374" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-04-29 18:33:09 CEST
+</em></small></p>
+</body>
+</html>

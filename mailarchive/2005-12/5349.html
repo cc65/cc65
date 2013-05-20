@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] 65816-based systems suppor</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] 65816-based systems support" />
+<meta name="Date" content="2005-12-11" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] 65816-based systems support</h1>
+<!-- received="Sun Dec 11 13:20:43 2005" -->
+<!-- isoreceived="20051211122043" -->
+<!-- sent="Sun, 11 Dec 2005 13:20:32 +0100" -->
+<!-- isosent="20051211122032" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] 65816-based systems support" -->
+<!-- id="20051211122032.GA12499@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="20051211003419.81607.qmail&#64;web25603.mail.ukl.yahoo.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5350.html" title="Ullrich von Bassewitz: &quot;[cc65] Problems with va_copy&quot;">Next message</a> ]
+[ <a href="5348.html" title="chris: &quot;Re: [cc65] 65816-based systems support&quot;">Previous message</a> ]
+[ <a href="5348.html" title="chris: &quot;Re: [cc65] 65816-based systems support&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5353.html" title="Groepaz: &quot;Re: [cc65] 65816-based systems support&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%2065816-based%20systems%20support">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-12-11 13:20:32</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Sun, Dec 11, 2005 at 01:34:19AM +0100, chris wrote:
+&gt; I wonder if I could use both lcc and ca65 and ld65 ?
+&gt; You told me that the assembler does support 65816 but
+&gt; is it true for the linker (if applicable) ?
+
+There's nothing in the linker that limits it to 16 bit. So yes, the linker
+will also work for the 816. There may be minor issues not detected because
+most programs are 16 bit programs, but if so, they're definitely no design
+limitations and should be rather easy to fix.
+
+&gt; In that case I could modify lcc and output assembler
+&gt; files using ca65 syntax.
+
+Since I don't know the assembler and linker backends used with lcc, I cannot
+judge, how worthwhile this is. My suggestion would be to translate one or two
+generated assembler files manually or with a perl script, and assemble/link
+the final programs from it, just to see if there are any problems lurking.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Dec 11 13:20:43 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5350.html" title="Next message in the list">Ullrich von Bassewitz: "[cc65] Problems with va_copy"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5348.html" title="Previous message in the list">chris: "Re: [cc65] 65816-based systems support"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5348.html" title="Message to which this message replies">chris: "Re: [cc65] 65816-based systems support"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5353.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] 65816-based systems support"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5349" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5349" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5349" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-12-11 13:20:46 CET
+</em></small></p>
+</body>
+</html>

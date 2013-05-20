@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Assembler Option --listing in </title>
+<meta name="Author" content="David Schmidt (david46021gmail.com)" />
+<meta name="Subject" content="[cc65] Assembler Option --listing in ant" />
+<meta name="Date" content="2011-02-16" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Assembler Option --listing in ant</h1>
+<!-- received="Wed Feb 16 22:31:53 2011" -->
+<!-- isoreceived="20110216213153" -->
+<!-- sent="Wed, 16 Feb 2011 16:31:43 -0500" -->
+<!-- isosent="20110216213143" -->
+<!-- name="David Schmidt" -->
+<!-- email="david46021gmail.com" -->
+<!-- subject="[cc65] Assembler Option &ndash;&ndash;listing in ant" -->
+<!-- id="AANLkTikaCuJhbFnfBdTAWCDO0N5Sx6bxAQrCxRBTzTY6@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9284.html" title="Oliver Schmidt: &quot;Re: [cc65] Assembler Option --listing in ant&quot;">Next message</a> ]
+[ <a href="9282.html" title="Shawn Jefferson: &quot;RE: [cc65] assembler/C stack issue&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9284.html" title="Oliver Schmidt: &quot;Re: [cc65] Assembler Option --listing in ant&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: David Schmidt &lt;<a href="mailto:david46021gmail.com?Subject=Re:%20[cc65]%20Assembler%20Option%20--listing%20in%20ant">david46021gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-02-16 22:31:43</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi, Uz, Oliver and all -
+
+I appreciate that the old '-l' listing option was grotty.  The trouble
+is - now that it's changed, I'm unable to generate listings for my
+project in ant when I'm assembling things as part of a fileset.  In
+ant, I have this production:
+&lt;apply executable=&quot;${assemblerPath}/ca65&quot;
+dir=&quot;${projdir}/client/src/ip65/drivers&quot;&gt;
+	&lt;arg line=&quot;-l -t c64&quot; /&gt;
+	&lt;fileset dir=&quot;${projdir}/client/src/ip65/drivers&quot; includes=&quot;**/*.s&quot;/&gt;
+&lt;/apply&gt;
+So for all files in a directory matching *.s, we call ca65 and get an
+object file and a listing file.  So far, so good.  Well, in the new
+scheme of things, I need to specify a filename for -l.  But ant's
+&quot;apply&quot; task (<a href="http://ant.apache.org/manual/Tasks/apply.html">http://ant.apache.org/manual/Tasks/apply.html</a>), you can
+only make one substitution at a time... they call it a mapper:
+&lt;apply executable=&quot;${assemblerPath}/ca65&quot;
+dir=&quot;${projdir}/client/src/ip65/drivers&quot;&gt;
+	&lt;arg value=&quot;-t c64&quot;/&gt;
+	&lt;arg value=&quot;-l &quot;/&gt;
+	&lt;targetfile/&gt;
+	&lt;srcfile/&gt;
+	&lt;fileset dir=&quot;${projdir}/client/src/ip65/drivers&quot; includes=&quot;**/*.s&quot;/&gt;
+	&lt;mapper type=&quot;glob&quot; from=&quot;*.s&quot; to=&quot;*.o&quot;/&gt;
+&lt;/apply&gt;
+
+I don't have the opportunity to make another mapper that would
+transform .s to .lst in the same step.  My options in this case are:
+1) stay on the old toolchain
+2) call apply twice for every .s file, first producing a .lst file and
+second producing a .o file.
+
+Is there an ant expert out there that can help me do something smarter
+with ant, or alternatively, is there a new/reverted option (i.e.
+--listForDummies) that can still behave the old way?
+
+- David
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Feb 16 22:31:53 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9284.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Assembler Option --listing in ant"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9282.html" title="Previous message in the list">Shawn Jefferson: "RE: [cc65] assembler/C stack issue"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9284.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Assembler Option --listing in ant"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9284.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Assembler Option --listing in ant"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9283" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9283" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9283" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-02-16 22:31:58 CET
+</em></small></p>
+</body>
+</html>

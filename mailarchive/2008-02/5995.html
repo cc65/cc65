@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-15" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] C64, Interrupt and in need</title>
+<meta name="Author" content="stefan (stefan-physik1gmx.net)" />
+<meta name="Subject" content="Re: [cc65] C64, Interrupt and in need of an example" />
+<meta name="Date" content="2008-02-28" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] C64, Interrupt and in need of an example</h1>
+<!-- received="Thu Feb 28 17:12:47 2008" -->
+<!-- isoreceived="20080228161247" -->
+<!-- sent="Thu, 28 Feb 2008 17:10:34 +0100" -->
+<!-- isosent="20080228161034" -->
+<!-- name="stefan" -->
+<!-- email="stefan-physik1gmx.net" -->
+<!-- subject="Re: [cc65] C64, Interrupt and in need of an example" -->
+<!-- id="47C6DCFA.9090708@gmx.net" -->
+<!-- charset="ISO-8859-15" -->
+<!-- inreplyto="200802281440.38215.groepaz&#64;gmx.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5996.html" title="stefan: &quot;Re: [cc65] C64, Interrupt and in need of an example&quot;">Next message</a> ]
+[ <a href="5994.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] C64, Interrupt and in need of an example&quot;">Previous message</a> ]
+[ <a href="5993.html" title="Groepaz: &quot;Re: [cc65] C64, Interrupt and in need of an example&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5997.html" title="Groepaz: &quot;Re: [cc65] C64, Interrupt and in need of an example&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: stefan &lt;<a href="mailto:stefan-physik1gmx.net?Subject=Re:%20[cc65]%20C64,%20Interrupt%20and%20in%20need%20of%20an%20example">stefan-physik1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-02-28 17:10:34</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Oh thats right, i overlooked it.
+asm(&quot;lda %v&quot;, VIC.irr)
+asm(&quot;sta %v&quot;, VIC.irr) in the c-irq routine
+will do it.
+For some reason asm(&quot;lsr %v&quot;, VIC.irr)  won't work.
+In this way, the complete irq-init can be written in c.
+No asm is needed.
+
+Monte 
+
+&gt; ooops, yes indeed.
+&gt;
+&gt; whats much worse though, and you overlooked it aswell *G*, is that d019 isnt 
+&gt; acknowledged in the irq routine itself either - so it wont work at all, 
+&gt; glitches or not =D
+&gt;
+&gt;   
+
+
+
+******* Diese Email wurde gesendet von der ********
+Laser- und Medizin-Technologie GmbH, Berlin
+                  (gemeinnuetzig nach §52 AO)
+     Fabeckstr. 60 - 62, 14195 Berlin
+     Telefon:  +49 (0)30 8449 23 - 0
+     Fax:      +49 (0)30 8449 23 - 99
+     Handelsregister:    Berlin 97 HRB 23 655
+     Homepage: www.LMTB.de
+     Vorsitzender des Aufsichtsrats: Dr. Frank Frank
+     Geschaeftsfuehrung: Dr. H. Albrecht
+                         Prof. Dr.-Ing. H. J. Eichler
+*************************************************** 
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Feb 28 17:12:47 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5996.html" title="Next message in the list">stefan: "Re: [cc65] C64, Interrupt and in need of an example"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5994.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] C64, Interrupt and in need of an example"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5993.html" title="Message to which this message replies">Groepaz: "Re: [cc65] C64, Interrupt and in need of an example"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5997.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] C64, Interrupt and in need of an example"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5997.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] C64, Interrupt and in need of an example"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5995" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5995" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5995" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-02-28 17:12:50 CET
+</em></small></p>
+</body>
+</html>

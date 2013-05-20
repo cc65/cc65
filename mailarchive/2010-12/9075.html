@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Manic Miner game for C64 more </title>
+<meta name="Author" content="Stefan Wessels (swessels1email.com)" />
+<meta name="Subject" content="[cc65] Manic Miner game for C64 more or less done" />
+<meta name="Date" content="2010-12-19" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Manic Miner game for C64 more or less done</h1>
+<!-- received="Sun Dec 19 02:34:19 2010" -->
+<!-- isoreceived="20101219013419" -->
+<!-- sent="Sat, 18 Dec 2010 17:34:07 -0800" -->
+<!-- isosent="20101219013407" -->
+<!-- name="Stefan Wessels" -->
+<!-- email="swessels1email.com" -->
+<!-- subject="[cc65] Manic Miner game for C64 more or less done" -->
+<!-- id="6BF9415C-E7A3-4276-9688-0FD9B0685B95@email.com" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9076.html" title="Marc 'BlackJack' Rintsch: &quot;Re: [cc65] Manic Miner game for C64 more or less done&quot;">Next message</a> ]
+[ <a href="9074.html" title="Dave Dribin: &quot;Re: [cc65] Re: Patch for reading a 'volatile' pointer&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9076.html" title="Marc 'BlackJack' Rintsch: &quot;Re: [cc65] Manic Miner game for C64 more or less done&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Stefan Wessels &lt;<a href="mailto:swessels1email.com?Subject=Re:%20[cc65]%20Manic%20Miner%20game%20for%20C64%20more%20or%20less%20done">swessels1email.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-12-19 02:34:07</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+I have more or less finished a game for the C64.  It's completely written in C - no assembly.  It's a clone of a game that was available on the ZX Spectrum and was also ported to several other systems, incl. the Commodore 64.  The game is called Manic Miner.  
+
+If anyone wants a copy of the project source, just email me and I'll send it along.  I don't know if people generally share their work, and if they (you) do, how you go about it.  Hope this is acceptable.  I  have to stop my work on this for a bit so that's why I am sharing when not quite done.  I would also love to get some feedback on the thing and hopefully someone will play it and have some fun with a bit of history.
+
+I have uploaded a 3X sped-up video of my version of the game to youtube.
+<a href="http://www.youtube.com/watch?v=_3_V-8X8J5o">http://www.youtube.com/watch?v=_3_V-8X8J5o</a>
+First 4 minutes is me playing, the last minute of the video (a 5 minute video) is the demo mode, so all 20 screens can be seen.  Very low quality video.
+
+I am building the game with the trunk build from 20101205.
+
+The following issues I can think of right now, exist:
+
+1. The cc65 100 / 10000 = 6 issue (in the trunk I was using) causes you to get extra lives when you shouldn't.  Not a big deal and should resolve itself.
+
+2. I don't use a .cfg file because I couldn't get the game working when I put some segments into a 2nd portion of RAM.  This means my sprites and custom characters get stamped down in memory that the machine thinks is it's memory.  Don't know if there's a better way (other than .cfg files).  Maybe someone can get the .cfg files to work?
+
+3.  The game doesn't run right on VICE.  It has worked, and has not worked at times.  I have no idea why I get such very different results between Vice and Power64 (a commercial emulator on OS X that I use).  For most of the time I worked on this, it ran on Vice but the sprites were messed up.  Now that's sorted but it seems I don't get proper keyboard input (or I get input - a left key, when there isn't a key down).  Doesn't appear to run in Frodo at all.  I have an old Frodo that I tried.
+
+4.  The level &quot;The Bank&quot; gets messed up.  I am guessing this is a memory stomp and probably my issue.  This sort of thing comes and goes as I move memory around so probably a stomp.
+
+5.  The levels don't play exactly like they were in the original because some need more sprites than I have available.  I chose to make the door a sprite but even if I didn't, at least one level still wouldn't fit (Amoebatrons' Revenge).  Probably worth changing at some point because Attack of the Mutant Telephones becomes too easy without the one guy.  Also, you can touch a door in my version that gets you out the level in ways that wasn't this way in the original.
+
+6.  I didn't use hi-res graphics so the title screen isn't graphical and that graphic is also not available on the last screen, as it should be.  The last screen is also supposed to have the door flip to another door, but I don't have that in here.
+
+7. I can't guarantee that all screens can be completed.  I am not good enough to do all levels, even if I start on them ;)
+
+8. I don't know about the way I wait for the v-sync (just a while loop).  Doesn't seem to work all that well, so I get sprite tearing.  I think that's the cause.
+
+9. I missed making a wall tile for the 16th level so it uses a The Endorian Forest tile.  Not important.
+
+10.  My little Willy guy doesn't move like the original exactly.  I first wrote a simple routine that worked great but wasn't, at all, like the original (wrote it before actually paying attention to the original).  I rewrote it to make it like the original.  I got close, but I didn't quite get it right.  Close enough that it doesn't matter too much for gameplay.  On Ore Refinery, I just discovered, the conveyor state isn't handled right if you get deposited off of a conveyor onto the regular floor.  There are other issues too - I move him horizontally before checking for a landing - my player ends up 2 pixels more to the side than the original, for example, when jumping.
+
+11.  No audio.  Not a beep.
+
+This could probably be ported to systems without hardware sprites.  There really isn't that much code.  I don't know the other systems so I can't say for sure how hard it would be.  Of course, almost all credit should go to Matthew Smith, the guy that originally made this game.
+
+Thank you
+Stefan
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Dec 19 02:34:19 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9076.html" title="Next message in the list">Marc 'BlackJack' Rintsch: "Re: [cc65] Manic Miner game for C64 more or less done"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9074.html" title="Previous message in the list">Dave Dribin: "Re: [cc65] Re: Patch for reading a 'volatile' pointer"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9076.html" title="Next message in this discussion thread">Marc 'BlackJack' Rintsch: "Re: [cc65] Manic Miner game for C64 more or less done"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9076.html" title="Message sent in reply to this message">Marc 'BlackJack' Rintsch: "Re: [cc65] Manic Miner game for C64 more or less done"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9075" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9075" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9075" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-12-19 02:34:23 CET
+</em></small></p>
+</body>
+</html>

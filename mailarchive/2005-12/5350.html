@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Problems with va_copy</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="[cc65] Problems with va_copy" />
+<meta name="Date" content="2005-12-11" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Problems with va_copy</h1>
+<!-- received="Sun Dec 11 14:08:00 2005" -->
+<!-- isoreceived="20051211130800" -->
+<!-- sent="Sun, 11 Dec 2005 14:07:49 +0100" -->
+<!-- isosent="20051211130749" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="[cc65] Problems with va_copy" -->
+<!-- id="20051211130749.GA14485@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5351.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Problems with va_copy&quot;">Next message</a> ]
+[ <a href="5349.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] 65816-based systems support&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5351.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Problems with va_copy&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Problems%20with%20va_copy">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-12-11 14:07:49</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>To work around problems with some compilers having snprintf and others not
+having it, I've added my own implementation some time ago. To do this, I
+needed a facility to copy a va_list, so I added a va_copy.h file which
+includes this facility for compilers that don't have it.
+
+va_copy is C99, which lead to a portability problem: C99 compilers have
+va_copy, and user programs are not allowed to define such an identifier. C89
+compilers do not have va_copy, and user programs are allowed to have such an
+identifier. Unfortunately, many compilers do not really state which type they
+are. In addition to that, distributors have often their own idea, what the
+compiler should support and what not, so for example there are several older
+versions of gcc in the wild that support va_copy. As a result, I got more and
+more request to add #ifs for this and that operating system/compiler version.
+
+It is my philosophy, that if you have to add too many #ifdefs to a file,
+you're doing something wrong. Portable code does not need #ifdefs (this is
+contrary to popular belief, which says the more #ifdefs you have, the more
+portable your code is).
+
+To solve the problem, I will try something different and resort to standard
+compliance: C99 compilers are required to define the __STDC_VERSION__ symbol
+to 199901, while C89 compilers do not have such a symbol (they would
+theoretically be allowed to define it, but this is highly unlikely). This
+means that, in the former case, the compiler does already have va_copy, while
+in the latter, it is not allowed to define such a symbol, so I can use this
+name for my own version. This leaves the problem to find a working
+implementation for va_copy (src = dest does not always work), but it removes
+the problem of knowing if va_copy clashes with something, the compiler already
+has.
+
+The advantage of this approach is that the problem is now the problem of the
+compiler. If it claims to be C99 conformant, it must have va_copy, if it
+doesn't claim to be a C99 compiler it is not allowed to have va_copy. If
+neither is true, the compiler is broken.
+
+In the case of GNU C, the compiler does not claim to adhere to the C89 or C99
+standard, if you don't force it to do so. So I've added -std=c89 to the
+makefiles. This required minor changes in three places where fileno() was
+used, which is no longer available in C89 mode (because it comes from
+stdio.h).
+
+If you're compiling cc65 yourself, I would request that to test this change
+and tell me if it works. Older versions of gcc may need to have the -std=c89
+command line parameter changed to -ansi or something similar. Apart from this,
+it should at least compile. Otherwise, the compiler has a problem with C
+standard compliance.
+
+I'm not sure if this is really the perfect solution, but the old one seemed to
+be even worse.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Dec 11 14:08:00 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5351.html" title="Next message in the list">Spiro Trikaliotis: "Re: [cc65] Problems with va_copy"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5349.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] 65816-based systems support"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5351.html" title="Next message in this discussion thread">Spiro Trikaliotis: "Re: [cc65] Problems with va_copy"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5351.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Re: [cc65] Problems with va_copy"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5350" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5350" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5350" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-12-11 14:08:02 CET
+</em></small></p>
+</body>
+</html>

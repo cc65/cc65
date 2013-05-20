@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] function pointer, fastcall</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] function pointer, fastcall" />
+<meta name="Date" content="2008-08-28" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] function pointer, fastcall</h1>
+<!-- received="Thu Aug 28 23:02:28 2008" -->
+<!-- isoreceived="20080828210228" -->
+<!-- sent="Thu, 28 Aug 2008 22:59:31 +0200" -->
+<!-- isosent="20080828205931" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] function pointer, fastcall" -->
+<!-- id="20080828205931.GA29032@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="002901c908bc$5cdc8700$b008f160&#64;monarch" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6231.html" title="Oliver Schmidt: &quot;Re: [cc65] function pointer, fastcall&quot;">Next message</a> ]
+[ <a href="6229.html" title="Greg King: &quot;Re: [cc65] function pointer, fastcall&quot;">Previous message</a> ]
+[ <a href="6229.html" title="Greg King: &quot;Re: [cc65] function pointer, fastcall&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6231.html" title="Oliver Schmidt: &quot;Re: [cc65] function pointer, fastcall&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20function%20pointer,%20fastcall">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-08-28 22:59:31</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Wed, Aug 27, 2008 at 09:58:04PM -0400, Greg King wrote:
+&gt; &quot;far&quot; and &quot;fastcall&quot; qualify different kinds of objects.  The first one
+&gt; describes an address -- in this case, a pointer.  The second one describes a
+&gt; function -- what it wants to see after it starts running.  That is why &quot;far&quot;
+&gt; and &quot;fastcall&quot; should be put in different places in a function-pointer's
+&gt; declaration.
+
+Actually this is only half of the truth. I've invested some time researching
+the issue after I've noticed that the current implementation is doubtful (to
+say at least).
+
+Address size qualifiers as &quot;far&quot; and &quot;near&quot; should work with any object, not
+only with pointers.
+
+    int far I;
+
+means that the object I needs to be addressed using &quot;far&quot; addressing (whatever
+that is - it is not defined in the standard). Taking the address of I will
+result in a &quot;far&quot; pointer by default. Assigning a &quot;far&quot; pointer to a &quot;near&quot;
+pointer - if this is possible - needs a conversion at compile or runtime.
+
+While &quot;far&quot; and &quot;near&quot; are part of a type and can also be applied to any
+object, &quot;fastcall&quot; can only applied to functions or function types, but not to
+pointers. A pointer may point to a fastcall function, but it is itself not
+&quot;farcall&quot;.
+
+Because of syntax requirements, these modifiers modify the object or pointer
+to its right. So
+
+    void fastcall Func (int);
+
+defines a fastcall function, while
+
+    void (* fastcall Func) (int);
+
+defines a pointer to a fastcall function (please note: This is not the syntax
+currently required by cc65). Using
+
+    void (fastcall * Func) (int);       /* illegal! */
+
+would be illegal, because on the right of the &quot;fastcall&quot; modifier is a pointer
+and a pointer cannot be fastcall.
+
+    void fastcall far Func (int);
+
+is a fastcall function that must be called by &quot;far&quot; addressing, while
+
+    void (* fastcall far Func) (int);
+
+is a pointer to a fastcall function that must be called using &quot;far&quot;
+addressing. This implies that the pointer itself is also &quot;far&quot;. Using
+
+    void (far * fastcall far Func) (int);
+
+says the same but explicitly: The pointer is also declared &quot;far&quot;.
+
+    void (near * fastcall far Func) (int);
+
+means a near pointer to a far function. This may or may not be useful or
+allowed.
+
+If you think about 80x86 architectures, &quot;far&quot; could mean &quot;segmented&quot; while
+&quot;near&quot; could mean a 16 or 32 bit pointer without a segment. For the 65816,
+&quot;near&quot; could mean 16 bit addressing while &quot;far&quot; could mean 24 bit addressing.
+For the 6502 or 65816, &quot;zeropage&quot; could be another address size modifier,
+which would mean 8 bit addressing. After declaring
+
+        int zeropage I;
+
+an 8 bit pointer would be declared as
+
+        int zeropage* pI = &amp;I;
+
+while a 16 bit pointer could be declared as
+
+        int near* pI = &amp;I
+
+Just a few thoughts ...
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Aug 28 23:02:28 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6231.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] function pointer, fastcall"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6229.html" title="Previous message in the list">Greg King: "Re: [cc65] function pointer, fastcall"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6229.html" title="Message to which this message replies">Greg King: "Re: [cc65] function pointer, fastcall"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6231.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] function pointer, fastcall"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6231.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] function pointer, fastcall"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6232.html" title="Message sent in reply to this message">stefan: "Re: [cc65] function pointer, fastcall"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6233.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] function pointer, fastcall"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6230" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6230" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6230" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-08-28 23:02:30 CEST
+</em></small></p>
+</body>
+</html>

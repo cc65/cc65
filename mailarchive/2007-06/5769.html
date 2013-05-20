@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Using the hardware stack</title>
+<meta name="Author" content="Dan (opendtv1yahoo.com)" />
+<meta name="Subject" content="[cc65] Using the hardware stack" />
+<meta name="Date" content="2007-06-27" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Using the hardware stack</h1>
+<!-- received="Wed Jun 27 19:47:51 2007" -->
+<!-- isoreceived="20070627174751" -->
+<!-- sent="Wed, 27 Jun 2007 10:47:37 -0700 (PDT)" -->
+<!-- isosent="20070627174737" -->
+<!-- name="Dan" -->
+<!-- email="opendtv1yahoo.com" -->
+<!-- subject="[cc65] Using the hardware stack" -->
+<!-- id="588159.30298.qm@web56211.mail.re3.yahoo.com" -->
+<!-- charset="iso-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5770.html" title="MagerValp: &quot;Re: [cc65] Using the hardware stack&quot;">Next message</a> ]
+[ <a href="5768.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Segment defines&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5770.html" title="MagerValp: &quot;Re: [cc65] Using the hardware stack&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Dan &lt;<a href="mailto:opendtv1yahoo.com?Subject=Re:%20[cc65]%20Using%20the%20hardware%20stack">opendtv1yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-06-27 19:47:37</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I implemented another enhancement to cc65, an option
+to use the hardware stack for saving/restoring
+'register' (zero page) variables (for non-leaf
+functions; leaf functions can avoid the save/restore
+altogether). This is much faster and often smaller
+than using the C stack. Since the default maximum
+usage is only 6 bytes per function, this is unlikely
+to cause stack overflow issues.
+
+Coupled with static parameter passing and leaf
+function optimization, the function call overhead is
+greatly reduced.
+
+Dan
+
+
+
+       
+____________________________________________________________________________________
+Got a little couch potato? 
+Check out fun summer activities for kids.
+<a href="http://search.yahoo.com/search?fr=oni_on_mail&amp;p=summer+activities+for+kids&amp;cs=bz">http://search.yahoo.com/search?fr=oni_on_mail&amp;p=summer+activities+for+kids&amp;cs=bz</a> 
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Jun 27 19:47:51 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5770.html" title="Next message in the list">MagerValp: "Re: [cc65] Using the hardware stack"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5768.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Segment defines"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5770.html" title="Next message in this discussion thread">MagerValp: "Re: [cc65] Using the hardware stack"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5770.html" title="Message sent in reply to this message">MagerValp: "Re: [cc65] Using the hardware stack"</a></li>
+<li><dfn>Reply</dfn>:  <a href="5772.html" title="Message sent in reply to this message">Christian Krüger: "RE: [cc65] Using the hardware stack"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5769" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5769" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5769" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-06-27 19:47:54 CEST
+</em></small></p>
+</body>
+</html>

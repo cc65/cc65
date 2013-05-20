@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] array of pointers to functions</title>
+<meta name="Author" content="Chiron Bramberger (chiron1bramberger.com)" />
+<meta name="Subject" content="[cc65] array of pointers to functions question" />
+<meta name="Date" content="2010-05-15" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] array of pointers to functions question</h1>
+<!-- received="Sat May 15 09:26:41 2010" -->
+<!-- isoreceived="20100515072641" -->
+<!-- sent="Sat, 15 May 2010 03:26:34 -0400" -->
+<!-- isosent="20100515072634" -->
+<!-- name="Chiron Bramberger" -->
+<!-- email="chiron1bramberger.com" -->
+<!-- subject="[cc65] array of pointers to functions question" -->
+<!-- id="1677.1273908394@bramberger.com" -->
+<!-- charset="utf-8" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8398.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] array of pointers to functions question&quot;">Next message</a> ]
+[ <a href="8396.html" title="Payton Byrd: &quot;Re: [cc65] Question about writing assembler app for both C128 and C64&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8398.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] array of pointers to functions question&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Chiron Bramberger &lt;<a href="mailto:chiron1bramberger.com?Subject=Re:%20[cc65]%20array%20of%20pointers%20to%20functions%20question">chiron1bramberger.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-05-15 09:26:34</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>  
+ If someone doesn't mind, I'm trying to figure something out. It's
+probably me just not being on the ball tonight. :)
+ In any case, I've got a program below that's actually 2 program. 
+ The first version is at the top of main() and there are a bunch of
+lines comments out. Having the program with just this first part works
+-&gt; as in it returns the results after being compiled and run on a
+Commodore 4032 pet (screen at the end of the email). 
+ The second version doesn't work - if you copied and pasted the
+program below in whole, it would compile as the second version I'm
+talking about, with the first version commented out as is. This
+version doesn't work, and gives me the errors I also list at the end
+of the program. 
+ So maybe this is me not being on the ball with C programming, or me
+being not on the ball with cc65 and some particular aspect of it's
+design, but...
+ -----
+ ...in short, why does this work:
+ -----
+ void (*vibrato_change)() = vib_chg; 
+ void (*lfo_change)() = lfo_chg ;
+ void (*command[])() = {vib_chg,lfo_chg }; // gives me an array of
+pointers to functions
+ -----
+ and this doesn't:
+ -----
+ void (*vibrato_change)(); 
+ void (*lfo_change)(); 
+ vibrato_change = vib_chg;
+ lfo_change = lfo_chg ;
+ void (*command[])() = {vib_chg,lfo_chg };
+ //Error: Expression expected
+ ----------
+ THANKS!!!!!!
+ -Chiron
+ ----- sample code below -----
+ #include 
+ #include 
+ void vib_chg() {
+     printf(&quot;vib -&gt; do me!n&quot;);
+ }//end func
+ void lfo_chg() {
+     printf(&quot;lfo - &gt; do me!n&quot;);
+ }//end func    
+   int main(){
+         // works! creates pointers to functions, 
+         // then creates array of those pointers to functions
+       //void (*vibrato_change)() = vib_chg; 
+       //void (*lfo_change)() = lfo_chg ;
+       //void (*command[])() = {vib_chg,lfo_chg };
+       //command[0]();
+       //command[1]();
+       //return EXIT_SUCCESS;    
+ //}//end main    
+     // the following returns errors: (see end of file)
+     // why doesn't this version work? 
+     // does it have something to do with declaring functions
+     // and then variables, and then functions again?
+     void (*vibrato_change)(); 
+     void (*lfo_change)();
+     vibrato_change = vib_chg;
+     lfo_change = lfo_chg ;
+     void (*command[])() = {vib_chg,lfo_chg };
+     command[0]();
+     command[1]();
+     return EXIT_SUCCESS;
+   }//end main
+ /**********
+ results for working program (the one commented out above)
+ as run on a commodore pet
+ *** commodore basic 4.0 ***
+  31743 bytes free
+ ready.
+ load&quot;array?of?funcs.prg&quot;,8,1:
+ searching for array?of?funcs.prg
+ loading
+ ready.
+ run
+ vib -&gt; do me!
+ lfo - &gt; do me!
+ ready.
+ **********
+ results for non-working programm
+ compile error output:
+ C:6502cc65bin&gt;cl65 -t pet array_of_funcs_ALT.c -o
+array_of_funcs_ALT.prg
+ array_of_funcs_ALT.c(52): Error: Expression expected
+ array_of_funcs_ALT.c(52): Warning: Statement has no effect
+ array_of_funcs_ALT.c(52): Error: `;' expected
+ array_of_funcs_ALT.c(52): Error: Expression expected
+ array_of_funcs_ALT.c(52): Warning: Statement has no effect
+ array_of_funcs_ALT.c(52): Error: `;' expected
+ array_of_funcs_ALT.c(52): Error: Expression expected
+ array_of_funcs_ALT.c(52): Warning: Statement has no effect
+ array_of_funcs_ALT.c(52): Error: `;' expected
+ array_of_funcs_ALT.c(52): Error: Expression expected
+ array_of_funcs_ALT.c(52): Warning: Statement has no effect
+ array_of_funcs_ALT.c(52): Error: `;' expected
+ array_of_funcs_ALT.c(52): Error: Expression expected
+ array_of_funcs_ALT.c(52): Warning: Statement has no effect
+ array_of_funcs_ALT.c(52): Error: `;' expected
+ array_of_funcs_ALT.c(52): Error: Expression expected
+ array_of_funcs_ALT.c(52): Fatal: Too many errors
+ **********/
+  
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat May 15 09:26:41 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8398.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] array of pointers to functions question"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8396.html" title="Previous message in the list">Payton Byrd: "Re: [cc65] Question about writing assembler app for both C128 and C64"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8398.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] array of pointers to functions question"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8398.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] array of pointers to functions question"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8399.html" title="Message sent in reply to this message">Mark J. Reed: "Re: [cc65] array of pointers to functions question"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8397" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8397" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8397" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-05-15 09:26:44 CEST
+</em></small></p>
+</body>
+</html>

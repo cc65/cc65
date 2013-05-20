@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] NULL descrepency</title>
+<meta name="Author" content="Andrew J. Kroll (forge1dr.ea.ms)" />
+<meta name="Subject" content="[cc65] NULL descrepency" />
+<meta name="Date" content="2006-04-06" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] NULL descrepency</h1>
+<!-- received="Thu Apr  6 11:08:35 2006" -->
+<!-- isoreceived="20060406090835" -->
+<!-- sent="Thu, 6 Apr 2006 05:08:26 -0400 (EDT)" -->
+<!-- isosent="20060406090826" -->
+<!-- name="Andrew J. Kroll" -->
+<!-- email="forge1dr.ea.ms" -->
+<!-- subject="[cc65] NULL descrepency" -->
+<!-- id="200604060908.k3698Qra009819@dr.ea.ms" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5479.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] NULL descrepency&quot;">Next message</a> ]
+[ <a href="5477.html" title="Markus Stehr: &quot;Re: [cc65] Optimization for size [scanned]&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5479.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] NULL descrepency&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Andrew J. Kroll &lt;<a href="mailto:forge1dr.ea.ms?Subject=Re:%20[cc65]%20NULL%20descrepency">forge1dr.ea.ms</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2006-04-06 11:08:26</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>First the quote :-)
+
+
+       WG14/N869   Committee Draft  --  January 18, 1999        287
+ 
+ 
+       7.17  Common definitions &lt;stddef.h&gt;
+&lt;SNIP&gt;
+       [#3] The macros are
+
+               NULL
+
+       which expands  to  an  implementation-defined  null  pointer
+       constant; and
+&lt;SNIP&gt;
+
+
+Now the problem...
+
+in stddef.h (and a few other places) we have:
+
+/* NULL pointer */
+#ifndef _HAVE_NULL
+#define NULL	0
+#define _HAVE_NULL
+#endif
+
+
+
+This should actually be:
+
+/* NULL pointer */
+#ifndef NULL
+#define NULL    (void *)0
+#endif
+
+This is true for the includes for GNU's headers, M$ C (every one I looked at),
+Borland's C products, HI-TECH C, AZTEC C, MIX C, and every other
+implementation I have seen. With that, I have made my point that the headers
+are in error. Furthermore, I suggest each header be wrapped so they are
+reentrant, this way you define things in ONE place and where they belong
+and can be called upon from other headers when required. 
+
+That also brings me to another point as far as the header files...
+
+We have the cbm.h file which calls on the other CBM platforms, atari.h, apple,
+and so on. Would it not make sense that if we have these particular headers
+which grab OS dependencies, to point any header at the proper header, and if
+you have them reentrantly wrapped with #ifdef _CC65_STDDEF_H_SEEN_ (example)
+more code can compile out of the box. This makes total sense to me, and how
+the many other cross compilers do it... with the pre-set cpp macros...
+Why not follow suit?
+
+Yours,
+-- 
+Andrew J. Kroll
+Software and Hardware Engineer and Consultant
+Grafixoft <a href="http://dr.ea.ms/HW/">http://dr.ea.ms/HW/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Apr  6 11:08:35 2006</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5479.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] NULL descrepency"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5477.html" title="Previous message in the list">Markus Stehr: "Re: [cc65] Optimization for size [scanned]"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5479.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] NULL descrepency"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5479.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] NULL descrepency"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5478" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5478" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5478" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2006-04-06 11:08:38 CEST
+</em></small></p>
+</body>
+</html>

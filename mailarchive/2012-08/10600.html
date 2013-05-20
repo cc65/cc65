@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Filenames for POSIX functi</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="Re: [cc65] Filenames for POSIX functins on CBM targets" />
+<meta name="Date" content="2012-08-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Filenames for POSIX functins on CBM targets</h1>
+<!-- received="Fri Aug 10 16:25:00 2012" -->
+<!-- isoreceived="20120810142500" -->
+<!-- sent="Fri, 10 Aug 2012 16:24:40 +0200" -->
+<!-- isosent="20120810142440" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="Re: [cc65] Filenames for POSIX functins on CBM targets" -->
+<!-- id="20120810142440.GD1982@trikaliotis.net" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="4d8fa060-624f-4143-875a-a62dc3b7151f&#64;email.android.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10601.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">Next message</a> ]
+[ <a href="10599.html" title="Oliver Schmidt: &quot;Re: [cc65] Atari Extended Memory Driver Anybody?&quot;">Previous message</a> ]
+[ <a href="10591.html" title="A.Fachat: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10602.html" title="Oliver Schmidt: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20[cc65]%20Filenames%20for%20POSIX%20functins%20on%20CBM%20targets">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-08-10 16:24:40</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello,
+
+* On Fri, Aug 10, 2012 at 02:10:04PM +0200 A.Fachat wrote:
+&gt;    For example
+&gt;    open(&quot;8#0:name&quot;, ...
+
+Note that open(&quot;#0&quot;, ...) is perfectly legal for the 1541 (opening a
+specific buffer).
+
+Thus, using the &quot;#&quot; is not completely unproblematic.
+
+Also: What if there would be no drive number? Should open(&quot;8#name&quot;) be
+valid, too?
+
+The double colon syntax proposes elsewhere is also not unproblematic.
+
+Look at the following syntaxes:
+- 8:0:name
+- 8:&#64;0:name (yes, overwrite-with-at is problematic, I know&#46;<!--nospam-->..)
+- 8:&#64;name
+
+Also: devices 0 and 1 normally do not exist on the IEC bus; however,
+screen (0) and tape (1) are valid targets for open(), too, aren't they?
+Thus, distinguishing between device and drive in &quot;n:name&quot; with n &lt; 2 or
+not is not an option, either.
+
+Regards,
+Spiro.
+
+-- 
+Spiro R. Trikaliotis
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Aug 10 16:25:00 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10601.html" title="Next message in the list">Spiro Trikaliotis: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10599.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Atari Extended Memory Driver Anybody?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10591.html" title="Message to which this message replies">A.Fachat: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10602.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10602.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10643.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10600" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10600" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10600" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-08-10 16:25:03 CEST
+</em></small></p>
+</body>
+</html>

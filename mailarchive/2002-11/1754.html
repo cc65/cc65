@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] Extended memory</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] Extended memory">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] Extended memory</h1>
+<!-- received="Wed Nov 20 23:48:54 2002" -->
+<!-- isoreceived="20021120224854" -->
+<!-- sent="Wed, 20 Nov 2002 23:48:49 +0100" -->
+<!-- isosent="20021120224849" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] Extended memory" -->
+<!-- id="4416091472.20021120234849@gmx.net" -->
+<!-- inreplyto="20021120222454.GA5590@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20Extended%20memory"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2002-11-20 23:48:49
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1753.html">Ullrich von Bassewitz: "Re: [cc65] Extended memory"</a>
+<li><strong>In reply to:</strong> <a href="1752.html">Ullrich von Bassewitz: "Re: [cc65] Extended memory"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1755.html">Ullrich von Bassewitz: "Re: [cc65] Extended memory"</a>
+<li><strong>Reply:</strong> <a href="1755.html">Ullrich von Bassewitz: "Re: [cc65] Extended memory"</a>
+<li><strong>Reply:</strong> <a href="1756.html">groepaz: "[cc65] warez gallore :)"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+UvB&gt; I've also thought of something like this, because this would be useful for
+UvB&gt; chaining IRQs on banked systems. On the C128 for example, the IRQ routine in
+UvB&gt; the ROM will bank in BASIC and KERNAL - and bank out part of the cc65 program.
+UvB&gt; If the cc65 program contains an IRQ or BRK handler, at least a small stub has
+UvB&gt; to go into non banked memory, otherwise the program will crash at this point,
+UvB&gt; because the vector points to code that is not available in this moment. BTW:
+UvB&gt; The Plus/4 routines posted by MagerValp do also have this problem.
+
+UvB&gt; However, I'm not sure how a good solution would look. Problem is, that &quot;at the
+UvB&gt; beginning&quot; is a soft requirement. If you have three big modules to place at
+UvB&gt; the beginning, the third one may already be in a range that is banked out.
+
+well... i'd say thats the responsibility of the programmer... those
+&quot;three big modules&quot; should only contain some small bits that actually
+have that requirement. (ie a bunch of actual wrapper functions that
+call the kernal, or even better, one of it that calls kernal via
+jumptable or sth). i see 2 possible solutions here... the first would
+require each module to be split into the &quot;non critical&quot; and the,
+small, &quot;critical&quot; part, and each put into a section with different
+attributes. the other would involve one common &quot;farcall&quot; API, which in
+turn means ONE common wrapper function for each target that takes care
+of that sorta things. however, while the first solution looks more
+attractive to me (wastes less cycles when done properly), it has still
+the disadvantage of possible clashes when linking to much of those
+modules - the common farcall-thing wouldnt have that disadvantage but
+would obviously be much slower. however, since that fastcall thing
+could probably be easily forced to link into always acessable ram (ie
+right after crt0 or sth) its probably the way to go, right? :) as a
+side-effect, this might be a relativly easy way to write quite
+portable assembly for cbm-machines or even across all targets, since
+calling routines through that jumptable would also mean the jumptable
+can be adjusted for each target :) (as a currently popular example,
+those pet file i/o patches might end up there - and
+automagically be available for any other sort of thing that might use
+them :=))
+
+&gt;&gt; btw is there a reason for not having a toplevel makefile for easy
+&gt;&gt; doing the usual &quot;make all install&quot; thing? :) if the answer is the same
+&gt;&gt; as for the (formerly ;=P) missing file i/o, i can post what i hacked
+&gt;&gt; up for myself now :=)
+
+UvB&gt; I think, Keith has requested that years ago, together with a &quot;bin&quot; directory
+UvB&gt; where all the binaries should go. The reason why I didn't add something like
+UvB&gt; this is, that I don't like to clutter the main directory and I don't know a
+UvB&gt; good way to have all these things without doing that.
+
+uhmz well eh... ;=P
+
+how do you go through the build/install cycle then after having
+changed stuff in the compiler or library code? i mean... manually
+going through the directories and typing make and copying stuff to
+/usr/bin etc pp just isnt really acceptable when there is a shell or
+make util that could easily do that kinda boring work for me ,=)
+
+anyway, there are more urgent problems than this hehe :=P just beeing
+curious :) you might want to direct any other ppl that ask to me
+though, i think i am going to make this thing complete for myself
+anyway :=)
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20Extended%20memory">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20Extended%20memory">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1753.html">Ullrich von Bassewitz: "Re: [cc65] Extended memory"</a>
+<li><strong>In reply to:</strong> <a href="1752.html">Ullrich von Bassewitz: "Re: [cc65] Extended memory"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1755.html">Ullrich von Bassewitz: "Re: [cc65] Extended memory"</a>
+<li><strong>Reply:</strong> <a href="1755.html">Ullrich von Bassewitz: "Re: [cc65] Extended memory"</a>
+<li><strong>Reply:</strong> <a href="1756.html">groepaz: "[cc65] warez gallore :)"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-11-20 23:48:58 CET</em>
+</em>
+</small>
+</body>
+</html>

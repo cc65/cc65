@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Uniform mass storage device di</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] Uniform mass storage device discovery and file locations" />
+<meta name="Date" content="2012-08-13" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Uniform mass storage device discovery and file locations</h1>
+<!-- received="Mon Aug 13 13:53:53 2012" -->
+<!-- isoreceived="20120813115353" -->
+<!-- sent="Mon, 13 Aug 2012 13:52:49 +0200" -->
+<!-- isosent="20120813115249" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] Uniform mass storage device discovery and file locations" -->
+<!-- id="CACT=u72JADO2-146p257t9KM5j1pOyRkhee+h0gR-d=n+au2sg@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10685.html" title="Payton Byrd: &quot;Re: [cc65] Uniform mass storage device discovery and file locations&quot;">Next message</a> ]
+[ <a href="10683.html" title="Oliver Schmidt: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10685.html" title="Payton Byrd: &quot;Re: [cc65] Uniform mass storage device discovery and file locations&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Uniform%20mass%20storage%20device%20discovery%20and%20file%20locations">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-08-13 13:52:49</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+As threatened I'd like to disuss the options for &quot;uniform mass storage
+device discovery and file locations&quot;. Unfortunately this is - at least
+from my perspective - more complex because it's about several
+scenarios and cross-target...
+
+1.
+The first scenario I have in mind is again the editor that is about to
+save the content to disk. I believe one could do that in a meaningful
+still portable (meaning not only cc65 cross-target) way:
+
+- Ask the user for the &quot;File Location&quot;
+- Ask the user for the &quot;File Name&quot;
+- Save the current location using getcwd()
+- Set the location entered by the user using chdir()
+- Open the name entered by the user using open()
+- Restore the current location using chdir()
+
+This is not just replacing one string with two strings. For me it
+means to recognize that there are basically to ways to deal with file
+locations. One could classify them as in-band and out-of-band. A
+system that has pathnames follows the in-band approach (i.e. &quot;modern&quot;
+OSes, Apple II ProDOS). A system that works with devices, slots,
+drives beside filenames follows the out-of-band approach (i.e. CBM
+DOS, Apple II DOS 3.3).
+
+I think by decribing a file as a string tuple that can be fed into
+chdir() and open() we can archive a harmonized view on in-band and
+out-of-band and still have two goodies
+- Full POSIX portability
+- A meaningful UI
+Again: From my perspective what the user enters as file location is
+totally different on the different targets - and this is good because
+the typical usecase isn't a user operating a single cc65 program on
+different targets but rather a user operating different programs on a
+single target.
+
+Additionally the use of a specific function for setting the file
+location - chdir() - possibly opens up the option to support CBM DOS
+extensions for subdirectories, because that function knows that it is
+fed with a file location (and not a filename) and is therefore
+supposed to do local processing - in contrast to open().
+
+2.
+The second scenario I have in mind is a program that discovers and
+displays the name of all files currently available in the system. This
+could be a demo program coming with cc65 and could be the base on
+which cc65 programs are build programs that allow users to handle
+files in a menu driven style (like CBM-Command / A2Command). In my
+opinion one should be able to write such a program in a cc65
+cross-targe style - while surely using cc65-specific stuff.
+
+Let's pretend for a moment that we have only one device/drive but a
+hierarchical filesystem. Then we could something like this:
+
+showdir(char *n) {
+    char o[PATH_MAX];
+    DIR* d;
+    struct dirent* e;
+
+    getcwd(o, sizeof(o));
+    chdir(n);
+
+    d = opendir(&quot;.&quot;);
+    while (e = readdir(d)) {
+        printf(&quot;%s\n&quot;, e-&gt;d_name);
+        if (_DE_ISDIR(e-&gt;d_type))
+            showdir(e-&gt;d_name);
+    }
+    closedir(d);
+
+    chdir(o);
+}
+
+There are a few things to note about this code:
+- It uses opendir() always with &quot;.&quot; (it especially doesn't make the
+presumption that opendir() can take the same argument as chdir()).
+- It doesn't presume it can traverse upwards using &quot;..&quot;.
+- It presumes only two things regarding chdir()
+  - A relative traverse into a subdirectory is possible by using a
+directory entry as-is (similar to what we want from open())
+  - What getcwd() delivers can be used for chdir() and reverts the
+state to that of the getcwd()
+- It doesn't make any presumptions on the directory path syntax
+(especially no presumption on a path separator)
+
+Maybe I'm naive but with this coding style it should be possible to
+support CBM DOS extensions with subdirectories - as there's no
+presumption made how the syntax looks like. Looking at our scenario
+1.) above it would still be desireable to use something user-friendly.
+
+So far so good (hopefully) ... but where does the parameter for the
+initial call to showdir come from? Here we need some cc65-specific yet
+cross-target stuff:
+
+The first question to answer seems to me: Do we want to enumerate
+devices/drives (even if they are empty) or do we want to enumerate
+disks/volumes present? I don't know enough of the other targets but if
+possible I'd argue for the former, simply because it's more powerful.
+A program like CBM-Command should be able to list all drives present
+and denote them with &quot;&lt;empty&gt;&quot; where appropriate. For Apple II ProDOS
+I can say it is possible.
+
+Presuming we're enumerating devices/drives the next question is if
+they are identified by numbers or strings. I personally tend towards
+strings but I'm open. However whatever we come up with it would be
+very desirable to have dio_open() use the very same thing. Afaik
+currently only the Apple II and the Atari implement DIO so that
+shouldn't be an issue. BTW: DIO for the CBMs &quot;should&quot; be implemented
+allowing i.e. programs like CBM-Command to transfer between disk image
+files and real disks in a cross-target manner.
+
+So if we distinguish between devices/drives and disks/volumes there
+needs to be some function to get from the former to the latter. This
+may seem superfluous from the CBM perspective but i.e. Apple II ProDOS
+uses volume names to access files so one needs to learn the volume
+name of the disk in a certain drive in order to be able to access
+files &quot;by drive specification&quot;.
+
+Given the fact that the only guaranteed usecase of the return value of
+the function in question is to be a parameter to chdir() I called the
+function I implemented on the Apple II just rootdir(). I'm however
+open to change that for a common cross-target name. If a device/drive
+is empty rootdir() fails. Otherwise its result can be fed into
+something like showdir() above.
+
+BTW: <a href="http://wiki.cc65.org/doku.php?id=cc65:apple2:files">http://wiki.cc65.org/doku.php?id=cc65:apple2:files</a> is such a
+program for the Apple II that I'd like to turn into a cross-target
+program to put into th cc65 samples directory.
+
+So far my thoughs on the topic,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Aug 13 13:53:53 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10685.html" title="Next message in the list">Payton Byrd: "Re: [cc65] Uniform mass storage device discovery and file locations"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10683.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10685.html" title="Next message in this discussion thread">Payton Byrd: "Re: [cc65] Uniform mass storage device discovery and file locations"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10685.html" title="Message sent in reply to this message">Payton Byrd: "Re: [cc65] Uniform mass storage device discovery and file locations"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10684" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10684" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10684" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-08-13 13:53:56 CEST
+</em></small></p>
+</body>
+</html>

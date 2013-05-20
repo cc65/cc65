@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="iso-8859-2"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-2" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] How to force a pointer optimiz</title>
+<meta name="Author" content="Jakub (debski.jakub1wp.pl)" />
+<meta name="Subject" content="[cc65] How to force a pointer optimization?" />
+<meta name="Date" content="2009-04-14" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] How to force a pointer optimization?</h1>
+<!-- received="Tue Apr 14 19:27:57 2009" -->
+<!-- isoreceived="20090414172757" -->
+<!-- sent="Tue, 14 Apr 2009 19:27:50 +0200" -->
+<!-- isosent="20090414172750" -->
+<!-- name="Jakub" -->
+<!-- email="debski.jakub1wp.pl" -->
+<!-- subject="[cc65] How to force a pointer optimization?" -->
+<!-- id="5F2CBAC0133B42179B0C04515921CFF6@pl.eset.com" -->
+<!-- charset="iso-8859-2" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6566.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] How to force a pointer optimization?&quot;">Next message</a> ]
+[ <a href="6564.html" title="Per Olofsson: &quot;[cc65] Re: alignment bug?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6566.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] How to force a pointer optimization?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Jakub &lt;<a href="mailto:debski.jakub1wp.pl?Subject=Re:%20[cc65]%20How%20to%20force%20a%20pointer%20optimization?">debski.jakub1wp.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-04-14 19:27:50</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+
+
+Addressing the known table generates a fast and compact code 
+(cl65 -Osi -Cl -l test.c):
+
+
+
+unsigned char a[255];
+
+void main(void)
+
+{
+
+  unsigned char i;
+
+  for (i=1;i;++i)
+
+    a[i] = 0x02;
+
+}
+
+
+
+000000r 1  A9 01             lda     #$01
+
+000002r 1  8D rr rr          sta     L0004
+
+000005r 1  AD rr rr     L0005:     lda     L0004
+
+000008r 1  F0 0E             beq     L0006
+
+00000Ar 1  AC rr rr          ldy     L0004
+
+00000Dr 1  A9 02             lda     #$02
+
+00000Fr 1  99 rr rr          sta     _a,y
+
+000012r 1  EE rr rr          inc     L0004
+
+000015r 1  4C rr rr          jmp     L0005
+
+000018r 1  60           L0006:     rts
+
+
+
+(I know about memset, this is just an example).
+
+
+
+However when I use a constant pointer, the generated code is much less 
+efficient, even with zero-page indexer.
+
+Is there a way to write constant+index ((unsigned char*)a)[i] somehow to 
+make it optimized by CC65?
+
+
+
+//// test.c
+
+#define a 0x9C68
+
+extern unsigned char i;
+
+#pragma zpsym (&quot;i&quot;);
+
+void main(void)
+
+{
+
+for (i=1;i;++i)
+
+((unsigned char*)a)[i] = 0x02;
+
+}
+
+//// zero.asm
+
+.export _i
+
+.segment &quot;ZEROPAGE&quot;
+
+_i: .byte 0
+
+////
+
+
+
+lda #$01
+
+sta _i
+
+L0003: lda _i
+
+beq L0004
+
+ldx #$9C
+
+lda #$68
+
+clc
+
+adc _i
+
+bcc L000E
+
+inx
+
+L000E: sta sreg
+
+stx sreg+1
+
+lda #$02
+
+ldy #$00
+
+sta (sreg),y
+
+inc _i
+
+jmp L0003
+
+L0004: rts
+
+
+
+Btw, do you still prefer not to add the zstatic keyword?
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Apr 14 19:27:57 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6566.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] How to force a pointer optimization?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6564.html" title="Previous message in the list">Per Olofsson: "[cc65] Re: alignment bug?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6566.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] How to force a pointer optimization?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6566.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] How to force a pointer optimization?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6565" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6565" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6565" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-04-14 19:28:00 CEST
+</em></small></p>
+</body>
+</html>

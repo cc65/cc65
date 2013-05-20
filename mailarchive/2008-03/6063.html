@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Compiler Bug (?)</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] Compiler Bug (?)" />
+<meta name="Date" content="2008-03-28" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Compiler Bug (?)</h1>
+<!-- received="Fri Mar 28 23:32:33 2008" -->
+<!-- isoreceived="20080328223233" -->
+<!-- sent="Fri, 28 Mar 2008 23:31:29 +0100" -->
+<!-- isosent="20080328223129" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] Compiler Bug (?)" -->
+<!-- id="f97798c20803281531q6c578aa2t936f1b3eca2757dc@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6064.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Compiler Bug (?)&quot;">Next message</a> ]
+[ <a href="6062.html" title="Karri Kaksonen: &quot;Re: [cc65] Lynx target&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6064.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Compiler Bug (?)&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Compiler%20Bug%20(?)">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-03-28 23:31:29</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+The following code produces an 'Error: Incompatible pointer types' at
+the last line when compiling with snapshot-2.11.9.20080316 without
+optimizations. If I remove the struct inside f() it compiles fine ?!?
+
+Best, Oliver
+
+----------
+
+void f(void)
+{
+  struct {
+    int i;
+  } d;
+}
+
+struct {
+  void (* p)(void);
+} s = {f};
+
+----------
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Mar 28 23:32:33 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6064.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Compiler Bug (?)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6062.html" title="Previous message in the list">Karri Kaksonen: "Re: [cc65] Lynx target"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6064.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Compiler Bug (?)"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6064.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Compiler Bug (?)"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6066.html" title="Message sent in reply to this message">Stefan: "Re: [cc65] Compiler Bug (?)"</a></li>
+<li><dfn>Reply</dfn>:  <a href="../2008-06/6136.html" title="Message sent in reply to this message">Stefan: "[cc65] Using CC65 for MMC Replay plugin programming"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6063" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6063" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6063" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-03-28 23:32:35 CET
+</em></small></p>
+</body>
+</html>

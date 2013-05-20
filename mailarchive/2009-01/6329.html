@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] 16-bit writes on 65816</title>
+<meta name="Author" content="Scott Goldman (scottjg1umich.edu)" />
+<meta name="Subject" content="[cc65] 16-bit writes on 65816" />
+<meta name="Date" content="2009-01-05" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] 16-bit writes on 65816</h1>
+<!-- received="Mon Jan  5 07:30:28 2009" -->
+<!-- isoreceived="20090105063028" -->
+<!-- sent="Mon, 05 Jan 2009 01:30:22 -0500" -->
+<!-- isosent="20090105063022" -->
+<!-- name="Scott Goldman" -->
+<!-- email="scottjg1umich.edu" -->
+<!-- subject="[cc65] 16-bit writes on 65816" -->
+<!-- id="4961A8FE.5020306@umich.edu" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6330.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] 16-bit writes on 65816&quot;">Next message</a> ]
+[ <a href="6328.html" title="Tachdaun: &quot;[cc65] using asm capabilities in cc65&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6330.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] 16-bit writes on 65816&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Scott Goldman &lt;<a href="mailto:scottjg1umich.edu?Subject=Re:%20[cc65]%2016-bit%20writes%20on%2065816">scottjg1umich.edu</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-01-05 07:30:22</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi.
+
+I've been trying to setup cc65 as a toolchain for super nintendo (65816) 
+development but I've run into a small problem. consider the following code:
+    *(unsigned short *)0x2116 = 0x41a9;
+I'm trying to write a value to the register at that address. This 
+results in the code:
+    ldx     #$41
+    lda     #$A9
+    sta     $2116
+    stx     $2116+1
+This code is a problem because while it is a 16-bit register, the 
+register isn't mapped to both addresses. The code I would expect would 
+look like:
+.a16
+    ldx     #$41a9
+    stx     $2116
+
+Am I doing something wrong? Is there a way to generate the code I would 
+expect?
+
+Thanks,
+Scott
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Jan  5 07:30:28 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6330.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] 16-bit writes on 65816"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6328.html" title="Previous message in the list">Tachdaun: "[cc65] using asm capabilities in cc65"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6330.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] 16-bit writes on 65816"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6330.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] 16-bit writes on 65816"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6329" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6329" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6329" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-01-05 07:30:30 CET
+</em></small></p>
+</body>
+</html>

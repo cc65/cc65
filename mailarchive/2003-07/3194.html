@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+<title>cc65 mailing list archive: Re: [cc65] win32 one file installer</title>
+<meta name="Author" content="Spiro Trikaliotis (trik-news_at_gmx.de)">
+<meta name="Subject" content="Re: [cc65] win32 one file installer">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] win32 one file installer</h1>
+<!-- received="Thu Jul 17 12:51:41 2003" -->
+<!-- isoreceived="20030717105141" -->
+<!-- sent="Thu, 17 Jul 2003 12:52:20 +0200" -->
+<!-- isosent="20030717105220" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="trik-news_at_gmx.de" -->
+<!-- subject="Re: [cc65] win32 one file installer" -->
+<!-- id="20030717105220.GD1255@trikaliotis.hn.org" -->
+<!-- charset="iso-8859-15" -->
+<!-- inreplyto="002801c34c4b$bb154f60$0100a8c0@1" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Spiro Trikaliotis (<a href="mailto:trik-news_at_gmx.de?Subject=Re:%20[cc65]%20win32%20one%20file%20installer"><em>trik-news_at_gmx.de</em></a>)<br>
+<strong>Date:</strong> 2003-07-17 12:52:20
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3193.html">Rafal: "Re: [cc65] win32 one file installer"</a>
+<li><strong>In reply to:</strong> <a href="3193.html">Rafal: "Re: [cc65] win32 one file installer"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3195.html">Raf: "Re[2]: [cc65] win32 one file installer"</a>
+<li><strong>Next in thread:</strong> <a href="3191.html">EMILIANO PERUCH: "RE: [cc65] win32 one file installer"</a>
+<li><strong>Reply:</strong> <a href="3195.html">Raf: "Re[2]: [cc65] win32 one file installer"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello again Rafal,
+
+ On Thu, Jul 17, 2003 at 12:09:55PM +0200, Rafal wrote:
+
+&gt; &gt; 1. Why do CC65_9X.BAT and CC65_NT.BAT only use relative
+&gt; &gt;    paths for CC65_LIB, CC65_INC, PATH?
+&gt; 
+&gt; READ SETTING_UP.txt
+&gt; 
+&gt; will be fixed later by additional (somewhat external) small setupping
+&gt; program :)
+
+Ok, this was what I wanted. Anyway, can't the installer change this itself?
+
+&gt; &gt; 2. NT.BAT is wrong:
+&gt; &gt;    a. use CMD.EXE instead of command.com
+&gt; &gt;    b. nt.bat calls NT.BAT; I think it should be
+&gt; &gt;         CMD.EXE /K CC65_NT.BAT
+&gt; &gt;       shouldn't it?
+&gt; 
+&gt; isn't CMD here? typo :)
+
+Yes, it isn't here, and you called NT.BAT, not CC65_NT.BAT. This made a
+&quot;fine&quot; recursive call.
+
+&gt; IT WORK for 9x as I said in the dox , 9x was succesfully tested ,
+&gt; I installed the package few times in different
+&gt; places and all was good
+
+Ok, good. Just wanted to make sure.
+
+&gt; &gt; 5. If I added files into the CC65 tree, they are not removed on
+&gt; &gt;    uninstalling. You could at least ask for it.
+&gt; &gt;    Furthermore, the uninstaller even does not tell me that it did
+&gt; &gt;    not remove the directories in this case. I know, this is common
+&gt; &gt;    behaviour on Win machines, but despite this, it is not good practice.
+&gt; 
+&gt; I check if installer support this option
+
+At least a hint that the directory was not removed due to not being empty
+would be enough, IMHO.
+
+
+&gt; &gt; 7. After installing, you want to start \cc65\index.url to go to the
+&gt; &gt;    CC65 homepage. At least as guest, this does not work, I get:
+&gt; &gt;    &quot;Unable to execute file: c:\cc65\index.url
+&gt; &gt;    CreateProcess failed; code 193.
+&gt; &gt;    This is due to installing it as guest on my machine. Nevertheless,
+&gt; &gt; since
+&gt; &gt;    double-clicking on the URL works, the automatic start should work, too.
+&gt; &gt;
+&gt; 
+&gt; in my system it worked
+
+Yes, because you have the right to do so. Anyway, as &quot;guest&quot;, you don't have
+much rights. Everything (except that step) works fine, this is something
+that is not normal on NT based machines. It would be nice if it would work
+this way.
+
+&gt; MANY MANY THANX
+
+You're welcome.
+
+Spiro.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20win32%20one%20file%20installer">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3193.html">Rafal: "Re: [cc65] win32 one file installer"</a>
+<li><strong>In reply to:</strong> <a href="3193.html">Rafal: "Re: [cc65] win32 one file installer"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3195.html">Raf: "Re[2]: [cc65] win32 one file installer"</a>
+<li><strong>Next in thread:</strong> <a href="3191.html">EMILIANO PERUCH: "RE: [cc65] win32 one file installer"</a>
+<li><strong>Reply:</strong> <a href="3195.html">Raf: "Re[2]: [cc65] win32 one file installer"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-07-17 12:51:48 CEST</em>
+</em>
+</small>
+</body>
+</html>

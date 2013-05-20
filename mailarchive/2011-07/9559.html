@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Interrupt &lt;-&gt;  C run</title>
+<meta name="Author" content="Marc 'BlackJack' Rintsch (marc1rintsch.de)" />
+<meta name="Subject" content="Re: [cc65] Interrupt &lt;-&gt;  C runtime environment" />
+<meta name="Date" content="2011-07-11" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Interrupt &lt;-&gt;  C runtime environment</h1>
+<!-- received="Mon Jul 11 10:28:52 2011" -->
+<!-- isoreceived="20110711082852" -->
+<!-- sent="Mon, 11 Jul 2011 10:28:17 +0200" -->
+<!-- isosent="20110711082817" -->
+<!-- name="Marc 'BlackJack' Rintsch" -->
+<!-- email="marc1rintsch.de" -->
+<!-- subject="Re: [cc65] Interrupt &lt;-&gt;  C runtime environment" -->
+<!-- id="201107111028.26025.marc@rintsch.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="4E1A8406.4020903&#64;chello.at" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9560.html" title="Joseph Rose: &quot;Re: [cc65] Apple 2 Suggestion: Language Card RODATA&quot;">Next message</a> ]
+[ <a href="9558.html" title="marcas: &quot;Re: [cc65] Interrupt &lt;-&gt;  C runtime environment&quot;">Previous message</a> ]
+[ <a href="9558.html" title="marcas: &quot;Re: [cc65] Interrupt &lt;-&gt;  C runtime environment&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9567.html" title="marcas: &quot;Re: [cc65] Interrupt &lt;-&gt;  C runtime environment&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Marc 'BlackJack' Rintsch &lt;<a href="mailto:marc1rintsch.de?Subject=Re:%20[cc65]%20Interrupt%20&amp;lt;-&amp;gt;%20%20C%20runtime%20environment">marc1rintsch.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-07-11 10:28:17</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt; On 2011-07-10 04:51, Greg King wrote:
+&gt; &gt; 2. Interrupts can happen in-between changes to the two bytes of the
+&gt; &gt; Stack-Pointer -- the SP will be &quot;indeterminate&quot;.  Therefore, your
+&gt; &gt; interrupt functions must create their own stack.
+&gt; 
+&gt; Why do I need an own stack? The only problem is, that the stack is
+&gt; very small and overflows after 256 bytes. Maybe then I will have to
+&gt; copy it to have 256 bytes for every task.
+
+Greg is not talking about the 256 bytes hardware stack of the processor 
+at $100, but the software stack used by cc65 generated code for passing 
+arguments and storing local variables.
+
+Ciao,
+	Marc 'BlackJack' Rintsch
+-- 
+“In Britain, it seems that all the attention in recent years has been
+ on the evils of Mad Cow – with little or no heed paid to the Mad Men!
+ Just because you don't eat the Mad Men is no reason to ignore the
+ serious safety issue here.”      -- Michael Moore, “Stupid White Men”
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<div>
+<ul>
+<li>application/pgp-signature attachment: <a href="../att-9559/signature.asc_">This is a digitally signed message part.</a></li>
+</ul>
+<!-- attachment="signature.asc_" -->
+</div>
+<span id="received"><dfn>Received on</dfn> Mon Jul 11 10:28:52 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9560.html" title="Next message in the list">Joseph Rose: "Re: [cc65] Apple 2 Suggestion: Language Card RODATA"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9558.html" title="Previous message in the list">marcas: "Re: [cc65] Interrupt &lt;-&gt;  C runtime environment"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9558.html" title="Message to which this message replies">marcas: "Re: [cc65] Interrupt &lt;-&gt;  C runtime environment"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9567.html" title="Next message in this discussion thread">marcas: "Re: [cc65] Interrupt &lt;-&gt;  C runtime environment"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9567.html" title="Message sent in reply to this message">marcas: "Re: [cc65] Interrupt &lt;-&gt;  C runtime environment"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9559" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9559" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9559" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-07-11 10:28:55 CEST
+</em></small></p>
+</body>
+</html>

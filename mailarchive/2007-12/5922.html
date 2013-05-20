@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Contiki 2.1 released</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] Contiki 2.1 released" />
+<meta name="Date" content="2007-12-05" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Contiki 2.1 released</h1>
+<!-- received="Wed Dec  5 11:50:47 2007" -->
+<!-- isoreceived="20071205105047" -->
+<!-- sent="Wed, 5 Dec 2007 11:50:37 +0100" -->
+<!-- isosent="20071205105037" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] Contiki 2.1 released" -->
+<!-- id="f97798c20712050250g6102d5a9s798a07cecd1e7ac3@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5923.html" title="Groepaz: &quot;[cc65] forcing adressing mode&quot;">Next message</a> ]
+[ <a href="../2007-11/5921.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] local .res ?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Contiki%202.1%20released">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-12-05 11:50:37</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+Just in time for the Contiki 2.1 release I finished my port of the
+Contiki 2.x codebase to cc65 targets :-)
+
+<a href="http://www.sics.se/contiki/current-events/contiki-2.1-released.html">http://www.sics.se/contiki/current-events/contiki-2.1-released.html</a>
+
+This port consist primarily of two parts:
+
+1. Complete and clean integration of the cc65 toolchain into the
+Contiki 2.x build system. This allows Contiki 2.x applications to be
+built for about every cc65 target. Predefined are the C64 and the
+enhanced Apple //e.
+
+2. Generic Ethernet packet driver with dynamically loading,
+self-modifying Ethernet card device drivers for the CS8900A and the
+LAN91C96. These two drivers are used both for the C64 and the enhanced
+Apple //e.
+
+My Contiki 2.x port is _NO_ successor of the existing Contiki 1.x
+ports - it's a framework for cc65 developers !
+
+While Contiki was originally a disk based OS with a GUI and with
+TCP/IP the goals have totally changed in the meanwhile. Now it's a ROM
+based OS for embedded systems without UI and with TCP/IP or low power
+radio MAC protocols.
+
+As a consequence there's no development at all done on the original
+GUI applications. Therefore it didn't make sense to invest a lot of
+effort into just recreating the Contiki 1.x experience with the
+Contiki 2.x codebase.
+
+The Contiki 1.x ports to cc65 targets use about every possible trick
+and hack to sqeeeze as much as possible into the available memory. In
+constrast my Contiki 2.x port is as straight and clean as possible
+with the goal to make it much more approachable to create new
+networking enabled applications using cc65.
+
+One major change is moving away from using cc65 modules for
+dynamically loading applications. The main reasons:
+- It's kind of a hack as the cc65 module loader doesn't resolve
+external references in the o65 file.
+- There's just not enough memory for more than one significant
+application at a time.
+
+Instead cc65 modules are now used as designed for low level Ethernet
+card device drivers. They closely follow the design of the driver
+interfaces coming with cc65. Here's an example:
+
+<a href="http://contiki.cvs.sourceforge.net/contiki/contiki-2.x/cpu/6502/net/cs8900a.S?revision=1.3">http://contiki.cvs.sourceforge.net/contiki/contiki-2.x/cpu/6502/net/cs8900a.S?revision=1.3</a>
+
+Have fun, Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Dec  5 11:50:47 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5923.html" title="Next message in the list">Groepaz: "[cc65] forcing adressing mode"</a></li>
+<li><dfn>Previous message</dfn>: <a href="../2007-11/5921.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] local .res ?"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5922" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5922" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5922" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-12-05 11:50:51 CET
+</em></small></p>
+</body>
+</html>

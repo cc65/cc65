@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] additional conio driver (was:</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="[cc65] additional conio driver (was: Joystick support)">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] additional conio driver (was: Joystick support)</h1>
+<!-- received="Sun Dec 22 17:14:04 2002" -->
+<!-- isoreceived="20021222161404" -->
+<!-- sent="Sun, 22 Dec 2002 17:12:51 +0100" -->
+<!-- isosent="20021222161251" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="[cc65] additional conio driver (was: Joystick support)" -->
+<!-- id="200212221712.51667.groepaz@gmx.net" -->
+<!-- inreplyto="15877.56772.671976.936385@panini.cling.gu.se" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20additional%20conio%20driver%20(was:%20Joystick%20support)"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2002-12-22 17:12:51
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2138.html">MagerValp: "Re: [cc65] 80 column support on the C128"</a>
+<li><strong>In reply to:</strong> <a href="2137.html">MagerValp: "Re: [cc65] Joystick support"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2146.html">Ullrich von Bassewitz: "Re: [cc65] Joystick support"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Sunday 22 December 2002 16:44, MagerValp wrote:
+&gt; &gt;&gt;&gt;&gt;&gt; &quot;G&quot; == Groepaz  &lt;<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20additional%20conio%20driver%20(was:%20Joystick%20support)">groepaz_at_gmx.net</a>&gt; writes:
+&gt;
+&gt; G&gt; btw any suggestion for a mechanism to choose between 80 or 40
+&gt; G&gt; columns on the c64 (or 40 vs 23 columns on the vic20) ? i
+&gt; G&gt; personally would put these &quot;patches&quot; into a seperate library (or
+&gt; G&gt; objectfile) that can be linked if wanted...but maybe you have an
+&gt; G&gt; even better idea :)
+&gt;
+&gt; This is something that I'm interested in too, as I recently wrote a 53
+&gt; column (6x8 pixel chars) driver. Is there any way of overriding
+&gt; certain conio functions in c64.lib? Only cputc and a few other
+&gt; functions need to be updated, others can be left as is so writing a
+&gt; complete conio replacement would be a waste.
+
+&quot;overriding&quot; can be done pretty simple, like i mentioned above already.... 
+just put the additional (or replaced) functions into a seperate library and 
+put this last on the linker commandline..... this however is somewhat tricky 
+for functions that are simply defined as kernal-calls inside the conio lib 
+(eg the &quot;kplot&quot; call which you have to patch for a new conio driver)... this 
+may be actually a flaw in the linker, it didnt always do what i expected 
+atleast :o)
+
+-- 
+          ___ ___ .___________________ .___________ _______.
+    c=64 /   |   \|   \__    ___/     \ \_   _____/ \      \ [groepaz]
+     gb /    '    \   | |    | /  \ /  \ |    __)_  /   |   \ gp32
+    cgb \    .    /   | |    |/    '    \|        \/    |    \ psx
+     gba \___|_  /|___| |____|\____|__  /_______  /\____|__  / dc
+          -----\/-----'---------------\/--------\/---------\/
+       <a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    Hitmen WWW Headquarters
+       <a href="http://fly.to/hitmen-groepaz">http://fly.to/hitmen-groepaz</a>     my personal playground
+       <a href="http://rr.c64.org/silversurfer">http://rr.c64.org/silversurfer</a>   home of the RR debugger
+       ftp.musoftware.de/pub/groepaz    cc65 dump site
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20additional%20conio%20driver%20(was:%20Joystick%20support)">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2138.html">MagerValp: "Re: [cc65] 80 column support on the C128"</a>
+<li><strong>In reply to:</strong> <a href="2137.html">MagerValp: "Re: [cc65] Joystick support"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2146.html">Ullrich von Bassewitz: "Re: [cc65] Joystick support"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-12-22 17:14:10 CET</em>
+</em>
+</small>
+</body>
+</html>

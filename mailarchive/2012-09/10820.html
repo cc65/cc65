@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Permanent &amp; Temporary Rese</title>
+<meta name="Author" content="Michael Bazzinotti (mbazzinotti1gmail.com)" />
+<meta name="Subject" content="[cc65] Permanent &amp; Temporary Reservation of Memory" />
+<meta name="Date" content="2012-09-09" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Permanent &amp; Temporary Reservation of Memory</h1>
+<!-- received="Sun Sep  9 00:24:37 2012" -->
+<!-- isoreceived="20120908222437" -->
+<!-- sent="Sat, 8 Sep 2012 18:23:35 -0400" -->
+<!-- isosent="20120908222335" -->
+<!-- name="Michael Bazzinotti" -->
+<!-- email="mbazzinotti1gmail.com" -->
+<!-- subject="[cc65] Permanent &amp; Temporary Reservation of Memory" -->
+<!-- id="CAGuiMHjnEfgQwqjg=25EZK8_gaPS6aqNZXM2ks=kXMN+GvtM4w@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10821.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Lynx include files&quot;">Next message</a> ]
+[ <a href="10819.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Atari Extended Memory Driver Anybody?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10822.html" title="thefox xofeht: &quot;Re: [cc65] Permanent &amp; Temporary Reservation of Memory&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Michael Bazzinotti &lt;<a href="mailto:mbazzinotti1gmail.com?Subject=Re:%20[cc65]%20Permanent%20&amp;amp;%20Temporary%20Reservation%20of%20Memory">mbazzinotti1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-09-09 00:23:35</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+My question relates to permanent and temporary reservation of memory.
+(for symbols).
+
+What I want, in a gist
+---------------------------------
+So i want to Temporarily reserve memory, unlike .RES which seems to
+permanently reserve space in the segment (even across separate source
+files, which is actually great for permanent reservation) But that's
+not always what I want.
+
+Automatically Temporarily Reserving portions of memory
+This would be useful for sections of code / source files, that use a
+chunk of memory, but are no longer needed after the whole section is
+finished executing.
+
+When I say temporary reservation, I suppose I mean temporary symbol
+dubbing, as I am using .RES currently as a way to automatically
+provide addresses for my ram symbols. But I want smarts so that i can
+also release some of the addresses these symbols relate to, so they
+can be reused later on!
+
+But is there a way to automatically name/reserve portions of memory
+and release these names so that further allocations will reuse these
+released addresses????
+
+basically looking for automated memory management. so that when I
+create new symbols they can automatically map to free parts  of the
+specified ram segment. and used parts of the segment can be made free
+again later, etc for later reservation, etc.
+
+I appreciate the help everyone :)
+-Bazz
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Sep  9 00:24:37 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10821.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Lynx include files"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10819.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Atari Extended Memory Driver Anybody?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10822.html" title="Next message in this discussion thread">thefox xofeht: "Re: [cc65] Permanent &amp; Temporary Reservation of Memory"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10822.html" title="Message sent in reply to this message">thefox xofeht: "Re: [cc65] Permanent &amp; Temporary Reservation of Memory"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10823.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Permanent &amp; Temporary Reservation of Memory"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10820" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10820" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10820" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-09-09 00:24:41 CEST
+</em></small></p>
+</body>
+</html>

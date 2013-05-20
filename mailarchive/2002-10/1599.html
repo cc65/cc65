@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Commodore file i/o (was:</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] Commodore file i/o (was: and another....)">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Commodore file i/o (was: and another....)</h1>
+<!-- received="Tue Oct  8 18:43:46 2002" -->
+<!-- isoreceived="20021008164346" -->
+<!-- sent="Tue, 8 Oct 2002 18:43:31 +0200" -->
+<!-- isosent="20021008164331" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] Commodore file i/o (was: and another....)" -->
+<!-- id="36092351.20021008184331@gmx.net" -->
+<!-- inreplyto="20021008163008.GA27685@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Commodore%20file%20i/o%20(was:%20and%20another....)"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2002-10-08 18:43:31
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1598.html">Ullrich von Bassewitz: "[cc65] Commodore file i/o (was: and another....)"</a>
+<li><strong>In reply to:</strong> <a href="1598.html">Ullrich von Bassewitz: "[cc65] Commodore file i/o (was: and another....)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1600.html">Ullrich von Bassewitz: "Re: [cc65] Commodore file i/o (was: and another....)"</a>
+<li><strong>Next in thread:</strong> <a href="../2002-07/1536.html">Greg King: "Re: [cc65] Alignment"</a>
+<li><strong>Reply:</strong> <a href="1600.html">Ullrich von Bassewitz: "Re: [cc65] Commodore file i/o (was: and another....)"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+UvB&gt; As far as I can see, it does not implement POSIX compatible I/O routines,
+UvB&gt; which is a problem as I see it, because that means that cc65 would need that,
+UvB&gt; too, and not only the low level routines but also the hig level stuff
+UvB&gt; (fopen/fread/...) will be platform dependent.
+
+??? please explain... it implements open/close/read/write basically,
+and also a ton of (dos/borland style) highlevel routines. also it DOES
+work when linked against your highlevel stuff (the NED port uses them
+and they seem to work, not extensivly tested though... i wouldnt mind
+getting a few more small programs like this which need file i/o and
+which might be worth porting...i prefer testing stuff in real
+environment instead of writing dumb test routines that is ;)).
+
+dont get confused by my naming sheme... its a bit odd i know ;=)
+
+oh, and maybe that old version is missing certain bits aswell, i dont
+remember....been a while since i uploaded that one ,)
+
+&gt;&gt; i was actually waiting for these loadables drivers and some
+&gt;&gt; instruction on how to use them so i can test if that filestuff really
+&gt;&gt; works as intended ;)
+
+UvB&gt; If you have a recent snapshot, you may want to have a look at the header file
+UvB&gt; include/modload.h. It exports the necessary structures and functions to load
+UvB&gt; modules at runtime. The libsrc/c64 directory contains a graphics driver for
+UvB&gt; 320x200x2 graphics mode, just have a look at the makefile to see how it is
+UvB&gt; translated and linked. There's a problem however: Since module loading needs
+UvB&gt; disk I/O, and disk I/O is not available for the CBMs, there will no longer be
+UvB&gt; loadable modules for the CBMs as soon as I remove the dirty hack I'm currently
+UvB&gt; using.
+
+does that mean dropping in open/read/close would do the trick?
+
+UvB&gt; Yes, I've also had some ideas for games. Writing a simple pacman or so
+UvB&gt; shouldn't be too much work. But since I'm already way behind schedule with all
+UvB&gt; my other projects, I'm glad I never started:-)
+
+hehe i'll do that some time.... actually, i think i have some tetris
+for the borland-c conio somewhere, so that should be ported w/o much
+effort.
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Commodore%20file%20i/o%20(was:%20and%20another....)">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Commodore%20file%20i/o%20(was:%20and%20another....)">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1598.html">Ullrich von Bassewitz: "[cc65] Commodore file i/o (was: and another....)"</a>
+<li><strong>In reply to:</strong> <a href="1598.html">Ullrich von Bassewitz: "[cc65] Commodore file i/o (was: and another....)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1600.html">Ullrich von Bassewitz: "Re: [cc65] Commodore file i/o (was: and another....)"</a>
+<li><strong>Next in thread:</strong> <a href="../2002-07/1536.html">Greg King: "Re: [cc65] Alignment"</a>
+<li><strong>Reply:</strong> <a href="1600.html">Ullrich von Bassewitz: "Re: [cc65] Commodore file i/o (was: and another....)"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-10-08 18:43:51 CEST</em>
+</em>
+</small>
+</body>
+</html>

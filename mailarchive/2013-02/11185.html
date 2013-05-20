@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Disable KERNAL ROM ?</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Disable KERNAL ROM ?" />
+<meta name="Date" content="2013-02-13" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Disable KERNAL ROM ?</h1>
+<!-- received="Wed Feb 13 23:03:00 2013" -->
+<!-- isoreceived="20130213220300" -->
+<!-- sent="Wed, 13 Feb 2013 23:02:51 +0100" -->
+<!-- isosent="20130213220251" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Disable KERNAL ROM ?" -->
+<!-- id="CACT=u72NKH2zoCXvac-WOQ+N2fwxz-hCmeW3R_UTb_adWzVmcg@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20130213185819.GF26629&#64;trikaliotis.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11186.html" title="Groepaz: &quot;Re: [cc65] Disable KERNAL ROM ?&quot;">Next message</a> ]
+[ <a href="11184.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Disable KERNAL ROM ?&quot;">Previous message</a> ]
+[ <a href="11181.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Disable KERNAL ROM ?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="11186.html" title="Groepaz: &quot;Re: [cc65] Disable KERNAL ROM ?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Disable%20KERNAL%20ROM%20?">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2013-02-13 23:02:51</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi
+
+&gt;&gt; BSOUT:
+&gt;&gt; [...]
+
+&gt; This is a perfect example where this is NOT a good idea. ;)
+
+Maybe. I didn't think much about it when I choose it. The programs I
+know/write/have in mind call it primarily inside write(). And there it
+would of course make sense to have an exception to the rule and
+actually modify the C library: Bank once, loop through the BSOUTs,
+bank back once. Same goes for read().
+
+&gt; IMHO, the overhead for outputting just one byte is too high. If a
+&gt; function putstring() (or however it is called in cc65) would use such a
+&gt; thunk, ok. But, in contrast, calling the BSOUT from above in a loop
+&gt; would add too much overhead.
+
+ACK - see above.
+
+&gt; But: If a putstring() function would be written (or changed, if such a
+&gt; thing exists), what if it wants to output strings under the ROM? Thus,
+&gt; special care would have to be done (or it would not be feasable to use
+&gt; putstring(), and BSOUT as above would be the solution)
+
+Exactly this can't happen as under the ROM is only CODE, no DATA,
+RODATA, BSS, heap, stack, ... :-)
+
+&gt; Having said this, I think this is the biggest disadvantage of your
+&gt; approach. I would assume that most projects would not have problems with
+&gt; the available RAM of the cc65 compiler.
+
+You see, I have sort of the opposite perspective: Each and every
+project I did so far with/for cc65 hit sooner or later the &quot;memory
+barrier&quot;. The only exception so far was NanoVM, which was just way too
+slow to grew.
+
+&gt; There is $0400-$CFFF = 51 KB
+&gt; freely available.
+
+Thanks for pointing out ;-))
+
+&gt; You approach would add 8 KB extra (or even 12 KB, if special care would
+&gt; be taken for $D000-$DFFF). For projects which need this extra memory,
+&gt; that would be very good. But what about projects that do not need this?
+&gt; They would have to carry the burden of the extra memory and time
+&gt; consumption of this approach -
+
+Regarding the memory: You could as well argue that for a small program
+it is only a marginal issue to be a little bigger while for large
+programs it is a showstopper to not fit into memory.
+
+Regarding the CPU: I really wonder if any &quot;clean&quot; cc65 program would
+slow down enough to be noticable. Significant screen output is usually
+done via CONIO (and is thus wthout KERNAL interaction) while POSIX
+disk i/o would benefit from the spacial handling in read() / write() -
+see above.
+
+&gt; Is this all worth it? How many projects are there that would benefit
+&gt; from this extra memory?
+
+cc65 is certainly supposed to be generic and not focused on specific
+projects - but as you explicitly ask for:
+
+With that memory I could build a Contiki 2.x in the Contiki 1.x style:
+A desktop core that loads individual programs (instead of / in
+addition to the standalone programs you currently have).
+
+&gt; Note also that I believe that projects can use this extra memory if they
+&gt; do this handling themselves. This involves carefully planing the
+&gt; placement of functions, strings for output (see above), and so on.
+
+This might work for projects written from scratch for the C64. But
+from my perspective the cool thing about cc65 is that it enables you
+to bring projects to the 6502 which were not necessarily intended for
+it originally.
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Feb 13 23:03:00 2013</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11186.html" title="Next message in the list">Groepaz: "Re: [cc65] Disable KERNAL ROM ?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="11184.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Disable KERNAL ROM ?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="11181.html" title="Message to which this message replies">Spiro Trikaliotis: "Re: [cc65] Disable KERNAL ROM ?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="11186.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] Disable KERNAL ROM ?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="11186.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] Disable KERNAL ROM ?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#11185" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#11185" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#11185" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2013-02-13 23:03:04 CET
+</em></small></p>
+</body>
+</html>

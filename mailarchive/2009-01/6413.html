@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] creating new output target</title>
+<meta name="Author" content="Tachdaun (tachdaun1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] creating new output target platform for cc65 - Arcade Hardware" />
+<meta name="Date" content="2009-01-24" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] creating new output target platform for cc65 - Arcade Hardware</h1>
+<!-- received="Sat Jan 24 15:36:05 2009" -->
+<!-- isoreceived="20090124143605" -->
+<!-- sent="Sat, 24 Jan 2009 12:35:28 -0300" -->
+<!-- isosent="20090124153528" -->
+<!-- name="Tachdaun" -->
+<!-- email="tachdaun1gmail.com" -->
+<!-- subject="Re: [cc65] creating new output target platform for cc65 - Arcade Hardware" -->
+<!-- id="497B3540.4030707@gmail.com" -->
+<!-- charset="UTF-8" -->
+<!-- inreplyto="20090124123222.GB28653&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6414.html" title="Simon Scott: &quot;Re: [cc65] creating new output target platform for cc65 - Arcade Hardware&quot;">Next message</a> ]
+[ <a href="6412.html" title="Maspethrose71aol.com: &quot;[cc65] Bug in GameCartVic... Help!&quot;">Previous message</a> ]
+[ <a href="6410.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] creating new output target platform for cc65 - Arcade Hardware&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6414.html" title="Simon Scott: &quot;Re: [cc65] creating new output target platform for cc65 - Arcade Hardware&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Tachdaun &lt;<a href="mailto:tachdaun1gmail.com?Subject=Re:%20[cc65]%20creating%20new%20output%20target%20platform%20for%20cc65%20-%20Arcade%20Hardware">tachdaun1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-01-24 16:35:28</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a></pre>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<head>
+  <meta content="text/html;charset=UTF-8" http-equiv="Content-Type">
+</head>
+<body bgcolor="#ffffff" text="#000000">
+Where there Arcade machines with 6502? didn't know that<br>
+<br>
+Ullrich von Bassewitz wrote:
+<blockquote cite="mid:20090124123222.GB28653@trixie.musoftware.de"
+ type="cite">
+  <pre wrap="">On Fri, Jan 23, 2009 at 05:38:11PM -0800, steve-cc65 wrote:
+  </pre>
+  <blockquote type="cite">
+    <pre wrap="">This may be more of a question for the compiler development list but I
+am interested in creating a new output target type for the cc65 compiler
+.  So far the info I have dug up online is disorganized and distributed
+across better than a hundred different mailing list posts.  Maybe I am
+looking in the wrong place?  Is there a good, organized tutorial on
+getting started?
+    </pre>
+  </blockquote>
+  <pre wrap=""><!---->
+No, there is no tutorial but quite some people have managed to create new
+targets anyway.
+
+1. Write a linker configuration for your target.
+
+2. Write a startup file using one of the existing startup files as an example.
+   I would suggest to use the startup file for the C16 because it's complete
+   without containing too many platform specialities.
+
+3. You can now start to write simple test programs that do - for example -
+   screen I/O by direct access just to make sure the stuff from step 1. and 2.
+   is working.
+
+4. Once you've verified the startup code and linker config, you can start to
+   write the target specific parts of the library. I do usually start with
+   the basic conio routines (read a key from the keyboard, output to screen),
+   because this simplifies debugging for the more complex library routines.
+
+Regards
+
+
+        Uz
+
+
+  </pre>
+</blockquote>
+</body>
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo@musoftware.de with
+the string "unsubscribe cc65" in the body(!) of the mail.
+<span id="received"><dfn>Received on</dfn> Sat Jan 24 15:36:05 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6414.html" title="Next message in the list">Simon Scott: "Re: [cc65] creating new output target platform for cc65 - Arcade Hardware"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6412.html" title="Previous message in the list">Maspethrose71aol.com: "[cc65] Bug in GameCartVic... Help!"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6410.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] creating new output target platform for cc65 - Arcade Hardware"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6414.html" title="Next message in this discussion thread">Simon Scott: "Re: [cc65] creating new output target platform for cc65 - Arcade Hardware"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6414.html" title="Message sent in reply to this message">Simon Scott: "Re: [cc65] creating new output target platform for cc65 - Arcade Hardware"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6417.html" title="Message sent in reply to this message">Andre Majorel: "Re: [cc65] creating new output target platform for cc65 - Arcade Hardware"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6413" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6413" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6413" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-01-24 15:36:07 CET
+</em></small></p>
+</body>
+</html>

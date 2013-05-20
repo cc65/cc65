@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] .import struct link_node</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] .import struct link_node" />
+<meta name="Date" content="2010-05-01" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] .import struct link_node</h1>
+<!-- received="Sat May  1 18:14:40 2010" -->
+<!-- isoreceived="20100501161440" -->
+<!-- sent="Sat, 1 May 2010 18:14:35 +0200" -->
+<!-- isosent="20100501161435" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] .import struct link_node" -->
+<!-- id="20100501161435.GB17617@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="20100501155636.GM29756&#64;trikaliotis.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8263.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] .import struct link_node&quot;">Next message</a> ]
+[ <a href="8261.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Why does this work in 128 mode but not 64 mode?&quot;">Previous message</a> ]
+[ <a href="8260.html" title="Spiro Trikaliotis: &quot;Re: [cc65] .import struct link_node&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8263.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] .import struct link_node&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20.import%20struct%20link_node">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-05-01 18:14:35</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Sat, May 01, 2010 at 05:56:36PM +0200, Spiro Trikaliotis wrote:
+&gt; &gt;  - Instead of _CMT(str) macro consuming str, how about a _CMT()
+&gt; &gt;    mac that turns the just inserts a ';' or a '//' ?
+&gt;
+&gt; Because neither ca65 nor cc65 would allow this. (cc65 targets C90, thus,
+&gt; no &quot;//&quot; comment; ca65 does not recognize it, either).
+&gt;
+&gt; Just test it out yourself!
+
+He talks about either inserting a ';' (for ca65) or '//' (for cc65), and both
+works. Just test it out yourself:-)
+
+More seriously: cc65 has three modes that are switchable using the --standard
+command line option.
+
+    c89
+        This disables anything that is illegal in C89/c90. Among those things
+        are // comments and the non-standard keywords without underscores.
+        Please note that cc65 is not a c89 compliant compiler despite this
+        option. A few more things (like floats) are missing.
+
+    c99
+        This a enables a few features from the c99 standard. With this option,
+        // comments are allowed. It will also cause warnings and even errors
+        in a few situations that are allowed with --standard c89. For example,
+        a call to a function without a prototype is an error in this mode.
+
+    cc65
+        This is the default mode. It is like c99 mode, but additional features
+        are enabled. Among these is &quot;void data&quot;, non-standard keywords without
+        the underlines, unnamed function parameters and the requirement for
+        main() to return an int.
+
+(maybe this list should go into the docs or the wiki).
+
+So without additional switches, // comments are definitely allowed. c89 will
+disable them, but it will also disable some useful features and warnings, so I
+would only recommend it for sources that definitely need it.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat May  1 18:14:40 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8263.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] .import struct link_node"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8261.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Why does this work in 128 mode but not 64 mode?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8260.html" title="Message to which this message replies">Spiro Trikaliotis: "Re: [cc65] .import struct link_node"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8263.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] .import struct link_node"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8263.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] .import struct link_node"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8295.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Re: [cc65] .import struct link_node"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8262" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8262" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8262" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-05-01 18:14:43 CEST
+</em></small></p>
+</body>
+</html>

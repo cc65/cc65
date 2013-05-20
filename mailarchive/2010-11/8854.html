@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] ca65 for stand-alone asm p</title>
+<meta name="Author" content="Christian Grössler (chris1groessler.org)" />
+<meta name="Subject" content="Re: [cc65] ca65 for stand-alone asm projects" />
+<meta name="Date" content="2010-11-12" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] ca65 for stand-alone asm projects</h1>
+<!-- received="Fri Nov 12 23:44:43 2010" -->
+<!-- isoreceived="20101112224443" -->
+<!-- sent="Fri, 12 Nov 2010 23:44:40 +0100" -->
+<!-- isosent="20101112224440" -->
+<!-- name="Christian Grössler" -->
+<!-- email="chris1groessler.org" -->
+<!-- subject="Re: [cc65] ca65 for stand-alone asm projects" -->
+<!-- id="4CDDC358.2010401@groessler.org" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="AANLkTik+CDfh+oMOXwF6bwr3XqkUkRUuFFAd6ktBFHGL&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8855.html" title="Oliver Schmidt: &quot;Re: [cc65] A Few Good Optimizations&quot;">Next message</a> ]
+[ <a href="8853.html" title="Oliver Schmidt: &quot;Re: [cc65] Forced imports by linker config&quot;">Previous message</a> ]
+[ <a href="8852.html" title="Oliver Schmidt: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8859.html" title="Oliver Schmidt: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Christian Grössler &lt;<a href="mailto:chris1groessler.org?Subject=Re:%20[cc65]%20ca65%20for%20stand-alone%20asm%20projects">chris1groessler.org</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-11-12 23:44:40</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello Oliver,
+
+On 12.11.10 23:16, Oliver Schmidt wrote:
+&gt;
+&gt; Hm, the link above contains the paragraph:
+&gt;
+&gt; &quot;Enabling the Language Card allows to use it as additional memory for
+&gt; cc65 generated code. However code is never automatically placed there.
+&gt; Rather code needs to be explicitly placed in the Language Card either
+&gt; per file by compiling with --code-name HIGHCODE or per function by
+&gt; enclosing in #pragma codeseg (push, &quot;HIGHCODE&quot;) and #pragma codeseg
+&gt; (pop). In either case the cc65 runtime system takes care of actually
+&gt; moving the code into the Language Card.&quot;
+&gt;
+&gt; That's basically all necessary to know from the user perspective...
+
+Fine. But I'm not a user in this respect, I think ... :-)
+
+&gt;&gt; How is the enabling/disabling of the ROM done? If code running
+&gt;&gt; in regular memory calls a function in HIGHCODE, someone would need
+&gt;&gt; to disable the ROM so that the function can be called, and afterwards
+&gt;&gt; enable the ROM again.
+&gt;
+&gt; The link above contains the sentence:
+&gt;
+&gt; &quot;While running main() the Language Card bank 2 is enabled for read access.&quot;
+
+Ok. This probably means, the OS is switched out and RAM is present
+at its location. I'm no Apple guy, so I overlooked this.
+
+&gt; So the idea it *not* to disable the ROM, call HIGHCODE and enable ROM
+&gt; again. Rather it's call HIGHCODE whenever you want - and enable ROM,
+&gt; call ROM, disable ROM when dealing with ROM.
+&gt;
+&gt; Here's the classic example - calling ROM to print a character (in cout.s):
+&gt;
+&gt; COUT:
+&gt; 	; Switch in ROM and call COUT
+&gt; 	bit	$C082
+&gt; 	jsr	$FDED		; Vector to user output routine
+&gt;
+&gt; 	; Switch in LC bank 2 for R/O and return
+&gt; 	bit	$C080
+&gt; 	rts
+
+How do you handle interrupts? Is the complete ROM switched out, or only a
+part? Can one call ROM routines from code placed in HIGHCODE?
+
+So many questions... :-)
+
+regards,
+chris
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Nov 12 23:44:43 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8855.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] A Few Good Optimizations"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8853.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Forced imports by linker config"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8852.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8859.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8859.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8854" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8854" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8854" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-11-12 23:44:46 CET
+</em></small></p>
+</body>
+</html>

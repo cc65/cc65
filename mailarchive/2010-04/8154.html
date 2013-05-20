@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Please critique this makef</title>
+<meta name="Author" content="Greg King (greg.king41verizon.net)" />
+<meta name="Subject" content="Re: [cc65] Please critique this makefile" />
+<meta name="Date" content="2010-04-24" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Please critique this makefile</h1>
+<!-- received="Sat Apr 24 22:03:19 2010" -->
+<!-- isoreceived="20100424200319" -->
+<!-- sent="Sat, 24 Apr 2010 16:02:07 -0400" -->
+<!-- isosent="20100424200207" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king41verizon.net" -->
+<!-- subject="Re: [cc65] Please critique this makefile" -->
+<!-- id="01b901cae3e9$14fd2520$443efea9@monarch" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="8F1331DF-713F-46CE-8730-3782E59E17FC&#64;wfmh.org.pl" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8155.html" title="Oliver Schmidt: &quot;Re: [cc65] Please critique this makefile&quot;">Next message</a> ]
+[ <a href="8153.html" title="Greg King: &quot;Re: [cc65] Please critique this makefile&quot;">Previous message</a> ]
+[ <a href="8152.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Please critique this makefile&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8155.html" title="Oliver Schmidt: &quot;Re: [cc65] Please critique this makefile&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king41verizon.net?Subject=Re:%20[cc65]%20Please%20critique%20this%20makefile">greg.king41verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-04-24 22:02:07</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: silverdr; on Sat., April 24, 2010; at 02:07 PM -0400
+&gt;
+
+&gt; On 2010-04-24, at 19:35, silverdr wrote:
+&gt;
+&gt; &gt; I thought so too, but have rewritten it to &quot;ifeq&quot; only after
+&gt; &gt; finding that &quot;ifndef&quot; doesn't work as expected. :-(
+&gt;
+&gt; Actually, even when writing the &quot;ifndef&quot;, I already was having doubts
+&gt; about whether that not assigning a value is the same as not mentioning
+&gt; the variable, at all. After all, it had to be processed. My doubts
+&gt; were proven valid. Other possibility would be to use &quot;ifndef&quot;,
+&gt; and comment out the variables at the top. But then, it potentially
+&gt; could be prone to errors caused, e.g., by bogus values passed
+&gt; from the outside. That is something that we both don't like. :-)
+
+To put it another way:
+Assigning an empty string to a variable _does_ define it!  Therefore,
+&quot;ifndef&quot; cannot be used in that context.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Apr 24 22:03:19 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8155.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Please critique this makefile"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8153.html" title="Previous message in the list">Greg King: "Re: [cc65] Please critique this makefile"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8152.html" title="Message to which this message replies">silverdr1wfmh.org.pl: "Re: [cc65] Please critique this makefile"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8155.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Please critique this makefile"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8155.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Please critique this makefile"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8154" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8154" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8154" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-04-24 22:03:21 CEST
+</em></small></p>
+</body>
+</html>

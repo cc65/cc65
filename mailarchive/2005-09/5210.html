@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] It's done: version 2.11.0 is h</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="[cc65] It's done: version 2.11.0 is here!" />
+<meta name="Date" content="2005-09-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] It's done: version 2.11.0 is here!</h1>
+<!-- received="Sat Sep 10 17:10:37 2005" -->
+<!-- isoreceived="20050910151037" -->
+<!-- sent="Sat, 10 Sep 2005 17:10:23 +0200" -->
+<!-- isosent="20050910151023" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="[cc65] It's done: version 2.11.0 is here!" -->
+<!-- id="20050910151023.GA15256@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5211.html" title="Raj Wurttemberg: &quot;[cc65] Read 15x1 error channel?&quot;">Next message</a> ]
+[ <a href="5209.html" title="Groepaz: &quot;Re: [cc65] A midi player for the cc65 targets ;)&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5211.html" title="Raj Wurttemberg: &quot;[cc65] Read 15x1 error channel?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20It's%20done:%20version%202.11.0%20is%20here!">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-09-10 17:10:23</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I'm proud to announce cc65 version 2.11.0. cc65 is a complete cross
+development package for 65(C)02 systems, including a powerful macro
+assembler, a C compiler, linker, librarian and several other tools.
+
+cc65 has C and runtime library support for many of the old 6502 machines,
+including
+
+  - The Commodore VIC20 (contributed by Steve Schmidtke
+    &lt;steve_schmidtke&#64;hotmail&#46;<!--nospam-->com&gt;).
+
+  - The Commodore C64 and C128.
+
+  - The Commodore C16, C116 and Plus/4.
+
+  - The CBM 510 (aka P500), a quite rare Commodore machine (programs
+    run in bank 0).
+
+  - The CBM 600/700 family (programs run in bank 1).
+
+  - Newer PET machines (not 2001)
+
+  - The Apple ][ and successors (basic support by Kevin Ruland
+    &lt;kevin&#64;rodin&#46;<!--nospam-->wustl.edu&gt; and many, many additions by Oliver Schmidt,
+    &lt;ol.sc&#64;web&#46;<!--nospam-->de&gt;).
+
+  - The Atari 8 bit machines (thanks to the Atari team: Christian Groessler
+    &lt;cpg&#64;aladdin&#46;<!--nospam-->de&gt;, Mark Keates &lt;markk&#64;dendrite&#46;<!--nospam-->co.uk&gt;, Freddy Offenga
+    &lt;taf_offenga&#64;yahoo&#46;<!--nospam-->com&gt; and David Lloyd, &lt;dmlloyd&#64;atari-central&#46;<!--nospam-->com&gt;).
+
+  - GEOS for the C64 and C128 (by Maciej Witkowiak &lt;ytm&#64;elysium&#46;<!--nospam-->pl&gt;)
+
+  - The Nintendo Entertainment System (NES) (contributed by Groepaz,
+    &lt;groepaz&#64;gmx&#46;<!--nospam-->net&gt;).
+
+  - The Supervision console (contributed by Peter Trauner,
+    &lt;peter.trauner&#64;utanet&#46;<!--nospam-->at&gt;) (startup code and linker config only).
+
+  - The Oric Atmos (this one is - still - BETA!).
+
+  - The Lynx Console. Support was added by Karri Kaksonen &lt;karri&#64;sipo&#46;<!--nospam-->fi&gt;
+    based on the original Lynx compiler by Bastian Schick. Bastians code
+    was used with permission - thanks!
+
+The libraries are fairly portable, so creating a version for other 6502s
+shouldn't be too much work.
+
+
+
+Changes to the last version:
+
+This is quite a large step from the last version. See the (probably
+incomplete) list of changes below for more information.
+
+
+
+Available packages:
+
+As usual I will provide the complete sources and several binary packages,
+including RPMs for RedHat Enterprise Linux 3. Linux is the primary
+development platform, so the sources do compile out of the box on Linux
+machines.
+
+Please note that there are separate RPMs for the compiler proper, the
+docs, and the target specific libraries. To develop for one of the
+predefined target systems you need the compiler RPM package *and* one of
+the target machine packages. Be sure to download the documentation package
+if you're not already a cc65 user.
+
+Binaries for DOS and and Windows should also be available at the time you
+read this. OS/2 packages will again be available, but since there are
+almost no downloads for OS/2, so the host platform may get dropped in the
+near future (again). As with the RPM packages, you need the package for
+the development system (Windows, etc.) *and* one or more of the target
+machine packages, plus optionally the doc package.
+
+New in the windows version is the beta version of a poor mans windows
+installer: Grab all the windows packages you need and unpack them into one
+tree. Then double click on the &quot;install.vbs&quot; file. This will install the
+tools in the program directory, will add start menu entries for the docs,
+setup the necessary environment variables, and add an uninstaller as well.
+IF YOU HAVE ANY PROBLEMS SETTING UP CC65, IT IS STRONGLY ADVISED THAT YOU
+GIVE THE INSTALLER A TRY!
+
+
+
+Download:
+
+For more information and a download link, please visit the cc65 web page
+at
+
+     	<a href="http://www.cc65.org/">http://www.cc65.org/</a>
+
+
+Mailing list:
+
+There is a mailing list for discussing cc65 related issues (programming,
+suggestions, bugs, ...). See
+
+        <a href="http://www.cc65.org/#List">http://www.cc65.org/#List</a>
+
+for information on how to subscribe to this list.
+
+
+
+Many people have contributed to this version, please be sure to have a
+look at the CREDITS file. Thanks to all contributors!
+
+Have fun!
+
+
+	Uz
+
+
+
+-----------------------------------------------------------------------------
+[Incomplete list of changes against version 2.10]
+
+
+  * Assembler:
+
+    - New feature missing_char_term.
+
+    - New feature ubiquitous_idents.
+
+    - Optional curly braces allowed as delimiters for token lists.
+      Incompatible change: Brace matching in some cases is gone.
+
+    - New 6502X cpu that includes 6502 illegal opcodes.
+
+    - Better error messages in case of a range error.
+
+    - Assembler defines target system symbols (__C64__ etc.) similar to the
+      C compiler.
+
+    - Handle foreign newline sequences (cr/lf under Unix) more gracefully.
+
+    - Fixed problems with unnamed labels.
+
+    - The assembler does now support the SWEET16 16 bit pseudo CPU.
+
+    - Support for zilog/intel style hex numbers (trailing 'h').
+
+    - New .ident and .sprintf pseudo functions.
+
+    - Variable symbols using .set.
+
+    - Support for a &quot;none&quot; CPU that has no opcode mnemonics at all. People
+      use ca65 to implement instructions sets for other CPUs using macros,
+      and this pseudo CPU should remove any conflicts.
+
+    - Support for the HuC6280 CPU used in the PC engine.
+
+
+
+  * Compiler:
+
+    - Rewrite of input and preprocessor routines. Among other things, this
+      adds variadic macros and removes the input line limit.
+
+    - Stackable pragmas using #pragma(push, val) and #pragma(pop)
+
+    - New pragmas codesize, optimize, regvars, and warn (all stackable)
+
+    - New option --writable-strings
+
+    - Rewrote part of the parser allowing better code generation in a few
+      places.
+
+    - The &quot;inline standard functions&quot; option (-Os) has slightly changed its
+      meaning: In older versions it controlled inlining. Now, the compiler
+      will always inline if it considers it safe to do so, and the flag does
+      only control inlining in situations where inlining is not always
+      completely safe.
+
+    - More and better inlining of known standard functions. The following
+      functions may get inlined: strcpy, strlen, memcpy, memset.
+
+    - Inline assembly can now reference C labels with the %g format specifier.
+
+    - The -A and --ansi switches are gone, together with the __STRICT_ANSI__
+      predefined macro. Instead there is now a command line option --standard
+      that allows to set c89, c99 or cc65 as language standard. The compiler
+      defines a macro __CC65_STD__ that is one of __CC65_STD_C89__,
+      __CC65_STD_C99__ or __CC65_STD_CC65__ depending on the command line
+      option. Default is cc65 (all extensions) as before.
+
+    - Improved code for shifts.
+
+
+
+  * Linker
+
+    - Start Oric programs at $500 (Stefan Haubenthal)
+
+    - Added library groups.
+
+    - Simple expressions now supported in the config files.
+
+
+
+  * cl65 utility:
+
+    - Extended to support additional command line switches of the
+      underlying tools as needed.
+
+    - New -Wa and -Wl switches to pass options to the assembler and linker.
+
+
+
+  * Disassembler
+
+    - New &quot;asminc&quot; directive that allows to read in a file containing assembler
+      symbol assignments in the form &quot;name = value&quot;.
+
+    - New &quot;comment&quot; attribute for several directives.
+
+
+
+  * Library
+
+    - Mouse support uses loadable drivers.
+
+    - Changed command line argument syntax for C64.
+
+    - Command line parameters are now working for: C64, C128, Plus/4, C16,
+      VIC20.
+
+    - ungetc is available. Read functions on streams support pushed back
+      characters.
+
+    - New apple2enh target by Oliver Schmidt.
+
+    - Lots of Apple2 improvements by Oliver Schmidt.
+
+    - Oric TGI driver by Stefan Haubenthal.
+
+    - New _heapblocksize function that returns the size of an allocated block.
+
+    - New lynx target by Karri Kaksonen and Shawn Jefferson based on
+      Bastian Schicks cc65 port (thanks!).
+
+    - Joystick and TGI drivers do now have an interrupt entry. The API version
+      has been changed which means that old drivers will need an update.
+
+    - Full set of scanf functions available (base work by me, lots of
+      improvements by Greg King).
+
+    - scanf functions for conio (Greg King).
+
+    - New function posix_memalign.
+
+    - Directory routines for the Apple machines (by Oliver Schmidt).
+
+    - SSC serial driver for the apple2 and apple2enh targets (Oliver Schmidt).
+
+
+
+  * Documentation
+
+    - Lots of additions to the function reference.
+
+    - Several target specific docs (one prominent contributor was Stefan
+      Haubenthal).
+
+
+  * Other
+
+    - Poor mans windows installer.
+
+    - The output of --help goes to stdout instead of stderr.
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Sep 10 17:10:37 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5211.html" title="Next message in the list">Raj Wurttemberg: "[cc65] Read 15x1 error channel?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5209.html" title="Previous message in the list">Groepaz: "Re: [cc65] A midi player for the cc65 targets ;)"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5211.html" title="Next message in this discussion thread">Raj Wurttemberg: "[cc65] Read 15x1 error channel?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5211.html" title="Message sent in reply to this message">Raj Wurttemberg: "[cc65] Read 15x1 error channel?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="5212.html" title="Message sent in reply to this message">Sidney Cadot: "Re: [cc65] It's done: version 2.11.0 is here!"</a></li>
+<li><dfn>Reply</dfn>:  <a href="5219.html" title="Message sent in reply to this message">Karri Kaksonen: "[cc65] Version 2.11.0-1 Atari Lynx testing..."</a></li>
+<li><dfn>Reply</dfn>:  <a href="../2005-10/5237.html" title="Message sent in reply to this message">Oliver Schmidt: "[cc65] Question regarding mouse driver"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5210" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5210" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5210" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-09-10 17:10:40 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Modules with self modifyin</title>
+<meta name="Author" content="silverdr1wfmh.org.pl (silverdr1wfmh.org.pl)" />
+<meta name="Subject" content="Re: [cc65] Modules with self modifying code" />
+<meta name="Date" content="2011-02-05" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Modules with self modifying code</h1>
+<!-- received="Sat Feb  5 01:09:53 2011" -->
+<!-- isoreceived="20110205000953" -->
+<!-- sent="Sat, 5 Feb 2011 01:09:40 +0100" -->
+<!-- isosent="20110205000940" -->
+<!-- name="silverdr1wfmh.org.pl" -->
+<!-- email="silverdr1wfmh.org.pl" -->
+<!-- subject="Re: [cc65] Modules with self modifying code" -->
+<!-- id="143FBBB0-DAB7-4E06-B138-F1634B5BBE15@wfmh.org.pl" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="20110204142244.GA30460&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9216.html" title="Shawn Jefferson: &quot;RE: [cc65] C64 text adventure to sell?&quot;">Next message</a> ]
+[ <a href="9214.html" title="Groepaz: &quot;Re: [cc65] assembler/C stack issue&quot;">Previous message</a> ]
+[ <a href="9203.html" title="Ullrich von Bassewitz: &quot;[cc65] Modules with self modifying code&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9218.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Modules with self modifying code&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:silverdr1wfmh.org.pl?Subject=Re:%20[cc65]%20Modules%20with%20self%20modifying%20code">silverdr1wfmh.org.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-02-05 01:09:40</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 2011-02-04, at 15:22, Ullrich von Bassewitz wrote:
+
+&gt; Christian Krüger, who has already contributed optimized memxxx functions has
+&gt; sent me a memset replacement that uses self modifying code. It performs
+&gt; significantly better than the existing one, especially for larger memory
+&gt; blocks and is based on two independent include files that contain macros and
+&gt; contants for developing modules containing self modifying code.
+
+/me was never a big fan of smc, and very rarely used it even back in the days. But I guess we all know what are the potential advantages. Like a step between &quot;proper&quot; code and programatically generated code (LDA STA LDA STA LDA ...), which can bring even more substantial performance improvements when dealing with large (from 6502 POV) memory blocks. memxxx seem almost like natural candidates for consideration here.
+
+&gt; 
+&gt; Now the question is what to do with it.
+&gt; [...]
+&gt; As I see it, my options are:
+&gt; 
+
+If my two pennies are of any value then I find
+
+&gt;  2. Accept replacement functions using smc, but let them have different
+&gt;     names, so a programmer must explicitly call the smc version.
+
+most appealing. Reasons for that:
+
+1) Smc's disadvantages, which you accurately named make it something one (IMHO) should not expect being there as default. Especially in an overall very &quot;clean&quot; and &quot;properly&quot; behaving environment as cc65 so far seem to be. We probably don't have to hold our breaths waiting for next generations of 65xx processors with caches and pipelines but still - to me &quot;unclean&quot; is &quot;unclean&quot; and prefer it to be included at explicit wish of an educated (the one who reads docs :) user.
+
+2) As I mentioned earlier - use cases for those extra performing functions are not always obvious. Yes, ultra-fast I/O, some soft-blitter gfx routines (I recall I used smc e. g. for gfx cleans and fills) but in general there would be no strikingly obvious need for common use, I believe.
+
+3) With this option #2, like with the just discussed __fastcall__ - the extra performance comes at explicit wish. Understanding and having in mind what it does and what the potential pitfalls might be seems to me like the right approach.
+
+-- 
+SD!----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Feb  5 01:09:53 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9216.html" title="Next message in the list">Shawn Jefferson: "RE: [cc65] C64 text adventure to sell?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9214.html" title="Previous message in the list">Groepaz: "Re: [cc65] assembler/C stack issue"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9203.html" title="Message to which this message replies">Ullrich von Bassewitz: "[cc65] Modules with self modifying code"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9218.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Modules with self modifying code"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9218.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Modules with self modifying code"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9215" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9215" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9215" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-02-05 01:09:58 CET
+</em></small></p>
+</body>
+</html>

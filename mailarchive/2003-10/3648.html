@@ -1,0 +1,169 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] cc65 and $ba again, sorry</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] cc65 and $ba again, sorry">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] cc65 and $ba again, sorry</h1>
+<!-- received="Fri Oct 17 20:45:56 2003" -->
+<!-- isoreceived="20031017184556" -->
+<!-- sent="Fri, 17 Oct 2003 20:45:51 +0200" -->
+<!-- isosent="20031017184551" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] cc65 and $ba again, sorry" -->
+<!-- id="20031017184551.GA17081@trixie.musoftware.de" -->
+<!-- inreplyto="000501c394d7$914d7d40$0500a8c0@acer5j0jdwij8z" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%20and%20$ba%20again,%20sorry"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-10-17 20:45:51
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3647.html">carlos: "Re: [cc65] cc65 and $ba again, sorry"</a>
+<li><strong>In reply to:</strong> <a href="3647.html">carlos: "Re: [cc65] cc65 and $ba again, sorry"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3649.html">carlos: "Re: [cc65] cc65 and $ba again, sorry"</a>
+<li><strong>Reply:</strong> <a href="3649.html">carlos: "Re: [cc65] cc65 and $ba again, sorry"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Fri, Oct 17, 2003 at 07:53:24PM +0200, carlos wrote:
+&gt; I see your arguments, but there should be any possibility to find out which
+&gt; drive has been accessed the last time or something like this, because i
+&gt; don't want to have a program running only on drive 8.
+&gt; The natural thing is, that you use the drive, from where the program has
+&gt; been loaded.
+
+That's ok, but you cannot rely on a compiled program that uses file I/O not
+touching the kernal variable used for the drive number. Someone suggested to
+initialize _curunit with the drive number from where the program was loaded.
+Until this is available, you can use this module to do something similar:
+
+----------------------------------------------------------------------------
+       	.constructor    saveunit, 32
+  	.export		_savedunit
+.code
+saveunit:
+     	lda	$ba
+     	sta	_savedunit
+     	rts
+.bss
+_savedunit:	.res 	1
+----------------------------------------------------------------------------
+
+It is used like this:
+
+----------------------------------------------------------------------------
+#include &lt;stdio.h&gt;
+
+extern unsigned char savedunit;
+
+int main (void)
+{
+    printf (&quot;Saved unit: %d\n&quot;, savedunit);
+    return 0;
+}
+----------------------------------------------------------------------------
+
+&gt; The second thing is, that there are kernal variables $9a/$9b for stdin
+&gt; stdout. This is where the drive
+&gt; output/input device number goes when doing a cmd ... from the c64 basic
+&gt; prompt.
+&gt; So i don't understand why to mess up $ba, which is at the moment the only
+&gt; possibility to get drive from where the program has been loaded.
+
+The library is &quot;messing&quot; with $ba because it is opening files. And when doing
+so, it uses the kernal OPEN entry point, which in turn will overwrite the $ba
+variable. Please note that it is not the library that is overwriting $ba, it
+is the ROM kernal of the C64!
+
+$9a/9b don't change anything, because stdin and stdout are files and are
+therefore using standard C file handles. Even if $9a/$9b would be used (which
+is difficult, because the file code is the same for all CBMs and $9a/$9b are
+C64 specific), stdin/stdout and stderr would still have to be opened. If you
+don't want the library to open any files, then don't use file I/O - it's
+really simple.
+
+&gt; If there would be another way instead of using kernal variables directly, i
+&gt; would appreciate.
+
+You do have two choices:
+
+  1. If you want to use kernal file variables without the library messing with
+     them, don't use file I/O in your program. PLEASE NOTE: This includes
+     printf/fprintf/puts/putc/...
+
+  2. If you find that you need to use C file I/O, you can still use kernal
+     variables, but stop complaining about the library using them, too. After
+     all, it's your program that is causing the library to do so. Instead, you
+     will need to understand what the library does and find a way to cooperate
+     with the library code. One way to do that is shown above. You may run
+     into difficulties with this approach if the library implementation
+     changes. But no one can prevent this.
+
+Above choices are not only limited to cc65, they are - in a similar way -
+inherent in all APIs, where a higher level API uses a lower level one. As a
+programmer, you should only use one API. If you don't do that, you will have
+to live with restrictions at best. If you are using C file I/O together with
+POSIX file I/O under Linux or Windows, you will get unexpected results.
+
+Regards
+
+
+  	Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%20and%20$ba%20again,%20sorry">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%20and%20$ba%20again,%20sorry">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3647.html">carlos: "Re: [cc65] cc65 and $ba again, sorry"</a>
+<li><strong>In reply to:</strong> <a href="3647.html">carlos: "Re: [cc65] cc65 and $ba again, sorry"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3649.html">carlos: "Re: [cc65] cc65 and $ba again, sorry"</a>
+<li><strong>Reply:</strong> <a href="3649.html">carlos: "Re: [cc65] cc65 and $ba again, sorry"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-10-17 20:49:02 CEST</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Fwd: NESICIDE + VICE</title>
+<meta name="Author" content="Christopher Pow (christopher.s.pow1gmail.com)" />
+<meta name="Subject" content="[cc65] Fwd: NESICIDE + VICE" />
+<meta name="Date" content="2012-04-13" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Fwd: NESICIDE + VICE</h1>
+<!-- received="Fri Apr 13 17:39:34 2012" -->
+<!-- isoreceived="20120413153934" -->
+<!-- sent="Fri, 13 Apr 2012 10:39:24 -0500" -->
+<!-- isosent="20120413153924" -->
+<!-- name="Christopher Pow" -->
+<!-- email="christopher.s.pow1gmail.com" -->
+<!-- subject="[cc65] Fwd: NESICIDE + VICE" -->
+<!-- id="CAKDufpBefvcMfMaEFCBN8ubV_gUhkRDYyFUsGWiONzLuiEbMwQ@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="CAKDufpAV_i4BpvyZbxBYD66B4NdSv=7H3yN=GDN2Xi-XcWAWOQ&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10237.html" title="Gábor Lénárt: &quot;Re: [cc65] Fwd: NESICIDE + VICE&quot;">Next message</a> ]
+[ <a href="10235.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Possible optimizer errors with -Oi&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10237.html" title="Gábor Lénárt: &quot;Re: [cc65] Fwd: NESICIDE + VICE&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Christopher Pow &lt;<a href="mailto:christopher.s.pow1gmail.com?Subject=Re:%20[cc65]%20Fwd:%20NESICIDE%20%2B%20VICE">christopher.s.pow1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-04-13 17:39:24</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I've put a very very preliminary version of VICE-capable NESICIDE on my Google
+project page, intended for feedback and criticisms:
+
+<a href="https://sites.google.com/site/nesicideproject/documents?pli=1">https://sites.google.com/site/nesicideproject/documents?pli=1</a>
+
+The installer for Windows is the setup.msi on that page.  [I have not
+yet updated the Linux packages].
+
+I've also packaged up the Manic Miner game graciously provided by
+Stefan Wessels as a NESICIDE project [ManicMiner.rar].
+
+To use NESICIDE you'll need to:
+
+1. Download and install the setup.msi
+2. Download, unpack, and install make-3.81.rar [for GNU Make 3.81 for Windows]
+3. Download, unpack, and install cc65-snapshot-2.13.9.20120326-1.rar
+[for CC65 toolchain for Windows]
+4. Launch NESICIDE
+5. Point NESICIDE at your VICE x64sc.exe containing folder when it
+asks [it'll save this so you only have to do it once...]
+6. Open &quot;ManicMiner.nesproject&quot; [or create your own by adding your own
+source files and your own linker configuration file in Project
+Properties!]
+7. Compile the project [F5]
+8. Load the image into the emulator [F6]
+9. Run the image [F7]
+
+I set up a couple of breakpoints.
+
+Not done yet:
+1. Memory dialog doesn't yet allow setting memory.
+2. SID register dialog is incomplete, does not yet show actual memory
+values, or setting memory values.
+3. No VIC-II or CIA register dialogs yet.
+4. CPU register dialog doesn't show I/O 0/1 yet, and NMI/IRQ/RESET
+vectors are not filled in.
+5. Breakpoints sometimes get hit while the emulator is being told to
+&quot;run&quot; which leaves the UI buttons in an inconsistent state.  My TCP
+comms needs a bit of work yet.
+6. I haven't yet moved to the binary memory retrieval command provided
+by Spiro to speed up memory updating on CPU stepping.  For now CPU
+stepping does not update memory--otherwise stepping would be
+ridiculously slow.  Memory is updated whenever a breakpoint is hit,
+the emulator is paused, or reset.  Still open to discussion on whether
+this can be achieved with shared memory -- though Qt has some
+restrictions on shared memory.
+7. Sometimes the C=64 comes up jammed.  Not sure why yet, but I think
+it might have something to do with me trying to communicate with it
+before it is &quot;happy&quot;.  Search for an appropriate delay mechanism
+continues.
+8. For some reason breakpoints don't seem to delete when you disable
+them.  I hope to resolve this soon!
+9. Setting the -remotemonitoraddress to anything other than 6510 doesn't work?
+
+Enjoy!  And please feel free to provide any kind of feedback...I'm
+hoping to polish this as time goes on.  I would have had something
+sooner but holidays got in the way!
+
+Thanks,
+Christopher
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Apr 13 17:39:34 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10237.html" title="Next message in the list">Gábor Lénárt: "Re: [cc65] Fwd: NESICIDE + VICE"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10235.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Possible optimizer errors with -Oi"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10237.html" title="Next message in this discussion thread">Gábor Lénárt: "Re: [cc65] Fwd: NESICIDE + VICE"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10237.html" title="Message sent in reply to this message">Gábor Lénárt: "Re: [cc65] Fwd: NESICIDE + VICE"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10242.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Re: [cc65] Fwd: NESICIDE + VICE"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10249.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] Fwd: NESICIDE + VICE"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10236" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10236" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10236" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-04-13 17:39:39 CEST
+</em></small></p>
+</body>
+</html>

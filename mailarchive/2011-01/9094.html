@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] cc65 + tcp/ip howto and/or</title>
+<meta name="Author" content="G·bor LÈn·rt (lgb1lgb.hu)" />
+<meta name="Subject" content="Re: [cc65] cc65 + tcp/ip howto and/or example" />
+<meta name="Date" content="2011-01-03" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] cc65 + tcp/ip howto and/or example</h1>
+<!-- received="Mon Jan  3 14:17:25 2011" -->
+<!-- isoreceived="20110103131725" -->
+<!-- sent="Mon, 3 Jan 2011 14:17:18 +0100" -->
+<!-- isosent="20110103131718" -->
+<!-- name="G·bor LÈn·rt" -->
+<!-- email="lgb1lgb.hu" -->
+<!-- subject="Re: [cc65] cc65 + tcp/ip howto and/or example" -->
+<!-- id="20110103131718.GF30776@vega.lgb.hu" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="4D21C038.1080708&#64;sipo.fi" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9095.html" title="Oliver Schmidt: &quot;Re: [cc65] cc65 + tcp/ip howto and/or example&quot;">Next message</a> ]
+[ <a href="9093.html" title="Karri Kaksonen: &quot;Re: [cc65] cc65 + tcp/ip howto and/or example&quot;">Previous message</a> ]
+[ <a href="9093.html" title="Karri Kaksonen: &quot;Re: [cc65] cc65 + tcp/ip howto and/or example&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9097.html" title="Oliver Schmidt: &quot;Re: [cc65] cc65 + tcp/ip howto and/or example&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: G·bor LÈn·rt &lt;<a href="mailto:lgb1lgb.hu?Subject=Re:%20[cc65]%20cc65%20%2B%20tcp/ip%20howto%20and/or%20example">lgb1lgb.hu</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-01-03 14:17:18</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hei Karri!
+
+On Mon, Jan 03, 2011 at 02:25:28PM +0200, Karri Kaksonen wrote:
+&gt; On 01/03/2011 12:53 PM, G√°bor L√©n√°rt wrote:
+&gt; &gt;It would be so nice if cc65 has some kind of library for some TCP/IP...
+&gt; 
+&gt; TCP/IP just eats up all the memory.
+
+For sure, that's why I've written that the &quot;standard POSIX API&quot; would be
+somewhat overkill for a platform like Commodore 64. However still, it would
+be cool to have some kind of &quot;standard&quot; CC65 library (standard= standard
+when you're using cc65 at least, hehe) to devolope tcp/ip applications, even
+if API is totally different like POSIX/UNIX like API.
+
+&gt; Sending out strings in wml and reading responses would be doable on
+&gt; a small machine with 64k of RAM. Besides, you could use the
+&gt; tgi-library and the serial-library as a basis for a wap-browser.
+&gt; 
+&gt; Connected to the serial port you could then have some serial to
+&gt; Ethernet dongle taking care of the TCP/IP stack. Or you could even
+&gt; implement the connection using the socat-command on Linux.
+&gt; 
+&gt; A small Linux-board at www.pcengines.ch goes for around 60‚Ç¨ and it
+&gt; has all the hardware required for connectivity over wire, wifi or
+&gt; 3G. (And it also has the serial port for connecting to cc65.)
+&gt; 
+&gt; As no cc65 comes with Ethernet ports anyway I see no reason to build
+&gt; in a TCP/IP stack in the cc65. It makes much more sense to use the
+&gt; memory for the browser or the multi-user game.
+
+&quot;No cc65 comes with Ethernet ports&quot;? Do you mean C64 here? Well, there is
+TFE for example, so there is at least one existing real Ethernet hardware
+for C64.  And as far as I know, only Contiki is the software (well, OS)
+which uses it (and it's compiled with CC65 for C64 at least - AFAIK - it
+uses uIP).  I've checked IP65 out, and it seems to be quite cool, that you
+can produce quite short (in size) applications doing some TCP/IP.  What I
+mean here is not to write a full web browser (well, only text parts), but I
+would need something like a &quot;downloader&quot; which generates a HTTP request and
+saves the result onto disk, and that's all.  As far as I can remember IP65
+has an example which does it (well, not so much saving the result onto disk
+but printing on the screen at least), and it really works, also it's not a
+too huge application either.
+
+Of course - as I've mentioned above - I was not serious to have a POSIX-like
+API for TCP/IP because it really needs more resources to implement, but as
+uIP shows (and eg.  Contiki if we're talking about an OS), it's possible to
+do TCP/IP even webservers (with steaming audio, btw!), and other
+applications on a stock C64 with only the TFE hardware (so no &quot;cheating&quot;
+that you use a custom board, or a Linux box with serial port: the cool thing
+when really the C64 can do even the ARP requests and programming the
+Ethernet I/O stuffs on the cartridge).  I have no real TFE at the momement,
+but indeed these seem to work with VICE (it has TFE/RR-Net emulation), I
+could even ping the emulated C64 on a real ethernet network.
+
+The only reason I don't use uIP as contiki does, that it seems to be a bit
+complex for me, but it's my fault, for sure. IP65 seems to be a smaller and
+easier-to-learn (but not fully finished, as far as I can tell/understand)
+solution, but some kind of &quot;CC65 binding&quot; (so you can use it from C too)
+would be cool.
+
+Currently, I have no plans to write advanced applications like &quot;wap browser&quot;
+or anything, just a simple &quot;downloader&quot; application and similar things,
+without too advanced user interaction. There, the HTTP request itself can
+fit into one packet, only receiving the answer needs some work, I guess.
+Currently, I am working on a very simple own test (trying to do as much
+things as possible by myself, and not depending too much on IP65) which can
+send a basic HTTP request and waits for a short answer which can fit into
+one packet, so only the basic TCP/IP handshaking is needed for this work.
+
+--
+G√°bor
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Jan  3 14:17:25 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9095.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] cc65 + tcp/ip howto and/or example"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9093.html" title="Previous message in the list">Karri Kaksonen: "Re: [cc65] cc65 + tcp/ip howto and/or example"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9093.html" title="Message to which this message replies">Karri Kaksonen: "Re: [cc65] cc65 + tcp/ip howto and/or example"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9097.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] cc65 + tcp/ip howto and/or example"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9097.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] cc65 + tcp/ip howto and/or example"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9094" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9094" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9094" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-01-03 14:17:27 CET
+</em></small></p>
+</body>
+</html>

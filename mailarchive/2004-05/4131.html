@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] macro arguments</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] macro arguments" />
+<meta name="Date" content="2004-05-11" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] macro arguments</h1>
+<!-- received="Tue May 11 22:41:48 2004" -->
+<!-- isoreceived="20040511204148" -->
+<!-- sent="Tue, 11 May 2004 22:41:44 +0200" -->
+<!-- isosent="20040511204144" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] macro arguments" -->
+<!-- id="20040511204144.GA32037@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="200404252050.30988.groepaz&#64;gmx.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4132.html" title="Groepaz: &quot;Re: [cc65] NoICE support?&quot;">Next message</a> ]
+[ <a href="4130.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] NoICE support?&quot;">Previous message</a> ]
+[ <a href="../2004-04/4087.html" title="Groepaz: &quot;Re: [cc65] macro arguments&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4133.html" title="Groepaz: &quot;Re: [cc65] macro arguments&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20macro%20arguments">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-05-11 22:41:44</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Sun, Apr 25, 2004 at 08:50:30PM +0200, Groepaz wrote:
+&gt; oh well..
+&gt;
+&gt;      ANC   Accu AND with memory, copy accu-bit 7 to carry
+&gt;      ARR   Accu AND with memory, ROR accu
+&gt;      ASR   Accu AND with memory, LSR accu
+&gt;      DCP   DEC memory, CMP memory
+&gt;      ISB   INC memory, SBC memory
+&gt;      LAX   LDA memory, TAX
+&gt;      NOP   No operation (various variants that take different amount of cycles)
+&gt;      RLA   ROL memory, AND accu, result into accu
+&gt;      RRA   ROR memory, ADC accu, result into accu
+&gt;      SAX   Accu AND with X-Register, result into memory
+&gt;      SBC   Subtract memory from accumulator with borrow (one byte version of sbc#$ff)
+&gt;      SBX   X-Register AND with accu, SBC memory, result into X-Register
+&gt;      SLO   ASL memory, ORA accu, result into accu
+&gt;      SRE   LSR memory, EOR accu, result into accu
+&gt;
+&gt; all stable (work on all known mask variants of the 6510) and all more or
+&gt; less useful.
+
+There is now a new &quot;6502X&quot; cpu, that supports all official 6502 mnemonics plus
+several illegal ones. I've used <a href="http://oxyron.net/graham/opcodes02.html">http://oxyron.net/graham/opcodes02.html</a> and
+implemented the ones marked as &quot;stable&quot;. Beware: Some of the opcodes differ
+from your list.
+
+The docs do contain an overview about the supported opcodes and its meaning.
+There is no .Pxxx available, you will have to use
+
+        .setcpu &quot;6502X&quot; 
+
+instead.
+
+The usual remark about feedback applies:-)
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue May 11 22:41:48 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4132.html" title="Next message in the list">Groepaz: "Re: [cc65] NoICE support?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4130.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] NoICE support?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="../2004-04/4087.html" title="Message to which this message replies">Groepaz: "Re: [cc65] macro arguments"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4133.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] macro arguments"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4133.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] macro arguments"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4131" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4131" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4131" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-05-11 22:41:55 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Maximum application size</title>
+<meta name="Author" content="Andreas Koch (email1kochandreas.com)" />
+<meta name="Subject" content="[cc65] Maximum application size" />
+<meta name="Date" content="2007-11-17" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Maximum application size</h1>
+<!-- received="Sat Nov 17 21:21:05 2007" -->
+<!-- isoreceived="20071117202105" -->
+<!-- sent="Sat, 17 Nov 2007 21:22:00 +0100" -->
+<!-- isosent="20071117202200" -->
+<!-- name="Andreas Koch" -->
+<!-- email="email1kochandreas.com" -->
+<!-- subject="[cc65] Maximum application size" -->
+<!-- id="473F4D68.30601@kochandreas.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5912.html" title="Johan Kotlinski: &quot;Re: [cc65] Maximum application size&quot;">Next message</a> ]
+[ <a href="5910.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] User Contribution&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5912.html" title="Johan Kotlinski: &quot;Re: [cc65] Maximum application size&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Andreas Koch &lt;<a href="mailto:email1kochandreas.com?Subject=Re:%20[cc65]%20Maximum%20application%20size">email1kochandreas.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-11-17 21:22:00</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi all,
+
+i'm trying to port one of my applications to the c64 using cc65.
+Problem is that it is pretty much code, so i need every byte i
+can find. Currently i have about 80% ported and got a &quot;Memory area 
+overflow in 'RAM', Segment 'BSS' (718 bytes)&quot;.
+
+What possibilities exist to handle that situation?
+
+I'd like to keep using a single PRG-File as long as possible...
+
+ From the MAP-File:
+
+Segment list:
+-------------
+Name                  Start   End     Size
+--------------------------------------------
+ZEROPAGE              000002  00001B  00001A
+STARTUP               0007FF  000892  000094
+INIT                  000893  000928  000096
+CODE                  000929  009834  008F0C
+RODATA                009835  00A050  00081C
+DATA                  00A051  00ADA3  000D53
+BSS                   00ADA4  00D2CD  00252A
+
+When reading the C64 memory map, we basically have:
+
+0400 Screen memory
+0800 basic
+A000 basic rom
+C000 upper RAM
+D000 char rom/vic/sid
+D800 color RAM
+DC00 CIA
+DE00 I/O-Area
+E000 Kernal ROM
+
+The prg currently has a filesize 38.652 bytes. I've seen working
+PRGs with up to 59kB so it should be possible...
+
+My app configures the VIC area so it has its screen at 0xE400,
+colors at 0xD800, using its own charset at 0xE800, and three
+sprites at 0xCF00 (which should conflict with code..mhhh).
+
+So, could i:
+
+1) load the app to 0400 instead of 0800 and still start it normally?
+2) could i switch i/o-area and/or Kernal to RAM and use these areas for 
+code? (how much of the kernal is needed - i need to use file-i/o?)
+3) is it possible to split code into non-continous memory regions 
+(without doing it &quot;by hand&quot; in assembly)
+4) i have a 2k const array for the charset - what is the best method for 
+  not wasting that memory, after the charset has been copied to its 
+final destination. Can i locate one of my global arrays of structs at the
+same location?
+5) can i place the arrays with sprite data at a 64 byte boundary so they 
+can be used directly without relocating?
+6) Other suggestions?
+
+thanks,
+   Andreas
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Nov 17 21:21:05 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5912.html" title="Next message in the list">Johan Kotlinski: "Re: [cc65] Maximum application size"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5910.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] User Contribution"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5912.html" title="Next message in this discussion thread">Johan Kotlinski: "Re: [cc65] Maximum application size"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5912.html" title="Message sent in reply to this message">Johan Kotlinski: "Re: [cc65] Maximum application size"</a></li>
+<li><dfn>Reply</dfn>:  <a href="5913.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Maximum application size"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5911" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5911" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5911" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-11-17 21:21:08 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] CBM units</title>
+<meta name="Author" content="Greg King (greg.king41verizon.net)" />
+<meta name="Subject" content="Re: [cc65] CBM units" />
+<meta name="Date" content="2010-02-04" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] CBM units</h1>
+<!-- received="Thu Feb  4 03:13:37 2010" -->
+<!-- isoreceived="20100204021337" -->
+<!-- sent="Wed, 03 Feb 2010 21:13:14 -0500" -->
+<!-- isosent="20100204021314" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king41verizon.net" -->
+<!-- subject="Re: [cc65] CBM units" -->
+<!-- id="008801caa53f$9cf7f920$0f73e760@monarch" -->
+<!-- charset="UTF-8" -->
+<!-- inreplyto="20100203172908.GA11020&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7852.html" title="Marco van den Heuvel: &quot;[cc65] c128 ptvjoy patch&quot;">Next message</a> ]
+[ <a href="7850.html" title="Greg King: &quot;Re: [cc65] c64 get_ostype patch&quot;">Previous message</a> ]
+[ <a href="7846.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] CBM units&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king41verizon.net?Subject=Re:%20[cc65]%20CBM%20units">greg.king41verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-02-04 03:13:14</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: &quot;Ullrich von Bassewitz&quot;; on Wed., Feb. 03, 2010; at 12:29 PM -0500
+&gt;
+&gt; On Wed, Feb 03, 2010 at 05:56:22PM +0100, Oliver Schmidt wrote:
+&gt; &gt;
+&gt; &gt; Is there a way that a C64 user can leverage &quot;a current unit&quot;?
+&gt;
+&gt; The kernal has no such thing. You must specify a unit each time, a file is
+&gt; loaded. On the C64, there is just a variable where the kernal remembers
+&gt; the unit from the last LOAD. It is not used for anything else
+&gt; (CBM hackers:  please correct me if that is wrong).
+
+The &quot;FA&quot; (First Address) variable is used for all file &quot;switching&quot;.  It is
+changed by four Kernal functions:  SETLFS, CHKIN, CHKOUT, and CLOSE
+(LOAD calls SETLFS).
+
+From: &quot;Oliver Schmidt&quot;; on Wed., Feb. 03, 2010; at 05:36 PM -0500
+&gt;
+&gt; Things obviously are more complicated. :-( When a cc65 main() is
+&gt; enterred, the zero-page location $BA doesn't contain the number of the
+&gt; unit the program was loaded from (anymore). This is, BTW, the code I
+&gt; added:
+&gt;
+&gt;   _curunit = *(unsigned char *)0xBA;
+
+It's changed by the stdin, stdout, and stderr constructors.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Feb  4 03:13:37 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7852.html" title="Next message in the list">Marco van den Heuvel: "[cc65] c128 ptvjoy patch"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7850.html" title="Previous message in the list">Greg King: "Re: [cc65] c64 get_ostype patch"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7846.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] CBM units"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7851" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7851" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7851" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-02-04 03:13:40 CET
+</em></small></p>
+</body>
+</html>

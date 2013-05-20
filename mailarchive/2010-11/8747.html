@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] ca65 for stand-alone asm p</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] ca65 for stand-alone asm projects" />
+<meta name="Date" content="2010-11-03" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] ca65 for stand-alone asm projects</h1>
+<!-- received="Wed Nov  3 11:57:40 2010" -->
+<!-- isoreceived="20101103105740" -->
+<!-- sent="Wed, 3 Nov 2010 11:57:34 +0100" -->
+<!-- isosent="20101103105734" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] ca65 for stand-alone asm projects" -->
+<!-- id="AANLkTikNK99168N_PDW8XDZcQGsh5a_d7tdYqdo3SU97@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="AANLkTi=jAX2tithsZWT=-HT-v7Leq6T1tq3bJPnW7XHS&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8748.html" title="Groepaz: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">Next message</a> ]
+[ <a href="8746.html" title="Per Olofsson: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">Previous message</a> ]
+[ <a href="8745.html" title="Agent Friday: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8759.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20ca65%20for%20stand-alone%20asm%20projects">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-11-03 11:57:34</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt; I think that to
+&gt; reasonably expect folks to be able to adopt ca65 for anything other
+&gt; than augmenting cc65 C code requires that a new user could easily
+&gt; figure out how to do what is one of the simplest things on all the other
+&gt; assemblers he's used.  Am I alone in this thought?
+
+So here's my take:
+
+As Per already pointed out it seams natural that using the cc65
+toolchain for an asm-only project requires at least two files: The
+input to the assembler and the input to the linker.
+
+Having that said things could very well made be more friendly without
+much effort:
+
+1. The information in a linker config can roughly be classified as
+either being related to the environment or being related to the
+program. This combination of these information in one file makes them
+hard to understand for any newbie. There could be two approaches for
+improvement:
+a) There could be a new (per target) secondary linker config making
+only minimal assumptions on the program.
+b) The exsisting primary linker configs could be made more asm-only
+friendly by declaring DATA, RODATA, ZPSAVE, BSS and ZEROPAGE as
+optional. Then they could be used with any asm-only program consisting
+of the three sections EXEHDR, STARTUP and CODE.
+I understand that making the sections mentioned above optional removes
+some consistency check for C porgrams but this loss might be
+considered small enough to justify the benefit described.
+
+2. It was already discussed on this list, if it would make sense to
+separate the stuff that goes into EXEHDR out of the crt0.s files. I
+personally think that would be a good idea, however this wasn't the
+result of the discussion... But it would be at least possible to have
+a copy of that code in a file exehdr.o placed in the 'extra'
+directory. That 'extra' directory infrastructure is already in place.
+It allows cc65 targets to deliver standalone .o files which can be
+refered by the user on the ld65 cmdline without providing a path to
+them. It is currently used for apple2-iobuf-0800.o - see here:
+<a href="http://www.cc65.org/snapshot-doc/apple2-5.html#ss5.3">http://www.cc65.org/snapshot-doc/apple2-5.html#ss5.3</a>
+
+1.) and 2.) together with a small tutorial provided by the OP that
+basically says
+- why there is a STARTUP segment and how to use it
+- how the ld65 cmdline has to look like to get the wanted config and
+the exehdr.o linked.
+could make ca65 much more approachable for asm-only usage.
+
+Just my (lengthy) two cents,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Nov  3 11:57:40 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8748.html" title="Next message in the list">Groepaz: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8746.html" title="Previous message in the list">Per Olofsson: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8745.html" title="Message to which this message replies">Agent Friday: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8759.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8759.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8860.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "[cc65] Linker config for assembler users (was: ca65 for stand-alone asm projects)"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8747" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8747" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8747" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-11-03 11:57:43 CET
+</em></small></p>
+</body>
+</html>

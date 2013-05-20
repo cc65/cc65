@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Porting cc65 to embedded s</title>
+<meta name="Author" content="Ormund Williams (ormundw1panix.com)" />
+<meta name="Subject" content="Re: [cc65] Porting cc65 to embedded system that has no OS, boot ROM or monitor" />
+<meta name="Date" content="2004-09-24" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Porting cc65 to embedded system that has no OS, boot ROM or monitor</h1>
+<!-- received="Fri Sep 24 20:38:29 2004" -->
+<!-- isoreceived="20040924183829" -->
+<!-- sent="24 Sep 2004 14:38:25 -0400" -->
+<!-- isosent="20040924183825" -->
+<!-- name="Ormund Williams" -->
+<!-- email="ormundw1panix.com" -->
+<!-- subject="Re: [cc65] Porting cc65 to embedded system that has no OS, boot ROM or monitor" -->
+<!-- id="1096051104.4504.3184.camel@station1.ormlab.com" -->
+<!-- inreplyto="20040923214932.GA12393&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4520.html" title="Raj Wurttemberg: &quot;[cc65] Get user input?&quot;">Next message</a> ]
+[ <a href="4518.html" title="MagerValp: &quot;Re: [cc65] RLE Toolkit&quot;">Previous message</a> ]
+[ <a href="4516.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Porting cc65 to embedded system that has no OS, boot ROM or monitor&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4520.html" title="Raj Wurttemberg: &quot;[cc65] Get user input?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ormund Williams &lt;<a href="mailto:ormundw1panix.com?Subject=Re:%20[cc65]%20Porting%20cc65%20to%20embedded%20system%20that%20has%20no%20OS,%20boot%20ROM%20or%20monitor">ormundw1panix.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-09-24 20:38:25</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Thu, 2004-09-23 at 17:49, Ullrich von Bassewitz wrote:
+&gt; A segment cannot have a size attribute. The error is caused because the linker
+&gt; tries to place the zeropage at $0 into the RAM, but because you did already
+&gt; place other stuff into this memory area, $0 is already taken. To solve this,
+&gt; the zeropage segment should go into its own RAM area. And I do assume that you
+&gt; don't want to use the CPU stack at $100 to be used for your program. So the
+&gt; following config would be better:
+&gt; 
+Thanks for that, my knowledge of the 6502 has been gained from reading
+the data sheets and the sorce code found in cc65 and other places on the
+Net.
+
+&gt; MEMORY {
+&gt;     ZP: start = $0, size = $100, type = rw, define = yes;
+&gt;     RAM: start = $200, size = $1E00, define = yes;
+	&lt;...snip...&gt;
+It worked! the LEDs are blinking, albeit at 3kHz
+
+This is a great project, I'm really surprised at how quickly I got this
+board to boot.  Thanks again!
+
+-- 
+Ormund Williams &lt;ormundw&#64;panix&#46;<!--nospam-->com&gt;
+ORMLAB
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Sep 24 20:38:29 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4520.html" title="Next message in the list">Raj Wurttemberg: "[cc65] Get user input?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4518.html" title="Previous message in the list">MagerValp: "Re: [cc65] RLE Toolkit"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4516.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Porting cc65 to embedded system that has no OS, boot ROM or monitor"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4520.html" title="Next message in this discussion thread">Raj Wurttemberg: "[cc65] Get user input?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4520.html" title="Message sent in reply to this message">Raj Wurttemberg: "[cc65] Get user input?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4519" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4519" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4519" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-09-24 20:38:39 CEST
+</em></small></p>
+</body>
+</html>

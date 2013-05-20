@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Lynx target</title>
+<meta name="Author" content="Greg King (greg.king41verizon.net)" />
+<meta name="Subject" content="Re: [cc65] Lynx target" />
+<meta name="Date" content="2008-03-20" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Lynx target</h1>
+<!-- received="Thu Mar 20 23:55:10 2008" -->
+<!-- isoreceived="20080320225510" -->
+<!-- sent="Thu, 20 Mar 2008 18:54:29 -0400" -->
+<!-- isosent="20080320225429" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king41verizon.net" -->
+<!-- subject="Re: [cc65] Lynx target" -->
+<!-- id="000601c88add$6455a8c0$443efea9@monarch" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="47E22C52.3040804&#64;kosh.dna.fi" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6062.html" title="Karri Kaksonen: &quot;Re: [cc65] Lynx target&quot;">Next message</a> ]
+[ <a href="6060.html" title="Karri Kaksonen: &quot;[cc65] Lynx target&quot;">Previous message</a> ]
+[ <a href="6060.html" title="Karri Kaksonen: &quot;[cc65] Lynx target&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6062.html" title="Karri Kaksonen: &quot;Re: [cc65] Lynx target&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king41verizon.net?Subject=Re:%20[cc65]%20Lynx%20target">greg.king41verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-03-20 23:54:29</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: &quot;Karri Kaksonen&quot; on Thursday, March 20, 2008; at 05:20 AM -0400
+&gt;
+&gt; The Lynx file I/O is a bit different from other systems, as the directory
+&gt; contains the RAM address where to load the data upon request.  So, there
+&gt; are really just two basic commands you use:
+&gt;
+&gt; void __fastcall__ FileLoadFile(int filenumber)
+&gt; void __fastcall__ FileExecFile(int filenumber)
+
+I think that those functions should be renamed CartLoadFile() and
+CartExecFile().  It will avoid confusion about the source of what they load.
+
+There are three sources of programs:
+1. cartridges,
+2. ComLynx serial cables,
+3. emulators can load from a host's file-system.
+
+Those functions' names should show that they read from the first source.
+
+&gt;
+&gt; Typical Lynx &quot;files&quot; are linked into a cartridge image as named segments.
+&gt; &quot;File&quot; number - description:
+&gt; 0 - title sprite, mandatory
+&gt; 1 - start-up executable, mandatory (also contains all the cc65
+&gt; resident libraries)
+&gt; 2 - miniloader library remains resident between $0200-$03ff for
+&gt; accessing the cart.
+&gt; 3 - first game executable, starting at $0400 (it does not contain the
+&gt; cc65 resident libraries)
+&gt; 4 - second game executable, starting at $0400 (it does not contain the
+&gt; cc65 resident libraries)
+&gt; .....
+&gt; N - sprites for first game
+&gt; N+1 - more sprites
+&gt; N+3 - one tune -- music in ABC format, to be used for all games
+&gt; N+4 - another tune -- more music
+&gt;
+&gt; The programmer just reads in the files his level needs, and uses them.
+&gt;
+&gt; FileLoadFile(BACKGROUND_SPRITE_FILENO); // The linker knows that the
+&gt; sprite is needed in Sbackground.
+&gt; tgi_draw(&amp;Sbackground);
+&gt; FileLoadFile(MOZART_SYMPHONY_FILENO); // The linker knows that the data
+&gt; goes to arrays mozart0..mozart3.
+&gt; abc_play(channel0, mozart0)
+&gt; abc_play(channel1, mozart1)
+&gt; abc_play(channel2, mozart2)
+&gt; abc_play(channel3, mozart3)
+&gt;
+&gt; The cc65 linker will assemble the directory, and set the addresses and
+&gt; sizes for code and data overlays.
+&gt;
+&gt; On some carts., we also have EEPROM support (128 * 16bit).
+&gt; For that, there are three functions:
+&gt; int __fastcall__ eeprom_read(unsigned char cell)
+&gt; void __fastcall__ eeprom_erase(unsigned char cell)
+&gt; void __fastcall__ eeprom_write(unsigned char cell, int data)
+&gt;
+&gt; The question I have is, can that functionality be implemented using
+&gt; some common functions found for other cc65 targets?
+
+No, the libraries do not have common functions for direct overlay support.
+
+However, I adapted some code from your &quot;lynx-cart-demo-1.1.zip&quot;
+contribution, and created enough POSIX input functions to allow Lynx
+programs to load dynamic drivers (into heap space) in the same way that
+other targets do it.  Examples:
+
+    // The joystick and graphics drivers are the third and fourth files
+    // in the directory.
+    status = joy_load_driver(joy_stddrv);
+    tgi_load_driver(&quot;\3&quot;);
+
+It might be interesting to add a layer above those EEPROM functions that
+sees the EEPROM as a POSIX file.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Mar 20 23:55:10 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6062.html" title="Next message in the list">Karri Kaksonen: "Re: [cc65] Lynx target"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6060.html" title="Previous message in the list">Karri Kaksonen: "[cc65] Lynx target"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6060.html" title="Message to which this message replies">Karri Kaksonen: "[cc65] Lynx target"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6062.html" title="Next message in this discussion thread">Karri Kaksonen: "Re: [cc65] Lynx target"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6062.html" title="Message sent in reply to this message">Karri Kaksonen: "Re: [cc65] Lynx target"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6061" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6061" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6061" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-03-20 23:55:12 CET
+</em></small></p>
+</body>
+</html>

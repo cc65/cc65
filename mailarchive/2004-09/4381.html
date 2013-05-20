@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] cc65 calling conventions</title>
+<meta name="Author" content="Sidney Cadot (sidney1jigsaw.nl)" />
+<meta name="Subject" content="Re: [cc65] cc65 calling conventions" />
+<meta name="Date" content="2004-09-02" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] cc65 calling conventions</h1>
+<!-- received="Thu Sep  2 14:36:30 2004" -->
+<!-- isoreceived="20040902123630" -->
+<!-- sent="Thu, 2 Sep 2004 14:36:44 +0200" -->
+<!-- isosent="20040902123644" -->
+<!-- name="Sidney Cadot" -->
+<!-- email="sidney1jigsaw.nl" -->
+<!-- subject="Re: [cc65] cc65 calling conventions" -->
+<!-- id="BFBE09A8-FCDC-11D8-9BFB-000A95914D12@jigsaw.nl" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="16694.48483.397029.932454&#64;panini.cling.gu.se" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4382.html" title="MagerValp: &quot;Re: [cc65] cc65 calling conventions&quot;">Next message</a> ]
+[ <a href="4380.html" title="MagerValp: &quot;Re: [cc65] cc65 calling conventions&quot;">Previous message</a> ]
+[ <a href="4380.html" title="MagerValp: &quot;Re: [cc65] cc65 calling conventions&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4382.html" title="MagerValp: &quot;Re: [cc65] cc65 calling conventions&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Sidney Cadot &lt;<a href="mailto:sidney1jigsaw.nl?Subject=Re:%20[cc65]%20cc65%20calling%20conventions">sidney1jigsaw.nl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-09-02 14:36:44</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Per,
+
+&gt; SC&gt; Is there documentation regarding the calling conventions used by
+&gt; SC&gt; CC65? I need to mix C and assembly and I like to play by the
+&gt; SC&gt; rules.
+&gt;
+&gt; Since Uz is out of town:
+&gt;
+&gt;   Arguments are pushed on the stack in left to right order. If you're
+&gt;   using __fastcall__ the last argument is instead put in A (lo) and X
+&gt;   (hi). You can access args with lda (sp),y. When returning, you must
+&gt;   have pulled everything off (jsr incspX, where X is the number of
+&gt;   bytes you want to increase the pointer with), and pushed your return
+&gt;   value. If you're using __fastcall__ the return value is instead
+&gt;   returned in A/X, as above.
+
+Ok, thanks for the rundown. Does this mean that I am free to alter the 
+A,X,Y, and P registers within the subroutine (unless I return a value 
+in A/X of course)? Also, with __fastcall__, if the the value is a 
+1-byte type, is X undefined at entry (and don't-care, at exit)?
+
+Best regards,
+
+   Sidney
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Sep  2 14:36:30 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4382.html" title="Next message in the list">MagerValp: "Re: [cc65] cc65 calling conventions"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4380.html" title="Previous message in the list">MagerValp: "Re: [cc65] cc65 calling conventions"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4380.html" title="Message to which this message replies">MagerValp: "Re: [cc65] cc65 calling conventions"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4382.html" title="Next message in this discussion thread">MagerValp: "Re: [cc65] cc65 calling conventions"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4382.html" title="Message sent in reply to this message">MagerValp: "Re: [cc65] cc65 calling conventions"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4381" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4381" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4381" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-09-02 14:36:39 CEST
+</em></small></p>
+</body>
+</html>

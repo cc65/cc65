@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Emitting data into segments de</title>
+<meta name="Author" content="David Schmidt (david1attglobal.net)" />
+<meta name="Subject" content="[cc65] Emitting data into segments defined in an interleaved way, while maintaining addresses?" />
+<meta name="Date" content="2012-08-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Emitting data into segments defined in an interleaved way, while maintaining addresses?</h1>
+<!-- received="Thu Aug 23 22:38:40 2012" -->
+<!-- isoreceived="20120823203840" -->
+<!-- sent="Thu, 23 Aug 2012 16:38:22 -0400" -->
+<!-- isosent="20120823203822" -->
+<!-- name="David Schmidt" -->
+<!-- email="david1attglobal.net" -->
+<!-- subject="[cc65] Emitting data into segments defined in an interleaved way, while maintaining addresses?" -->
+<!-- id="503694BE.3030702@attglobal.net" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10766.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Emitting data into segments defined in an interleaved way, while maintaining addresses?&quot;">Next message</a> ]
+[ <a href="10764.html" title="Spiro Trikaliotis: &quot;Re: [cc65] [PATCH 2/3] Fix documentation for DiskChangeDevice.&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10766.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Emitting data into segments defined in an interleaved way, while maintaining addresses?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: David Schmidt &lt;<a href="mailto:david1attglobal.net?Subject=Re:%20[cc65]%20Emitting%20data%20into%20segments%20defined%20in%20an%20interleaved%20way,%20while%20maintaining%20addresses?">david1attglobal.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-08-23 22:38:22</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I've run into a bit of trouble with a technique I'd like to apply to the 
+way I handle messages in some assembler code.  The way I'd like to 
+operate is this:
+
+I have three tables that define message strings.  They are:
+1) a table of strings (of variable lengths, 255 byte limit)
+2) a table of string lengths (each length is a 1-byte value)
+3) a table of addresses of the strings
+
+This all works well if all three tables are part of the same, contiguous 
+assembly file.  But I'd like to break these up into separate files, and 
+pick and choose which ones get included in various situations.  So I'd 
+like to end up with files like this:
+
+File1.asm:
+.segment &quot;MESSAGES&quot;
+	M11: asc &quot;1A&quot;
+	M11_END =*
+	M12: asc &quot;1B&quot;
+	M12_END =*
+.segment &quot;MSGLEN&quot;
+	.byte M11_END-M11
+	.byte M12_END-M12
+.segment &quot;MSGTABLE&quot;
+	.addr M11,M12
+
+File2.asm:
+.segment &quot;MESSAGES&quot;
+	M21: asc &quot;2A&quot;
+	M21_END =*
+	M22: asc &quot;2B&quot;
+	M22_END =*
+.segment &quot;MSGLEN&quot;
+	.byte M21_END-M21
+	.byte M22_END-M22
+.segment &quot;MSGTABLE&quot;
+	.addr M21,M22
+
+I link everything with this config file:
+MEMORY {
+     RAM: start = $0800, size = $6500, define = yes, file = %O;
+}
+SEGMENTS {
+     CODE: load = RAM, type = ro;
+     MESSAGES: load = RAM, type = ro;
+     MSGLEN: load = RAM, type = ro;
+     MSGTABLE: load = RAM, type = ro;
+     RODATA: load = RAM, type = ro;
+     BSS: load = RAM, type = bss;
+}
+
+I see that the linker does in fact re-pack the various segments together 
+as expected - effectively un-interleaving them.  But the addresses in 
+MSGTABLE after File1.asm are incorrect.  The addresses in the output 
+from File2.asm are actually relative to the file when it got assembled 
+(vs. linked), which are different at link time once the re-packing occurred.
+
+I could probably fix this by having two files per message &quot;package&quot; - 
+and include all message text/lengths first, followed by all message 
+addresses.  But I'd like to keep all related messages, lengths, and 
+addresses together in single files.
+
+I realize there are at least a million other ways to deal with strings. 
+  I'd like to maintain this scheme (3 tables) since a fairly large 
+codebase is already using it this way.  Aside from custom file 
+processing to generate a single file out of several at build time, is 
+there a way I can convince the toolchain to do what I want with separate 
+files like this?
+
+- David
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Aug 23 22:38:40 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10766.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Emitting data into segments defined in an interleaved way, while maintaining addresses?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10764.html" title="Previous message in the list">Spiro Trikaliotis: "Re: [cc65] [PATCH 2/3] Fix documentation for DiskChangeDevice."</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10766.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Emitting data into segments defined in an interleaved way, while maintaining addresses?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10766.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Emitting data into segments defined in an interleaved way, while maintaining addresses?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10770.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Re: [cc65] Emitting data into segments defined in an interleaved way, while maintaining addresses?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10765" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10765" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10765" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-08-23 22:38:43 CEST
+</em></small></p>
+</body>
+</html>

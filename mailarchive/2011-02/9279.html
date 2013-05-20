@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] assembler/C stack issue</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] assembler/C stack issue" />
+<meta name="Date" content="2011-02-12" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] assembler/C stack issue</h1>
+<!-- received="Sat Feb 12 13:29:52 2011" -->
+<!-- isoreceived="20110212122952" -->
+<!-- sent="Sat, 12 Feb 2011 13:30:38 +0100" -->
+<!-- isosent="20110212123038" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] assembler/C stack issue" -->
+<!-- id="1297513838.10316.5.camel@Nokia-N900-51-1" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="AANLkTikKdw2qb26NEykh5uQfsbkDTocx8vm1EDue+U_U&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9280.html" title="Shawn Jefferson: &quot;RE: [cc65] assembler/C stack issue&quot;">Next message</a> ]
+[ <a href="9278.html" title="Oliver Schmidt: &quot;Re: [cc65] assembler/C stack issue&quot;">Previous message</a> ]
+[ <a href="9278.html" title="Oliver Schmidt: &quot;Re: [cc65] assembler/C stack issue&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9280.html" title="Shawn Jefferson: &quot;RE: [cc65] assembler/C stack issue&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20assembler/C%20stack%20issue">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-02-12 13:30:38</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>----- Ursprüngliche Mitteilung -----
+&gt; &gt; The compiler/linker will know that the function returns a char and not
+&gt; &gt; an int, and it shouldn't just use whatever is in A+X when promoting to
+&gt; &gt; int, but rather &quot;know&quot; that it should stick a zero in X first. ??? 
+&gt; &gt;  Seems broken if that is so?
+[...]
+&gt; Certainly what you say is the normal/theoretical/native approach. What
+&gt; I describe is an optimization. Functions are supposed to be reused.
+&gt; Therefore it is desirable to place as much as possible stuff into the
+&gt; function instead at the call site. Exactly the same as with parameter
+&gt; stack handling: Theoretically the caller pushes and pops - with the
+&gt; practical benefit of having no issues with varargs etc. But for
+&gt; optimization reasons one might want to have the function pop the
+&gt; arguments.
+
+Sorry for answering so late. I'm not at home and writing mails with the phone is somewhat uncomfortable ...
+
+Oliver is completely right here: The C standard requires that chars are promoted to int in expressions. Doing it inside the called function is a size vs speed optimization, in the same way as cc65 implements &quot;callee pops&quot; instead of &quot;caller pops&quot; as most other C compilers do it. Having int promotion in the function is especially important for signed chars where it is much more expensive.
+Think about the compiler adding
+
+        ldx     #$00
+        tay
+        bpl     L1
+        dex
+L1:
+
+after each function call. 6 bytes including a branch - that adds up quickly. Especially since the function does often have more knowledge about the returned value and may be able to do it cheaper.
+
+So there is nothing wrong or broken, it's just a design decision.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                                                   uz&#64;musoftware&#46;<!--nospam-->de
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Feb 12 13:29:52 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9280.html" title="Next message in the list">Shawn Jefferson: "RE: [cc65] assembler/C stack issue"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9278.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] assembler/C stack issue"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9278.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] assembler/C stack issue"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9280.html" title="Next message in this discussion thread">Shawn Jefferson: "RE: [cc65] assembler/C stack issue"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9280.html" title="Message sent in reply to this message">Shawn Jefferson: "RE: [cc65] assembler/C stack issue"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9279" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9279" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9279" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-02-12 13:29:55 CET
+</em></small></p>
+</body>
+</html>

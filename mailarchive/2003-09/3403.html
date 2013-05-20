@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Atari stack pointer?</title>
+<meta name="Author" content="Shawn Jefferson (shawnjefferson_at_24fightingchickens.com)">
+<meta name="Subject" content="Re: [cc65] Atari stack pointer?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Atari stack pointer?</h1>
+<!-- received="Thu Sep 18 00:19:32 2003" -->
+<!-- isoreceived="20030917221932" -->
+<!-- sent="Wed, 17 Sep 2003 15:17:04 -0700" -->
+<!-- isosent="20030917221704" -->
+<!-- name="Shawn Jefferson" -->
+<!-- email="shawnjefferson_at_24fightingchickens.com" -->
+<!-- subject="Re: [cc65] Atari stack pointer?" -->
+<!-- id="kmmhmvgmnotk9bub7d8t8dcbs9kv1ubetm@4ax.com" -->
+<!-- inreplyto="Pine.LNX.4.30.0309172314290.14455-100000@ds9.reckziegel.com" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Shawn Jefferson (<a href="mailto:shawnjefferson_at_24fightingchickens.com?Subject=Re:%20[cc65]%20Atari%20stack%20pointer?"><em>shawnjefferson_at_24fightingchickens.com</em></a>)<br>
+<strong>Date:</strong> 2003-09-18 00:17:04
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3402.html">Christian Groessler: "Re: [cc65] Atari stack pointer?"</a>
+<li><strong>In reply to:</strong> <a href="3402.html">Christian Groessler: "Re: [cc65] Atari stack pointer?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3404.html">Ullrich von Bassewitz: "[cc65] Platform specific docs (was: Atari stack pointer?)"</a>
+<li><strong>Reply:</strong> <a href="3404.html">Ullrich von Bassewitz: "[cc65] Platform specific docs (was: Atari stack pointer?)"</a>
+<li><strong>Reply:</strong> <a href="3406.html">Christian Groessler: "Re: [cc65] Atari stack pointer?"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Wed, 17 Sep 2003 23:41:56 +0200 (CEST), Christian wrote:
+
+I agree with you about the way the stack is calculated.  The current
+system makes the most sense with the different configs of Atari out
+there.  We just need some documentation letting people know the quirks
+of the Atari platform, I guess.
+
+&gt;Hmm, I don't think that the stack resides inside your assigned memory
+&gt;areas.
+&gt;By default, the runtime assumes the largest possible memory use for
+&gt;graphics (graphics 9) and adjusts the stack pointer accordingly. So the
+&gt;stack pointer would initially be around 8k below MEMTOP.
+
+Well, when I run my program without _graphmode_used = 0, I get MEMTOP
+as BC1F and the sp (at $0082 right?) is a couple of bytes below BC1F
+and as my program runs it gets a few more bytes below that...  
+
+I was seeing garbage in my bitmap that was changing as my program ran.
+
+What I did was to calculate my pointers from MEMTOP.  My grid bitmap
+is now calculated as MEMTOP - 255 - 2560 (64 lines of mode D) and my
+P/M area is grid_bmp.dat - 2048 &amp; ~2047.  This sort of gets around the
+problem of the stack in upper memory, but my other memory areas are
+hard-coded still.
+
+I guess I should calculate them as well, by the address of the screen
+ram.  Then my program will be able to run on different setups where
+MEMTOP and screen ram is set differently.
+
+Thanks for you help.
+
+--
+Shawn Jefferson
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Atari%20stack%20pointer?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3402.html">Christian Groessler: "Re: [cc65] Atari stack pointer?"</a>
+<li><strong>In reply to:</strong> <a href="3402.html">Christian Groessler: "Re: [cc65] Atari stack pointer?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3404.html">Ullrich von Bassewitz: "[cc65] Platform specific docs (was: Atari stack pointer?)"</a>
+<li><strong>Reply:</strong> <a href="3404.html">Ullrich von Bassewitz: "[cc65] Platform specific docs (was: Atari stack pointer?)"</a>
+<li><strong>Reply:</strong> <a href="3406.html">Christian Groessler: "Re: [cc65] Atari stack pointer?"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-09-18 00:19:44 CEST</em>
+</em>
+</small>
+</body>
+</html>

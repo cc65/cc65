@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] optimizer or me?</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] optimizer or me?" />
+<meta name="Date" content="2004-07-15" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] optimizer or me?</h1>
+<!-- received="Thu Jul 15 09:03:23 2004" -->
+<!-- isoreceived="20040715070323" -->
+<!-- sent="Thu, 15 Jul 2004 09:03:19 +0200" -->
+<!-- isosent="20040715070319" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] optimizer or me?" -->
+<!-- id="20040715070319.GA11541@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="20040715033310.12105.qmail&#64;web52208.mail.yahoo.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4233.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Anyway to stop optimzation of inline assembler&quot;">Next message</a> ]
+[ <a href="4231.html" title="Glenn Jones: &quot;[cc65] Anyway to stop optimzation of inline assembler&quot;">Previous message</a> ]
+[ <a href="4230.html" title="Shawn Jefferson: &quot;[cc65] optimizer or me?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4234.html" title="Shawn Jefferson: &quot;Re: [cc65] optimizer or me?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20optimizer%20or%20me?">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-07-15 09:03:19</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Wed, Jul 14, 2004 at 08:33:10PM -0700, Shawn Jefferson wrote:
+&gt; Well, a possible bug or my expectations are wrong?  In
+&gt; one of my projects I am testing for the existance of
+&gt; hardware at a particular address.  The listing is a
+&gt; little wierd.  I guess it's optimizing out the compare
+&gt; and first case, but should it do that?
+
+The optimizer is removing the test because it knows you stored a one in this
+place before. And yes, it is allowed to do that.
+
+With another compiler you could declare the memory cell volatile, which would
+cause the compiler to read and write it each time it is needed (that is, don't
+remove reads or writes to this location). But - while cc65 understands the
+keyword - cc65 won't generate different code, because it ignores the volatile
+modifier.
+
+The possibilities you have are:
+
+    * Disable the optimizer for this module (affects all code in the module).
+
+    * Place the stuff into a small assembler module.
+
+    * Hide parts of the code from the optimizer:
+
+        unsigned char ReadD104 (void)
+        {
+            return *(unsigned char*) 0xD104;
+        }
+
+        int main (void)
+            char a;
+
+            *(unsigned char*) 0xD104 = 1;
+            if (ReadD104 () == 1) {
+                a = 1;
+            } else {
+                a = 2;
+            }
+            return 1;
+        }
+
+The latter is not safe for all times, because in theory the compiler could
+look at ReadD104, or even inline it, but hopefully it will also understand
+volatile once it is smart enough to inline functions.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Jul 15 09:03:23 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4233.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Anyway to stop optimzation of inline assembler"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4231.html" title="Previous message in the list">Glenn Jones: "[cc65] Anyway to stop optimzation of inline assembler"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4230.html" title="Message to which this message replies">Shawn Jefferson: "[cc65] optimizer or me?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4234.html" title="Next message in this discussion thread">Shawn Jefferson: "Re: [cc65] optimizer or me?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4234.html" title="Message sent in reply to this message">Shawn Jefferson: "Re: [cc65] optimizer or me?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="4235.html" title="Message sent in reply to this message">Shawn Jefferson: "Re: [cc65] optimizer or me?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4232" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4232" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4232" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-07-15 09:03:31 CEST
+</em></small></p>
+</body>
+</html>

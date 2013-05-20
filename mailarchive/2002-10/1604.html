@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Bank Switching</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Bank Switching">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Bank Switching</h1>
+<!-- received="Thu Oct 10 12:31:47 2002" -->
+<!-- isoreceived="20021010103147" -->
+<!-- sent="Thu, 10 Oct 2002 12:31:50 +0200" -->
+<!-- isosent="20021010103150" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Bank Switching" -->
+<!-- id="20021010103150.GA13612@trixie.musoftware.de" -->
+<!-- inreplyto="sda439d4.057@gwmail.sd62.bc.ca" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Bank%20Switching"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-10-10 12:31:50
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1603.html">Shawn Jefferson: "Re: [cc65] Bank Switching"</a>
+<li><strong>In reply to:</strong> <a href="1603.html">Shawn Jefferson: "Re: [cc65] Bank Switching"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Wed, Oct 09, 2002 at 02:14:12PM -0700, Shawn Jefferson wrote:
+&gt; I also was thinking that you could use the original $4000-7FFF for code, as
+&gt; long as that code does not try to bank in the other banks, doesn't contain
+&gt; screens or display lists, and your other code banks it back in after accessing
+&gt; any extended memory.  It would be a little complex, but no real problem I
+&gt; don't think.
+
+You can also use cc65 to write code for systems with banked memory. Just a
+little manual work is needed.
+
+The rodata, data, and bss segments have to go into a common area, together
+with the part of the code that contains the cc65 runtime and C library
+functions needed by your program. In addition to that, small wrappers for
+banked functions must also go into common memory.
+
+Assume that you have three banks, each with just one function that has to be
+called (it is easy to extend this to more complex systems). The actual
+functions are named f1_bank1, f2_bank2 and f3_bank3 and reside in bank 1, bank
+2 and bank 3 respectively. Now, generate short wrapper functions in assembler
+looking similar to this one:
+
+        .code
+        .export _f1
+        .proc   _f1
+                sta     tmp1            ; Save A
+                lda     bank_register   ; Load current bank
+                pha                     ; Save current bank
+                lda     #1              ; Target bank number
+                sta     bank_register   ; Switch to target bank
+                lda     tmp1            ; Restore A
+                jsr     _f1_bank1       ; Call function in bank 1
+                pla                     ; Get old bank
+                sta     bank_register   ; Restore old bank
+                rts                     ; Return to caller
+        .endproc
+
+Because all the wrapper functions look very similar, one can easily use a
+macro to save some typing. Of course, C code in other banks needs to call the
+wrapper function f1() instead of the real function f1_bank1().
+
+While the wrappers have to reside in common memory, the actual functions go
+into separate banks. Since the runtime and C library together with all data is
+located in common memory, calling it from each of the banks is not a problem.
+
+Banking is somewhat expensive in terms of CPU cycles, and (at least when
+implemented as shown above) it needs 3 additional bytes on the return stack,
+so it is best to group complete subsystems into one bank, preferrably with
+just one entry point. Grouping stuff together is easily done by placing the
+code into a segment with a common name, and then tell the linker to relocate
+this segment to the base address of the banked memory.
+
+An example would be a printing subsystem that is called whenever the user
+chooses to print some text. It has just one entry point but many functions
+used to implement the necessary functionality, and all of these functions
+reside in one bank. There is exactly one wrapper function for the entry point,
+so the overhead in terms of additional code needed is not too large.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Bank%20Switching">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Bank%20Switching">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1603.html">Shawn Jefferson: "Re: [cc65] Bank Switching"</a>
+<li><strong>In reply to:</strong> <a href="1603.html">Shawn Jefferson: "Re: [cc65] Bank Switching"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-10-10 12:32:18 CEST</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Inserting Assembly Routin</title>
+<meta name="Author" content="MagerValp (MagerValp_at_cling.gu.se)">
+<meta name="Subject" content="Re: [cc65] Inserting Assembly Routines">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Inserting Assembly Routines</h1>
+<!-- received="Tue Nov 26 13:56:29 2002" -->
+<!-- isoreceived="20021126125629" -->
+<!-- sent="Tue, 26 Nov 2002 13:55:48 +0100" -->
+<!-- isosent="20021126125548" -->
+<!-- name="MagerValp" -->
+<!-- email="MagerValp_at_cling.gu.se" -->
+<!-- subject="Re: [cc65] Inserting Assembly Routines" -->
+<!-- id="15843.28500.35560.829912@panini.cling.gu.se" -->
+<!-- inreplyto="20021126122827.GA3553@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> MagerValp (<a href="mailto:MagerValp_at_cling.gu.se?Subject=Re:%20[cc65]%20Inserting%20Assembly%20Routines"><em>MagerValp_at_cling.gu.se</em></a>)<br>
+<strong>Date:</strong> 2002-11-26 13:55:48
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1799.html">Piotr Fusik: "RE: [cc65] Inserting Assembly Routines"</a>
+<li><strong>In reply to:</strong> <a href="1798.html">Ullrich von Bassewitz: "Re: [cc65] Inserting Assembly Routines"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1802.html">Ullrich von Bassewitz: "Re: [cc65] Inserting Assembly Routines"</a>
+<li><strong>Next in thread:</strong> <a href="1792.html">Ullrich von Bassewitz: "Re: [cc65] Inserting Assembly Routines"</a>
+<li><strong>Reply:</strong> <a href="1802.html">Ullrich von Bassewitz: "Re: [cc65] Inserting Assembly Routines"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+&gt;&gt;&gt;&gt;&gt; &quot;UvB&quot; == Ullrich von Bassewitz &lt;<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Inserting%20Assembly%20Routines">uz_at_musoftware.de</a>&gt; writes:
+
+UvB&gt; This is not an easy question, especially if you want to stay
+UvB&gt; portable between the platforms supported by the SCPU.
+
+This is a C64 only project, but it doesn't hurt to be portable.
+
+UvB&gt; Currently, all platforms with the exception of GEOS have
+UvB&gt; contignous zero page locations. GEOS divides them into three
+UvB&gt; chunks, but ptr1..4 do still live together. So another solution
+UvB&gt; would be to use ptr1/ptr2 for the first and ptr3/ptr4 for the
+UvB&gt; second zero page pointer (wasting one byte each time). This would
+UvB&gt; work for the C64, the C128 and for both using GEOS.
+
+As GEOS is of no interest here (it has its own way of dealing with
+expansion ram), ptr1/ptr2 and ptr4/tmp1 seems like the way to go,
+keeping ptr3 free (I need something for the unsigned int length as
+well).
+
+MV&gt; Should I use my own area for them (I'm a fan of $5f and up) or can
+MV&gt; I count on ptr1..4 and tmp1..4 staying in the same locations
+MV&gt; between cc65 releases?
+
+UvB&gt; Why do you need them in the same location between releases? Just
+UvB&gt; access them by name, and let the linker move it to the right
+UvB&gt; place.
+
+I think I meant relative to eachother, ptr2 following ptr1, etc.
+
+Thanks!
+
+-- 
+    ___          .     .  .         .       . +  .         .      o   
+  _|___|_   +   .  +     .     +         .  Per Olofsson, arkadspelare
+    o-o    .      .     .   o         +          <a href="mailto:MagerValp_at_cling.gu.se?Subject=Re:%20[cc65]%20Inserting%20Assembly%20Routines">MagerValp_at_cling.gu.se</a>
+     -       +            +    .     <a href="http://www.cling.gu.se/~cl3polof/">http://www.cling.gu.se/~cl3polof/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Inserting%20Assembly%20Routines">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1799.html">Piotr Fusik: "RE: [cc65] Inserting Assembly Routines"</a>
+<li><strong>In reply to:</strong> <a href="1798.html">Ullrich von Bassewitz: "Re: [cc65] Inserting Assembly Routines"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1802.html">Ullrich von Bassewitz: "Re: [cc65] Inserting Assembly Routines"</a>
+<li><strong>Next in thread:</strong> <a href="1792.html">Ullrich von Bassewitz: "Re: [cc65] Inserting Assembly Routines"</a>
+<li><strong>Reply:</strong> <a href="1802.html">Ullrich von Bassewitz: "Re: [cc65] Inserting Assembly Routines"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-11-26 13:57:14 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Issue with an initializer </title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Issue with an initializer using the address of an automatic variable" />
+<meta name="Date" content="2008-02-11" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Issue with an initializer using the address of an automatic variable</h1>
+<!-- received="Mon Feb 11 08:52:58 2008" -->
+<!-- isoreceived="20080211075258" -->
+<!-- sent="Mon, 11 Feb 2008 08:52:47 +0100" -->
+<!-- isosent="20080211075247" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Issue with an initializer using the address of an automatic variable" -->
+<!-- id="20080211075247.GA9718@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="f97798c20802101528k25e0c632w26f54086ceda1025&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5951.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Issue with an initializer using the address of an automatic variable&quot;">Next message</a> ]
+[ <a href="5949.html" title="Oliver Schmidt: &quot;[cc65] Issue with an initializer using the address of an automatic variable&quot;">Previous message</a> ]
+[ <a href="5949.html" title="Oliver Schmidt: &quot;[cc65] Issue with an initializer using the address of an automatic variable&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5951.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Issue with an initializer using the address of an automatic variable&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Issue%20with%20an%20initializer%20using%20the%20address%20of%20an%20automatic%20variable">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-02-11 08:52:47</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Good morning!
+
+On Mon, Feb 11, 2008 at 12:28:55AM +0100, Oliver Schmidt wrote:
+&gt; GCC and MS VC++ consider this fine while cc65 (recent snapshot) states:
+&gt;
+&gt; Error: Constant expression expected
+&gt; Warning: Converting integer to pointer without a cast
+&gt;
+&gt; Is this a cc65 bug?
+
+Actually two of them:-) For one, cc65 will not search in struct scope to
+resolve names. This is easily circumvented by writing &amp;s.i. Second, cc65 will
+not insert local symbols into the symbol table before initializing them, so
+while this works on a global level, it won't work on function level. The later
+should be fixable, I will have a look at it.
+
+Thanks for the report!
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Feb 11 08:52:58 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5951.html" title="Next message in the list">Spiro Trikaliotis: "Re: [cc65] Issue with an initializer using the address of an automatic variable"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5949.html" title="Previous message in the list">Oliver Schmidt: "[cc65] Issue with an initializer using the address of an automatic variable"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5949.html" title="Message to which this message replies">Oliver Schmidt: "[cc65] Issue with an initializer using the address of an automatic variable"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5951.html" title="Next message in this discussion thread">Spiro Trikaliotis: "Re: [cc65] Issue with an initializer using the address of an automatic variable"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5951.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Re: [cc65] Issue with an initializer using the address of an automatic variable"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5950" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5950" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5950" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-02-11 08:53:02 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] tgi interrupts?</title>
+<meta name="Author" content="Karri Kaksonen (karri1sipo.fi)" />
+<meta name="Subject" content="[cc65] tgi interrupts?" />
+<meta name="Date" content="2009-09-09" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] tgi interrupts?</h1>
+<!-- received="Wed Sep  9 11:22:56 2009" -->
+<!-- isoreceived="20090909092256" -->
+<!-- sent="Wed, 09 Sep 2009 12:22:42 +0300" -->
+<!-- isosent="20090909092242" -->
+<!-- name="Karri Kaksonen" -->
+<!-- email="karri1sipo.fi" -->
+<!-- subject="[cc65] tgi interrupts?" -->
+<!-- id="4AA773E2.1020800@sipo.fi" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6880.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] tgi interrupts?&quot;">Next message</a> ]
+[ <a href="6878.html" title="Oliver Schmidt: &quot;[cc65] More low hanging fruits for target independence&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6880.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] tgi interrupts?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Karri Kaksonen &lt;<a href="mailto:karri1sipo.fi?Subject=Re:%20[cc65]%20tgi%20interrupts?">karri1sipo.fi</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-09-09 11:22:42</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>In all my programs I have a VBL interrupt handler in order to swap 
+tgi_drawpage and tgi_showpage at a time when the user won't notice the 
+change.
+
+Somehow it would be nice to include this service to the cc65 libraries.
+
+Perhaps a separate tgi_utils.s ?
+
+.segment &quot;ZP_DATA&quot;
+_paused:
+     .byte     0
+_framecounter:
+     .byte     0
+     .byte     0
+     .byte     0
+_tgi_swapbuffers:
+     .byte     0
+_tgi_drawpage:
+     .byte     0
+
+.code
+                        
+.proc   _tgi_swap: near
+        pha
+        phx
+        phy
+        lda     _paused
+        bne     &#64;L0
+        inc     _framecounter
+        bne     &#64;L0
+        inc     _framecounter+1
+        bne     &#64;L0
+        inc     _framecounter+2
+&#64;L0:
+        lda     _tgi_swapbuffers
+        beq     &#64;L1
+        lda     _tgi_drawpage
+        jsr     _tgi_setviewpage
+        lda     _tgi_drawpage
+        eor     #$01
+        sta     _tgi_drawpage
+        jsr     _tgi_setdrawpage
+        stz     _drawPending
+&#64;L1:
+        ply
+        plx
+        pla
+        rts
+
+
+The variables _paused and _framecounter could be in ZP as they are very 
+usable for other things also.
+
+The framecounter can be used for controlling the tempo of the music.
+The framecounter can also be used as a source for a real time clock.
+
+The variable _tgi_swapbuffers is set by the game application to trigger 
+the swap buffer function.
+
+
+...
+game code
+...
+if (screen_update_needed &amp;&amp; !tgi_swapbuffers) {
+  ... draw stuff on the drawpage
+  tgi_swapbuffers = true;
+}
+
+The _tgi_swap code is called at every vertical blanking interrupt.
+
+--
+Karri
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Sep  9 11:22:56 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6880.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] tgi interrupts?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6878.html" title="Previous message in the list">Oliver Schmidt: "[cc65] More low hanging fruits for target independence"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6880.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] tgi interrupts?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Maybe reply</dfn>:  <a href="6880.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] tgi interrupts?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6879" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6879" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6879" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-09-09 11:22:58 CEST
+</em></small></p>
+</body>
+</html>

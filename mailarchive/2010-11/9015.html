@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] RS-232 on the C64</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="Re: [cc65] RS-232 on the C64" />
+<meta name="Date" content="2010-11-30" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] RS-232 on the C64</h1>
+<!-- received="Tue Nov 30 19:45:44 2010" -->
+<!-- isoreceived="20101130184544" -->
+<!-- sent="Tue, 30 Nov 2010 19:45:26 +0100" -->
+<!-- isosent="20101130184526" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="Re: [cc65] RS-232 on the C64" -->
+<!-- id="20101130184525.GL17484@trikaliotis.net" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="201011300720.24575.groepaz&#64;gmx.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9016.html" title="Groepaz: &quot;Re: [cc65] RS-232 on the C64&quot;">Next message</a> ]
+[ <a href="9014.html" title="Gábor Lénárt: &quot;Re: [cc65] C64DTV: different stack and zero page position + cc65&quot;">Previous message</a> ]
+[ <a href="9013.html" title="Groepaz: &quot;Re: [cc65] RS-232 on the C64&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9016.html" title="Groepaz: &quot;Re: [cc65] RS-232 on the C64&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20[cc65]%20RS-232%20on%20the%20C64">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-11-30 19:45:26</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello,
+
+* On Tue, Nov 30, 2010 at 07:20:24AM +0100 Groepaz wrote:
+ 
+&gt; &gt; However, VICE does implement virtual RS-232 through Kernal
+&gt; &gt; emulation code to a telnet connection.  Those work fine using
+&gt; &gt; the stock calls, since VICE intercepts them.  I'd like to get that
+&gt; &gt; working w/ vice.  I'll assume I need to go the route of direct Kernal
+&gt; &gt; calls.
+&gt; 
+&gt; it does? since when? :) afaik rs232 emulation doesnt use kernal traps at all,
+
+Right. Instead, it emulates bit-banging on the userport side. Thus,
+there is a bit-banging from inside (C64 KERNAL) working with the
+bit-banging from outside (VICE). It is a real surprise that it works at
+all. ;)
+
+&gt; and if you want to use telnet you still have to do hackish stuff with piping 
+&gt; i/o through something like tcpser.
+
+No, you do not. If you &quot;only&quot; need the data (TXD/RXD), you can directly
+connect to a port without the need to use tcpser.
+
+Regards,
+Spiro.
+
+-- 
+Spiro R. Trikaliotis                              <a href="http://opencbm.sf.net/">http://opencbm.sf.net/</a>
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>                     <a href="http://www.viceteam.org/">http://www.viceteam.org/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Nov 30 19:45:44 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9016.html" title="Next message in the list">Groepaz: "Re: [cc65] RS-232 on the C64"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9014.html" title="Previous message in the list">Gábor Lénárt: "Re: [cc65] C64DTV: different stack and zero page position + cc65"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9013.html" title="Message to which this message replies">Groepaz: "Re: [cc65] RS-232 on the C64"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9016.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] RS-232 on the C64"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9016.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] RS-232 on the C64"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9015" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9015" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9015" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-11-30 19:45:47 CET
+</em></small></p>
+</body>
+</html>

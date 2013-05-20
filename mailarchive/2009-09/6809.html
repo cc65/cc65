@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Own parameter call stack?</title>
+<meta name="Author" content="Karri Kaksonen (karri1sipo.fi)" />
+<meta name="Subject" content="Re: [cc65] Own parameter call stack?" />
+<meta name="Date" content="2009-09-03" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Own parameter call stack?</h1>
+<!-- received="Thu Sep  3 12:12:41 2009" -->
+<!-- isoreceived="20090903101241" -->
+<!-- sent="Thu, 03 Sep 2009 13:12:29 +0300" -->
+<!-- isosent="20090903101229" -->
+<!-- name="Karri Kaksonen" -->
+<!-- email="karri1sipo.fi" -->
+<!-- subject="Re: [cc65] Own parameter call stack?" -->
+<!-- id="4A9F968D.6060106@sipo.fi" -->
+<!-- charset="UTF-8" -->
+<!-- inreplyto="20090903092710.GB20987&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6810.html" title="Karri Kaksonen: &quot;Re: [cc65] Own parameter call stack?&quot;">Next message</a> ]
+[ <a href="6808.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Own parameter call stack?&quot;">Previous message</a> ]
+[ <a href="6808.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Own parameter call stack?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6810.html" title="Karri Kaksonen: &quot;Re: [cc65] Own parameter call stack?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Karri Kaksonen &lt;<a href="mailto:karri1sipo.fi?Subject=Re:%20[cc65]%20Own%20parameter%20call%20stack?">karri1sipo.fi</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-09-03 12:12:29</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Ullrich von Bassewitz wrote:
+&gt; On Thu, Sep 03, 2009 at 08:10:35AM +0200, Oliver Schmidt wrote:
+&gt;   
+&gt;&gt;&gt; Whow, that's really respectable.
+&gt;&gt;&gt;       
+&gt;&gt; Maybe a case for the cc65 web site 'Links' section?
+&gt;&gt;     
+&gt;
+&gt; Yes, good idea! Karri, do you have a project page or something? I would like
+&gt; to add a link from the cc65 pages.
+&gt;
+&gt; Regards
+&gt;
+&gt;
+&gt;         Uz
+&gt;
+&gt;
+&gt;   
+
+Well... Not really. I only have my home computer that has a public 
+address sipo.fi
+But it is only accessible now and then.
+
+Perhaps AtariAge could add it somewhere. Or perhaps I could add it to 
+the contrib section at cc65.org?
+
+Another thing is that the new compiler messes with the code and 
+introduced bugs in gameplay. The piles don't scroll as they should 
+anymore :(
+
+It appears that this routine (very bad code by me - just a last minute 
+hack) produces a zero always. Before it returned many values.
+
+int getOffY(Pile *pile, int card_in_pile, unsigned char start, unsigned 
+char end, int ds)
+{
+    int count;
+
+    count = Pile_cardsLeft(pile);
+    if (count &gt; start) {
+        while (count - card_in_pile &gt; end) {
+            --count;
+        }
+        return -ds * (count - start);
+    }
+    return 0;
+}
+
+The good old compiler produced code like this:
+; ---------------------------------------------------------------
+; int __near__ getOffY (__near__ struct $anon-struct-0008*, int, 
+unsigned char, unsigned char, int)
+; ---------------------------------------------------------------
+
+.segment    &quot;CARDS_CODE&quot;
+
+.proc    _getOffY: near
+
+.segment    &quot;CARDS_BSS&quot;
+
+L0074:
+    .res    2,$00
+
+.segment    &quot;CARDS_CODE&quot;
+
+;
+; count = Pile_cardsLeft(pile);
+;
+    ldy     #$09
+    jsr     pushwysp
+    jsr     _Pile_cardsLeft
+    sta     L0074
+    stx     L0074+1
+;
+; if (count &gt; start) {
+;
+    jsr     pushax
+    ldy     #$05
+    ldx     #$00
+    lda     (sp),y
+    jsr     tosicmp
+    bcc     L0078
+    beq     L0078
+;
+; while (count - card_in_pile &gt; end) {
+;
+L007A:    lda     L0074
+    ldx     L0074+1
+    jsr     pushax
+    ldy     #$07
+    jsr     ldaxysp
+    jsr     tossubax
+    jsr     pushax
+    ldy     #$04
+    ldx     #$00
+    lda     (sp),y
+    jsr     tosicmp
+    bcc     L007B
+    beq     L007B
+;
+; --count;
+;
+    sec
+    lda     L0074
+    sbc     #$01
+    sta     L0074
+    bcs     L007A
+    dec     L0074+1
+;
+; }
+;
+    bra     L007A
+;
+; return -ds * (count - start);
+;
+L007B:    jsr     ldax0sp
+    jsr     negax
+    jsr     pushax
+    lda     L0074
+    ldx     L0074+1
+    jsr     pushax
+    ldy     #$07
+    lda     (sp),y
+    jsr     tossuba0
+    jsr     tosumulax
+    jmp     incsp8
+;
+; return 0;
+;
+L0078:    ldx     #$00
+    txa
+;
+; }
+;
+    jmp     incsp8
+
+.endproc
+
+The current buggy compiler produces code like this:
+; ---------------------------------------------------------------
+; int __near__ getOffY (__near__ struct $anon-struct-0008*, int, 
+unsigned char, unsigned char, int)
+; ---------------------------------------------------------------
+
+.segment    &quot;CARDS_CODE&quot;
+
+.proc    _getOffY: near
+
+.segment    &quot;CARDS_BSS&quot;
+
+L0074:
+    .res    2,$00
+
+.segment    &quot;CARDS_CODE&quot;
+
+;
+; count = Pile_cardsLeft(pile);
+;
+    ldy     #$09
+    jsr     pushwysp
+    jsr     _Pile_cardsLeft
+    sta     L0074
+    stx     L0074+1
+;
+; if (count &gt; start) {
+;
+    ldy     #$03
+    cmp     (sp),y
+    txa
+    sbc     #$00
+    bcc     L0078
+    beq     L0078
+;
+; while (count - card_in_pile &gt; end) {
+;
+L007A:    lda     L0074
+    sec
+    ldy     #$04
+    sbc     (sp),y
+    pha
+    lda     L0074+1
+    iny
+    sbc     (sp),y
+    tax
+    pla
+    ldy     #$02
+    cmp     (sp),y
+    txa
+    sbc     #$00
+    bcc     L007B
+    beq     L007B
+;
+; --count;
+;
+    lda     L0074
+    sec
+    sbc     #$01
+    sta     L0074
+    bcs     L007A
+    dec     L0074+1
+;
+; }
+;
+    bra     L007A
+;
+; return -ds * (count - start);
+;
+L007B:    jsr     ldax0sp
+    jsr     negax
+    jsr     pushax
+    lda     L0074
+    sec
+    ldy     #$05
+    sbc     (sp),y
+    pha
+    lda     L0074+1
+    sbc     #$00
+    tax
+    pla
+    jsr     tosumulax
+    jmp     incsp8
+;
+; return 0;
+;
+L0078:    ldx     #$00
+    txa
+;
+; }
+;
+    jmp     incsp8
+
+.endproc
+
+--
+Karri
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Sep  3 12:12:41 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6810.html" title="Next message in the list">Karri Kaksonen: "Re: [cc65] Own parameter call stack?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6808.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Own parameter call stack?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6808.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Own parameter call stack?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6810.html" title="Next message in this discussion thread">Karri Kaksonen: "Re: [cc65] Own parameter call stack?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6810.html" title="Message sent in reply to this message">Karri Kaksonen: "Re: [cc65] Own parameter call stack?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6812.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] Own parameter call stack?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6813.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Own parameter call stack?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6809" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6809" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6809" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-09-03 12:12:44 CEST
+</em></small></p>
+</body>
+</html>

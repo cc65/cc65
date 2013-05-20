@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] c64 kernal 02 vs. 03</title>
+<meta name="Author" content="Thomas Giesel (skoe1directbox.com)" />
+<meta name="Subject" content="Re: [cc65] c64 kernal 02 vs. 03" />
+<meta name="Date" content="2009-09-26" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] c64 kernal 02 vs. 03</h1>
+<!-- received="Sat Sep 26 14:46:23 2009" -->
+<!-- isoreceived="20090926124623" -->
+<!-- sent="Sat, 26 Sep 2009 14:46:14 +0200" -->
+<!-- isosent="20090926124614" -->
+<!-- name="Thomas Giesel" -->
+<!-- email="skoe1directbox.com" -->
+<!-- subject="Re: [cc65] c64 kernal 02 vs. 03" -->
+<!-- id="20090926144614.68d652af@akoya" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="20090926083356.GE25690&#64;trikaliotis.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7036.html" title="Groepaz: &quot;Re: [cc65] library path&quot;">Next message</a> ]
+[ <a href="7034.html" title="Maspethrose71aol.com: &quot;[cc65] New version of Fields available!&quot;">Previous message</a> ]
+[ <a href="7031.html" title="Spiro Trikaliotis: &quot;Re: [cc65] c64 kernal 02 vs. 03&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7041.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] c64 kernal 02 vs. 03&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Thomas Giesel &lt;<a href="mailto:skoe1directbox.com?Subject=Re:%20[cc65]%20c64%20kernal%2002%20vs.%2003">skoe1directbox.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-09-26 14:46:14</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi all,
+
+&gt; From my (still incomplete) analysis, I think this fix is only needed
+&gt; if you output the backspace. Feel free to proove me wrong. ;)
+
+Maybe you didn't see the example program yesterday, which also crashs on
+02 kernals without using a backspace. After having slept enough, let me
+do the complete analysis:
+
+Let's have a look at one of the bad scenarious again:
+
+    for (;;)
+    {
+        cputcxy(39, 5, '*');
+    }
+
+This moves the cursor to the last coloumn of a line and prints a
+character. This leads to a movement of the cursor to the next line,
+which is fine normally. The next loop sets the cursor back and repeats
+the stuff. After a few loops the I/O memory behind the color RAM gets
+overwritten, e.g. CIA $dc00 etc.
+
+Why does this happen with 02 kernals? It's easy to explain, once the
+reason was found. Lets have a look what cputcxy does:
+
+Check libsrc/c64/putc.s and libsrc/cbm/gotoxy.s.
+
+First it calls _gotoxy, this functions writes the cursor position (39,5)
+to the right zeropage locations CURS_X = $d3 and CURS_Y = $d6. Then it
+jumps to &quot;plot&quot;, which is in putc.s. This function gets the cursor
+coordinated into the X/Y registers and calls the kernal vector $fff0
+(set cursor position). 
+
+Now follow the call chain in the Kernal: $fff0 =&gt; $e56c. Here we see
+the difference between the two kernals.
+(<a href="http://unusedino.de/ec64/technical/aay/c64/rome56c.htm">http://unusedino.de/ec64/technical/aay/c64/rome56c.htm</a>)
+
+The 03 kernal calculates, among others, the screen pointer at $d1/$d2,
+this is done by calling a function at $e9f0. Finally it jumps to $ea24
+to calculate the Color RAM pointer $f3/$f4.
+
+The 02 kernel DOES NOT calculate the color RAM pointer when being
+called at $fff0! It calculates the screen pointer only.
+
+Now lets go back to the libsrc. Our state is now that on a 03 kernal
+the color ram pointer and the screen pointer are in sync, while on
+a 02 kernal the Color RAM pointer hasn't been updated.
+
+After a few checks the label &quot;putchar&quot; is called. This functions writes
+the character to the current screen pointer and the color to the
+current Color RAM pointer (which is out of sync on a 02 kernal).
+
+After this is done the code at label &quot;advance&quot; finds out that we are
+on the last coloumn and branches to &quot;newline&quot;. This code adds the line
+length XSIZE to the color RAM pointer.
+
+There's nothing wrong with adding XSIZE at this point. But because in
+the test program above the Color RAM pointer is NEVER correctly
+updated, it goes higher and higher until it reaches other I/O memory.
+(Bang!)
+
+How to fix this? I'm still not sure about the best way, these are my
+ideas at the moment:
+
+1) Call $ea24 from &quot;plot&quot; to make sure the color RAM pointer gets
+   synchronized
+   - That's not an official kernal entry, does it work on other kernals
+     (e.g. Jiffy and many other modified kernels)?
+
+2) Check all of the callers which call $ea24
+   (<a href="http://unusedino.de/ec64/technical/aay/c64/romea24.htm">http://unusedino.de/ec64/technical/aay/c64/romea24.htm</a>)
+   Maybe there's one we can use from an official kernal entry point?
+
+3) Put the code from $ea24 into libsrc directly
+   - Only a few bytes, should be okay to add it to &quot;plot&quot; at
+     libsrc/c64/putc.s
+
+Which of these ways is your preference? I tend to 3).
+
+We also should check other functions of c64.lib regarding this issue.
+
+btw: The 02 Kernal can be found more often than I thought, many older
+board revisions have this kernal.
+
+Regards,
+
+Thomas
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Sep 26 14:46:23 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7036.html" title="Next message in the list">Groepaz: "Re: [cc65] library path"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7034.html" title="Previous message in the list">Maspethrose71aol.com: "[cc65] New version of Fields available!"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7031.html" title="Message to which this message replies">Spiro Trikaliotis: "Re: [cc65] c64 kernal 02 vs. 03"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7041.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] c64 kernal 02 vs. 03"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7041.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] c64 kernal 02 vs. 03"</a></li>
+<li><dfn>Reply</dfn>:  <a href="7051.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Re: [cc65] c64 kernal 02 vs. 03"</a></li>
+<li><dfn>Reply</dfn>:  <a href="7053.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Re: [cc65] c64 kernal 02 vs. 03"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7035" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7035" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7035" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-09-26 14:46:25 CEST
+</em></small></p>
+</body>
+</html>

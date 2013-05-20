@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] cc65 not producing .s output f</title>
+<meta name="Author" content="Apple2Stuff (apple2stuff1rogers.com)" />
+<meta name="Subject" content="[cc65] cc65 not producing .s output file" />
+<meta name="Date" content="2004-05-01" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] cc65 not producing .s output file</h1>
+<!-- received="Sat May  1 19:46:16 2004" -->
+<!-- isoreceived="20040501174616" -->
+<!-- sent="Sat, 1 May 2004 13:46:05 -0400" -->
+<!-- isosent="20040501174605" -->
+<!-- name="Apple2Stuff" -->
+<!-- email="apple2stuff1rogers.com" -->
+<!-- subject="[cc65] cc65 not producing .s output file" -->
+<!-- id="00b901c42fa4$2de12b90$6601a8c0@mypc" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="200404301109.46683.groepaz&#64;gmx.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4109.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] cc65 not producing .s output file&quot;">Next message</a> ]
+[ <a href="../2004-04/4107.html" title="Groepaz: &quot;Re: [cc65] cc65 macros&quot;">Previous message</a> ]
+[ <a href="../2004-04/4107.html" title="Groepaz: &quot;Re: [cc65] cc65 macros&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4109.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] cc65 not producing .s output file&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Apple2Stuff &lt;<a href="mailto:apple2stuff1rogers.com?Subject=Re:%20[cc65]%20cc65%20not%20producing%20.s%20output%20file">apple2stuff1rogers.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-05-01 19:46:05</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi, I have run into an odd problem where a .s file is not being produced by
+the c compiler....
+
+Other .c files in the same directory still compile properly. I can tell from
+the -v option that all the header files are being processed. If I comment
+out a header file I can tell that the compiler is processing the rest of the
+.c file (well at least until enough errors are reported and then it gives
+up).
+
+Here is the command
+
+$ cc65 -I apps -I ctk -I ek -I lib -I uip -I arch/cc65 -t apple2enh -T
+-DWITH_ETHERNET -DCTK_CONIO -DWITH_UIP -WITH_TFE -DWITH_TELNET
+-v -d -o w3100a.s arch/cc65/w3100a.c
+
+I get
+
+Opened include file `arch/cc65/w3100a.h'
+Opened include file `arch/cc65/uip_arch.h'
+Opened include file `uip/uip.h'
+Opened include file `uip/uipopt.h'
+Opened include file `/usr/lib/cc65/include/string.h'
+Opened include file `/usr/lib/cc65/include/stddef.h'
+Opened include file `ek/dispatcher.h'
+Opened include file `ek/ek.h'
+Opened include file `ek/ek-conf.h'
+Opened include file `/usr/lib/cc65/include/time.h'
+Opened include file `uip/uip.h'
+Opened include file `uip/uip_arp.h'
+Opened include file `uip/uip.h'
+Opened include file `arch/cc65/type.h'
+Opened include file `uip/uip.h'
+Opened include file `uip/uip_arp.h'
+Opened include file `arch/cc65/serial.h'
+Opened include file `arch/cc65/type.h'
+
+and no .s file is produced.
+
+I spent a few hours looking over my source files but I'm stumped ...
+
+Any thoughts on where to look or how to debug this would be appreciated
+
+
+Personal Website: <a href="http://members.rogers.com/rg.jones/">http://members.rogers.com/rg.jones/</a>
+Apple Specific Website <a href="http://members.rogers.com/apple2stuff/apple.htm">http://members.rogers.com/apple2stuff/apple.htm</a>
+Email: Reply to apple2stuff at rogers dot com
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat May  1 19:46:16 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4109.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] cc65 not producing .s output file"</a></li>
+<li><dfn>Previous message</dfn>: <a href="../2004-04/4107.html" title="Previous message in the list">Groepaz: "Re: [cc65] cc65 macros"</a></li>
+<li><dfn>In reply to</dfn>: <a href="../2004-04/4107.html" title="Message to which this message replies">Groepaz: "Re: [cc65] cc65 macros"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4109.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] cc65 not producing .s output file"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4109.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] cc65 not producing .s output file"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4108" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4108" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4108" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-05-01 19:46:22 CEST
+</em></small></p>
+</body>
+</html>

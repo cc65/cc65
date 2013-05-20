@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Zeropage Vars</title>
+<meta name="Author" content="Tachdaun (tachdaun1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] Zeropage Vars" />
+<meta name="Date" content="2009-02-06" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Zeropage Vars</h1>
+<!-- received="Fri Feb  6 17:54:36 2009" -->
+<!-- isoreceived="20090206165436" -->
+<!-- sent="Fri, 06 Feb 2009 14:53:31 -0300" -->
+<!-- isosent="20090206175331" -->
+<!-- name="Tachdaun" -->
+<!-- email="tachdaun1gmail.com" -->
+<!-- subject="Re: [cc65] Zeropage Vars" -->
+<!-- id="498C791B.7080609@gmail.com" -->
+<!-- charset="UTF-8" -->
+<!-- inreplyto="20090205200555.GB16077&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6473.html" title="Tachdaun: &quot;Re: [cc65] Zeropage Vars&quot;">Next message</a> ]
+[ <a href="6471.html" title="Ullrich von Bassewitz: &quot;[cc65] Zeropage Regbank&quot;">Previous message</a> ]
+[ <a href="6465.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Zeropage Vars&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6473.html" title="Tachdaun: &quot;Re: [cc65] Zeropage Vars&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Tachdaun &lt;<a href="mailto:tachdaun1gmail.com?Subject=Re:%20[cc65]%20Zeropage%20Vars">tachdaun1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-02-06 18:53:31</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a></pre>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<head>
+  <meta content="text/html;charset=UTF-8" http-equiv="Content-Type">
+</head>
+<body bgcolor="#ffffff" text="#000000">
+Thanks!<br>
+very useful info.<br>
+<br>
+Ullrich von Bassewitz wrote:
+<blockquote cite="mid:20090205200555.GB16077@trixie.musoftware.de"
+ type="cite">
+  <pre wrap="">
+For a variable to be accessible from C, there must be two conditions met:
+
+  1. The symbol must be .export'ed from an object file somewhere.
+
+  2. The symbol must begin with an underscore, which is automatically
+     prepended to all external C identifiers.
+
+The tickcount symbol doesn't meet either condition, so you cannot use it from
+C as is.
+
+But there's a simple workaround. Write a small assembler module containing
+
+        .include        "nes.inc"
+        _tickcount      := tickcount
+        .exportzp       _tickcount
+
+and link the resulting .o file to your application. This will enable you to
+use tickcount as described in one of my last mails
+
+  </pre>
+  <blockquote type="cite">
+    <pre wrap="">How's the correct way to do this? if it's possible?
+Does #pragma zpsym() create a var in the zp?
+    </pre>
+  </blockquote>
+  <pre wrap=""><!---->You can answer questions like this yourself: Just compile your sources using
+the "-g" and "-T" command line switches. The former will add debug infos, so
+code is attributed with line numbers of the source file, while the latter will
+add the actual source file lines to the assembly. Checking the assembly code
+will show exactly what code was generated for each C source line.
+
+Regards
+
+
+        Uz
+
+
+  </pre>
+</blockquote>
+</body>
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo@musoftware.de with
+the string "unsubscribe cc65" in the body(!) of the mail.
+<span id="received"><dfn>Received on</dfn> Fri Feb  6 17:54:36 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6473.html" title="Next message in the list">Tachdaun: "Re: [cc65] Zeropage Vars"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6471.html" title="Previous message in the list">Ullrich von Bassewitz: "[cc65] Zeropage Regbank"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6465.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Zeropage Vars"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6473.html" title="Next message in this discussion thread">Tachdaun: "Re: [cc65] Zeropage Vars"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6472" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6472" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6472" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-02-06 17:54:38 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] feature questions...</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="[cc65] feature questions...">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] feature questions...</h1>
+<!-- received="Wed Sep 24 06:21:58 2003" -->
+<!-- isoreceived="20030924042158" -->
+<!-- sent="Wed, 24 Sep 2003 06:16:50 +0200" -->
+<!-- isosent="20030924041650" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="[cc65] feature questions..." -->
+<!-- id="200309240616.51088.groepaz@gmx.net" -->
+<!-- inreplyto="200309240144.00724.groepaz@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20feature%20questions..."><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2003-09-24 06:16:50
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3446.html">Groepaz: "Re: [cc65] Platform specific docs"</a>
+<li><strong>In reply to:</strong> <a href="3446.html">Groepaz: "Re: [cc65] Platform specific docs"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3452.html">Ullrich von Bassewitz: "Re: [cc65] feature questions..."</a>
+<li><strong>Next in thread:</strong> <a href="3451.html">Ullrich von Bassewitz: "Re: [cc65] Platform specific docs"</a>
+<li><strong>Reply:</strong> <a href="3452.html">Ullrich von Bassewitz: "Re: [cc65] feature questions..."</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+mmmh... i was wondering if this is possible...
+
+in one project i am using a real lot of macros for readability, but while 
+thats nice for actual coding, it can be a major drawback when debugging and 
+additionally, it makes any form of automatic optimizing (a peephole run would 
+make a lot of sence here) kindof impossible.
+
+so is there a possibility to make ca65 ouput the &quot;preprocessed&quot; assembler 
+code? something like the list-file, but in a format that can be assembled by 
+ca65 again?
+
+tjam, then for a totally different thingy.... a compiler option that would 
+make the compiler threat &quot;int&quot; as &quot;signed long&quot; (ie 32 vs 16 bit ints) could 
+be really useful when you are porting code and are wondering why the hell it 
+doesnt work as intended...if it changes behaviour with 32 bit ints, you know 
+whats the problem atleast :=P (no idea how deep the 16bit thing is hardcoded 
+into the compiler though, making it an option might be anything from easy to 
+impossible depending on the implementation :=P)
+
+gpz
+
+ps...oh and i noticed another thing....on your FAQ page there is a big 
+paragraph about the .org directive and the difference between ca65/ld65 and 
+other simplier assemblers, but yet it doesnt tell how to exactly &quot;emulate&quot; 
+their simplier behaviour (and your suggestion is somewhat misleading too 
+IMHO) .... since this is something ppl tend to ask me every now and then, why 
+not add this snippet ... :o)
+
+Q: I just want to use ca65 the same way i was using the infamous TASS on the 
+C64 before, i dont need the additional features provided by the linker - so 
+how to do this?
+
+A: You need to use some of the ca65 emulation features to simulate the 
+behaviour of such simple assemblers, for example like this:
+
+1) prepare your sourcecode like this:
+
+; if you want TASS style labels without colons
+.feature labels_without_colons
+; if you want TASS style character constants (&quot;a&quot; instead of the default 'a')
+.feature loose_char_term
+
+	.word *+2	; the cbm load address
+
+	[yourcode here]
+
+notice that the two emulation features are mostly useful for porting sources 
+originally written in/for TASS, they are not needed for the actual &quot;simple 
+assembler operation&quot; and are not recommended if you are writing new code from 
+scratch.
+
+2) replace all programcounter assignments (which are not possible in ca65 by 
+default, and the respective emulation feature works different from what you'd 
+expect too) by another way to skip to another memory location, for example 
+the .res directive
+
+	; *=$2000
+	.res $2000-*	; reserve memory up to $2000
+
+notice that other than the original TASS, ca65 can never move the 
+programmcounter backwards - think of it as if you are assembling to disc with 
+TASS.
+
+3) conditional assembly (.ifeq/.endif/.goto etc) must be rewritten to match 
+ca65 syntax - most importantly notice that due to the lack of .goto 
+everything involving loops must be replaced by .repeat (consult the ca65 docs 
+for more)
+
+4) to assemble code to a different address than it is executed at, use the 
+.org directive instead of .offs-constructs
+
+	.org $1800
+
+	[floppy code here]
+
+	.reloc	; back to normal
+
+5) then assemble like this:
+
+cl65 --start-addr 0x0ffe -t none myprog.s -o myprog.prg
+
+notice that you need to use the actual start address minus two, since two 
+bytes are used for the cbm loadaddress
+
+....
+
+
+mmmh, maybe rephrase it a bit, but other than that it should give those a clue 
+who come from other assemblers to ca65 :) (and yeah, its actually possible to 
+do without making any linker configs :))
+
+oh and in ca65 docs you suggest using &quot;pc_assignment&quot; for emulating xa65... 
+are you sure about this? in TASS (and several crossassembler that are clones 
+of it) atleast a programmcounter assignment really moves the programcounter 
+(ie, both run AND load address) and not only the (run-)address (eh tricky 
+terminology here...so whats the correct term for &quot;the address we are 
+assembling to&quot; and &quot;the address we are currently assembling at&quot; ? :=P) 
+so...not sure if the &quot;progcount assignment means .org&quot; is really accurate 
+.... TASS and derivates use .offs for what is .org in ca65, and i _think_ 
+there is a simelar thing in xa65 too.
+
+tjam...that reminds me of the &quot;ca65 vs other assemblers&quot; table i have started 
+once...maybe i should bring it into a useable state too :=P (can anyone 
+recommend a way to layout a large table? its currently in html, but not 
+really useful due to its size - lots of scrolling involved etc :/)
+
+mmhz...that became much more text than intended :=P so...lets stop :=P
+
+gpz
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20feature%20questions...">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3446.html">Groepaz: "Re: [cc65] Platform specific docs"</a>
+<li><strong>In reply to:</strong> <a href="3446.html">Groepaz: "Re: [cc65] Platform specific docs"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3452.html">Ullrich von Bassewitz: "Re: [cc65] feature questions..."</a>
+<li><strong>Next in thread:</strong> <a href="3451.html">Ullrich von Bassewitz: "Re: [cc65] Platform specific docs"</a>
+<li><strong>Reply:</strong> <a href="3452.html">Ullrich von Bassewitz: "Re: [cc65] feature questions..."</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-09-24 06:22:19 CEST</em>
+</em>
+</small>
+</body>
+</html>

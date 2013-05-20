@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] controlling location of li</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] controlling location of literal storage" />
+<meta name="Date" content="2009-03-11" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] controlling location of literal storage</h1>
+<!-- received="Wed Mar 11 19:25:58 2009" -->
+<!-- isoreceived="20090311182558" -->
+<!-- sent="Wed, 11 Mar 2009 19:23:34 +0100" -->
+<!-- isosent="20090311182334" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] controlling location of literal storage" -->
+<!-- id="20090311182334.GA17964@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="7b4c32$2kei7a&#64;dmzms99801.na.baesystems.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6546.html" title="newsclan(zhblue): &quot;[cc65] Bank Switching on NES&quot;">Next message</a> ]
+[ <a href="6544.html" title="Winslow, Dan D (US SSA): &quot;[cc65] controlling location of literal storage&quot;">Previous message</a> ]
+[ <a href="6544.html" title="Winslow, Dan D (US SSA): &quot;[cc65] controlling location of literal storage&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6546.html" title="newsclan(zhblue): &quot;[cc65] Bank Switching on NES&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20controlling%20location%20of%20literal%20storage">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-03-11 19:23:34</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Wed, Mar 11, 2009 at 11:14:24AM -0700, Winslow, Dan D (US SSA) wrote:
+&gt; Is there a way to force these literals to be in the same output file as
+&gt; the variables that point to them are?
+
+The literal pool is written into the rodata segment (or the data segment if
+--writable-strings is in effect). This is done after compilation is complete.
+In your case, one of the last actions is to restore the rodata segment to it's
+initial value - and this is where the literal pool finally goes.
+
+If you remove the push/pop sequence and just set the new segment name, things
+will probably work as you expect it. This can be easily controlled in the
+generated assembler source without first generating any output files by the
+linker.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Mar 11 19:25:58 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6546.html" title="Next message in the list">newsclan(zhblue): "[cc65] Bank Switching on NES"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6544.html" title="Previous message in the list">Winslow, Dan D (US SSA): "[cc65] controlling location of literal storage"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6544.html" title="Message to which this message replies">Winslow, Dan D (US SSA): "[cc65] controlling location of literal storage"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6546.html" title="Next message in this discussion thread">newsclan(zhblue): "[cc65] Bank Switching on NES"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6546.html" title="Message sent in reply to this message">newsclan(zhblue): "[cc65] Bank Switching on NES"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6545" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6545" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6545" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-03-11 19:26:00 CET
+</em></small></p>
+</body>
+</html>

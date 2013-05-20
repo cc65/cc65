@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] VICE/NESICIDE integration</title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="Re: [cc65] VICE/NESICIDE integration" />
+<meta name="Date" content="2012-03-28" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] VICE/NESICIDE integration</h1>
+<!-- received="Wed Mar 28 16:12:31 2012" -->
+<!-- isoreceived="20120328141231" -->
+<!-- sent="Wed, 28 Mar 2012 16:13:15 +0200" -->
+<!-- isosent="20120328141315" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="Re: [cc65] VICE/NESICIDE integration" -->
+<!-- id="201203281613.15228.groepaz@gmx.net" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="CAKDufpABS5KPVUBshqqP-g6OOyY54Qh0F03amqg-CvndYdfHsg&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10222.html" title="Spiro Trikaliotis: &quot;Re: [cc65] VICE/NESICIDE integration&quot;">Next message</a> ]
+[ <a href="10220.html" title="Christopher Pow: &quot;Re: [cc65] VICE/NESICIDE integration&quot;">Previous message</a> ]
+[ <a href="10218.html" title="Christopher Pow: &quot;Re: [cc65] VICE/NESICIDE integration&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10222.html" title="Spiro Trikaliotis: &quot;Re: [cc65] VICE/NESICIDE integration&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20VICE/NESICIDE%20integration">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-03-28 16:13:15</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Wednesday 28 March 2012, you wrote:
+&gt; The NES, which is what I started with, has a well-known set of
+&gt; cartridge memory controller chips.  I need to refresh my memory on how
+&gt; the C=64 or its cartridges control different memory regions.  If VICE
+&gt; doesn't have the ability to retrieve whatever is mapped at whatever
+&gt; memory region currently, is that something that can be added?
+
+that would be quite complex, as said. the respective code in vice somewhat 
+tries to model how it works on the real hardware, meaning it just &quot;looks 
+through&quot; the cartridge port, and the rest of the emulation doesnt (need to) 
+know whats behind it. compared to the NES, not only the port is much more 
+complex (a cartridge may generate interrupts or nmis, or even take over the 
+bus and disable the cpu to do dma). there are also many more different types 
+of cartridges (about 60 or so emulated right now, not counting i/o only 
+extensions) and they are very different in some cases, so putting them into 
+some kind of generic memory mapping scheme is quite a task.
+
+&gt; It appears [as I would expect] that the VIC and SID chips are memory
+&gt; mapped so I can access them using the &quot;m&quot; or &quot;&gt;&quot; commands.  Perhaps an
+&gt; extension to that command could specify which &quot;region&quot; to read or
+&gt; write to if multiple regions can be mapped at that address?
+
+you can do that with the &quot;bank&quot; command in the vice monitor
+
+bank cpu - gives you whatever the cpu sees right now
+bank ram - always (c64) ram
+bank rom - always (c64) rom
+bank cart - enables cartridge rom (at ROML and ROMH, depending on current 
+mode) even if currently mapped out by the PLA
+bank io - to get i/o area at $dxxx
+
+(maybe for accessing i/o its a better idea to use the &quot;io&quot; command though, as 
+it will also show what i/o is actually available)
+
+generally you will mostly use the cpu bank when stepping through code, and the 
+others for inspecting things :)
+
+-- 
+
+<a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    <a href="http://magicdisk.untergrund.net">http://magicdisk.untergrund.net</a>
+<a href="http://www.pokefinder.org">http://www.pokefinder.org</a>        <a href="http://ftp.pokefinder.org">http://ftp.pokefinder.org</a>
+
+Wer Ficken super findet hat noch nie was anstaendiges gegessen. 
+&lt;Jihad/Hitmen&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Mar 28 16:12:31 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10222.html" title="Next message in the list">Spiro Trikaliotis: "Re: [cc65] VICE/NESICIDE integration"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10220.html" title="Previous message in the list">Christopher Pow: "Re: [cc65] VICE/NESICIDE integration"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10218.html" title="Message to which this message replies">Christopher Pow: "Re: [cc65] VICE/NESICIDE integration"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10222.html" title="Next message in this discussion thread">Spiro Trikaliotis: "Re: [cc65] VICE/NESICIDE integration"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10221" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10221" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10221" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-03-28 16:12:34 CEST
+</em></small></p>
+</body>
+</html>

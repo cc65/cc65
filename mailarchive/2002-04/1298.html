@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Atari file i/o functions</title>
+<meta name="Author" content="Shawn Jefferson (sjefferson_at_sd62.bc.ca)">
+<meta name="Subject" content="Re: [cc65] Atari file i/o functions">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Atari file i/o functions</h1>
+<!-- received="Wed Apr 24 22:28:44 2002" -->
+<!-- isoreceived="20020424202844" -->
+<!-- sent="Wed, 24 Apr 2002 13:28:29 -0700" -->
+<!-- isosent="20020424202829" -->
+<!-- name="Shawn Jefferson" -->
+<!-- email="sjefferson_at_sd62.bc.ca" -->
+<!-- subject="Re: [cc65] Atari file i/o functions" -->
+<!-- id="scc6b30f.028@gwmail.sd62.bc.ca" -->
+<!-- inreplyto="[cc65] Atari file i/o functions" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Shawn Jefferson (<a href="mailto:sjefferson_at_sd62.bc.ca?Subject=Re:%20[cc65]%20Atari%20file%20i/o%20functions"><em>sjefferson_at_sd62.bc.ca</em></a>)<br>
+<strong>Date:</strong> 2002-04-24 22:28:29
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1297.html">Ullrich von Bassewitz: "Re: [cc65] Atari file i/o functions"</a>
+<li><strong>Maybe in reply to:</strong> <a href="1286.html">Shawn Jefferson: "[cc65] Atari file i/o functions"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1299.html">Ullrich von Bassewitz: "Re: [cc65] Atari file i/o functions"</a>
+<li><strong>Reply:</strong> <a href="1299.html">Ullrich von Bassewitz: "Re: [cc65] Atari file i/o functions"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+&gt;&gt;&gt; Christian Groessler &lt;<a href="mailto:cpg_at_aladdin.de?Subject=Re:%20[cc65]%20Atari%20file%20i/o%20functions">cpg_at_aladdin.de</a>&gt; 04/24/02 03:40AM &gt;&gt;&gt;
+&gt;I took a look at the source for the atari library and I figured that
+&gt;fseek and ftell could be implemented for SpartaDOS fairly easily,
+&gt;since SpartaDOS implements a sane NOTE and POINT functions in the
+&gt;FMS.  POINT is XIO#37 and NOTE is XIO #38.  AtariDOS is another story
+&gt;since it doesn't use an offset from the beginning of the file like
+&gt;SpartaDOS... it uses sector and byte!  Ugh!
+
+I don't know about SpartaDOS, but since I'm using it all the time and
+if it has &quot;sane&quot; NOTE and POINT, it'd be worthwile to implement
+fseek/ftell for it.
+
+I just did some testing in basic with SpartaDOS v3.3a and there are several XIO functions that work like this:
+
+XIO 37 - POINT:
+  Aux3 lo byte (&lt;256)
+  Aux4 high byte ( * 256)
+  Aux5 highest byte (* 65536)
+
+XIO 38 - NOTE:
+  Returns file position in Aux3-5 like POINT.
+
+XIO 39 - file length (could use this for SEEK_END):
+  Returns file position in Aux3-5 like POINT.
+
+I propose doing lseek something like this:
+
+off_t __fastcall__ lseek(int fd, off_t offset, int whence)
+{
+  off_t pos;
+
+
+  switch(whence) {
+    SEEK_SET:
+      pos = 0;
+      break;
+    SEEK_CUR:
+      pos = note(fd);                   // XIO #38 SpartaDOS
+      break;
+    SEEK_END:
+      pos = filesize(fd);               // XIO #39 SpartaDOS
+      break;
+  }
+
+  pos += offset;
+  
+  // we could check for seek_cur and offset of 0 and not call point
+  point(fd, pos);                     // XIO #37 SpartaDOS
+
+  pos = note(fd);
+  return(pos);
+}
+
+and implementing note, point and filesize as assembly functions.  Of course this doesn't work in AtariDOS since it needs a bunch of magic to go from sector/byte to offset..  Do you know how MyDOS implements XIO 37, 38 (and 39?)
+
+I think I could figure out how to write the assembly for these functions, but am at a bit of a loss as to error checking and returning, etc... and will probably never be able to compile the atari library as I'm not running linux anywhere.  Someone else would have to compile and test it, unfortunately.
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Atari%20file%20i/o%20functions">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1297.html">Ullrich von Bassewitz: "Re: [cc65] Atari file i/o functions"</a>
+<li><strong>Maybe in reply to:</strong> <a href="1286.html">Shawn Jefferson: "[cc65] Atari file i/o functions"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1299.html">Ullrich von Bassewitz: "Re: [cc65] Atari file i/o functions"</a>
+<li><strong>Reply:</strong> <a href="1299.html">Ullrich von Bassewitz: "Re: [cc65] Atari file i/o functions"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-04-24 22:29:50 CEST</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] optimizer?</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] optimizer?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] optimizer?</h1>
+<!-- received="Sun Jun 24 22:04:50 2001" -->
+<!-- isoreceived="20010624200450" -->
+<!-- sent="Sun, 24 Jun 2001 22:04:55 +0200" -->
+<!-- isosent="20010624200455" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] optimizer?" -->
+<!-- id="20010624220455.A608@trixie.musoftware.de" -->
+<!-- inreplyto="9625462635.20010624213230@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20optimizer?"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2001-06-24 22:04:55
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0541.html">groepaz: "Re[2]: [cc65] optimizer?"</a>
+<li><strong>Previous message:</strong> <a href="0539.html">groepaz: "Re[2]: [cc65] optimizer?"</a>
+<li><strong>In reply to:</strong> <a href="0539.html">groepaz: "Re[2]: [cc65] optimizer?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0541.html">groepaz: "Re[2]: [cc65] optimizer?"</a>
+<li><strong>Reply:</strong> <a href="0541.html">groepaz: "Re[2]: [cc65] optimizer?"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Sun, Jun 24, 2001 at 09:32:30PM +0200, groepaz wrote:
+&gt; well, ofcoz optimization should be somehow control-able on sourcecode
+&gt; level..... so the programmer can exclude certain routines of which he
+&gt; knows they are already optimal.... other than that, all those
+&gt; optimization would never break the code (result in non-working code)
+&gt; but instead _maybe_ make it perform worse than before.... that can
+&gt; easily be determined through profiling (aka testing ;D) though, so i
+&gt; guess one can live with that.
+
+What about something like
+
+        acia    = $DC00
+	data    = $00
+
+     	lda     acia+data		; dummy read
+	lda  	#$00
+	...
+
+The first load is a dummy read, but it is needed in some way to initialize
+hardware, acknowledge an interrupt or whatever. An optimizer would have a
+really hard time to figure this out.
+
+&gt; uhm well... would there be a real difference in optimizing binary vs
+&gt; assembler code ? (except with assembler code you get much more
+&gt; information about the code structure, dont have to guess code adresses
+&gt; that are loaded as 8bit lo/hi pairs etc)
+
+You don't have to mess with expressions when using binary code. It is easy to
+detect that things like
+
+        foo     = $02
+        bar  	= $02
+    	lda	foo
+    	...
+    	lda	bar
+
+are accessing the same location. Or what about
+
+        foo     = $02
+        bar  	= $01
+    	lda	foo
+    	...
+    	lda	bar*2
+
+Having an optimizer working on source code, you need to mimic the complete
+symbol handling of the assembler, including local symbols and so on. Or
+something like
+
+       	.import	foo, bar
+
+	jmp	foo
+	...
+	jmp	bar
+
+foo and bar may in fact resolve to the same address which would allow some
+speed and/or size optimizations, but an optimizer working on source code would
+not have the necessary knowledge, while this would be easy to detect when
+working with binary code.
+
+Regards
+
+
+        Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20optimizer?">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20optimizer?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0541.html">groepaz: "Re[2]: [cc65] optimizer?"</a>
+<li><strong>Previous message:</strong> <a href="0539.html">groepaz: "Re[2]: [cc65] optimizer?"</a>
+<li><strong>In reply to:</strong> <a href="0539.html">groepaz: "Re[2]: [cc65] optimizer?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0541.html">groepaz: "Re[2]: [cc65] optimizer?"</a>
+<li><strong>Reply:</strong> <a href="0541.html">groepaz: "Re[2]: [cc65] optimizer?"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:40 CET</em>
+</em>
+</small>
+</body>
+</html>

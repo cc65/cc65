@@ -1,0 +1,157 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Bug Hunting Odysee</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Bug Hunting Odysee">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Bug Hunting Odysee</h1>
+<!-- received="Thu Jul 11 21:30:57 2002" -->
+<!-- isoreceived="20020711193057" -->
+<!-- sent="Thu, 11 Jul 2002 21:31:02 +0200" -->
+<!-- isosent="20020711193102" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Bug Hunting Odysee" -->
+<!-- id="20020711193102.GB24415@trixie.musoftware.de" -->
+<!-- inreplyto="9125177491.20020711205105@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Bug%20Hunting%20Odysee"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-07-11 21:31:02
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1465.html">groepaz: "[cc65] Bug Hunting Odysee"</a>
+<li><strong>In reply to:</strong> <a href="1465.html">groepaz: "[cc65] Bug Hunting Odysee"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1482.html">groepaz: "Re[2]: [cc65] Bug Hunting Odysee"</a>
+<li><strong>Reply:</strong> <a href="1482.html">groepaz: "Re[2]: [cc65] Bug Hunting Odysee"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Thu, Jul 11, 2002 at 08:51:05PM +0200, groepaz wrote:
+&gt;    YES... a quick hack inside cl65 proves it.... it doesnt pass -O
+&gt;    flags at ALL !!!
+&gt;
+&gt;    PHEW... and the solution is so easy, just never put any switches
+&gt;    after filenames .. doh :~] this has probably caused other problems
+&gt;    before aswell, argls ;/
+
+There are many command line tools out there that process the command line from
+left to right. For a compiler that could mean that -O remembers the flag, and
+the occurrance of a file name compiles that file. Now, if the file name comes
+first, and then the -O flag, the file is first compiled and then the -O switch
+is remembered for later...
+
+So a general rule (not only for cc65) is that options should always preceed
+file names on the command line if the docs do not say that it is ok the other
+way round. The order is also clearly stated in the output of the --help
+option:
+
+	uz_at_trixie:~/tmp$ cl65 --help
+	Usage: cl65 [options] file
+
+Note the order: 1.  2.        3.
+
+Now the good news: All tools that take just one file name will accept an
+arbitrary position of the options. The file name is remembered and the file is
+processed when the command line is parsed completely. For tools taking any
+number of file names (cl65 comes to mind) this is more overhead, because an
+unknown number of file names must be remembered. So these tools process the
+files when they appear on the command line, which means that any options
+occuring behind the name are still processed but have no effect when
+processing files that preceed it.
+
+I hope this explains why things are as they are :-)
+
+&gt;    ok, so now this should have really been it.... i changed all my
+&gt;    environment to always put filenames last on the command line and i
+&gt;    use -Ors now..... looks like this fixes most of the problems i had,
+&gt;    cheers :o)
+
+Good to hear that :-)
+
+&gt; ok, for the -Oi bug its your turn now i guess :o)
+
+The base routine for printf() contains a
+
+	jmp	(ind)
+
+command. The linker should warn if the argument address crosses a page
+boundary, but it does not. Your code seems to trigger that bug. Please try to
+reorder the array program (move the f() and g() functions before main() in the
+source) and recompile it with the command line switches that were not working.
+If the program works now, it is the bug described above. I have already fixed
+the problem in the development version (using jmp (ind) is never a good idea,
+even with a linker extension, because there are output formats - o65 for
+example - where the final address is not known).
+
+&gt; 1) in cl65 cmdline-help is a typo.... it should be &quot;compile and
+&gt;    assemble&quot; not &quot;Compiler ...&quot; :=D
+
+Thanks, fixed!
+
+&gt; 2) there should be an easy way to let cl65 print the commandline it
+&gt; uses to call sub-processes. would have saved me some time atleast i
+&gt; guess :o) (i quickly hacked it to do that actually ;=P)
+
+Good idea. I will output this information when the -d (debug) switch is used.
+
+Regards
+
+
+	Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Bug%20Hunting%20Odysee">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Bug%20Hunting%20Odysee">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1465.html">groepaz: "[cc65] Bug Hunting Odysee"</a>
+<li><strong>In reply to:</strong> <a href="1465.html">groepaz: "[cc65] Bug Hunting Odysee"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1482.html">groepaz: "Re[2]: [cc65] Bug Hunting Odysee"</a>
+<li><strong>Reply:</strong> <a href="1482.html">groepaz: "Re[2]: [cc65] Bug Hunting Odysee"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-07-11 21:31:07 CEST</em>
+</em>
+</small>
+</body>
+</html>

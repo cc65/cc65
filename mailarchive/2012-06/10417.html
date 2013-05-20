@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] C64 Userport Serial Driver</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] C64 Userport Serial Driver" />
+<meta name="Date" content="2012-06-26" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] C64 Userport Serial Driver</h1>
+<!-- received="Tue, 26 Jun 2012 17:22:31 +0200" -->
+<!-- isoreceived="20120626152231" -->
+<!-- sent="Tue, 26 Jun 2012 17:22:31 +0200" -->
+<!-- isosent="20120626152231" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] C64 Userport Serial Driver" -->
+<!-- id="CACT=u70=hnZcqacBa2j3dOxc1NEmqbxzVw-4QZCDY4BE9dhYVQ@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20120625184856.GC12876&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10418.html" title="Oliver Schmidt: &quot;Re: [cc65] C64 Userport Serial Driver&quot;">Next message</a> ]
+[ <a href="10416.html" title="Payton Byrd: &quot;Re: [cc65] Common macros for dirent.d_type&quot;">Previous message</a> ]
+[ <a href="10405.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] C64 Userport Serial Driver&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10418.html" title="Oliver Schmidt: &quot;Re: [cc65] C64 Userport Serial Driver&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20C64%20Userport%20Serial%20Driver">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-06-26 17:22:31</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Uz,
+
+&gt; On Mon, Jun 25, 2012 at 01:00:28PM -0500, Payton Byrd wrote:
+&gt;&gt;    Are there any plans to implement a serial driver for the userport on the
+&gt;&gt;    C64?  I am working on a project that uses EasyFlash (thus no
+&gt;&gt;    SwiftLink/Turbo232) and need RS232 communications.
+&gt;
+&gt; At least not by me. The problem with this approach is that the driver must
+&gt; permanently poll the user port, otherwise it will loose characters.
+
+We had this discussion in Nov 2010:
+<a href="http://www.cc65.org/mailarchive/2010-11/index.html#8972">http://www.cc65.org/mailarchive/2010-11/index.html#8972</a>
+
+From the two messages:
+<a href="http://www.cc65.org/mailarchive/2010-11/9000.html">http://www.cc65.org/mailarchive/2010-11/9000.html</a>
+<a href="http://www.cc65.org/mailarchive/2010-11/9001.html">http://www.cc65.org/mailarchive/2010-11/9001.html</a>
+I got the notion that George Hug's &quot;Toward 2400&quot; source code could be
+refactored as cc65 .ser driver.
+
+A scan of the magazine in question:
+<a href="http://www.csbruce.com/cbm/transactor/v9/i3/">http://www.csbruce.com/cbm/transactor/v9/i3/</a>
+
+As long as it isn't verified that it doesn't work it lingers on my
+cc65-next-release-to-do list ;-)
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue, 26 Jun 2012 17:22:31 +0200</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10418.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] C64 Userport Serial Driver"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10416.html" title="Previous message in the list">Payton Byrd: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10405.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] C64 Userport Serial Driver"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10418.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] C64 Userport Serial Driver"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10418.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] C64 Userport Serial Driver"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10417" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10417" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10417" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-06-26 17:23:19 CEST
+</em></small></p>
+</body>
+</html>

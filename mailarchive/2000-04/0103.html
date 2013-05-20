@@ -1,0 +1,221 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] .ORG</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] .ORG">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] .ORG</h1>
+<!-- received="Mon Apr 10 22:45:05 2000" -->
+<!-- isoreceived="20000410204505" -->
+<!-- sent="Mon, 10 Apr 2000 22:44:45 +0200" -->
+<!-- isosent="20000410204445" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] .ORG" -->
+<!-- id="20000410224445.A15222@trixie.musoftware.de" -->
+<!-- inreplyto="38F24675.3810.1B89A8@localhost" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20.ORG"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2000-04-10 22:44:45
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0104.html">Groepaz: "Re: [cc65] Information wanted about projects using cc65"</a>
+<li><strong>Previous message:</strong> <a href="0102.html">Martin Ancher Holm: "[cc65] .ORG"</a>
+<li><strong>In reply to:</strong> <a href="0102.html">Martin Ancher Holm: "[cc65] .ORG"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0104.html">Groepaz: "Re: [cc65] Information wanted about projects using cc65"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+				    
+On Mon, Apr 10, 2000 at 09:24:05PM +0200, Martin Ancher Holm wrote:
+&gt; I've tried to use the .ORG statement like this:
+&gt; .RODATA
+&gt; .ORG $2000
+&gt; .INCBIN &quot;gfx-file&quot;
+&gt; to get my graphics at this particular address, but it doesn't work.
+
+Many people have problems with .ORG, and as soon as I start writing a FAQ,
+this will be one of the first entries:-)
+
+Most other assemblers for the 6502 handle .ORG different than ca65. The reason
+is, that these tools are often working without a linker. Professional
+development systems separate the job of the assembler and the linker to gain
+more flexibility and to implement features not possible with just one tool.
+
+If you don't have a separate linker, the assembler is responsible for code
+translation *and* code placement. With such an assembler, you use the .ORG
+directive to place your code at a specific address.
+
+If you have a look at the cc65 library, you will notice that it consists of
+several hundred(!) assembler files. Each of these files contains one or more
+support subroutines or pieces of data. Without a linker, placement of this
+code would be a nightmare, since it depends on your program, which of these
+files are actually used, so the runtime address for each one is different for
+any program.
+
+To solve this, ca65 creates intermediate files (object files) containing
+relocatable code. Instead of absolute code references, complete expression
+trees are stored into the object files. Placement of a code section is done by
+the linker, and the linker will evaluate the expressions at link time, and
+replace it by the real addresses. With a linker, having a lot of object files
+with support routines is easy: Since the linker knows which object files will
+be part of the final program (because it looks for external symbols in the
+library), it can add these modules, calculate the start address for each
+module, evaluate the expressions stored inside the object files, and create an
+executable containing binary code.
+
+So you should not use ca65 to place your code at a specific address. This is
+the job of the linker. Instead create a new segment containing your code, and
+use a linker config file to put this segment at the address you want. Using
+your example:
+
+       	.segment 	&quot;gfx&quot;
+       	.incbin		&quot;gfx-file&quot;
+       	.code
+
+(Note that there is no .ORG!)
+
+In the linker config use something like
+
+MEMORY {
+    ...
+    GFX:       	start = $2000, size = $1000, type = ro, file = %O, fill = yes;
+    ...
+}
+
+SEGMENTS {
+    ...
+    gfx:       	load = GFX, type = ro;
+    ...
+}
+
+You define a memory area at $2000 and tell the linker to place the segment
+with the name &quot;gfx&quot; into this area.
+
+In your case, it would probably be a good idea to use a separate assembler
+module for each binary include file that contains just the lines
+
+       	.segment	&quot;segmentname&quot;
+       	.incbin		&quot;filename&quot;
+				  
+		  
+
+Now the remaining question is, why is there an .ORG command and what does it
+do?
+
+Most people will never use .ORG with ca65, since things will usually work as
+expected without it. The linker takes care for all things needed to place some
+piece of code at a specific address. If the linker puts your code at address
+$1234, it will resolve all jumps and other references, so your code will be
+able to run at this address. It is even able to handle different load and run
+addresses (this may be needed if your code is placed in a ROM but copied into
+RAM before it runs). In fact, using the &quot;load&quot; and &quot;run&quot; attributes of the
+linker, it would be possible to get along without using .ORG even in the
+situation described below.
+
+The only situation where you need a .ORG directive is, when your code is
+placed at a specific address, but it should not be run at this address. A
+prominent example would be some code that is loaded into the 1541 CBM floppy.
+Having the linker relocate the code to the load address would be wrong, since
+the code will be copied at a specific address into the floppy RAM. So what you
+need is to tell the assembler to start a section of absolute code. If you do
+that, the assembler will still not place the code at a specific address, but
+since the final location of the code is already known, there is no need to
+make the code relocatable (references to symbols outside the absolute code
+range will still create relocation entries resolved by the linker). Code
+created with .ORG does not have internal relocation information. It may (must)
+be placed at a specific address by the linker, but if this address is not
+equal to the absolute address used in the .ORG directive, the code will
+usually not run at this address.
+
+Since sections of absolute code are a rare exception with ca65, there is also
+a directive to end a section of absolute code: .RELOC switches back to
+relocatable mode.
+
+You may use .ORG and .RES to emulate the behaviour of other assemblers (this
+may be useful for a short time when porting old code written for other
+assemblers), but you loose a lot if you do this, and it's not recommended.
+
+So, while the way ca65 handles things is more complex than the old &quot;.ORG&quot;
+stuff, it is also a lot more powerful.
+
+&gt; Now i solve the problem by adding a .RES command:
+&gt; .CODE
+&gt; 	bla
+&gt; 	bla
+&gt; .RODATA
+&gt; .RES 342
+&gt; .INCBIN &quot;music-file&quot;
+&gt; .RES 123
+&gt; .INCBIN &quot;gfx-file&quot;
+
+If you really want to use .res, you may want to use code like this:
+
+	.rodata
+	.org   	$1000
+	.incbin	&quot;music-file&quot;
+	.res   	$2000-*
+	.incbin	&quot;gfx-file&quot;
+
+Since the program counter is known inside a section of absolute code, you can
+use an expression to evalute the amount of space to insert.
+
+Regards
+
+
+	Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20.ORG">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20.ORG">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0104.html">Groepaz: "Re: [cc65] Information wanted about projects using cc65"</a>
+<li><strong>Previous message:</strong> <a href="0102.html">Martin Ancher Holm: "[cc65] .ORG"</a>
+<li><strong>In reply to:</strong> <a href="0102.html">Martin Ancher Holm: "[cc65] .ORG"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0104.html">Groepaz: "Re: [cc65] Information wanted about projects using cc65"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:36 CET</em>
+</em>
+</small>
+</body>
+</html>

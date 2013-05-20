@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] Register variables</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="[cc65] Register variables">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] Register variables</h1>
+<!-- received="Fri Jul 16 22:11:03 1999" -->
+<!-- isoreceived="19990716201103" -->
+<!-- sent="Fri, 16 Jul 1999 22:10:43 +0200 (MEST)" -->
+<!-- isosent="19990716201043" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="[cc65] Register variables" -->
+<!-- id="m115EJf-000brTC@wuschel.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Register%20variables"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 1999-07-16 22:10:43
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="1006.html">Marko Mäkelä: "Re: [cc65] Register variables"</a>
+<li><strong>Previous message:</strong> <a href="1004.html">Ullrich von Bassewitz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1006.html">Marko Mäkelä: "Re: [cc65] Register variables"</a>
+<li><strong>Reply:</strong> <a href="1006.html">Marko Mäkelä: "Re: [cc65] Register variables"</a>
+<li><strong>Maybe reply:</strong> <a href="1009.html">Harald Arnesen: "Re: [cc65] Register variables"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+I'm currently adding register variables to the compiler, but unfortunately I
+run into a problem that seems unsolvable. I would be glad for any help.
+
+Register variables are actually zero page locations. The current
+implementation reserves a few bytes in the zero page for this purpose. The
+available space is used in a &quot;first come first served&quot; manner, that is, for
+each variable with storage class &quot;register&quot; zero page space is allocated until
+the space available for register variables is exhausted.
+
+To make the functions with register variables reentrant, the old values of the
+register variable locations are saved onto the stack, so each function has the
+whole register variable space available. The problem occurs when pointers to
+register variables are involved:
+
+    void anyfunc (void)
+    {
+     	register char c;	/* First byte in register variable bank */
+	register char unused;	/* Second byte */
+     	f (&amp;c);
+    }
+
+    void f (char* s)
+    {
+    	register char i;	/* First byte, same address as c */
+    	for (i = 0; i &lt; 5; ++i) {
+    	    ....
+    	}
+    }
+
+Variable c is assigned to the first byte in the register space. When calling
+f(), a pointer to this location is passed. Unfortunately the variable i will
+occupy the same space as c: The old value is saved and the storage is reused.
+A store operation to *s (which points to c) will now overwrite i instead of c,
+since i and c share the same storage.
+
+I know the problem can be solved by generating parse trees for the complete
+function, so the problem can be detected before generating code for the
+register keyword. But the current compiler implementation does not generate
+explicit parse trees, and adding it is a real lot of work, so this is out of
+reach for now. On the other side, register variables would be very nice, but
+if I don't find a solution for the described problem, I have to remove or at
+least disable the already existing code.
+
+Can anyone think of a better implementation of register variables that doesn't
+have the described problem, or find some way to work around it? I would be
+really glad for any suggestions.
+
+Regards
+
+
+	Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Register%20variables">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Register%20variables">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="1006.html">Marko Mäkelä: "Re: [cc65] Register variables"</a>
+<li><strong>Previous message:</strong> <a href="1004.html">Ullrich von Bassewitz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1006.html">Marko Mäkelä: "Re: [cc65] Register variables"</a>
+<li><strong>Reply:</strong> <a href="1006.html">Marko Mäkelä: "Re: [cc65] Register variables"</a>
+<li><strong>Maybe reply:</strong> <a href="1009.html">Harald Arnesen: "Re: [cc65] Register variables"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:44 CET</em>
+</em>
+</small>
+</body>
+</html>

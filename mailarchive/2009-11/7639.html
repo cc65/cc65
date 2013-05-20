@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Memory impact of Atari lib</title>
+<meta name="Author" content="Daniel Serpell (daniel.serpell1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] Memory impact of Atari library compile time defines" />
+<meta name="Date" content="2009-11-26" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Memory impact of Atari library compile time defines</h1>
+<!-- received="Thu Nov 26 03:50:31 2009" -->
+<!-- isoreceived="20091126025031" -->
+<!-- sent="Wed, 25 Nov 2009 23:50:24 -0300" -->
+<!-- isosent="20091126025024" -->
+<!-- name="Daniel Serpell" -->
+<!-- email="daniel.serpell1gmail.com" -->
+<!-- subject="Re: [cc65] Memory impact of Atari library compile time defines" -->
+<!-- id="f0796bb70911251850s4fe6f6dbvf47e24e0b3e094b@mail.gmail.com" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="4B0D89C3.8060902&#64;groessler.org" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7640.html" title="Fatih Aygün: &quot;Re: [cc65] Memory impact of Atari library compile time defines&quot;">Next message</a> ]
+[ <a href="7638.html" title="Shawn Jefferson: &quot;RE: [cc65] Memory impact of Atari library compile time defines&quot;">Previous message</a> ]
+[ <a href="7634.html" title="Christian GrÃ¶ssler: &quot;Re: [cc65] Memory impact of Atari library compile time defines&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7641.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Memory impact of Atari library compile time defines&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Daniel Serpell &lt;<a href="mailto:daniel.serpell1gmail.com?Subject=Re:%20[cc65]%20Memory%20impact%20of%20Atari%20library%20compile%20time%20defines">daniel.serpell1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-11-26 03:50:24</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+On Wed, Nov 25, 2009 at 4:47 PM, Christian Grössler &lt;chris&#64;groessler&#46;<!--nospam-->org&gt; wrote:
+&gt;
+[...]
+&gt; The ucase_fn code in fact does two things:
+&gt;
+&gt;        a) uppercasing the string
+&gt;        b) preprending a device string (like &quot;D1:&quot;), dependent on the
+&gt;           current &quot;default&quot; drive
+&gt;
+&gt; This happened historically somehow and I hope I can split these tasks
+&gt; when I rework the code.
+&gt;
+&gt; Removing b) is IMO problematic. Consider the TGI driver names. They
+&gt; don't have a device descriptor preceeding. We could use e.g. &quot;D1:&quot;,
+&gt; but this would force the drivers always to be loaded from disk 1.
+&gt; Typically, the drivers probably are on the same disk as the program.
+&gt;
+
+I agree, but found a bug with current implementation, and have some
+ideas to improve it.
+
+Currently, the only part of _defdev that is used is the number after the
+letter, this does not work if the current device is not a disk drive, for
+example, using the atari800 emulator with th &quot;H:&quot; device, BWDOS
+allows you to change the current drive to &quot;H1:&quot;, and directly execute
+programs there. But the default drive is set to &quot;D1:&quot; regardless.
+
+I tough an idea to get smaller code and also fix the ucase_fn routine,
+joust reserve the space for _defdev in the BSS as 128 bytes, then
+you can use it as the temporal buffer to hold the uppercased filename
+always, no need to allocate in the stack.
+
+The first patch attached allocates __defdev in bss segment. The second
+patch, applied after the first, allocates the extra buffer after __defdev and
+directly copies the uppercased filename to that buffer.
+
+&gt; This said, it seems that only SpartaDOS, OS/A, and MyDOS provide the
+&gt; notion of a &quot;default drive&quot;. At least, only these are recognized by
+&gt; the runtime lib. The other DOSes will use the DEFAULT_DEVICE as set
+&gt; in the runtime lib Makefile.
+
+Also BW-DOS, that is compatible with SpartaDOS. I prefer BW-DOS
+because is smaller and works great with the H: device of atari800 emulator.
+
+&gt; To wrap it up, I'll split tasks a) and b) into separate defines, and
+&gt; let the community (you :-)) decide which ones should be enabled by
+&gt; default.
+
+I think that if the size is small the defines could simply be removed.
+
+    Daniel.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<div>
+<ul>
+<li>text/x-diff attachment: <a href="../att-7639/allocate_defdev_in_bss.patch">allocate_defdev_in_bss.patch</a></li>
+</ul>
+<!-- attachment="allocate_defdev_in_bss.patch" -->
+<ul>
+<li>text/x-diff attachment: <a href="../att-7639/use_defdev_buffer.patch">use_defdev_buffer.patch</a></li>
+</ul>
+<!-- attachment="use_defdev_buffer.patch" -->
+</div>
+<span id="received"><dfn>Received on</dfn> Thu Nov 26 03:50:31 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7640.html" title="Next message in the list">Fatih Aygün: "Re: [cc65] Memory impact of Atari library compile time defines"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7638.html" title="Previous message in the list">Shawn Jefferson: "RE: [cc65] Memory impact of Atari library compile time defines"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7634.html" title="Message to which this message replies">Christian GrÃ¶ssler: "Re: [cc65] Memory impact of Atari library compile time defines"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7641.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Memory impact of Atari library compile time defines"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7639" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7639" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7639" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-11-26 03:50:32 CET
+</em></small></p>
+</body>
+</html>

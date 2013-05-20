@@ -1,0 +1,201 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] ca65 syntax problems</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] ca65 syntax problems">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] ca65 syntax problems</h1>
+<!-- received="Mon Nov  5 15:03:24 2001" -->
+<!-- isoreceived="20011105140324" -->
+<!-- sent="Sun, 4 Nov 2001 13:49:12 +0100" -->
+<!-- isosent="20011104124912" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] ca65 syntax problems" -->
+<!-- id="15714307705.20011104134912@gmx.net" -->
+<!-- inreplyto="20011105140221.A20204@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20ca65%20syntax%20problems"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2001-11-04 13:49:12
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0911.html">MagerValp: "[cc65] Serial port API"</a>
+<li><strong>Previous message:</strong> <a href="0909.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<li><strong>In reply to:</strong> <a href="0909.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0916.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<li><strong>Reply:</strong> <a href="0916.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+UvB&gt; There is no way to have a traditional .org directive if you have relocatable
+UvB&gt; code. And, seriously, I think that having relocatable code is far more useful
+UvB&gt; than an old style .ORG directive.
+
+yes and no ;=) that is, for big projects having relocatable code and
+such is a real bonus..... but for most other stuff (that would be
+mostly everything except the one or two bigger things everyone does
+once in a while) having to tinker with a linkerscript where &quot;.org
+xxxx&quot; could have been enough is kindof overkill. (and no, simply using
+another assembler in that case isnt the type of solution i'd accept
+;=P)
+
+&gt;&gt; actually, the lack of certain features (traditional .org and
+&gt;&gt; prog-count assignment in particular) is what scares a lot of people i
+&gt;&gt; have talked to ....
+
+UvB&gt; Both are non issues. If you use one file (and one or more include files as is
+UvB&gt; common use with other assemblers) .ORG works fine for most things. And program
+UvB&gt; counter assignment is possible using one or more of the .feature commands.
+
+hehe well ;=) .org like its implemented in ca65 kinda never did for me
+what i expected ;P (nor did the .org command in gnu-assembler, so i
+guess what they do is a simelar thing hehehe)
+
+i guess the main issue with that is that people cant see a reason why
+stuff that worked fine for 15years has to work entire differently all
+of a sudden ;=) (i know for myself atleast that it took me some time
+to adapt to the &quot;big&quot; compiler/assembler/linker toolsets)
+
+UvB&gt; Using
+UvB&gt;         .feature pc_assignment, dollar_is_pc
+UvB&gt; things like
+UvB&gt;         $ = $200
+UvB&gt; are completely legal.
+
+uhhh, that means i could write code like:
+
+
+           $=$1000
+
+           sei
+           lda #&gt;irq
+           sta $0315
+           lda #&lt;irq
+           sta $0314
+           cli
+
+           jmp *
+
+           $=$1100
+
+irq:
+           inc $d020
+           jmp $ea31
+
+
+????
+
+i always thought THAT would be one of the things not beeing possible
+with ca65.
+
+btw why the dollar-sign and not the asterix (*) (tasm uses that one
+for eg, seen that in other assemblers aswell)
+
+UvB&gt; You are right, having some more emulation features would be nice, but on the
+UvB&gt; other side, ca65 will probably work with more different styled input files
+UvB&gt; than any other assembler out there.
+
+true,true,true ;=) then again, 6510 is probably that family of cpu's
+with most different styled assemblers out there ;=) (and yeah, beeing
+able to translate all and every source without having to touch them
+would rule bigtime ;=))
+
+&gt;&gt; mmmh i have started one when i have translated some of my old sources
+&gt;&gt; to ca65..... its very incomplete/inaccurate by now i guess, but i can
+&gt;&gt; mail it over if you like.
+
+UvB&gt; That would be nice, even if it is incomplete.
+
+ok.... hope i remember to actually do it when i'm back home ,=P
+
+UvB&gt; Yes, there is such a file, it is called rs232.h. There is also the
+UvB&gt; corresponding library for some machines including the C64, it was used by the
+UvB&gt; uIP TCP/IP stack and web server.
+
+cool... i'll take that as a guideline then ,=P
+
+also, can i find that tcp/ip stack etc ready to compile for cc65
+somewhere? (would love to use this for testing that is ,=))
+
+UvB&gt; Having support for the silver surfer would be nice, because the 16550 chip it
+UvB&gt; uses is far more advanced than the usual 6551. With the silver surfer, using
+UvB&gt; 115200 bps on the slip line should be easily possible with even more cycles to
+UvB&gt; spare than with the Swiftlink at 38400.
+
+115200bps actually work pretty fine even using polling operation only
+(didnt bother writing an irq-based driver yet) ... nicolas welte (who
+wrote silversurfer drivers for novaterm and desterm) reported even
+230400bps would work (my pc cant handle this ;=P) and he'll soon get a
+highspeed-serial card so even 460800bps can be checked out ;=)
+
+UvB&gt;  But I've myself written more than one
+UvB&gt; driver for the 16550 chip on different platforms, so if it is too much work to
+UvB&gt; adapt your code, I don't think it would be a problem for me to write a support
+UvB&gt; module for the silver surfer - provided that I will get the hardware.
+
+well, like i said.... i have written that code anyway, would probably
+just need to translate to ca65 syntax (its written in the c64-tasm
+atm) and a little cleanup (change function names to fit the api that
+is)
+
+
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20ca65%20syntax%20problems">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20ca65%20syntax%20problems">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0911.html">MagerValp: "[cc65] Serial port API"</a>
+<li><strong>Previous message:</strong> <a href="0909.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<li><strong>In reply to:</strong> <a href="0909.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0916.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<li><strong>Reply:</strong> <a href="0916.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:43 CET</em>
+</em>
+</small>
+</body>
+</html>

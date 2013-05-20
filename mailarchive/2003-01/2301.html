@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] &quot;none&quot; target (</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] &quot;none&quot; target (was: LUnix)">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] &quot;none&quot; target (was: LUnix)</h1>
+<!-- received="Thu Jan 16 03:16:44 2003" -->
+<!-- isoreceived="20030116021644" -->
+<!-- sent="Thu, 16 Jan 2003 03:18:07 +0100" -->
+<!-- isosent="20030116021807" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] &quot;none&quot; target (was: LUnix)" -->
+<!-- id="200301160318.07208.groepaz@gmx.net" -->
+<!-- inreplyto="20030115172843.GD26009@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20&quot;none&quot;%20target%20(was:%20LUnix)"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2003-01-16 03:18:07
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2300.html">Ullrich von Bassewitz: "Re: [cc65] Best way to get aligned memory..."</a>
+<li><strong>In reply to:</strong> <a href="2298.html">Ullrich von Bassewitz: "Re: [cc65] &quot;none&quot; target (was: LUnix)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2304.html">Greg King: "Re: [cc65] &quot;none&quot; target (was: LUnix)"</a>
+<li><strong>Next in thread:</strong> <a href="2216.html">Greg King: "Re: [cc65] LUnix"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Wednesday 15 January 2003 18:28, Ullrich von Bassewitz wrote:
+&gt; Hi!
+&gt;
+&gt; On Sat, Jan 11, 2003 at 05:02:41AM +0100, Groepaz wrote:
+&gt; &gt; at this point it should also be possible to use &quot;-t none -C myown.cfg&quot; to
+&gt; &gt; instruct the linker to link the none.lib, but use my own linker config.
+&gt;
+&gt; So here is a proposal: I will add a &quot;nonelib&quot; target to the library
+&gt; makefile, so such a library can be built. I will not add a &quot;none&quot; startup
+&gt; file, and I will keep cl65 as is. That is, when using &quot;-t none&quot;, neither
+&gt; the library is linked by default, nor a startup file. This is no big
+&gt; problem, because you can add these on the command line.
+
+that will work i guess :)
+
+however, it might also be good to able to use &quot;-t c64 -C custom.cfg&quot; atleast 
+with cl65. (the -t c64 is required here to instruct cc65 to use the right 
+character-translation table, even if you link init and lib manually).... for 
+my taste the -t switch implies things that it shouldnt at this point, imho it 
+should really only affect memory layout/startup code/std libraries (compare 
+the gcc/ld -m switch) and other options should be set seperatly, or if 
+implied by -t, it should be able to overide them somehow.
+
+anyway...you can always achieve whatever you like by calling cc65/ca65/ld65 
+manually, so its not really a problem at all... just involves a little bit to 
+much manual work (/me lazy peep :=P)
+
+-- 
+          ___ ___ .___________________ .___________ _______.
+    c=64 /   |   \|   \__    ___/     \ \_   _____/ \      \ [groepaz]
+     gb /    '    \   | |    | /  \ /  \ |    __)_  /   |   \ gp32
+    cgb \    .    /   | |    |/    '    \|        \/    |    \ psx
+     gba \___|_  /|___| |____|\____|__  /_______  /\____|__  / dc
+          -----\/-----'---------------\/--------\/---------\/
+       <a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    Hitmen WWW Headquarters
+       <a href="http://fly.to/hitmen-groepaz">http://fly.to/hitmen-groepaz</a>     my personal playground
+       <a href="http://rr.c64.org/silversurfer">http://rr.c64.org/silversurfer</a>   home of the RR debugger
+       ftp.musoftware.de/pub/groepaz    cc65 dump site
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20&quot;none&quot;%20target%20(was:%20LUnix)">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2300.html">Ullrich von Bassewitz: "Re: [cc65] Best way to get aligned memory..."</a>
+<li><strong>In reply to:</strong> <a href="2298.html">Ullrich von Bassewitz: "Re: [cc65] &quot;none&quot; target (was: LUnix)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2304.html">Greg King: "Re: [cc65] &quot;none&quot; target (was: LUnix)"</a>
+<li><strong>Next in thread:</strong> <a href="2216.html">Greg King: "Re: [cc65] LUnix"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-01-16 03:17:08 CET</em>
+</em>
+</small>
+</body>
+</html>

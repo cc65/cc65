@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] extern const construct</title>
+<meta name="Author" content="Bruce & Ann Reidenbach (bereiden1gmail.com)" />
+<meta name="Subject" content="[cc65] extern const construct" />
+<meta name="Date" content="2010-08-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] extern const construct</h1>
+<!-- received="Mon Aug 23 16:19:55 2010" -->
+<!-- isoreceived="20100823141955" -->
+<!-- sent="Mon, 23 Aug 2010 10:19:27 -0400" -->
+<!-- isosent="20100823141927" -->
+<!-- name="Bruce & Ann Reidenbach" -->
+<!-- email="bereiden1gmail.com" -->
+<!-- subject="[cc65] extern const construct" -->
+<!-- id="AANLkTi=cqbW4c5pzN015WRf0BhGLjom9c=8ERRjGD5no@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8577.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Contiki 2.4 binary release for Retrocomputing&quot;">Next message</a> ]
+[ <a href="8575.html" title="Oliver Schmidt: &quot;Re: [cc65] Contiki 2.4 binary release for Retrocomputing&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8579.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] extern const construct&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Bruce & Ann Reidenbach &lt;<a href="mailto:bereiden1gmail.com?Subject=Re:%20[cc65]%20extern%20const%20construct">bereiden1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-08-23 16:19:27</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>It appears that cc65 does not allow for an &quot;extern const&quot; declaration
+when the constant value is a part of the declaration.  I'm trying to
+create a single .h file for my project that defines the constants in
+one case and declares them in another, thusly:
+
+in file.c:
+----------------------------------------------
+#define  _DEFINE_GLOBALS_
+#include &quot;file.h&quot;
+
+in all other .c files:
+----------------------------------------------
+#include &quot;file.h&quot;
+
+and in file.h:
+----------------------------------------------
+#ifdef  _DEFINE_GLOBALS_
+#define _GLOBAL_
+#else
+#define _GLOBAL_ extern
+#endif
+
+_GLOBAL_ const int foo = &quot;bar&quot;;  //  This does not work when _GLOBAL_ = extern
+_GLOBAL        int woof;         //  This works in both case
+
+The declaration of extern const int foo = &quot;bar&quot;; results in a
+compilation error.  If I set it up such that the constants are
+declared in all files, I get the following warning from ld65:
+
+     ld65.exe: Warning: Duplicate external identifier: `_foo'
+
+However, even thought the linker detected multiple constant
+definitions, I end up with multiple copies of the (same) constants in
+the linked image.  If I define the constant in the other files as:
+
+extern const int foo;
+
+then everything works as desired (no compilation errors and a single
+constant in the image).
+
+I'm not sure what the position of the C standard is in this case, but
+I would think this would be allowed.
+
+Bruce
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Aug 23 16:19:55 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8577.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Contiki 2.4 binary release for Retrocomputing"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8575.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Contiki 2.4 binary release for Retrocomputing"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8579.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] extern const construct"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8579.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] extern const construct"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8580.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] extern const construct"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8576" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8576" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8576" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-08-23 16:19:59 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Re: Questions for CBM guys</title>
+<meta name="Author" content="Jonathan Graham Harston (jgh1arcade.demon.co.uk)" />
+<meta name="Subject" content="[cc65] Re: Questions for CBM guys" />
+<meta name="Date" content="2008-03-04" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Re: Questions for CBM guys</h1>
+<!-- received="Tue Mar  4 13:04:26 2008" -->
+<!-- isoreceived="20080304120426" -->
+<!-- sent="04 Mar 2008 10:53:59 +0000" -->
+<!-- isosent="20080304105359" -->
+<!-- name="Jonathan Graham Harston" -->
+<!-- email="jgh1arcade.demon.co.uk" -->
+<!-- subject="[cc65] Re: Questions for CBM guys" -->
+<!-- id="080304115504@arcade.demon.co.uk" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6037.html" title="silverdr1inet.com.pl: &quot;Re: [cc65] Re: Questions for CBM guys&quot;">Next message</a> ]
+[ <a href="6035.html" title="silverdr1inet.com.pl: &quot;Re: [cc65] Re: Questions for CBM guys&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6037.html" title="silverdr1inet.com.pl: &quot;Re: [cc65] Re: Questions for CBM guys&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Jonathan Graham Harston &lt;<a href="mailto:jgh1arcade.demon.co.uk?Subject=Re:%20[cc65]%20Re:%20Questions%20for%20CBM%20guys">jgh1arcade.demon.co.uk</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-03-04 11:53:59</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I checked the documentation before posting to check that
+the C64 was similar to the Acorn world:
+ 
+Commodore 64 Programmer's Reference Guide:
+ 
+&quot;If no punctuation finishes the list, a carriage-return
+and a line- feed are printed at the end of the data. If
+a comma or semicolon terminates the output-list, the
+carriage-return and line-feed are suppressed.&quot;
+ 
+&quot;For printer files, an automatic line-feed will be
+performed by carriage-return&quot;
+ 
+&quot;if you choose a logical file number that is greater
+than 127, then a line feed will follow all carriage
+returns.&quot;
+ 
+That clearly indicates that line-feed and carriage-return
+are two seperate functions.
+ 
+Remember, I'm talking about /screen/ drivers here, not
+teletypes, printers, typing input, etc.
+ 
+Character 13 - CR - repeatedly moves left until in the
+  lefthand column
+Character 8 moves left one
+Character 9 moves right one
+Character 10 moves down one
+Character 11 moves up one
+ 
+The only system I knew before this thread where this does
+not happen is the Sinclair computers, where CHR$13 moves
+down and left, the equivalent of CR/LF, so making it
+impossible to do a LF or a CR.
+ 
+&gt; MSDOS   : $0d$0a
+&gt; CBM     : $0d
+&gt; Amiga   : $0a
+&gt; Atari   : $9b
+&gt; Unix    : $0a
+&gt; Mac[*]  : $0d
+ 
+Nope, I've used a Mac, and PRINT CHR$13; moves to the
+lefthand column without moving down, and PRINT CHR$10;
+moves down without changing the column, and the Unix
+systems I've used that have a screen driver (/not/ a
+teletype driver) do the same.
+ 
+If the others do perform as you say, then how on earth
+do you move the cursor down without changing the column?
+And how on earth do you move to the lefthand column without
+moving down a line?
+ 
+-- 
+J.G.Harston - jgh&#64;arcade&#46;<!--nospam-->demon.co.uk - mdfs.net/User/JGH
+BBC BASIC for Windows and Internationalisation
+  See <a href="http://mdfs.net/Software/BBCBasic/Windows/ProgTips">http://mdfs.net/Software/BBCBasic/Windows/ProgTips</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Mar  4 13:04:26 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6037.html" title="Next message in the list">silverdr1inet.com.pl: "Re: [cc65] Re: Questions for CBM guys"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6035.html" title="Previous message in the list">silverdr1inet.com.pl: "Re: [cc65] Re: Questions for CBM guys"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6037.html" title="Next message in this discussion thread">silverdr1inet.com.pl: "Re: [cc65] Re: Questions for CBM guys"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6037.html" title="Message sent in reply to this message">silverdr1inet.com.pl: "Re: [cc65] Re: Questions for CBM guys"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6038.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Re: [cc65] Re: Questions for CBM guys"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6036" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6036" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6036" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-03-04 13:04:29 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Problems playing Goattracker B</title>
+<meta name="Author" content="Sebastian Gutsfeld (segoh1gmx.net)" />
+<meta name="Subject" content="[cc65] Problems playing Goattracker BIN files" />
+<meta name="Date" content="2006-11-02" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Problems playing Goattracker BIN files</h1>
+<!-- received="Thu Nov  2 13:11:41 2006" -->
+<!-- isoreceived="20061102121141" -->
+<!-- sent="Thu, 02 Nov 2006 13:11:31 +0100" -->
+<!-- isosent="20061102121131" -->
+<!-- name="Sebastian Gutsfeld" -->
+<!-- email="segoh1gmx.net" -->
+<!-- subject="[cc65] Problems playing Goattracker BIN files" -->
+<!-- id="20061102121134.4ED6E136C1@mail.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5604.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Problems playing Goattracker BIN files&quot;">Next message</a> ]
+[ <a href="../2006-10/5602.html" title="Oliver Schmidt: &quot;Re: [cc65] ProDos 16?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5604.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Problems playing Goattracker BIN files&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Sebastian Gutsfeld &lt;<a href="mailto:segoh1gmx.net?Subject=Re:%20[cc65]%20Problems%20playing%20Goattracker%20BIN%20files">segoh1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2006-11-02 13:11:31</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+inspired by Chris McCormick's aSid
+(<a href="http://mccormick.cx/viewcvs/aSid/src/">http://mccormick.cx/viewcvs/aSid/src/</a>), which uses CC65 as compiler, I
+started to program for my old C64, but I have problems converting a
+little DASM assembler sid player to CA65 assembler. 
+
+This little snippet should play the sid tune &quot;example2.bin&quot;, exported
+from goattracker to BIN format (init at $1000, plays a frame at $1003).
+
+Here's the DASM source:
+
+,----[ sid_player_dasm.s ]
+|         processor 6502
+|         org $0800
+| 
+| _main:
+|         lda #$00
+|         tax
+|         tay
+|         jsr song                ; Initialize music 
+| 
+| mainloop:
+|         lda $d012               ; Load $d012
+|         cmp #$80                ; Is it equal to #$80?
+|         bne mainloop            ; If not, keep checking
+| 
+|         inc $d020               ; Inc border colour
+|         jsr song+3              ; Jump to music play routine
+|         dec $d020               ; Dec border colour
+|         jmp mainloop            ; Keep looping
+| 
+|         org $1000
+| song:   incbin &quot;example2.bin&quot;
+`----
+
+After assembling this and setting the execution address with pucrunch to
+2048 the resulting programm starts fine and plays my sid file (taken
+from the Goattracker examples).
+
+But I am not able to reproduce this with CA65. I read the FAQ about the
+.ORG directive, so I tried to modify the C64 linker config.
+
+Here's my code:
+
+,----[ sid_player_ca65.s ]
+|         .export _main
+|         .segment &quot;PRG&quot;
+| 
+| _main:  lda #$00
+|         tax
+|         tay
+|         jsr song                ; Initialize music 
+| 
+| mainloop:
+|         lda $d012               ; Load $d012
+|         cmp #$80                ; Is it equal to #$80?
+|         bne mainloop            ; If not, keep checking
+| 
+|         inc $d020               ; Inc border colour
+|         jsr song+3              ; Jump to music play routine
+|         dec $d020               ; Dec border colour
+|         jmp mainloop            ; Keep looping
+| 
+| 
+|         .segment &quot;SID&quot;
+| song:   .incbin &quot;example2.bin&quot;
+`----
+
+And here are my modifications to the C64 linker config
+
+,----[ c64.cfg ]
+| MEMORY {
+|     [...]
+|     SIDDATA: start = $1000, size = $1000, file = %O, fill = yes, define = yes;
+|     PRGDATA: start = $0800, size = $0B00, file = %O, define = yes;
+| }
+| SEGMENTS {
+|     [...]
+|     SID:      load = SIDDATA, type = ro, define = yes;
+|     PRG:      load = PRGDATA, type = ro, define = yes;
+| }
+| [...]
+`----
+
+I assembled it with
+
+,----
+| cl65 -C c64.cfg -o sid_player_ca65.prg sid_player_ca65.s
+`----
+
+but this program just clears the screen and shows me the ready prompt. I
+think my problem must be really basic to you all, but since I am a real
+newbie when it comes to assembler and C64 programming I hope you can
+explain me what's wrong.
+
+regards,
+   Sebastian
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Nov  2 13:11:41 2006</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5604.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Problems playing Goattracker BIN files"</a></li>
+<li><dfn>Previous message</dfn>: <a href="../2006-10/5602.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] ProDos 16?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5604.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Problems playing Goattracker BIN files"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5604.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Problems playing Goattracker BIN files"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5603" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5603" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5603" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2006-11-02 13:11:45 CET
+</em></small></p>
+</body>
+</html>

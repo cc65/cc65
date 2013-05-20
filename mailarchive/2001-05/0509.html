@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] Segments and banking</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="[cc65] Segments and banking">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] Segments and banking</h1>
+<!-- received="Fri May 25 15:30:37 2001" -->
+<!-- isoreceived="20010525133037" -->
+<!-- sent="Fri, 25 May 2001 15:30:40 +0200" -->
+<!-- isosent="20010525133040" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="[cc65] Segments and banking" -->
+<!-- id="20010525153040.A4993@trixie.musoftware.de" -->
+<!-- inreplyto="6FE38E8E2879D41199A10090273BEF3A017CA33B@srbradshaw.lss.emc.com" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Segments%20and%20banking"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2001-05-25 15:30:40
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0510.html">Mike McCarty: "Re: [cc65] Segments and banking"</a>
+<li><strong>Previous message:</strong> <a href="0508.html">Mike McCarty: "RE: [cc65] structure bug?"</a>
+<li><strong>In reply to:</strong> <a href="0507.html">shubel, paul: "RE: [cc65] structure bug?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0510.html">Mike McCarty: "Re: [cc65] Segments and banking"</a>
+<li><strong>Reply:</strong> <a href="0510.html">Mike McCarty: "Re: [cc65] Segments and banking"</a>
+<li><strong>Maybe reply:</strong> <a href="0511.html">shubel, paul: "RE: [cc65] Segments and banking"</a>
+<li><strong>Maybe reply:</strong> <a href="0513.html">Mark Keates: "RE: [cc65] Segments and banking"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Fri, May 25, 2001 at 09:13:33AM -0400, shubel, paul wrote:
+&gt; Question:  Can CC65 compile and link a segmented build?  For example,
+&gt; can it call modules in &quot;banked&quot; areas of memory to exceed the 64K boundary?
+
+cc65 cannot call functions in other banks by itself, because the banking
+mechanism is always hardware dependent. However, the linker is able to overlay
+memory areas. This means that it is possible to write programs for banked
+hardware with some help from the programmer.
+
+&gt; Is this what is meant by segments?
+
+segments are just some hunks of code or data that have a name. The linker
+combines all pieces that have the same name to one large chunk, and places it
+into a memory area according to the rules in the configuration file.
+
+This means that by placing a function f1() into a segment with the name CODE1,
+and a function named f2() into a segment CODE2, it is possible to tell the
+linker to relocate both segments CODE1 and CODE2 to the same address, but
+write it to different files. To support banking, the programmer has to supply
+a short stub in common memory for each such function that enables the correct
+bank and calls the function.
+
+Regards
+
+
+        Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Segments%20and%20banking">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Segments%20and%20banking">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0510.html">Mike McCarty: "Re: [cc65] Segments and banking"</a>
+<li><strong>Previous message:</strong> <a href="0508.html">Mike McCarty: "RE: [cc65] structure bug?"</a>
+<li><strong>In reply to:</strong> <a href="0507.html">shubel, paul: "RE: [cc65] structure bug?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0510.html">Mike McCarty: "Re: [cc65] Segments and banking"</a>
+<li><strong>Reply:</strong> <a href="0510.html">Mike McCarty: "Re: [cc65] Segments and banking"</a>
+<li><strong>Maybe reply:</strong> <a href="0511.html">shubel, paul: "RE: [cc65] Segments and banking"</a>
+<li><strong>Maybe reply:</strong> <a href="0513.html">Mark Keates: "RE: [cc65] Segments and banking"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:40 CET</em>
+</em>
+</small>
+</body>
+</html>

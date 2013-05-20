@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Memory impact of Atari library</title>
+<meta name="Author" content="Christian Grössler (chris1groessler.org)" />
+<meta name="Subject" content="[cc65] Memory impact of Atari library compile time defines" />
+<meta name="Date" content="2009-11-15" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Memory impact of Atari library compile time defines</h1>
+<!-- received="Sun Nov 15 19:06:02 2009" -->
+<!-- isoreceived="20091115180602" -->
+<!-- sent="Sun, 15 Nov 2009 19:05:45 +0100" -->
+<!-- isosent="20091115180545" -->
+<!-- name="Christian Grössler" -->
+<!-- email="chris1groessler.org" -->
+<!-- subject="[cc65] Memory impact of Atari library compile time defines" -->
+<!-- id="4B0042F9.8090109@groessler.org" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7615.html" title="Christian GrÃ¶ssler: &quot;Re: [cc65] Atari tgi update&quot;">Next message</a> ]
+[ <a href="7613.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Atari tgi update&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7618.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Memory impact of Atari library compile time defines&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Christian Grössler &lt;<a href="mailto:chris1groessler.org?Subject=Re:%20[cc65]%20Memory%20impact%20of%20Atari%20library%20compile%20time%20defines">chris1groessler.org</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-11-15 19:05:45</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+here are the impacts of various parameter which can be disabled
+when compiling the library:
+
+
+empty.c:
+--------
+
+int main ()
+{
+     return 0;
+}
+
+
+hello.c:
+--------
+
+#include &lt;stdio.h&gt;
+int main ()
+{
+     printf (&quot;Hello world!\n&quot;);
+     return 0;
+}
+
+
+open.c:
+-------
+
+#include &lt;stdio.h&gt;
+int main ()
+{
+         FILE *fp;
+         fp = fopen(&quot;bla.txt&quot;,&quot;w&quot;);
+         if (fp) fclose(fp);
+         return 0;
+}
+
+
+
+default configuration:
+
+-rw-r--r-- 1 chris chris  557 Nov 15 16:23 empty
+-rw-r--r-- 1 chris chris 3277 Nov 15 16:23 hello
+-rw-r--r-- 1 chris chris 2055 Nov 15 16:33 open
+
+no DYNAMIC_DD:
+
+-rw-r--r-- 1 chris chris  430 Nov 15 16:25 empty
+-rw-r--r-- 1 chris chris 3150 Nov 15 16:24 hello
+-rw-r--r-- 1 chris chris 1927 Nov 15 16:34 open
+
+no UCASE_FILENAME:
+
+-rw-r--r-- 1 chris chris  430 Nov 15 16:35 empty
+-rw-r--r-- 1 chris chris 3150 Nov 15 16:35 hello
+-rw-r--r-- 1 chris chris 1504 Nov 15 16:35 open
+
+
+DYNAMIC_DD should be easily possible to make a contructor
+of open(). Then its size impact would only affect programs
+which really open files.
+
+UCASE_FILENAME is a different thing, though. Despite its
+name it not only uppercases file names at open() time (needed
+for DOS 2.5 which only accepts file names in uppercase), it
+also prepends a &quot;Dx:&quot; to the file name. Because of this one
+can open &quot;BLA.TXT&quot; instead of &quot;D0:BLA.TXT&quot;. &quot;BLA.TXT&quot; alone
+is no valid string for the DOS open routine. So without
+this setting the user program must take care to uppercase
+the filename and prepend a &quot;Dx:&quot;. Additionally, the driver
+names for dynamically loaded drivers would have to be
+adapted. (They don't contain a &quot;Dx:&quot; in front.)
+
+The file descriptor initialization is done in order
+to have stdin/stdout/stderr implicitly available.
+I think I could move it to a contructor for open/close/read/write.
+Then programs which use conio and/or joysticks to get their
+input and use conio for output shouldn't be affected.
+
+
+regards,
+chris
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Nov 15 19:06:02 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7615.html" title="Next message in the list">Christian GrÃ¶ssler: "Re: [cc65] Atari tgi update"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7613.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Atari tgi update"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7618.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Memory impact of Atari library compile time defines"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7618.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Memory impact of Atari library compile time defines"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7614" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7614" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7614" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-11-15 19:06:05 CET
+</em></small></p>
+</body>
+</html>

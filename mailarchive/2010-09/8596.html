@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Optimizations of structure</title>
+<meta name="Author" content="thefox xofeht (thefox1aspekt.fi)" />
+<meta name="Subject" content="Re: [cc65] Optimizations of structures" />
+<meta name="Date" content="2010-09-11" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Optimizations of structures</h1>
+<!-- received="Sat Sep 11 11:57:16 2010" -->
+<!-- isoreceived="20100911095716" -->
+<!-- sent="Sat, 11 Sep 2010 12:57:08 +0300" -->
+<!-- isosent="20100911095708" -->
+<!-- name="thefox xofeht" -->
+<!-- email="thefox1aspekt.fi" -->
+<!-- subject="Re: [cc65] Optimizations of structures" -->
+<!-- id="AANLkTik10tMk+=5JLNk+RG1gJf6tmxz+Nn4SHi_gA0YZ@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="201009101454.59265.marc&#64;rintsch.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8597.html" title="Shay Green: &quot;Re: [cc65] Optimizations of structures&quot;">Next message</a> ]
+[ <a href="8595.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Optimizations of structures&quot;">Previous message</a> ]
+[ <a href="8594.html" title="Marc 'BlackJack' Rintsch: &quot;Re: [cc65] Optimizations of structures&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8597.html" title="Shay Green: &quot;Re: [cc65] Optimizations of structures&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: thefox xofeht &lt;<a href="mailto:thefox1aspekt.fi?Subject=Re:%20[cc65]%20Optimizations%20of%20structures">thefox1aspekt.fi</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-09-11 11:57:08</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Fri, Sep 10, 2010 at 3:54 PM, Marc 'BlackJack' Rintsch
+&lt;marc&#64;rintsch&#46;<!--nospam-->de&gt; wrote:
+&gt; IMHO it has too many implications and breaks too much.  For example what
+&gt; will ``pos[n]`` return?  It can't be a pointer to a structure anymore.
+
+p[n] (struct pos p[64];) wouldn't return a pointer, it would return a
+reference to the array element, so the compiler would still know how
+to perform the pointer arithmetics as long as it knows the size of the
+array. But yeah, pointers to the array would be impossible to do
+(without some additional attributes to the pointer, i.e. the array
+size, and then things start to get messy).
+
+-thefox
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Sep 11 11:57:16 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8597.html" title="Next message in the list">Shay Green: "Re: [cc65] Optimizations of structures"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8595.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Optimizations of structures"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8594.html" title="Message to which this message replies">Marc 'BlackJack' Rintsch: "Re: [cc65] Optimizations of structures"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8597.html" title="Next message in this discussion thread">Shay Green: "Re: [cc65] Optimizations of structures"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8597.html" title="Message sent in reply to this message">Shay Green: "Re: [cc65] Optimizations of structures"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8596" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8596" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8596" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-09-11 11:57:19 CEST
+</em></small></p>
+</body>
+</html>

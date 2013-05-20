@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Compile with --as-needed patch</title>
+<meta name="Author" content="Mario Fetka (geos_one) (mario.fetka1gmail.com)" />
+<meta name="Subject" content="[cc65] Compile with --as-needed patch" />
+<meta name="Date" content="2010-11-07" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Compile with --as-needed patch</h1>
+<!-- received="Sun Nov  7 07:09:40 2010" -->
+<!-- isoreceived="20101107060940" -->
+<!-- sent="Sun, 7 Nov 2010 07:09:30 +0100" -->
+<!-- isosent="20101107060930" -->
+<!-- name="Mario Fetka (geos_one)" -->
+<!-- email="mario.fetka1gmail.com" -->
+<!-- subject="[cc65] Compile with &ndash;&ndash;as&ndash;needed patch" -->
+<!-- id="201011070709.31768.mario.fetka@gmail.com" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8795.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">Next message</a> ]
+[ <a href="8793.html" title="Oliver Schmidt: &quot;Re: [cc65] uIP and cc65&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8796.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Compile with --as-needed patch&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Mario Fetka (geos_one) &lt;<a href="mailto:mario.fetka1gmail.com?Subject=Re:%20[cc65]%20Compile%20with%20--as-needed%20patch">mario.fetka1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-11-07 07:09:30</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hallo from the Gentoo ebuild hacker,
+
+Gentoo now activated the --as-needed ldflag by default this breaks compiling 
+cc65
+the follwing patch corrects this
+<a href="https://svn.disconnected-by-peer.at/svn/linamh/trunk/linamh/dev">https://svn.disconnected-by-peer.at/svn/linamh/trunk/linamh/dev</a>-
+embedded/cc65/files/cc65-2.13.2-asneeded-1.patch
+
+it correct the the order in the link command and adds the missing -lm to the 
+the cc65 linking (when linking with --as-needed it is not automticlally 
+included)
+
+plz include in the next release
+
+thx
+Mario
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Nov  7 07:09:40 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8795.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8793.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] uIP and cc65"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8796.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Compile with --as-needed patch"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8796.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Compile with --as-needed patch"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8794" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8794" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8794" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-11-07 07:09:44 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Simple PEEK &amp; POKE qu</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Simple PEEK &amp; POKE question.">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Simple PEEK &amp; POKE question.</h1>
+<!-- received="Mon Mar  5 20:03:21 2001" -->
+<!-- isoreceived="20010305190321" -->
+<!-- sent="Mon, 5 Mar 2001 20:03:24 +0100" -->
+<!-- isosent="20010305190324" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Simple PEEK &amp; POKE question." -->
+<!-- id="20010305200324.A8838@trixie.musoftware.de" -->
+<!-- inreplyto="Pine.SOL.4.10.10103051117290.1715-100000@sun1307.ssd.usa.alcatel.com" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Simple%20PEEK%20&amp;%20POKE%20question."><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2001-03-05 20:03:24
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0427.html">Mike McCarty: "Re: [cc65] Simple PEEK &amp; POKE question."</a>
+<li><strong>Previous message:</strong> <a href="0425.html">Mike McCarty: "Re: [cc65] Simple PEEK &amp; POKE question."</a>
+<li><strong>In reply to:</strong> <a href="0425.html">Mike McCarty: "Re: [cc65] Simple PEEK &amp; POKE question."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0427.html">Mike McCarty: "Re: [cc65] Simple PEEK &amp; POKE question."</a>
+<li><strong>Reply:</strong> <a href="0427.html">Mike McCarty: "Re: [cc65] Simple PEEK &amp; POKE question."</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Mon, Mar 05, 2001 at 11:24:47AM -0600, Mike McCarty wrote:
+&gt; 	For better readability you may want to use macros:
+&gt;
+&gt; 	#define POKE(addr,val)	(*(unsigned char *)(addr)=(val))
+&gt;
+&gt; This definitely REDUCES readability and obscures what the code
+&gt; is doing.
+&gt;
+&gt; Which code is easier for you to read?
+&gt;
+&gt; (a)	VideoMode = VIDEO_REVERSE;
+&gt;
+&gt; (b)	POKE(199,1)	/* Set video mode to reverse */
+
+Your quote is completely out of context (or my english is even worse than I
+thought). The sentence &quot;For better readability you may want to use macros&quot; on
+the page references the example above (in the FAQ), where memory access is
+done in full length. Which code is easier for you to read?
+
+  (a)	*(unsigned char*)199 = 1;
+
+  (b)   POKE (199, 1);
+
+And, later on I'm proposing predefined variables for hardware access, saying
+that this is the most readable way. So where is the difference between your
+statements and mine?
+
+&gt; I recommend that people NOT implement PEEK and POKE at all. The direct C
+&gt; is more readable than the macros. Even better is to implement macros
+&gt; which make the code understandable without having to add comments.
+
+For someone with a BASIC background (and many people programming the old
+machines do have BASIC knowledge), PEEK and POKE are completely readable and
+do have a meaning. It is easy to translate BASIC programs using PEEK and POKE,
+this would be another reason to use them. So while I would recommend to use
+fixed memory variables as I have done in the FAQ and in posts to this list, I
+don't think that PEEK and POKE are evil. Just use what is best in a given
+situation.
+
+Regards
+
+
+	Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Simple%20PEEK%20&amp;%20POKE%20question.">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Simple%20PEEK%20&amp;%20POKE%20question.">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0427.html">Mike McCarty: "Re: [cc65] Simple PEEK &amp; POKE question."</a>
+<li><strong>Previous message:</strong> <a href="0425.html">Mike McCarty: "Re: [cc65] Simple PEEK &amp; POKE question."</a>
+<li><strong>In reply to:</strong> <a href="0425.html">Mike McCarty: "Re: [cc65] Simple PEEK &amp; POKE question."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0427.html">Mike McCarty: "Re: [cc65] Simple PEEK &amp; POKE question."</a>
+<li><strong>Reply:</strong> <a href="0427.html">Mike McCarty: "Re: [cc65] Simple PEEK &amp; POKE question."</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:39 CET</em>
+</em>
+</small>
+</body>
+</html>

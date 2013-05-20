@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] is the following safe, i think</title>
+<meta name="Author" content="Egan Ford (egan1sense.net)" />
+<meta name="Subject" content="[cc65] is the following safe, i think not" />
+<meta name="Date" content="2011-11-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] is the following safe, i think not</h1>
+<!-- received="Wed Nov 23 18:53:46 2011" -->
+<!-- isoreceived="20111123175346" -->
+<!-- sent="Wed, 23 Nov 2011 10:53:10 -0700" -->
+<!-- isosent="20111123175310" -->
+<!-- name="Egan Ford" -->
+<!-- email="egan1sense.net" -->
+<!-- subject="[cc65] is the following safe, i think not" -->
+<!-- id="CAFGhWqtyfa3yGoM3V2ULtWzVNXuK0V6DBjw6SxzWm48BigafkA@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9709.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] is the following safe, i think not&quot;">Next message</a> ]
+[ <a href="9707.html" title="Joseph Rose: &quot;[cc65] TempC Small/DOS?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9709.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] is the following safe, i think not&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Egan Ford &lt;<a href="mailto:egan1sense.net?Subject=Re:%20[cc65]%20is%20the%20following%20safe,%20i%20think%20not">egan1sense.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-11-23 18:53:10</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>.export         _putchar
+.import         popa
+
+ECHO    =       $FFEF           ; print character from A
+
+_putchar:
+        jsr     popa
+        ORA     $80
+        JSR     ECHO
+        RTS
+
+The code works, but when used in a C function, the value passed gets
+clobbered, e.g.:
+
+function foo(char bar) {
+
+putchar(blah[bar]);  //works
+putchar(blah[bar]); //fails
+
+If do this I can work around the problem:
+
+function foo(char bar) {
+char tmp=bar;
+
+putchar(blah[tmp]);  //works
+putchar(blah[tmp]); //works too
+
+
+So I know that my _putchar code is the problem, but what is the fix?
+
+Thanks.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Nov 23 18:53:46 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9709.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] is the following safe, i think not"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9707.html" title="Previous message in the list">Joseph Rose: "[cc65] TempC Small/DOS?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9709.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] is the following safe, i think not"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9709.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] is the following safe, i think not"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9710.html" title="Message sent in reply to this message">Joseph Rose: "Re: [cc65] is the following safe, i think not"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9708" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9708" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9708" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-11-23 18:53:49 CET
+</em></small></p>
+</body>
+</html>

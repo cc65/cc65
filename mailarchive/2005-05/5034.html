@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Re: signals</title>
+<meta name="Author" content="Jonathan Graham Harston (jgh1arcade.demon.co.uk)" />
+<meta name="Subject" content="[cc65] Re: signals" />
+<meta name="Date" content="2005-05-31" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Re: signals</h1>
+<!-- received="Tue May 31 03:00:56 2005" -->
+<!-- isoreceived="20050531010056" -->
+<!-- sent="31 May 2005 01:10:48 +0100" -->
+<!-- isosent="20050531001048" -->
+<!-- name="Jonathan Graham Harston" -->
+<!-- email="jgh1arcade.demon.co.uk" -->
+<!-- subject="[cc65] Re: signals" -->
+<!-- id="050531015502@arcade.demon.co.uk" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5035.html" title="Jonathan Graham Harston: &quot;[cc65] Re: signals&quot;">Next message</a> ]
+[ <a href="5033.html" title="Jonathan Graham Harston: &quot;[cc65] Re: signals&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Jonathan Graham Harston &lt;<a href="mailto:jgh1arcade.demon.co.uk?Subject=Re:%20[cc65]%20Re:%20signals">jgh1arcade.demon.co.uk</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-05-31 02:10:48</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt; Message-ID: &lt;429B360D.1030200&#64;brahms&#46;<!--nospam-->demon.co.uk&gt;
+ 
+dominic beesley &lt;dominic&#64;brahms&#46;<!--nospam-->demon.co.uk&gt; wrote:
+&gt; The &quot;standard&quot; is to have the byte after the BRK as an errorcode
+&gt; followed by a NULL terminated string. Makes for very compact
+&gt; code in the OS ROMS but can be a pain in the arse when writing
+&gt; code. (In the Risc OS operating system they recognised this and
+&gt; have two forms of each call, one that issues something like BRK
+&gt; and one that returns
+ 
+I've interpreted that in light of your post to csa.programmer as
+meaning that it's a problem to program with if you don't set up an
+error handler, and that you would like to be able to do the
+equivalent of using 'X' form SWIs on the BBC, so errors are
+returned rather than generated.
+ 
+This reminded me that I was thinking about this myself some time
+ago. Following the theme of the RISC OS 'C' compiler, os_*
+functions should just call the relevant OS routine, but _kernel_*
+calls should put a veneer around the OS call to catch and return
+any error.
+ 
+Something like:
+._kernel_osfile
+lda brkv+0:pha
+lda brkv+1:pha
+lda _kernel_brktrap and 255:sta brkv+0
+lda _kernel_brktrap div 256:sta brkv+1
+tsx:stx errorsp
+; set up registers for osfile
+jsr osfile
+; store returned registers
+ldx #0:clc
+._kernel_osfile_exit
+pla:sta brkv+1
+pla:sta brkv+0
+txa:rts
+._kernel_brktrap
+ldx errorsp:txs
+ldy #0:lda (&amp;fd),y
+sec:bcs _kernel_osfile_exit
+.errorsp
+equb &amp;00
+ 
+There's a way of generalising this for all OS calls instead of
+duplicating the veneer each time, and I need to have a dig though
+some code notes to work out what the return state should be, and
+how the 'C' program finds ERR and REPORT$.
+ 
+&gt; checked on return) would this make Escape handling safer....?
+ 
+You should let Escape set it's escape flag, and let the foreground
+program check the escape flag. If some code doesn't respond to
+Escape a quickly as you'd like it, it's either because the code
+shouldn't be interrupted, or *you* the programmer haven't checked
+for escape frequently enough.
+ 
+Escape should *never* change the foreground program flow.
+ 
+-- 
+J.G.Harston - jgh&#64;arcade&#46;<!--nospam-->demon.co.uk - mdfs.net/User/JGH
+BBC BASIC for Windows and Internationalisation
+  See <a href="http://mdfs.net/Software/BBCBasic/Windows/ProgTips">http://mdfs.net/Software/BBCBasic/Windows/ProgTips</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue May 31 03:00:56 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5035.html" title="Next message in the list">Jonathan Graham Harston: "[cc65] Re: signals"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5033.html" title="Previous message in the list">Jonathan Graham Harston: "[cc65] Re: signals"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5034" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5034" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5034" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-05-31 03:00:59 CEST
+</em></small></p>
+</body>
+</html>

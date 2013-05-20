@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Atari &quot;tgi&quot; agai</title>
+<meta name="Author" content="Christian Groessler (chris1groessler.org)" />
+<meta name="Subject" content="Re: [cc65] Atari &quot;tgi&quot; again :)" />
+<meta name="Date" content="2005-07-24" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Atari &quot;tgi&quot; again :)</h1>
+<!-- received="Sun Jul 24 02:26:02 2005" -->
+<!-- isoreceived="20050724002602" -->
+<!-- sent="Sun, 24 Jul 2005 02:25:42 +0200 (CEST)" -->
+<!-- isosent="20050724002542" -->
+<!-- name="Christian Groessler" -->
+<!-- email="chris1groessler.org" -->
+<!-- subject="Re: [cc65] Atari &quot;tgi&quot; again :)" -->
+<!-- id="Pine.LNX.4.30.0507240149420.19431-100000@ds9.groessler.org" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20050723025826.74993.qmail&#64;web54603.mail.yahoo.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5120.html" title="Christian Groessler: &quot;Re: [cc65] Atari &quot;tgi&quot; again :)&quot;">Next message</a> ]
+[ <a href="5118.html" title="Greg King: &quot;Re: [cc65] To Atari platform coordinator&quot;">Previous message</a> ]
+[ <a href="5116.html" title="Fatih : &quot;[cc65] Atari &quot;tgi&quot; again :)&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5120.html" title="Christian Groessler: &quot;Re: [cc65] Atari &quot;tgi&quot; again :)&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Christian Groessler &lt;<a href="mailto:chris1groessler.org?Subject=Re:%20[cc65]%20Atari%20&amp;quot;tgi&amp;quot;%20again%20:)">chris1groessler.org</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-07-24 02:25:42</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+On Fri, 22 Jul 2005, Fatih Aygün wrote:
+
+&gt; It seems that tgi mode to file name mapping won't work
+&gt; in Atari platform.
+&gt;
+&gt; &quot;tgi_mode_table&quot; maps the graphics mode constants to
+&gt; driver file names. As far as I know (I looked at the
+&gt; library codes) Atari platform has no default path.
+
+It's probably a bit hidden, but the standard Atari library has a
+&quot;default path&quot;. Look in ucase_fn.s. If there is no &quot;:&quot; at position 2 or 3
+of the file to open, it will prepend a &quot;Dx:&quot; to the path. &quot;x&quot; is the
+current drive (if started from SpartaDOS) or a compile time default for
+other DOSes. The compile time default is changeable in the Atari library
+makefile (libsrc/atari/makefile, search for DEFAULT_DEVICE).
+
+
+&gt; So
+&gt; the file name should begin with a disk drive
+&gt; specification. If we define for example
+&gt; &lt;TGI_MODE_320_200_2=&quot;atari-hi.tgi&quot;&gt;, it won't work. We
+&gt; have to make it &quot;D1:atari-hi.tgi&quot; or something
+&gt; similar. But then, we cannot load the driver form
+&gt; &quot;D2:&quot; or other device, even if the main program was
+&gt; loaded from &quot;D2:&quot; or other device. Most Ataris don't
+&gt; have a second disk drive but if you use a disk drive
+&gt; simulator, it IS a problem...
+
+The DEFAULT_DEVICE should fix this for compile time adaptation. I don't
+know how to detect the drive the program was loaded from (maybe it's
+simple? someone knows?), therefore probably the user has to indicate which
+drive to use to load the drivers. But there is currently no way for the
+program to set the drive where the drivers are loaded from. I could think
+of a _setdefdev function for the Atari (as counterpart to _getdefdev), but
+this looks like a hack.
+
+
+&gt; I think that other platforms may have this problem
+&gt; too. If so, it is not a real problem :)
+
+Maybe no one tried to load the program and the drivers from different
+drives up to now?
+
+regards,
+chris
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Jul 24 02:26:02 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5120.html" title="Next message in the list">Christian Groessler: "Re: [cc65] Atari &quot;tgi&quot; again :)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5118.html" title="Previous message in the list">Greg King: "Re: [cc65] To Atari platform coordinator"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5116.html" title="Message to which this message replies">Fatih : "[cc65] Atari &quot;tgi&quot; again :)"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5120.html" title="Next message in this discussion thread">Christian Groessler: "Re: [cc65] Atari &quot;tgi&quot; again :)"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5120.html" title="Message sent in reply to this message">Christian Groessler: "Re: [cc65] Atari &quot;tgi&quot; again :)"</a></li>
+<li><dfn>Reply</dfn>:  <a href="5134.html" title="Message sent in reply to this message">Shawn Jefferson: "Re: [cc65] Atari &quot;tgi&quot; again :)"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5119" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5119" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5119" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-07-24 02:26:05 CEST
+</em></small></p>
+</body>
+</html>

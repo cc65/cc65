@@ -1,0 +1,160 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] Floating point support</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="[cc65] Floating point support">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] Floating point support</h1>
+<!-- received="Wed May 22 09:15:16 2002" -->
+<!-- isoreceived="20020522071516" -->
+<!-- sent="Wed, 22 May 2002 09:15:17 +0200" -->
+<!-- isosent="20020522071517" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="[cc65] Floating point support" -->
+<!-- id="20020522091517.A23385@trixie.musoftware.de" -->
+<!-- inreplyto="12229411129.20020521194849@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Floating%20point%20support"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-05-22 09:15:17
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1365.html">Matt Ackeret: "Re: [cc65] statics in zero page"</a>
+<li><strong>In reply to:</strong> <a href="1364.html">groepaz: "Re[2]: [cc65] statics in zero page"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1368.html">Christian Groessler: "Re: [cc65] Floating point support"</a>
+<li><strong>Next in thread:</strong> <a href="1360.html">Christian Krüger: "Re: [cc65] statics in zero page"</a>
+<li><strong>Reply:</strong> <a href="1368.html">Christian Groessler: "Re: [cc65] Floating point support"</a>
+<li><strong>Reply:</strong> <a href="1369.html">Piotr Fusik: "Re: [cc65] Floating point support"</a>
+<li><strong>Reply:</strong> <a href="1376.html">Keates, Mark: "RE: [cc65] Floating point support"</a>
+<li><strong>Reply:</strong> <a href="1378.html">groepaz: "Re: [cc65] Floating point support"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Tue, May 21, 2002 at 07:48:49PM +0200, groepaz wrote:
+&gt; how is that issue different from stuff like disc/file i/o for example?
+
+IMHO the problem is in the way you're using to achieve the desired result. If
+you want some library to be portable, it is the wrong way, to write a
+collection of highly system dependent modules and then try to make it portable
+afterwards. With a few rare exceptions this will not work, or will be quite
+ugly at least. If you start with portable code and then try to make it faster
+by using system dependent stuff, the result will be much better.
+
+The real world gives you many examples for this: If you start coding a program
+that should end up to be ported to several platforms, probably the worst idea
+of all would be to go ahead and code it using Visual Studio for Windows and
+MFC. There are (some) programs that started like this and were ported to other
+platforms, and all these programs suck.
+
+The approach I suggest is to write a portable library first. If you can use
+system depdendent stuff later to make it faster and shorter: good! If not,
+then you do still have a solution that works on all platforms.
+
+I admit that in theory, your approach and mine should both achieve the same
+results. But I've tried both ways myself, and my experience is that - starting
+with something unportable - it is much more difficult to make it portable
+later.
+
+&gt; not using the c64's (or cbm's for that matter) kernal
+&gt; because of that reason would mean adding in a KB or more of code just
+&gt; for that one or two floating-point variables your code uses.
+
+The situation would be the same as with ints or longs: If you use float
+multiplication, the linker would add the necessary routine and may be some
+support stuff, but nothing else. So you pay only for the stuff, you do really
+use.
+
+&gt; easy (more or less) if the assembler knows about the specific
+&gt; target-format... let the compiler handle them as &quot;real&quot; floats and
+&gt; make the assembler support some directive &quot;.float&quot; that works simelar
+&gt; to &quot;.byte&quot; but which inserts a floating-point number in the format of
+&gt; the selected target. that could even achive compatibility on assembler
+&gt; level and only the actual routines doing arithmetics on them would
+&gt; need to be target-specific.
+
+This is not enough. The C standard requires, that computations done in the
+compiler generate the same results as computations done at runtime - which
+does usually mean that the compiler MUST use the same float representation as
+the target machine.
+
+If you're using IEEE floats for example, this is not a problem, since most
+of todays platforms use it. If the compiler has to emulate all of the
+different and non standard floating point formats, this would be - uhmm -
+&quot;inconvenient&quot; :-)
+
+&gt; you arent really seriously suggesting to implement a full IEE
+&gt; compliant floating-point emulator that passes all tests are you ?
+
+Yes, I do.
+
+&gt; That
+&gt; may be a nice tech-demo, but completely useless for real use (large
+&gt; and slow, just what we like ,=P)
+
+Why do you expect such a library to be slower than what the CBM kernal has?
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Floating%20point%20support">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Floating%20point%20support">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1365.html">Matt Ackeret: "Re: [cc65] statics in zero page"</a>
+<li><strong>In reply to:</strong> <a href="1364.html">groepaz: "Re[2]: [cc65] statics in zero page"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1368.html">Christian Groessler: "Re: [cc65] Floating point support"</a>
+<li><strong>Next in thread:</strong> <a href="1360.html">Christian Krüger: "Re: [cc65] statics in zero page"</a>
+<li><strong>Reply:</strong> <a href="1368.html">Christian Groessler: "Re: [cc65] Floating point support"</a>
+<li><strong>Reply:</strong> <a href="1369.html">Piotr Fusik: "Re: [cc65] Floating point support"</a>
+<li><strong>Reply:</strong> <a href="1376.html">Keates, Mark: "RE: [cc65] Floating point support"</a>
+<li><strong>Reply:</strong> <a href="1378.html">groepaz: "Re: [cc65] Floating point support"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-05-22 09:15:42 CEST</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] code generation</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] code generation">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] code generation</h1>
+<!-- received="Sun Sep 14 13:27:17 2003" -->
+<!-- isoreceived="20030914112717" -->
+<!-- sent="Sun, 14 Sep 2003 13:27:14 +0200" -->
+<!-- isosent="20030914112714" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] code generation" -->
+<!-- id="20030914112714.GA6502@trixie.musoftware.de" -->
+<!-- inreplyto="200309120138.38909.groepaz@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20code%20generation"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-09-14 13:27:14
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3386.html">Daniel Pralle: "Re: [cc65] Optimizing C code"</a>
+<li><strong>In reply to:</strong> <a href="3385.html">Groepaz: "Re: [cc65] code generation"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3388.html">Groepaz: "Re: [cc65] code generation"</a>
+<li><strong>Next in thread:</strong> <a href="3377.html">Maciej Witkowiak: "Re: [cc65] Optimizing C code"</a>
+<li><strong>Reply:</strong> <a href="3388.html">Groepaz: "Re: [cc65] code generation"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Fri, Sep 12, 2003 at 01:38:38AM +0200, Groepaz wrote:
+&gt; a) everytime a macro expansion takes place a certain counter &quot;local_prefix&quot; is
+&gt; incremented
+&gt; b) inline asm gets a format-string added that works like this:
+&gt;
+&gt; 	__asm__(&quot;beq %l&quot;, 1); // generates labelnr=1
+&gt;
+&gt; the actual label is now formed as &quot;@%4d%4d&quot;,local_prefix,labelnr
+
+I've had a look at the preprocessor: What you're suggesting is rather
+difficult to add to the current implementation[1]. But because of some other
+problems with the current implementation, the preprocessor may get a rewrite
+at some time, and then I may consider your proposal.
+
+&gt; that should allow labels in inline asm in both macros and functions with the
+&gt; following restrictions:
+[...]
+
+Here is one more: The concept does not allow generation of local labels
+outside of macros, because it relies on a counter incremented when a macro is
+expanded.
+
+&gt; its almost at that state actually :) i've made some minor modifications so it
+&gt; runs flawlessly on cc65 generated code, and currently try to teach it some
+&gt; more little details (eg removing immediate lda followed by immediate
+&gt; ora/and/eor)...
+
+This and the load/transfer stuff is in the current snapshot, but I do somehow
+regret adding it, because it saves just a few bytes, at least when compiling
+the samples and libraries. For new peephole optimization proposals I would
+suggest a few statistics highlighting the advantages/disadvantages.
+
+&gt; however, the main things that opt65 catches atm is a lot of unnessary lda/tax
+&gt; ldx/txa etc stuff (~400 lines removed on ~5000 lines of asm for the raycaster
+&gt; - although i have to make better figures here, the numbers seem to be
+&gt; somewhat large, there must be a bug in the linecounter in opt65 somewhere
+&gt; :=P)....
+
+I do really, really doubt this number, at least for compiler generated code.
+It may be true for inline asm or use of __AX__/__EAX__, but in this case it's
+a problem if the asm code. Within the samples and library sources, there is
+exactly ONE module that profits from the optimization - and the reason is that
+this modules makes heavy use of the is... functions from ctype.h that are
+inline assembly.
+
+&gt; this macro... (you reckon why asking for __X__/__Y__ eh? :=P)
+[...]
+&gt; will result in wrong code (i think the condition was not checked at all,dont
+&gt; remember exactly sorry :=P), whereas
+
+Yes, it's a bug, thanks for the report! When using the __AX__ pseudo variable,
+the compiler doesn't make sure that the condition codes are set, which causes
+the test to fail. It works in most cases, because a load will set the
+condition codes right (which is the reason why the macros from ctype.h work),
+but in your macro this is not the case because of the last ldx. The compiler
+from the head branch does actually remove the complete code from the macro,
+because it finds out that all the loads and stores are useless without the
+final test:-)
+
+BTW, your macro is a good example of code that will not work in certain cases
+as pointed out by me in my last mail within this thread:
+
+&gt; #define getblock(_x,_y) (unsigned char) \
+&gt;    	( \
+&gt;    	__AX__= (_y), \
+&gt;    	__asm__ (&quot;txa&quot;), \
+&gt;    	__asm__ (&quot;tay&quot;), \
+&gt;    	__AX__= (_x), \
+&gt;    	__asm__ (&quot;lda %v,x&quot;, worldptr_lo ), \
+&gt;    	__asm__ (&quot;sta ptr1&quot;), \
+&gt;    	__asm__ (&quot;lda %v,x&quot;, worldptr_hi ), \
+&gt;    	__asm__ (&quot;sta ptr1+1&quot;), \
+&gt;    	__asm__ (&quot;lda (ptr1),y&quot;), \
+&gt;    	__asm__ (&quot;ldx #%b&quot;, 0), \
+&gt;      __AX__)
+
+The second assignment to __AX__ will destroy the Y register just loaded in all
+but the most simplest cases (where _x is a global variable).
+
+Regards
+
+
+        Uz
+
+
+
+[1] The current preprocessor code loops until no more macros are found instead
+of doing macro expansion recursively. This means that there is no easy way to
+determine if the preprocessor is currently expanding a macro, which is the
+cause of several problems. However, it works most of the time, so it's not
+urgent to fix it.
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20code%20generation">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20code%20generation">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3386.html">Daniel Pralle: "Re: [cc65] Optimizing C code"</a>
+<li><strong>In reply to:</strong> <a href="3385.html">Groepaz: "Re: [cc65] code generation"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3388.html">Groepaz: "Re: [cc65] code generation"</a>
+<li><strong>Next in thread:</strong> <a href="3377.html">Maciej Witkowiak: "Re: [cc65] Optimizing C code"</a>
+<li><strong>Reply:</strong> <a href="3388.html">Groepaz: "Re: [cc65] code generation"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-09-14 13:28:13 CEST</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-15" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Re: [Contiki-developers] build</title>
+<meta name="Author" content="Adam Dunkels (adam1sics.se)" />
+<meta name="Subject" content="[cc65] Re: [Contiki-developers] build problems" />
+<meta name="Date" content="2006-06-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Re: [Contiki-developers] build problems</h1>
+<!-- received="Fri Jun 23 13:28:03 2006" -->
+<!-- isoreceived="20060623112803" -->
+<!-- sent="Fri, 23 Jun 2006 13:27:54 +0200" -->
+<!-- isosent="20060623112754" -->
+<!-- name="Adam Dunkels" -->
+<!-- email="adam1sics.se" -->
+<!-- subject="[cc65] Re: [Contiki-developers] build problems" -->
+<!-- id="449BD03A.5030004@sics.se" -->
+<!-- charset="ISO-8859-15" -->
+<!-- inreplyto="200606231315.00816.groepaz&#64;gmx.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5517.html" title="Groepaz: &quot;[cc65] cl65 bugs&quot;">Next message</a> ]
+[ <a href="5515.html" title="Groepaz: &quot;[cc65] Re: [Contiki-developers] build problems&quot;">Previous message</a> ]
+[ <a href="5515.html" title="Groepaz: &quot;[cc65] Re: [Contiki-developers] build problems&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="../2007-08/5849.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Re: [Contiki-developers] build problems&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Adam Dunkels &lt;<a href="mailto:adam1sics.se?Subject=Re:%20[cc65]%20Re:%20[Contiki-developers]%20build%20problems">adam1sics.se</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2006-06-23 13:27:54</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Groepaz wrote:
+&gt; On Friday 23 June 2006 09:05, Adam Dunkels wrote:
+&gt; 
+&gt; (crossposted to cc65 list, note for UZ: i volunteered to handle the 2.x port 
+&gt; of contiki for the c64, currently trying to just make it compile with cc65)
+&gt; 
+&gt;&gt; The Makefile.include currently contains a lot of gcc-isms since it has
+&gt;&gt; only been used with gcc-style compilers. It would be great, however, if
+&gt;&gt; it could be entirely generic and work for all C compilers and if any has
+&gt;&gt; ideas on how to make things more generic, feel free to share them :-)
+&gt; 
+&gt; one problem i have found is that it is assumed that the compiler understands 
+&gt; certain options, such as -c (compile but do not link). not much of a problem 
+&gt; with cc65 (because cl65 _does_ understand it, and cl65 pretty much resembles 
+&gt; what the &quot;gcc&quot; program does) but it'll be a problem with lesser compilers 
+&gt; (such as sdcc *shudder*). [however, maybe some custom rules in the arch 
+&gt; specific makefile can overide this behaviour, didnt try because it doesnt 
+&gt; bother me right now :=P]
+
+Yeah, letting the platform/ makefile override the targets in the 
+Makefile.include is probably the best way for such compilers.
+
+&gt; the offending code is:
+&gt; 
+&gt; (somewhere in ./platform/c64/contiki-conf.h)
+&gt; #define LC_CONF_INCLUDE &quot;lib/lc-cc65.h&quot;
+&gt; 
+&gt; (in ./core/sys/lc.h)
+&gt; #ifdef LC_CONF_INCLUDE
+&gt; #include LC_CONF_INCLUDE
+&gt; #else /* LC_CONF_INCLUDE */
+&gt; #include &quot;sys/lc-switch.h&quot;
+&gt; #endif /* LC_CONF_INCLUDE */
+&gt; 
+&gt; ...is this even legal? mmmh i can see a lot of lesser compilers fail on this 
+&gt; too... maybe some kind of configure script would do the job better than this? 
+&gt; (although i can see other kinds of problems with that). args :/
+
+I talked to Uz about this some time ago and he said that the above code 
+indeed is legal C but that cc65 doesn't support it (yet! :-))
+
+/adam
+-- 
+Adam Dunkels, Swedish Institute of Computer Science
+<a href="http://www.sics.se/~adam/">http://www.sics.se/~adam/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Jun 23 13:28:03 2006</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5517.html" title="Next message in the list">Groepaz: "[cc65] cl65 bugs"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5515.html" title="Previous message in the list">Groepaz: "[cc65] Re: [Contiki-developers] build problems"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5515.html" title="Message to which this message replies">Groepaz: "[cc65] Re: [Contiki-developers] build problems"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="../2007-08/5849.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Re: [Contiki-developers] build problems"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="../2007-08/5849.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Re: [Contiki-developers] build problems"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5516" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5516" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5516" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2006-06-23 13:28:05 CEST
+</em></small></p>
+</body>
+</html>

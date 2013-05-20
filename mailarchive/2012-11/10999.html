@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] tgi_sprite and friends</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] tgi_sprite and friends" />
+<meta name="Date" content="2012-11-09" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] tgi_sprite and friends</h1>
+<!-- received="Fri Nov  9 16:20:48 2012" -->
+<!-- isoreceived="20121109152048" -->
+<!-- sent="Fri, 9 Nov 2012 16:20:28 +0100" -->
+<!-- isosent="20121109152028" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] tgi_sprite and friends" -->
+<!-- id="20121109152027.GA16442@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="CACT=u71Y9qw1FhDd0nzdkKrqWhGbSj-jNcqaVEdNW6SHr6Se3A&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11000.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] tgi_sprite and friends&quot;">Next message</a> ]
+[ <a href="10998.html" title="Oliver Schmidt: &quot;Re: [cc65] tgi_sprite and friends&quot;">Previous message</a> ]
+[ <a href="10998.html" title="Oliver Schmidt: &quot;Re: [cc65] tgi_sprite and friends&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="11001.html" title="Oliver Schmidt: &quot;Re: [cc65] tgi_sprite and friends&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20tgi_sprite%20and%20friends">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-11-09 16:20:28</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Fri, Nov 09, 2012 at 11:40:53AM +0100, Oliver Schmidt wrote:
+&gt; 1. Recently we moved towards having the TGI kernel handle all clipping
+&gt; resulting i.e. in not drawing a character at all if it doesn't fully
+&gt; fit on the screen. Is the same approach reasonable for bitmaps. Or are
+&gt; partially rendered bitmaps so &quot;necessary&quot; that we need to deviate from
+&gt; the general approach here?
+
+Partially rendered bitmaps are quite useful and do fit nicely into the current
+concept. If a line ends outside the visible screen, the kernel won't decide
+not to draw it at all, but to draw just the visible part. The same is true for
+ellipses, bars and whatever. For strings, clipping occurs on character level,
+simply because the the actual outline of a character isn't known to the
+kernel.
+
+Regarding images, while I would prefer to have the kernel clip them, I don't
+think it is a viable option. Different platforms might need different image
+formats for effective drawing, and the kernel would need knowledge of all of
+them to do clipping.
+
+&gt; 2. I imagine that most targets have a graphics screen buffer layout
+&gt; that allows bitmaps to be drawn much faster on some locations than
+&gt; others, especially the X offset being a multiple of a certain value
+&gt; (usually 8). Am I right in presuming that we don't want to pose such
+&gt; limitations on &quot;our function&quot;?
+
+Yes.
+
+&gt; 3. Somewhat related is the size of the bitmap. Is it reasonable to
+&gt; pose constraints on the bitmap size saying i.e. the horizonal size
+&gt; must be multiple of a certain value (usually 8)?
+
+No, I wouldn't impose such a limit.
+
+&gt; 4. I presume we don't want the function to be obligated to be capable
+&gt; of more than an opaque copy - right? Any fancy masking stuff would be
+&gt; a proprietary extension - wouldn't it?
+
+While xor would be nice, other drawing primitives don't have it, too. So
+anything else beyond a simple &quot;put&quot; shouldn't be a standard operation.
+
+&gt; 5. What about coordinates? Is the coordinate supplied used as upper
+&gt; left corner - most likely yes...
+
+I suppose yes.
+
+&gt; 5. What about the TGI cursor. Is it moved by the function?  I'd say
+&gt; most likely not...
+   
+It might be set to the upper left corner before drawing the image. But tgi_bar
+doesn't do that either ...
+
+&gt; 6. Do we want to go with the proposed ellipsis parameter (...)? If
+&gt; yes: Five fixed parameters seem clear (bitmap pointer, x, y, width,
+&gt; height). Any more? If saved as C source file then sp65 delivers beside
+&gt; &quot;width&quot; and &quot;height&quot; a &quot;colors&quot; meta information. From the perspective
+&gt; of &quot;our function&quot; being a companion to sp65 it might make sense to
+&gt; have the colors as fixed parameter - as it's &quot;always avaliable&quot;.
+
+We might as well make colours, the size and maybe a format specifier part of a
+structure that does also contain the image data. Something like
+
+    struct image_data {
+        unsigned char format;
+        unsigned char colors;
+        unsigned width;
+        unsigned height;
+        unsigned char data[];
+    };
+
+(colors might be unnecessary if part of the format spec).
+
+The advantages are
+
+  - there are less parameters to pass to the function
+  - a possible get... function might also use such a structure.
+
+For sp65, this would just be some other output format.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Nov  9 16:20:48 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11000.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] tgi_sprite and friends"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10998.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] tgi_sprite and friends"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10998.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] tgi_sprite and friends"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="11001.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] tgi_sprite and friends"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="11001.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] tgi_sprite and friends"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10999" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10999" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10999" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-11-09 16:20:52 CET
+</em></small></p>
+</body>
+</html>

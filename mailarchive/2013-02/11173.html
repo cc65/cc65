@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Disable KERNAL ROM ?</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] Disable KERNAL ROM ?" />
+<meta name="Date" content="2013-02-11" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Disable KERNAL ROM ?</h1>
+<!-- received="Mon Feb 11 14:13:58 2013" -->
+<!-- isoreceived="20130211131358" -->
+<!-- sent="Mon, 11 Feb 2013 14:13:40 +0100" -->
+<!-- isosent="20130211131340" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] Disable KERNAL ROM ?" -->
+<!-- id="CACT=u734v+68iU+00e9GKh+b+xXmWpSSWBN41jYRtnVQ0ez2rg@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11174.html" title="Oliver Schmidt: &quot;[cc65] Changes in Interrupt Handling&quot;">Next message</a> ]
+[ <a href="11172.html" title="thefox xofeht: &quot;Re: [cc65] void* pointer to asm sequence?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="11175.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Disable KERNAL ROM ?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Disable%20KERNAL%20ROM%20?">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2013-02-11 14:13:40</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+As I'm no C64 pro I only recently realized that - leaving the BASIC
+ROM out of consideration - the memory layout of the C64 and the Apple2
+are in general very similiar:
+
+A large RAM area followed by some I/O area followed by banking between
+ROM and &quot;high&quot; RAM.
+
+On the Apple2 I introduced quite some time ago a way to make &quot;native&quot;
+use of high RAM for cc65 programs and so I'm wondering if a similiar
+approach wouldn't be applicable - and in fact desirable - for the C64
+too. Sorry, if that should have already been discussed (too) many
+times...
+
+On the Apple2 it works like this:
+
+- After running the constructors (which tend to interact with the ROM)
+the startup code banks in high RAM just before calling main().
+
+- Before running the destructors the _exit() code banks in ROM again.
+
+- All calls from the C library into the ROM go through little thunks
+which bank in ROM, do the call and bank in high RAM again. This can be
+done without changing the library code by just removing the existing
+aliases between ROM routine names and actual addresses. These aliases
+are replaced by the thunks exporting the same names. The thunks
+themselves use the actual addresses for doing the calls.
+
+- The builtin linker config contains a memory area and a segment for
+the &quot;high&quot; RAM marked as optional (!).
+
+- The builtin linker config makes sure the content of that high RAM
+segment (which by default empty) is placed at the end of the generated
+binary file. So after loading the binary into RAM it's located where
+the BSS starts.
+
+- The startup code copies the content of the high RAM segment (which
+is by default empty) from the BSS location to it's final location just
+before zero'ing the BSS. The  startup code uses for that task an
+existing ROM routine that deals nicely with zero bytes to copy.
+
+So far so good. Now that everything is in place the user just has to
+compile some of his code with the option --code-name or use the
+#pragma code-name to place code in high RAM. That' all :-)
+
+Note that by this usage scenario there's no problem with code banking
+out itself as the thunks are of course placed in the CODE segment.
+There's no problem with data not available to the ROM as only code is
+placed in high RAM. And if there's desire for a C program to call some
+arbitrary ROM routine it can use the _sys() function which does the
+necessary banking like the thunks.
+
+I understand that the C64 would additionally require the setup of an
+IRQ thunk handler...
+
+Looking forward to your comments, Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Feb 11 14:13:58 2013</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11174.html" title="Next message in the list">Oliver Schmidt: "[cc65] Changes in Interrupt Handling"</a></li>
+<li><dfn>Previous message</dfn>: <a href="11172.html" title="Previous message in the list">thefox xofeht: "Re: [cc65] void* pointer to asm sequence?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="11175.html" title="Next message in this discussion thread">silverdr1wfmh.org.pl: "Re: [cc65] Disable KERNAL ROM ?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="11175.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] Disable KERNAL ROM ?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#11173" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#11173" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#11173" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2013-02-11 14:14:03 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] ca65 syntax problems</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] ca65 syntax problems">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] ca65 syntax problems</h1>
+<!-- received="Wed Nov  7 11:56:31 2001" -->
+<!-- isoreceived="20011107105631" -->
+<!-- sent="Wed, 7 Nov 2001 11:56:33 +0100" -->
+<!-- isosent="20011107105633" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] ca65 syntax problems" -->
+<!-- id="20011107115633.B3834@trixie.musoftware.de" -->
+<!-- inreplyto="Pine.SOL.4.10.10111061338360.867-100000@sun1307.ssd.usa.alcatel.com" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20ca65%20syntax%20problems"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2001-11-07 11:56:33
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0934.html">Mike McCarty: "Re: [cc65] ca65 syntax problems"</a>
+<li><strong>Previous message:</strong> <a href="0932.html">Mike McCarty: "Re: [cc65] ca65 syntax problems"</a>
+<li><strong>In reply to:</strong> <a href="0932.html">Mike McCarty: "Re: [cc65] ca65 syntax problems"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0934.html">Mike McCarty: "Re: [cc65] ca65 syntax problems"</a>
+<li><strong>Reply:</strong> <a href="0934.html">Mike McCarty: "Re: [cc65] ca65 syntax problems"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Tue, Nov 06, 2001 at 02:00:23PM -0600, Mike McCarty wrote:
+&gt; Suppose there is a structure which is being built, which has pointers
+&gt; to various other places in the code. One can then put the
+&gt; initialization for that structure in the source where the various
+&gt; things are created.
+[...]
+&gt; In this way, file1.asm does not have to have embedded knowledge of the
+&gt; names of the external addresses used, or even which ones are actually
+&gt; present.
+
+Well, yes. One could use it for this purpose. But the problem is rare and can
+be solved by other means.
+
+&gt; Another, more mundane use, is to implement placing things in a
+&gt; relocatable area, but on an address which is divisible by some
+&gt; particular size, especially if the assembler does not support an .align
+&gt; to that size. For example, suppose some piece of the code must reside at
+&gt; an address divisible by 16, and no .align 16 directive exists.
+
+This is hard to solve, since the assembler does not know how much space is
+actually inserted by such an .org command. We had this problem some time ago,
+when we talked about short branch optimization in the assembler: The assembler
+has to emit completely relocatable code (that is no constant values at all)
+and all address resolving has to be done by the linker. This would add
+complexity and delay several warnings/errors until linking occurs. 
+
+And ca65 does allow .align in powers of two up to 2^16.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20ca65%20syntax%20problems">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20ca65%20syntax%20problems">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0934.html">Mike McCarty: "Re: [cc65] ca65 syntax problems"</a>
+<li><strong>Previous message:</strong> <a href="0932.html">Mike McCarty: "Re: [cc65] ca65 syntax problems"</a>
+<li><strong>In reply to:</strong> <a href="0932.html">Mike McCarty: "Re: [cc65] ca65 syntax problems"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0934.html">Mike McCarty: "Re: [cc65] ca65 syntax problems"</a>
+<li><strong>Reply:</strong> <a href="0934.html">Mike McCarty: "Re: [cc65] ca65 syntax problems"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:44 CET</em>
+</em>
+</small>
+</body>
+</html>

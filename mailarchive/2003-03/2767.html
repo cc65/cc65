@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] The Contiki Desktop OS fo</title>
+<meta name="Author" content="Shawn Jefferson (sjefferson_at_sd62.bc.ca)">
+<meta name="Subject" content="Re: [cc65] The Contiki Desktop OS for cc65">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] The Contiki Desktop OS for cc65</h1>
+<!-- received="Fri Mar 14 17:30:14 2003" -->
+<!-- isoreceived="20030314163014" -->
+<!-- sent="Fri, 14 Mar 2003 08:29:13 -0800" -->
+<!-- isosent="20030314162913" -->
+<!-- name="Shawn Jefferson" -->
+<!-- email="sjefferson_at_sd62.bc.ca" -->
+<!-- subject="Re: [cc65] The Contiki Desktop OS for cc65" -->
+<!-- id="se7192f1.062@gwmail.sd62.bc.ca" -->
+<!-- inreplyto="[cc65] The Contiki Desktop OS for cc65" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Shawn Jefferson (<a href="mailto:sjefferson_at_sd62.bc.ca?Subject=Re:%20[cc65]%20The%20Contiki%20Desktop%20OS%20for%20cc65"><em>sjefferson_at_sd62.bc.ca</em></a>)<br>
+<strong>Date:</strong> 2003-03-14 17:29:13
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2766.html">Ullrich von Bassewitz: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Maybe in reply to:</strong> <a href="2677.html">Adam Dunkels: "[cc65] The Contiki Desktop OS for cc65"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2768.html">Ullrich von Bassewitz: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Next in thread:</strong> <a href="2720.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Maybe reply:</strong> <a href="2720.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Maybe reply:</strong> <a href="2721.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Maybe reply:</strong> <a href="2742.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Reply:</strong> <a href="2768.html">Ullrich von Bassewitz: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+&gt;&gt;&gt; Christian Groessler &lt;<a href="mailto:chris_at_groessler.org?Subject=Re:%20[cc65]%20The%20Contiki%20Desktop%20OS%20for%20cc65">chris_at_groessler.org</a>&gt; 03/14/03 06:02AM &gt;&gt;&gt;
+&gt;&gt; With these mini-loader DOSes, will cc65 file i/o routines work?
+&gt;
+&gt;No, the DOS is only loading the program and then disappearing...
+
+That precludes the use of loadable modules.  I'm guessing that using AtariDOS with this isn't going to be feasible, since that has one of the highest memlos.  But most versions of SpartaDOS won't work with the 800 (maybe X?  I dont' have that one.)  No perfect solutions! :(
+
+&gt;&gt; &gt;Another idea is to get more memory by loading the 800 (not xl) BIOS into
+&gt;&gt; &gt;RAM which should make the area $C000 to $D000 available (not used by this
+&gt;&gt; &gt;BIOS), giving another 4k of RAM.
+&gt;&gt;
+&gt;&gt; That would cut off some hardware from being used with Contiki (PBI
+&gt;&gt; hard drives.)  Maybe that's not an issue.
+&gt;
+&gt;Do they use the area btw $C000 and $D000? I thought all devices are mapped
+&gt;into the $D000-$E000 region?
+
+I believe that they use the floating point area of rom (turning it on and off as needed), as well as some at D600 (or is that D800)?  Anyway, with a 800 OS you don't have any of the PBI routines so those devices won't work anyhow.
+
+&gt;&gt; &gt;The memory is very tight on the Atari, so it's not that straightforward...
+&gt;&gt;
+&gt;&gt; Maybe we would have to implement some type of application swapping to
+&gt;&gt; extended memory.  Also not everyone is going to want to run the http
+&gt;&gt; server, web browser, telnet client, email, etc...  It would be better
+&gt;&gt; to implement these things as loadable modules and let the user load
+&gt;&gt; which ones they wanted until they fill up memory.
+&gt;
+&gt;The memory is so tight with only the web browser, the other things are
+&gt;already disabled... :-(
+
+Does the C64 really have that much more RAM than the Atari?  We may have to get a little more creative in using space from the OS... although I don't know how much more there is to take?  The C: routines?
+
+I guess we need to look at other options such as banking to extended memory, or even disk (hard disk virtual memory?)  Although that makes coding the programs much more difficult since we need to swap parts in and out of memory, and the 16k banks really cut down on the size of your core program!
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20The%20Contiki%20Desktop%20OS%20for%20cc65">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2766.html">Ullrich von Bassewitz: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Maybe in reply to:</strong> <a href="2677.html">Adam Dunkels: "[cc65] The Contiki Desktop OS for cc65"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2768.html">Ullrich von Bassewitz: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Next in thread:</strong> <a href="2720.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Maybe reply:</strong> <a href="2720.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Maybe reply:</strong> <a href="2721.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Maybe reply:</strong> <a href="2742.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Reply:</strong> <a href="2768.html">Ullrich von Bassewitz: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-03-14 17:30:33 CET</em>
+</em>
+</small>
+</body>
+</html>

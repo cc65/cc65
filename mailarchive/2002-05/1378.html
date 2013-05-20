@@ -1,0 +1,210 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Floating point support</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] Floating point support">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Floating point support</h1>
+<!-- received="Wed May 22 15:13:20 2002" -->
+<!-- isoreceived="20020522131320" -->
+<!-- sent="Wed, 22 May 2002 15:15:01 +0200" -->
+<!-- isosent="20020522131501" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] Floating point support" -->
+<!-- id="8711985158.20020522151501@gmx.net" -->
+<!-- inreplyto="20020522091517.A23385@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Floating%20point%20support"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2002-05-22 15:15:01
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1377.html">Piotr Fusik: "RE: [cc65] Floating point support"</a>
+<li><strong>In reply to:</strong> <a href="1366.html">Ullrich von Bassewitz: "[cc65] Floating point support"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1383.html">Ullrich von Bassewitz: "Re: [cc65] Floating point support"</a>
+<li><strong>Next in thread:</strong> <a href="1360.html">Christian Krüger: "Re: [cc65] statics in zero page"</a>
+<li><strong>Reply:</strong> <a href="1383.html">Ullrich von Bassewitz: "Re: [cc65] Floating point support"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+Wednesday, May 22, 2002, 9:15:17 AM, you wrote:
+
+
+UvB&gt; Hi!
+
+UvB&gt; On Tue, May 21, 2002 at 07:48:49PM +0200, groepaz wrote:
+&gt;&gt; how is that issue different from stuff like disc/file i/o for example?
+
+UvB&gt; IMHO the problem is in the way you're using to achieve the desired result. If
+UvB&gt; you want some library to be portable, it is the wrong way, to write a
+UvB&gt; collection of highly system dependent modules and then try to make it portable
+UvB&gt; afterwards. With a few rare exceptions this will not work, or will be quite
+UvB&gt; ugly at least. If you start with portable code and then try to make it faster
+UvB&gt; by using system dependent stuff, the result will be much better.
+
+UvB&gt; The real world gives you many examples for this: If you start coding a program
+UvB&gt; that should end up to be ported to several platforms, probably the worst idea
+UvB&gt; of all would be to go ahead and code it using Visual Studio for Windows and
+UvB&gt; MFC. There are (some) programs that started like this and were ported to other
+UvB&gt; platforms, and all these programs suck.
+
+myohmyohmy
+
+so you are saying that for example a grafics-library should contain
+only portable routines, and one target-specific setpixel routine?
+and if not, please explain whats different between that and the floats
+coz i just dont get it.
+
+we arent talking about writing a portable program (and yes i agree to
+what you were saying when it comes to that), we are talking about
+writing libraries used to compile the portable program =&gt; totally
+different thing.
+
+and yes i know its nice to have portable libraries aswell, but you
+know it yourself that most libraries cant be portable at all - except
+they dont cover any system-specific tasks (say sound, say grafics, say
+i/o). the only difference i can see for the floats here would be that
+they are _usually_ not such a target-specific thing, although also
+there have been exceptions to the rule in the past.
+
+UvB&gt; The approach I suggest is to write a portable library first. If you can use
+UvB&gt; system depdendent stuff later to make it faster and shorter: good! If not,
+UvB&gt; then you do still have a solution that works on all platforms.
+
+yeah, a theoretically nice, but practically unuseable solution. slow
+and large.... sounds like windoze(tm) to me ;=P
+
+(however the &quot;knock something up that works everywhere and if you cant
+improve it later so be it&quot; thing reminds me of linux desktop ;=DDD)
+
+UvB&gt; I admit that in theory, your approach and mine should both achieve the same
+UvB&gt; results. But I've tried both ways myself, and my experience is that - starting
+UvB&gt; with something unportable - it is much more difficult to make it portable
+UvB&gt; later.
+
+the point is, theres no point in makeing _the library_ portable -
+except for the heck of it.
+
+i would however prefer a compiler that produces the best code possible
+- not one whose libraries sourcecode looks most beautiful. thats just
+a non argument.
+
+&gt;&gt; not using the c64's (or cbm's for that matter) kernal
+&gt;&gt; because of that reason would mean adding in a KB or more of code just
+&gt;&gt; for that one or two floating-point variables your code uses.
+
+UvB&gt; The situation would be the same as with ints or longs: If you use float
+UvB&gt; multiplication, the linker would add the necessary routine and may be some
+UvB&gt; support stuff, but nothing else. So you pay only for the stuff, you do really
+UvB&gt; use.
+
+yes ofcoz, i know.... that still means that in whatever reallife
+situation that needs one or two floats for certain calculation you
+need to include almost the full floatingpoint emulator (minus the
+trig. functions obviously which arent really part of the emulator
+anyway).
+
+&gt;&gt; easy (more or less) if the assembler knows about the specific
+&gt;&gt; target-format... let the compiler handle them as &quot;real&quot; floats and
+&gt;&gt; make the assembler support some directive &quot;.float&quot; that works simelar
+&gt;&gt; to &quot;.byte&quot; but which inserts a floating-point number in the format of
+&gt;&gt; the selected target. that could even achive compatibility on assembler
+&gt;&gt; level and only the actual routines doing arithmetics on them would
+&gt;&gt; need to be target-specific.
+
+UvB&gt; This is not enough. The C standard requires, that computations done in the
+UvB&gt; compiler generate the same results as computations done at runtime - which
+UvB&gt; does usually mean that the compiler MUST use the same float representation as
+UvB&gt; the target machine.
+
+UvB&gt; If you're using IEEE floats for example, this is not a problem, since most
+UvB&gt; of todays platforms use it. If the compiler has to emulate all of the
+UvB&gt; different and non standard floating point formats, this would be - uhmm -
+UvB&gt; &quot;inconvenient&quot; :-)
+
+again, noone will go port that highly accurate 3d engine to some old
+8bit machine. thats a pretty theoretical accuracy argument that would
+for 99.9% never break any reallife code. and again, if you really need
+that accuracy, you may still snap in your fully standard compliant IEE
+float emulator.
+
+&gt;&gt; you arent really seriously suggesting to implement a full IEE
+&gt;&gt; compliant floating-point emulator that passes all tests are you ?
+UvB&gt; Yes, I do.
+
+*ouch*
+
+UvB&gt; Why do you expect such a library to be slower than what the CBM kernal has?
+
+i disassembled the entire kernal routines for that matter... those are
+large and slow already, and they provide less accuracy then IEE would
+require. so yes, i really expect routines that deal with more data to
+be even slower and probably larger aswell. the kernals routines
+already make more than one stunt to achive their relativly small
+codesize - which is still quite large comparing to other routines.
+
+btw talking of accurracy.... even a stripped down version of the
+kernal routines (2 byte floats) worked perfectly fine and accurate
+enough for me in quite a bunch of programms..... whythehell would i
+even consider using IEE floats here? to bloat my code and make it 10
+times slower?
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Floating%20point%20support">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Floating%20point%20support">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1377.html">Piotr Fusik: "RE: [cc65] Floating point support"</a>
+<li><strong>In reply to:</strong> <a href="1366.html">Ullrich von Bassewitz: "[cc65] Floating point support"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1383.html">Ullrich von Bassewitz: "Re: [cc65] Floating point support"</a>
+<li><strong>Next in thread:</strong> <a href="1360.html">Christian Krüger: "Re: [cc65] statics in zero page"</a>
+<li><strong>Reply:</strong> <a href="1383.html">Ullrich von Bassewitz: "Re: [cc65] Floating point support"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-05-22 15:14:20 CEST</em>
+</em>
+</small>
+</body>
+</html>

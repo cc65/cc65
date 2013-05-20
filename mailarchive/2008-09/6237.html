@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] segment address arithmetic</title>
+<meta name="Author" content="Shawn Jefferson (sjefferson1shaw.ca)" />
+<meta name="Subject" content="[cc65] segment address arithmetic" />
+<meta name="Date" content="2008-09-21" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] segment address arithmetic</h1>
+<!-- received="Sun Sep 21 02:45:49 2008" -->
+<!-- isoreceived="20080921004549" -->
+<!-- sent="Sat, 20 Sep 2008 17:45:38 -0700" -->
+<!-- isosent="20080921004538" -->
+<!-- name="Shawn Jefferson" -->
+<!-- email="sjefferson1shaw.ca" -->
+<!-- subject="[cc65] segment address arithmetic" -->
+<!-- id="669CB16F7DF341F8BE025ABA4711B7E5@ORANGE2" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6238.html" title="David A. Lyons: &quot;Re: [cc65] segment address arithmetic&quot;">Next message</a> ]
+[ <a href="6236.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Code::Blocks IDE and cc65&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6238.html" title="David A. Lyons: &quot;Re: [cc65] segment address arithmetic&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Shawn Jefferson &lt;<a href="mailto:sjefferson1shaw.ca?Subject=Re:%20[cc65]%20segment%20address%20arithmetic">sjefferson1shaw.ca</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-09-21 02:45:38</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I'm trying to take the address of one of my segments (or memory areas) and
+add 1024 to that address.  When I do that using the following code:
+
+ 
+
+extern char *_DATA_LOAD__;
+
+ 
+
+void main(void) {
+
+  cprintf(&quot;%X&quot;, &amp;_DATA_LOAD__+1024);
+
+ 
+
+  return;
+
+}
+
+ 
+
+The compiler produces:
+
+ 
+
+000003r 1               .segment     &quot;CODE&quot;
+
+000000r 1               
+
+000000r 1               .proc            _main: near
+
+000000r 1               
+
+000000r 1               .segment     &quot;CODE&quot;
+
+000000r 1               
+
+000000r 1               ;
+
+000000r 1               ; cprintf(&quot;%X&quot;, &amp;_DATA_LOAD__+1024);
+
+000000r 1               ;
+
+000000r 1  A9 rr             lda     #&lt;(L0001)
+
+000002r 1  A2 rr             ldx     #&gt;(L0001)
+
+000004r 1  20 rr rr          jsr     pushax
+
+000007r 1  A9 rr             lda     #&lt;(__DATA_LOAD__+2048)
+
+000009r 1  A2 rr             ldx     #&gt;(__DATA_LOAD__+2048)
+
+00000Br 1  20 rr rr          jsr     pushax
+
+00000Er 1  A0 04           ldy     #$04
+
+000010r 1  4C rr rr          jmp     _cprintf
+
+000013r 1               
+
+000013r 1               .endproc
+
+000013r 1               
+
+000013r 1               
+
+ 
+
+What am I doing wrong here?
+
+ 
+
+Thanks,
+
+Shawn
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Sep 21 02:45:49 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6238.html" title="Next message in the list">David A. Lyons: "Re: [cc65] segment address arithmetic"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6236.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Code::Blocks IDE and cc65"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6238.html" title="Next message in this discussion thread">David A. Lyons: "Re: [cc65] segment address arithmetic"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6238.html" title="Message sent in reply to this message">David A. Lyons: "Re: [cc65] segment address arithmetic"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6239.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] segment address arithmetic"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6237" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6237" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6237" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-09-21 02:45:51 CEST
+</em></small></p>
+</body>
+</html>

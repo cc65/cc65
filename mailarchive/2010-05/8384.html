@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Question about linking assembl</title>
+<meta name="Author" content="Payton Byrd (plbyrd1gmail.com)" />
+<meta name="Subject" content="[cc65] Question about linking assembler to specific address" />
+<meta name="Date" content="2010-05-13" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Question about linking assembler to specific address</h1>
+<!-- received="Thu May 13 19:01:29 2010" -->
+<!-- isoreceived="20100513170129" -->
+<!-- sent="Thu, 13 May 2010 12:00:53 -0500" -->
+<!-- isosent="20100513170053" -->
+<!-- name="Payton Byrd" -->
+<!-- email="plbyrd1gmail.com" -->
+<!-- subject="[cc65] Question about linking assembler to specific address" -->
+<!-- id="AANLkTinpU5Wekeb161GVvFh6WdW19ECWOOshOfP987Ne@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8385.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Question about linking assembler to specific address&quot;">Next message</a> ]
+[ <a href="8383.html" title="Payton Byrd: &quot;[cc65] Question about writing assembler app for both C128 and C64&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8385.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Question about linking assembler to specific address&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Payton Byrd &lt;<a href="mailto:plbyrd1gmail.com?Subject=Re:%20[cc65]%20Question%20about%20linking%20assembler%20to%20specific%20address">plbyrd1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-05-13 19:00:53</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I want to have an assembler program that I can compile and link that starts
+at $1400 and only contains the code in my .S file.  Reading up on the ld65
+docs, it appears I should do the following:
+
+ld65 -t none -S $1400 -o outputfile input.s
+
+However, when I load outputfile on the C64 using load&quot;outputfile&quot;,8,1 and
+then go to the monitor, the code does not exist at $1400, there is simply
+zeroes as far as the eye can see.  Here's the code I'm trying to compile.
+
+.word $1400
+
+LDA #$48
+JSR $FFD2
+ LDA #$49
+JSR $FFD2
+LDA #$0D
+ JSR $FFD2
+JSR $FFCF
+BRK
+
+Please help.
+
+-- 
+Payton Byrd
+&lt;<a href="http://www.paytonbyrd.com">http://www.paytonbyrd.com</a>&gt;
+&lt;<a href="http://it.toolbox.com/blogs/paytonbyrd">http://it.toolbox.com/blogs/paytonbyrd</a>&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu May 13 19:01:29 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8385.html" title="Next message in the list">silverdr1wfmh.org.pl: "Re: [cc65] Question about linking assembler to specific address"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8383.html" title="Previous message in the list">Payton Byrd: "[cc65] Question about writing assembler app for both C128 and C64"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8385.html" title="Next message in this discussion thread">silverdr1wfmh.org.pl: "Re: [cc65] Question about linking assembler to specific address"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8385.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] Question about linking assembler to specific address"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8387.html" title="Message sent in reply to this message">Kevin Schuetz: "Re: [cc65] Question about linking assembler to specific address"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8384" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8384" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8384" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-05-13 19:01:31 CEST
+</em></small></p>
+</body>
+</html>

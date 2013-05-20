@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Please critique this makef</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Please critique this makefile" />
+<meta name="Date" content="2010-04-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Please critique this makefile</h1>
+<!-- received="Fri Apr 23 00:05:05 2010" -->
+<!-- isoreceived="20100422220505" -->
+<!-- sent="Fri, 23 Apr 2010 00:04:56 +0200" -->
+<!-- isosent="20100422220456" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Please critique this makefile" -->
+<!-- id="n2t1002edb71004221504p39fdfc0an1c32f2a623c40926@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="g2l1002edb71004220309hebad0095va5348f78bb751ec1&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8106.html" title="Payton Byrd: &quot;Re: [cc65] Please be patient... More questions&quot;">Next message</a> ]
+[ <a href="8104.html" title="Oliver Schmidt: &quot;Re: [cc65] Fwd: Bug in cl65 (?)&quot;">Previous message</a> ]
+[ <a href="8093.html" title="Oliver Schmidt: &quot;Re: [cc65] Please critique this makefile&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8111.html" title="Kevin Schuetz: &quot;Re: [cc65] Please critique this makefile&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Please%20critique%20this%20makefile">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-04-23 00:04:56</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt; <a href="http://www.pascalschmidt.de/cc65/Makefile">http://www.pascalschmidt.de/cc65/Makefile</a>
+
+Now that I understand how to use cl65 the right way I changed the
+Makefile to do so thus turning it somewhat cleaner.
+
+Some more notes:
+
+- The -I $(SOURCEDIR) compiler option reflects the recent discussion
+about where #include &quot;&quot; searches for files. cc65 goes for the current
+directory and not for the directory of the file containing the
+#include directive.
+
+- Before the sed script just replaced .s with .o but now it replaces
+$(&lt;:.c=.s) with $&#64; because it's not only about the file extension
+anymore but about the (later deleted) .s file residing in the source
+directory.
+
+- When using cl65 for compiling it seemed cleaner to use it as well
+for assembling and linking.
+
+Regards,
+Oliver
+
+SOURCEDIR := src
+OBJECTDIR := obj
+
+PROGRAM := foobar
+
+CFLAGS  := -O
+ASFLAGS :=
+LDFLAGS :=
+
+################################################################################
+
+CC := $(CC65_HOME)/bin/cl65
+
+SOURCES := $(wildcard $(SOURCEDIR)/*.c)
+DEPENDS := $(addsuffix .d,$(basename $(addprefix
+$(OBJECTDIR)/,$(notdir $(SOURCES)))))
+SOURCES += $(wildcard $(SOURCEDIR)/*.s)
+OBJECTS := $(addsuffix .o,$(basename $(addprefix
+$(OBJECTDIR)/,$(notdir $(SOURCES)))))
+
+.SUFFIXES:
+.PHONY: all clean
+all: $(PROGRAM)
+
+ifneq ($(MAKECMDGOALS),clean)
+-include $(DEPENDS)
+endif
+
+$(OBJECTDIR):
+	mkdir $&#64;
+
+$(OBJECTDIR)/%.o: $(SOURCEDIR)/%.c | $(OBJECTDIR)
+	$(CC) -t $(CC65_TARGET) -I $(SOURCEDIR) $(CFLAGS) --create-dep -c -o $&#64; $&lt;
+	&#64;sed -e&quot;s!$(&lt;:&#46;<!--nospam-->c=.s)!$&#64;!p&quot; -e&quot;s![^\t]*\t\(&#46;<!--nospam-->*\)!\1:!&quot; &lt; $(&lt;:.c=.u) &gt; $(&#64;:&#46;<!--nospam-->o=.d)
+	&#64;rm -f $(&lt;:&#46;<!--nospam-->c=.u)
+
+$(OBJECTDIR)/%.o: $(SOURCEDIR)/%.s | $(OBJECTDIR)
+	$(CC) -t $(CC65_TARGET) -I $(SOURCEDIR) $(ASFLAGS) -c -o $&#64; $&lt;
+
+$(PROGRAM): $(OBJECTS)
+	$(CC) -t $(CC65_TARGET) $(LDFLAGS) -o $&#64; -m $&#64;&#46;<!--nospam-->map $^
+
+clean:
+	rm -f $(OBJECTS) $(DEPENDS) $(PROGRAM) $(PROGRAM).map
+	rmdir $(OBJECTDIR)
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Apr 23 00:05:05 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8106.html" title="Next message in the list">Payton Byrd: "Re: [cc65] Please be patient... More questions"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8104.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Fwd: Bug in cl65 (?)"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8093.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] Please critique this makefile"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8111.html" title="Next message in this discussion thread">Kevin Schuetz: "Re: [cc65] Please critique this makefile"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8111.html" title="Message sent in reply to this message">Kevin Schuetz: "Re: [cc65] Please critique this makefile"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8113.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] Please critique this makefile"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8105" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8105" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8105" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-04-23 00:05:07 CEST
+</em></small></p>
+</body>
+</html>

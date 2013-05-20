@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="iso-8859-15"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Floating point support?</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="Re: [cc65] Floating point support?" />
+<meta name="Date" content="2004-09-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Floating point support?</h1>
+<!-- received="Wed Sep 29 10:20:53 2004" -->
+<!-- isoreceived="20040929082053" -->
+<!-- sent="Wed, 29 Sep 2004 10:20:38 +0200" -->
+<!-- isosent="20040929082038" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="Re: [cc65] Floating point support?" -->
+<!-- id="20040929082038.GA10634@mail" -->
+<!-- charset="iso-8859-15" -->
+<!-- inreplyto="20040929072307.GA12286&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4586.html" title="Karri Kaksonen: &quot;Re: [cc65] Floating point support?&quot;">Next message</a> ]
+[ <a href="4584.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Floating point support?&quot;">Previous message</a> ]
+[ <a href="4584.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Floating point support?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4586.html" title="Karri Kaksonen: &quot;Re: [cc65] Floating point support?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20[cc65]%20Floating%20point%20support?">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-09-29 10:20:38</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>* On Wed, Sep 29, 2004 at 09:23:07AM +0200 Ullrich von Bassewitz wrote:
+ 
+&gt; Lets sum up the arguments:
+&gt; 
+&gt; 
+&gt;                  32 bit                        48 bit
+&gt;     -----------------------------------------------------------------------
+&gt; 
+&gt;       Needs slightly less memory and
+&gt; 
+&gt;                                        Needs slightly more memory and is
+&gt;                                        slower.
+ 
+&gt; Did I forget anything?
+
+
+        Is suboptimal. wrt exponent      could be made optimal wrt.
+        processing (8 bit covered in     exponent processing
+        2 bytes)
+
+
+Especially on an 8 bit machine, this argument might be a significant one
+if we mostly want to add or subtract values. With multiplication and
+division, this might not be that important anymore.
+
+Regards,
+   Spiro.
+
+-- 
+Spiro R. Trikaliotis
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Sep 29 10:20:53 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4586.html" title="Next message in the list">Karri Kaksonen: "Re: [cc65] Floating point support?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4584.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Floating point support?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4584.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Floating point support?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4586.html" title="Next message in this discussion thread">Karri Kaksonen: "Re: [cc65] Floating point support?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4586.html" title="Message sent in reply to this message">Karri Kaksonen: "Re: [cc65] Floating point support?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="../2004-10/4593.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Floating point support?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4585" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4585" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4585" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-09-29 10:21:02 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Re: cc65-2.13.0 DEBs avail</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="Re: [cc65] Re: cc65-2.13.0 DEBs available" />
+<meta name="Date" content="2009-10-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Re: cc65-2.13.0 DEBs available</h1>
+<!-- received="Sun Oct 25 20:07:08 2009" -->
+<!-- isoreceived="20091025190708" -->
+<!-- sent="Sun, 25 Oct 2009 20:06:49 +0100" -->
+<!-- isosent="20091025190649" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="Re: [cc65] Re: cc65-2.13.0 DEBs available" -->
+<!-- id="20091025190649.GQ32752@trikaliotis.net" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="20091025155825.GA28892&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7313.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] .global vs .export vs what i really need :)&quot;">Next message</a> ]
+[ <a href="7311.html" title="Oliver Schmidt: &quot;Re: [cc65] TGI API deficit / proposal&quot;">Previous message</a> ]
+[ <a href="7308.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Re: cc65-2.13.0 DEBs available&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7320.html" title="Daniel Serpell: &quot;Re: [cc65] Re: cc65-2.13.0 DEBs available&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20[cc65]%20Re:%20cc65-2.13.0%20DEBs%20available">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-10-25 20:06:49</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello Uz,
+
+* On Sun, Oct 25, 2009 at 04:58:25PM +0100 Ullrich von Bassewitz wrote:
+ 
+&gt; &gt; Ok, I've done it. My DEB repository now contains the current latest
+&gt; &gt; version of 2.13 (r4389) as well as &quot;plain vanilla&quot; 2.13.0.
+&gt; 
+&gt; Failed to fetch <a href="http://debian.trikaliotis.net/dists/stable/Release">http://debian.trikaliotis.net/dists/stable/Release</a>  Unable to
+&gt; find expected entry  contrib/binary-amd64/Packages in Meta-index file
+&gt; (malformed Release file?)
+&gt; Some index files failed to download, they have been ignored, or old ones used
+&gt; instead.
+&gt; 
+&gt; Seems there are only 32-bit packages available, right?
+
+Yes. I do not own a 64 bit machine, nor do I know how I could
+cross-build an AMD64 package. I am sorry for this.
+
+However, using
+
+$ apt-get source cc65 --build
+
+should get you AMD64 packages. (Only the package &quot;cc65&quot; itself is
+affected, as the other packages cc65-* are architecture-agnostic.)
+
+
+I will check how I can cross-build AMD64 packages, and put them on the
+server, too. This might take some time, however.
+
+&gt; Is there a way to check
+&gt; which packages are available without going through all the apt hassle? A
+&gt; simple directory listing with download facility would have saved me 15 minutes
+&gt; of work.
+
+Well, <a href="http://debian.trikaliotis.net/dists/stable/Release">http://debian.trikaliotis.net/dists/stable/Release</a> shows that I
+only have i386 architecture.
+
+This is also backed up by
+<a href="http://debian.trikaliotis.net/dists/stable/contrib/">http://debian.trikaliotis.net/dists/stable/contrib/</a>, which only shows a
+binary-i386 directory.
+
+
+&gt; &gt; Uz, feel free to add my repository to the list of mirrors (although,
+&gt; &gt; strictly speaking, it is not a mirror). Also note that the mirror to
+&gt; &gt; funet.fi is outdated, is redirected to zimmers.net now, but that only
+&gt; &gt; includes the outdated 2.10.1 version.
+&gt; 
+&gt; Done.
+
+Thanks.
+
+Regards,
+Spiro.
+
+-- 
+Spiro R. Trikaliotis                              <a href="http://opencbm.sf.net/">http://opencbm.sf.net/</a>
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>                     <a href="http://www.viceteam.org/">http://www.viceteam.org/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Oct 25 20:07:08 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7313.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] .global vs .export vs what i really need :)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7311.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] TGI API deficit / proposal"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7308.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Re: cc65-2.13.0 DEBs available"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7320.html" title="Next message in this discussion thread">Daniel Serpell: "Re: [cc65] Re: cc65-2.13.0 DEBs available"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7320.html" title="Message sent in reply to this message">Daniel Serpell: "Re: [cc65] Re: cc65-2.13.0 DEBs available"</a></li>
+<li><dfn>Reply</dfn>:  <a href="7323.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Re: cc65-2.13.0 DEBs available"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7312" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7312" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7312" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-10-25 20:07:10 CET
+</em></small></p>
+</body>
+</html>

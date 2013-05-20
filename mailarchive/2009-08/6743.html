@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] bug?</title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="[cc65] bug?" />
+<meta name="Date" content="2009-08-26" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] bug?</h1>
+<!-- received="Wed Aug 26 19:22:05 2009" -->
+<!-- isoreceived="20090826172205" -->
+<!-- sent="Wed, 26 Aug 2009 19:22:04 +0200" -->
+<!-- isosent="20090826172204" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="[cc65] bug?" -->
+<!-- id="200908261922.04568.groepaz@gmx.net" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6744.html" title="Groepaz: &quot;Re: [cc65] bug?&quot;">Next message</a> ]
+[ <a href="6742.html" title="Oliver Schmidt: &quot;Re: [cc65] Mouse API Proposals&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6744.html" title="Groepaz: &quot;Re: [cc65] bug?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20bug?">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-08-26 19:22:04</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>(someone asked here: 
+<a href="http://www.lemon64.com/forum/viewtopic.php?p=382331#382331">http://www.lemon64.com/forum/viewtopic.php?p=382331#382331</a> )
+
+static void __fastcall__ waitraster(void) 
+{ 
+   if (VIC.ctrl1 &amp; 0x80 == 0x0)  // test bit 7 of $d011 
+   { 
+     while (VIC.rasterline &lt; 0xfb); 
+   } 
+}
+
+gives:
+
+ lda     #$00 
+L0479: beq     L045D 
+ lda     $D012 
+ cmp     #$FB 
+ jsr     boolult 
+ jmp     L0479 
+L045D: rts
+
+whereas:
+
+static void __fastcall__ waitraster(void) 
+{ 
+   if ((VIC.ctrl1 &amp; 0x80) == 0x0)  // test bit 7 of $d011 
+   { 
+     while (VIC.rasterline &lt; 0xfb); 
+   } 
+}
+
+gives:
+
+        lda     $D011
+        and     #$80
+        cmp     #$00
+L000C:  bne     L0009
+        lda     $D012
+        cmp     #$FB
+        jsr     boolult
+        jmp     L000C
+L0009:  rts
+
+
+i have to admit that i didnt check what exactly the VIC macro expands into and 
+what exactly it means and wether the first is actually right .... if it is, 
+then it would atleast be very nice to get a warning from the compiler (gcc 
+does it on similar ambiguous expressions) if that is possible at all :)
+
+(still on 2.12.9 ... may i suggest that the tools print their revision/date or 
+whatever is needed for you to identify what *exactly* i am using, too? =))
+
+-- 
+
+<a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    <a href="http://magicdisk.untergrund.net">http://magicdisk.untergrund.net</a>
+<a href="http://www.pokefinder.org">http://www.pokefinder.org</a>        <a href="http://ftp.pokefinder.org">http://ftp.pokefinder.org</a>
+
+PROGRAM n. A magic spell cast over a computer allowing it to turn one's input 
+into error messages. tr.v. To engage in a pastime similar to banging one's 
+head against a wall, but with fewer opportunities for reward.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Aug 26 19:22:05 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6744.html" title="Next message in the list">Groepaz: "Re: [cc65] bug?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6742.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Mouse API Proposals"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6744.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] bug?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6744.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] bug?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6745.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] bug?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6743" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6743" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6743" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-08-26 19:22:07 CEST
+</em></small></p>
+</body>
+</html>

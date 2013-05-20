@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Atari Disk Image Tool ?</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Atari Disk Image Tool ?" />
+<meta name="Date" content="2010-09-26" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Atari Disk Image Tool ?</h1>
+<!-- received="Sun Sep 26 16:11:04 2010" -->
+<!-- isoreceived="20100926141104" -->
+<!-- sent="Sun, 26 Sep 2010 16:10:49 +0200" -->
+<!-- isosent="20100926141049" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Atari Disk Image Tool ?" -->
+<!-- id="AANLkTimyfRP22s9+3TTyu7GjfXUk3HkN4gUYxT15p5J9@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="4C9F315E.9010704&#64;groessler.org" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8622.html" title="Oliver Schmidt: &quot;Re: [cc65] Atari Memory Layout&quot;">Next message</a> ]
+[ <a href="8620.html" title="Christian Grössler: &quot;Re: [cc65] Atari Memory Layout&quot;">Previous message</a> ]
+[ <a href="8619.html" title="Christian Grössler: &quot;Re: [cc65] Atari Disk Image Tool ?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8623.html" title="Shawn Jefferson: &quot;RE: [cc65] Atari Disk Image Tool ?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Atari%20Disk%20Image%20Tool%20?">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-09-26 16:10:49</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Chris,
+
+&gt; You should use 90k single density or 130k enhanced density format.
+&gt; Which version of DOS shouldn't matter, but the &quot;standard&quot; is
+&gt; Atari DOS 2.5.
+
+I see.
+
+&gt; To make it bootable the first 3 sectors should contain boot code. unix2atr
+&gt; writes
+&gt; it
+
+Yeah, I saw that in the source code.
+
+&gt; (at least DOS 2 any MyDOS compatible, I don't know if it's dependent on
+&gt; the
+&gt; DOS used).
+
+Is &quot;DOS 2&quot; meant to say DOS 2.x including DOS 2.5 mentioned above?
+
+&gt; DIR2ATR probably write it, too, but I haven't checked.
+
+At least the doc seems to imply it.
+
+&gt;&gt; If I have several binaries on a disk the user should be able to easily
+&gt;&gt; choose from do I have to do something special to meet Atari user
+&gt;&gt; expectations?
+&gt;
+&gt; Write a menu loader? :-)
+&gt; Or you can try MyPicoDOS (<a href="http://www.horus.com/~hias/atari/">http://www.horus.com/~hias/atari/</a>) which is tiny
+&gt; and
+&gt; boots into a menu showing all files and the user can highlight one and start
+&gt; it.
+
+Ah, I thought I had understood that PicoDOS was &quot;only&quot; a bootloader
+for programs not doing disk I/O on their own. If the Atari cc65 C
+library POSIX I/O functions work on PicoDOS than I should have a
+close(r) look at it...
+
+&gt; Are you by chance trying to port contiki 2 to the Atari?
+
+Good guess - but actually not *that* hard ;-))
+
+I found the other day by chance <a href="http://www.atari8ethernet.com/">http://www.atari8ethernet.com/</a> and
+thought that this project justifies an &quot;official&quot; port.
+
+&gt; If yes, I did the
+&gt; Contiki 1 port.
+
+I know !
+
+&gt; If you need assistance. please contact me off-list.
+
+Thanks for the offer - will do :-)
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Sep 26 16:11:04 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8622.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Atari Memory Layout"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8620.html" title="Previous message in the list">Christian Grössler: "Re: [cc65] Atari Memory Layout"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8619.html" title="Message to which this message replies">Christian Grössler: "Re: [cc65] Atari Disk Image Tool ?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8623.html" title="Next message in this discussion thread">Shawn Jefferson: "RE: [cc65] Atari Disk Image Tool ?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8623.html" title="Message sent in reply to this message">Shawn Jefferson: "RE: [cc65] Atari Disk Image Tool ?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8624.html" title="Message sent in reply to this message">Christian Grössler: "Re: [cc65] Atari Disk Image Tool ?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8621" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8621" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8621" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-09-26 16:11:06 CEST
+</em></small></p>
+</body>
+</html>

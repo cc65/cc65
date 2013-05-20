@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Snake Byte release</title>
+<meta name="Author" content="Stefan Wessels (swessels1email.com)" />
+<meta name="Subject" content="[cc65] Snake Byte release" />
+<meta name="Date" content="2011-05-14" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Snake Byte release</h1>
+<!-- received="Sat May 14 21:04:02 2011" -->
+<!-- isoreceived="20110514190402" -->
+<!-- sent="Sat, 14 May 2011 11:58:34 -0700" -->
+<!-- isosent="20110514185834" -->
+<!-- name="Stefan Wessels" -->
+<!-- email="swessels1email.com" -->
+<!-- subject="[cc65] Snake Byte release" -->
+<!-- id="216A837F-F38C-4F1B-9CF1-91F1A06FBFB9@email.com" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="E844D4C2-44AB-4A18-B51E-34E9E94D4FD6&#64;email.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9429.html" title="Greg King: &quot;Re: [cc65] TGI palettes (was: TGI colors revisited)&quot;">Next message</a> ]
+[ <a href="9427.html" title="Oliver Schmidt: &quot;Re: [cc65] TGI palettes (was: TGI colors revisited)&quot;">Previous message</a> ]
+[ <a href="9401.html" title="Stefan Wessels: &quot;Re: [cc65] ca65: .sizeof() doesn't return correct values?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Stefan Wessels &lt;<a href="mailto:swessels1email.com?Subject=Re:%20[cc65]%20Snake%20Byte%20release">swessels1email.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-05-14 20:58:34</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+I just finished another remake of a game I loved in the 80's on my Commodore 64. 
+
+This time there's a conio version that runs on more targets, but it's very slow as it brute-force redraws the screen every frame.  The readme below has all the info - where the source is, link to youtube video, etc.  The c64 4-colour hi-res version runs a lot like the original.  
+
+The game is mostly in C.  There's a little bit of inline assembly for the raster interrupt and scrolling.  I think that's about it.  I used a nightly build from 23 April 2011 with version info cc65 V2.13.9 to build it.
+
+Thank you
+Stefan
+
+*** readme.txt ***
+
+I.   Introduction
+
+This is a remake of a game called Snake Byte by Sirius Software Inc. published
+in 1982 for, according to Moby Games, the Commodore 64, Vic-20, Apple II &amp; 
+Atari 8-bit.  This remake has no audio.
+
+From Wikipedia: The player controls a snake, crawling into a rectangular area.
+The aim is to eat 10 apples per level. If an apple is not eaten during the
+given deadline, three extra apples are to be eaten. The snake becomes longer
+with each apple eaten. The snake loses a life when crashing a wall or its
+tail. Higher levels have more fences, making the game more difficult. An
+optional difficulty are the &quot;plums&quot; (one or two pieces), which kill the snake
+when hitting its head.
+
+It's a game I loved to play back in the 80's and it gave me a lot of pleasure
+to recreate the game using cc65.
+
+I uploaded a video on YouTube that shows the different versions and some 
+gameplay.  <a href="http://www.youtube.com/watch?v=H7Y4HVXVzoI">http://www.youtube.com/watch?v=H7Y4HVXVzoI</a>
+
+II.  Distribution
+
+The version packaged up here comes in a few different flavours:
+1.  The 4-colour hi-res version that closely resembles the original
+2.  A text-based, colour version for the Commodore 64
+3.  A conio version that runs on several platforms (slow!)
+
+The conio version was done so anyone that wants to attempt a port has
+an easy starting-point.  It contains no assembly.  It's worth noting that
+I wrote the game for the C64 but made it so it's as portable as I could.
+If your conio display isn't at least 40x25, you will miss some info.  On
+the Atari with 24 rows, for example, there's a screen that asks how many
+plums right before the game starts.  That question is on the 25th line
+and isn't seen so it looks like a blank screen.
+
+III. Building from source
+
+This distribution is available from the following svn repository:
+svn://stewbc.dnsalias.com/snake
+
+The Makefile is a variant on the one with the following credits:
+#############################################################################
+## Generic Makefile for cc65 projects - full version with abstract options ##
+## V1.1.1 (w) 2010 - 2011 Oliver Schmidt &amp; Patryk &quot;Silver Dream !&quot; Łogiewa ##
+#############################################################################
+
+I found it at the link:
+<a href="http://wiki.cc65.org/doku.php?id=cc65:project_setup">http://wiki.cc65.org/doku.php?id=cc65:project_setup</a>
+
+I added something I call SKUs so that I can have variants for the same target.
+Building the (default) C64 hi-res version is done with:
+make 
+Building other SKU's is done by adding SKUS on the command line, example:
+make SKUS=&quot;c64 c64text conio&quot;
+Building other targets is done by adding TARGETS on the command line:
+make SKUS=conio TARGETS=&quot;c64 c128 apple2 atari&quot;
+The conio SKU is the only one that will compile on all of these targets.
+See the Makfile for what's possible.  It's the best-written Makefile I 
+have seen (not that I spend a lot of time in Makefiles, but this was
+easy to understand and modify).
+
+IV.  Porting
+
+The source files can be found in the src folder inside the project.  Inside
+the src folder are other folders, namely c64, c64text and conio.  These are
+the SKU-specific files that make up that SKU.  The file that's really needed
+is the target or sku-specific implementation for the functions in plat.h.  If
+those are provided, and some can have empty implementations, the game can be
+made to work on a target.  These are the files and why they exist in the C64
+folder:
+c64
+	crt0.s		- Moves DATA and RODATA segments into place
+	logo64.c	- The graphical image of the snake logo
+	logo64.h	- Accompanying header
+	plat64.c	- Implementation of c64 specific functions
+	snakec64.cfg	- Custom memory layout (VIC hi-res in the 0x4000 bank)
+
+See the other folders for their files.  They all have less files.  Only a
+plat.c is actually required to make a target go.  To add the nes as a target,
+simply create src/nes and add a file, let's say platnes.c, and you are off
+to the races.  The conio version complains about no cgetc() on the nes.  You
+really should be able to make a target work by just working in the plat file,
+no other editing should be required.
+
+There is a Misc folder that contains a file SnakeLogo.txt.  This is a string
+version of the snake logo with the pixel colours represented by the letters
+y for yellow, G for dark green and g for light green.  This may help with the
+creation of that logo in the native format of the target.
+
+V.   Credits &amp; Misc.
+
+Credits for the Commodore 64 version:
+Game design by Chuck Sommerville
+Programmed by Dan Stanfield
+Music &amp; Sound effects by Ray Elzey
+
+Links for the original:
+<a href="http://en.wikipedia.org/wiki/Snake_Byte">http://en.wikipedia.org/wiki/Snake_Byte</a>
+<a href="http://www.mobygames.com/game/snake-byte">http://www.mobygames.com/game/snake-byte</a>
+
+VI.  Contact
+
+Feel free to send me an email if you have any comments.  If you do make a port
+or something else, I would love to hear about it!
+
+swessels&#64;email&#46;<!--nospam-->com
+
+VII. Thanks
+
+To people who did great work back in the 8-bit days, and now, making the tools
+to make this possible.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat May 14 21:04:02 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9429.html" title="Next message in the list">Greg King: "Re: [cc65] TGI palettes (was: TGI colors revisited)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9427.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] TGI palettes (was: TGI colors revisited)"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9401.html" title="Message to which this message replies">Stefan Wessels: "Re: [cc65] ca65: .sizeof() doesn't return correct values?"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9428" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9428" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9428" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-05-14 21:04:05 CEST
+</em></small></p>
+</body>
+</html>

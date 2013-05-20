@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Problem with 16/32-bit var</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Problem with 16/32-bit variables and conditions" />
+<meta name="Date" content="2005-03-11" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Problem with 16/32-bit variables and conditions</h1>
+<!-- received="Fri Mar 11 13:52:06 2005" -->
+<!-- isoreceived="20050311125206" -->
+<!-- sent="Fri, 11 Mar 2005 13:52:03 +0100" -->
+<!-- isosent="20050311125203" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Problem with 16/32-bit variables and conditions" -->
+<!-- id="20050311125203.GA4850@trixie.musoftware.de" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="42318954.3070203&#64;sidsa.es" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4815.html" title="Spiro Trikaliotis: &quot;[cc65] cl65 ignoring -I option for assembler files, while ca65 does not?&quot;">Next message</a> ]
+[ <a href="4813.html" title="Carlos Sánchez de La Lama: &quot;Re: [cc65] Problem with 16/32-bit variables and conditions&quot;">Previous message</a> ]
+[ <a href="4811.html" title="Carlos Sánchez de La Lama: &quot;[cc65] Problem with 16/32-bit variables and conditions&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Problem%20with%2016/32-bit%20variables%20and%20conditions">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-03-11 13:52:03</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Fri, Mar 11, 2005 at 01:04:36PM +0100, Carlos Sánchez de La Lama wrote:
+&gt; I have a problem with this piece of code, I think the compiler is
+&gt; generating wrong assembler.
+[...]
+&gt; Am I right?
+
+Yes, it's a bug. The code generator does not honor the CF_TEST flag when the
+data type is long and the addressing mode is auto.
+
+Here's the necessary patch for the snapshot version:
+
+--------------------------------------------------------------------------
+diff -c -b -r1.97 codegen.c
+*** codegen.c   30 Jun 2004 19:18:56 -0000      1.97
+--- codegen.c   11 Mar 2005 12:50:14 -0000
+***************
+*** 840,845 ****
+--- 840,848 ----
+          case CF_LONG:
+              ldyconst (offs+3);
+              AddCodeLine (&quot;jsr ldeaxysp&quot;);
++             if (flags &amp; CF_TEST) {
++               AddCodeLine (&quot;jsr tsteax&quot;);
++             }
+              break;
+
+          default:
+--------------------------------------------------------------------------
+
+Thanks a lot for the report!
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Mar 11 13:52:06 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4815.html" title="Next message in the list">Spiro Trikaliotis: "[cc65] cl65 ignoring -I option for assembler files, while ca65 does not?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4813.html" title="Previous message in the list">Carlos Sánchez de La Lama: "Re: [cc65] Problem with 16/32-bit variables and conditions"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4811.html" title="Message to which this message replies">Carlos Sánchez de La Lama: "[cc65] Problem with 16/32-bit variables and conditions"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4814" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4814" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4814" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-03-11 13:52:12 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Setting aside Character S</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Setting aside Character Set ram">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Setting aside Character Set ram</h1>
+<!-- received="Sat Oct 19 19:37:37 2002" -->
+<!-- isoreceived="20021019173737" -->
+<!-- sent="Sat, 19 Oct 2002 19:37:41 +0200" -->
+<!-- isosent="20021019173741" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Setting aside Character Set ram" -->
+<!-- id="20021019173741.GB20797@trixie.musoftware.de" -->
+<!-- inreplyto="000901c276df$b5217ad0$8000a8c0@briandvwzriudd" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Setting%20aside%20Character%20Set%20ram"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-10-19 19:37:41
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1616.html">groepaz_at_gmx.net: "Re: [cc65] Disk IO"</a>
+<li><strong>In reply to:</strong> <a href="1615.html">Brian Bagnall: "[cc65] Setting aside Character Set ram"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1618.html">Ullrich von Bassewitz: "Re: [cc65] Setting aside Character Set ram"</a>
+<li><strong>Reply:</strong> <a href="1618.html">Ullrich von Bassewitz: "Re: [cc65] Setting aside Character Set ram"</a>
+<li><strong>Reply:</strong> <a href="1619.html">Brian Bagnall: "Re: [cc65] Setting aside Character Set ram"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Fri, Oct 18, 2002 at 02:51:09PM -0500, Brian Bagnall wrote:
+&gt; First, do I alter c64.cfg in the doc directory? (seems strange that it's
+&gt; stored here)
+
+It is in the doc directory, because this is just a copy of what is compiled
+into ld65. It is thought as a reference and may be used as some sort of
+documentation. To use it, create a copy in your program directory and use
+
+        -C config-file-name
+
+instead of
+
+        -t c64
+
+when calling the linker.
+
+&gt; Second, you mentioned the program is stored from $801 to $D000 but the
+&gt; c64.cfg file says $7FF to C801. Which is right?
+
+The config file says
+
+    RAM: start = $7FF, size = $c801, define = yes, file = %O;
+
+So the RAM area starts at $7FF (this includes the two byte load address on
+disk, so the actual start address is the BASIC start, $801) and is $C801 in
+*size*. If you add both numbers you get
+
+        $7FF + $C801 = $D000
+
+which equals the end address I've mentioned.
+
+&gt; Third, do you recommend setting aside memory at the start or end of this
+&gt; block?
+
+Setting aside memory from the start of the block is problematic, since
+programs generated with the default setup for the C64 will load as BASIC
+programs and have a small BASIC header (to check that, load a cc65 generated
+program and enter &quot;LIST&quot; before running it). The easier way is probably to use
+memory at the end of the former RAM area. This brings in another problem: The
+data must be moved into this range somehow. However, for most people, this
+should be easier to solve than changing the cc65 startup file.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Setting%20aside%20Character%20Set%20ram">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Setting%20aside%20Character%20Set%20ram">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1616.html">groepaz_at_gmx.net: "Re: [cc65] Disk IO"</a>
+<li><strong>In reply to:</strong> <a href="1615.html">Brian Bagnall: "[cc65] Setting aside Character Set ram"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1618.html">Ullrich von Bassewitz: "Re: [cc65] Setting aside Character Set ram"</a>
+<li><strong>Reply:</strong> <a href="1618.html">Ullrich von Bassewitz: "Re: [cc65] Setting aside Character Set ram"</a>
+<li><strong>Reply:</strong> <a href="1619.html">Brian Bagnall: "Re: [cc65] Setting aside Character Set ram"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-10-19 19:38:13 CEST</em>
+</em>
+</small>
+</body>
+</html>

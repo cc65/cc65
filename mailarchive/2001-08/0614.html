@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] First Try of CBM File-</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] First Try of CBM File-IO">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] First Try of CBM File-IO</h1>
+<!-- received="Mon Aug 13 18:13:54 2001" -->
+<!-- isoreceived="20010813161354" -->
+<!-- sent="Mon, 13 Aug 2001 18:14:47 +0200" -->
+<!-- isosent="20010813161447" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] First Try of CBM File-IO" -->
+<!-- id="5726602939.20010813181447@gmx.net" -->
+<!-- inreplyto="15223.63791.246272.994806@panini.cling.gu.se" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20First%20Try%20of%20CBM%20File-IO"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2001-08-13 18:14:47
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0615.html">Ullrich von Bassewitz: "Re: [cc65] First Try of CBM File-IO"</a>
+<li><strong>Previous message:</strong> <a href="0613.html">MagerValp: "Re: [cc65] First Try of CBM File-IO"</a>
+<li><strong>In reply to:</strong> <a href="0613.html">MagerValp: "Re: [cc65] First Try of CBM File-IO"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0618.html">udo klasmeier: "Re: [cc65] First Try of CBM File-IO"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello MagerValp,
+
+g&gt;&gt; you should _NEVER_ use that &quot;@&quot; method to overwrite a file (there is a
+g&gt;&gt; known bug in some 154x drives' kernal that sometimes causes broken
+g&gt;&gt; files on the disc)
+
+M&gt; Actually it nukes track 18 :/ But doesn't @0: get around that bug?
+M&gt; IIRC it's due to old 1541:s' dir cache being confused about drive 0
+M&gt; and drive 1 (which doesn't exist). The bug also doesn't exist in
+M&gt; 1541-II, 1571, 1581, and drives with JiffyDOS.
+
+well no THAT is yet another problem (which is much less critical
+actually) ... the 'real' bug is when you have a disc that has only
+little free blocks, less than needed for the program you want to
+overwrite that is.... the DOS doesnt actually 'overwrite' the blocks
+already in use by the other file (the one you are overwriting), but
+first saves the new blocks to disc (creating a new file chain) and
+THEN kills the old (no more needed) blocks..... obviously this
+approach is doomed to fail ;=) i guess the DOS does it coz when an
+error occours while overwriting, the old file would still be there and
+useable. (which isnt the case if you scratch the old file in advance
+or 'really' write over it)
+
+oh and the other bug... &quot;18:01 read error&quot; .... its not tied to
+overwriting files, its tied to writing files in general (and it
+is present in every kernal i have seen so far - even the newest)
+
+you can recover the 18:01 error more or less easily though by using
+some &quot;unformat&quot; tool.... since it doesnt really fuck up important data
+(just the directory).... the &quot;@&quot; bug on the other hand DOES fuck up
+important data (always hits the most important file on the disc, you
+know it ,=)) so it is really highly recommended to fight this bug in
+all your applications (you cant really do anything about the 18:01 bug
+since the only way to 100% avoid it would be not writing any files at
+all ;=))
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20First%20Try%20of%20CBM%20File-IO">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20First%20Try%20of%20CBM%20File-IO">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0615.html">Ullrich von Bassewitz: "Re: [cc65] First Try of CBM File-IO"</a>
+<li><strong>Previous message:</strong> <a href="0613.html">MagerValp: "Re: [cc65] First Try of CBM File-IO"</a>
+<li><strong>In reply to:</strong> <a href="0613.html">MagerValp: "Re: [cc65] First Try of CBM File-IO"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0618.html">udo klasmeier: "Re: [cc65] First Try of CBM File-IO"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:41 CET</em>
+</em>
+</small>
+</body>
+</html>

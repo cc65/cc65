@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="iso-8859-15"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: FP format, and test suite (was: [cc65</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="FP format, and test suite (was: [cc65] Floating point support?)" />
+<meta name="Date" content="2004-09-28" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>FP format, and test suite (was: [cc65] Floating point support?)</h1>
+<!-- received="Tue Sep 28 10:31:49 2004" -->
+<!-- isoreceived="20040928083149" -->
+<!-- sent="Tue, 28 Sep 2004 10:31:40 +0200" -->
+<!-- isosent="20040928083140" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="FP format, and test suite (was: [cc65] Floating point support?)" -->
+<!-- id="20040928083140.GC20031@mail" -->
+<!-- charset="iso-8859-15" -->
+<!-- inreplyto="200409280933.57975.marc&#64;rintsch.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4572.html" title="Keates, Mark: &quot;RE: [cc65] Floating point support?&quot;">Next message</a> ]
+[ <a href="4570.html" title="Marc Rintsch: &quot;Re: [cc65] Floating point support?&quot;">Previous message</a> ]
+[ <a href="4570.html" title="Marc Rintsch: &quot;Re: [cc65] Floating point support?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4576.html" title="Sidney Cadot: &quot;Re: FP format, and test suite (was: [cc65] Floating point support?)&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20FP%20format,%20and%20test%20suite%20(was:%20[cc65]%20Floating%20point%20support?)">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-09-28 10:31:40</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello,
+
+* On Tue, Sep 28, 2004 at 09:33:57AM +0200 Marc Rintsch wrote:
+
+&gt; &gt; AFAIR, IEEE 754 does *not* tell use the format of the FP values! 
+
+&gt; I always thought one benefit of the IEEE format is, that it's designed to 
+&gt; implement comparisons (&lt;, &gt;, =) of n-bit floats as comparisons of n-bit 
+&gt; signed integers?  That's only possible if the MSB is the sign bit.
+
+Yes - in fact, you're right. :-(
+
+This is another example of &quot;never trust your teacher/Professor&quot;. ;-) He
+once told us that the order of the entries were not given by 754. I
+never checked for myself, but I trusted him. He even told us that this
+way is the most common, and that many sources would state it was the
+only one, but that this were not given by 754.
+
+While I do not have access to 754 (do not want to pay for it just to
+find out this thing), the official page
+<a href="http://grouper.ieee.org/groups/754/">http://grouper.ieee.org/groups/754/</a> links to pages which describe the FP
+format with sign = MSB, exponent, fractional part - order (from MSB).
+
+
+BTW: If anyone wants to implemente IEEE 754 FP, he might want to check
+the test suite of <a href="http://www.math.utah.edu/~beebe/software/ieee/">http://www.math.utah.edu/~beebe/software/ieee/</a>. ;-)
+
+Some more resources on 754-1985 can be found here:
+<a href="http://cch.loria.fr/documentation/IEEE754/">http://cch.loria.fr/documentation/IEEE754/</a>
+
+BTW: 754 seems to be going through revisions, so it might change in the
+future.
+
+Regards,
+   Spiro.
+
+-- 
+Spiro R. Trikaliotis
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Sep 28 10:31:49 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4572.html" title="Next message in the list">Keates, Mark: "RE: [cc65] Floating point support?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4570.html" title="Previous message in the list">Marc Rintsch: "Re: [cc65] Floating point support?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4570.html" title="Message to which this message replies">Marc Rintsch: "Re: [cc65] Floating point support?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4576.html" title="Next message in this discussion thread">Sidney Cadot: "Re: FP format, and test suite (was: [cc65] Floating point support?)"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4576.html" title="Message sent in reply to this message">Sidney Cadot: "Re: FP format, and test suite (was: [cc65] Floating point support?)"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4571" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4571" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4571" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-09-28 10:31:58 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Compiler Issue</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Compiler Issue" />
+<meta name="Date" content="2011-04-12" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Compiler Issue</h1>
+<!-- received="Tue Apr 12 21:52:29 2011" -->
+<!-- isoreceived="20110412195229" -->
+<!-- sent="Tue, 12 Apr 2011 21:52:20 +0200" -->
+<!-- isosent="20110412195220" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Compiler Issue" -->
+<!-- id="20110412195220.GA23757@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="BANLkTino9j9ddvAEqBMVr4xF1Yryh-sT=Q&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9335.html" title="Oliver Schmidt: &quot;Re: [cc65] Compiler Issue&quot;">Next message</a> ]
+[ <a href="9333.html" title="Oliver Schmidt: &quot;[cc65] Compiler Issue&quot;">Previous message</a> ]
+[ <a href="9333.html" title="Oliver Schmidt: &quot;[cc65] Compiler Issue&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9335.html" title="Oliver Schmidt: &quot;Re: [cc65] Compiler Issue&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Compiler%20Issue">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-04-12 21:52:20</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Tue, Apr 12, 2011 at 03:07:58PM +0200, Oliver Schmidt wrote:
+&gt; The reason is that the goto skipped the definition of the scope-local
+&gt; variable. Therefore the stack pointer stays unaltered while the code
+&gt; behind the scope-local variable assumes it to have been altered by the
+&gt; scope-local variable definition.
+
+Yes, variables in local blocks in combination with jumps are broken. Here is
+another piece of code that doesn't work:
+
+    int foo = 1;
+    while (foo) {
+        int bar = 1;
+        if (bar) {
+            goto faz;
+        }
+    }
+faz: ;
+
+This has been broken since ages (version 2.4 or similar) and no one has
+complained so I almost forgot about it:-)
+
+The compiler can be fixed for the code shown above with not too much effort.
+But the code you posted is a different thing, because it would be required to
+move allocation of variables to the top of the function, and this doesn't
+really fit into the compiler as it is now. Maybe I can at least make this an
+error ..
+
+Thanks for the report!
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Apr 12 21:52:29 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9335.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Compiler Issue"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9333.html" title="Previous message in the list">Oliver Schmidt: "[cc65] Compiler Issue"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9333.html" title="Message to which this message replies">Oliver Schmidt: "[cc65] Compiler Issue"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9335.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Compiler Issue"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9335.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Compiler Issue"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9336.html" title="Message sent in reply to this message">Dirk Jagdmann: "Re: [cc65] Compiler Issue"</a></li>
+<li><dfn>Reply</dfn>:  <a href="../2011-05/9437.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Compiler Issue"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9334" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9334" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9334" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-04-12 21:52:32 CEST
+</em></small></p>
+</body>
+</html>

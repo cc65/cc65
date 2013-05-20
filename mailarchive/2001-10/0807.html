@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] access order when doing int o</title>
+<meta name="Author" content="Spiro Trikaliotis (trik-news_at_gmx.de)">
+<meta name="Subject" content="[cc65] access order when doing int operation">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] access order when doing int operation</h1>
+<!-- received="Sun Oct 14 14:09:08 2001" -->
+<!-- isoreceived="20011014120908" -->
+<!-- sent="Sun, 14 Oct 2001 14:07:08 +0200" -->
+<!-- isosent="20011014120708" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="trik-news_at_gmx.de" -->
+<!-- subject="[cc65] access order when doing int operation" -->
+<!-- id="004e01c154a8$c828a3b0$0271a8c0@home.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Spiro Trikaliotis (<a href="mailto:trik-news_at_gmx.de?Subject=Re:%20[cc65]%20access%20order%20when%20doing%20int%20operation"><em>trik-news_at_gmx.de</em></a>)<br>
+<strong>Date:</strong> 2001-10-14 14:07:08
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0808.html">Ullrich von Bassewitz: "Re: [cc65] cc65 v2.7.0 released"</a>
+<li><strong>Previous message:</strong> <a href="0806.html">MagerValp: "Re: [cc65] cc65 v2.7.0 released"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0809.html">Ullrich von Bassewitz: "Re: [cc65] access order when doing int operation"</a>
+<li><strong>Reply:</strong> <a href="0809.html">Ullrich von Bassewitz: "Re: [cc65] access order when doing int operation"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Uz,
+
+I have a question regarding the use of int which I have not found documented
+so far (correct me if I'm wrong).
+
+
+Let's say, we have the following little test program that defines the TA und
+TB as ints instead of 2 times 2 bytes:
+
+#include &lt;c64.h&gt;
+
+struct cia6526new {
+    unsigned char        pra;  /* Port register A */
+    unsigned char        prb;  /* Port register B */
+    unsigned char        ddra; /* Data direction register A */
+    unsigned char        ddrb; /* Data direction register B */
+    unsigned int         ta;   /* Timer A, low byte */
+    unsigned int         tb;   /* Timer B, high byte */
+    /* snipped */
+};
+
+#define CIA1NEW (*(struct cia6526new*)0xDC00)
+
+int main( void )
+{
+   int a = CIA1NEW.ta;
+}
+
+This can be read very nice by a human.
+
+As we all (should) know, the 6526 latches the timer whenever the low byte is
+read and releases the latch when the high byte is read, so it has to
+accessed in low/high byte order.
+
+Compiling this program shows that indeed, the low/high-byte order is
+preserved. Anyway, I ask myself if this is a *quaranteed* behaviour or if
+there are circumstances where this order may be reordered (for example, by
+the optimizer?), or if it might be something that might change in future
+revisions of CC65? If it is guaranteed, this might even be better since it's
+less likely that someone reverts the order in which the timer bytes are
+accessed.
+
+
+Another question is if it might be that CC65 will support unnamed structs
+and unions in the future? If so, one might replace the definition of ta_lo
+and ta_hi in struct __6526 by
+
+    union {
+      unsigned int       ta;        /* Timer A */
+      struct {
+        unsigned char        ta_lo;                /* Timer A, low byte */
+        unsigned char        ta_hi;                /* Timer A, high byte */
+      };
+    };
+
+which would allow int and byte access to the timers.
+
+
+Just my EUR 0.02,
+   Spiro.
+
+PS: I'm sorry that I haven't worked on the thing we talked about, but I'm
+busy at the moment to do this big thing.
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20access%20order%20when%20doing%20int%20operation">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0808.html">Ullrich von Bassewitz: "Re: [cc65] cc65 v2.7.0 released"</a>
+<li><strong>Previous message:</strong> <a href="0806.html">MagerValp: "Re: [cc65] cc65 v2.7.0 released"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0809.html">Ullrich von Bassewitz: "Re: [cc65] access order when doing int operation"</a>
+<li><strong>Reply:</strong> <a href="0809.html">Ullrich von Bassewitz: "Re: [cc65] access order when doing int operation"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:42 CET</em>
+</em>
+</small>
+</body>
+</html>

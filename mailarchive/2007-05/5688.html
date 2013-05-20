@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] C64 Cartridge Program</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="Re: [cc65] C64 Cartridge Program" />
+<meta name="Date" content="2007-05-18" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] C64 Cartridge Program</h1>
+<!-- received="Fri May 18 08:15:16 2007" -->
+<!-- isoreceived="20070518061516" -->
+<!-- sent="Fri, 18 May 2007 08:14:58 +0200" -->
+<!-- isosent="20070518061458" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="Re: [cc65] C64 Cartridge Program" -->
+<!-- id="20070518061458.GA10590@trikaliotis.net" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="D6A9DEC492BA1748B89E48B2FC5147B24B2C&#64;server.fox56.local" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5689.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] C64 Cartridge Program&quot;">Next message</a> ]
+[ <a href="5687.html" title="Bill Katsak: &quot;[cc65] C64 Cartridge Program&quot;">Previous message</a> ]
+[ <a href="5687.html" title="Bill Katsak: &quot;[cc65] C64 Cartridge Program&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5689.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] C64 Cartridge Program&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20[cc65]%20C64%20Cartridge%20Program">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-05-18 08:14:58</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello Bill,
+
+* On Thu, May 17, 2007 at 11:32:47PM -0400 Bill Katsak wrote:
+ 
+&gt;    To get to this point, I had to add some kernal initialization
+&gt;    instructions right after the header bytes:
+&gt; 
+&gt; 
+&gt;    stx $d016
+
+Although the original KERNAL performs this STX, it is not necessary. You
+can leave it out.
+
+It is this STX which makes the screen smaller when you press a hardware
+RESET button, or perform a SYS 64738.
+
+ 
+&gt;    I also had to comment out the lines that disable the BASIC ROM (with
+&gt;    these in, it hangs on boot).
+[...]
+
+To follow this problem and the others mentioned, it might be better if
+you provide a small (!) sample which demonstrates the problems, so we
+can follow them.
+
+ 
+&gt;    Does anyone know what I have to do to make this work? Some type of
+&gt;    additional kernal initialization routine?
+
+I doubt it to be the KERNAL. - Although: Doesn't cc65 switch to
+lowercase mode? The initialization from above does not do this, it used
+the uppercase mode of the C64.
+
+Regards,
+   Spiro.
+
+-- 
+Spiro R. Trikaliotis                              <a href="http://opencbm.sf.net/">http://opencbm.sf.net/</a>
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>                     <a href="http://www.viceteam.org/">http://www.viceteam.org/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri May 18 08:15:16 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5689.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] C64 Cartridge Program"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5687.html" title="Previous message in the list">Bill Katsak: "[cc65] C64 Cartridge Program"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5687.html" title="Message to which this message replies">Bill Katsak: "[cc65] C64 Cartridge Program"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5689.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] C64 Cartridge Program"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5688" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5688" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5688" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-05-18 08:15:19 CEST
+</em></small></p>
+</body>
+</html>

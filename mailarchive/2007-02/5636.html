@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] a question about the write</title>
+<meta name="Author" content="Jac Ato (jaxatwork11gmail.com)" />
+<meta name="Subject" content="Re: [cc65] a question about the write function" />
+<meta name="Date" content="2007-02-12" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] a question about the write function</h1>
+<!-- received="Mon Feb 12 22:13:34 2007" -->
+<!-- isoreceived="20070212211334" -->
+<!-- sent="Mon, 12 Feb 2007 16:13:22 -0500" -->
+<!-- isosent="20070212211322" -->
+<!-- name="Jac Ato" -->
+<!-- email="jaxatwork11gmail.com" -->
+<!-- subject="Re: [cc65] a question about the write function" -->
+<!-- id="1c282c9d0702121313v834fba7x568a0eccaef88e95@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20070212193640.GA18971&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5637.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] a question about the write function&quot;">Next message</a> ]
+[ <a href="5635.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] a question about the write function&quot;">Previous message</a> ]
+[ <a href="5635.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] a question about the write function&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5637.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] a question about the write function&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Jac Ato &lt;<a href="mailto:jaxatwork11gmail.com?Subject=Re:%20[cc65]%20a%20question%20about%20the%20write%20function">jaxatwork11gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-02-12 22:13:22</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello,
+
+On 2/12/07, Ullrich von Bassewitz &lt;uz&#64;musoftware&#46;<!--nospam-->de&gt; wrote:
+
+&gt; What about other programs, do they work? CallOutFunc is just a jmp instruction
+&gt; in the data segment (because it is modified at runtime). It looks like this:
+&gt;
+
+Other programs work properly without printf or sprintf. Ive done peek
+and poke &#64; $6000 and my emulator has RAM at that location&#46;<!--nospam--> My hardware
+works too, it has RAM installed at that location.
+
+What is the code that is suppose to be at $6000? is it just a jump? If
+it is, then to which location does it needs to go. Also, what is meant
+by this:
+
+/* Type of the function that is called to output data */
+typedef void (*outfunc) (struct outdesc* desc, const char* buf, unsigned count);
+
+that's from __printf.h
+
+Is it write() or outfunc() that I need to implement?
+
+&gt; -----------------------------------------------------------------------------
+&gt; .data
+&gt;
+&gt; ; Stuff from OutData. Is used as a vector and must be aligned
+&gt; CallOutFunc:    jmp     $0000
+&gt; -----------------------------------------------------------------------------
+&gt;
+&gt; Since the contents of CallOutFunc on your system seems to be $01/$00/$??,
+&gt; while the source says it should be $20/$00/$00, the file is either not loaded
+&gt; correctly, or the data gets corrupted at runtime.
+&gt;
+
+Actually, some piece of code in STARTUP i believe does this:
+
+$8042:A0 00     LDY #$00
+$8044:B1 0A     LDA ($0A),Y &#64; $8AD5 = #$01
+$8046:91 0C     STA ($0C),Y &#64; $6000 = #$01
+$8048:C8        INY
+$8049:C0 30     CPY #$30
+$804B:D0 F7     BNE $8044
+
+This writes data to 0x30 memory locations starting at $6000 with $01.
+On entry in _main, the memory locations still contain 0x01.
+
+My command line for ld65 is:
+--dbgfile debug.txt -t nes -m $(FileTitle)_map.txt -o $(FileTitle).nes
+nes.o $(FileTitle).o $(UserInput) uart.o timer.o nes.lib
+
+Thanks for the support.
+JA
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Feb 12 22:13:34 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5637.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] a question about the write function"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5635.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] a question about the write function"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5635.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] a question about the write function"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5637.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] a question about the write function"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5637.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] a question about the write function"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5636" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5636" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5636" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-02-12 22:13:37 CET
+</em></small></p>
+</body>
+</html>

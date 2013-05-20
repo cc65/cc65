@@ -1,0 +1,270 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] Finished product:  FAST Shell</title>
+<meta name="Author" content="Greg Long (greg_at_maneuveringspeed.com)">
+<meta name="Subject" content="[cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?</h1>
+<!-- received="Wed Mar  5 15:18:27 2003" -->
+<!-- isoreceived="20030305141827" -->
+<!-- sent="Tue, 4 Mar 2003 19:09:40 -0800" -->
+<!-- isosent="20030305030940" -->
+<!-- name="Greg Long" -->
+<!-- email="greg_at_maneuveringspeed.com" -->
+<!-- subject="[cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?" -->
+<!-- id="006801c2e2c4$a96ee640$8001a8c0@ENDEAVOR" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Greg Long (<a href="mailto:greg_at_maneuveringspeed.com?Subject=Re:%20[cc65]%20Finished%20product:%20%20FAST%20ShellSort%20demo%20for%20c64%20(working%20:)%20)%20-%20feedback?"><em>greg_at_maneuveringspeed.com</em></a>)<br>
+<strong>Date:</strong> 2003-03-05 04:09:40
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2576.html">MagerValp: "Re: [cc65] using newline in cprintf on c64"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2578.html">Ullrich von Bassewitz: "Re: [cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?"</a>
+<li><strong>Reply:</strong> <a href="2578.html">Ullrich von Bassewitz: "Re: [cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?"</a>
+<li><strong>Reply:</strong> <a href="2586.html">Groepaz: "Re: [cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?"</a>
+<li><strong>Reply:</strong> <a href="2593.html">Spiro Trikaliotis: "Re: [cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+This same sort, 19,000 random 16bit integers, took 256 minutes in
+uncompiled BASIC.  CC65's -Oi code does it in 10minutes, 34 seconds.
+
+(.NET release C++ build on a Pentium III 1ghz CPU - about 1/20th of a
+second.)
+
+I wrote the same routine in 6502 assembly but have yet to debug it;)
+
+
+SO.... we might say a &quot;typical&quot; 1ghz computer today is roughly 13,000
+faster than a 1982 Commodore 64 (for Compiled C) or 300,000 times faster
+than uncompiled BASIC.
+
+The Shell Sort, invented by Donald Shell, is one of the fastest sorting
+routines available. Others, such as the Quick Sort, involve too much
+recursion to be practical on the 64. The Merge and Quick sort algorithms
+are faster, but waste memory...up to twice the ammount of the original
+array.
+
+It can be seen that this routine can be modifed to sort strings without
+much difficulty.  (Now how do I overload the &lt; and &gt; operators in C?)
+
+Actual results may vary, see dealer for details.
+
+Known bugs:
+-----------
+1) cprintf does not appear to work properly :  replace \r with \n and
+watch the results.
+
+2) If the code is executed a second time, it crashes.  Don't know
+why...It may be due to the writing to RAM beneath the BASIC interpreter.
+I went with 19,000 integers because in a BASIC routine, that was the
+most that would fit in the standard 38,911 bytes available.  Does CCS65
+modify and make calls to the BASIC interpreter?
+
+Greg
+
+
+//Code below
+/***********************************************************************
+*****
+Shell Sort c64
+
+Demonstration of shell sort
+
+(Much faster selecting &quot;warp mode&quot; on an emulator such as VICE)
+************************************************************************
+****/
+
+
+#include &lt;stdlib.h&gt;
+#include &lt;time.h&gt;
+#include &lt;conio.h&gt;
+
+#define POKE(addr,val)     (*(unsigned char*) (addr) = (val))
+#define POKEW(addr,val)    (*(unsigned*) (addr) = (val))
+#define PEEK(addr)         (*(unsigned char*) (addr))
+#define PEEKW(addr)        (*(unsigned*) (addr))
+
+//Sort routine invented by Donald Shell
+void ShellSort(unsigned int *ra, unsigned int size);
+
+//sets TI$=&quot;000000&quot; (realtime jiffy clock at addr 160-162)
+void stopwatch_reset();
+
+//returns the jiffy clock (60ths of a second)
+unsigned long stopwatch();
+
+int main()
+{	
+	unsigned int size = 19000;
+	unsigned int i = size;  
+	unsigned int* ra;//Our array
+	unsigned char a;//for peek function
+	unsigned long sort_time = 0;
+	unsigned int secs = 0;
+
+	ra = malloc(size*2);
+
+	//bank out BASIC interpreter
+	a = PEEK(1);
+	POKE(1,a&amp;254);
+
+	//generate random numbers ranging 0-32767
+	while(i)
+	{
+		ra[i] = rand();
+		--i;
+	}
+	
+	//set TI$=0, and call our sort routine.
+	stopwatch_reset();
+	ShellSort(ra, size);
+
+	sort_time = stopwatch();
+	secs = (unsigned int)(sort_time / 60);
+	
+	//stores # of seconds in locations 1020-1021
+	POKEW(1020,secs);
+	
+	cprintf (&quot;                    Time: %u sec\r&quot;, secs);
+	//Maybe someone can debug the cprintf calls here in this
+block(?):
+	for(i=0 ; i&lt;size ; ++i)
+	{
+		unsigned int num = ra[i];
+		cprintf(&quot;%u) %u    \r&quot;, i, num);
+	}
+
+	//re-enable BASIC interpreter
+	a = PEEK(1);
+	POKE(1,a|1);
+
+	return 0;
+}
+
+void stopwatch_reset()
+{
+	POKE(160,0);
+	POKE(161,0);
+	POKE(162,0);
+}
+
+unsigned long stopwatch()
+{
+	unsigned long sw_time = 0;
+
+	sw_time += ((unsigned long)PEEK(160)) * 0x10000;
+	sw_time += ((unsigned long)PEEK(161)) * 0x100;
+	sw_time += (unsigned long)PEEK(162);
+
+	return sw_time;
+}
+
+
+void ShellSort(unsigned int *ra, unsigned int size)
+{	
+	unsigned int incs[16];
+
+	unsigned int h=1;//increment
+	unsigned int i=0;//number of increments)
+	char quit=0;
+
+	while(!quit)
+	{
+		incs[i] = h;
+		h = 3*h+1;
+		++i;
+		
+		if(h &gt;= size)
+			quit = 1;
+	}
+
+	--i;
+
+	while(i)
+	{
+		unsigned int hCnt = 0;
+		unsigned int j = 0;
+		unsigned int hCnt2 = 0;
+		--i;
+		h = incs[i];
+
+		cprintf (&quot;increment: %u     \r&quot;, h);
+
+		hCnt2 = 2*h;
+		for(hCnt=h ; hCnt&lt;hCnt2 ; ++hCnt)
+		{
+			for(j = hCnt ; j &lt; size ; j+= h)
+			{
+				unsigned int temp = ra[j];
+				unsigned int k = j;
+
+				while( (h&lt;k) &amp;&amp; (temp&lt;ra[k-h]) )
+				{
+					ra[k] = ra[k-h];
+					k-= h;
+				}
+				ra[k] = temp;
+			}
+		}
+	}
+}
+
+
+</pre>
+<hr noshade>
+<ul>
+<li>text/plain attachment: <a href="../att-2577/01-ShellSort.c">ShellSort.c</a>
+</ul>
+<!-- attachment="01-ShellSort.c" -->
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Finished%20product:%20%20FAST%20ShellSort%20demo%20for%20c64%20(working%20:)%20)%20-%20feedback?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2576.html">MagerValp: "Re: [cc65] using newline in cprintf on c64"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2578.html">Ullrich von Bassewitz: "Re: [cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?"</a>
+<li><strong>Reply:</strong> <a href="2578.html">Ullrich von Bassewitz: "Re: [cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?"</a>
+<li><strong>Reply:</strong> <a href="2586.html">Groepaz: "Re: [cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?"</a>
+<li><strong>Reply:</strong> <a href="2593.html">Spiro Trikaliotis: "Re: [cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-03-05 15:18:34 CET</em>
+</em>
+</small>
+</body>
+</html>

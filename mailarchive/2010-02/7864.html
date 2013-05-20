@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Re: CBM POSIX I/O w/o O_TRUNC </title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] Re: CBM POSIX I/O w/o O_TRUNC ?" />
+<meta name="Date" content="2010-02-07" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Re: CBM POSIX I/O w/o O_TRUNC ?</h1>
+<!-- received="Sun Feb  7 23:29:21 2010" -->
+<!-- isoreceived="20100207222921" -->
+<!-- sent="Sun, 7 Feb 2010 23:29:11 +0100" -->
+<!-- isosent="20100207222911" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] Re: CBM POSIX I/O w/o O_TRUNC ?" -->
+<!-- id="f97798c21002071429ne9aead1x3bfe46057da2f013@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="f97798c21002050433q74618b0eva2ff59dd9745a39f&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7865.html" title="Oliver Schmidt: &quot;Re: [cc65] Bug in C128 C-library&quot;">Next message</a> ]
+[ <a href="7863.html" title="Oliver Schmidt: &quot;[cc65] CBM POSIX I/O w/o O_TRUNC ?&quot;">Previous message</a> ]
+[ <a href="7863.html" title="Oliver Schmidt: &quot;[cc65] CBM POSIX I/O w/o O_TRUNC ?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7868.html" title="Dirk Jagdmann: &quot;Re: [cc65] CBM POSIX I/O w/o O_TRUNC ?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Re:%20CBM%20POSIX%20I/O%20w/o%20O_TRUNC%20?">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-02-07 23:29:11</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+As there were no answers to my posting I presumed that everyting is
+just as expected. However this doesn't seem to be the case at all...
+
+&gt; I want to change just the first few bytes of a longer file. From the
+&gt; POSIX docs (and my experience in other environments) learned that I
+&gt; can do so simply by omitting O_TRUNC (and O_CREAT) like this:
+&gt;
+&gt; int f = open(&quot;myfile&quot;, O_WRONLY);
+&gt; write(f, mybuffer, mysize);
+&gt; close(f);
+
+
+1. As the code above didn't work I checked out the source code of the
+CBM implementation of POSIX open(). It says:
+
+; ... we cannot
+; open a file for writing without creating it.
+[...]
+  cmp     #(O_WRONLY | O_CREAT)   ; Open for writing?
+  bne     invflags        ; No: Invalid open mode
+
+I didn't find any hint on this limitation the docs (if we don't
+consider the source as THE docs) that O_WRONLY can't be used without
+O_CREAT (and O_RDONLY can't be combined with O_WRONLY).
+
+So changed the code above from
+
+  int f = open(&quot;myfile&quot;, O_WRONLY);
+
+to
+
+  int f = open(&quot;myfile&quot;, O_WRONLY | O_CREAT);
+
+
+2. Now the open() fails with error EEXIST. This surprised me very much
+as O_EXCL wasn't set - and the POSIX spec seems to say that EEXIST is
+only applicable with O_EXCL. Looking at the CBM open() code once more
+I noticed that O_EXCL isn't checked at all - so I sort of assume that
+the CBMs can in general only write to &quot;new&quot; files. If this should be
+the case I don't understand two things:
+
+a) Why doesn't the open() code require O_EXCL to be set in the same
+way it requires O_CREAT to be set?
+
+b) Why does the code check for O_TRUNC and O_APPEND if only &quot;new&quot;
+files can be written?
+
+In any case it would be great if there were some hints in the docs on
+what the CBM implementation of the POSIX I/O calls can and what they
+can't.
+
+Thanks in advance for answers to my questions, Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Feb  7 23:29:21 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7865.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Bug in C128 C-library"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7863.html" title="Previous message in the list">Oliver Schmidt: "[cc65] CBM POSIX I/O w/o O_TRUNC ?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7863.html" title="Message to which this message replies">Oliver Schmidt: "[cc65] CBM POSIX I/O w/o O_TRUNC ?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7868.html" title="Next message in this discussion thread">Dirk Jagdmann: "Re: [cc65] CBM POSIX I/O w/o O_TRUNC ?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7868.html" title="Message sent in reply to this message">Dirk Jagdmann: "Re: [cc65] CBM POSIX I/O w/o O_TRUNC ?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="7870.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Re: CBM POSIX I/O w/o O_TRUNC ?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="7873.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] Re: CBM POSIX I/O w/o O_TRUNC ?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7864" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7864" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7864" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-02-07 23:29:24 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Strange things happen with seg</title>
+<meta name="Author" content="MagerValp (MagerValp1cling.gu.se)" />
+<meta name="Subject" content="[cc65] Strange things happen with segments after BSS" />
+<meta name="Date" content="2005-11-18" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Strange things happen with segments after BSS</h1>
+<!-- received="Fri Nov 18 14:47:04 2005" -->
+<!-- isoreceived="20051118134704" -->
+<!-- sent="Fri, 18 Nov 2005 14:46:52 +0100" -->
+<!-- isosent="20051118134652" -->
+<!-- name="MagerValp" -->
+<!-- email="MagerValp1cling.gu.se" -->
+<!-- subject="[cc65] Strange things happen with segments after BSS" -->
+<!-- id="17277.56140.147972.14327@panini.cling.gu.se" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5271.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Strange things happen with segments after BSS&quot;">Next message</a> ]
+[ <a href="5269.html" title="Spiro Trikaliotis: &quot;Re: [cc65] &quot;--feature labels_without_colons&quot; not always working with 2.11.0?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5271.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Strange things happen with segments after BSS&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: MagerValp &lt;<a href="mailto:MagerValp1cling.gu.se?Subject=Re:%20[cc65]%20Strange%20things%20happen%20with%20segments%20after%20BSS">MagerValp1cling.gu.se</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-11-18 14:46:52</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>When BSS isn't the last segment in the linker config file, strange
+things happen. It could be related to alignment, but I'm not sure. For
+my current project, the config file looks like this:
+
+  MEMORY {
+    ZP:		start = $0002, size = $001C, define = yes;
+    MYZP:	start = $0057, size = $0010;
+    RAM:	start = $07FF, size = $9001, file = %O, define = yes, fill = yes;
+    TILERAM:	start = $9800, size = $1800, file = %O, fill = yes;
+    MAPRAM:	start = $b000, size = $2000, file = %O, fill = yes;
+    GFXRAM:	start = $c000, size = $4000, file = &quot;&quot;;
+  }
+  SEGMENTS {
+    STARTUP:	load = RAM, type = ro;
+    LOWCODE:	load = RAM, type = ro, optional = yes;
+    INIT:	load = RAM, type = ro, define = yes, optional = yes;
+    CODE:	load = RAM, type = ro;
+    RODATA:	load = RAM, type = ro, align = 64;
+    DATA:	load = RAM, type = rw, align = 64;
+    BSS:	load = RAM, type = bss, define = yes, align = $100;
+    TILEDATA:	load = TILERAM, type = ro, align = $100;
+    MAPDATA:	load = MAPRAM, type = rw, align = $400;
+    GFXZP:	load = MYZP, type = zp, optional = yes;
+    ZEROPAGE:	load = ZP, type = zp;
+  }
+
+In tile.s, I have:
+
+  	.segment &quot;TILEDATA&quot;
+
+  tile_bmp:
+	.incbin &quot;tile_bmp.bin&quot;
+
+  tile_scr:
+	.incbin &quot;tile_scr.bin&quot;
+
+  tile_col:
+	.incbin &quot;tile_col.bin&quot;
+
+
+	.align 64
+
+  tile_bmp_tab_lo:
+	.byte &lt;(tile_bmp + 0 * 3 * 8)
+	.byte &lt;(tile_bmp + 1 * 3 * 8)
+	.byte &lt;(tile_bmp + 2 * 3 * 8)
+	.byte &lt;(tile_bmp + 3 * 3 * 8)
+	[...]
+
+  tile_bmp_tab_hi:
+	.byte &gt;(tile_bmp + 0 * 3 * 8)
+	.byte &gt;(tile_bmp + 1 * 3 * 8)
+	.byte &gt;(tile_bmp + 2 * 3 * 8)
+	.byte &gt;(tile_bmp + 3 * 3 * 8)
+	[...]
+
+As the graphics data has a fixed size ($1200 + $240 + $240), the
+tables should start at $ae80, but instead it looks like this:
+
+  ae00  00 00 00 00  00 00 00 00  00 00 00 00  00 00 00 00   ................
+  ae10  00 00 00 00  00 00 00 00  00 00 00 00  00 00 00 00   ................
+  ae20  00 00 00 00  00 00 00 00  00 00 00 00  00 00 00 00   ................
+  ae30  00 00 00 00  00 00 00 00  00 00 00 00  00 00 00 00   ................
+  ae40  00 00 00 00  18 30 48 60  78 90 a8 c0  d8 f0 08 20   .....0H`x...... 
+  ae50  38 50 68 80  98 b0 c8 e0  f8 10 28 40  58 70 88 a0   8Ph.......(&#64;Xp&#46;<!--nospam-->.
+  ae60  b8 d0 e8 00  18 30 48 60  78 90 a8 c0  d8 f0 08 20   .....0H`x...... 
+  ae70  38 50 68 80  98 b0 c8 e0  f8 10 28 40  58 70 88 a0   8Ph.......(&#64;Xp&#46;<!--nospam-->.
+  ae80  b8 d0 e8 98  98 98 98 98  98 98 98 98  98 98 99 99   ................
+
+The table is moved forward 61 bytes. If I change the segment type to
+rw, the data appears in the right place:
+
+  ae70  00 00 00 00  00 00 00 00  00 00 00 00  00 00 00 00   ................
+  ae80  00 18 30 48  60 78 90 a8  c0 d8 f0 08  20 38 50 68   ..0H`x...... 8Ph
+  ae90  80 98 b0 c8  e0 f8 10 28  40 58 70 88  a0 b8 d0 e8   .......(&#64;Xp&#46;<!--nospam-->....
+  aea0  00 18 30 48  60 78 90 a8  c0 d8 f0 08  20 38 50 68   ..0H`x...... 8Ph
+  aeb0  80 98 b0 c8  e0 f8 10 28  40 58 70 88  a0 b8 d0 e8   .......(&#64;Xp&#46;<!--nospam-->....
+  aec0  98 98 98 98  98 98 98 98  98 98 98 99  99 99 99 99   ................
+
+I have $614 bytes of BSS in my code, so it isn't just skipping the BSS
+data...
+
+ld65 bug? The workaround is simple (change BSS to type = rw), but it
+took me a while to figure out what the problem was the first time it
+bit me.
+
+-- 
+    ___          .     .  .         .       . +  .         .      o   
+  _|___|_   +   .  +     .     +         .  Per Olofsson, arkadspelare
+    o-o    .      .     .   o         +          MagerValp&#64;cling&#46;<!--nospam-->gu.se
+     -       +            +    .     <a href="http://www.cling.gu.se/~cl3polof/">http://www.cling.gu.se/~cl3polof/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Nov 18 14:47:04 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5271.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Strange things happen with segments after BSS"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5269.html" title="Previous message in the list">Spiro Trikaliotis: "Re: [cc65] &quot;--feature labels_without_colons&quot; not always working with 2.11.0?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5271.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Strange things happen with segments after BSS"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5271.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Strange things happen with segments after BSS"</a></li>
+<li><dfn>Reply</dfn>:  <a href="5290.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Strange things happen with segments after BSS"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5270" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5270" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5270" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-11-18 14:47:07 CET
+</em></small></p>
+</body>
+</html>

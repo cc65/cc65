@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] TGI preview</title>
+<meta name="Author" content="Fatih Aygün (cyco1301yahoo.com)" />
+<meta name="Subject" content="Re: [cc65] TGI preview" />
+<meta name="Date" content="2009-11-13" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] TGI preview</h1>
+<!-- received="Fri Nov 13 11:00:52 2009" -->
+<!-- isoreceived="20091113100052" -->
+<!-- sent="Fri, 13 Nov 2009 02:00:44 -0800 (PST)" -->
+<!-- isosent="20091113100044" -->
+<!-- name="Fatih Aygün" -->
+<!-- email="cyco1301yahoo.com" -->
+<!-- subject="Re: [cc65] TGI preview" -->
+<!-- id="966359.96360.qm@web56507.mail.re3.yahoo.com" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="93BDEF4D-B32A-443B-99E9-A3A86C0223C6&#64;wfmh.org.pl" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7573.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] TGI preview&quot;">Next message</a> ]
+[ <a href="7571.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Zeropage Addressing?&quot;">Previous message</a> ]
+[ <a href="7569.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] TGI preview&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7573.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] TGI preview&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Fatih Aygün &lt;<a href="mailto:cyco1301yahoo.com?Subject=Re:%20[cc65]%20TGI%20preview">cyco1301yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-11-13 11:00:44</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+silverdr&#64;wfmh&#46;<!--nospam-->org.pl wrote:
+&gt; 
+&gt; What is the total ram of your setup?
+&gt; 
+
+Atari has 36384 bytes of RAM when using the builtinconfig. The 320x192x2
+graphics mode needs 7147 bytes plus 1601 bytes for the tgi driver proper.
+The rest gets eaten up by the program itself and mostly by the fonts.
+
+But I figured out that if I configure the emulator to act like an atari 800
+with 52K of ram (instead of like an atari 130xe with 1088K of ram!), I have more 
+memory and the tgi-preview runs out of the box.
+
+That's because the 800 roms were smaller than the xl/xeroms and leaves more
+room for linear memory. That space is not connected in a stock 800 that has
+48K of ram but the emulator can be configured to use that too. I suppose one
+
+can install real ram in a real machine to get the same setup.
+
+With a custom startup and config, it should be possible to get a similar setup
+with xl/xe machines, but not easily. One has to bank out the osrom and revector
+the interrupts and os entries. I've done it several times, I'll see if I can put together
+something that's generally useful.
+
+&gt; Does anyone here have the easy accessible possibility to verify this with original 
+&gt; Borland stuff?
+
+Not currently, but my brother claims to remember that it was like this in the original
+font.
+
+Regards,
+Fatih.
+
+
+      
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Nov 13 11:00:52 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7573.html" title="Next message in the list">silverdr1wfmh.org.pl: "Re: [cc65] TGI preview"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7571.html" title="Previous message in the list">silverdr1wfmh.org.pl: "Re: [cc65] Zeropage Addressing?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7569.html" title="Message to which this message replies">silverdr1wfmh.org.pl: "Re: [cc65] TGI preview"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7573.html" title="Next message in this discussion thread">silverdr1wfmh.org.pl: "Re: [cc65] TGI preview"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7573.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] TGI preview"</a></li>
+<li><dfn>Reply</dfn>:  <a href="7575.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] TGI preview"</a></li>
+<li><dfn>Reply</dfn>:  <a href="7586.html" title="Message sent in reply to this message">SHAWN JEFFERSON: "Re: [cc65] TGI preview"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7572" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7572" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7572" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-11-13 11:00:55 CET
+</em></small></p>
+</body>
+</html>

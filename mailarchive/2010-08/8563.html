@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Strange behaviour of a sim</title>
+<meta name="Author" content="Johan Kotlinski (kotlinski1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] Strange behaviour of a simple code" />
+<meta name="Date" content="2010-08-09" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Strange behaviour of a simple code</h1>
+<!-- received="Mon Aug  9 11:01:35 2010" -->
+<!-- isoreceived="20100809090135" -->
+<!-- sent="Mon, 9 Aug 2010 11:00:45 +0200" -->
+<!-- isosent="20100809090045" -->
+<!-- name="Johan Kotlinski" -->
+<!-- email="kotlinski1gmail.com" -->
+<!-- subject="Re: [cc65] Strange behaviour of a simple code" -->
+<!-- id="AANLkTi=-jg+-zNp5L9Qb7YJ6VjPrJvLQb-CWbC5SJ7A-@mail.gmail.com" -->
+<!-- charset="UTF-8" -->
+<!-- inreplyto="9BEA1915764041599DD422F2904BEA47&#64;caixanova.gz" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8564.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Strange behaviour of a simple code&quot;">Next message</a> ]
+[ <a href="8562.html" title="Carlos: &quot;[cc65] Strange behaviour of a simple code&quot;">Previous message</a> ]
+[ <a href="8562.html" title="Carlos: &quot;[cc65] Strange behaviour of a simple code&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8564.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Strange behaviour of a simple code&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Johan Kotlinski &lt;<a href="mailto:kotlinski1gmail.com?Subject=Re:%20[cc65]%20Strange%20behaviour%20of%20a%20simple%20code">kotlinski1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-08-09 11:00:45</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Could it be because inc_test overwrites a and x registers + flags?
+
+Not sure why that would give such a behavior, but... it is the first thing
+that strikes me.
+
+Johan
+
+On Mon, Aug 9, 2010 at 10:51 AM, Carlos &lt;shangri-la&#64;teleline&#46;<!--nospam-->es&gt; wrote:
+
+&gt;  In these last days i'm really puzzled with a strange behaviour with a
+&gt; cc65 simple program, don't know if is some kind of bug or a bad code from my
+&gt; part but can't find where the problem can be.
+&gt;
+&gt; The result of the main code is not right:
+&gt;
+&gt; 1.  FROM:  17600
+&gt; 1.  TO:  30719
+&gt; 3.  FROM:  17473
+&gt; 3.  TO:  30209
+&gt;
+&gt; but if uncomment the two commented printf lines then the result is the
+&gt; expected:
+&gt;
+&gt; 1.  FROM:  17600
+&gt; 1.  TO:  30719
+&gt; 2.  FROM:  17600
+&gt; 2.  TO:  30336
+&gt; 3.  FROM:  17728
+&gt; 3.  TO:  30464
+&gt;
+&gt;
+&gt; why is the behaviour changed only for the printf lines? Any ideas?
+&gt;
+&gt;
+&gt; test.c
+&gt; ------
+&gt;
+&gt; #include &lt;stdio.h&gt;
+&gt;
+&gt; void inc_test(void);
+&gt;
+&gt; unsigned int from, to;
+&gt;
+&gt;
+&gt; // MAIN
+&gt; void main(void)
+&gt; {
+&gt;  from = 17600;
+&gt;  to = 30719;
+&gt;
+&gt;  printf(&quot;1. FROM: %u\n&quot;, from);
+&gt;  printf(&quot;1. TO: %u\n&quot;, to);
+&gt;
+&gt;  if (to &gt;= 0x7740)   // 30528
+&gt;  {
+&gt;   to = 0x7680;  // 30336
+&gt;  }
+&gt;  else
+&gt;  {
+&gt;   to = 0x7740;
+&gt;  }
+&gt;
+&gt;  //printf(&quot;2. FROM: %u\n&quot;, from);
+&gt;  //printf(&quot;2. TO: %u\n&quot;, to);
+&gt;
+&gt;  inc_test();
+&gt;  ++from;
+&gt;  ++to;
+&gt;
+&gt;  inc_test();
+&gt;  ++from;
+&gt;  ++to;
+&gt;
+&gt;  printf(&quot;3. FROM: %u\n&quot;, from);
+&gt;  printf(&quot;3. TO: %u\n&quot;, to);
+&gt; }
+&gt;
+&gt;
+&gt;
+&gt; inctest.s
+&gt; ---------
+&gt;
+&gt; .export _inc_test
+&gt;
+&gt; .import _from
+&gt; .import _to
+&gt;
+&gt;
+&gt; .CODE
+&gt;
+&gt; ; ---------------------------------------------------------------
+&gt; ; _inc_test
+&gt; ; ---------------------------------------------------------------
+&gt; _inc_test:
+&gt;
+&gt;  ldx #$15
+&gt;
+&gt; &#64;LGO:
+&gt;
+&gt;  lda _from
+&gt;  adc #$03
+&gt;  sta _from
+&gt;  lda _to
+&gt;  adc #$03
+&gt;  sta _to
+&gt;
+&gt;  dex
+&gt;  bne &#64;LGO
+&gt;
+&gt;  rts
+&gt;
+&gt;
+&gt;
+&gt; ------------------------------
+&gt; - - - AVISO - - -
+&gt; Este correo electrónico contiene información privada y confidencial. Si
+&gt; usted no es el destinatario del mensaje no está autorizado a leerlo,
+&gt; copiarlo o difundirlo. Si lo ha recibido por error, por favor contacte con
+&gt; el remitente y destruya su contenido. Cualquier uso adicional de este correo
+&gt; está estrictamente prohibido.
+&gt;
+&gt; - - - NOTICE - - -
+&gt; Privileged/confidential information may be contained in this e-mail. Any
+&gt; reading, copying o dissemination of this communication by persons or
+&gt; entities other than its intended recipient is prohibited. If you received
+&gt; this in error, please contact the sender and delete it. Any further use of
+&gt; this e-mail by you is strictly prohibited.
+&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Aug  9 11:01:35 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8564.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Strange behaviour of a simple code"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8562.html" title="Previous message in the list">Carlos: "[cc65] Strange behaviour of a simple code"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8562.html" title="Message to which this message replies">Carlos: "[cc65] Strange behaviour of a simple code"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8564.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Strange behaviour of a simple code"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8563" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8563" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8563" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-08-09 11:01:37 CEST
+</em></small></p>
+</body>
+</html>

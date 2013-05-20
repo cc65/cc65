@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] float and double support</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] float and double support - libraries?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] float and double support - libraries?</h1>
+<!-- received="Fri Mar  7 11:43:24 2003" -->
+<!-- isoreceived="20030307104324" -->
+<!-- sent="Fri, 7 Mar 2003 11:43:20 +0100" -->
+<!-- isosent="20030307104320" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] float and double support - libraries?" -->
+<!-- id="20030307104320.GB31512@trixie.musoftware.de" -->
+<!-- inreplyto="00d101c2e435$34336be0$8001a8c0@ENDEAVOR" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20float%20and%20double%20support%20-%20libraries?"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-03-07 11:43:20
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2646.html">Ullrich von Bassewitz: "Re: [cc65] Floating point support (was: C++ compiler)"</a>
+<li><strong>In reply to:</strong> <a href="2627.html">Greg Long: "RE: [cc65] float and double support - libraries?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2649.html">Piotr Fusik: "Re: [cc65] float and double support - libraries?"</a>
+<li><strong>Reply:</strong> <a href="2649.html">Piotr Fusik: "Re: [cc65] float and double support - libraries?"</a>
+<li><strong>Reply:</strong> <a href="2666.html">David Holz: "[cc65] IEEE vs nonstandard floats"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Thu, Mar 06, 2003 at 03:07:47PM -0800, Greg Long wrote:
+&gt; Which is a VERY good point...although I would submit that if they both
+&gt; have the same precision, it's silly to have both other than for
+&gt; compatability reasons.  Therefore I would suggest a double should indeed
+&gt; have 64 bits in the interest of, &quot;while we're at it.&quot;
+
+I see absolutely no reason to support 64 bit floating point on a 6502
+platform. While there are places where having floating point is a must, if one
+wants to do high precision calculations, it's definitely better to use a PC.
+
+Handling 64 bit is absolutely, really big, fat and slow on a 6502. And because
+the default promotions of the language promote to double (and not to float!),
+even a program using just floats will do most calculations in double
+precision, leading to bloat and slow programs. Plus, this would need larger
+changes in the compiler, because passing 32 bit data types around is already
+implemented, but 64 bit is not.
+
+&quot;while we're at it&quot; is rarely a good reason to add something, especially if
+we're talking about very limited target platforms, where every byte and every
+cycle counts.
+
+&gt; IEEE compliant float and double support, 32bit each, with the double
+&gt; code written in mind that it could be expanded to 64bits.
+&gt;
+&gt; Let's not worry aobut math.h yet...just basic add, subtract, multiply,
+&gt; divide support would be a good starting point.
+
+These routines are not really difficult to write, the tricky part is to make
+them fast. The support needed in the compiler is more work.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20float%20and%20double%20support%20-%20libraries?">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20float%20and%20double%20support%20-%20libraries?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2646.html">Ullrich von Bassewitz: "Re: [cc65] Floating point support (was: C++ compiler)"</a>
+<li><strong>In reply to:</strong> <a href="2627.html">Greg Long: "RE: [cc65] float and double support - libraries?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2649.html">Piotr Fusik: "Re: [cc65] float and double support - libraries?"</a>
+<li><strong>Reply:</strong> <a href="2649.html">Piotr Fusik: "Re: [cc65] float and double support - libraries?"</a>
+<li><strong>Reply:</strong> <a href="2666.html">David Holz: "[cc65] IEEE vs nonstandard floats"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-03-07 11:43:28 CET</em>
+</em>
+</small>
+</body>
+</html>

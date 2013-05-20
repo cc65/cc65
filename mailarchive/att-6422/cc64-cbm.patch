@@ -1,0 +1,15 @@
+Index: libsrc/cbm/Makefile
+===================================================================
+--- libsrc/cbm/Makefile	(revision 3916)
++++ libsrc/cbm/Makefile	(working copy)
+@@ -30,7 +30,8 @@
+ # Object files
+ 
+ C_OBJS =  	cbm_load.o	\
+-		cbm_save.o
++		cbm_save.o	\
++		cbm_dir.o
+ 
+ S_OBJS =	c_acptr.o	\
+ 	 	c_basin.o 	\
+

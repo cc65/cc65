@@ -1,0 +1,230 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] cc65 v2.7.0 released</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="[cc65] cc65 v2.7.0 released">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] cc65 v2.7.0 released</h1>
+<!-- received="Sun Oct 14 10:29:16 2001" -->
+<!-- isoreceived="20011014082916" -->
+<!-- sent="Sun, 14 Oct 2001 10:29:17 +0200" -->
+<!-- isosent="20011014082917" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="[cc65] cc65 v2.7.0 released" -->
+<!-- id="20011014102917.A30270@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%20v2.7.0%20released"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2001-10-14 10:29:17
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0806.html">MagerValp: "Re: [cc65] cc65 v2.7.0 released"</a>
+<li><strong>Previous message:</strong> <a href="0804.html">Michal Bartczak: "RE: [cc65] Package locations"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0806.html">MagerValp: "Re: [cc65] cc65 v2.7.0 released"</a>
+<li><strong>Reply:</strong> <a href="0806.html">MagerValp: "Re: [cc65] cc65 v2.7.0 released"</a>
+<li><strong>Reply:</strong> <a href="0821.html">Marko Mäkelä: "Re: [cc65] cc65 v2.7.0 released"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+				    
+Hi!
+
+A few minutes ago I've placed version 2.7.0 onto the FTP server at
+
+        <a href="ftp://ftp.musoftware.de/pub/uz/cc65/">ftp://ftp.musoftware.de/pub/uz/cc65/</a>
+
+(the usual FTP server quirks apply).
+
+Thanks to all who helped developing and testing this release! The official
+announcement is appended below.
+
+Regards
+
+
+        Uz
+
+
+---------------------------------------------------------------------------
+
+I'm proud to announce version 2.7.0 of CC65, a C crosscompiler /
+crossassembler combo for 6502 systems.
+
+CC65 has C and runtime library support for many of the old 6502 machines,
+including
+
+  - The Commodore C64, C128 and the C16, C116, Plus/4 machines.
+  - The CBM 510 (aka P500), a quite rare Commodore machine (programs
+    run in bank 0).
+  - The CBM 600/700 family (programs run in bank 1).
+  - Newer PET machines (not 2001)
+  - The Apple ][ (library support by Kevin Ruland &lt;<a href="mailto:kevin_at_rodin.wustl.edu?Subject=Re:%20[cc65]%20cc65%20v2.7.0%20released">kevin_at_rodin.wustl.edu</a>&gt;)
+  - The Atari 8 bit machines (thanks to the Atari team: Christian Groessler
+    &lt;<a href="mailto:cpg_at_aladdin.de?Subject=Re:%20[cc65]%20cc65%20v2.7.0%20released">cpg_at_aladdin.de</a>&gt;, Mark Keates &lt;<a href="mailto:markk_at_dendrite.co.uk?Subject=Re:%20[cc65]%20cc65%20v2.7.0%20released">markk_at_dendrite.co.uk</a>&gt;, Freddy Offenga
+    &lt;<a href="mailto:taf_offenga_at_yahoo.com?Subject=Re:%20[cc65]%20cc65%20v2.7.0%20released">taf_offenga_at_yahoo.com</a>&gt; and David Lloyd, &lt;<a href="mailto:dmlloyd_at_atari-central.com?Subject=Re:%20[cc65]%20cc65%20v2.7.0%20released">dmlloyd_at_atari-central.com</a>&gt;).
+  - GEOS for the C64 and C128 (GEOSLib by Maciej Witkowiak &lt;<a href="mailto:ytm_at_elysium.pl?Subject=Re:%20[cc65]%20cc65%20v2.7.0%20released">ytm_at_elysium.pl</a>&gt;)
+
+The libraries are fairly portable, so creating a version for other 6502s
+shouldn't be too much work.
+
+
+Version 2.7 has a real lot of changes, including a completely rewritten
+backend. Here is a short list:
+
+  - New compiler option --create-dep to create a dependency list for a
+    makefile.
+
+  - Option and pragma to generate stack overflow checks (both, parameter
+    and CPU stack).
+
+  - Transparent and efficient handling of fixed params in variadic
+    functions.
+
+  - Build parameter frames when calling other functions by adjusting
+    the stack once and then storing into this frame instead of pushing
+    each parameter separately.
+
+  - More flexible .INCBIN command for the assembler.
+
+  - Compiler generates line info for the assembler. The assembler passes
+    this to the linker, which is able to generate files containing this
+    information.
+
+  - New, much improved compiler backend.
+
+  - The literal pool works now without a hardcoded limit.
+
+  - C functions may now be declared as __fastcall__.
+
+  - New #elif preprocessor directive
+
+  - Boolean and and or in preprocessor #if clauses does now work.
+
+  - New, improved __asm__ syntax for the inline assembler.
+
+  - New code generation for the switch statement.
+
+  - Optimizations. Please note that some of the optimizations of the
+    old backend are no longer there, so in rare cases, code may be slower
+    when compiled with this version.
+
+  - Symbols may now be defined in the linker config file. This is used for
+    most platforms to define the size of the stack.
+
+  - Updated the cc65 utility with all the new command line switches.
+
+  - C64 startup code no longer uses fixed stack top.
+
+  - Several changed/added runtime functions for better performance.
+
+  - CBM BASIC compatible file I/O functions by Marc Rintsch.
+
+  - Support for the Commodore 510.
+
+  - Mouse routines completed! Mouse support is available for the following
+    systems: Atari, C64, C128, CBM 510 and GEOS.
+
+  - Command line response files are now supported to aid those people
+    working with &quot;operating systems&quot; that have a serious command line
+    length limit.
+
+  - A new plasma graphics demo written in pure C (by groepaz/hitmen).
+
+  - And lots of other minor changes...
+
+
+There is still no support for the following features:
+
+  * Floats and bit fields.
+
+  * stdio file routines on most systems. The 8 bit Ataris are the first
+    machines that do have full file I/O support. Please note that the
+    complete CBM family doesn't have stdio file support!
+
+  * The 80 column mode on the C128 is not supported by the conio library.
+
+
+Available packages:
+
+As usual I will provide the complete sources and several binary packages,
+including RPMs for RedHat Linux. Linux is the primary development platform,
+so the sources do compile out of the box on Linux machines.
+
+Please note that there are now separate RPMs for the compiler proper and
+the target specific libraries. To develop for one of the predefined target
+systems you need the compiler RPM package *and* one of the target machine
+packages.
+
+Binaries for DOS and and Windows will follow or may already be available at
+the time you read this. OS/2 packages will again be available, but since
+there are almost no downloads for OS/2, so the host platform may get
+dropped in the near future (again). As with the RPM packages, you need the
+package for the development system (Windows, etc.) *and* one of the target
+machine packages.
+
+
+Download:
+
+More information information and a download link, please visit the cc65 web
+page at
+
+	<a href="http://www.cc65.org/">http://www.cc65.org/</a>
+
+
+Thanks to all who sent feedback and suggestions and of course to anyone who
+helped developing cc65!
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%20v2.7.0%20released">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%20v2.7.0%20released">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0806.html">MagerValp: "Re: [cc65] cc65 v2.7.0 released"</a>
+<li><strong>Previous message:</strong> <a href="0804.html">Michal Bartczak: "RE: [cc65] Package locations"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0806.html">MagerValp: "Re: [cc65] cc65 v2.7.0 released"</a>
+<li><strong>Reply:</strong> <a href="0806.html">MagerValp: "Re: [cc65] cc65 v2.7.0 released"</a>
+<li><strong>Reply:</strong> <a href="0821.html">Marko Mäkelä: "Re: [cc65] cc65 v2.7.0 released"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:42 CET</em>
+</em>
+</small>
+</body>
+</html>

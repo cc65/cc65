@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Re: TGI colors revisited</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Re: TGI colors revisited" />
+<meta name="Date" content="2011-05-07" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Re: TGI colors revisited</h1>
+<!-- received="Sat, 7 May 2011 12:21:31 +0200" -->
+<!-- isoreceived="20110507102131" -->
+<!-- sent="Sat, 7 May 2011 12:21:31 +0200" -->
+<!-- isosent="20110507102131" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Re: TGI colors revisited" -->
+<!-- id="BANLkTinN4Ld8TkozTP2i6Gk7BzcPi=V6BA@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="4DC4100E.2010308&#64;sipo.fi" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9395.html" title="Joseph Rose: &quot;[cc65] Hidden64 SPAM&quot;">Next message</a> ]
+[ <a href="9393.html" title="Karri Kaksonen: &quot;Re: [cc65] Re: TGI colors revisited&quot;">Previous message</a> ]
+[ <a href="9393.html" title="Karri Kaksonen: &quot;Re: [cc65] Re: TGI colors revisited&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9405.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Re: TGI colors revisited&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Re:%20TGI%20colors%20revisited">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-05-07 12:21:31</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Karri,
+
+&gt;&gt; I'm pretty lost now: Is the brush table an indexed palette? I've been
+&gt;&gt; researching for more Lynx info but didn't come up with something
+&gt;&gt; explaining how the 'brush table' and the '12-bit hardware palette'
+&gt;&gt; work...
+
+&gt; No wonder. The lynx has double-indexing in use.
+&gt; [...]
+&gt; In the screen buffer every pixel is stored as a 4-bit value. This 4-bit
+&gt; value is drawn through the palette. So if you change the RGB values of color
+&gt; number 1 then all pixels with the value of 1 in the buffer will change.
+
+Thanks a lot for the detailed and very helpful explanation :-)
+
+&gt;&gt; If a TGI driver reports 16 colors than the palette used for
+&gt;&gt; tgi_getdefpalette/tgi_getpalette/tgi_setpalette _HAS_ to consist of 16
+&gt;&gt; 'unsigned char's.
+
+&gt; Now you are missing the point. If the TGI driver reports 16 colors then it
+&gt; means that it can draw with a pen that can have values between 0 and 15.
+
+Sorry, but I'm still trying to sort misunderstandings from different opinions...
+
+Do you want to express that my statement above &quot;If a TGI driver
+reports...&quot; is wrong?
+
+If yes: See this section from tgi.h:
+==========
+void __fastcall__ tgi_setpalette (const unsigned char* palette);
+/* Set the palette (not available with all drivers/hardware). palette is
+ * a pointer to as many entries as there are colors.
+ */
+==========
+- The prototype requires a pointer to unsigned char's.
+- The comment states that the array size corresponds to the number of colors.
+
+I don't see any room for interpretation from the side of the TGI driver...
+
+&gt; There is no place in the driver where we work with RGB values.
+
+Sorry, but I'm not able to interpret that statement.
+
+From looking at lynx-160-102-16.s it seems to me that
+tgi_getdefpalette/tgi_getpalette/tgi_setpalette all three work with 16
+entities of 2 bytes each. And that those 2 byte entities are holding 4
+bit color values for the three channels RGB.
+
+My analysis stems from:
+- the 32 byte sized default palette
+- the fact that palettes are read/written without conversion to what I
+presume the 12-bit-hardware palette
+- you wrote in older postings that palettes were directly read/written
+to the hardware
+
+So how does that fit to your statement above?
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat, 7 May 2011 12:21:31 +0200</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9395.html" title="Next message in the list">Joseph Rose: "[cc65] Hidden64 SPAM"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9393.html" title="Previous message in the list">Karri Kaksonen: "Re: [cc65] Re: TGI colors revisited"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9393.html" title="Message to which this message replies">Karri Kaksonen: "Re: [cc65] Re: TGI colors revisited"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9405.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Re: TGI colors revisited"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9405.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Re: TGI colors revisited"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9394" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9394" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9394" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-05-07 12:21:48 CEST
+</em></small></p>
+</body>
+</html>

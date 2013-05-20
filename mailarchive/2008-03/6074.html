@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Compiler Bug (?)</title>
+<meta name="Author" content="silverdr1inet.com.pl (silverdr1inet.com.pl)" />
+<meta name="Subject" content="Re: [cc65] Compiler Bug (?)" />
+<meta name="Date" content="2008-03-31" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Compiler Bug (?)</h1>
+<!-- received="Mon Mar 31 21:59:44 2008" -->
+<!-- isoreceived="20080331195944" -->
+<!-- sent="Mon, 31 Mar 2008 21:59:36 +0200" -->
+<!-- isosent="20080331195936" -->
+<!-- name="silverdr1inet.com.pl" -->
+<!-- email="silverdr1inet.com.pl" -->
+<!-- subject="Re: [cc65] Compiler Bug (?)" -->
+<!-- id="6DA54CDB-E180-4A77-84FC-548BBE07954C@inet.com.pl" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="20080331181337.GA20979&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6075.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Compiler Bug (?)&quot;">Next message</a> ]
+[ <a href="6073.html" title="silverdr1inet.com.pl: &quot;Re: [cc65] Compiler Bug (?)&quot;">Previous message</a> ]
+[ <a href="6070.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Compiler Bug (?)&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6076.html" title="Ullrich von Bassewitz: &quot;[cc65] cc65 Snapshot mit Aenderungen&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:silverdr1inet.com.pl?Subject=Re:%20[cc65]%20Compiler%20Bug%20(?)">silverdr1inet.com.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-03-31 21:59:36</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 2008-03-31, at 20:13, Ullrich von Bassewitz wrote:
+
+&gt;&gt; A small question/suggestion: wouldn't it be worth migrating the code
+&gt;&gt; repository to SVN and setting up read-only access for anonymous  
+&gt;&gt; users?
+&gt;&gt; I know it's not a trivial task, when there is an automated build
+&gt;&gt; system scripted around CVS but probably not _that_ difficult too, and
+&gt;&gt; in the long run it would IMHO be more &quot;future-proof&quot; and would
+&gt;&gt; certainly help all the users in keeping up to date when needed and
+&gt;&gt; &quot;down to date&quot; when something gets wrong with the bleeding edge  
+&gt;&gt; version.
+&gt;
+&gt; I'm introduced SVN at the place where I'm currently working, and I'm  
+&gt; quite
+&gt; happy with it. Especially the windows client, TortoiseSVN, is a  
+&gt; really cool
+&gt; piece of software. I don't know if there is a similar thing for  
+&gt; Linux but I
+&gt; sure hope so.
+
+I know TortoiseSVN but I haven't seen anything similar for Linux.  
+Frankly - I use command line with couple of aliases (svi, svs, svu,  
+etc.) to do most SVN related work. I use GUI client only to  
+(re)organise directories. I shortly used something remotely similar to  
+TortoiseSVN under OS X, though.
+
+&gt; Importing CVS archives is a snap using cvs2svn.
+&gt;
+&gt; So yes, I've already thought about a change myself. Converting the  
+&gt; build
+&gt; script is rather easy - it does nothing more than checking if there  
+&gt; are
+&gt; changes between now and the time of the last run. If there are  
+&gt; changes, it
+&gt; checks out the complete head branch and starts the build. The two CVS
+&gt; operations are easy to &quot;translate&quot; into SVN.
+
+Great! I was hoping for something easily transferrable. I have  
+something similar used to create off-site backups of the SVN  
+repository. Those get created and uploaded only if changes are  
+introduced since the time of the last backup but I could easily hook  
+it up to do something else.
+
+&gt; So let's see what happens:-)
+
+Looking ahead! :-)
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Mar 31 21:59:44 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6075.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Compiler Bug (?)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6073.html" title="Previous message in the list">silverdr1inet.com.pl: "Re: [cc65] Compiler Bug (?)"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6070.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Compiler Bug (?)"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6076.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "[cc65] cc65 Snapshot mit Aenderungen"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6074" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6074" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6074" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-03-31 21:59:46 CEST
+</em></small></p>
+</body>
+</html>

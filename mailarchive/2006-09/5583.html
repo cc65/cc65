@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Read bytes (program load addre</title>
+<meta name="Author" content="Raj Wurttemberg (rajw1c64.us)" />
+<meta name="Subject" content="[cc65] Read bytes (program load address) from a file?" />
+<meta name="Date" content="2006-09-26" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Read bytes (program load address) from a file?</h1>
+<!-- received="Tue Sep 26 00:17:16 2006" -->
+<!-- isoreceived="20060925221716" -->
+<!-- sent="Mon, 25 Sep 2006 18:17:31 -0400" -->
+<!-- isosent="20060925221731" -->
+<!-- name="Raj Wurttemberg" -->
+<!-- email="rajw1c64.us" -->
+<!-- subject="[cc65] Read bytes (program load address) from a file?" -->
+<!-- id="004401c6e0f0$6518ba10$d201a8c0@akira" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5584.html" title="Groepaz: &quot;Re: [cc65] Read bytes (program load address) from a file?&quot;">Next message</a> ]
+[ <a href="5582.html" title="MagerValp: &quot;Re: [cc65] ca65html and anonymous labels&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5584.html" title="Groepaz: &quot;Re: [cc65] Read bytes (program load address) from a file?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Raj Wurttemberg &lt;<a href="mailto:rajw1c64.us?Subject=Re:%20[cc65]%20Read%20bytes%20(program%20load%20address)%20from%20a%20file?">rajw1c64.us</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2006-09-26 00:17:31</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a> 
+Hi All,
+ 
+I'm trying to write a simple program to read the load address of a C64
+program. I tried the cbm_read function but the wrong bytes come up. Is there
+another function I should use?
+
+I'm still learning C... so I'm sure I've done something wrong. I know there
+is no error checking. :) (code below)
+
+Thanks,
+/*Raj*/
+
+---------------------------------------
+
+#include &lt;cbm.h&gt;
+#include &lt;stdio.h&gt;
+
+int main()
+{
+  unsigned char device = 8;
+  unsigned char s, b ;
+  unsigned char buff[2];
+
+    s = cbm_open(15, device, 15, &quot;name&quot;);
+
+    printf(&quot;\ncommand: open15,%d,15 staus: %d\n&quot;, device, s);
+
+    b = cbm_read(15, &amp;buff, 2);
+
+	printf(&quot;\nbytes read: %d\n&quot;, b);
+	printf(&quot;\ndata read: %d %d\n&quot;, buff[0], buff[1]);
+
+	cbm_close(15);
+	return(0);
+
+}
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Sep 26 00:17:16 2006</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5584.html" title="Next message in the list">Groepaz: "Re: [cc65] Read bytes (program load address) from a file?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5582.html" title="Previous message in the list">MagerValp: "Re: [cc65] ca65html and anonymous labels"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5584.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] Read bytes (program load address) from a file?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5584.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] Read bytes (program load address) from a file?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="5585.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Read bytes (program load address) from a file?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5583" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5583" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5583" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2006-09-26 00:17:19 CEST
+</em></small></p>
+</body>
+</html>

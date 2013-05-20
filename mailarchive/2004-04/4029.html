@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Expression usage question</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Expression usage question" />
+<meta name="Date" content="2004-04-09" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Expression usage question</h1>
+<!-- received="Fri Apr  9 14:56:09 2004" -->
+<!-- isoreceived="20040409125609" -->
+<!-- sent="Fri, 9 Apr 2004 14:56:05 +0200" -->
+<!-- isosent="20040409125605" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Expression usage question" -->
+<!-- id="20040409125605.GA1998@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="027d01c41e2a$b266d580$6902a8c0&#64;magnesium" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4030.html" title="Christian Krüger: &quot;[cc65] Linker output for EPROM image files&quot;">Next message</a> ]
+[ <a href="4028.html" title="David Holz: &quot;Re: [cc65] Expression usage question&quot;">Previous message</a> ]
+[ <a href="4028.html" title="David Holz: &quot;Re: [cc65] Expression usage question&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Expression%20usage%20question">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-04-09 14:56:05</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Fri, Apr 09, 2004 at 05:03:40AM -0700, David Holz wrote:
+&gt; If you're going to choose one sign, I'd say make it unsigned.  Unsigned
+&gt; numbers are a bit more &quot;literal&quot;, as bits in your number directly translate
+&gt; into bits, and we assembly programmers like that. :)  But if A = -1 and A =
+&gt; $ffffffff both end up being the same thing (ie, the $ffffffff doesn't give
+&gt; an out-of-range error in signed mode), I doubt it will even matter what the
+&gt; internal representation is, though unsigned would be my preference.
+
+The problem in making values always unsigned is that there is no longer any
+way to work with signed numbers. Dividing -3 by -1 gives a different result
+than dividing $FFFFFFFC by $FFFFFFFF. If the assembler handles all values
+internally as unsigned, the former will no longer work. And it will not work
+for *any* negative value. On the other side, when always handling values as
+signed, problems for unsigned values only arise of bit 31 is 1, something that
+should be quite rare because the platform we're using doesn't support such
+values directly.
+
+I'm myself a strong supporter of using unsigned types where a value cannot
+become negative. But in case of ca65, there is currently just one numeric data
+type, and in this case I cannot rule out negative values, so interpreting
+anything as unsigned is not really an option.
+
+&gt; I'd prefer to leave shifts as unsigned shifts, and add signed shift
+&gt; operators.  This would mirror 6502 functionality, where you'd need to to
+&gt; something special to make a shift signed, and since this is a 6502 family
+&gt; assembler it would be reasonable to have signedness assumptions be
+&gt; consistent between the assembly code and the pseudo-ops.
+
+Sounds reasonable on the first glance, but there's also a counter argument.
+The current .shr and .shl operators assume unsigned arguments (both, for the
+left hand side and the shift count). This will continue to work, and there
+will be new .asr/.asl operators that treat the operands as signed. But since
+the default interpretation of values would be signed, I would like to change
+the meaning of the undocumented &lt;&lt; and &gt;&gt; operators to also work on signed
+values. What you wrote about unsigned shifts being more natural for the
+platform is absolutely correct, but having an operator that breaks the
+signedness rules that all other operators adhere to, is not a good idea
+either. If the / operator works correctly for signed values, but &gt;&gt; does not,
+this might be confusing. It is exactly this non deterministic handling of the
+current assembler version, that I would like to change.
+
+Are you using the &gt;&gt; operator in your code? If so, do you depend on the fact
+that is is treating its arguments as unsigned values? If the arguments are
+always smaller than 32 bit, nothing will change.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Apr  9 14:56:09 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4030.html" title="Next message in the list">Christian Krüger: "[cc65] Linker output for EPROM image files"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4028.html" title="Previous message in the list">David Holz: "Re: [cc65] Expression usage question"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4028.html" title="Message to which this message replies">David Holz: "Re: [cc65] Expression usage question"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4029" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4029" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4029" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-04-09 14:56:15 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="iso-8859-15"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] if/else/endif macros</title>
+<meta name="Author" content="42Bastian Schick (bastian421monlynx.de)" />
+<meta name="Subject" content="[cc65] if/else/endif macros" />
+<meta name="Date" content="2005-05-11" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] if/else/endif macros</h1>
+<!-- received="Wed May 11 07:33:57 2005" -->
+<!-- isoreceived="20050511053357" -->
+<!-- sent="Wed, 11 May 2005 07:29:26 +0200" -->
+<!-- isosent="20050511052926" -->
+<!-- name="42Bastian Schick" -->
+<!-- email="bastian421monlynx.de" -->
+<!-- subject="[cc65] if/else/endif macros" -->
+<!-- id="opsqlivckh4jhyy0@smtp.monlynx.de" -->
+<!-- charset="iso-8859-15" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4989.html" title="42Bastian Schick: &quot;Re: [cc65] Hello and ca65 questions&quot;">Next message</a> ]
+[ <a href="4987.html" title="42Bastian Schick: &quot;Re: [cc65] Hello and ca65 questions&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4994.html" title="42Bastian Schick: &quot;Re: [cc65] if/else/endif macros&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: 42Bastian Schick &lt;<a href="mailto:bastian421monlynx.de?Subject=Re:%20[cc65]%20if/else/endif%20macros">bastian421monlynx.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-05-11 07:29:26</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi all (cc65 and lynx group),
+
+I played a bit with the .scope feature of ca65 and found it can be nicely 
+used
+to implement if/else/endif macros.
+Even more, the .match,.tcount etc. functions allow more nice things.
+
+Here a very simple one as a starter:
+	.macro ifne arg
+	.scope
+	cmp arg
+	beq	_else
+	.endmacro
+
+	.macro else
+	bra	_endif
+_else:
+	.endmacro
+	
+	.macro endif
+  .ifndef _else
+_else:
+  .endif
+_endif:
+	.endscope
+	.endmacro
+
+For a test:
+	ifne 10
+	ldx #10
+	else
+	ldx #20
+	endif
+
+I am working on a more complicated version of the if, but currently get an
+&quot;Range Error&quot; I cannot solve ...
+
+	.macro if arg
+	.scope
+	.if .blank(arg)
+	.error &quot;Macro 'if' needs parameter(s) !&quot;
+	.endif
+	.out .string(=.tcount(arg))
+	.if .tcount(arg) = 1
+	  .if (.match(.mid(0,1,arg),A))
+	  cmp #0
+	  .elseif .match(.mid(0,1,arg),X)
+	  cpx #0
+	  .elseif .match(.mid(0,1,arg),Y)
+	  cpy #0
+	  .else
+	  .error &quot;Syntax: if (A|X|Y) !&quot;
+	  .endif
+	  beq _else
+         .elseif .tcount(arg) &gt;= 3
+	   .if .match(.mid(1,1,arg),=)
+	      .if .match(.mid(0,1,arg),A)
+		cmp .right(.tcount(arg)-2,arg)
+	      .elseif .match(.mid(0,1,arg),X)
+		cpx .right(.tcount(arg)-2,arg)
+	      .elseif .match(.mid(0,1,arg),Y)
+		cpy .right(.tcount(arg)-2,arg)
+	      .else
+		.error &quot;Syntax: if (A|X|Y) = expr&quot;
+	      .endif
+	      bne _else
+	   .elseif .match(.mid(1,1,arg),!) .and .match(.mid(2,1,arg),=)
+	      .if .match(.mid(0,1,arg),A)
+		cmp .right(.tcount(arg)-3,arg)
+	      .elseif .match(.mid(0,1,arg),X)
+		cpx .right(.tcount(arg)-3,arg)
+	      .elseif .match(.mid(0,1,arg),Y)
+		cpy .right(.tcount(arg)-3,arg)
+	      .else
+		.error &quot;Syntax: if (A|X|Y) != expr&quot;
+	      .endif
+	      beq _else
+	   .else
+		.error &quot;Wrong if usage&quot;
+	    .endif
+	.else
+	.error &quot;Wrong if usage&quot;
+	.endif
+	.endmacro
+
+With this following should work:
+	if A
+	if X
+	if Y
+or
+	if A = 10
+or
+	if a = #10
+
+But again, with the .tcount(arg) &gt;= 3 clause it does not work ...
+
+-- 
+42Bastian Schick
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed May 11 07:33:57 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4989.html" title="Next message in the list">42Bastian Schick: "Re: [cc65] Hello and ca65 questions"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4987.html" title="Previous message in the list">42Bastian Schick: "Re: [cc65] Hello and ca65 questions"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4994.html" title="Next message in this discussion thread">42Bastian Schick: "Re: [cc65] if/else/endif macros"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4994.html" title="Message sent in reply to this message">42Bastian Schick: "Re: [cc65] if/else/endif macros"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4988" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4988" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4988" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-05-11 07:33:59 CEST
+</em></small></p>
+</body>
+</html>

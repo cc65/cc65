@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Calling another program: e</title>
+<meta name="Author" content="silverdr1wfmh.org.pl (silverdr1wfmh.org.pl)" />
+<meta name="Subject" content="Re: [cc65] Calling another program: exec() ?" />
+<meta name="Date" content="2011-01-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Calling another program: exec() ?</h1>
+<!-- received="Tue Jan 25 19:45:04 2011" -->
+<!-- isoreceived="20110125184504" -->
+<!-- sent="Tue, 25 Jan 2011 19:44:55 +0100" -->
+<!-- isosent="20110125184455" -->
+<!-- name="silverdr1wfmh.org.pl" -->
+<!-- email="silverdr1wfmh.org.pl" -->
+<!-- subject="Re: [cc65] Calling another program: exec() ?" -->
+<!-- id="6C8DF53D-B0ED-4416-ADF3-87644F6E860A@wfmh.org.pl" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="20110125155806.GA5667&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9187.html" title="Oliver Schmidt: &quot;Re: [cc65] Calling another program: exec() ?&quot;">Next message</a> ]
+[ <a href="9185.html" title="Oliver Schmidt: &quot;Re: [cc65] Calling another program: exec() ?&quot;">Previous message</a> ]
+[ <a href="9184.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Calling another program: exec() ?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9187.html" title="Oliver Schmidt: &quot;Re: [cc65] Calling another program: exec() ?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:silverdr1wfmh.org.pl?Subject=Re:%20[cc65]%20Calling%20another%20program:%20exec()%20?">silverdr1wfmh.org.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-01-25 19:44:55</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 2011-01-25, at 16:58, Ullrich von Bassewitz wrote:
+
+&gt;
+&gt; Hi!
+&gt;
+&gt; On Tue, Jan 25, 2011 at 12:12:30PM +0100, Oliver Schmidt wrote:
+&gt;&gt;&gt; Having an error code allows an &quot;explanation&quot; of the failure.
+&gt;&gt;
+&gt;&gt; The execl() function and friends just return -1 and set errno for  
+&gt;&gt; more
+&gt;&gt; details. I presumed that exec() would behave the same...
+&gt;
+&gt; As I've found out, when writing the funcref entry (see below),  
+&gt; returning an
+&gt; error in errno will probably not work in most cases, since when we  
+&gt; load the
+&gt; new program, the old one has already terminated, files have been  
+&gt; closed and
+&gt; the destructors have been run.
+
+That will be later. Most of the things that may go wrong (ENOENT,  
+ENFILE, etc.) can be caught during the prepping. So it makes perfect  
+sense to me.
+
+&gt; It may be possible to return on some errors, so
+&gt; I think the error code is still a good idea and not too much overhead.
+
+Yup. :-)
+
+&gt; [...]
+
+&gt; Please let me know if there is anything wrong or missing. Maybe we  
+&gt; want to
+&gt; allow a NULL pointer for cmdline?
+
+Yes. I guess in more cases than not it is going to be used without  
+actual command line passed.
+
+-- 
+SD!
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Jan 25 19:45:04 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9187.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Calling another program: exec() ?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9185.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Calling another program: exec() ?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9184.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Calling another program: exec() ?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9187.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Calling another program: exec() ?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9187.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Calling another program: exec() ?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9186" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9186" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9186" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-01-25 19:45:07 CET
+</em></small></p>
+</body>
+</html>

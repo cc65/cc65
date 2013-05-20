@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Zero page, C stack, and in</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Zero page, C stack, and interrupts" />
+<meta name="Date" content="2010-04-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Zero page, C stack, and interrupts</h1>
+<!-- received="Sun Apr 25 16:54:39 2010" -->
+<!-- isoreceived="20100425145439" -->
+<!-- sent="Sun, 25 Apr 2010 16:54:31 +0200" -->
+<!-- isosent="20100425145431" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Zero page, C stack, and interrupts" -->
+<!-- id="20100425145431.GA21438@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="j2o6c36ebcc1004250721s82f48a44w130c63dde3757e5a&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8173.html" title="Oliver Schmidt: &quot;Re: [cc65] Zero page, C stack, and interrupts&quot;">Next message</a> ]
+[ <a href="8171.html" title="Steve Davison: &quot;[cc65] Zero page, C stack, and interrupts&quot;">Previous message</a> ]
+[ <a href="8171.html" title="Steve Davison: &quot;[cc65] Zero page, C stack, and interrupts&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8173.html" title="Oliver Schmidt: &quot;Re: [cc65] Zero page, C stack, and interrupts&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Zero%20page,%20C%20stack,%20and%20interrupts">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-04-25 16:54:31</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Sun, Apr 25, 2010 at 07:21:11AM -0700, Steve Davison wrote:
+&gt; My program needs to co-exists with the ROM OS, and with BASIC
+&gt; programs.  On the surface, this seems like a very Unnatural
+&gt; Thing for cc65, requiring that I swap the cc65 ZP area every
+&gt; time I transition into or out of cc65 code.
+
+Maybe you can explain a bit what that means. Either there's nothing to worry
+about, or you're planning some really complex things, in which case the
+necessary precautions depend heavily on your program.
+
+&gt; Also, it looks like
+&gt; calling into any library code from an ISR would require separate
+&gt; parameter stacks as well (except for maybe single-param fastcall
+&gt; functions).
+
+That is true, and even worse: You have to take special precautions when
+calling C code from an interrupt handler. See the mailing list archive for
+several threads on this topic.
+
+&gt; I haven't found any information on choosing a good location for
+&gt; ZP.
+
+Why do you want to do explicit ZP placement? What is so bad about the standard
+ZP location?
+
+&gt; I tried to see what
+&gt; cbm_load might do to deal with it, but I can't find where
+&gt; cbm_k_load is defined.  (It's declared in cbm.h, and called by
+&gt; cbm_load, but from there it falls off the radar.)
+
+It's in libsrc/cbm/c_load.s.
+
+&gt; I guess that's what I really need to get nailed down first: how
+&gt; do cc65 and the kernal coexist?
+
+There's nothing special about that. They coexist as every other machine
+language program coexists with the kernal. There are thousands of examples for
+machine language programs that load from disk, run and terminate without any
+problems with the kernal or whatsoever. Why do you assume, cc65 generated
+programs have special problems?
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Apr 25 16:54:39 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8173.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Zero page, C stack, and interrupts"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8171.html" title="Previous message in the list">Steve Davison: "[cc65] Zero page, C stack, and interrupts"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8171.html" title="Message to which this message replies">Steve Davison: "[cc65] Zero page, C stack, and interrupts"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8173.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Zero page, C stack, and interrupts"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8173.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Zero page, C stack, and interrupts"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8174.html" title="Message sent in reply to this message">Steve Davison: "Re: [cc65] Zero page, C stack, and interrupts"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8172" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8172" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8172" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-04-25 16:54:42 CEST
+</em></small></p>
+</body>
+</html>

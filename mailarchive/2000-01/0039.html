@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: Sv: [cc65] Back on Track</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: Sv: [cc65] Back on Track">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: Sv: [cc65] Back on Track</h1>
+<!-- received="Sat Jan 22 21:46:53 2000" -->
+<!-- isoreceived="20000122204653" -->
+<!-- sent="Sat, 22 Jan 2000 21:46:28 +0100 (CET)" -->
+<!-- isosent="20000122204628" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: Sv: [cc65] Back on Track" -->
+<!-- id="200001222046.VAA08696@trixie.musoftware.de" -->
+<!-- inreplyto="3888CBA3.F201F032@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20Sv:%20[cc65]%20Back%20on%20Track"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2000-01-22 21:46:28
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0040.html">Martin Ancher Holm - Bankdata: "Sv: Sv: Sv: [cc65] Back on Track"</a>
+<li><strong>Previous message:</strong> <a href="0038.html">Ullrich von Bassewitz: "Re: [cc65] cc65 and VICE"</a>
+<li><strong>In reply to:</strong> <a href="0034.html">Groepaz: "Re: Sv: [cc65] Back on Track"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0035.html">Spiro Trikaliotis: "Re: Sv: [cc65] Back on Track"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+&gt; i understand rooting printf through the filesystem makes sence... it will
+&gt; require (maybe) some modification on your printf call though (it shouldnt go
+&gt; directly to $ffd2 but to some other routine that i will provide)
+
+I´m pretty sure that the current printf() implementation does not call $ffd2
+directly. It calls _printf(), which does the formatting and calls write(),
+which will call $ffd2 - but since you are replacing write() anyway, there is
+no problem.
+
+&gt; ... subsequent calls to open() will return handles 3,4,5,... for easier
+&gt; internal handling (this should be perfectly standard compliant, is it?!)
+
+The standard does not care about handle values apart from the first three.
+
+&gt; ... a printf replacement will map stdin etc to their defined filehandles (at
+&gt; this point, how *exactly * do printf/fprintf/write corrospond?! is printf just
+&gt; some #define printf fprintf(stdout ... thing or really a direct call to $ffd2?
+&gt; (i have to admit... erhm... i could check myself ;=P) ... just wanna make sure i
+&gt; could savely replace your printf() without effecting any other stuff (oh, and
+&gt; are you using some other related kernal calls somewhere in your libs? these
+&gt; could cause some quite weird and hard to find bugs if so ;P)
+
+None of the file stream functions do use direct kernal calls. All they do is
+to call the low level functions open(), close(), read() and write(). The
+current implementation does also care about mapping the handles, so you
+don´t have to touch any of the high level functions (this is intentionally -
+I don´t wanted the functions to be as portable as possible).
+
+&gt; although this could turn out as a satisfying solution, it has one major draw-
+&gt; back that i dont really like, and that is that drivers would HAVE to be loaded
+&gt; at the start of your program, before you malloc() any other memory - or your
+&gt; heap will get corrupted. also it wont be possible to remove/add drivers at
+&gt; runtime, which would be a neat feature indeed.
+
+Why should the heap get corrupted when loading the drivers later? If your
+drivers behave well and don´t overwrite memory, they do not own, it should
+be possible to remove one driver and load another one without problems.
+
+[Initialization of static variables]
+&gt; yes! all i wanted is THIS ;=P mmmh... was that added just recently? i tried that
+&gt; sometime when i started writing my cmd-line interpreter but i couldnt get
+&gt; it to compile 8=) have to check asap with the recent version hehe ;=)
+
+This has always been in cc65, it was even in the old Atari version I started
+with. Something that does not work is initialization of compound local
+variables. Adding this would not be too difficult, but it is not very
+efficient, so initialized local compound variables are not a good idea
+anyway.
+
+Regards
+
+
+	Uz							
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20Sv:%20[cc65]%20Back%20on%20Track">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20Sv:%20[cc65]%20Back%20on%20Track">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0040.html">Martin Ancher Holm - Bankdata: "Sv: Sv: Sv: [cc65] Back on Track"</a>
+<li><strong>Previous message:</strong> <a href="0038.html">Ullrich von Bassewitz: "Re: [cc65] cc65 and VICE"</a>
+<li><strong>In reply to:</strong> <a href="0034.html">Groepaz: "Re: Sv: [cc65] Back on Track"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0035.html">Spiro Trikaliotis: "Re: Sv: [cc65] Back on Track"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:35 CET</em>
+</em>
+</small>
+</body>
+</html>

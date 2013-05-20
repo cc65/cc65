@@ -1,0 +1,156 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] The Contiki Desktop OS fo</title>
+<meta name="Author" content="Adam Dunkels (adam_at_sics.se)">
+<meta name="Subject" content="Re: [cc65] The Contiki Desktop OS for cc65">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] The Contiki Desktop OS for cc65</h1>
+<!-- received="Tue Mar 11 23:42:43 2003" -->
+<!-- isoreceived="20030311224243" -->
+<!-- sent="11 Mar 2003 23:41:43 +0100" -->
+<!-- isosent="20030311224143" -->
+<!-- name="Adam Dunkels" -->
+<!-- email="adam_at_sics.se" -->
+<!-- subject="Re: [cc65] The Contiki Desktop OS for cc65" -->
+<!-- id="1047422493.63838.212.camel@localhost" -->
+<!-- inreplyto="20030311184057.A1787@ws" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Adam Dunkels (<a href="mailto:adam_at_sics.se?Subject=Re:%20[cc65]%20The%20Contiki%20Desktop%20OS%20for%20cc65"><em>adam_at_sics.se</em></a>)<br>
+<strong>Date:</strong> 2003-03-11 23:41:43
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2709.html">Shawn Jefferson: "RE: [cc65] Renaming imported zeropage variables in ca65"</a>
+<li><strong>In reply to:</strong> <a href="2702.html">M Ancher: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2711.html">MagerValp: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Reply:</strong> <a href="2711.html">MagerValp: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Reply:</strong> <a href="2712.html">Groepaz: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Tue, 2003-03-11 at 18:40, M Ancher wrote:
+&gt; First let me tell ya': I'm impressed. Thank you.
+
+Thanks! :-)
+
+&gt; *Disk access*
+&gt; I see why it is so small. There's no disk-operating-system (&quot;DOS&quot;) in
+&gt; the OS. This will make the system less complex.
+
+Adding disk support for Contiki will require a little bit of extra code,
+but nothing that makes the system significantly larger. Especially for
+cc65 target systems, as it often is possible to make use of ROM
+routines.
+
+The main problem with using ROM routines (at least on the C64) is that
+they don't work well together with the RS232 NMIs. There are a few ways
+to remedy this - one would be to see to it that disk access never
+happens while the RS232 is active. It is a little tricky to implement in
+practice, but one way would be to queue all disk requests for later
+processing while the RS232 driver is busy reading a packet. When the
+packet is read and processed, the disk driver could turn off the RS232
+driver and pull one request from the queue and service it, and then turn
+the RS232 driver back on when the disk request is finished.
+
+It would be a large performance hit, however, as it would lead to
+dropped packets and really bad network performance.
+
+An asyncronous fastloader is a better solution - faster than the C64
+kernal routines and works with the RS232 NMIs. It wouldn't work with
+hard drives, though.
+
+&gt; Maybe Contiki is just a toolkit a programmer can use for his own
+&gt; programs, and not an OS.
+
+Yes, that's exactly what an operating system is - a toolkit a programmer
+can use for his own programs ;-) It is an abstraction layer between the
+hardware and other software.
+
+&gt; *API*
+&gt; Will there be an API, so we'll know which kernel call are &quot;public&quot;, and
+&gt; which are &quot;private&quot;? Maybe there's som &quot;must-implement-methods&quot;.
+
+Yes, there is a kernel API that is quite simple... but it isn't
+documented yet. It consists of the following functions:
+
+/* Start a new process */
+ek_id_t dispatcher_start(struct dispatcher_proc *p);
+
+/* Listen to a specified signal */
+void dispatcher_listen(ek_signal_t s);
+
+/* Set a timer */
+void dispatcher_timer(ek_signal_t s, ek_data_t data, ek_ticks_t t);
+
+/* Allocate a signal */
+ek_signal_t dispatcher_sigalloc(void);
+
+/* Emit a signal */
+ek_err_t dispatcher_emit(ek_signal_t s, ek_data_t data, ek_id_t id);
+
+There is one thing that must be done by every Contiki program, and that
+is to call the dispatcher_start() function, which starts a new process
+for the program. Without dispatcher_start(), there is no way for a
+program to receive signals, and therefore no way for it to actually do
+much.
+
+Cheers,
+
+/adam
+-- 
+Adam Dunkels &lt;<a href="mailto:adam_at_sics.se?Subject=Re:%20[cc65]%20The%20Contiki%20Desktop%20OS%20for%20cc65">adam_at_sics.se</a>&gt;
+<a href="http://www.sics.se/~adam/">http://www.sics.se/~adam/</a>
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20The%20Contiki%20Desktop%20OS%20for%20cc65">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2709.html">Shawn Jefferson: "RE: [cc65] Renaming imported zeropage variables in ca65"</a>
+<li><strong>In reply to:</strong> <a href="2702.html">M Ancher: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2711.html">MagerValp: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Reply:</strong> <a href="2711.html">MagerValp: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Reply:</strong> <a href="2712.html">Groepaz: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-03-11 23:42:54 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] scratch files on C64 or fi</title>
+<meta name="Author" content="Greg King (greg.king41verizon.net)" />
+<meta name="Subject" content="Re: [cc65] scratch files on C64 or file spec and drive numbers" />
+<meta name="Date" content="2008-09-26" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] scratch files on C64 or file spec and drive numbers</h1>
+<!-- received="Fri Sep 26 21:14:06 2008" -->
+<!-- isoreceived="20080926191406" -->
+<!-- sent="Fri, 26 Sep 2008 14:50:33 -0400" -->
+<!-- isosent="20080926185033" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king41verizon.net" -->
+<!-- subject="Re: [cc65] scratch files on C64 or file spec and drive numbers" -->
+<!-- id="038001c9200b$dde262a0$443efea9@monarch" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="20080925080925.GA27137&#64;trikaliotis.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6250.html" title="Dirk Jagdmann: &quot;Re: [cc65] scratch files on C64 or file spec and drive numbers&quot;">Next message</a> ]
+[ <a href="6248.html" title="Spiro Trikaliotis: &quot;Re: [cc65] scratch files on C64 or file spec and drive numbers&quot;">Previous message</a> ]
+[ <a href="6248.html" title="Spiro Trikaliotis: &quot;Re: [cc65] scratch files on C64 or file spec and drive numbers&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6257.html" title="Oliver Schmidt: &quot;Re: [cc65] scratch files on C64 or file spec and drive numbers&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king41verizon.net?Subject=Re:%20[cc65]%20scratch%20files%20on%20C64%20or%20file%20spec%20and%20drive%20numbers">greg.king41verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-09-26 20:50:33</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: &quot;Spiro Trikaliotis&quot;; at Thursday, September 25, 2008, 04:09 AM -0400
+&gt;
+&gt; * On Wed, Sep 24, 2008 at 06:10:55PM -0400, Greg King wrote:
+&gt; &gt; From: &quot;Groepaz&quot;; on Wednesday, September 24, 2008; at 11:31 AM -0400
+&gt;
+&gt; &gt; &gt; I:/the/path/file
+&gt; &gt; &gt;
+&gt; &gt; &gt; That's almost trivial to parse, with little overhead.
+&gt; [...]
+&gt;
+&gt; &gt; &quot;k:2//8/:my/file.prg&quot;
+&gt; &gt;
+&gt; &gt; (In case anybody is wonderring,  the first slash says, &quot;this is a path.&quot;
+&gt; &gt; The second one says, &quot;the path starts at the root directory.&quot;  The third
+&gt; &gt; one separates the path from the file-name.  And, the fourth one is
+&gt; &gt; a part of the file-name [that second colon tells the DOS what
+&gt; &gt; the slashes are doing]!)
+&gt;
+&gt; I ask myself if GPZ' comment in the sense of &quot;this is easier to parse
+&gt; than doing a _curunit = 11; in C&quot; (done in IRC) still holds true.  In
+&gt; fact, I even doubt it, for GPZ' original proposal.
+
+It isn't easier than the current &quot;_curunit&quot; method -- when the program
+_already_ knows which device you want to use.  But, when a program must ask
+you about the device, at the same time that it is asking about the file,
+then embedding the unit-number in a path-name is easier -- and more
+portable.  Groepaz's method is better than other proposals.
+
+The name-parser in CC65's library already looks for a colon (if it doesn't
+find one, then it prepends &quot;0:&quot;).  These steps could be done before that
+code:
+1. Scan the string argument, if a colon is found, then look at the _single_
+character on its left side.
+2. If that character is a letter, then use it to compute a unit-number; and
+then, ignore that colon and everything on its left side.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Sep 26 21:14:06 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6250.html" title="Next message in the list">Dirk Jagdmann: "Re: [cc65] scratch files on C64 or file spec and drive numbers"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6248.html" title="Previous message in the list">Spiro Trikaliotis: "Re: [cc65] scratch files on C64 or file spec and drive numbers"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6248.html" title="Message to which this message replies">Spiro Trikaliotis: "Re: [cc65] scratch files on C64 or file spec and drive numbers"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6257.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] scratch files on C64 or file spec and drive numbers"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6257.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] scratch files on C64 or file spec and drive numbers"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6249" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6249" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6249" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-09-26 21:14:09 CEST
+</em></small></p>
+</body>
+</html>

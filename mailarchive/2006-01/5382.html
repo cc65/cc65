@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] simple assembly interrupt hand</title>
+<meta name="Author" content="PH (shackman1alpinecom.net)" />
+<meta name="Subject" content="[cc65] simple assembly interrupt handler" />
+<meta name="Date" content="2006-01-02" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] simple assembly interrupt handler</h1>
+<!-- received="Mon Jan  2 23:22:35 2006" -->
+<!-- isoreceived="20060102222235" -->
+<!-- sent="Mon, 02 Jan 2006 16:24:51 -0600" -->
+<!-- isosent="20060102222451" -->
+<!-- name="PH" -->
+<!-- email="shackman1alpinecom.net" -->
+<!-- subject="[cc65] simple assembly interrupt handler" -->
+<!-- id="43B9A833.3080806@alpinecom.net" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5383.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] simple assembly interrupt handler&quot;">Next message</a> ]
+[ <a href="../2005-12/5381.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Function to convert ATASCII to screen codes&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5383.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] simple assembly interrupt handler&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: PH &lt;<a href="mailto:shackman1alpinecom.net?Subject=Re:%20[cc65]%20simple%20assembly%20interrupt%20handler">shackman1alpinecom.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2006-01-02 23:24:51</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello All,
+
+    I'm attempting to convert the excellent tutorial assembly program in 
+the NES 101 document by Michael Martin to cc65 c.  I think I can get it 
+99% there, but I can't seem to do the interrupt handler in c, at least 
+according to the cc65 faq.  Here is the interrupt handler code that I 
+need to convert.
+
+vblank: jsr scroll'screen
+            jsr update'sprite
+            jsr react'to'input
+   irq:    rti
+
+.advance $FFFA
+.word vblank, reset, irq
+
+    As I understand it, $FFFA is the memory address where the interrupt 
+looks for the handler to jump to.  In this case, I am mostly interested 
+in the vblank isr, as I need to update the video ram buffer during the 
+video blank interval.  In the original code, several things are updated 
+in the handler by calling the 3 subroutines, but I think if I could just 
+set a vblank flag variable in the handler and do the updates in my main 
+code loop, that would be fine.  So, if I want to do this, I think I need 
+to use a linker config file and a .segment command to place the handler 
+address at $FFFA, but I'm not sure how to do that, since I don't know 
+how I specify where I want to jump to.  Can someone help me out with a 
+bit of example code or something?  Any help is appreciated.
+
+Thanks,
+Paul
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Jan  2 23:22:35 2006</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5383.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] simple assembly interrupt handler"</a></li>
+<li><dfn>Previous message</dfn>: <a href="../2005-12/5381.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Function to convert ATASCII to screen codes"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5383.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] simple assembly interrupt handler"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5383.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] simple assembly interrupt handler"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="5384.html" title="Message sent in reply to this message">Keates, Mark: "RE: [cc65] simple assembly interrupt handler"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5382" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5382" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5382" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2006-01-02 23:22:39 CET
+</em></small></p>
+</body>
+</html>

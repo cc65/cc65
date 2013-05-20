@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Loadable drivers (again)</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] Loadable drivers (again)">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Loadable drivers (again)</h1>
+<!-- received="Thu Feb 20 13:30:33 2003" -->
+<!-- isoreceived="20030220123033" -->
+<!-- sent="Thu, 20 Feb 2003 04:35:43 +0100" -->
+<!-- isosent="20030220033543" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] Loadable drivers (again)" -->
+<!-- id="200302200435.44051.groepaz@gmx.net" -->
+<!-- inreplyto="3E53B5C4.C82A3751@web.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Loadable%20drivers%20(again)"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2003-02-20 04:35:43
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2470.html">Shawn Jefferson: "Re: [cc65] Lynx target"</a>
+<li><strong>In reply to:</strong> <a href="2468.html">Tim Schürmann: "Re: [cc65] Loadable drivers (again)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2481.html">Ullrich von Bassewitz: "Re: [cc65] Loadable drivers (again)"</a>
+<li><strong>Reply:</strong> <a href="2481.html">Ullrich von Bassewitz: "Re: [cc65] Loadable drivers (again)"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Wednesday 19 February 2003 17:50, Tim Schürmann wrote:
+&gt; Hi!
+&gt;
+&gt; Groepaz schrieb:
+&gt; &gt; On Wednesday 19 February 2003 11:50, Ullrich von Bassewitz wrote:
+&gt; &gt; &gt; Does anybody have comments, suggestions or maybe even a complete
+&gt; &gt; &gt; solution for the naming problem?
+&gt; &gt;
+&gt; &gt; hexadezimal numbers?
+&gt;
+&gt; I got an idea of this type too:  :)
+&gt;
+&gt; Ok, this is a weird idea, but what about a hash-function: a function, where
+&gt; you put in the long names and then pops out the short names...
+&gt; Or what about compression: just &quot;zip&quot; the long names (in contrast to the
+&gt; first method this works in both directions).
+ 
+something else that goes into a simelar direction....
+
+1) we could define certain types of drivers to have a certain unique 
+extension, ie joystick==.joy graphics==.tgi etc (this is already the case)
+2) we forget about filenames that are the same on all _targets_ alltogether. 
+we use long names in the source, and make up whatever filename we like for 
+the target. the idea is, that if only one driver exists it can be either 
+statically linked or loaded with a wildcard (&quot;*.joy&quot;). if more than one 
+driver exists, the user would need to select one of them (this could be 
+autodetection aswell, but simelar things apply here) in one way or another. 
+at this point on a target that allows very short filenames only, sth like 
+&quot;abc4prt.joy&quot; doesnt quite tell the user what he really wants to know. so
+3) we embed a short description (mayb 10 or 20 chars or so) into the driver 
+binary, preferably right at the start of it. then with a little modified 
+loader for the driver we could read this information and show for the 
+user...ie, with simple dir-scanner (&quot;*.joy&quot;) we could list all modules' 
+descriptions easily (this is all we really want, else why wouldnt we even 
+talk about those filenames? :=)), and the filenames wouldnt matter at all.
+
+just an idea :)
+
+oh and as you mention packing... one could probably more or less easily 
+implement a depacker for say, exomizer or pucrunched files for atleast 
+loadable modules...its questionable though if packing files that are this 
+short (~1 or 2 blocks) makes a lot of sence at all...maybe simpliest rle that 
+takes not more than a fraction of that for depacker doesnt even work well 
+here, since code typically doesnt pack well in terms of rle.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Loadable%20drivers%20(again)">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2470.html">Shawn Jefferson: "Re: [cc65] Lynx target"</a>
+<li><strong>In reply to:</strong> <a href="2468.html">Tim Schürmann: "Re: [cc65] Loadable drivers (again)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2481.html">Ullrich von Bassewitz: "Re: [cc65] Loadable drivers (again)"</a>
+<li><strong>Reply:</strong> <a href="2481.html">Ullrich von Bassewitz: "Re: [cc65] Loadable drivers (again)"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-02-20 13:31:37 CET</em>
+</em>
+</small>
+</body>
+</html>

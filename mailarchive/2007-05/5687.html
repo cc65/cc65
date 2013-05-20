@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] C64 Cartridge Program</title>
+<meta name="Author" content="Bill Katsak (bill1katsak.com)" />
+<meta name="Subject" content="[cc65] C64 Cartridge Program" />
+<meta name="Date" content="2007-05-18" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] C64 Cartridge Program</h1>
+<!-- received="Fri May 18 05:33:06 2007" -->
+<!-- isoreceived="20070518033306" -->
+<!-- sent="Thu, 17 May 2007 23:32:47 -0400" -->
+<!-- isosent="20070518033247" -->
+<!-- name="Bill Katsak" -->
+<!-- email="bill1katsak.com" -->
+<!-- subject="[cc65] C64 Cartridge Program" -->
+<!-- id="D6A9DEC492BA1748B89E48B2FC5147B24B2C@server.fox56.local" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5688.html" title="Spiro Trikaliotis: &quot;Re: [cc65] C64 Cartridge Program&quot;">Next message</a> ]
+[ <a href="5686.html" title="Johan Kotlinski: &quot;Re: [cc65] [OT] recommended read-ups on Embedded C&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5688.html" title="Spiro Trikaliotis: &quot;Re: [cc65] C64 Cartridge Program&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Bill Katsak &lt;<a href="mailto:bill1katsak.com?Subject=Re:%20[cc65]%20C64%20Cartridge%20Program">bill1katsak.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-05-18 05:32:47</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello all,
+
+ 
+
+Since my last message, I have managed to edit the C64 startup code to
+add the autostart header and call copydata. I can compile a binary and
+convert it to a CRT file for my emulator, and it autostarts like it
+should.
+
+ 
+
+To get to this point, I had to add some kernal initialization
+instructions right after the header bytes:
+
+ 
+
+stx $d016
+
+jsr $fda3
+
+jsr $fd50
+
+jsr $fd15
+
+jsr $ff5b
+
+cli
+
+ 
+
+I also had to comment out the lines that disable the BASIC ROM (with
+these in, it hangs on boot).
+
+ 
+
+The problem now is that printf, scanf, and puts type IO does not work
+right (cases are reversed and it doesn't seem to be reading input
+right). Conio I/O does seem to work right however. I assume it is
+because some structure related to file IO is broken because it isn't
+initialized.
+
+ 
+
+Does anyone know what I have to do to make this work? Some type of
+additional kernal initialization routine? I also have the feeling that I
+might need set some type of flag to free the BASIC memory for other use.
+I am not initializing it, but I think it is still there as the ROM.
+
+ 
+
+Thanks,
+
+Bill
+
+ 
+
+ 
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri May 18 05:33:06 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5688.html" title="Next message in the list">Spiro Trikaliotis: "Re: [cc65] C64 Cartridge Program"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5686.html" title="Previous message in the list">Johan Kotlinski: "Re: [cc65] [OT] recommended read-ups on Embedded C"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5688.html" title="Next message in this discussion thread">Spiro Trikaliotis: "Re: [cc65] C64 Cartridge Program"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5688.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Re: [cc65] C64 Cartridge Program"</a></li>
+<li><dfn>Reply</dfn>:  <a href="5689.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] C64 Cartridge Program"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="5690.html" title="Message sent in reply to this message">Bill Katsak: "RE: [cc65] C64 Cartridge Program"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="5691.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] C64 Cartridge Program"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="5695.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] C64 Cartridge Program"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5687" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5687" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5687" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-05-18 05:33:14 CEST
+</em></small></p>
+</body>
+</html>

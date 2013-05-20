@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Apple //e time() and print</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Apple //e time() and printer support." />
+<meta name="Date" content="2009-08-14" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Apple //e time() and printer support.</h1>
+<!-- received="Fri Aug 14 11:00:09 2009" -->
+<!-- isoreceived="20090814090009" -->
+<!-- sent="Fri, 14 Aug 2009 11:00:01 +0200" -->
+<!-- isosent="20090814090001" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Apple //e time() and printer support." -->
+<!-- id="f97798c20908140200n55d7dc6bub1955c8b3e77fe70@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="258e18ac0908122015h4d7ec664g87318145af512048&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6675.html" title="Egan Ford: &quot;Re: [cc65] Apple //e time() and printer support.&quot;">Next message</a> ]
+[ <a href="6673.html" title="Oliver Schmidt: &quot;Re: [cc65] Apple //e time() and printer support.&quot;">Previous message</a> ]
+[ <a href="6669.html" title="Egan Ford: &quot;[cc65] Apple //e time() and printer support.&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Apple%20//e%20time()%20and%20printer%20support.">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-08-14 11:00:01</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt; 2.  How do I output to a printer?  With Aztec C I just have to open &quot;pr:&quot;
+&gt; and use fprintf.
+
+cc65 C-Libraries generally don't follow the paradigm of virtual files
+for devices.
+
+&gt; What is the equivalent with cc65?
+
+The cc65 style for printer output support would be a driver interface
+similiar to the exsisting serial/joystick/mouse/extended-memory
+interfaces. However there's currently no such interface.
+
+&gt; Again looking for an
+&gt; example.
+
+The method described in <a href="http://www.cc65.org/doc/coding.html">http://www.cc65.org/doc/coding.html</a> section
+&quot;10. Use constants to access absolute memory locations&quot; could be used
+to directly access the two I/O ports for checking the printer
+readiness and sending a character to the printer. These two locations
+may of course vary between different printer cards.
+
+The general benefit of this low level access to the printer is that
+you can check the keyboard in your &quot;wait for printer readiness to send
+next char&quot;-loop allowing the user to abort at any time.
+
+Best, Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Aug 14 11:00:09 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6675.html" title="Next message in the list">Egan Ford: "Re: [cc65] Apple //e time() and printer support."</a></li>
+<li><dfn>Previous message</dfn>: <a href="6673.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Apple //e time() and printer support."</a></li>
+<li><dfn>In reply to</dfn>: <a href="6669.html" title="Message to which this message replies">Egan Ford: "[cc65] Apple //e time() and printer support."</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6674" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6674" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6674" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-08-14 11:00:11 CEST
+</em></small></p>
+</body>
+</html>

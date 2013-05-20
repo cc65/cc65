@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] function pointer, fastcall</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] function pointer, fastcall" />
+<meta name="Date" content="2008-08-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] function pointer, fastcall</h1>
+<!-- received="Fri Aug 29 11:11:26 2008" -->
+<!-- isoreceived="20080829091126" -->
+<!-- sent="Fri, 29 Aug 2008 11:11:18 +0200" -->
+<!-- isosent="20080829091118" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] function pointer, fastcall" -->
+<!-- id="f97798c20808290211x6291bedauf9975c0a28acf884@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20080828205931.GA29032&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6232.html" title="stefan: &quot;Re: [cc65] function pointer, fastcall&quot;">Next message</a> ]
+[ <a href="6230.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] function pointer, fastcall&quot;">Previous message</a> ]
+[ <a href="6230.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] function pointer, fastcall&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6232.html" title="stefan: &quot;Re: [cc65] function pointer, fastcall&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20function%20pointer,%20fastcall">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-08-29 11:11:18</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt; If you think about 80x86 architectures, &quot;far&quot; could mean &quot;segmented&quot; while
+&gt; &quot;near&quot; could mean a 16 or 32 bit pointer without a segment.
+
+And several compilers additionally supported &quot;huge&quot; meaning that
+pointer arithmetic was perfomed on the segment too - with an offset of
+0x100 or 0x8 depending on real mode or protected mode, where
+neighboring descriptor table entries had to be allocated.
+
+And the compilers allowed to adjust the default being &quot;near&quot; or &quot;far&quot;
+separately for code and data resulting in four distinct &quot;memory
+models&quot;, but on Windows you needed MakeProcInstance() for far code -
+or &quot;just&quot; load the DS register from the SS register, which was
+originally published by Michael Geary: <a href="http://www.geary.com/fixds.html">http://www.geary.com/fixds.html</a>
+
+... okay, I certainly got carried far away ;-))
+
+Best, Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Aug 29 11:11:26 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6232.html" title="Next message in the list">stefan: "Re: [cc65] function pointer, fastcall"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6230.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] function pointer, fastcall"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6230.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] function pointer, fastcall"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6232.html" title="Next message in this discussion thread">stefan: "Re: [cc65] function pointer, fastcall"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6231" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6231" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6231" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-08-29 11:11:28 CEST
+</em></small></p>
+</body>
+</html>

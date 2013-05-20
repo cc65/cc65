@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] TGI bitmap fnts revisited</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] TGI bitmap fnts revisited" />
+<meta name="Date" content="2011-07-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] TGI bitmap fnts revisited</h1>
+<!-- received="Sun Jul 10 12:56:23 2011" -->
+<!-- isoreceived="20110710105623" -->
+<!-- sent="Sun, 10 Jul 2011 12:56:09 +0200" -->
+<!-- isosent="20110710105609" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] TGI bitmap fnts revisited" -->
+<!-- id="20110710105609.GA14075@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="CACT=u72bnhSsRfmUwyA260XNrUNpW7bARQKQfAjF3q-r+FFR3w&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9554.html" title="Oliver Schmidt: &quot;Re: [cc65] TGI bitmap fnts revisited&quot;">Next message</a> ]
+[ <a href="9552.html" title="Karri Kaksonen: &quot;Re: [cc65] TGI bitmap fnts revisited&quot;">Previous message</a> ]
+[ <a href="9551.html" title="Oliver Schmidt: &quot;[cc65] TGI bitmap fnts revisited&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9554.html" title="Oliver Schmidt: &quot;Re: [cc65] TGI bitmap fnts revisited&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20TGI%20bitmap%20fnts%20revisited">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-07-10 12:56:09</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Sun, Jul 10, 2011 at 10:23:54AM +0200, Oliver Schmidt wrote:
+&gt; 1. The coordinate used for text output becomes the bottom left corner
+&gt; of the first character.
+&gt;
+&gt; 2. The bottom left corner refers to the bounding box of the
+&gt; characters, _not_ the baseline of the characters. So all drawing
+&gt; happens above and to the right of the coordinate used.
+&gt;
+&gt; 3. Vertical direction means the text runs upwards. The coordinate used
+&gt; still refers to the same point relative to the first character. So all
+&gt; drawing happens above and to the _left_ of the coordinate used.
+&gt;
+&gt; 4. The TGI cursor is advanced by the TGI kernel beyond the last
+&gt; character in a way that a subsequent text output would result in
+&gt; continuous text drawn.
+
+There are two possible views: 
+
+  a) Coordinates increase when drawing fonts
+
+  b) Text should be drawn in the same way, we write
+
+a) means that the top left corner is point zero of the bounding box of the
+characters, while b) means that it's the lower left corner. The stroke fonts
+use b) and if I remember correctly, this is what the Borland BGI did.
+
+Since bitmap fonts usually don't have a common baseline, I would agree to
+ignore it. BGI did it this way.
+
+Please note that the behaviour is different for stroke fonts. For stroke
+fonts, the horizontal coordinate is the baseline of the characters.
+
+&gt; &#64;Uz: The current implementation of that cursor movement seems to take
+&gt; vertical direction into account but seems to _not_ take text scaling
+&gt; into account.
+
+Thanks for the hint. I will fix that.
+
+&gt; 1. Do we want to make any statements what the user can expect from
+&gt; setting the first two parameters of tgi_textstyle (&lt;1&gt;, &lt;2&gt;, &lt;3&gt;,
+&gt; TGI_FONT_BITMAP) to anything different from 0x100? Range? Granularity?
+&gt; Minimal value? Maximal value?
+
+The size parameters are 8.8 fixed point values. For the vector fonts, they're
+used directly (as fixed point value). For the bitmap fonts, the kernal will
+round the 8.8 value to the next integer and pass this to the drivers. So $280
+will become an integer scale factor of 3, $27F will become 2.
+
+&gt; Now that vector fonts are (close to be) there we might even consider
+&gt; not supporting bitmap font scaling in general - leaving those
+&gt; &quot;advanced&quot; stuff to vector font text output. Two arguments (beside
+&gt; code size):
+&gt; - Enlarged bitmap fonts are ugly
+&gt; - The screen resolution of our target devices are even in &quot;hires&quot; mode
+&gt; so low that there's not much use for enlarged text output
+
+I would still prefer a &quot;full&quot; implementation that also does scaling, but
+having bitmap fonts at all is better than nothing.
+
+&gt; 2. Our last TGI discussions lead to the result that the TGI kernel
+&gt; takes care of clipping for about all drawing primitives. However
+&gt; there's currently no clipping for bitmap font text output implemented
+&gt; in the TGI kernel. But for consistency reasons I believe it should be
+&gt; done there.
+
+Sounds reasonable.
+
+&gt; - Characters not fitting the screen are omitted completely
+&gt;   a) The TGI kernel creates a copy of the substring fitting the screen
+&gt; (and adjusts potentially the coordinate)
+&gt;   b) The TGI kernel creates a single character string for every
+&gt; character fitting the screen and calls into the driver in a loop
+&gt; (leveraging the cursor movement feature)
+
+Since a) needs some unknown amount of memory, b) is probably the way to go.
+
+&gt; 3. What happens to the pixels not being part of the character glyph
+&gt; but being part of the character bounding box? Are they to be left
+&gt; as-is? Or are they to be set to some value - if yes to which?
+
+BGI feft them alone and this is what I would do, too.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Jul 10 12:56:23 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9554.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] TGI bitmap fnts revisited"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9552.html" title="Previous message in the list">Karri Kaksonen: "Re: [cc65] TGI bitmap fnts revisited"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9551.html" title="Message to which this message replies">Oliver Schmidt: "[cc65] TGI bitmap fnts revisited"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9554.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] TGI bitmap fnts revisited"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9554.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] TGI bitmap fnts revisited"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9572.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] TGI bitmap fnts revisited"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9553" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9553" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9553" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-07-10 12:56:26 CEST
+</em></small></p>
+</body>
+</html>

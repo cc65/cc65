@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Announcement: New compile</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Announcement: New compiler release">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Announcement: New compiler release</h1>
+<!-- received="Mon Nov 26 22:15:27 2001" -->
+<!-- isoreceived="20011126211527" -->
+<!-- sent="Mon, 26 Nov 2001 22:15:31 +0100" -->
+<!-- isosent="20011126211531" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Announcement: New compiler release" -->
+<!-- id="20011126221531.A30327@trixie.musoftware.de" -->
+<!-- inreplyto="200111262014.VAA12471@color.sics.se" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Announcement:%20New%20compiler%20release"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2001-11-26 22:15:31
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0946.html">groepaz: "Re[2]: [cc65] Announcement: New compiler release"</a>
+<li><strong>Previous message:</strong> <a href="0944.html">MagerValp: "Re: [cc65] Announcement: New compiler release"</a>
+<li><strong>In reply to:</strong> <a href="0941.html">Adam Dunkels: "Re: [cc65] Announcement: New compiler release"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Mon, Nov 26, 2001 at 09:14:12PM +0100, Adam Dunkels wrote:
+&gt; I would also like to add that the cc65 port in uIP 0.5 is simpler to adapt to
+&gt; new platforms. The 0.4 version used a timer IRQ to drive timer events such as
+&gt; retransmissions. This was changed with 0.5 so that it uses the clock()
+&gt; function and busy waiting instead. Thus is should be simple to port to the
+&gt; Atari and other cc65 target architectures.
+
+As far as I can say, the code compiles without any changes for the Atari, just
+change the target in the makefile. The only missing thing is the rs232
+library, so you will get errors when trying to link the resulting executable.
+
+&gt; To the best of my knowledge, the cc65 port has only been tested on the C64
+&gt; (and C128, right Uz?). It would be nice to see a few Ataris, Apple ][s, C16s
+&gt; and other computers Internet enabled using uIP :-)
+
+I've debugged the rs232 library for the C128, but this version is not included
+in version 2.7.1 because I'm not quite satisfied with it. The state of the
+library for the other systems is as follows:
+
+  - CBM 500/600/700: Code ported and tried once, but not really debugged.
+
+  - C16, C116, Plus/4: No code, but porting shouldn't be a problem, since the
+    Plus/4 has a builtin 6551 ACIA, so the C64 code should run with just a few
+    changes.
+
+  - Atari: No code. I have no idea which serial hardware is supported on the
+    Atari.
+
+  - Apple ][: No code. See Atari.
+
+  - PET machines: No code. I would assume that existing rs232 modules use a
+    6551, so porting the C64 module should require almost no effort.
+
+  - GEOS: I don't know about this one, but I would assume that the C64 module
+    should run without major changes.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Announcement:%20New%20compiler%20release">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Announcement:%20New%20compiler%20release">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0946.html">groepaz: "Re[2]: [cc65] Announcement: New compiler release"</a>
+<li><strong>Previous message:</strong> <a href="0944.html">MagerValp: "Re: [cc65] Announcement: New compiler release"</a>
+<li><strong>In reply to:</strong> <a href="0941.html">Adam Dunkels: "Re: [cc65] Announcement: New compiler release"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:44 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Strange cc65 generation?</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Strange cc65 generation?" />
+<meta name="Date" content="2009-10-15" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Strange cc65 generation?</h1>
+<!-- received="Thu Oct 15 22:36:45 2009" -->
+<!-- isoreceived="20091015203645" -->
+<!-- sent="Thu, 15 Oct 2009 22:33:52 +0200" -->
+<!-- isosent="20091015203352" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Strange cc65 generation?" -->
+<!-- id="20091015203352.GA29465@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="B00AC1B538D24F3C91FFC817CC690E3D&#64;keops" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7145.html" title="Oliver Schmidt: &quot;[cc65] 3dmaze portability&quot;">Next message</a> ]
+[ <a href="7143.html" title="Carlos: &quot;[cc65] Strange cc65 generation?&quot;">Previous message</a> ]
+[ <a href="7143.html" title="Carlos: &quot;[cc65] Strange cc65 generation?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Strange%20cc65%20generation?">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-10-15 22:33:52</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Thu, Oct 15, 2009 at 10:16:39PM +0200, Carlos wrote:
+&gt; This second function seems to work fine, so i conclude there are something
+&gt; wrong in the first case. Any idea? What's exactly means the jsr boolult
+&gt; sentence?
+
+No, there is nothing wrong in the first case. boolugt converts cpu flags into
+a boolean value and sets the Z flag accordingly. It is not as optimal as it
+could be, but the code itself is correct.
+
+You didn't specify which compiler you're using. I assume it's an older
+version, since 2.13 generates almost perfect code (without a call to boolugt):
+
+------------------------------------------------------------------------------
+;
+; if ((VIC.ctrl1 &amp; 0x80) == 0x0) {
+;
+        lda     $D011
+        and     #$80
+        bne     L0009
+;
+; while (VIC.rasterline &lt; 0xfb);
+;
+L000F:  lda     $D012
+        cmp     #$FB
+        bcc     L000F
+;
+; }
+;
+L0009:  rts
+------------------------------------------------------------------------------
+
+Hint: If you want to check bit 7 (the sign bit) of $D011, you can do that by
+saying so:
+
+------------------------------------------------------------------------------
+static void waitraster (void)
+{
+    if ((signed char)VIC.ctrl1 &gt;= 0)
+        while (VIC.rasterline &lt; 0xfb);
+    }
+}
+------------------------------------------------------------------------------
+
+Now, the generated code looks like hand written assembly:
+
+------------------------------------------------------------------------------
+;
+; if ((signed char)VIC.ctrl1 &gt;= 0) {
+;
+        ldx     $D011
+        bmi     L0008
+;
+; while (VIC.rasterline &lt; 0xfb);
+;
+L000E:  lda     $D012
+        cmp     #$FB
+        bcc     L000E
+;
+; }
+;
+L0008:  rts
+------------------------------------------------------------------------------
+
+Please note that using &quot;__fastcall__&quot; in a function with no parameters has no
+effect.
+
+The VIC is also able to generate an interrupt if it reaches a programmable
+scan line. Using this feature may be better suited to your needs.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Oct 15 22:36:45 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7145.html" title="Next message in the list">Oliver Schmidt: "[cc65] 3dmaze portability"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7143.html" title="Previous message in the list">Carlos: "[cc65] Strange cc65 generation?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7143.html" title="Message to which this message replies">Carlos: "[cc65] Strange cc65 generation?"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7144" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7144" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7144" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-10-15 22:36:47 CEST
+</em></small></p>
+</body>
+</html>

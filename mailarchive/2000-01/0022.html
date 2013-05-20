@@ -1,0 +1,182 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] cc65 and VICE</title>
+<meta name="Author" content="Spiro Trikaliotis (Spiro.Trikaliotis_at_gmx.de)">
+<meta name="Subject" content="Re: [cc65] cc65 and VICE">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] cc65 and VICE</h1>
+<!-- received="Thu Jan 20 23:36:06 2000" -->
+<!-- isoreceived="20000120223606" -->
+<!-- sent="Thu, 20 Jan 2000 23:06:45 +0100" -->
+<!-- isosent="20000120220645" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="Spiro.Trikaliotis_at_gmx.de" -->
+<!-- subject="Re: [cc65] cc65 and VICE" -->
+<!-- id="001c01bf6396$7b221a60$0171a8c0@bonn" -->
+<!-- inreplyto="[cc65] cc65 and VICE" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Spiro Trikaliotis (<a href="mailto:Spiro.Trikaliotis_at_gmx.de?Subject=Re:%20[cc65]%20cc65%20and%20VICE"><em>Spiro.Trikaliotis_at_gmx.de</em></a>)<br>
+<strong>Date:</strong> 2000-01-20 23:06:45
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0023.html">Spiro Trikaliotis: "Re: [cc65] Back on Track"</a>
+<li><strong>Previous message:</strong> <a href="0021.html">Groepaz: "Re: [cc65] Back on Track"</a>
+<li><strong>Maybe in reply to:</strong> <a href="0017.html">Spiro Trikaliotis: "[cc65] cc65 and VICE"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0026.html">Ullrich von Bassewitz: "Re: [cc65] cc65 and VICE"</a>
+<li><strong>Reply:</strong> <a href="0026.html">Ullrich von Bassewitz: "Re: [cc65] cc65 and VICE"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi Ullrich (and, not to forget, all the others, ;-),
+
+&gt;I have worked with the VICE monitor code myself, so I'm pretty sure that the
+&gt;YACC grammar has nothing to do with line termination. 
+
+Grmph. You're right, it was only a &quot;wrong&quot; mode parameter with fopen() 
+in VICE which opened a binary file.
+
+I just 'fixed' it in VICE, but I'll have to see what the others have to
+say about this.
+
+
+&gt;&gt; Well, I asked my question about the debug generations because I want
+&gt;&gt; to extend the VICE monitor for better debugging.
+
+&gt;Ahh! Does that mean that I do not have to bug Daniel requesting new
+&gt;monitor features, but send my mails to you instead? :-)
+
+:-)
+
+Well, I don't want to take over someone's work ;-), and I'm sure Daniel
+will be much more familiar with the code than I am, but I will be glad
+to hear from you, too.
+
+I just started with VICE 1 or 2 months ago, so I'm lacking much 
+experience in regard of the code.
+
+
+&gt;Do you know if the fast breakpoint check is now implemented in VICE? [...]
+
+Well, I haven't seen something like this (which does _not_ necessarily
+mean that it's not there), but I'll look for it.
+
+
+&gt;My plan was to use spunk (<a href="http://www.von-bassewitz.de/uz/spunk/">http://www.von-bassewitz.de/uz/spunk/</a>). [...]
+
+I'll have a look at it.
+
+
+&gt;I'm not sure if this is really worth the effort, since the compiler
+&gt;generated code is really bad without optimization. 
+
+Yes, sure, but it's better to have not-so-optimal-code which can be
+debugged in a good manner than having near-to-optimal-code ;-) which
+is very hard to debug (provided the optimizer does not add new bugs),
+so it were a good starting point.
+
+&gt;And, line information is
+&gt;only one part. To access local variables, information about the stack offset
+&gt;of these variables has to be generated. But since the generated code does
+&gt;not use a base pointer (this would be difficult on the 6502 since it does
+&gt;only allow positive offsets to an address), stack pointer plus offset is
+&gt;used to access local variables. This means that the compiler has to emit
+&gt;debug information with every change of the stack pointer - which is quite
+&gt;often, since the stack is used in almost any expression that has more than
+&gt;one operand.
+
+Well, what about this solution:
+You're using a kind of stack frame which solely consists of a pointer to
+the previous frame, and you add one pointer which points to where the actual 
+stack frame is located on.
+
+So, the pointer is a kind of BP on the Intel (which actually needs not to 
+be used by the code, it's maintened only for debugging purposes), so we
+don't have to change debug info with every change of the stack pointer.
+The 'stack frame' would allow an easy return to the previous stack 
+frame when returning from a subroutine.
+
+
+&gt;The VICE monitor is nice, but in my eyes it is crafted too much after gdb.
+&gt;While both (gdb and the VICE monitor) are extremely powerful, one has
+&gt;problems to find an interface that is more unfriendly to the user.
+
+Well, I don't know GDB, but Andreas Boose told me that the interface
+is intended to be compatible to AR.
+
+
+&gt;What I would like to see is an interface like the one in the old Borland
+&gt;Turbo Debugger. Stepping through the code is easy with VICE, but you have to
+&gt;enter commands to look at the stack or a memory area after each step. Having
+&gt;a fullscreen debugger that allows you to step through the code while stack,
+&gt;registers and a selectable memory range are in view would be a *great*
+&gt;improvement. 
+
+Well, I think about adding a symbol bar to the monitor console (in the
+WIN32 port), so some commands could be entered more easily. A memory 
+'window' is on my todo list, too, although I don't know if it should be 
+implemented in an own console window (where I do not know how easily
+it could be ported), or to split the console in &quot;text-mode-windows&quot;
+(where we would need something like positioning inside of the console,
+where I don't know if it's possible to port it either).
+
+
+You see, I have some improvements in my mind, but to be honest, I'm
+currently not coding at all since I have a deadline by the beginning of 
+next month. Hopefully, I will be able to start at the middle of february,
+until then, I'm collecting as much information as possible (which is
+because I got here in this mailing list).
+
+Spiro.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%20and%20VICE">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0023.html">Spiro Trikaliotis: "Re: [cc65] Back on Track"</a>
+<li><strong>Previous message:</strong> <a href="0021.html">Groepaz: "Re: [cc65] Back on Track"</a>
+<li><strong>Maybe in reply to:</strong> <a href="0017.html">Spiro Trikaliotis: "[cc65] cc65 and VICE"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0026.html">Ullrich von Bassewitz: "Re: [cc65] cc65 and VICE"</a>
+<li><strong>Reply:</strong> <a href="0026.html">Ullrich von Bassewitz: "Re: [cc65] cc65 and VICE"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:35 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] The Contiki Desktop OS fo</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] The Contiki Desktop OS for cc65">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] The Contiki Desktop OS for cc65</h1>
+<!-- received="Sun Mar 16 01:31:13 2003" -->
+<!-- isoreceived="20030316003113" -->
+<!-- sent="Sun, 16 Mar 2003 01:31:08 +0100" -->
+<!-- isosent="20030316003108" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] The Contiki Desktop OS for cc65" -->
+<!-- id="20030316003108.GB3233@trixie.musoftware.de" -->
+<!-- inreplyto="1047773532.349.239.camel@localhost" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20The%20Contiki%20Desktop%20OS%20for%20cc65"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-03-16 01:31:08
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2790.html">Ullrich von Bassewitz: "Re: [cc65] non-ANSI extensions and initialized structures"</a>
+<li><strong>In reply to:</strong> <a href="2788.html">Adam Dunkels: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2792.html">Adam Dunkels: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Next in thread:</strong> <a href="2720.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Maybe reply:</strong> <a href="2720.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Maybe reply:</strong> <a href="2721.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Maybe reply:</strong> <a href="2742.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Reply:</strong> <a href="2792.html">Adam Dunkels: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Sun, Mar 16, 2003 at 01:12:12AM +0100, Adam Dunkels wrote:
+&gt; As Uz wrote in another mail in this thread, it isn't possible (or at
+&gt; least not advisable) to have dynamically linked functions in the module
+&gt; (i.e., the Contiki application program). So, instead we statically link
+&gt; all external functions and variables in the application program to the
+&gt; memory mappings of a well-defined Contiki version. For instance, lets
+&gt; say Contiki 1.1 gets loadable program support. In the C64 version of
+&gt; Contiki 1.1, the function ctk_widget_redraw() is put in memory 0x3ce1.
+&gt; Now, when we compile and link our Contiki application programs, all
+&gt; calls to ctk_widget_redraw() will be statically linked so that they will
+&gt; correspond to a call too 0x3ec1.
+
+You can also do this for the runtime functions that are linked to Contiki.
+What you need is some advanced perl magic that does the following:
+
+  1. Extract the list of public functions from the map file (or debug info or
+     whatever) together with their address.
+
+  2. Create one big assembler file that just contains lines like
+
+        .export booleq
+        booleq  = $1257
+        .export mulax
+        mulax   = $2312
+
+     and so on.
+
+  3. Assemble this file and link it to your module *before* the standard
+     library. This will cause the linker to use the symbols from this file,
+     and only ressort to the code in the standard library if there is no such
+     symbol exported from the Contiki main program.
+
+Since the map file contains all public symbols, it would even be possible to
+access variables from the module.
+
+This way, modules would have almost zero overhead (just the code to load and
+relocate the module).
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20The%20Contiki%20Desktop%20OS%20for%20cc65">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20The%20Contiki%20Desktop%20OS%20for%20cc65">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2790.html">Ullrich von Bassewitz: "Re: [cc65] non-ANSI extensions and initialized structures"</a>
+<li><strong>In reply to:</strong> <a href="2788.html">Adam Dunkels: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2792.html">Adam Dunkels: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Next in thread:</strong> <a href="2720.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Maybe reply:</strong> <a href="2720.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Maybe reply:</strong> <a href="2721.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Maybe reply:</strong> <a href="2742.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Reply:</strong> <a href="2792.html">Adam Dunkels: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-03-16 01:31:18 CET</em>
+</em>
+</small>
+</body>
+</html>

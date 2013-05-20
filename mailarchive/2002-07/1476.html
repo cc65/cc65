@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: Re: [cc65] raw disk access (was:</title>
+<meta name="Author" content="cbmnut_at_hushmail.com (cbmnut_at_hushmail.com)">
+<meta name="Subject" content="Re: Re: [cc65] raw disk access (was: cr/lf translation?)">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: Re: [cc65] raw disk access (was: cr/lf translation?)</h1>
+<!-- received="Fri Jul 12 19:46:12 2002" -->
+<!-- isoreceived="20020712174612" -->
+<!-- sent="Fri, 12 Jul 2002 10:46:13 -0700" -->
+<!-- isosent="20020712174613" -->
+<!-- name="cbmnut_at_hushmail.com" -->
+<!-- email="cbmnut_at_hushmail.com" -->
+<!-- subject="Re: Re: [cc65] raw disk access (was: cr/lf translation?)" -->
+<!-- id="200207121746.g6CHkD425881@mailserver2.hushmail.com" -->
+<!-- inreplyto="Re: [cc65] raw disk access (was: cr/lf translation?)" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> <a href="mailto:cbmnut_at_hushmail.com?Subject=Re:%20Re:%20[cc65]%20raw%20disk%20access%20(was:%20cr/lf%20translation?)"><em>cbmnut_at_hushmail.com</em></a><br>
+<strong>Date:</strong> 2002-07-12 19:46:13
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1475.html">MagerValp: "Re: [cc65] raw disk access (was: cr/lf translation?)"</a>
+<li><strong>Maybe in reply to:</strong> <a href="1475.html">MagerValp: "Re: [cc65] raw disk access (was: cr/lf translation?)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1481.html">groepaz: "Re[2]: [cc65] raw disk access (was: cr/lf translation?)"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi all,
+block access is quite easy, you could do it yourself in some 30 minutes.
+Go to <a href="http://project64.c64.org/index.htm">http://project64.c64.org/index.htm</a> and get the 1541 users manual.
+Look at the chapter on disk access.
+--------
+6.9 USER1 and USER2
+
+The USER commands are generally designed to work with machine language
+(see chapter 8 for more on this).  The USER1 and USER2 commands are
+special versions of the BLOCK-READ and BLOCK-WRITE commands, but...
+with an important difference: the way USER1 and USER2 work with the
+buffer-pointer.
+
+The BLOCK-READ command reads up to 256 characters, but stops reading
+when the buffer-pointer stored with the block says that block is
+finished.  The USER1 command performs the BLOCK-READ operation, but
+first forces the pointer to 255 in order to read the entire block of
+data from the disk.
+
+FORMAT FOR USER1 COMMAND
+
+   PRINT#file#, &quot;U1:&quot; channel; drive; track; block
+
+or
+
+   PRINT#file#, &quot;UA:&quot; channel; drive; track; block
+
+There is no difference between the U1 and UA designations for this
+command.
+
+The BLOCK-WRITE command writes the contents of the buffer to the block
+on the disk along with the value of the buffer-pointer.  The USER2
+command writes the buffer without disturbing the buffer-pointer value
+already stored on that block of the diskette.  This is useful when a
+block is to be read in with BLOCK-READ, updated through the BUFFER-
+POINTER and PRINT# statements, and then written back to the diskette
+with USER2.
+
+FORMAT FOR USER2 COMMAND:
+
+   PRINT#file#, &quot;U2:&quot; channel; drive; track; block
+
+or
+
+   PRINT#file#, &quot;UB:&quot; channel; drive; track; block
+
+For a more complex sample program, see Appendix C.
+
+
+-----------------------
+Only one problem, how to access the disk drive from C?  There are the assembly
+functions already present.  Try cbm_open(2, 8, CBM_READ, &quot;data,s&quot;);
+Look at include/cbm.h.
+
+Communicate in total privacy.
+Get your free encrypted email at <a href="https://www.hushmail.com/?l=2">https://www.hushmail.com/?l=2</a>
+
+Looking for a good deal on a domain name? <a href="http://www.hush.com/partners/offers.cgi?id=domainpeople">http://www.hush.com/partners/offers.cgi?id=domainpeople</a>
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20Re:%20[cc65]%20raw%20disk%20access%20(was:%20cr/lf%20translation?)">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1475.html">MagerValp: "Re: [cc65] raw disk access (was: cr/lf translation?)"</a>
+<li><strong>Maybe in reply to:</strong> <a href="1475.html">MagerValp: "Re: [cc65] raw disk access (was: cr/lf translation?)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1481.html">groepaz: "Re[2]: [cc65] raw disk access (was: cr/lf translation?)"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-07-12 19:46:26 CEST</em>
+</em>
+</small>
+</body>
+</html>

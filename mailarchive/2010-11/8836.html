@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Forced imports by linker confi</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="[cc65] Forced imports by linker config" />
+<meta name="Date" content="2010-11-12" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Forced imports by linker config</h1>
+<!-- received="Fri Nov 12 15:53:00 2010" -->
+<!-- isoreceived="20101112145300" -->
+<!-- sent="Fri, 12 Nov 2010 15:52:54 +0100" -->
+<!-- isosent="20101112145254" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="[cc65] Forced imports by linker config" -->
+<!-- id="20101112145253.GA25835@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8837.html" title="Oliver Schmidt: &quot;Re: [cc65] Forced imports by linker config&quot;">Next message</a> ]
+[ <a href="8835.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8837.html" title="Oliver Schmidt: &quot;Re: [cc65] Forced imports by linker config&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Forced%20imports%20by%20linker%20config">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-11-12 15:52:54</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I reworked linker config parsing and processing, so it is now possible to
+force imports of symbols by using the linker config. The code needs some
+testing, but it looks very promising. This means that the conceptual model
+used currently can be changed: It is no longer the compiler that must force
+the import of startup code, this can be done in the linker. Using this method,
+the linker config can also define, which headers get included in the output
+file(s).
+
+So as an example, normal C programs or C programs that are loaded elsewhere
+and started using SYS (on the Commodores, that is) can be created with a
+simple change in the linker config. It is no longer necessary to change the
+startup code.
+
+Please note that the old syntax for the SYMBOLS section (&quot;symbol = value&quot;) is
+gone. Attributes are used instead as with the other sections in the config
+file.
+
+To make the above possible, I had to change the evaluation of expressions used
+in the linker config. Before, they were handled specially and had a constant
+value as a result. Because this did no longer work when reading the config and
+processing it at a later time, I had to make the expressions &quot;normal&quot;
+expression trees as they're also used in the assembler and object files.
+
+This has far reaching consequences. Actually the consequences may be even
+greater than the ones from adding forced imports. Since the start address and
+size of a memory area is now an expression that is parsed but evaluation is
+delayed until its value is needed, it is now possible to use other symbols in
+these expressions. These other symbols may be the start address or size of
+another memory area already defined before, or exported symbols from any of
+the object files. This allows to do so complicated things that I'm not even
+able to guess what is finally possible:-)
+
+A few of the easier examples: One can make a memory area variable sized
+depending on the size of the memory area before it:
+
+---------------------------------------------------------------------------
+MEMORY {
+    ZP:     file = &quot;&quot;, define = yes, start = $0002, size = $001A;
+    HEADER: file = %O, define = yes, start = $07FF, size = $000E;
+    RAM:    file = %O, define = yes,
+            start = __HEADER_START__ + __HEADER_SIZE__,
+            size = $D000 - __HEADER_START__ + __HEADER_SIZE__;
+}
+---------------------------------------------------------------------------
+
+A memory area can also have a size that is defined somewhere in an object
+file:
+
+---------------------------------------------------------------------------
+header.s:
+        .export         HEADERSIZE = .sizeof(Header)
+        .segment        &quot;HEADER&quot;
+        Header:         .addr   *+2
+---------------------------------------------------------------------------
+SYMBOLS {
+    HEADERSIZE:  type = import, addrsize = absolute;
+}
+MEMORY {
+    HEADER: file = %O, define = yes, start = $07FF, size = HEADERSIZE;
+}
+SEGMENTS {
+    HEADER:   load = HEADER, type = ro;
+}
+---------------------------------------------------------------------------
+
+Or we can place a memory area inside a buffer that is defined in an assembler
+module:
+
+---------------------------------------------------------------------------
+drivebuf.s:
+        DriveBuffer:    .res    256
+        .export         DriveBuffer
+        .export         DriveBufferSize = .sizeof (DriveBuffer)
+---------------------------------------------------------------------------
+SYMBOLS {
+    DriveBuffer:     type = import, addrsize = absolute;
+    DriveBufferSize: type = import, addrsize = absolute;
+}
+MEMORY {
+    RAM:         file = %O,           start = $800, size = $D000;
+    DRIVEBUFFER: file = &quot;driver.bin&quot;, start = DriveBuffer, size = DriveBufferSize;
+}
+SEGMENTS {
+    CODE:       load = RAM,         type = ro;
+    RODATA:     load = RAM,         type = ro;
+    DATA:       load = RAM,         type = rw;
+    BSS:        load = RAM,         type = bss, define = yes;
+    DRIVERCODE: load = DRIVEBUFFER, type = ro;
+}
+---------------------------------------------------------------------------
+
+
+The changes had some effects on order of command line arguments, so it may be
+necessary to change make- or batch processing files. For examples, the output
+file (-o switch) must now be defined before using -t or -C, because the config
+file is read when -t or -C is found on the command line. Changing the output
+file name using -o when the config is already read will cause the name be
+ignored in most cases. The same is true for -t/-C and libraries: If your
+config has forced imports, it must be read before any libraries, because
+otherwise the import may not be resolved.
+
+Please let me know if there are any problems with the new code.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Nov 12 15:53:00 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8837.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Forced imports by linker config"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8835.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8837.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Forced imports by linker config"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8837.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Forced imports by linker config"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8839.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] Forced imports by linker config"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8848.html" title="Message sent in reply to this message">Per Olofsson: "Re: [cc65] Forced imports by linker config"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8878.html" title="Message sent in reply to this message">Christian Krüger: "Re: [cc65] Forced imports by linker config"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8911.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] Forced imports by linker config"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8836" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8836" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8836" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-11-12 15:53:04 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Segments and banking</title>
+<meta name="Author" content="Mike McCarty (jmccarty_at_ssd.usa.alcatel.com)">
+<meta name="Subject" content="Re: [cc65] Segments and banking">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Segments and banking</h1>
+<!-- received="Fri May 25 17:04:40 2001" -->
+<!-- isoreceived="20010525150440" -->
+<!-- sent="Fri, 25 May 2001 10:03:02 -0500 (CDT)" -->
+<!-- isosent="20010525150302" -->
+<!-- name="Mike McCarty" -->
+<!-- email="jmccarty_at_ssd.usa.alcatel.com" -->
+<!-- subject="Re: [cc65] Segments and banking" -->
+<!-- id="Pine.SOL.4.10.10105250942390.6033-100000@sun1307.ssd.usa.alcatel.com" -->
+<!-- inreplyto="20010525153040.A4993@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Mike McCarty (<a href="mailto:jmccarty_at_ssd.usa.alcatel.com?Subject=Re:%20[cc65]%20Segments%20and%20banking"><em>jmccarty_at_ssd.usa.alcatel.com</em></a>)<br>
+<strong>Date:</strong> 2001-05-25 17:03:02
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0511.html">shubel, paul: "RE: [cc65] Segments and banking"</a>
+<li><strong>Previous message:</strong> <a href="0509.html">Ullrich von Bassewitz: "[cc65] Segments and banking"</a>
+<li><strong>In reply to:</strong> <a href="0509.html">Ullrich von Bassewitz: "[cc65] Segments and banking"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0511.html">shubel, paul: "RE: [cc65] Segments and banking"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Fri, 25 May 2001, Ullrich von Bassewitz wrote:
+
+&gt; 
+&gt; On Fri, May 25, 2001 at 09:13:33AM -0400, shubel, paul wrote:
+&gt; &gt; Question:  Can CC65 compile and link a segmented build?  For example,
+&gt; &gt; can it call modules in &quot;banked&quot; areas of memory to exceed the 64K boundary?
+&gt; 
+&gt; cc65 cannot call functions in other banks by itself, because the banking
+&gt; mechanism is always hardware dependent. However, the linker is able to overlay
+&gt; memory areas. This means that it is possible to write programs for banked
+&gt; hardware with some help from the programmer.
+&gt; 
+&gt; &gt; Is this what is meant by segments?
+&gt; 
+&gt; segments are just some hunks of code or data that have a name. The linker
+&gt; combines all pieces that have the same name to one large chunk, and places it
+&gt; into a memory area according to the rules in the configuration file.
+&gt; 
+&gt; This means that by placing a function f1() into a segment with the name CODE1,
+&gt; and a function named f2() into a segment CODE2, it is possible to tell the
+&gt; linker to relocate both segments CODE1 and CODE2 to the same address, but
+&gt; write it to different files. To support banking, the programmer has to supply
+&gt; a short stub in common memory for each such function that enables the correct
+&gt; bank and calls the function.
+
+Excellent description, Ullrich. Having done banked memory switching
+myself, I'd like to add to your statement.
+
+Banked memory switching is both a blessing and a curse. It is a
+blessing, in a sense, because it allows one to use much more memory
+than the processor can directly access.
+
+It is a curse for a multitude of reasons. One is the &quot;short stub&quot;, also
+sometimes called a &quot;trampoline&quot;. This is the bane of programmers.
+Debugging this stuff is a major pain. One has to be sure that the stack
+appears in all banks. Initializing the memory (loading the program) is
+a major pain. Single stepping in a debugger may or may not work. It may
+be impossible to set a break in code not in the present bank, and it
+may be impossible to step into it.
+
+Oh, another way to do it is to have the trampolines appear in each bank,
+rather than in common memory.
+
+I prefer not to use trampolines at all, but rather to put a dispatcher
+in common memory, along with a jump table and information on what bank
+each destination lies in. Macroes can hide the interface. It's something
+like this:
+
+        #define SOME_FUNCTION           6
+        #define SomeFunction(Arg1,Arg2) BankCall(SOME_FUNCTION,Arg1,Arg2)
+
+where BankCall is a real routine in the common memory, the dispatcher.
+Its prototype looks like this
+
+        int     BankCall(int FunctionId,...);
+
+It uses FunctionId as an index into a table of entries giving the
+banked address (bank and offset) of the destination function.
+
+SomeFunction looks like this:
+
+        int     SomeFunction(SomeFunctionParmsStruct_t *Parms);
+
+BankCall computes the address of the argument with the lowest address,
+and passes that as the pointer to the parameter block accepted by the
+function. One could use &lt;stdarg.h&gt; and make the functions receive a
+va_list
+
+        int     SomeFunction(va_list Parms);
+
+similar to vfprintf().
+
+BankCall looks in the function table, and checks the current hardware
+state against the table entry. If necessary, it first enables the
+chosen bank (or even just unconditionally enables it), saving the
+current bank in a bank stack (or in a local variable on the stack).
+Then it invokes the address in the table. On return, it re-enables the
+bank called from if necessary (or even just unconditionally) and then
+returns the value returned by the invoked routine.
+
+In this way, no additional code need be written for multiple routines,
+just add an entry in the table. Get the code right once, and then don't
+change it.
+
+Some prefer to do this
+
+        #define SOME_BANK       3
+        #define SOME_FUNCTION   0x1234
+        int     BankCall(SOME_BANK,SOME_FUNCTION,...);
+
+where the actual bank and function address get passed in. I don't like
+this, as one has to edit a header file somewhere to put the banks and
+addresses in. I prefer editing a jump table in a source file.
+
+YMMV
+
+Mike
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Segments%20and%20banking">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0511.html">shubel, paul: "RE: [cc65] Segments and banking"</a>
+<li><strong>Previous message:</strong> <a href="0509.html">Ullrich von Bassewitz: "[cc65] Segments and banking"</a>
+<li><strong>In reply to:</strong> <a href="0509.html">Ullrich von Bassewitz: "[cc65] Segments and banking"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0511.html">shubel, paul: "RE: [cc65] Segments and banking"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:40 CET</em>
+</em>
+</small>
+</body>
+</html>

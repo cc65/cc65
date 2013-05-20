@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] signals</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] signals" />
+<meta name="Date" content="2005-05-27" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] signals</h1>
+<!-- received="Fri May 27 15:31:44 2005" -->
+<!-- isoreceived="20050527133144" -->
+<!-- sent="Fri, 27 May 2005 15:31:28 +0200" -->
+<!-- isosent="20050527133128" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] signals" -->
+<!-- id="1724875552@web.de" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="[cc65] signals" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5021.html" title="davide.bologna1katamail.com: &quot;[cc65] Incomplete type declaration for structures&quot;">Next message</a> ]
+[ <a href="5019.html" title="dominic beesley: &quot;Re: [cc65] signals&quot;">Previous message</a> ]
+[ <a href="5015.html" title="dominic beesley: &quot;[cc65] signals&quot;">Maybe in reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5023.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] signals&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20signals">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-05-27 15:31:28</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt; &gt; I want to override _sig_dfl for BBC micro so that it traps
+&gt; &gt; SIGINT and aborts to the OS when Escape is pressed and not
+&gt; &gt; captured. What is the best way of doing this? I don't want to move
+&gt; &gt; it from common otherwise it'll need redefining for all the other
+&gt; &gt; architectures...
+&gt; 
+&gt; I had a discussion with Oliver regarding this topic, and we came to the
+&gt; conclusion that - at least for the Apple - it is almost impossible to map an
+&gt; asynchronous signal to a signal handler, and terminate the program in this
+&gt; case. If the Escape key generates something like an interrupt, you don't know,
+&gt; which part of the code has been interrupted. Hard aborting the program is
+&gt; possible, but even this may leave the operating system in an unstable state.
+&gt; Executing more cc65 code (like flushing disk buffers) is not possible, because
+&gt; disk routines may have been interrupted, and most of the code is not
+&gt; reentrant.
+
+In fact I recall this issue a little bit different ;-)
+
+When you press Ctrl-Reset on an Apple2 a specific asynch handler gets
+called and I wanted to call the C-Library cleanup function &quot;donelib&quot;
+from that handler. So I asked Uz about his opinion. We started
+thinking about raising a signal from within that handler a let the
+application programmer decide what to do. Beside other arguments I
+don't remember anymore exactly the finaly showstopper for this approach
+was that the Ctrl-Reset &quot;simply&quot; asserts the RESET line on the CPU so
+that the previous program counter gets lost. This means that it would
+never ever be possible to ignore the signal in question (and continue
+the running program). At that point Uz and I aggreed that the signal
+semantic simply doesn't fit the Ctrl-Reset scenario.
+
+So I reverted back to calling the C-Library cleanup from within the 
+handler - although both the terms &quot;handler&quot; and &quot;within&quot; are probably
+not correct because there's nothing to return to from that point.
+Fortunately that's no issue for the Apple2 as after C-Library cleanup
+a cc65 program doesn't try to return to somewhere but re-runs the BASIC
+interpreter from scratch on a new stack.
+
+This means that on the Apple2 there *IS* async C-Library cleanup - with
+all problems that may cause! One important part is closing open files,
+although that may be a little less risky than on other platforms because it
+doesn't mean to itterate over cc65 datastructures to find the open
+files. Instead the OS has a close_all call without parameters.
+
+Please note that even application programmer written atexit functions
+are called as part of this. Hopefully Uz doesn't insist in removing all 
+that now ;-))
+
+Oliver
+
+______________________________________________________________
+Verschicken Sie romantische, coole und witzige Bilder per SMS!
+Jetzt bei WEB.DE FreeMail: <a href="http://f.web.de/?mc=021193">http://f.web.de/?mc=021193</a>
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri May 27 15:31:44 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5021.html" title="Next message in the list">davide.bologna1katamail.com: "[cc65] Incomplete type declaration for structures"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5019.html" title="Previous message in the list">dominic beesley: "Re: [cc65] signals"</a></li>
+<li><dfn>Maybe in reply to</dfn>: <a href="5015.html" title="Message to which this message replies">dominic beesley: "[cc65] signals"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5023.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] signals"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5023.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] signals"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5020" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5020" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5020" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-05-27 15:31:46 CEST
+</em></small></p>
+</body>
+</html>

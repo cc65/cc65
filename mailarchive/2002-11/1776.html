@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] warez gallore :)</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] warez gallore :)">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] warez gallore :)</h1>
+<!-- received="Sat Nov 23 02:48:50 2002" -->
+<!-- isoreceived="20021123014850" -->
+<!-- sent="Sat, 23 Nov 2002 02:48:46 +0100" -->
+<!-- isosent="20021123014846" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] warez gallore :)" -->
+<!-- id="569314378.20021123024846@gmx.net" -->
+<!-- inreplyto="20021123003738.GB26235@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20warez%20gallore%20:)"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2002-11-23 02:48:46
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1775.html">Ullrich von Bassewitz: "Re: [cc65] warez gallore :)"</a>
+<li><strong>In reply to:</strong> <a href="1775.html">Ullrich von Bassewitz: "Re: [cc65] warez gallore :)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1779.html">Ullrich von Bassewitz: "Re: [cc65] warez gallore :)"</a>
+<li><strong>Reply:</strong> <a href="1779.html">Ullrich von Bassewitz: "Re: [cc65] warez gallore :)"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+UvB&gt; Yes, that's true, but there are more than 10 programs and at least 5
+UvB&gt; libraries, burried somewhere in a deep directory structure. It is not easy to
+UvB&gt; pick the good parts from that:-)
+
+[...]
+
+UvB&gt; Some of the code is really worth a look, so I would like to see access to it
+UvB&gt; as simple as possible. But it is of course your code, so this is only a
+UvB&gt; suggestion.
+
+ok well, yes, that might be confusing.... i will have a look at it...
+one major reason to keep my original directory structure was to make
+sure that all the source actually builts without major hazzle (i
+personally like makefiles in each directory as you might have seen
+;=P). however,i think creating additional release archives that
+contain one seperated program each should be easily doable, ppl would
+need to compile them seperatly in that case though. (on the other
+hand, i could then make them all reside in samples/whatever/) mmmh
+well..... should i do sth like
+
+/samples/c64/&lt;prog&gt;
+                   for programs that are c64 specific (ie the plasma,
+                   fire demo, radial demo)
+/samples/&lt;prog&gt;
+                   for programs that should be portable across cc65
+                   targets
+/contribs/&lt;prog&gt;
+                   for anything else whose licence might be
+                   incompatible with cc65 (NED possibly, i dont know
+                   for sure about the bytebench and other stuff in the
+                   /ports directory)
+
+and what about the libraries...mmmh one archive for each lib and an
+/include and /lib dir?
+
+mmh and the testcode (the ported testsuite and some of the libtest
+stuff i made myself) probably shouldnt go into /samples either? well
+:=P
+
+guess we should define something that works well for everyone ... also
+some kind of naming sheme for the archives (i'd prefer timestamp over
+versionnumbers for that matter ;))
+
+what do you think?
+
+(btw i noticed that snapshot is missing the silversurfer rs232
+module i made.... gotta add that aswell :o) ... wasnt there some plan
+about changing the api or sth?)
+
+&gt;&gt; however... i guess the next thing i'll be doing related to cc65 would
+&gt;&gt; be converting that gfx-related stuff into loadable modules that can be
+&gt;&gt; used with (and merged into) the normal libs...
+
+UvB&gt; Having a second graphics module would be nice, because it would show problems
+UvB&gt; with the design that cannot be seen now as there's just one module written by
+UvB&gt; me (using S. Judds fine grlib as a base).
+
+yeah probably... so is there a working example (that runs on the c64)
+on how to use that stuff yet? shouldnt be a major problem to convert
+the stuff i've done so far then.... maybe we can use some of the
+&quot;generic&quot; code (like line and circle algo) to emulate missing
+functions in the actual modules aswell...
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20warez%20gallore%20:)">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20warez%20gallore%20:)">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1775.html">Ullrich von Bassewitz: "Re: [cc65] warez gallore :)"</a>
+<li><strong>In reply to:</strong> <a href="1775.html">Ullrich von Bassewitz: "Re: [cc65] warez gallore :)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1779.html">Ullrich von Bassewitz: "Re: [cc65] warez gallore :)"</a>
+<li><strong>Reply:</strong> <a href="1779.html">Ullrich von Bassewitz: "Re: [cc65] warez gallore :)"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-11-23 02:49:01 CET</em>
+</em>
+</small>
+</body>
+</html>

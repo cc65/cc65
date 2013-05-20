@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: Cursory analyses of CBM readdir b</title>
+<meta name="Author" content="silverdr1wfmh.org.pl (silverdr1wfmh.org.pl)" />
+<meta name="Subject" content="Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)" />
+<meta name="Date" content="2013-01-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)</h1>
+<!-- received="Thu Jan 10 11:59:30 2013" -->
+<!-- isoreceived="20130110105930" -->
+<!-- sent="Thu, 10 Jan 2013 11:59:18 +0100" -->
+<!-- isosent="20130110105918" -->
+<!-- name="silverdr1wfmh.org.pl" -->
+<!-- email="silverdr1wfmh.org.pl" -->
+<!-- subject="Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)" -->
+<!-- id="C47D6FC1-AD43-4645-853A-7EFBAA0BA2C9@wfmh.org.pl" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="EE858991D64E4A1BA0718561A308159C&#64;Kaiser" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11080.html" title="Oliver Schmidt: &quot;Re: [cc65] News for 2013&quot;">Next message</a> ]
+[ <a href="11078.html" title="Christian Grössler: &quot;Re: [cc65] News for 2013&quot;">Previous message</a> ]
+[ <a href="11073.html" title="Greg King: &quot;Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="11081.html" title="Spiro Trikaliotis: &quot;Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:silverdr1wfmh.org.pl?Subject=Re:%20Cursory%20analyses%20of%20CBM%20readdir%20bug%20(was:%20[cc65]%20Re:%20readdir%20bug)">silverdr1wfmh.org.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2013-01-10 11:59:18</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 2013-01-10, at 00:50, Greg King wrote:
+
+&gt;&gt; Well-written programs may as well check for the C flag on return;
+&gt;&gt; which is a sort of convention with many KERNAL routines.
+&gt;&gt; Unfortunately, somebody &quot;forgot&quot; to add this to, e. g., OPEN call.
+&gt; 
+&gt; Are you talking about the Kernal's function or BASIC's OPEN statement? (The Kernal's OPEN does set the Carry flag; and, BASIC does check it.)
+
+What about this simple test then:
+*******************************
+	lda #$08
+	tax
+	tay
+	jsr $ffba	; SETLFS
+	lda #fnamelength
+	ldx #&lt;fname
+	ldy #&gt;fname
+	jsr $ffbd	; SETNAM
+	jsr $ffc0	; OPEN
+	bcc white
+	lda #$02
+setborder:
+	sta $d020
+	bne end
+white:
+	lda #$01
+	bne setborder
+end:
+	lda #$08
+	jsr $ffc3	; CLOSE
+	rts
+
+fname:
+	.byte	&quot;test&quot;
+fnamend:
+fnamelength = fnamend - fname
+*******************************
+
+This is the use case I am referring to and I get white, no matter whether the file opened correctly or not. It is honest question - I'd be glad not to use status channel in this case but I know no other way to confirm that the file opened correctly (or not).
+
+&gt;&gt; [..]
+&gt;&gt; Anyway -- this is quite OT here.
+&gt; 
+&gt; It actually isn't Off-Topic.  People who want to deal with many drives and
+&gt; many files, as you did -- but, in C -- will need to know that CC65's CBM
+&gt; library does what I described:  When the first file, on a particular mass
+&gt; storage unit, is openned, the library opens a status file, too.  It keeps
+&gt; that status file open until all files, on that unit, have been closed.  The
+&gt; library does that separately for each unit!  The ROM KERNAL has a limit of
+&gt; 10 open files; but, CC65's CBM library has a limit of 8!  And, that count can
+&gt; include stdin, stdout, and stderr.
+
+This is indeed an important and non-OT information. I haven't checked the docs but I believe it should be documented too. What I said was OT, was the purely CBM &quot;feature&quot; that messes with data files whenever one closes status channel. As Spiro mentioned: opening status channel is a NOOP on the drive but closing it... uh-oh.. ;-)
+
+-- 
+SD!----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Jan 10 11:59:30 2013</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11080.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] News for 2013"</a></li>
+<li><dfn>Previous message</dfn>: <a href="11078.html" title="Previous message in the list">Christian Grössler: "Re: [cc65] News for 2013"</a></li>
+<li><dfn>In reply to</dfn>: <a href="11073.html" title="Message to which this message replies">Greg King: "Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="11081.html" title="Next message in this discussion thread">Spiro Trikaliotis: "Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="11081.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#11079" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#11079" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#11079" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2013-01-10 11:59:34 CET
+</em></small></p>
+</body>
+</html>

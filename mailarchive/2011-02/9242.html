@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Modules with self modifyin</title>
+<meta name="Author" content="Gábor Lénárt (lgb1lgb.hu)" />
+<meta name="Subject" content="Re: [cc65] Modules with self modifying code" />
+<meta name="Date" content="2011-02-07" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Modules with self modifying code</h1>
+<!-- received="Mon Feb  7 09:26:59 2011" -->
+<!-- isoreceived="20110207082659" -->
+<!-- sent="Mon, 7 Feb 2011 09:26:51 +0100" -->
+<!-- isosent="20110207082651" -->
+<!-- name="Gábor Lénárt" -->
+<!-- email="lgb1lgb.hu" -->
+<!-- subject="Re: [cc65] Modules with self modifying code" -->
+<!-- id="20110207082651.GA16711@vega.lgb.hu" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="20110206193826.GC20545&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9243.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Assembler Option --listing&quot;">Next message</a> ]
+[ <a href="9241.html" title="Oliver Schmidt: &quot;Re: [cc65] Assembler Option --listing&quot;">Previous message</a> ]
+[ <a href="9233.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Modules with self modifying code&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9244.html" title="Oliver Schmidt: &quot;Re: [cc65] Modules with self modifying code&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Gábor Lénárt &lt;<a href="mailto:lgb1lgb.hu?Subject=Re:%20[cc65]%20Modules%20with%20self%20modifying%20code">lgb1lgb.hu</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-02-07 09:26:51</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+On Sun, Feb 06, 2011 at 08:38:26PM +0100, Ullrich von Bassewitz wrote:
+&gt; 
+&gt; Hi!
+&gt; 
+&gt; On Sun, Feb 06, 2011 at 04:49:56PM +0100, Oliver Schmidt wrote:
+&gt; &gt; And placing the smc code in the data segment as I suggested wouldn't
+&gt; &gt; cause any surprise even for those:
+&gt; 
+&gt; Ok, convinced. Let it be the data segment.
+
+As far as I see, these segment names and purposes are a bit confusing on
+6502 any way, these were designed for platforms where there is more hw level
+protection of segments like:
+
+non-executable + read only = RODATA
+non-executable + read-write = DATA or BSS (the difference: BSS is not stored
+  but initialized to zero on run-time)
+executable + read only = CODE (or called TEXT originally??)
+executable + read-write = (would be) SMC??
+
+I always felt, that in most cases a 6502 target does not need to be
+separated (at least not with &quot;default&quot; targets, for sure, some targets like
+an OS - though I am not sure with lunix - may need these), the only thing is
+writeable or not, so in theory there is even not so much 
+
+But if it's true, that we have not-so-much valid segment types (in the sense
+of 6502) then we could have even more one, the writable CODE segment, which
+would be the place for smc. The other solution would be the DATA segment,
+hmmm but then I can't clearly say why we mix two different things into one
+segment, then we can also say that RODATA and CODE is the same (read-only)
+so we don't need two separated segment for that either (it's fair if we can
+say that DATA is ok for - smc - code too ...)
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Feb  7 09:26:59 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9243.html" title="Next message in the list">silverdr1wfmh.org.pl: "Re: [cc65] Assembler Option --listing"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9241.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Assembler Option --listing"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9233.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Modules with self modifying code"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9244.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Modules with self modifying code"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9244.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Modules with self modifying code"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9246.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Modules with self modifying code"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9242" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9242" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9242" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-02-07 09:27:04 CET
+</em></small></p>
+</body>
+</html>

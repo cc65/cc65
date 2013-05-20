@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] C128 Bank Switching and cc</title>
+<meta name="Author" content="Chiron Bramberger (chiron1bramberger.com)" />
+<meta name="Subject" content="Re: [cc65] C128 Bank Switching and cc65" />
+<meta name="Date" content="2010-05-06" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] C128 Bank Switching and cc65</h1>
+<!-- received="Thu May  6 09:32:27 2010" -->
+<!-- isoreceived="20100506073227" -->
+<!-- sent="Thu, 6 May 2010 03:32:16 -0400" -->
+<!-- isosent="20100506073216" -->
+<!-- name="Chiron Bramberger" -->
+<!-- email="chiron1bramberger.com" -->
+<!-- subject="Re: [cc65] C128 Bank Switching and cc65" -->
+<!-- id="6CA087A8-4F7A-495F-A511-3531525532E2@bramberger.com" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="l2s1adf4c761005041730o5462cbcas9fd0339ce4616329&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8361.html" title="Mark J. Reed: &quot;Re: [cc65] C128 Bank Switching and cc65&quot;">Next message</a> ]
+[ <a href="8359.html" title="Chiron Bramberger: &quot;[cc65] - object oriented style&quot;">Previous message</a> ]
+[ <a href="8346.html" title="Payton Byrd: &quot;[cc65] C128 Bank Switching and cc65&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8361.html" title="Mark J. Reed: &quot;Re: [cc65] C128 Bank Switching and cc65&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Chiron Bramberger &lt;<a href="mailto:chiron1bramberger.com?Subject=Re:%20[cc65]%20C128%20Bank%20Switching%20and%20cc65">chiron1bramberger.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-05-06 09:32:16</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Okay, this is just a random thought, but could you create a piece  
+table in code, which tracks each listing added to the list, and the  
+changes to the list as the user traverses it and changes are made,  
+and then links to a cache area of memory where you keep a handful of  
+filenames in a linked list. So you've got a chunk of your list as a  
+cache, just enough to display the current screen, and the rest of the  
+listing is in a file on disk, which is where your piece table points to.
+
+Sorry, I'm doing a horrible job explaining this.
+
+Okay, it's like a text editor using a piece table. There a table of  
+value for chucks of text. When you open a file with text, the piece  
+table has an entry, start of file to end of file. Then, when the user  
+types an extra line of text, the actual text typed in gets written to  
+a file, a cache file if you will. An entry is added to the piece  
+table contain the start and stop points to the text that was written  
+to the cache file. Thereafter, every change, or delete, or insertion,  
+is made up of changes to a piece table, which holds the start and  
+stop points for blocks of text in the original file and the file that  
+contains blocks of text the user has typed during their session. The  
+screen display only has to load and render the currently viewed  
+section of the document. The document itself is unlimited in file  
+size, but you only need enough actual system memory for the piece  
+table. ALL the text is stored in 2 files. As the user types, the  
+second file gets bigger and bigger. When the user saves the file, the  
+piece table is used to assemble a new third file which then  
+overwrites the original file.
+
+So, you could treat your direction listing in the same way. Write out  
+a text file of all the filenames in a directory. Then use your piece  
+table to record the order of the files. When a new file is saved, you  
+add the new file's filename text to your temp file. Your piece table  
+gets an entry for the new file, so your directory generator function  
+knows about it (and the piece table could track the date or other  
+order data). When you delete a file, you don't re-write the output  
+filename file, you just add an entry in your piece table to NOT  
+display this file as it doesn't exist anymore.
+
+So, the on memory you need, is the piece table, and perhaps a cache  
+of it, or instead a screen buffer. Then, as the user scrolls through  
+the very long list, you use the piece table to determine what  
+filenames' text you need to load into the display. In theory, and  
+unless my nighttime vitamins was made my brain and writing all wonky,  
+I think this should support an unlimited number of filenames, without  
+ever using more than either a screenbuffer worth of memory, or a  
+cache file that contains a block of filenames kind of around where  
+the user is looking, so that scrolling up and down over the same 2  
+areas back and forth doesn't hit the disk over and over again.
+
+Here's a great walk through of someone making their own text editor  
+using piece tables
+<a href="http://www.catch22.net/book/export/html/14">http://www.catch22.net/book/export/html/14</a>
+
+I have designed my own text editor using piece tables for the  
+Commodore PET, but I haven't started writing it yet. I worked out on  
+paper all the modules and buffers and everything, I just need to do  
+it. :)  Maybe when I'm not busy with PetSynth synths and FlytrapGear  
+guitar pedal circuits, haha !
+
+Sorry so long! I hope I didn't ramble too much!
+-Chiron
+
+
+On 4-May-10, at 8:30 PM, Payton Byrd wrote:
+
+OK, I'm at the point where the 128 version of my program is simply  
+running out of RAM and is incapable of storing large directories any  
+longer.  The executable code is around 17.3K and I don't know how to  
+tell the running size, but I can tell you that another 2000 bytes are  
+consumed by the VIC screen buffers.  I'm looking for suggestions on  
+how to free up some RAM or how to use banking intelligently with cc65.
+
+I see from the C128 PRG that it's possible to setup 16K of RAM that  
+is &quot;shared&quot; between both 64K banks of RAM; in other words a write to  
+the &quot;shared&quot; memory results in the same data being available when  
+using either bank 0 or bank 1 of RAM within the &quot;shared&quot; memory  
+areas.  I'm wondering if the linker can be configured to write  
+specific segments of C code into the shared memory which would allow  
+me to  have two 48K blocks to work with for data instead of a single  
+48K block (which has to include VIC, IO blocks and the kernel).
+
+Another question I have is whether or not the default C128 memory  
+setup used by ld65 disables the BASIC ROM and frees that memory up  
+for RAM.  the BASIC ROM for the 128 is HUGE compared to the 64 and I  
+don't need it!  Likewise, does the default C64 memory setup used by  
+ld65 disable the BASIC ROM?
+
+Finally, and this has nothing to do with banking, is it possible to  
+have a specific array be allocated to a specific memory location?  I  
+would like to be able to memcopy the VIC's screen from one page in  
+the 16K allocated to the VIC to another page in the 16K allocated to  
+the VIC.  This would free up 1000 bytes of main memory for me.  If I  
+could also do this with the color map then that would free up another  
+1000 bytes of main memory for me.
+
+Thanks again to everyone for the their help the last couple of  
+weeks.  This project would not be anywhere near the state it's in  
+without your help.
+-- 
+Payton Byrd
+&lt;<a href="http://www.paytonbyrd.com">http://www.paytonbyrd.com</a>&gt;
+&lt;<a href="http://it.toolbox.com/blogs/paytonbyrd">http://it.toolbox.com/blogs/paytonbyrd</a>&gt;
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu May  6 09:32:27 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8361.html" title="Next message in the list">Mark J. Reed: "Re: [cc65] C128 Bank Switching and cc65"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8359.html" title="Previous message in the list">Chiron Bramberger: "[cc65] - object oriented style"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8346.html" title="Message to which this message replies">Payton Byrd: "[cc65] C128 Bank Switching and cc65"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8361.html" title="Next message in this discussion thread">Mark J. Reed: "Re: [cc65] C128 Bank Switching and cc65"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8361.html" title="Message sent in reply to this message">Mark J. Reed: "Re: [cc65] C128 Bank Switching and cc65"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8362.html" title="Message sent in reply to this message">Payton Byrd: "Re: [cc65] C128 Bank Switching and cc65"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8360" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8360" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8360" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-05-06 09:32:30 CEST
+</em></small></p>
+</body>
+</html>

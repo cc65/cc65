@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] c64 question</title>
+<meta name="Author" content="Arvid Norberg (c99ang_at_cs.umu.se)">
+<meta name="Subject" content="[cc65] c64 question">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] c64 question</h1>
+<!-- received="Tue Mar  6 11:17:40 2001" -->
+<!-- isoreceived="20010306101740" -->
+<!-- sent="Tue, 06 Mar 2001 11:17:25 GMT" -->
+<!-- isosent="20010306111725" -->
+<!-- name="Arvid Norberg" -->
+<!-- email="c99ang_at_cs.umu.se" -->
+<!-- subject="[cc65] c64 question" -->
+<!-- id="200103061017.LAA24895@mail.umu.se" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Arvid Norberg (<a href="mailto:c99ang_at_cs.umu.se?Subject=Re:%20[cc65]%20c64%20question"><em>c99ang_at_cs.umu.se</em></a>)<br>
+<strong>Date:</strong> 2001-03-06 12:17:25
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0433.html">Adam Dunkels: "Re: [cc65] c64 question"</a>
+<li><strong>Previous message:</strong> <a href="0431.html">Ullrich von Bassewitz: "Re: [cc65] Simple PEEK &amp; POKE question."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0433.html">Adam Dunkels: "Re: [cc65] c64 question"</a>
+<li><strong>Reply:</strong> <a href="0433.html">Adam Dunkels: "Re: [cc65] c64 question"</a>
+<li><strong>Reply:</strong> <a href="0434.html">groepaz: "Re: [cc65] c64 question"</a>
+<li><strong>Reply:</strong> <a href="0435.html">Michael Pfeiffer: "Re: [cc65] c64 question"</a>
+<li><strong>Reply:</strong> <a href="0436.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<li><strong>Maybe reply:</strong> <a href="0437.html">Arvid Norberg: "Re: [cc65] c64 question"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello,
+
+I'm sorry to a post computer-specific question here, but you guys are 
+my last hope.. ;)
+
+What I'm trying to do is to scroll the lines 100 through 150 by using a 
+raster-interrupt (two actually). But I can't get it to work.
+
+My questions are:
+
+What am I missing? why doesn't it work the way I want it to?
+If I want to make a function that ends with an &quot;rti&quot; instead of &quot;rts&quot;, 
+is there a keyword/modifier in cc65 that does that to a function?
+in some compilers you can to write:
+
+interrupt void IRQ_handler(void)
+{
+	...
+}
+
+ok then, here's the source:
+-------------------
+
+#include &lt;c64.h&gt;
+#include &lt;6502.h&gt;
+
+#define irq_vector (*(void**)0x314)
+
+void IRQ_handler_bottom();
+void IRQ_handler_top();
+void main();
+
+void IRQ_handler_top()
+{
+	if (VIC.irr &amp; 1) // make sure we got a raster interrupt
+	{
+		static unsigned char a = 0;
+		a = (a + 1) &amp; 7; // increase the scroll-counter
+
+		// select 38 column mode and scroll this part of the screen 'a' 
+pixels
+		VIC.ctrl2 = a;
+
+		// let the next interrupt handler get executed on line 150
+		irq_vector = IRQ_handler_bottom;
+		VIC.rasterline = 150;
+		
+		// tell the VIC-chip that we have handled the interrupt
+		VIC.irr &amp;= ~1;
+	}
+
+	// jump to the standard interrupt routine
+	__asm__(&quot;	jmp	$ea31&quot;);
+}
+
+void IRQ_handler_bottom()
+{
+	if (VIC.irr &amp; 1) // make sure we got a raster interrupt
+	{
+		// select 40 columns mode and 
+		VIC.ctrl2 = 0x8;
+
+		// let the first interrupt handler get executed on line 100
+		irq_vector = IRQ_handler_top;
+		VIC.rasterline = 100;
+
+		// tell the VIC-chip that we have handled the interrupt
+		VIC.irr &amp;= ~1;
+	}
+
+	// jump to the standard interrupt routine
+	__asm__(&quot;	jmp	$ea31&quot;);
+}
+
+
+void main()
+{
+	SEI(); // make sure we don't get an interrupt while we are setting 
+up our own
+	
+	irq_vector = IRQ_handler_top;
+
+	CIA1.icr = 0x7f;
+	VIC.imr = 1;			// enable raster IRQ
+	VIC.rasterline = 100;	// the line where we want to get an 
+interrupt
+
+	CLI(); // enable interrupts again
+
+	while (1); // just wait here
+}
+
+
+---
+Arvid Norberg
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20c64%20question">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0433.html">Adam Dunkels: "Re: [cc65] c64 question"</a>
+<li><strong>Previous message:</strong> <a href="0431.html">Ullrich von Bassewitz: "Re: [cc65] Simple PEEK &amp; POKE question."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0433.html">Adam Dunkels: "Re: [cc65] c64 question"</a>
+<li><strong>Reply:</strong> <a href="0433.html">Adam Dunkels: "Re: [cc65] c64 question"</a>
+<li><strong>Reply:</strong> <a href="0434.html">groepaz: "Re: [cc65] c64 question"</a>
+<li><strong>Reply:</strong> <a href="0435.html">Michael Pfeiffer: "Re: [cc65] c64 question"</a>
+<li><strong>Reply:</strong> <a href="0436.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<li><strong>Maybe reply:</strong> <a href="0437.html">Arvid Norberg: "Re: [cc65] c64 question"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:39 CET</em>
+</em>
+</small>
+</body>
+</html>

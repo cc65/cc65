@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] cbm_dir.c patch</title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="[cc65] cbm_dir.c patch" />
+<meta name="Date" content="2011-04-07" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] cbm_dir.c patch</h1>
+<!-- received="Thu Apr  7 01:58:25 2011" -->
+<!-- isoreceived="20110406235825" -->
+<!-- sent="Thu, 7 Apr 2011 01:57:33 +0200" -->
+<!-- isosent="20110406235733" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="[cc65] cbm_dir.c patch" -->
+<!-- id="201104070157.33905.groepaz@gmx.net" -->
+<!-- charset="utf-8" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9330.html" title="Greg King: &quot;Re: [cc65] cbm_dir.c patch&quot;">Next message</a> ]
+[ <a href="9328.html" title="Vladimir Jankovic: &quot;Re: [cc65] IDE support within Eclipse&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9330.html" title="Greg King: &quot;Re: [cc65] cbm_dir.c patch&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20cbm_dir.c%20patch">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-04-07 01:57:33</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Index: libsrc/cbm/cbm_dir.c
+===================================================================
+--- libsrc/cbm/cbm_dir.c        (Revision 4974)
++++ libsrc/cbm/cbm_dir.c        (Arbeitskopie)
+&#64;&#64; -34,15 +34,13 &#64;&#64;
+     return status;
+ }
+ 
+-
+-
+ unsigned char __fastcall__ cbm_readdir (unsigned char lfn, register struct 
+cbm_dirent* l_dirent)
+ {
+     unsigned char byte, i;
+     unsigned char rv;
+     unsigned char is_header;
+     static const unsigned char types[] = {
+-        CBM_T_OTHER, CBM_T_OTHER, CBM_T_CBM,   CBM_T_DIR,   /* a b c d */
++        CBM_T_OTHER, CBM_T_OTHER, CBM_T_CBM,   CBM_T_DEL,   /* a b c d */
+         CBM_T_OTHER, CBM_T_OTHER, CBM_T_OTHER, CBM_T_OTHER, /* e f g h */
+         CBM_T_OTHER, CBM_T_OTHER, CBM_T_OTHER, CBM_T_OTHER, /* i j k l */
+         CBM_T_OTHER, CBM_T_OTHER, CBM_T_OTHER, CBM_T_PRG,   /* m n o p */
+&#64;&#64; -120,8 +118,10 &#64;&#64;
+                     l_dirent-&gt;type = CBM_T_OTHER;
+                 }
+ 
++                if ((cbm_k_basin() == 'i') &amp;&amp; (l_dirent-&gt;type == CBM_T_DEL)) 
+{
++                    l_dirent-&gt;type = CBM_T_DIR;
++                }
+                 cbm_k_basin();
+-                cbm_k_basin();
+ 
+                 byte = cbm_k_basin();
+
+this will fix the problem that DEL files would appear as type DIR, which is 
+quite annoying at best =P
+
+-- 
+
+<a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    <a href="http://magicdisk.untergrund.net">http://magicdisk.untergrund.net</a>
+<a href="http://www.pokefinder.org">http://www.pokefinder.org</a>        <a href="http://ftp.pokefinder.org">http://ftp.pokefinder.org</a>
+
+Chilli ohne Ratten ist wie Döner ohne Sperma
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Apr  7 01:58:25 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9330.html" title="Next message in the list">Greg King: "Re: [cc65] cbm_dir.c patch"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9328.html" title="Previous message in the list">Vladimir Jankovic: "Re: [cc65] IDE support within Eclipse"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9330.html" title="Next message in this discussion thread">Greg King: "Re: [cc65] cbm_dir.c patch"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9330.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] cbm_dir.c patch"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9332.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] cbm_dir.c patch"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9329" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9329" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9329" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-04-07 01:58:29 CEST
+</em></small></p>
+</body>
+</html>

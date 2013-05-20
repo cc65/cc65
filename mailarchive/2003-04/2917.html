@@ -1,0 +1,234 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Lynx target</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Lynx target">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Lynx target</h1>
+<!-- received="Mon Apr 28 19:45:29 2003" -->
+<!-- isoreceived="20030428174529" -->
+<!-- sent="Mon, 28 Apr 2003 19:45:24 +0200" -->
+<!-- isosent="20030428174524" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Lynx target" -->
+<!-- id="20030428174524.GB5909@trixie.musoftware.de" -->
+<!-- inreplyto="200304281839.00071.groepaz@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Lynx%20target"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-04-28 19:45:24
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2916.html">Ullrich von Bassewitz: "Re: [cc65] Lynx target"</a>
+<li><strong>In reply to:</strong> <a href="2915.html">Groepaz: "Re: [cc65] Lynx target"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2920.html">Groepaz: "Re: [cc65] Lynx target"</a>
+<li><strong>Reply:</strong> <a href="2920.html">Groepaz: "Re: [cc65] Lynx target"</a>
+<li><strong>Reply:</strong> <a href="2921.html">Adam Dunkels: "Re: [cc65] Lynx target"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Mon, Apr 28, 2003 at 06:39:00PM +0200, Groepaz wrote:
+&gt; as for the dual drives...well, this can not be the reason for not doing things
+&gt; like i said above :) invent something to handle cbm dual drives then, dont
+&gt; pollute the whole thing with this rather exceptional stuff :) (the same is
+&gt; true for stuff like handling subdirectories...if its machine dependend, its
+&gt; not very useful IMHO)
+
+As I said, my original idea was to use drive:filename, so I could live with
+that. Unfortunately, the CBM drives do *require* a drive number (the internal
+one), at least according to my docs. Otherwise two data channels are allocated
+instead of one, which limits the number of files that can be open at once.
+This is even true for single disk drives, because the ROMs are derived from
+the dual disk drive versions.
+
+&gt; mmmh yeah well...it would limit the thing somewhat though. (not for newly
+&gt; written code, but for porting existing code that uses write() it would
+&gt; eventually add lotta extra work)
+
+But the drawbacks (rewriting the POSIX low level stuff for all platforms) are
+far worse than having the advantage of being able to port programs that use
+write() to use a ramdisk. write() is not even standard C, this would be a good
+excuse for not supporting ram disks on this level:-)
+
+&gt; could this be made somewhat universal then ? (ie, have irq-loader for 1541,
+&gt; ram-disc and maybe a /dev/ttyS0 ? :o))
+
+If we decide to apply a special meanings to the names passed to fopen(),
+anything is possible. I would suggest using numerical drive numbers (I've
+already hated the A:, B:, C: stuff in DOS derived operating systems), and
+reserve drive numbers &gt; 128 for virtual drives - or something similar.
+
+&gt; (for example
+&gt; reading a character from screen is not possible, thats why my cpeekchar stuff
+&gt; :=)).
+
+This, and scrolling of rectangular areas are two possible extensions. Maybe
+later...
+
+&gt; that problem with file i/o would be another thing like this.....as it
+&gt; is, its just not possible to for example use an irq or fastloader (which you
+&gt; really want to do when writing a serious game for example)... thats the only
+&gt; reason for suggesting all this, preventing future hackery :)
+
+It is, in one way, dangerous to have too many ideas. There must be a balance
+between your ideas, and your ability to implement them. Having too many ideas,
+you will run into danger, never to implement something usable, because what
+you are doing is always under construction. You will also run into danger to
+change your APIs so often, that no one is actually able to use them.
+
+Of course, not having any ideas isn't a good idea either:-)
+
+Since file I/O and the extended memory subsystem are brand new, and there is
+not a single program I've heard of, that uses the latter, I would suggest just
+to wait some time and see what people are actually doing. In my experience,
+this is a good way to learn what is really needed and to have all necessary
+features in an API while at the same time keep it as minimalistic as possible.
+
+&gt; well noone is is expecting YOU to do the work i guess :=)
+
+Yes. Maybe. But maybe not:-)
+
+&gt; i like this one too :o) btw if you'd just define the api and implement one of
+&gt; the drivers i am sure other people could convert other existing drivers
+&gt; easily....
+
+I've already started with the rewrite. The new header file is called
+&quot;serial.h&quot;, so for some time, the new API and the old one can coexist. The API
+and driver framework should be mostly complete, and I'm currently converting
+the C64 driver, so that there is a reference implementation. Existing code is
+in the snapshot source.
+
+[OUTTEXT]
+&gt; he :) i could add that, think i've even such a routine laying around
+&gt; (optimized for size and not for speed though i think, so it'll be rather
+&gt; slow). is the api defined in detail for that? i have to admit i didnt really
+&gt; look at that yet :=)
+
+The API is defined, at least in my head:-) OUTTEXT should output the text at
+the current cursor position, with the direction and magnification defined by
+tgi_textstyle. If you would like to have a look at it, just go ahead (and
+remember those tabs:-)
+
+&gt; as for that, since i am always working on/debugging/testing on real thing/etc
+&gt; the actual nes library stuff.... if you could just add the crt0 (and some
+&gt; solution for the heap thing :/) so i can continue working with that, then i
+&gt; could clean up one of the other files after the other and just send it
+&gt; over...
+
+Just download the snapshot sources, it's already in there.
+
+&gt; however... i wouldnt mind if such a (maybe more detailed) todo list would be
+&gt; available somewhere...maybe seperatily on the snapshot ftp or sth... some of
+&gt; the tasks really look like other ppl could also do them, if they only knew
+&gt; what to do :=)
+
+My experience with this is not very good, at least not outside a small circle
+of developers. Anyway, if someone is in desperate need for something to do the
+next weekend, here is a list out of my head:
+
+  * Documentation: The function reference is still very imcomplete. Adding
+    descriptions for more functions, short pieces of sample code or similar
+    would probably help more people to use cc65 successfully. When starting
+    your work, please be sure to change the right file (funcref.sgml).
+
+  * More documentation: Having some system specific documentation would be
+    nice. Such a documentation could explain the executable layout, the memory
+    setup for a specific machine, possible linker configurations for other
+    uses, features available (and not available), and a list of the machine
+    specific functions in the library.
+
+  * Drivers: APIs for loadable drivers exist for
+
+      - extended memory,
+
+      - graphics, and
+
+      - joysticks.
+
+    Maciej has written several drivers for VDC graphics (C128), there's one
+    driver for the C64 hires mode, most machines have standard joystick
+    drivers, and there is a wealth of extended memory drivers for several
+    Commodore machines. Apart from this, most machines are lacking driver
+    support. Something that should be rather easy to implement is a driver for
+    the C16 and Plus/4 in 320*200 mode, since this mode is almost identical to
+    the same mode on the C64. It should be possible to port the C64 driver
+    with not too many changes.
+
+  * dio (direct disk i/o) has been designed by Christian as a portable
+    interface for low level disk i/o. Unfortunately, there's still just an
+    implementation for the Atari. Having a dio implementation for the CBMs
+    would allow writing programs that access disk directly in C (manipulate
+    the directory and BAM for example).
+
+  * For most platforms, the ctype tables needed by the tolower/toupper/is...
+    functions are just copies of the ones for the Commodore machines. In
+    addition to that, the sources are old, and I didn't use symbolic constants
+    when writing the original Commodore one. Having ajusted tables for the
+    Apple, and Oric Atmos would be nice. Using the symbolic constants from
+    asminc/ctype.inc for better readability would be even nicer.
+
+There's more, but I need to get a beer now[1], since my mouth got dry from all
+the writing:-)
+
+Regards
+
+
+        Uz
+
+
+[1] &quot;Rothaus Tannenzäpfle&quot; - wohl bekomm's:-)
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Lynx%20target">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Lynx%20target">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2916.html">Ullrich von Bassewitz: "Re: [cc65] Lynx target"</a>
+<li><strong>In reply to:</strong> <a href="2915.html">Groepaz: "Re: [cc65] Lynx target"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2920.html">Groepaz: "Re: [cc65] Lynx target"</a>
+<li><strong>Reply:</strong> <a href="2920.html">Groepaz: "Re: [cc65] Lynx target"</a>
+<li><strong>Reply:</strong> <a href="2921.html">Adam Dunkels: "Re: [cc65] Lynx target"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-04-28 19:45:39 CEST</em>
+</em>
+</small>
+</body>
+</html>

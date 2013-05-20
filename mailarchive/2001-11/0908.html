@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] ca65 syntax problems</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] ca65 syntax problems">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] ca65 syntax problems</h1>
+<!-- received="Mon Nov  5 13:27:22 2001" -->
+<!-- isoreceived="20011105122722" -->
+<!-- sent="Sun, 4 Nov 2001 12:13:33 +0100" -->
+<!-- isosent="20011104111333" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] ca65 syntax problems" -->
+<!-- id="1028568214.20011104121333@gmx.net" -->
+<!-- inreplyto="20011105130508.A19966@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20ca65%20syntax%20problems"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2001-11-04 12:13:33
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0909.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<li><strong>Previous message:</strong> <a href="0907.html">Ullrich von Bassewitz: "Re: [cc65] putpixel"</a>
+<li><strong>In reply to:</strong> <a href="0906.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0909.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<li><strong>Reply:</strong> <a href="0909.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<li><strong>Reply:</strong> <a href="0911.html">MagerValp: "[cc65] Serial port API"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+UvB&gt; The problem with such an emulation is, that some features may not be emulated,
+UvB&gt; especially when it comes to things that are caused by the larger feature set
+UvB&gt; of the cc65 tool chain, like relocatable object code, which makes the .ORG
+UvB&gt; command work different. This means that such an emulation will never be
+UvB&gt; perfect and people may be disappointed.
+
+mmmh, i've 'emulated' the tasm-style &quot;*=$xxxx&quot; thing fine atleast....
+and seriously, i still want a traditional .org directive (thats one
+thing really missing in ca65 IMHO) ... its kinda annyoing to eg write
+drivecode embedded in your sources this way ;/
+
+UvB&gt; And it will of course mean even more
+UvB&gt; features which makes ca65 difficult to understand for newbies.
+
+hehe well, if THAT would be an issue, you gotta remove like 95% of all
+features i guess ;=P
+
+actually, the lack of certain features (traditional .org and
+prog-count assignment in particular) is what scares a lot of people i
+have talked to ....
+
+UvB&gt; But ok, I will have a look into this issue. Maybe I can find the narrow path
+UvB&gt; between simplicity and complexity...
+
+UvB&gt; BTW: Is there some sort of comparison sheet for the different assemblers?
+
+mmmh i have started one when i have translated some of my old sources
+to ca65..... its very incomplete/inaccurate by now i guess, but i can
+mail it over if you like.
+
+BTW... different thing... is there already some header file that
+defines an api for serial-port access? i have just recently made the
+serial routines for the silversurfer (serial port for use with the new
+retro-replay hardware) and since i am going to write some
+debugging-stub using that for cc65 anyway (atm its just pure asm) i'd
+be glad to do it in a way so other ppl can re-use those pieces of
+code.... however, if there's no api defined for now, mine looks like
+
+sio_init(portname,baudrate); /* init port, return 0 on success or -1
+on error) */
+sio_readbyte();              /* waits until character arrives and
+returns it */
+sio_readbyte_nowait();       /* if character is waiting, returns it.
+otherwhise return 0 */
+sio_writebyte(val);          /* send byte, waits until byte has been
+send */
+
+all routines incorporate a timeout, and they set the global variables
+sio_readerr and sio_writerr for further error-handling.
+
+hope thats ok that way (that would mean i could just copy/paste most
+of the code i am using under dos/windoze that is ;D)
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20ca65%20syntax%20problems">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20ca65%20syntax%20problems">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0909.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<li><strong>Previous message:</strong> <a href="0907.html">Ullrich von Bassewitz: "Re: [cc65] putpixel"</a>
+<li><strong>In reply to:</strong> <a href="0906.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0909.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<li><strong>Reply:</strong> <a href="0909.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<li><strong>Reply:</strong> <a href="0911.html">MagerValp: "[cc65] Serial port API"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:43 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] ca65html and anonymous lab</title>
+<meta name="Author" content="MagerValp (MagerValp1cling.gu.se)" />
+<meta name="Subject" content="Re: [cc65] ca65html and anonymous labels" />
+<meta name="Date" content="2006-09-22" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] ca65html and anonymous labels</h1>
+<!-- received="Fri Sep 22 00:16:35 2006" -->
+<!-- isoreceived="20060921221635" -->
+<!-- sent="Fri, 22 Sep 2006 00:16:22 +0200" -->
+<!-- isosent="20060921221622" -->
+<!-- name="MagerValp" -->
+<!-- email="MagerValp1cling.gu.se" -->
+<!-- subject="Re: [cc65] ca65html and anonymous labels" -->
+<!-- id="17683.3894.158460.185449@hal.cling.gu.se" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="20060921212232.GA21781&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5583.html" title="Raj Wurttemberg: &quot;[cc65] Read bytes (program load address) from a file?&quot;">Next message</a> ]
+[ <a href="5581.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65html and anonymous labels&quot;">Previous message</a> ]
+[ <a href="5581.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65html and anonymous labels&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="../2007-08/5833.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65html and anonymous labels&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: MagerValp &lt;<a href="mailto:MagerValp1cling.gu.se?Subject=Re:%20[cc65]%20ca65html%20and%20anonymous%20labels">MagerValp1cling.gu.se</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2006-09-22 00:16:22</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt;&gt;&gt;&gt;&gt; &quot;UvB&quot; == Ullrich von Bassewitz &lt;uz&#64;musoftware&#46;<!--nospam-->de&gt; writes:
+
+MV&gt; ca65html incorrectly parses
+MV&gt; 
+MV&gt; bne :-
+MV&gt; 
+MV&gt; as a label named &quot;bne&quot;. ca65 apparently allows whitespace around
+MV&gt; the label name, and the ca65html regexp is a little too greedy. As
+MV&gt; I don't use that particular feature myself (does anyone?), I
+MV&gt; hacked the regexp to only allow spaces before =, and not before :.
+
+UvB&gt; There must be a better solution (only accept the ':' if it is not
+UvB&gt; followed by '+' or '-').
+
+Probably, this was just a quick hack to get it to handle my sources.
+There's actually another false positive now, label:= value.
+
+I wasn't sure how to match something that isn't followed by a
+particular pattern, but google tells me:
+
+  (?!...)
+
+    This is a &quot;look ahead&quot; thing and always comes after some other
+    part of the regular expression. It means, match the stuff before
+    me only if it is not followed by &quot;...&quot;.
+
+Btw, would it be possible to add an option (in da65) that only
+includes referenced labels at the top? I'm including a full list of
+kernal labels in some disassemblies, and it would be handy if da65
+only kept those definitions that are referenced.
+
+MV&gt; I also made it output valid HTML 4.01 Strict + CSS when
+MV&gt; colorizing. Patch is here:
+MV&gt; 
+MV&gt; <a href="http://www.paradroid.net/tmp/ca65html.patch">http://www.paradroid.net/tmp/ca65html.patch</a>
+
+UvB&gt; Whow, nice work! Can I integrate this into the official version?
+
+Of course.
+
+I also thought about adding a few more classes (mnemonics, control
+commands, etc), but decided it was too much work. I won't complain if
+you add that though :)
+
+-- 
+    ___          .     .  .         .       . +  .         .      o   
+  _|___|_   +   .  +     .     +         .  Per Olofsson, arkadspelare
+    o-o    .      .     .   o         +          MagerValp&#64;cling&#46;<!--nospam-->gu.se
+     -       +            +    .     <a href="http://www.cling.gu.se/~cl3polof/">http://www.cling.gu.se/~cl3polof/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Sep 22 00:16:35 2006</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5583.html" title="Next message in the list">Raj Wurttemberg: "[cc65] Read bytes (program load address) from a file?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5581.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] ca65html and anonymous labels"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5581.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] ca65html and anonymous labels"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="../2007-08/5833.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] ca65html and anonymous labels"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="../2007-08/5833.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] ca65html and anonymous labels"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5582" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5582" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5582" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2006-09-22 00:16:37 CEST
+</em></small></p>
+</body>
+</html>

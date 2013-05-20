@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Target &quot;BBC&quot;</title>
+<meta name="Author" content="Shawn Jefferson (jefferson_shawn_a8bit1yahoo.com)" />
+<meta name="Subject" content="Re: [cc65] Target &quot;BBC&quot;" />
+<meta name="Date" content="2005-03-30" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Target &quot;BBC&quot;</h1>
+<!-- received="Wed Mar 30 22:34:43 2005" -->
+<!-- isoreceived="20050330203443" -->
+<!-- sent="Wed, 30 Mar 2005 12:34:40 -0800 (PST)" -->
+<!-- isosent="20050330203440" -->
+<!-- name="Shawn Jefferson" -->
+<!-- email="jefferson_shawn_a8bit1yahoo.com" -->
+<!-- subject="Re: [cc65] Target &quot;BBC&quot;" -->
+<!-- id="20050330203440.89198.qmail@web52210.mail.yahoo.com" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4871.html" title="Stephen Thomas: &quot;Re: [cc65] Target &quot;BBC&quot;&quot;">Next message</a> ]
+[ <a href="4869.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Target &quot;BBC&quot;&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Shawn Jefferson &lt;<a href="mailto:jefferson_shawn_a8bit1yahoo.com?Subject=Re:%20[cc65]%20Target%20&amp;quot;BBC&amp;quot;">jefferson_shawn_a8bit1yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-03-30 22:34:40</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>--- Stephen Thomas &lt;mail&#64;stephenthomas&#46;<!--nospam-->uklinux.net&gt; &gt;
+&gt; I've had to put it to one side for now. However, I
+&gt; had come to the
+&gt; conclusion that supporting the BBC might prove to be
+&gt; more awkward than
+&gt; it seems at first sight, because the base and end
+&gt; addresses of the
+&gt; program load area are essentially unknown until
+&gt; runtime - the screen
+&gt; sits at the top of RAM, taking a mode-dependent
+&gt; amount of memory, while
+&gt; the OS nabs memory from the lowest addresses - the
+&gt; precise amount
+&gt; depending on what filing systems are in use.
+
+The Atari 8-bit target behaves in a similiar way.  DOS
+usually takes up some low memory, and is dependent on
+the DOS.  The Atari linker config decides to start the
+program at $2E00 to avoid this area (as well as some
+additional room for any loaded drivers.)  It also has
+a variable high bound of memory address, that is
+pointed to by an OS variable.  The startup code uses
+this variable to determine where to put the C stack
+and the heap does something similiar (IIRC).
+
+I'm sure you can do something similiar for the BBC. 
+The beauty of the cc65 linker is that you can change
+addresses pretty easily to suit your own project.
+
+--
+Shawn Jefferson
+
+
+
+		
+__________________________________ 
+Do you Yahoo!? 
+Yahoo! Small Business - Try our new resources site!
+<a href="http://smallbusiness.yahoo.com/resources/">http://smallbusiness.yahoo.com/resources/</a> 
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Mar 30 22:34:43 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4871.html" title="Next message in the list">Stephen Thomas: "Re: [cc65] Target &quot;BBC&quot;"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4869.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Target &quot;BBC&quot;"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4870" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4870" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4870" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-03-30 22:34:49 CEST
+</em></small></p>
+</body>
+</html>

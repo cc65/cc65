@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Another ca65html tweak</title>
+<meta name="Author" content="MagerValp (MagerValp1cling.gu.se)" />
+<meta name="Subject" content="[cc65] Another ca65html tweak" />
+<meta name="Date" content="2006-10-12" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Another ca65html tweak</h1>
+<!-- received="Thu Oct 12 21:40:10 2006" -->
+<!-- isoreceived="20061012194010" -->
+<!-- sent="Thu, 12 Oct 2006 21:39:57 +0200" -->
+<!-- isosent="20061012193957" -->
+<!-- name="MagerValp" -->
+<!-- email="MagerValp1cling.gu.se" -->
+<!-- subject="[cc65] Another ca65html tweak" -->
+<!-- id="17710.39437.793259.749074@hal.cling.gu.se" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5602.html" title="Oliver Schmidt: &quot;Re: [cc65] ProDos 16?&quot;">Next message</a> ]
+[ <a href="5600.html" title="cdoty1rastersoft.net: &quot;[cc65] ProDos 16?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="../2007-02/5624.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Another ca65html tweak&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: MagerValp &lt;<a href="mailto:MagerValp1cling.gu.se?Subject=Re:%20[cc65]%20Another%20ca65html%20tweak">MagerValp1cling.gu.se</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2006-10-12 21:39:57</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I adjusted some of the regexps in ca65html again, to better detect
+labels, and to eliminate false positives where labels start with three
+characters matching an opcode:
+
+--- ca65html     2006-09-20 17:34:04.000000000 +0200
++++ ca65html     2006-10-12 21:31:54.000000000 +0200
+&#64;&#64; -430,7 +430,7 &#64;&#64;
+                chomp ($Line);
+
+                # Check for a label
+-               if ($Line =~ /^\s*(\&#64;?)([_a-zA-Z]\w*)(:|\s*=)/) {
++               if ($Line =~ /^\s*(\&#64;?)([_a-zA-Z]\w*)(:(?!=)|\s*:?=)/)
+                {
+
+            # Is this a local label?
+            if ($1 eq &quot;\&#64;&quot;) {
+&#64;&#64; -605,7 +605,7 &#64;&#64;
+
+                # Check for a label at the start of the line. If we
+                # have one, process
+         # it and remove it from the line
+-       if ($Line =~ s/^\s*?(\&#64;?)([_a-zA-Z]\w*)(:|\s*=)//) {
++       if ($Line =~ s/^\s*?(\&#64;?)([_a-zA-Z]\w*)(:(?!=)|\s*:?=)//) {
+
+            # Is this a local label?
+                    if ($1 eq &quot;\&#64;&quot;) {
+&#64;&#64; -873,7 +873,7 &#64;&#64;
+            $OutLine .= Cleanup ($Line);
+
+        # Check for instructions with labels
+-       } elsif ($Line =~ /^($LabelIns)(\s+)(.*)$/) {
++       } elsif ($Line =~ /^($LabelIns)\b(\s+)(.*)$/) {
+
+            # Print the instruction and white space
+             $OutLine .= ColorizeKeyword ($1) . $2;
+&#64;&#64; -902,7 +902,7 &#64;&#64;
+                    $OutLine .= $Operand;
+
+        # Check for all other instructions
+-       } elsif ($Line =~ /^($AllIns)(.*)$/) {
++       } elsif ($Line =~ /^($AllIns)\b(.*)$/) {
+
+            # Colorize and print
+             $OutLine .= ColorizeKeyword ($1) . Cleanup ($2);
+
+-- 
+    ___          .     .  .         .       . +  .         .      o   
+  _|___|_   +   .  +     .     +         .  Per Olofsson, arkadspelare
+    o-o    .      .     .   o         +          MagerValp&#64;cling&#46;<!--nospam-->gu.se
+     -       +            +    .     <a href="http://www.cling.gu.se/~cl3polof/">http://www.cling.gu.se/~cl3polof/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Oct 12 21:40:10 2006</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5602.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] ProDos 16?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5600.html" title="Previous message in the list">cdoty1rastersoft.net: "[cc65] ProDos 16?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="../2007-02/5624.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Another ca65html tweak"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="../2007-02/5624.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Another ca65html tweak"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="../2007-02/5627.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] Another ca65html tweak"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5601" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5601" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5601" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2006-10-12 21:40:15 CEST
+</em></small></p>
+</body>
+</html>

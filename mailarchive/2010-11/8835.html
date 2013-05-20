@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] ca65 for stand-alone asm p</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] ca65 for stand-alone asm projects" />
+<meta name="Date" content="2010-11-11" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] ca65 for stand-alone asm projects</h1>
+<!-- received="Thu Nov 11 15:24:01 2010" -->
+<!-- isoreceived="20101111142401" -->
+<!-- sent="Thu, 11 Nov 2010 15:23:54 +0100" -->
+<!-- isosent="20101111142354" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] ca65 for stand-alone asm projects" -->
+<!-- id="20101111142354.GA3618@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="00aa01cb8197$095373e0$f981e760&#64;monarch" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8836.html" title="Ullrich von Bassewitz: &quot;[cc65] Forced imports by linker config&quot;">Next message</a> ]
+[ <a href="8834.html" title="Greg King: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">Previous message</a> ]
+[ <a href="8834.html" title="Greg King: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+[ <a href="8808.html" title="Agent Friday: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20ca65%20for%20stand-alone%20asm%20projects">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-11-11 15:23:54</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Thu, Nov 11, 2010 at 05:47:13AM -0500, Greg King wrote:
+&gt; Some headers/trailers don't have any addresses in them that need to be
+&gt; relocated.  Therefore, any random start-address would work just as well
+&gt; as any other address.  There are situations where a programmer wouldn't
+&gt; care what the start address is; and, he wouldn't care about size-checks.
+&gt; He doesn't want to be forced to name things that are totally irrelevant
+&gt; to him.  There are values that are obvious defaults for those
+&gt; attributes:  If &quot;start=&quot; isn't there, then it would default to zero.  If
+&gt; &quot;size=&quot; isn't there, then it would default to the host compiler's
+&gt; maximum unsigned int value.
+
+While it is theoretically possible to construct a case where a memory area
+doesn't have relocatable data placed into it, this is quite rare. I don't
+think that it's the case with any of the existing C targets. Making &quot;start&quot;
+and &quot;size&quot; optional just for such a case and having errors going unnoticed in
+all others is a bad idea. What's the big deal with saying &quot;start=0
+size=0x10000&quot; if you don't need it?
+
+&gt; &gt; &gt; Since the non-loading file sections have no place in the o65 format,
+&gt; &gt; &gt; it seems you would need some such method to identify them.
+&gt; &gt;
+&gt; &gt; Not sure what you mean with that, either.
+&gt;
+&gt; He's talking about the headers and trailers (they're read, but not
+&gt; loaded into memory).
+
+If so, it's a misunderstanding. The MEMORY section is not about what's getting
+loaded. It is used to place code and data into memory (assign an address to
+it).
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Nov 11 15:24:01 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8836.html" title="Next message in the list">Ullrich von Bassewitz: "[cc65] Forced imports by linker config"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8834.html" title="Previous message in the list">Greg King: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8834.html" title="Message to which this message replies">Greg King: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8808.html" title="Next message in this discussion thread">Agent Friday: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8835" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8835" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8835" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-11-11 15:24:04 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] broken string arithmetic</title>
+<meta name="Author" content="MagerValp (MagerValp1cling.gu.se)" />
+<meta name="Subject" content="[cc65] broken string arithmetic" />
+<meta name="Date" content="2004-07-13" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] broken string arithmetic</h1>
+<!-- received="Tue Jul 13 17:13:55 2004" -->
+<!-- isoreceived="20040713151355" -->
+<!-- sent="Tue, 13 Jul 2004 17:13:52 +0200" -->
+<!-- isosent="20040713151352" -->
+<!-- name="MagerValp" -->
+<!-- email="MagerValp1cling.gu.se" -->
+<!-- subject="[cc65] broken string arithmetic" -->
+<!-- id="16627.64560.120716.771415@panini.cling.gu.se" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4220.html" title="MagerValp: &quot;Re: [cc65] broken string arithmetic&quot;">Next message</a> ]
+[ <a href="4218.html" title="Groepaz: &quot;Re: [cc65] DASM RORG?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4220.html" title="MagerValp: &quot;Re: [cc65] broken string arithmetic&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: MagerValp &lt;<a href="mailto:MagerValp1cling.gu.se?Subject=Re:%20[cc65]%20broken%20string%20arithmetic">MagerValp1cling.gu.se</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-07-13 17:13:52</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>This piece of broken code:
+
+&gt; void main(void) {
+&gt;   int len = 10;
+&gt;   unsigned char *str = &quot;xxxxxxxxxxxxxxxxxxxx&quot; + len - 20; // should be - len + 20
+&gt; 
+&gt;   puts(str);
+&gt; }
+
+produces the following compilation error with 2.10.0:
+
+&gt; Unresolved external `L0000' referenced in:
+&gt;   test.s(43)
+
+from test.s:
+
+&gt; .segment        &quot;RODATA&quot;
+&gt; 
+&gt; L0001:
+&gt;         .byte   $58,$58,$58,$58,$58,$58,$58,$58,$58,$58,$58,$58,$58,$58,$58,$58
+&gt;         .byte   $58,$58,$58,$58,$00
+
+and then
+
+&gt; ;
+&gt; ; unsigned char *str = &quot;xxxxxxxxxxxxxxxxxxxx&quot; + len - 20;
+&gt; ;
+&gt;         ldy     #$01
+&gt;         jsr     ldaxysp
+&gt;         clc
+&gt;         adc     #&lt;(L0000)
+&gt;         tay
+&gt;         txa
+&gt;         adc     #&gt;(L0000)
+&gt;         tax
+&gt;         tya
+&gt;         sec
+&gt;         sbc     #$14
+&gt;         bcs     L0005
+&gt;         dex
+&gt; L0005:  jsr     pushax
+
+The code's broken, and it worked fine once I fixed it, but I'd expect
+an invalid pointer rather than a compilation error.
+
+-- 
+    ___          .     .  .         .       . +  .         .      o   
+  _|___|_   +   .  +     .     +         .  Per Olofsson, arkadspelare
+    o-o    .      .     .   o         +          MagerValp&#64;cling&#46;<!--nospam-->gu.se
+     -       +            +    .     <a href="http://www.cling.gu.se/~cl3polof/">http://www.cling.gu.se/~cl3polof/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Jul 13 17:13:55 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4220.html" title="Next message in the list">MagerValp: "Re: [cc65] broken string arithmetic"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4218.html" title="Previous message in the list">Groepaz: "Re: [cc65] DASM RORG?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4220.html" title="Next message in this discussion thread">MagerValp: "Re: [cc65] broken string arithmetic"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4220.html" title="Message sent in reply to this message">MagerValp: "Re: [cc65] broken string arithmetic"</a></li>
+<li><dfn>Reply</dfn>:  <a href="4244.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] broken string arithmetic"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4219" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4219" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4219" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-07-13 17:14:04 CEST
+</em></small></p>
+</body>
+</html>

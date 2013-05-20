@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Fwd: NESICIDE + VICE</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="Re: [cc65] Fwd: NESICIDE + VICE" />
+<meta name="Date" content="2012-04-13" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Fwd: NESICIDE + VICE</h1>
+<!-- received="Fri Apr 13 21:04:17 2012" -->
+<!-- isoreceived="20120413190417" -->
+<!-- sent="Fri, 13 Apr 2012 21:03:44 +0200" -->
+<!-- isosent="20120413190344" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="Re: [cc65] Fwd: NESICIDE + VICE" -->
+<!-- id="20120413190344.GT21067@trikaliotis.net" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="20120413182136.GB30535&#64;vega.lgb.hu" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10241.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Fwd: NESICIDE + VICE&quot;">Next message</a> ]
+[ <a href="10239.html" title="Gábor Lénárt: &quot;Re: [cc65] Fwd: NESICIDE + VICE&quot;">Previous message</a> ]
+[ <a href="10239.html" title="Gábor Lénárt: &quot;Re: [cc65] Fwd: NESICIDE + VICE&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10243.html" title="Chris Cureau: &quot;Re: [cc65] Fwd: NESICIDE + VICE&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20[cc65]%20Fwd:%20NESICIDE%20%2B%20VICE">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-04-13 21:03:44</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello Gábor,
+
+* On Fri, Apr 13, 2012 at 08:21:36PM +0200 Gábor Lénárt wrote:
+ 
+&gt; The binary memory transfer, you wrote about :) And in general: it seems
+&gt; monitor features of VICE evolving quickly recently, but hardly documents
+&gt; exist on it (at least AFAIK).
+
+Here is the documentation (at least, all that exists):
+
+21:55 &lt;&#64;s3cal&gt; cpow: Ready for the protocol description? ;)
+21:55 &lt;&#64;s3cal&gt; The binary remote monitor commands are injected into the &quot;normal&quot; commands&#46;<!--nospam-->
+21:55 &lt;&#64;s3cal&gt; The remote monitor detects a binary command because it starts with ASCII STX (0x02)
+21:56 &lt;&#64;s3cal&gt; After this, there is one byte telling the length of the command&#46;<!--nospam--> The next byte describes the command. Currently, only 0x01 is implemented which is &quot;memdump&quot;.
+21:56 &lt;&#64;s3cal&gt; Note that the command length byte (the one after STX) does *not* count the STX, the command length nor the command byte&#46;<!--nospam-->
+21:57 &lt;&#64;s3cal&gt; For the memdump command, the next bytes are as follows:
+21:57 &lt;&#64;s3cal&gt; 1&#46;<!--nospam--> start address low
+21:57 &lt;&#64;s3cal&gt; 2&#46;<!--nospam--> start address high
+21:57 &lt;&#64;s3cal&gt; 3&#46;<!--nospam--> end address low
+21:57 &lt;&#64;s3cal&gt; 4&#46;<!--nospam--> end address high
+21:57 &lt;&#64;s3cal&gt; 5&#46;<!--nospam--> memspace
+21:57 &lt;&#64;s3cal&gt; That's it&#46;<!--nospam-->
+21:57 &lt;&#64;s3cal&gt; The memspace describes which part of the computer you want to read:
+21:57 &lt;&#64;s3cal&gt; 0 --&gt; the computer (C64), 1 --&gt; drive 8, 2 --&gt; drive 9, 3 --&gt; drive 10, 4 --&gt; drive 11
+21:58 &lt;&#64;s3cal&gt; So, for a memdump of 0xa0fe to 0xa123, you have to issue the bytes (in this order):
+21:59 &lt; cpow&gt; ok thanks
+21:59 &lt;&#64;s3cal&gt; 0x02 (STX), 0x05 (command length), 0x01 (command: memdump), 0xfe (SA low), 0xa0 (SA high), 0x23 (EA low), 0xa1 (EA high), 0x00 (computer memspace)
+21:59 &lt;&#64;s3cal&gt; The answer looks as follows:
+21:59 &lt; cpow&gt; is there a termination character?
+21:59 &lt;&#64;s3cal&gt; No, no termination character&#46;<!--nospam--> The command length acts as synchronisation point.,
+22:00 &lt;&#64;s3cal&gt; Ok, comming to the answer:
+22:00 &lt;&#64;s3cal&gt; byte 0: STX (0x02)
+22:00 &lt;&#64;s3cal&gt; byte 1: answer length low
+22:00 &lt;&#64;s3cal&gt; byte 2: answer length (bits 8-15)
+22:00 &lt;&#64;s3cal&gt; byte 3: answer length (bits 16-23)
+22:00 &lt;&#64;s3cal&gt; byte 4: answer length (bits 24-31, that is, high)
+22:01 &lt;&#64;s3cal&gt; byte 5: error code
+22:01 &lt;&#64;s3cal&gt; byte 6 - (answer length+6): the binary answer
+[...]
+22:01 &lt;&#64;s3cal&gt; Error codes are currently:
+22:02 &lt;&#64;s3cal&gt; 0x00: ok, everything worked
+22:02 &lt;&#64;s3cal&gt; 0x80: command length is not long enough for this specific command
+22:02 &lt;&#64;s3cal&gt; 0x81: an invalid parameter occurred
+22:02 &lt;&#64;s3cal&gt; If an error stats but &quot;ok&quot; occurs, then VICE will output more details for the reason into its log&#46;<!--nospam-->
+[...]
+22:05 &lt;&#64;s3cal&gt; Ok&#46;<!--nospam--> Tell me about problems. It has not been tested extensively yet.
+22:06 &lt;&#64;s3cal&gt; (I am not completely sure if everything works when switching between binary and text commands, for example&#46;<!--nospam--> There might be some errors).
+
+
+There is nothing more currently. The code is in since 2012-04-01,
+r25520.
+
+Note, however, that after I wrote this, I left the VICE team. So, no
+further updates from me.
+
+In fact, I expect the code to be removed quite soon. It seems people did
+not like it, because of its prototype state. Hey, I came up with a quick
+and dirty solution to solve a problem and help Christopher - that's all.
+
+
+Regards,
+Spiro.
+
+-- 
+Spiro R. Trikaliotis
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Apr 13 21:04:17 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10241.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Fwd: NESICIDE + VICE"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10239.html" title="Previous message in the list">Gábor Lénárt: "Re: [cc65] Fwd: NESICIDE + VICE"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10239.html" title="Message to which this message replies">Gábor Lénárt: "Re: [cc65] Fwd: NESICIDE + VICE"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10243.html" title="Next message in this discussion thread">Chris Cureau: "Re: [cc65] Fwd: NESICIDE + VICE"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10243.html" title="Message sent in reply to this message">Chris Cureau: "Re: [cc65] Fwd: NESICIDE + VICE"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10240" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10240" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10240" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-04-13 21:04:20 CEST
+</em></small></p>
+</body>
+</html>

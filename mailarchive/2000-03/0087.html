@@ -1,0 +1,194 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] Atari crt0 update</title>
+<meta name="Author" content="Mark Keates (markk_at_dendrite.co.uk)">
+<meta name="Subject" content="[cc65] Atari crt0 update">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] Atari crt0 update</h1>
+<!-- received="Mon Mar 20 15:16:54 2000" -->
+<!-- isoreceived="20000320141654" -->
+<!-- sent="Mon, 20 Mar 2000 09:15:23 -0500" -->
+<!-- isosent="20000320141523" -->
+<!-- name="Mark Keates" -->
+<!-- email="markk_at_dendrite.co.uk" -->
+<!-- subject="[cc65] Atari crt0 update" -->
+<!-- id="D0A9DA72CDC1D211880A00A024C508E60E42B7@ARNIE" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Mark Keates (<a href="mailto:markk_at_dendrite.co.uk?Subject=Re:%20[cc65]%20Atari%20crt0%20update"><em>markk_at_dendrite.co.uk</em></a>)<br>
+<strong>Date:</strong> 2000-03-20 15:15:23
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0088.html">David Lloyd: "Re: [cc65] Atari crt0 update"</a>
+<li><strong>Previous message:</strong> <a href="0086.html">Mark Keates: "RE: [cc65] documentation"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0088.html">David Lloyd: "Re: [cc65] Atari crt0 update"</a>
+<li><strong>Reply:</strong> <a href="0088.html">David Lloyd: "Re: [cc65] Atari crt0 update"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Attached is an update to the Atari startup code. Also, the
+LD65 settings for the Atari can be changed to: (Thanks Chris!)
+
+static const char CfgAtari [] =
+    &quot;MEMORY {&quot;
+        &quot;HEADER: start = $0000, size = $6, file = %O;&quot;
+        &quot;RAM: start = $1F00, size = $6100, file = %O;&quot;
+    &quot;}&quot;
+    &quot;SEGMENTS {&quot;
+        &quot;EXEHDR: load = HEADER, type = wprot;&quot;
+        &quot;CODE: load = RAM, type = wprot, define = yes;&quot;
+        &quot;RODATA: load = RAM, type = wprot;&quot;
+        &quot;DATA: load = RAM, type = rw;&quot;
+        &quot;BSS: load = RAM, type = bss, define = yes;&quot;
+        &quot;AUTOSTRT: load = RAM, type = wprot;&quot;
+    &quot;}&quot;;
+
+Can you help me with the correct method of switching
+off Sprites. I've saved and restored GRACTL, SDMCTL 
+and GPRIOR but still they persist when returning to DOS.
+(I can send you the example if you request it privately)
+I don't want to just position them off screen, so what did
+I miss? Perhaps PMBASE?
+
+Regards,
+
+Mark
+
+ &lt;&lt;crt0.s&gt;&gt; 
+
+begin 600 crt0.s
+M.PT*.R!3=&amp;%R='5P(&amp;-O9&amp;4_at_9F]R(&amp;-C-C4@*$%405))('9E&lt;G-I;VXI#0H[
+M#0H[(%1H:7,@;75S=&quot;!B92!T:&amp;4@*F9I&lt;G-T*B!F:6QE(&amp;]N('1H92!L:6YK
+M97(@8V]M;6%N9&quot;!L:6YE#0H[#0H-&quot;@DN97AP;W)T&quot;0E?97AI=`T*(&quot;`@(&quot;`@
+M(`DN:6UP;W)T&quot;2`@(&quot;`@(&quot;`)7U]H:6YI=&quot;P@:6YI=&amp;-O;FEO+&quot;!Z97)O8G-S
+M+&quot;!P=7-H87_at_L(&amp;1O871E&gt;&amp;ET#0H)+FEM&lt;&amp;]R=`D)7VUA:6X-&quot;@DN:6UP;W)T
+M&quot;0E?7T-/1$5?3$]!1%]?+&quot;!?7T)34U],3T%$7U\-&quot;@D-&quot;@DN:6YC;'5D90DB
+M871A&lt;FDN:6YC(@T*#0H[(&quot;TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM
+M+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+0T*
+M.R!$969I;F4_at_86YD(&amp;5X&lt;&amp;]R=&quot;!T:&amp;4_at_6E`@=F%R:6%B;&amp;5S(&amp;9O&lt;B!T:&amp;4@
+M0S8T(')U;G1I;64-&quot;@T*&quot;2YE&gt;'!O&lt;G1Z&lt;&quot;`@(`ES&lt;&quot;P@&lt;W)E9RP@&lt;F5G&lt;V%V
+M90T*&quot;2YE&gt;'!O&lt;G1Z&lt;&quot;`@(`EP='(Q+&quot;!P='(R+&quot;!P='(S+&quot;!P='(T#0H)+F5X
+M&lt;&amp;]R='IP(&quot;`@&quot;71M&lt;#$L('1M&lt;#(L('1M&lt;#,L('1M&lt;#0-&quot;@DN97AP;W)T&gt;G`@
+M(&quot;`)9FYT96UP+&quot;!R96=B86YK+&quot;!Z&lt;'-P86-E#0H-&quot;@DN;W)G(&quot;0X,@T*&lt;W`Z
+M(&quot;`@(&quot;`)+G)E&lt;R`R(`D@(&quot;`@.R!S=&amp;%C:R!P;VEN=&amp;5R#0IS&lt;F5G._at_D)+G)E
+M&lt;R`R(`D@(&quot;`@.R!S96-O;F1A&lt;GD@&lt;F5G:7-T97(O:&amp;EG:&quot;`Q-B!B:70_at_9F]R
+M(&amp;QO;F=S#0IR96=S879E._at_DN&lt;F5S(#0@&quot;2`@(&quot;`[('-L;W0@=&amp;\@&lt;V%V92]R
+M97-T;W)E(&quot;A%*4%8(&amp;EN=&amp;\-&quot;G!T&lt;C$Z&quot;0DN&lt;F5S(#(@&quot;2`@(&quot;`[#0IP='(R
+M._at_D)+G)E&lt;R`R(`D@(&quot;`@.PT*&lt;'1R,SH)&quot;2YR97,@,B`)(&quot;`@(#L-&quot;G!T&lt;C0Z
+M&quot;0DN&lt;F5S(#(@&quot;2`@(&quot;`[#0IT;7`Q._at_D)+G)E&lt;R`Q(`D@(&quot;`@.PT*=&amp;UP,CH)
+M&quot;2YR97,@,2`)(&quot;`@(#L-&quot;G1M&lt;#,Z&quot;0DN&lt;F5S(#$@&quot;2`@(&quot;`[#0IT;7`T._at_D)
+M+G)E&lt;R`Q(`D@(&quot;`@.PT*9FYT96UP._at_D)+G)E&lt;R`R&quot;0D[('!O:6YT97(@=&amp;\@
+M9FEL92!N86UE#0IR96=B86YK._at_DN&lt;F5S(#8@&quot;2`@(&quot;`[(#8_at_8GET92!R96=I
+M&lt;W1E&lt;B!B86YK#0IZ&lt;'-P86-E&quot;0D](&quot;H@+2!S&lt;`D[(%IE&lt;F\@&lt;&amp;%G92!S&lt;&amp;%C
+M92!A;&amp;QO8V%T960-&quot;@T*.R`M+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM
+M+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2T-
+M&quot;CL_at_0D%324,@:&amp;5A9&amp;5R('=I=&amp;@@82!365,@8V%L;`T*#0H)+G-E9VUE;G0@
+M(D5814A$4B(-&quot;@DN=V]R9`DD1D9&amp;1_at_T*&quot;2YW;W)D&quot;5]?0T]$15],3T%$7U\-
+M&quot;@DN=V]R9`E?7T)34U],3T%$7U\@+2`Q#0H)+F-O9&amp;4-&quot;@DN&lt;F5L;V,-&quot;@D-
+M&quot;CL@+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM
+M+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM#0H[($%C='5A;&quot;!C;V1E
+M#0H-&quot;CL_at_4V%V92!T:&amp;4@&gt;F5R;R!P86=E(&amp;QO8V%T:6]N&lt;R!W92!N965D#0H-
+M&quot;@EL9'D)(WIP&lt;W!A8V4M,0T*3#$Z&quot;6QD80ES&lt;&quot;QY#0H@(&quot;`)&lt;W1A&quot;7IP&lt;V%V
+M92QY#0H)9&amp;5Y#0H@(&quot;`@(&quot;`@&quot;6)P;`E,,0T*#0H[($-L96%R('1H92!&quot;4U,@
+M9&amp;%T80T*#0H):G-R&quot;7IE&lt;F]B&lt;W,-&quot;@T*.R!3879E('-Y&lt;W1E;2!S='5F9B!A
+M;F0@&lt;V5T=7`@=&amp;AE('-T86-K#0H-&quot;B`@(&quot;`@(&quot;`)='-X#0H@(&quot;`@(&quot;`@&quot;7-T
+M&gt;&quot;`@(&quot;`)&lt;W!S879E#0H-&quot;@EL9&amp;$@(&quot;`@&quot;59$4TQ35`T*&quot;7-T80EO;&amp;1?9&amp;QI
+M#0H);&amp;1A&quot;59$4TQ35&quot;LQ#0H@(&quot;`@(&quot;`@&quot;7-T80EO;&amp;1?9&amp;QI*S$-&quot;@EL9&amp;$@
+M(&quot;`@&quot;5-$3%-43`T*&quot;7-T80EO;&amp;1?9&amp;QI&lt;W0-&quot;@EL9&amp;$)4T1,4U1,*S$-&quot;B`@
+M(&quot;`@(&quot;`)&lt;W1A&quot;6]L9%]D;&amp;ES=&quot;LQ#0H);&amp;1A(&quot;`@(`E65D),2TD-&quot;@ES=&amp;$)
+M;VQD7W9B:0T*&quot;6QD80E65D),2TDK,0T*(&quot;`@(&quot;`@(`ES=&amp;$);VQD7W9B:2LQ
+M#0H);&amp;1A(&quot;`@(`E65D),2T0-&quot;@ES=&amp;$);VQD7W9B9`T*&quot;6QD80E65D),2T0K
+M,0T*(&quot;`@(&quot;`@(`ES=&amp;$);VQD7W9B9&quot;LQ#0H);&amp;1A&quot;4=204-43`T*&quot;7-T82`@
+M(&quot;`);VQD7V=R80T*&quot;6QD82`@(&quot;`)4T1-0U1,#0H)&lt;W1A&quot;6]L9%]D;6$-&quot;@EL
+M9&amp;$)1U!224]2#0H@(&quot;`@(&quot;`@&quot;7-T80EO;&amp;1?&lt;')I;W(-&quot;@EL9&amp;$@(&quot;`@&quot;4-(
+M4E-%5`T*&quot;7-T80EO;&amp;1?&lt;V5T#0H);&amp;1A(&quot;`@(`E,34%21TX-&quot;@ES=&amp;$);VQD
+M7VQM87)G:6X-&quot;@EL9&amp;$@(&quot;`@&quot;5)-05)'3_at_T*&quot;7-T80EO;&amp;1?&lt;FUA&lt;F=I;@T*
+M#0H)3$19(&quot;,W#0I315154#$Z#0H)3$1!(%!#3TQ2,&quot;Q9#0H)4U1!(&amp;]L9%]C
+M;VQS+%D-&quot;@E$15D@#0H)0E!,(%-%5%50,0T*#0H);&amp;1A(&quot;`@(`DC/&quot;0X,#`P
+M#0H)&lt;W1A&quot;7-P#0H);&amp;1A&quot;2,^)#@P,#`-&quot;B`@(&quot;`@(&quot;`)&lt;W1A&quot;7-P*S$@(&quot;`)
+M&quot;3L_at_4V5T(&amp;%R9W5M96YT('-T86-K('!T&lt;@T*#0H[($EN:71I86QI&gt;F4@=&amp;AE
+M(&amp;AE87`-&quot;@T*&quot;6IS&lt;@E?7VAI;FET#0H-&quot;CL_at_26YI=&amp;EA;&amp;EZ92!C;VYI;R!S
+M='5F9_at_T*#0H):G-R&quot;6EN:71C;VYI;PT*#0H);&amp;1A&quot;2,D1D8-&quot;@ES=&amp;$)0TA2
+M#0H-&quot;CL_at_4&amp;%S&lt;R!A;B!E;7!T&gt;2!C;VUM86YD(&amp;QI;F4-&quot;@T*&quot;6QD82`@&quot;2,P
+M#0H)=&amp;%X#0H):G-R&quot;7!U&lt;VAA&gt;&quot;`)(&quot;`).R!A&lt;F=C#0H):G-R&quot;7!U&lt;VAA&gt;`D@
+M(`D[(&amp;%R9W8-&quot;@T*&quot;6QD&gt;0DC-`D@(`D[($%R9W5M96YT('-I&gt;F4-&quot;B`@(&quot;`@
+M(&quot;`):G-R(&quot;`@(`E?;6%I;@D@(`D[(&amp;-A;&amp;P@=&amp;AE('5S97)S(&amp;-O9&amp;4-&quot;@T*
+M.R!F86QL('1H&lt;G4@=&amp;\@97AI=&quot;XN+@T*#0I?97AI=#H):G-R&quot;61O871E&gt;&amp;ET
+M(&quot;`).R!C86QL(&amp;5X:70_at_9G5N8W1I;VYS#0H-&quot;@E,1$$)(S8-&quot;@EL9'@);VQD
+M7W9B:2LQ#0H);&amp;1Y&quot;6]L9%]V8FD-&quot;@E*4U()4T545D)6#0H)3$1!&quot;2,W#0H)
+M;&amp;1X&quot;6]L9%]V8F0K,0T*&quot;6QD&gt;0EO;&amp;1?=F)D#0H)2E-2&quot;5-%5%9&quot;5_at_T*&quot;6QD
+M82`@(&quot;`);VQD7V1L:0T*&quot;7-T80E61%-,4U0-&quot;@EL9&amp;$);VQD7V1L:2LQ#0H@
+M(&quot;`@(&quot;`@&quot;7-T80E61%-,4U0K,0T*&quot;6QD82`@(&quot;`);VQD7V1L:7-T#0H)&lt;W1A
+M&quot;5-$3%-43`T*&quot;6QD80EO;&amp;1?9&amp;QI&lt;W0K,0T*(&quot;`@(&quot;`@(`ES=&amp;$)4T1,4U1,
+M*S$-&quot;@EL9&amp;$@(&quot;`@&quot;6]L9%]G&lt;F$-&quot;@ES=&amp;$)1U)!0U1,#0H);&amp;1A&quot;6]L9%]P
+M&lt;FEO&lt;@T*(&quot;`@(&quot;`@(`ES=&amp;$)1U!224]2#0H);&amp;1A(&quot;`@(`EO;&amp;1?9&amp;UA#0H)
+M&lt;W1A&quot;5-$34-43`T*&quot;6QD82`@(&quot;`);VQD7W-E=`T*&quot;7-T80E#2%)3150-&quot;@EL
+M9&amp;$);VQD7VQM87)G:6X-&quot;@ES=&amp;$@(&quot;`@&quot;4Q-05)'3_at_T*&quot;6QD80EO;&amp;1?&lt;FUA
+M&lt;F=I;@T*&quot;7-T82`@(&quot;`)4DU!4D=.#0H);&amp;1A&quot;2,D1D8-&quot;@ES=&amp;$)0TA2#0H)
+M3$19(&quot;,W#0I315154#(Z#0H)3$1!(&amp;]L9%]C;VQS+%D-&quot;@E35$$@4$-/3%(P
+M+%D-&quot;@E$15D@#0H)0E!,(%-%5%50,@T*#0H);&amp;1X&quot;7-P&lt;V%V90T*&quot;71X&lt;PD@
+M(&quot;`)(&quot;`).R!297-T;W)E('-T86-K('!O:6YT97(-&quot;@T*.R!#;W!Y(&amp;)A8VL@
+M=&amp;AE('IE&lt;F\@&lt;&amp;%G92!S='5F9_at_D@(&quot;`-&quot;@T*&quot;6QD&gt;0DC&gt;G!S&lt;&amp;%C92TQ#0I,
+M,CH);&amp;1A&quot;7IP&lt;V%V92QY#0H)&lt;W1A&quot;7-P+'D-&quot;@ED97D-&quot;B`@(&quot;`@(&quot;`)8G!L
+M&quot;4PR#0H-&quot;CL_at_4F5S970@8VAA;F=E9&quot;!V96-T;W)S+&quot;!B86-K('1O(&amp;)A&lt;VEC
+M#0H-&quot;CL):FUP&quot;5=!4DU35_at_T*&quot;7)T&lt;PT*#0HN9&amp;%T80T*#0IZ&lt;'-A=F4Z&quot;2`@
+M(&quot;YR97,)&gt;G!S&lt;&amp;%C90T*#0HN8G-S#0H-&quot;G-P&lt;V%V93H@(&quot;`@(&quot;`N&lt;F5S(#$-
+M&quot;@T*;VQD7V1L:3H@(&quot;`@(&quot;YR97,@,@T*;VQD7V1L:7-T.B`@(&quot;YR97,@,@T*
+M;VQD7W9B:3H@(&quot;`@(&quot;YR97,@,@T*;VQD7W9B9#H@(&quot;`@(&quot;YR97,@,@T*;VQD
+M7V=R83H@(&quot;`@(&quot;YR97,@,0T*;VQD7V1M83H@(&quot;`@(&quot;YR97,@,0T*;VQD7W!R
+M:6]R.B`@(&quot;YR97,@,0T*;VQD7V-O;',Z(&quot;`@(&quot;YR97,@.`T*;VQD7W-E=#H@
+M(&quot;`@(&quot;YR97,@,0T*;VQD7W)M87)G:6XZ(&quot;YR97,@,0T*;VQD7VQM87)G:6XZ
+M(&quot;YR97,@,0T*#0H)+G-E9VUE;G0@(D%55$]35%)4(@T*&quot;2YW;W)D&quot;20P,D4P
+F#0H)+G=O&lt;F0))#`R13$-&quot;@DN=V]R9`E?7T-/1$5?3$]!1%]?#0H=
+`
+end
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Atari%20crt0%20update">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0088.html">David Lloyd: "Re: [cc65] Atari crt0 update"</a>
+<li><strong>Previous message:</strong> <a href="0086.html">Mark Keates: "RE: [cc65] documentation"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0088.html">David Lloyd: "Re: [cc65] Atari crt0 update"</a>
+<li><strong>Reply:</strong> <a href="0088.html">David Lloyd: "Re: [cc65] Atari crt0 update"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:36 CET</em>
+</em>
+</small>
+</body>
+</html>

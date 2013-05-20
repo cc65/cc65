@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] cl65 -t apple2 works, but </title>
+<meta name="Author" content="Scott Alfter (scott1alfter.us)" />
+<meta name="Subject" content="Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't" />
+<meta name="Date" content="2007-09-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't</h1>
+<!-- received="Mon Sep 10 01:14:02 2007" -->
+<!-- isoreceived="20070909231402" -->
+<!-- sent="Sun, 09 Sep 2007 16:13:45 -0700" -->
+<!-- isosent="20070909231345" -->
+<!-- name="Scott Alfter" -->
+<!-- email="scott1alfter.us" -->
+<!-- subject="Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't" -->
+<!-- id="46E47E29.1090008@alfter.us" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="200709092353.15934.mario-fetka&#64;gmx.at" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5864.html" title="Mario Fetka: &quot;Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't&quot;">Next message</a> ]
+[ <a href="5862.html" title="Mario Fetka: &quot;Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't&quot;">Previous message</a> ]
+[ <a href="5862.html" title="Mario Fetka: &quot;Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5864.html" title="Mario Fetka: &quot;Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Scott Alfter &lt;<a href="mailto:scott1alfter.us?Subject=Re:%20[cc65]%20cl65%20-t%20apple2%20works,%20but%20cl65%20-C%20apple2.cfg%20doesn't">scott1alfter.us</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-09-10 01:13:45</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Mario Fetka wrote:
+&gt; Am Sonntag, 9. September 2007 23:31:32 schrieb Scott Alfter:
+&gt;&gt; 2.11.0 is the latest version, right?  I'm using it under Linux (built
+&gt;&gt; manually, installed on Gentoo...saw a reference to an ebuild in the
+&gt;&gt; mailing-list archive, but it's now 404).
+&gt; 
+&gt; the ebuild is up to date now
+
+Is it at a different location than the one I tried a few hours ago?  The one I
+found in the archive was <a href="http://mars.arge.at/svn/n4g/trunk/linamh/">http://mars.arge.at/svn/n4g/trunk/linamh/</a>.
+
+In other news, I think I figured out what I might've been doing wrong.  Instead
+of doing the whole build process with one invocation of cl65, it looks like I
+should instead build the program piece by piece.  This works with the config
+file under /usr/share/doc/cc65, which I've copied to the project directory:
+
+cc65 -O hello.c
+ca65 hello.s
+ca65 text.s
+ld65 -C apple2.cfg *.o apple2enh.o apple2enh.lib
+
+This produces a binary identical to what's produced by this:
+
+cl65 -t apple2enh hello.c text.s
+
+As with the latter, the former produces no errors or warnings.  I can edit the
+config file to get rid of the header.  I can edit it to change the start
+address (moving it to $2000 and resaving the binary with type SYS instead of
+$00 creates a file that can be double-clicked from the Finder to launch, though
+it crashes to the Monitor when it exits...there's probably a ProDOS MLI call or
+something that can be hacked in at the end of main() to fix that).
+
+I can also build and load tgidemo, but it runs into a problem when it tries to
+load the TGI driver.  The driver apparently can't be linked into the binary,
+either:
+
+ld65: Error: File `a2e.hi.tgi' has unknown type
+
+Since the documentation for the Apple II libraries says file I/O isn't working
+yet, maybe this is to be expected.  Time to unpack the Apple II books so I can
+figure out what I need to do.  I might try redoing my beer-fridge controller
+software for the Apple II with cc65 first...it'd be an opportunity to get the
+1-Wire code tested and known to work, and it'd almost have to be faster than my
+current mix of BASIC and assembly (assembly for the 1-Wire primitives and a
+reimplementation of 40-column text mode in Hi-Res (so I can mix text and
+graphics), BASIC for the rest).
+
+Scott Alfter
+scott&#64;alfter&#46;<!--nospam-->us
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Sep 10 01:14:02 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5864.html" title="Next message in the list">Mario Fetka: "Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5862.html" title="Previous message in the list">Mario Fetka: "Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5862.html" title="Message to which this message replies">Mario Fetka: "Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5864.html" title="Next message in this discussion thread">Mario Fetka: "Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5864.html" title="Message sent in reply to this message">Mario Fetka: "Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't"</a></li>
+<li><dfn>Reply</dfn>:  <a href="5866.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5863" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5863" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5863" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-09-10 01:14:05 CEST
+</em></small></p>
+</body>
+</html>

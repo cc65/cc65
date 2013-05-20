@@ -1,0 +1,171 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] ca65</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="[cc65] ca65">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] ca65</h1>
+<!-- received="Tue Nov 26 14:03:06 2002" -->
+<!-- isoreceived="20021126130306" -->
+<!-- sent="Tue, 26 Nov 2002 14:03:05 +0100" -->
+<!-- isosent="20021126130305" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="[cc65] ca65" -->
+<!-- id="20021126130305.GB3553@trixie.musoftware.de" -->
+<!-- inreplyto="1D2B2C77C9CF964EB1331ABEB51562E101C0F1DC@ukntsvr2.uk.drte.com" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20ca65"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-11-26 14:03:05
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1800.html">MagerValp: "Re: [cc65] Inserting Assembly Routines"</a>
+<li><strong>In reply to:</strong> <a href="1797.html">Keates, Mark: "RE: [cc65] Inserting Assembly Routines"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1803.html">MagerValp: "Re: [cc65] ca65"</a>
+<li><strong>Reply:</strong> <a href="1803.html">MagerValp: "Re: [cc65] ca65"</a>
+<li><strong>Reply:</strong> <a href="1816.html">shubel, paul: "RE: [cc65] ca65"</a>
+<li><strong>Reply:</strong> <a href="1818.html">shubel, paul: "RE: [cc65] ca65"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Tue, Nov 26, 2002 at 05:40:19AM -0500, Keates, Mark wrote:
+&gt; Many of the developers on AtariAge
+&gt; (<a href="http://www.atariage.com/forums/index.php">http://www.atariage.com/forums/index.php</a>)
+&gt; seem to prefer XASM or TASM, probably because the CC65 suite is not
+&gt; out-of-the-box
+&gt; ready for the Atari consoles. I've not tried these myself to make a fair
+&gt; comparison
+&gt; but from what I see in their source listings they are close to MAC/65 which
+&gt; was
+&gt; a favourite of A8 developers.
+
+Please don't take my comments too serious. I just wanted to point out, that
+ca65 is playing in the top league when it comes to features. Most people don't
+realize this , because they know ca65 as &quot;the assembler that comes with the
+cc65 compiler&quot;.
+
+There are of course a lot more reasons for using an assembler: Some people are
+using an assembler because it's their own, others are used to a specific
+syntax, some are using the assembler they have used 20 years ago and like the
+retro feeling, and again others have lots of code that is written for even
+another assembler. For most people, the reasons for using an assembler have
+nothing to do with its features, and this is ok. It's all about having fun,
+isn't it? :-)
+
+&gt; For me, CA65 is the choice as I prefer the modular approach to developing,
+&gt; i.e. .s or .c to .o and then link, with makefiles controling the building
+&gt; of that which has changed.
+
+You can also use C like header files:
+
+---[fcntl.inc]---
+; Exported functions
+.global         _close
+.global         _open
+...
+; File mode constants
+O_RDONLY	= $01
+O_WRONLY	= $02
+O_RDWR		= $03
+O_CREAT		= $10
+...
+---[open.s]---
+.include        &quot;fcntl.inc&quot;
+
+.proc           _open   ; Will get exported because of the .global in fcntl.h
+...
+---[another.s]---
+.include        &quot;fcntl.inc&quot;
+...
+        lda     #&lt;O_RDONLY      ; from fcntl.h
+        ldx     #&gt;O_RDONLY
+        jsr     _open   ; Will get imported because of the .global in fcntl.h
+-----------------
+
+Using &quot;.global&quot; (or &quot;.globalzp&quot;) is like the &quot;extern&quot; directive in C: If such
+a symbol is encountered, it is exported, otherwise it is declared and marked
+as an import. So using .inc files (or whatever they are named) may be used to
+describe an interface to a module or a library, similar like a .h file does
+the same for C code.
+
+Another feature I do really like is the capability to store complete
+expression trees in the object file. For example, the startup code for the
+VIC20 generates the BASIC header like this:
+
+        .word   Head            ; Load address
+Head:   .word   @Next
+        .word   1000            ; Line number
+        .byte   $9E             ; SYS token
+        .byte   &lt;(((@Start / 1000) .mod 10) + $30)
+        .byte   &lt;(((@Start /  100) .mod 10) + $30)
+        .byte   &lt;(((@Start /   10) .mod 10) + $30)
+        .byte   &lt;(((@Start /    1) .mod 10) + $30)
+        .byte   $00             ; End of BASIC line
+@Next:  .word   0               ; BASIC end marker
+@Start:
+
+The actual address of the SYS call embedded in this BASIC header (the four
+complex expression lines) is calculated by the linker(!) depending on the
+start address of the module (which comes from the linker configuration).
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20ca65">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20ca65">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1800.html">MagerValp: "Re: [cc65] Inserting Assembly Routines"</a>
+<li><strong>In reply to:</strong> <a href="1797.html">Keates, Mark: "RE: [cc65] Inserting Assembly Routines"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1803.html">MagerValp: "Re: [cc65] ca65"</a>
+<li><strong>Reply:</strong> <a href="1803.html">MagerValp: "Re: [cc65] ca65"</a>
+<li><strong>Reply:</strong> <a href="1816.html">shubel, paul: "RE: [cc65] ca65"</a>
+<li><strong>Reply:</strong> <a href="1818.html">shubel, paul: "RE: [cc65] ca65"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-11-26 14:03:10 CET</em>
+</em>
+</small>
+</body>
+</html>

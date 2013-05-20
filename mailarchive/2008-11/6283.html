@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] C64 - how to use disk I/O?</title>
+<meta name="Author" content="Maspethrose71aol.com (Maspethrose71aol.com)" />
+<meta name="Subject" content="Re: [cc65] C64 - how to use disk I/O?" />
+<meta name="Date" content="2008-11-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] C64 - how to use disk I/O?</h1>
+<!-- received="Sat Nov 29 20:25:43 2008" -->
+<!-- isoreceived="20081129192543" -->
+<!-- sent="Sat, 29 Nov 2008 14:25:27 EST" -->
+<!-- isosent="20081129192527" -->
+<!-- name="Maspethrose71aol.com" -->
+<!-- email="Maspethrose71aol.com" -->
+<!-- subject="Re: [cc65] C64 - how to use disk I/O?" -->
+<!-- id="d02.4837d01e.3662f127@aol.com" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="[cc65] C64 - how to use disk I/O?" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="../2008-12/6284.html" title="Ullrich von Bassewitz: &quot;[cc65] cc65 under Windows Vista&quot;">Next message</a> ]
+[ <a href="6282.html" title="Andreas Koch: &quot;Re: [cc65] C64 - how to use disk I/O?&quot;">Previous message</a> ]
+[ <a href="6275.html" title="Adrian Siekierka: &quot;[cc65] C64 - how to use disk I/O?&quot;">Maybe in reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:Maspethrose71aol.com?Subject=Re:%20[cc65]%20C64%20-%20how%20to%20use%20disk%20I/O?">Maspethrose71aol.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-11-29 20:25:27</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Try reading a byte at a time using cbm_read() and ending the read when  
+cbm_read() returns 0.  Or, use cbm_read to read the maximum number of bytes  
+readable and use the returned value to state the size of used memory.  CBM  drives 
+don't record the exact size of a file.  Instead, they record the  number of 
+sectors that a file uses.  That is 254 bytes per sector plus 2  bytes to either 
+point to the next sector or record the number of bytes in the  last sector.
+**************Life should be easier. So should your homepage. Try the NEW 
+AOL.com. 
+(<a href="http://www.aol.com/?optin=new-dp&amp;icid=aolcom40vanity&amp;ncid=emlcntaolcom00000002">http://www.aol.com/?optin=new-dp&amp;icid=aolcom40vanity&amp;ncid=emlcntaolcom00000002</a>)
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Nov 29 20:25:43 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="../2008-12/6284.html" title="Next message in the list">Ullrich von Bassewitz: "[cc65] cc65 under Windows Vista"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6282.html" title="Previous message in the list">Andreas Koch: "Re: [cc65] C64 - how to use disk I/O?"</a></li>
+<li><dfn>Maybe in reply to</dfn>: <a href="6275.html" title="Message to which this message replies">Adrian Siekierka: "[cc65] C64 - how to use disk I/O?"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6283" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6283" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6283" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-11-29 20:25:45 CET
+</em></small></p>
+</body>
+</html>

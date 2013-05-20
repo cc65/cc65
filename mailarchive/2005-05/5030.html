@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Re: signals</title>
+<meta name="Author" content="Jonathan Graham Harston (jgh1arcade.demon.co.uk)" />
+<meta name="Subject" content="[cc65] Re: signals" />
+<meta name="Date" content="2005-05-30" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Re: signals</h1>
+<!-- received="Mon May 30 22:17:49 2005" -->
+<!-- isoreceived="20050530201749" -->
+<!-- sent="30 May 2005 15:04:59 +0100" -->
+<!-- isosent="20050530140459" -->
+<!-- name="Jonathan Graham Harston" -->
+<!-- email="jgh1arcade.demon.co.uk" -->
+<!-- subject="[cc65] Re: signals" -->
+<!-- id="050530155502@arcade.demon.co.uk" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5031.html" title="Jonathan Graham Harston: &quot;[cc65] Re: signals&quot;">Next message</a> ]
+[ <a href="5029.html" title="Oliver Schmidt: &quot;Re: [cc65] signals&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5038.html" title="dominic beesley: &quot;Re: [cc65] Re: signals&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Jonathan Graham Harston &lt;<a href="mailto:jgh1arcade.demon.co.uk?Subject=Re:%20[cc65]%20Re:%20signals">jgh1arcade.demon.co.uk</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-05-30 16:04:59</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt; Message-ID: &lt;4294A998.2010908&#64;brahms&#46;<!--nospam-->demon.co.uk&gt;
+ 
+dominic beesley &lt;dominic&#64;brahms&#46;<!--nospam-->demon.co.uk&gt; wrote:
+&gt; Some quick questions on signals, trying to get escape and
+&gt; error handling working for BBC...
+[snip]
+&gt; I want to override _sig_dfl for BBC micro so that it traps
+&gt; SIGINT and aborts to the OS when Escape is pressed and not
+&gt; captured. What is the best way of doing this? I don't want to move
+ 
+The best way is to not do this. The default action of Escape is to
+set a flag that the foreground program checks. The background (ie,
+the escape) should not bomb out on the foreground's behalf. The
+foreground may be halfway through a disk write!
+ 
+The foreground has to explicity check the escape flag if it wants
+to act upon it. BASIC does this between every statement. A BASIC
+statement itself is uninterruptable. Try:
+ 
+A$=STRING$(255,&quot;*&quot;)
+PRINT A$;A$;A$;A$;A$;A$;A$;A$;A$;A$;A$;A$;A$;A$;A$;A$;A$;A$
+ 
+and you will see that you cannot Escape from the PRINT statement,
+only prior to it and after it.
+ 
+A 'C' program compiles to a chunk of machine code, essentially
+what a single BASIC statement is. Effectively, BASIC's ':' and
+'eol' are effectively a &lt;if escape, generate error&gt; command. If
+you do not explicity do that yourself in any program you write,
+Escape is going to be ignored.
+ 
+Consider the machine code pseudo-code: [1]
+ 
+.label
+print &quot;hello&quot;
+goto labal
+ 
+This will go on forever until a reset. Compare this with: [2]
+ 
+.label
+print &quot;hello&quot;
+check escape
+if notset goto lebal
+ret
+ 
+This will loop as long as the escape state is not set. When escape
+is set, the loop terminates.
+ 
+BASIC checks the Escape flag and generates an &quot;Escape&quot; error. VIEW
+checks the Escape flag and toggles between Command and Editing.
+Repton checks the Escape flags and kills the current life.
+ 
+If you want to change away from the default action of escape, you
+should do some other /background/ action, such as setting a 'C'
+program variable. Something like:
+ 
+...
+signal(_sig_esc,my_esc());
+...
+ 
+my_esc()
+{ a_global_variable=1; }
+ 
+Remember, in 'C', you're effectively writing machine code, so
+*you* the programmer have to do the background checking that a
+higher-level language does for you. I would recommend you provide
+some library functions to check for and acknowledge Escape, so
+that you can do something like:
+ 
+for(;;) {
+  printf(&quot;Hello\n&quot;);
+  if(os_checkescape()) {
+    os_ackescape();
+    break;
+    }
+  }
+ 
+signalling a BRK (ie, a BBC error) is allowed to change the
+program flow, as a BRK on the BBC is a foreground action, the
+equivalent of BASIC's ON ERROR. With the appropriate code, you
+should be able to do something like this:
+ 
+main()
+{
+signal(_sig_brk, myerror());
+for(;;) {
+  printf(&quot;Hello\n&quot;);
+  if(os_checkescape()) { os_error(17, &quot;Escape&quot;); }
+  }
+}
+ 
+myerror()
+{
+os_report();
+main();
+}
+ 
+Remember, that the code that processes BRK must reset the
+language's stacks, otherwise each BRK pushes the program further
+and further into the stack.
+ 
+JGH
+ 
+[1]
+.label
+ldx #0
+.loop
+lda hello,x:jsr osasci:inx:cmp #13:bne loop
+jmp label
+.hello
+equs &quot;Hello&quot;:equb 13
+ 
+[2]
+.label
+ldx #0
+.loop
+lda hello,x:jsr osasci:inx:cmp #13:bne loop
+bit &amp;FF:bpl label  ; loop back if Escape not set
+rts
+.hello
+equs &quot;Hello&quot;:equb 13
+ 
+-- 
+J.G.Harston - jgh&#64;arcade&#46;<!--nospam-->demon.co.uk - mdfs.net/User/JGH
+BBC BASIC for Windows and Internationalisation
+  See <a href="http://mdfs.net/Software/BBCBasic/Windows/ProgTips">http://mdfs.net/Software/BBCBasic/Windows/ProgTips</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon May 30 22:17:49 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5031.html" title="Next message in the list">Jonathan Graham Harston: "[cc65] Re: signals"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5029.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] signals"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5038.html" title="Next message in this discussion thread">dominic beesley: "Re: [cc65] Re: signals"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5038.html" title="Message sent in reply to this message">dominic beesley: "Re: [cc65] Re: signals"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5030" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5030" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5030" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-05-30 22:17:52 CEST
+</em></small></p>
+</body>
+</html>

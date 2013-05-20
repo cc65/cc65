@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] C64 web server</title>
+<meta name="Author" content="Adam Dunkels (adam_at_sics.se)">
+<meta name="Subject" content="Re: [cc65] C64 web server">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] C64 web server</h1>
+<!-- received="Wed Oct 17 13:59:51 2001" -->
+<!-- isoreceived="20011017115951" -->
+<!-- sent="Wed, 17 Oct 2001 13:59:51 +0200" -->
+<!-- isosent="20011017115951" -->
+<!-- name="Adam Dunkels" -->
+<!-- email="adam_at_sics.se" -->
+<!-- subject="Re: [cc65] C64 web server" -->
+<!-- id="200110171159.NAA19465@color.sics.se" -->
+<!-- inreplyto="1937940226.20011017130926@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Adam Dunkels (<a href="mailto:adam_at_sics.se?Subject=Re:%20[cc65]%20C64%20web%20server"><em>adam_at_sics.se</em></a>)<br>
+<strong>Date:</strong> 2001-10-17 13:59:51
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0846.html">groepaz: "Re[2]: [cc65] C64 web server"</a>
+<li><strong>Previous message:</strong> <a href="0844.html">Adam Dunkels: "Re: [cc65] C64 web server"</a>
+<li><strong>In reply to:</strong> <a href="0826.html">groepaz: "Re: [cc65] C64 web server"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0848.html">MagerValp: "Re: [cc65] C64 web server"</a>
+<li><strong>Reply:</strong> <a href="0848.html">MagerValp: "Re: [cc65] C64 web server"</a>
+<li><strong>Reply:</strong> <a href="0849.html">Spiro Trikaliotis: "Re: [cc65] C64 web server"</a>
+<li><strong>Reply:</strong> <a href="0850.html">Ullrich von Bassewitz: "Re: [cc65] C64 web server"</a>
+<li><strong>Reply:</strong> <a href="0851.html">Marko Mäkelä: "Re: [cc65] C64 web server"</a>
+<li><strong>Reply:</strong> <a href="0852.html">groepaz: "Re[2]: [cc65] C64 web server"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Wednesday 17 October 2001 13:09, you wrote:
+&gt; Hello Ullrich,
+&gt;
+&gt; UvB&gt; Remember Adam Dunkels uIP TCP/IP stack?
+&gt;
+&gt; UvB&gt; I've set up a web server on a C64 yesterday using the uIP stack and
+&gt; the http UvB&gt; server that comes with it. Have a look at
+&gt;
+&gt; UvB&gt;         <a href="http://c64.cc65.org/">http://c64.cc65.org/</a>
+&gt;
+&gt; coooool :o) i've always dreamt of setting up a ftp-server with just a
+&gt; c64 and a 1541 on some party ;=))
+
+Version 1.0 of uIP is planned include a simple FTP server ;-)
+
+But an even cooler project would be to port uIP to the 1541 and let the 
+FTP/HTTP server run directly on the diskdrive. One 5.25&quot; disk == one web 
+site! It should be possible to run RS232 over the serial line from the 
+diskdrive with simple add-on hardware, right?
+
+Since there is very little RAM avaliable in the 1541, I guess the only option 
+would be to burn the code to ROM. Some of the 1541 code would probably have 
+to be thrown out in order to make room for the TCP/IP and RS232 stuff. 
+Routines for saving files and fiddling with the BAM could easily be removed 
+from the code since the web server won't be saving any files anyway.
+
+How much ROM does a 1541 have? Native uIP be fitted into some 4k and by 
+hand-compiling the code to 6502, it should be possible to reduce the code 
+size down to some 1k. RAM usage for the TCP/IP stack can be kept below 256 
+bytes. The RS232 routines probably needs some 256 bytes for buffering. That 
+leaves more than 1k for disk block buffers (the BAM wouldn't have to be kept 
+in RAM either)! 
+
+/adam
+-- 
+Adam Dunkels &lt;<a href="mailto:adam_at_sics.se?Subject=Re:%20[cc65]%20C64%20web%20server">adam_at_sics.se</a>&gt;
+<a href="http://www.sics.se/~adam">http://www.sics.se/~adam</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20C64%20web%20server">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0846.html">groepaz: "Re[2]: [cc65] C64 web server"</a>
+<li><strong>Previous message:</strong> <a href="0844.html">Adam Dunkels: "Re: [cc65] C64 web server"</a>
+<li><strong>In reply to:</strong> <a href="0826.html">groepaz: "Re: [cc65] C64 web server"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0848.html">MagerValp: "Re: [cc65] C64 web server"</a>
+<li><strong>Reply:</strong> <a href="0848.html">MagerValp: "Re: [cc65] C64 web server"</a>
+<li><strong>Reply:</strong> <a href="0849.html">Spiro Trikaliotis: "Re: [cc65] C64 web server"</a>
+<li><strong>Reply:</strong> <a href="0850.html">Ullrich von Bassewitz: "Re: [cc65] C64 web server"</a>
+<li><strong>Reply:</strong> <a href="0851.html">Marko Mäkelä: "Re: [cc65] C64 web server"</a>
+<li><strong>Reply:</strong> <a href="0852.html">groepaz: "Re[2]: [cc65] C64 web server"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:43 CET</em>
+</em>
+</small>
+</body>
+</html>

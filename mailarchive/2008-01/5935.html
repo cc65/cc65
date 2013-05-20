@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] ca65 question</title>
+<meta name="Author" content="silverdr1inet.com.pl (silverdr1inet.com.pl)" />
+<meta name="Subject" content="[cc65] ca65 question" />
+<meta name="Date" content="2008-01-21" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] ca65 question</h1>
+<!-- received="Mon Jan 21 03:13:30 2008" -->
+<!-- isoreceived="20080121021330" -->
+<!-- sent="Mon, 21 Jan 2008 03:13:22 +0100" -->
+<!-- isosent="20080121021322" -->
+<!-- name="silverdr1inet.com.pl" -->
+<!-- email="silverdr1inet.com.pl" -->
+<!-- subject="[cc65] ca65 question" -->
+<!-- id="6896AB9A-0B37-4AEE-94AB-572FB0E9A1F0@inet.com.pl" -->
+<!-- charset="US-ASCII" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5936.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65 question&quot;">Next message</a> ]
+[ <a href="5934.html" title="Oliver Schmidt: &quot;Re: [cc65] adding assembler labels from c?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5936.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65 question&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:silverdr1inet.com.pl?Subject=Re:%20[cc65]%20ca65%20question">silverdr1inet.com.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-01-21 03:13:22</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello!
+
+I recently decided to reorganise the code of one of my projects to  
+make use of the advanced features of ca65/ld65 (possibly later also  
+cc65). I wrote nice Makefile and started reorganising the code but I  
+hit a bump right on the beginning. I have a main file, which contains  
+something like:
+
+.include &quot;basicstub.asm&quot;
+
+main:
+	lda #$00
+	[...]
+
+
+and the basicstub.asm looks like:
+
+;----------------------------------------
+	.word basicstub
+
+.ORG	$0801
+basicstub:
+	.word _nextline				; pointer to next BASIC line
+	.word 2005				; line number
+	.byte $9e				; token for SYS command
+	.byte &lt;(((main / 1000) .mod 10) + $30)	; SYS address
+	.byte &lt;(((main / 100 ) .mod 10) + $30)
+	.byte &lt;(((main / 10  ) .mod 10) + $30)
+	.byte &lt;(((main       ) .mod 10) + $30)
+	.byte &quot;:&quot;
+	.byte $8f				; token for REM
+	.byte $14, $14, $14, $14		; remove the REM keyword
+	.byte $0d				; print the rest on the next line
+	.byte $0d				; print the rest on the next line
+	.byte PROGRAM_NAME
+	.byte $20
+	.byte VERSION_TAG
+	.byte $0d				; print the rest on the next line
+	.byte COPYRIGHT_NOTICE
+	.byte $0d				; print the rest on the next line
+	.byte $00
+_nextline:
+	.word $0000				; double zero means no more lines
+;-----------------------------------------------------------------------------------
+
+Now, when I link it with &quot;ld65 -t c64 -Ln $(PROGRAM).labels&quot; I get a  
+warning:
+
+ld65: Warning: [builtin config](6): Segment `STARTUP' does not exist
+
+and the resulting file loads at $20EE rather than $0801!
+
+
+Thus I added
+
+.segment &quot;STARTUP&quot;
+.include &quot;basicstub.asm&quot;
+
+main:
+	lda #$00
+	[...]
+
+
+Which seems to cure the problem but... the documentation says about  
+&quot;STARTUP&quot; segment that: &quot;This segment contains the startup code which  
+initializes the C software stack and the libraries. It is placed in  
+its own segment because it needs to be loaded at the lowest possible  
+program address on several platforms.&quot;
+
+I don't initialise &quot;C software stack and the libraries&quot; here. I just  
+want the file to be assembled and load into the address I want it to.  
+What if I wanted it to load at a different address - say $5000? I  
+assume .segment &quot;STARTUP&quot; wouldn't help there..
+
+Please enlighten me what am I doing wrong here.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Jan 21 03:13:30 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5936.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] ca65 question"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5934.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] adding assembler labels from c?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5936.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] ca65 question"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5936.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] ca65 question"</a></li>
+<li><dfn>Reply</dfn>:  <a href="5937.html" title="Message sent in reply to this message">Marc 'BlackJack Rintsch: "Re: [cc65] ca65 question"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5935" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5935" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5935" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-01-21 03:13:33 CET
+</em></small></p>
+</body>
+</html>

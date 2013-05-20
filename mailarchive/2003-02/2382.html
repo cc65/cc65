@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Another wish: Unsized Arr</title>
+<meta name="Author" content="Christian Krüger (christian.krueger_at_pace.de)">
+<meta name="Subject" content="Re: [cc65] Another wish: Unsized Arrays in Structures">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Another wish: Unsized Arrays in Structures</h1>
+<!-- received="Sat Feb  1 16:05:48 2003" -->
+<!-- isoreceived="20030201150548" -->
+<!-- sent="Sat, 1 Feb 2003 16:05:45 +0100 " -->
+<!-- isosent="20030201150545" -->
+<!-- name="Christian Krüger" -->
+<!-- email="christian.krueger_at_pace.de" -->
+<!-- subject="Re: [cc65] Another wish: Unsized Arrays in Structures" -->
+<!-- id="DCE2904C62EF104F9B2C76252D63EDB1032FB2@paceserver1.pace.de" -->
+<!-- inreplyto="[cc65] Another wish: Unsized Arrays in Structures" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Christian Krüger (<a href="mailto:christian.krueger_at_pace.de?Subject=Re:%20[cc65]%20Another%20wish:%20Unsized%20Arrays%20in%20Structures"><em>christian.krueger_at_pace.de</em></a>)<br>
+<strong>Date:</strong> 2003-02-01 16:05:45
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2381.html">Ullrich von Bassewitz: "Re: [cc65] loadpaintmagic"</a>
+<li><strong>Maybe in reply to:</strong> <a href="../2003-01/2330.html">Christian Krüger: "[cc65] Another wish: Unsized Arrays in Structures"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2384.html">Ullrich von Bassewitz: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<li><strong>Reply:</strong> <a href="2384.html">Ullrich von Bassewitz: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi,
+
+&gt;legalize a common practice that is also used frequently in the cc65
+&gt;compiler
+&gt;sources:
+&gt;
+&gt;        struct foo {
+&gt;            int x, y;
+&gt;            char name[1];
+&gt;        };
+&gt;
+&gt;        ...
+&gt;        struct foo* f = malloc (sizeof (foo) + strlen (name));
+&gt;        ...
+
+I my case, this is a kind of overhead. Since I'm working in a
+single task/program environment (game console) I have no use
+for dynamic memory mangement and like to save the memory/cycles
+which is/are needed for 'malloc/free'. I think that many embedded
+applications also dislike this overhead when all resources are
+'defined' at compile time...
+And remember: I like to asign *static* data! When I have to allocate
+this buffer dynamicly I also have to copy my static data into this
+buffer 'dynamicly' (costs cycles &amp; code...).
+
+&gt;The difference is that the standard does not allow initialization for
+&gt;flexible
+&gt;array members, while Microsoft allows this.
+
+Yepp, that's my point!
+
+&gt;I'm still not decided how useful this feature actually is. I've been
+&gt;using
+&gt;structures with an &quot;open&quot; array myself, but always in conjunction with
+&gt;dynamic memory.
+
+See above. I would be very unhappy if I have to include 'stdlib' only
+for this usecase. In fact, currently I helped myself with some crude
+casts... 
+
+&gt;But how useful is this additional Microsoft feature of allowing
+&gt;initialization? Especially since it introduces some problems. One is
+&gt;that the
+&gt;sizeof operator does no longer return the actual size of the variable:
+
+In your case (with dynamic memory) 'sizeof' delivers also an 'untrue'
+value, taking your array allways with one byte into account...
+
+&gt;Another problem is, that one can initialize single struct instances, but
+&gt;not
+&gt;arrays of structs:
+
+Won't work with dynamic allocation either...
+
+&gt;Can anyone post an example where the additional initialization is not
+&gt;only
+&gt;convenient, but helps to to something not possible before, or were the
+&gt;alternative, standard compliant code is a lot more complex and/or ugly?
+
+It's not only convenience. As I wrote above, I won't use dynamic
+memory, so I helped myself with ugly casts and initialize the data
+in ca65 and let cc65 point on it, telling that this is the structure.
+
+The way of defining an unsized array seems much more 'portable' than
+relying upon the allocation principle of static data by a
+specific compilier:
+
+--8&lt;----
+
+struct foo = {10,20,'T'};
+char addtionalData[] = &quot;his is the name&quot;;
+
+--8&lt;----
+
+...hoping that the compiler will put the data exactly in this
+sequence into memory.
+
+Maybe you know a solution of defining static data of various length
+which is accessible by a structure, but I don't know how to handle
+this... (any solution would be better than none..)
+
+Regards
+chrisker
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Another%20wish:%20Unsized%20Arrays%20in%20Structures">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2381.html">Ullrich von Bassewitz: "Re: [cc65] loadpaintmagic"</a>
+<li><strong>Maybe in reply to:</strong> <a href="../2003-01/2330.html">Christian Krüger: "[cc65] Another wish: Unsized Arrays in Structures"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2384.html">Ullrich von Bassewitz: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<li><strong>Reply:</strong> <a href="2384.html">Ullrich von Bassewitz: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-02-01 16:06:27 CET</em>
+</em>
+</small>
+</body>
+</html>

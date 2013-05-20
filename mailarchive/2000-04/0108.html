@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Future work for cc65 kit?</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Future work for cc65 kit?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Future work for cc65 kit?</h1>
+<!-- received="Mon Apr 17 14:20:54 2000" -->
+<!-- isoreceived="20000417122054" -->
+<!-- sent="Mon, 17 Apr 2000 14:20:40 +0200" -->
+<!-- isosent="20000417122040" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Future work for cc65 kit?" -->
+<!-- id="20000417142040.A5051@trixie.musoftware.de" -->
+<!-- inreplyto="Pine.SOL.4.21.0004171147010.27091-100000@jsbach" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Future%20work%20for%20cc65%20kit?"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2000-04-17 14:20:40
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0109.html">Tim Vanderhoek: "Re: [cc65] Information wanted about projects using cc65"</a>
+<li><strong>Previous message:</strong> <a href="0107.html">Aidan Thomas Dixon: "[cc65] Future work for cc65 kit?"</a>
+<li><strong>In reply to:</strong> <a href="0107.html">Aidan Thomas Dixon: "[cc65] Future work for cc65 kit?"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+&gt; I'd be interested to learn what plans there are for the further development
+&gt; of the cc65 packages. (I noticed the 'roadmap' link on the cc65 web page
+&gt; doesn't point to anything.)
+
+I had to change the roadmap several times so I decided it is better to remove
+the stuff from the web page, because it was wrong anyway:-)
+
+One major problem with the compiler is that it is at its limits and beyond.
+The compiler was never thought to do all the things I did with it. The sources
+are in a state, were changing some minor piece of code in one place will break
+totally unrelated things in other places, resulting in hours of debugging.
+
+In other words: Main parts of the compiler need a total rewrite. I tried twice
+to do that, but failed for several reasons.
+
+However, things are not completely lost: I have rewritten the complete symbol
+table handling last week (register variables and gotos are still broken, I
+will fix that soon). This is one of the two major steps needed to get a new
+version of the compiler, one that has a clean source and may be extended
+without problems.
+
+The second step is to rewrite the parser, so it will no longer create
+assembler code directly, but use an apropriate intermediate code. I have some
+plans for it, but as usual there is no time frame. Things should be easier
+with the new symbol table code, however.
+
+Until this rewrite has happened, it doesn't make sense to add anything besides
+really minor stuff to the compiler. So I'm concentrating on the rewrite, and
+on bugfixing and adding stuff to the library.
+
+&gt; I've made a brief start on writing cc65 versions of the Unix 'nm' and 'dump'
+&gt; tools which I often find useful at various stages of development.  If
+&gt; anyone's interested I'd be happy to make them available when I'm a little
+&gt; further forward.
+&gt;
+&gt; I'm prepared to take on technical work that might be required - only, of
+&gt; course, if outside help is what is wanted.
+
+Having tools like this would be great, and of course any help is appreciated!
+I do offer write access to the CVS repository for cc65 developers. There are
+some other issues (licensing issues, ...) that would better be discussed in
+private mail.
+
+Regards
+
+
+	Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Future%20work%20for%20cc65%20kit?">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Future%20work%20for%20cc65%20kit?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0109.html">Tim Vanderhoek: "Re: [cc65] Information wanted about projects using cc65"</a>
+<li><strong>Previous message:</strong> <a href="0107.html">Aidan Thomas Dixon: "[cc65] Future work for cc65 kit?"</a>
+<li><strong>In reply to:</strong> <a href="0107.html">Aidan Thomas Dixon: "[cc65] Future work for cc65 kit?"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:36 CET</em>
+</em>
+</small>
+</body>
+</html>

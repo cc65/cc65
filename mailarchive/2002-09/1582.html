@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Bank Switching</title>
+<meta name="Author" content="Christian Groessler (cpg_at_aladdin.de)">
+<meta name="Subject" content="Re: [cc65] Bank Switching">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Bank Switching</h1>
+<!-- received="Wed Sep 25 12:51:17 2002" -->
+<!-- isoreceived="20020925105117" -->
+<!-- sent="Wed, 25 Sep 2002 12:51:06 +0200" -->
+<!-- isosent="20020925105106" -->
+<!-- name="Christian Groessler" -->
+<!-- email="cpg_at_aladdin.de" -->
+<!-- subject="Re: [cc65] Bank Switching" -->
+<!-- id="200209251051.MAA25939@panther.aladdin.de" -->
+<!-- inreplyto="[cc65] Bank Switching" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Christian Groessler (<a href="mailto:cpg_at_aladdin.de?Subject=Re:%20[cc65]%20Bank%20Switching"><em>cpg_at_aladdin.de</em></a>)<br>
+<strong>Date:</strong> 2002-09-25 12:51:06
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1581.html">groepaz: "Re[2]: [cc65] Bank Switching"</a>
+<li><strong>Maybe in reply to:</strong> <a href="1566.html">Shawn Jefferson: "[cc65] Bank Switching"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1585.html">Ullrich von Bassewitz: "Re: [cc65] Bank Switching"</a>
+<li><strong>Next in thread:</strong> <a href="1583.html">Shawn Jefferson: "Re: [cc65] Bank Switching"</a>
+<li><strong>Reply:</strong> <a href="1585.html">Ullrich von Bassewitz: "Re: [cc65] Bank Switching"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On 09/24/2002 04:13:20 PM MST &quot;Shawn Jefferson&quot; wrote:
+&gt;
+&gt;&gt;&gt;&gt; Christian Groessler &lt;<a href="mailto:cpg_at_aladdin.de?Subject=Re:%20[cc65]%20Bank%20Switching">cpg_at_aladdin.de</a>&gt; 09/20/02 04:22PM &gt;&gt;&gt;
+&gt;
+&gt;&gt;So with some linker and segments fiddling, one should be able to make
+&gt;&gt;RAM2 a separate chunk in the file. The AUTOSTRT chunk should be last
+&gt;&gt;(unless you know what you do), because I think it's address will be
+&gt;&gt;called immediately after being loaded, before the remaining chunks get
+&gt;&gt;loaded.
+&gt;
+&gt;Ok, I think I succeeded in setting this up with these files:
+&gt;
+&gt;atari.cfg:
+&gt;
+&gt;MEMORY {
+&gt;    ZP: start = $82, size = $7E, type = rw;
+&gt;    HEADER: start = $0000, size = $6, file = %O;
+&gt;    RAM1: start = $2000, size = $2000, file = %O;
+&gt;    BANK: start = $4000, size = $3FFF, type = ro;   # just to show the memory layout, not used
+&gt;    SECHDR: start = $8000, size = $4, file = %O;
+&gt;    RAM2: start = $8004, size = $3C1F, file = %O;
+&gt;}
+&gt;SEGMENTS {
+&gt;    EXEHDR: load = HEADER, type = wprot;
+&gt;    CODE: load = RAM1, type = wprot, define = yes;
+&gt;    BSS: load = RAM1, type = bss, define = yes;
+&gt;    CHKHDR: load = SECHDR, type = wprot;
+&gt;    RODATA: load = RAM2, type = wprot, define = yes;
+&gt;    DATA: load = RAM2, type = rw;
+&gt;    ZEROPAGE: load = ZP, type = zp;
+&gt;    AUTOSTRT: load = RAM2, type = wprot, define = yes;
+&gt;}
+&gt;
+&gt;and chunk.s:
+&gt;
+&gt;    .import __RODATA_LOAD__, __AUTOSTRT_LOAD__
+&gt;
+&gt;; CHUNK HEADER
+&gt;    .segment &quot;CHKHDR&quot;
+&gt;    .word __RODATA_LOAD__
+&gt;    .word __AUTOSTRT_LOAD__ - 1
+&gt;    .code
+&gt;    .reloc
+&gt;
+&gt;From looking at the source code for crt0.s in the atari library, the
+&gt;main header uses the values for CODE and BSS - 1 to create the
+&gt;header, so you are sort of stuck with putting the code and bss (what
+&gt;does that stand for?) in the first memory segment.  Unless there is a
+&gt;way to override this without recompiling the library.  The first
+
+You'll only need to recompile and change crt0.s...
+
+I think you can also free the 4 bytes at $8000, since they're part of
+the load file format, but not loaded into memory. The start address of
+SECHDR doesn't matter. So you could use
+
+    SECHDR: start = $0, size = $4, file = %O;
+    RAM2: start = $8000, size = $3C1F, file = %O;
+
+I don't know whether the  linker complains if HEADER and SECHDR have
+the same start address, if yes, you could take some other value for
+SECHDR start address.
+
+regards,
+chris
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Bank%20Switching">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1581.html">groepaz: "Re[2]: [cc65] Bank Switching"</a>
+<li><strong>Maybe in reply to:</strong> <a href="1566.html">Shawn Jefferson: "[cc65] Bank Switching"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1585.html">Ullrich von Bassewitz: "Re: [cc65] Bank Switching"</a>
+<li><strong>Next in thread:</strong> <a href="1583.html">Shawn Jefferson: "Re: [cc65] Bank Switching"</a>
+<li><strong>Reply:</strong> <a href="1585.html">Ullrich von Bassewitz: "Re: [cc65] Bank Switching"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-09-25 12:51:24 CEST</em>
+</em>
+</small>
+</body>
+</html>

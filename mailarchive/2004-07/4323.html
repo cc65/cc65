@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Apple2 Libraries - Current</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Apple2 Libraries - Current status of file io ?" />
+<meta name="Date" content="2004-07-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Apple2 Libraries - Current status of file io ?</h1>
+<!-- received="Thu Jul 29 09:49:32 2004" -->
+<!-- isoreceived="20040729074932" -->
+<!-- sent="Thu, 29 Jul 2004 09:49:29 +0200" -->
+<!-- isosent="20040729074929" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Apple2 Libraries - Current status of file io ?" -->
+<!-- id="20040729074929.GF29100@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="000201c4751f$5dc14640$db662c42&#64;palace" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4324.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Apple2 Libraries - Current status of file io ?&quot;">Next message</a> ]
+[ <a href="4322.html" title="Oliver Schmidt: &quot;Re: [cc65] Apple2 Libraries - Current status of file io ?&quot;">Previous message</a> ]
+[ <a href="4315.html" title="Greg King: &quot;Re: [cc65] Apple2 Libraries - Current status of file io ?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Apple2%20Libraries%20-%20Current%20status%20of%20file%20io%20?">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-07-29 09:49:29</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Wed, Jul 28, 2004 at 11:48:08PM -0400, Greg King wrote:
+&gt; That info. suggests that an easy division of the code would be:
+&gt; o  put DOS 3 file-functions into the &quot;apple2/&quot; sub-directory;
+&gt; o  put ProDOS file-functions into the &quot;apple2enh/&quot; sub-directory.
+
+I don't think this is true. apple2enh assumes several things about the
+hardware (mousetext characters, small and capital letters, ...), but it
+doesn't make assumptions about the disk I/O system running. An Apple //e can
+be run with an older ProDOS version, and as I understood it, most probably
+are.
+
+I have to admit that I don't like to add more and more apple targets, but on
+the other side, I cannot see how to map this to either of the existing ones.
+
+Maybe I will have to reconsider using separate libraries. Currently all stuff
+is in one target library. Having one main target library plus additional ones
+may work, since file routines could come with a second library. I've already
+thought about this when planning floating point math: To avoid linking in the
+whole math library just because printf is used, a dummy math library must be
+used, which leads to the same library design. One problem is currently the
+linker, because it doesn't consider a library twice, and doesn't allow
+circular dependencies between libraries as it is. But adding that feature
+wouldn't be a big change.
+
+Using this library method would need a clean design, however. The common stuff
+may contain hooks that are satisfied from a second library, but the second
+library would not be able to change main target code.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Jul 29 09:49:32 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4324.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4322.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4315.html" title="Message to which this message replies">Greg King: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4323" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4323" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4323" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-07-29 09:49:41 CEST
+</em></small></p>
+</body>
+</html>

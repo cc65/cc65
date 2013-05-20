@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] function style macro usage</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="Re: [cc65] function style macro usage" />
+<meta name="Date" content="2009-03-15" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] function style macro usage</h1>
+<!-- received="Sun Mar 15 12:40:20 2009" -->
+<!-- isoreceived="20090315114020" -->
+<!-- sent="Sun, 15 Mar 2009 12:39:59 +0100" -->
+<!-- isosent="20090315113959" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="Re: [cc65] function style macro usage" -->
+<!-- id="20090315113959.GC6141@trikaliotis.net" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="1237073956.6149.16.camel&#64;toontown" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6555.html" title="Tobias Pflug: &quot;Re: [cc65] function style macro usage&quot;">Next message</a> ]
+[ <a href="6553.html" title="Tobias Pflug: &quot;[cc65] function style macro usage&quot;">Previous message</a> ]
+[ <a href="6553.html" title="Tobias Pflug: &quot;[cc65] function style macro usage&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6555.html" title="Tobias Pflug: &quot;Re: [cc65] function style macro usage&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20[cc65]%20function%20style%20macro%20usage">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-03-15 12:39:59</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello Tobias,
+
+* On Sun, Mar 15, 2009 at 12:39:16AM +0100 Tobias Pflug wrote:
+ 
+&gt; #define setup_bg1(map,char) (map&gt;&gt;12|char&gt;&gt;8)
+&gt; lda setup_bg1($2000,$00)
+&gt; sta FOOBAR
+&gt; 
+&gt; The way I see it neither .define nor .macro are quite cut out
+&gt; for this. Is there some way this or something syntactically close? :)
+
+You can do it exactly like this by using a C preprocessor, and feeding
+its output into ca65.
+
+For gcc, the preprocessor is in the file cpp. cpp --help gives you some
+options you might want to use.
+
+HTH,
+Spiro.
+
+-- 
+Spiro R. Trikaliotis                              <a href="http://opencbm.sf.net/">http://opencbm.sf.net/</a>
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>                     <a href="http://www.viceteam.org/">http://www.viceteam.org/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Mar 15 12:40:20 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6555.html" title="Next message in the list">Tobias Pflug: "Re: [cc65] function style macro usage"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6553.html" title="Previous message in the list">Tobias Pflug: "[cc65] function style macro usage"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6553.html" title="Message to which this message replies">Tobias Pflug: "[cc65] function style macro usage"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6555.html" title="Next message in this discussion thread">Tobias Pflug: "Re: [cc65] function style macro usage"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6555.html" title="Message sent in reply to this message">Tobias Pflug: "Re: [cc65] function style macro usage"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6554" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6554" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6554" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-03-15 12:40:23 CET
+</em></small></p>
+</body>
+</html>

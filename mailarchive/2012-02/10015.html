@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Problem with evaluating if</title>
+<meta name="Author" content="S M (san.mes1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] Problem with evaluating if with negative numbers" />
+<meta name="Date" content="2012-02-03" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Problem with evaluating if with negative numbers</h1>
+<!-- received="Fri Feb  3 15:38:36 2012" -->
+<!-- isoreceived="20120203143836" -->
+<!-- sent="Fri, 3 Feb 2012 14:38:27 +0000" -->
+<!-- isosent="20120203143827" -->
+<!-- name="S M" -->
+<!-- email="san.mes1gmail.com" -->
+<!-- subject="Re: [cc65] Problem with evaluating if with negative numbers" -->
+<!-- id="CAOQ5ps5d7t+FFvcA0B+j9Z0Lh_bydwSoKnDa+Ty0c5Nftk6mjQ@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="1328279646.75449.YahooMailNeo&#64;web120605.mail.ne1.yahoo.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10016.html" title="Chris Cureau: &quot;[cc65] bug report&quot;">Next message</a> ]
+[ <a href="10014.html" title="Joseph Rose: &quot;Re: [cc65] Problem with evaluating if with negative numbers&quot;">Previous message</a> ]
+[ <a href="10014.html" title="Joseph Rose: &quot;Re: [cc65] Problem with evaluating if with negative numbers&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: S M &lt;<a href="mailto:san.mes1gmail.com?Subject=Re:%20[cc65]%20Problem%20with%20evaluating%20if%20with%20negative%20numbers">san.mes1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-02-03 15:38:27</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>The program is working fine now since I added &quot;signed&quot; to char as Gábor
+told me to do. Thanks
+
+
+2012/2/3 Joseph Rose &lt;rose.joseph12&#64;yahoo&#46;<!--nospam-->com&gt;
+
+&gt; Try casting the test number to a signed number, i.e. (signed) or (signed
+&gt; char).
+&gt; -----------------------
+&gt; Joseph Rose, a.k.a. Harry Potter
+&gt; Working magic in the computer community
+&gt;
+&gt;   *From:* S M &lt;san.mes&#64;gmail&#46;<!--nospam-->com&gt;
+&gt; *To:* cc65 &lt;cc65&#64;musoftware&#46;<!--nospam-->de&gt;
+&gt; *Sent:* Friday, February 3, 2012 8:24 AM
+&gt; *Subject:* [cc65] Problem with evaluating if with negative numbers
+&gt;
+&gt; Hello
+&gt;
+&gt; I had the following line of code
+&gt;
+&gt; if (bugs[n].mx &lt; 0 ) {...
+&gt;
+&gt; but it didn't work so I had to change it to:
+&gt;
+&gt; if ( (bugs[n].mx &gt;=128) &amp;&amp; (bugs[1].mx &lt;=255) ) {...
+&gt;
+&gt; Why the first line doesn't work if .mx is not unsigned ?
+&gt;
+&gt;
+&gt;
+&gt;
+&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Feb  3 15:38:36 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10016.html" title="Next message in the list">Chris Cureau: "[cc65] bug report"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10014.html" title="Previous message in the list">Joseph Rose: "Re: [cc65] Problem with evaluating if with negative numbers"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10014.html" title="Message to which this message replies">Joseph Rose: "Re: [cc65] Problem with evaluating if with negative numbers"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10015" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10015" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10015" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-02-03 15:38:39 CET
+</em></small></p>
+</body>
+</html>

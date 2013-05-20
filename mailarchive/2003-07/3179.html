@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Another bug, with preproc</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Another bug, with preprocessor macros">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Another bug, with preprocessor macros</h1>
+<!-- received="Sun Jul 13 12:56:59 2003" -->
+<!-- isoreceived="20030713105659" -->
+<!-- sent="Sun, 13 Jul 2003 12:56:57 +0200" -->
+<!-- isosent="20030713105657" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Another bug, with preprocessor macros" -->
+<!-- id="20030713105657.GC10984@trixie.musoftware.de" -->
+<!-- inreplyto="072d01c34907$aefe5c90$6902a8c0@magnesium" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Another%20bug,%20with%20preprocessor%20macros"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-07-13 12:56:57
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3178.html">Ullrich von Bassewitz: "Re: [cc65] Little bug with -D"</a>
+<li><strong>In reply to:</strong> <a href="3176.html">David Holz: "[cc65] Another bug, with preprocessor macros"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3180.html">David Holz: "Re: [cc65] Another bug, with preprocessor macros"</a>
+<li><strong>Next in thread:</strong> <a href="3178.html">Ullrich von Bassewitz: "Re: [cc65] Little bug with -D"</a>
+<li><strong>Reply:</strong> <a href="3180.html">David Holz: "Re: [cc65] Another bug, with preprocessor macros"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Sat, Jul 12, 2003 at 11:26:24PM -0700, David Holz wrote:
+&gt; .ifdef, .ifndef, .def, and .defined all seem to throw a &quot;Error #24:
+&gt; Identifier expected&quot; when the macro is already defined, ie:
+&gt;
+&gt; .define BLAH
+&gt; .ifndef BLAH  ; &lt;- error gets tossed here
+&gt; .define BLAH
+&gt; .endif
+&gt;
+&gt; The same error gets thrown when you try to redefine a macro, instead of a
+&gt; &quot;Identifier already in use&quot; type of message.
+
+This is a misunderstanding. .ifdef/.ifndef do not work with macros, they work
+with symbols:
+
+        HAVE_REU        = 1
+        ...
+        .ifdef HAVE_REU
+        ...
+        .endif
+
+.define creates low level macros, you should avoid it if you can. It was added
+to allow emulation of features some other assembler had. Macros created with
+.define do not obey scoping, and they are handled in a very early translation
+phase, which means that you can do some really nasty things with them. The code
+
+        .define BLAH
+
+defines BLAH to be replaced by nothing whenever the token is found in the
+input stream. This is the reason why
+
+        .ifdef BLAH
+
+causes an &quot;Identifier expected&quot; error. Since BLAH is removed, there is no
+argument for .ifdef.
+
+As said above, I would suggest to avoid the low level macros and use the high
+level ones instead. They are much more predictable.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Another%20bug,%20with%20preprocessor%20macros">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Another%20bug,%20with%20preprocessor%20macros">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3178.html">Ullrich von Bassewitz: "Re: [cc65] Little bug with -D"</a>
+<li><strong>In reply to:</strong> <a href="3176.html">David Holz: "[cc65] Another bug, with preprocessor macros"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3180.html">David Holz: "Re: [cc65] Another bug, with preprocessor macros"</a>
+<li><strong>Next in thread:</strong> <a href="3178.html">Ullrich von Bassewitz: "Re: [cc65] Little bug with -D"</a>
+<li><strong>Reply:</strong> <a href="3180.html">David Holz: "Re: [cc65] Another bug, with preprocessor macros"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-07-13 12:57:05 CEST</em>
+</em>
+</small>
+</body>
+</html>

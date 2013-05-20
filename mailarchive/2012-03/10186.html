@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] VICE file formats</title>
+<meta name="Author" content="Christopher Pow (christopher.s.pow1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] VICE file formats" />
+<meta name="Date" content="2012-03-26" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] VICE file formats</h1>
+<!-- received="Mon Mar 26 18:32:52 2012" -->
+<!-- isoreceived="20120326163252" -->
+<!-- sent="Mon, 26 Mar 2012 11:32:37 -0500" -->
+<!-- isosent="20120326163237" -->
+<!-- name="Christopher Pow" -->
+<!-- email="christopher.s.pow1gmail.com" -->
+<!-- subject="Re: [cc65] VICE file formats" -->
+<!-- id="CAKDufpAUCJnbVezD0xdn1HgqvaGbUWvSZ9aDVbtd7Rvm9OA+AA@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20120326155317.GC20306&#64;trikaliotis.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10187.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Possible bug in cc65&quot;">Next message</a> ]
+[ <a href="10185.html" title="Joseph Rose: &quot;[cc65] Possible bug in cc65&quot;">Previous message</a> ]
+[ <a href="10184.html" title="Spiro Trikaliotis: &quot;Re: [cc65] VICE file formats&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10206.html" title="Spiro Trikaliotis: &quot;Re: [cc65] VICE file formats&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Christopher Pow &lt;<a href="mailto:christopher.s.pow1gmail.com?Subject=Re:%20[cc65]%20VICE%20file%20formats">christopher.s.pow1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-03-26 18:32:37</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt; Background: In order not to hog the CPU, the remote monitor code tries
+&gt; to give back the CPU to the UI by calling a function to do so (to pump
+&gt; the message queue).
+
+So the remote monitor code is not in a worker thread or another UI
+thread.  I haven't had a chance to look at the VICE code
+yet...unfortunately work life has intervened.
+
+&gt; Unfortunately, this function blocks until there is a message in the
+&gt; message queue. Now, if there is anything in the queue, the remote
+&gt; monitor code works as expected.
+
+That is the behavior I'm experiencing.  I deduced there's probably no
+separate thread for the remote monitor based on my observations.  You
+have confirmed that.
+
+&gt; Of course, one could argue that this is bad design in the first place -
+&gt; and this is correct. However, it's the way the VICE code works ATM.
+
+I'm not going to start a blame war.  =]  I've been working the UI
+elements in NESICIDE to support the plan I emailed out earlier, so
+I've got plenty to do.  Good news is I'm already at the point where
+I'm trying to interact with the remote monitor...so most of the work
+is already done!
+
+Christopher
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Mar 26 18:32:52 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10187.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Possible bug in cc65"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10185.html" title="Previous message in the list">Joseph Rose: "[cc65] Possible bug in cc65"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10184.html" title="Message to which this message replies">Spiro Trikaliotis: "Re: [cc65] VICE file formats"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10206.html" title="Next message in this discussion thread">Spiro Trikaliotis: "Re: [cc65] VICE file formats"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10206.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Re: [cc65] VICE file formats"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10186" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10186" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10186" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-03-26 18:32:54 CEST
+</em></small></p>
+</body>
+</html>

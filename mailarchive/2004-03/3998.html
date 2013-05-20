@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Referencing 'Split' Labels</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Referencing 'Split' Labels" />
+<meta name="Date" content="2004-03-16" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Referencing 'Split' Labels</h1>
+<!-- received="Tue Mar 16 00:40:11 2004" -->
+<!-- isoreceived="20040315234011" -->
+<!-- sent="Tue, 16 Mar 2004 00:40:04 +0100" -->
+<!-- isosent="20040315234004" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Referencing 'Split' Labels" -->
+<!-- id="20040315234004.GA10597@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="Pine.LNX.4.58.0403160904190.7832&#64;vcsweb.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="3999.html" title="Todd Elliott: &quot;Re: [cc65] Referencing 'Split' Labels&quot;">Next message</a> ]
+[ <a href="3997.html" title="David Holz: &quot;Re: [cc65] Referencing 'Split' Labels&quot;">Previous message</a> ]
+[ <a href="3996.html" title="Todd Elliott: &quot;[cc65] Referencing 'Split' Labels&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="3999.html" title="Todd Elliott: &quot;Re: [cc65] Referencing 'Split' Labels&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Referencing%20'Split'%20Labels">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-03-16 00:40:04</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Tue, Mar 16, 2004 at 09:09:32AM +1030, Todd Elliott wrote:
+&gt; The following code did not compile correctly under ca65?
+&gt;
+&gt; 	LoadW r0, epsLineBuf+14	; point to start of coordinates.
+&gt;
+&gt; The LoadW is a macro, meaning that r0 ($02-$03) will contain the address
+&gt; of epsLineBuf+14.
+&gt;
+&gt; Problem is, the high byte seems to be wrong; It appears that the +14 is
+&gt; added to high byte, a no-no.
+
+ca65 is correct, the macro is not.
+
+As you can see from the operator precedence table in the ca65 docs, the '&lt;'
+and '&gt;' operators have a higher precedence than the '+' operator. This means
+that
+
+        lda     #&lt;epsLineBuf+14
+
+will *first* take the low byte of the label, and *then* add 14 to the result.
+
+When using the '&lt;' and '&gt;' operators, the operand must usually be put into
+parenthesis:
+
+        lda     #&lt;(epsLineBuf+14)
+
+You can also use the new pseudo functions .lobyte and .hibyte. Since they are
+functions, braces are always needed, which means that you cannot forget
+them:-)
+
+        lda     #.lobyte(epsLineBuf+14)
+
+Maciej, can you have a look at the GEOS macros? Todd didn't tell where he got
+the LoadW macro from, but the one in libsrc/geos/geosmac.ca65.inc does
+definitely have this problem.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Mar 16 00:40:11 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="3999.html" title="Next message in the list">Todd Elliott: "Re: [cc65] Referencing 'Split' Labels"</a></li>
+<li><dfn>Previous message</dfn>: <a href="3997.html" title="Previous message in the list">David Holz: "Re: [cc65] Referencing 'Split' Labels"</a></li>
+<li><dfn>In reply to</dfn>: <a href="3996.html" title="Message to which this message replies">Todd Elliott: "[cc65] Referencing 'Split' Labels"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="3999.html" title="Next message in this discussion thread">Todd Elliott: "Re: [cc65] Referencing 'Split' Labels"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="3999.html" title="Message sent in reply to this message">Todd Elliott: "Re: [cc65] Referencing 'Split' Labels"</a></li>
+<li><dfn>Reply</dfn>:  <a href="4001.html" title="Message sent in reply to this message">Maciej Witkowiak: "Re: [cc65] Referencing 'Split' Labels"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#3998" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#3998" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#3998" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-03-16 00:40:17 CET
+</em></small></p>
+</body>
+</html>

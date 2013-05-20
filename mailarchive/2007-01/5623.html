@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Template for MAKE files?</title>
+<meta name="Author" content="MagerValp (MagerValp1cling.gu.se)" />
+<meta name="Subject" content="Re: [cc65] Template for MAKE files?" />
+<meta name="Date" content="2007-01-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Template for MAKE files?</h1>
+<!-- received="Wed Jan 10 16:27:48 2007" -->
+<!-- isoreceived="20070110152748" -->
+<!-- sent="Wed, 10 Jan 2007 16:27:38 +0100" -->
+<!-- isosent="20070110152738" -->
+<!-- name="MagerValp" -->
+<!-- email="MagerValp1cling.gu.se" -->
+<!-- subject="Re: [cc65] Template for MAKE files?" -->
+<!-- id="17829.1514.458046.317076@hal.cling.gu.se" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="EAD69227B254473597D5708AF1CAFE5C&#64;core2xp" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="../2007-02/5624.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Another ca65html tweak&quot;">Next message</a> ]
+[ <a href="5622.html" title="Payton Byrd: &quot;[cc65] Template for MAKE files?&quot;">Previous message</a> ]
+[ <a href="5622.html" title="Payton Byrd: &quot;[cc65] Template for MAKE files?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: MagerValp &lt;<a href="mailto:MagerValp1cling.gu.se?Subject=Re:%20[cc65]%20Template%20for%20MAKE%20files?">MagerValp1cling.gu.se</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-01-10 16:27:38</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt;&gt;&gt;&gt;&gt; &quot;PB&quot; == Payton Byrd &lt;payton&#64;paytonbyrd&#46;<!--nospam-->com&gt; writes:
+
+PB&gt; I've finally set up a Linux box for my CC65 development stuff and
+PB&gt; want to start using proper make files with it. Does anyone have
+PB&gt; any make file templates for CC65 that they are willing to share?
+
+Sure, here's one of mine:
+
+TARGET=c64
+CC=cl65
+AS=ca65
+LD=ld65
+C1541=c1541
+CFLAGS=-Oirs -t $(TARGET)
+AFLAGS=-g # -D DEBUG
+LDFLAGS=
+
+
+%.o: %.c
+	$(CC) -c $(CFLAGS) $&lt;
+
+%.o: %.s
+	$(AS) $(AFLAGS) $&lt;
+
+
+OBJS = \
+	main.o \
+	init.o \
+	projname.o
+
+
+all: projname.d64
+
+
+projname.d64: projname.exo
+	&#64;rm -f temp&#46;<!--nospam-->d64
+	&#64;c1541 -format &quot;projname,07&quot; d64 temp&#46;<!--nospam-->d64
+	&#64;c1541 temp&#46;<!--nospam-->d64 -write projname.exo &quot;projname&quot;
+	mv temp.d64 projname.d64
+
+
+projname.exo: projname.prg
+	exomizer sfx sys -q -o $&#64; $^
+#	pucrunch +f $^ $&#64;
+
+
+projname.prg: $(OBJS)
+	$(LD) -C projname.cfg -m projname.map -o $&#64; $^
+
+
+clean:
+	rm -f *.o *.map *.dbg *.lab
+	rm -f projname.prg projname.exo
+	rm -f temp.d64 projname.d64
+
+
+distclean: clean
+	rm -f *~
+
+-- 
+    ___          .     .  .         .       . +  .         .      o   
+  _|___|_   +   .  +     .     +         .  Per Olofsson, arkadspelare
+    o-o    .      .     .   o         +          MagerValp&#64;cling&#46;<!--nospam-->gu.se
+     -       +            +    .     <a href="http://www.cling.gu.se/~cl3polof/">http://www.cling.gu.se/~cl3polof/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Jan 10 16:27:48 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="../2007-02/5624.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Another ca65html tweak"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5622.html" title="Previous message in the list">Payton Byrd: "[cc65] Template for MAKE files?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5622.html" title="Message to which this message replies">Payton Byrd: "[cc65] Template for MAKE files?"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5623" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5623" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5623" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-01-10 16:27:51 CET
+</em></small></p>
+</body>
+</html>

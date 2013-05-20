@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] THE Makefile V1.2 availabl</title>
+<meta name="Author" content="thefox xofeht (thefox1aspekt.fi)" />
+<meta name="Subject" content="Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies" />
+<meta name="Date" content="2011-05-30" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies</h1>
+<!-- received="Mon May 30 21:04:32 2011" -->
+<!-- isoreceived="20110530190432" -->
+<!-- sent="Mon, 30 May 2011 22:04:14 +0300" -->
+<!-- isosent="20110530190414" -->
+<!-- name="thefox xofeht" -->
+<!-- email="thefox1aspekt.fi" -->
+<!-- subject="Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies" -->
+<!-- id="BANLkTikozaiJSuVEDMd4HeJmsN00==LtcQ@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="BANLkTin-E8Ok5Xm8nR3H14NVVUN1fF7nLw&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="../2011-06/9483.html" title="Greg King: &quot;Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies&quot;">Next message</a> ]
+[ <a href="9481.html" title="Oliver Schmidt: &quot;Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies&quot;">Previous message</a> ]
+[ <a href="9481.html" title="Oliver Schmidt: &quot;Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="../2011-06/9483.html" title="Greg King: &quot;Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: thefox xofeht &lt;<a href="mailto:thefox1aspekt.fi?Subject=Re:%20[cc65]%20THE%20Makefile%20V1.2%20available%20-%20was:%20automatic%20generation%20of%20makefile%20dependencies">thefox1aspekt.fi</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-05-30 21:04:14</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Sat, May 28, 2011 at 5:18 PM,  &lt;silverdr&#64;wfmh&#46;<!--nospam-->org.pl&gt; wrote:
+&gt; Isn't it easier/better to just install the lib?
+
+It's kind of a problem for me since I'm using my own customized
+version of the library so there would be conflicts... I guess the
+&quot;proper&quot; solution indeed is to set the target as &quot;none&quot;...
+
+&gt; BTW - not a complete solution to the inelegance of the above, but version 1.2.1 of the makefile, (which is behind the corner now, unless Oliver finds compelling reasons for not releasing it in current shape) allows for arbitrary &quot;extensions&quot; by using appropriately named src subdirectories.
+
+That's good to hear. :)
+
+On Sat, May 28, 2011 at 11:46 PM, Oliver Schmidt &lt;ol.sc&#64;web&#46;<!--nospam-->de&gt; wrote:
+&gt;&gt; (of course
+&gt;&gt; make from MinGW/whatever is required as well). This would mean
+&gt;&gt; replacing mkdir/rmdir/rm/etc with Windows equivalents when Windows is
+&gt;&gt; detected. It's up to you if you want to pursue that or not.
+&gt;
+&gt; I personally don't see any point in doing so. Where ever you get your
+&gt; make from should be a great place to get mkdir/rmdir/rm from.
+
+Yeah I understand you completely. In the case of cmd.exe the problem
+isn't getting mkdir/rmdir/rm however, it's that it implements built-in
+versions of mkdir/rmdir that (AFAIK) can't be overridden without
+specifying the full path to the executables... correct me if I'm
+wrong.
+
+Because of that, if nothing else, it might be good to give the user a
+warning if cmd.exe is used because there's just no way &quot;mkdir -p&quot; is
+going to work when run from cmd.exe. I think this piece of code should
+be pretty reliable for detecting cmd.exe in case you want to add that:
+
+ifeq ($(firstword $(shell echo)),ECHO)
+  $(info DOS-like shell detected)
+else
+  $(info Seems to be an unix shell)
+endif
+
+&gt; Check out this:
+&gt; <a href="http://www.gnu.org/software/make/manual/make.html#Utilities-in-Makefiles">http://www.gnu.org/software/make/manual/make.html#Utilities-in-Makefiles</a>
+&gt;
+&gt; To get anywhere near reproducable results with 'make' one needs to
+&gt; envision make and the enumerated utilities as a single entitiy to be
+&gt; provided/installed/used together.
+&gt;
+&gt; Build tools trying to improve/replace 'make' typically have the
+&gt; functionality of those utilities built in. But with 'make' they happen
+&gt; to be separate - neverless they are part of a 'make' environment.
+&gt;
+&gt; Trying to have 'make' work with some other utilities that happen to
+&gt; come with Windows is like trying to have ld65 work with another
+&gt; compiler instead of cc65.
+
+Yeah I understand this view. Funnily enough in that manual they also
+advise against using &quot;mkdir -p&quot;. :)
+
+&gt;&gt;&gt; I haven't however tested the Makefile with GunWin32 so far, maybe
+&gt;&gt;&gt; someone else...
+&gt;
+&gt;&gt; I'll try it out and let you know.
+&gt;
+&gt; That would be great - thanks in advance :-)
+
+You're right, GnuWin32 is far superior to UnxUtils (albeit a little
+bit more complicated to install). The version of make they ship seems
+to be the same as in MinGW.
+
+-thefox
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon May 30 21:04:32 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="../2011-06/9483.html" title="Next message in the list">Greg King: "Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9481.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9481.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="../2011-06/9483.html" title="Next message in this discussion thread">Greg King: "Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="../2011-06/9483.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies"</a></li>
+<li><dfn>Reply</dfn>:  <a href="../2011-06/9485.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9482" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9482" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9482" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-05-30 21:04:37 CEST
+</em></small></p>
+</body>
+</html>

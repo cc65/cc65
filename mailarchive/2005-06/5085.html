@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] 6502 runtime relocation</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] 6502 runtime relocation" />
+<meta name="Date" content="2005-06-22" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] 6502 runtime relocation</h1>
+<!-- received="Wed Jun 22 23:25:02 2005" -->
+<!-- isoreceived="20050622212502" -->
+<!-- sent="Wed, 22 Jun 2005 23:24:48 +0200" -->
+<!-- isosent="20050622212448" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] 6502 runtime relocation" -->
+<!-- id="20050622212448.GB22030@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="050622145504&#64;arcade.demon.co.uk" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5086.html" title="dominic beesley: &quot;Re: [cc65] 6502 runtime relocation&quot;">Next message</a> ]
+[ <a href="5084.html" title="Jonathan Graham Harston: &quot;[cc65] 6502 runtime relocation&quot;">Previous message</a> ]
+[ <a href="5084.html" title="Jonathan Graham Harston: &quot;[cc65] 6502 runtime relocation&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5086.html" title="dominic beesley: &quot;Re: [cc65] 6502 runtime relocation&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%206502%20runtime%20relocation">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-06-22 23:24:48</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Wed, Jun 22, 2005 at 01:58:23PM +0100, Jonathan Graham Harston wrote:
+&gt; On the BBC you do not know the upper and lower bounds of memory
+&gt; until runtime. I've got some code that relocates a 6502 program
+&gt; loaded into the middle of memory to the bottom and jumps to it.
+&gt; Before I start adapting it to be suitable to work with a compiled
+&gt; 'C' program is there already any code that is already suitable?
+
+There are some other platforms with a variable lower memory bound, but
+on these systems, the solution was to use the &quot;highest&quot; low memory
+address available for the general purpose builtin configuration. 
+
+Probably the most versatile solution would be to generate o65 output and
+write a relocator that runs on arbitrary memory addresses. I don't know
+how your relocator works, but if it disassembles the code, there are
+pieces of code it won't handle correctly.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Jun 22 23:25:02 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5086.html" title="Next message in the list">dominic beesley: "Re: [cc65] 6502 runtime relocation"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5084.html" title="Previous message in the list">Jonathan Graham Harston: "[cc65] 6502 runtime relocation"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5084.html" title="Message to which this message replies">Jonathan Graham Harston: "[cc65] 6502 runtime relocation"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5086.html" title="Next message in this discussion thread">dominic beesley: "Re: [cc65] 6502 runtime relocation"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5086.html" title="Message sent in reply to this message">dominic beesley: "Re: [cc65] 6502 runtime relocation"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5085" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5085" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5085" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-06-22 23:25:05 CEST
+</em></small></p>
+</body>
+</html>

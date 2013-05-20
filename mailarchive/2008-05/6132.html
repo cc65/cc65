@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Re: Macro naming</title>
+<meta name="Author" content="Jonathan Graham Harston (jgh1arcade.demon.co.uk)" />
+<meta name="Subject" content="[cc65] Re: Macro naming" />
+<meta name="Date" content="2008-05-31" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Re: Macro naming</h1>
+<!-- received="Sat May 31 03:00:54 2008" -->
+<!-- isoreceived="20080531010054" -->
+<!-- sent="31 May 2008 01:00:53 +0100" -->
+<!-- isosent="20080531000053" -->
+<!-- name="Jonathan Graham Harston" -->
+<!-- email="jgh1arcade.demon.co.uk" -->
+<!-- subject="[cc65] Re: Macro naming" -->
+<!-- id="080531015504@arcade.demon.co.uk" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6133.html" title="Oliver Schmidt: &quot;Re: [cc65] Re: Macro naming&quot;">Next message</a> ]
+[ <a href="6131.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Re: Macro naming&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6133.html" title="Oliver Schmidt: &quot;Re: [cc65] Re: Macro naming&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Jonathan Graham Harston &lt;<a href="mailto:jgh1arcade.demon.co.uk?Subject=Re:%20[cc65]%20Re:%20Macro%20naming">jgh1arcade.demon.co.uk</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-05-31 02:00:53</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt; Message-ID: &lt;20080530090951.GA3166&#64;trixie&#46;<!--nospam-->musoftware.de&gt;
+ 
+&gt; Again: Bad idea. Using these identifiers is inherently non portable, because
+&gt; you rely on something the compiler maker says. It may change every day and
+if
+ 
+If a compiler writer deliberately pisses off their userbase, then they will
+and will deserve to have their compiler shunned by the world and their
+neighbour.
+ 
+&gt; in your code. You can either set this #define in the makefile when calling
+the
+&gt; preprocessor. Or you can use your own header file, for example machine.h
+which
+&gt; does something like this:
+[snip]
+&gt; With such a file, if compiler semantics change, or if you want to support a
+&gt; new compiler, you have to change ONE file, and not every file.
+ 
+Exactly!!!! But what are the predefined macros?!?!?!?????
+ 
+&gt; Regarding code like this:
+&gt; 
+&gt; &gt; #ifdef __riscos__
+&gt; &gt;   setfileattr(fn, load, exec, attr);
+&gt; &gt; #elif __win32__
+&gt; &gt;   writeattr(fn, mdateoff, ro);
+&gt; &gt; #elif __macos__
+&gt; &gt;   filer_setinf(fn, macfdate(mdateoff));
+&gt; &gt; #endif
+&gt; &gt; etc...
+&gt; 
+&gt; Don't do it. Instead, supply your own set_file_attr() function with
+semantics
+&gt; defined by you.
+ 
+That ***IS***!!!!!!!! the set_file_attr() code. How else would you
+write it?????
+ 
+/* hostio.c - Interface with host system */
+/* Platform-specific code in this module */
+ 
+void set_file_attr(fn, fn_info)
+char * fn; t_file * fn_info;
+{
+#ifdef __riscos__
+   xswi(OS_File, 1, fn, fn_info.load, fn_info.exec, fn_info.attr);
+#elif __win32__
+   SetFileMDate(fn, fn_info.mdate, fn_info.mtime);
+   SetFileAttribute(fn, fn_info.ro);
+#elif __macos__
+   filer_setinf(fn, macfdate(fn_info.mdate,fn_info.mtime));
+#endif
+}
+ 
+or an example closer to cc65, the conio header file. You can't
+even do something as simple as clearing the screen without
+a conditional set of #define CH_CLR statements.
+ 
+Are you really sitting up and saying to the world &quot;fuck off and
+stop daring to try and write anything that's not for Windows&quot;?
+Especially a community that *IS* developing a system that
+doesn't target Windows.
+ 
+Based on hours of trawling the web I found the documents in
+<a href="http://mdfs.net/Docs/Comp/C">http://mdfs.net/Docs/Comp/C</a> and I'm just going to go ahead and
+use __(lowercase)__.
+ 
+-- 
+J.G.Harston - jgh&#64;arcade&#46;<!--nospam-->demon.co.uk - mdfs.net/User/JGH
+Youth has now fled. Their best years have been passed in the service
+of the party. They are ageing and their ideals have also passed,
+dispersed by the contrarities of daily struggles.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat May 31 03:00:54 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6133.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Re: Macro naming"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6131.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Re: Macro naming"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6133.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Re: Macro naming"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6133.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Re: Macro naming"</a></li>
+<li><dfn>Reply</dfn>:  <a href="../2008-06/6134.html" title="Message sent in reply to this message">Markus Stehr: "Re: [cc65] Re: Macro naming"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6132" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6132" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6132" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-05-31 03:00:57 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Need to pass drive number </title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Need to pass drive number in addition to device number to cbm_opendir" />
+<meta name="Date" content="2012-05-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Need to pass drive number in addition to device number to cbm_opendir</h1>
+<!-- received="Tue May 29 20:36:57 2012" -->
+<!-- isoreceived="20120529183657" -->
+<!-- sent="Tue, 29 May 2012 20:36:39 +0200" -->
+<!-- isosent="20120529183639" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Need to pass drive number in addition to device number to cbm_opendir" -->
+<!-- id="20120529183639.GA28557@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="201205281449.36484.groepaz&#64;gmx.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10337.html" title="Oliver Schmidt: &quot;Re: [cc65] Need to pass drive number in addition to device number to cbm_opendir&quot;">Next message</a> ]
+[ <a href="10335.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Need to pass drive number in addition to device number to cbm_opendir&quot;">Previous message</a> ]
+[ <a href="10328.html" title="Groepaz: &quot;Re: [cc65] Need to pass drive number in addition to device number to cbm_opendir&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10337.html" title="Oliver Schmidt: &quot;Re: [cc65] Need to pass drive number in addition to device number to cbm_opendir&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Need%20to%20pass%20drive%20number%20in%20addition%20to%20device%20number%20to%20cbm_opendir">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-05-29 20:36:39</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Mon, May 28, 2012 at 02:49:36PM +0200, Groepaz wrote:
+&gt; and i still wonder... WHY? at least two implementations are available (one
+&gt; from greg if i recall correctly, the other from myself). what the hell is
+&gt; wrong with them? =P
+
+The one from Greg doesn't only implement open-/read-/closedir, but does also
+completely change the syntax of file names, implements stat and friends,
+rewind and other stuff, changes things that Greg didn't like in many different
+places (comments, function declarations with unnecessary __fastcall__, types
+in function declarations, ...) and more. The stuff Greg sent me has a total
+size of &gt; 90KB.
+
+There's nothing to say against implementing stat or whatever. I would also
+happily apply patches that fix typos in comments and improve their wording
+(I'm not a native english speaker after all). But I want these patches broken
+down and one by one. I'm not going to apply a monster patch that changes 10
+different things at once and that I'm not able to grasp within a reasonable
+time. In the given case, I had also decided against changing file name syntax
+earlier, so if I have only one big chunk with completely rewritten file name
+parsing, it won't get applied.
+
+Don't get me wrong, Greg is a genius, and I appreciate, what he is doing. But
+he has the tendency to mix up lots of different things in his patches. Just
+the diffs(!) to implement a clock() function for the Lynx had more than 90 KB.
+To get this in relation: The complete source code of the Lynx specific library
+is just 80KB!  After my complaints he was fortunately able to strip it down to
+a 3.5 KB patch, which I happily applied.
+
+When it was in this stage, I had already forgotten the link you posted, so
+I decided to do it myself, stopped somewhere in between, and managed to
+somehow loose the sources, as I found out now when looking for them.
+
+So it's not bad will on my side, just an unfortunate coincidence.
+
+I might start over with your C module, but as you probably know it is not
+usable as is and will need some work.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue May 29 20:36:57 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10337.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Need to pass drive number in addition to device number to cbm_opendir"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10335.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Need to pass drive number in addition to device number to cbm_opendir"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10328.html" title="Message to which this message replies">Groepaz: "Re: [cc65] Need to pass drive number in addition to device number to cbm_opendir"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10337.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Need to pass drive number in addition to device number to cbm_opendir"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10337.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Need to pass drive number in addition to device number to cbm_opendir"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10336" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10336" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10336" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-05-29 20:37:00 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] rebuilding libraries - ge</title>
+<meta name="Author" content="jimsymolon (jsymolon01_at_attbi.com)">
+<meta name="Subject" content="Re: [cc65] rebuilding libraries - generated program crashes">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] rebuilding libraries - generated program crashes</h1>
+<!-- received="Sat Jun  7 21:28:12 2003" -->
+<!-- isoreceived="20030607192812" -->
+<!-- sent="Sat, 07 Jun 2003 15:15:44 -0400" -->
+<!-- isosent="20030607191544" -->
+<!-- name="jimsymolon" -->
+<!-- email="jsymolon01_at_attbi.com" -->
+<!-- subject="Re: [cc65] rebuilding libraries - generated program crashes" -->
+<!-- id="3EE239E0.8030500@attbi.com" -->
+<!-- inreplyto="3ED69925.2090806@attbi.com" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> jimsymolon (<a href="mailto:jsymolon01_at_attbi.com?Subject=Re:%20[cc65]%20rebuilding%20libraries%20-%20generated%20program%20crashes"><em>jsymolon01_at_attbi.com</em></a>)<br>
+<strong>Date:</strong> 2003-06-07 21:15:44
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3084.html">Ullrich von Bassewitz: "Re: [cc65] OT: Atari ML help"</a>
+<li><strong>In reply to:</strong> <a href="../2003-05/3048.html">jimsymolon: "Re: [cc65] rebuilding libraries - generated program crashes"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3086.html">Ullrich von Bassewitz: "Re: [cc65] rebuilding libraries - generated program crashes"</a>
+<li><strong>Reply:</strong> <a href="3086.html">Ullrich von Bassewitz: "Re: [cc65] rebuilding libraries - generated program crashes"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+jimsymolon wrote:
+
+&gt; Ullrich von Bassewitz wrote:
+&gt;
+&gt;&gt; On Fri, May 30, 2003 at 12:20:05AM +0200, Groepaz wrote:
+&gt;&gt;  
+&gt;&gt;
+&gt;&gt;&gt; mmmh i dont think this is a windows cr/lf related problem (ofcoz, 
+&gt;&gt;&gt; still check
+&gt;&gt;&gt; it! :=)) ... i'm using a simelar setup for the c64 (one linux box, one
+&gt;&gt;&gt; windoze box, and because i havent really bothered looking into 
+&gt;&gt;&gt; cbm4linux yet
+&gt;&gt;&gt; the 1541 is hooked to the windoze pc) and never had problems related 
+&gt;&gt;&gt; to cr/lf
+&gt;&gt;&gt; conversion. (only tools that expect a &quot;text&quot; file would have this 
+&gt;&gt;&gt; problem,
+&gt;&gt;&gt; and none of the tools involved does that).
+&gt;&gt;&gt;   
+&gt;&gt;
+&gt;&gt;
+&gt;&gt; All similar problems that have been reported were caused by 
+&gt;&gt; corruption when
+&gt;&gt; transfering files. And Samba is able to do some sort of &quot;auto 
+&gt;&gt; conversion&quot;. So
+&gt;&gt; it's really worth to check it.
+&gt;&gt;
+&gt;&gt; Regards
+&gt;&gt;
+&gt;&gt;
+&gt;&gt;        Uz
+&gt;&gt;
+&gt;&gt;
+&gt;&gt;  
+&gt;&gt;
+&gt; I'll take a look into the samba angle.
+&gt;
+&gt;
+&gt;
+&gt;
+&gt; ----------------------------------------------------------------------
+&gt; To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20rebuilding%20libraries%20-%20generated%20program%20crashes">majordomo_at_musoftware.de</a> with
+&gt; the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+&gt;
+I've started from scratch.  Deleted the windows and linux installs and 
+re-installed.
+
+The original library and the re-build on linux are the same size.  I 
+really don't think that it is a compiler or assembler problem.
+
+The windows install is on the local C: drive.  It is not using Samba as 
+a file server.
+
+Both systems produce the same binary files.
+
+How I build:
+cl65 -t apple2 -l -o hello hello.c
+ld65 -t apple2 -o hello hello.o /usr/lib/cc65/apple2.o apple2.lib
+
+This consistantly builds the same binary file.
+
+I've installed a linux apple2 emulator (with svgalibs ...).  Using this 
+and the applewin emulator produce the same results.
+
+I load the binary file into a Dos3.3 disk using a2tools and load that 
+&quot;disk&quot; into an emulator.
+
+&quot;Boot&quot; the apple2 and BLOAD the file into memory at location $800
+    ]BLOAD HELLO,A$800
+    ]CALL-151
+    *800L
+    0800-00        BRK  
+    0801-08        PHP
+    0802-C4 09     CPY $09
+    0804-A2 19     LDX #$19
+    0806-B5 00     LDA $00,X
+    0808-9D 98 11  STA $1198,X
+    080B-CA        DEX
+    080C-10 F8     BPL $0806
+    080E-20 F1 0E  JSR $0EF1
+    0811-BA        TSX
+    0812-8E C4 11  STX $11C4
+    0815-A5 73     LDA $73
+    0817-85 00     STA $00
+    0819-A5 74     LDA $74
+    081B-85 01     STA $01
+    081D-20 34 0F  JSR $0F34
+    0820-A9 FF     LDA #$FF
+    0822-85 32     STA $32
+    0824-20 08 10  JSR $1008
+    0827-20 08 10  JSR $1008
+
+This the start of the crt0 from the library.  The program will BRK 
+immediately, so I tell it to start at $802.  It usually BRKs at $100A, 
+but I know that all the JSRs are resolved to the wrong addresses.  For 
+example:  the jsr $ef1 is the zerobss function call.  If I dump the $EF1 
+memory it looks like so:
+
+    0EF1-AE B6 11 LDX $11B6
+    0EF4-60       RTS
+    0EF5-A9 C4    LDA #$C4
+    0EF7-85 08    STA $08
+    0EF9-A9 11    LDA #$11
+    0EFB-85 09    STA $09
+    0EFD-A9 00    LDA #$00
+    0EFF-A8       TAY
+    0F00-A2 00    LDX #$00
+    0F02-F0 0A    BEQ $0F0E
+    0F04-91 08    STA ($08),Y
+    0F06-C8       INY
+    0F07-D0 FB    BNE $0F04
+    0F09-E6 09    INC $09
+    0F0B-CA       DEX
+    0F0C-D0 F6    BNE $0F04
+
+
+  Starting from $0EF5, I would say that's the zerobss code.  It's pretty 
+close to what the assembler listing.
+
+000000r 1               zerobss:
+000000r 1  A9 rr            lda    #&lt;__BSS_RUN__
+000002r 1  85 rr            sta    ptr1
+000004r 1  A9 rr            lda    #&gt;__BSS_RUN__
+000006r 1  85 rr            sta    ptr1+1
+000008r 1  A9 00            lda    #0
+00000Ar 1  A8               tay
+00000Br 1
+00000Br 1               ; Clear full pages
+00000Br 1
+00000Br 1  A2 rr        L1:    ldx    #&gt;__BSS_SIZE__
+00000Dr 1  F0 0A            beq    L3
+00000Fr 1  91 rr        L2:    sta    (ptr1),y
+000011r 1  C8                  iny
+000012r 1  D0 FB               bne    L2
+000014r 1  E6 rr            inc    ptr1+1
+000016r 1  CA               dex
+000017r 1  D0 F6            bne    L2
+
+
+But the main program JSRs to 4 bytes before ??  I've produced a verbose 
+map and this is part of the Exports List:
+
+_vcprintf                 000EC1 RL
+zerobss                   000EF1 RL
+addysp1                  000F14 RL
+addysp                    000F15 RL
+
+Taking a quick look at the code at $F14:
+0f10-f0 05   BEQ $0F17
+0F12-91 08   STA ($08),Y
+0F14-C8      INY
+0F15-D0 F7   BNE $0F0E
+0F17-60      RTS
+0F18-C8      INY
+0F19-48      PHA
+0F1A-18      CLC
+0F1B-98      TYA
+0F1C-65 00   ADC $00
+0F1E-85 00   STA $00
+
+If my theory is correct - addysp and addysp1 should be at 0F18 and 0F19:
+000000r 1                          .export        addysp1, addysp
+000000r 1                   .importzp    sp
+000000r 1
+000000r 1               addysp1:
+000000r 1  C8               iny
+000001r 1  48           addysp:    pha                   ; Save A
+000002r 1  18                clc
+000003r 1  98                tya                   ; Get the value
+000004r 1  65 rr             adc    sp               ; Add low byte
+000006r 1  85 rr             sta    sp               ; Put it back
+
+And it looks pretty close.
+
+What I think is happening, is the EXEHDR is not being stripped off. 
+ What can be done to supress the EXEHDR from the output file ?
+
+I've just checked by &quot;stripping&quot; the 1st four bytes off by loading &quot;low&quot;.
+   ]BLOAD HELLO,A$7FC
+
+and it runs fine.  Damn....
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20rebuilding%20libraries%20-%20generated%20program%20crashes">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3084.html">Ullrich von Bassewitz: "Re: [cc65] OT: Atari ML help"</a>
+<li><strong>In reply to:</strong> <a href="../2003-05/3048.html">jimsymolon: "Re: [cc65] rebuilding libraries - generated program crashes"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3086.html">Ullrich von Bassewitz: "Re: [cc65] rebuilding libraries - generated program crashes"</a>
+<li><strong>Reply:</strong> <a href="3086.html">Ullrich von Bassewitz: "Re: [cc65] rebuilding libraries - generated program crashes"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-06-07 21:28:36 CEST</em>
+</em>
+</small>
+</body>
+</html>

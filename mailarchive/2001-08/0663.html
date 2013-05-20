@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: RE: Re[2]: [cc65] Graphics library</title>
+<meta name="Author" content="Mike McCarty (jmccarty_at_ssd.usa.alcatel.com)">
+<meta name="Subject" content="RE: Re[2]: [cc65] Graphics library">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>RE: Re[2]: [cc65] Graphics library</h1>
+<!-- received="Wed Aug 15 20:15:43 2001" -->
+<!-- isoreceived="20010815181543" -->
+<!-- sent="Wed, 15 Aug 2001 13:15:21 -0500 (CDT)" -->
+<!-- isosent="20010815181521" -->
+<!-- name="Mike McCarty" -->
+<!-- email="jmccarty_at_ssd.usa.alcatel.com" -->
+<!-- subject="RE: Re[2]: [cc65] Graphics library" -->
+<!-- id="Pine.SOL.4.10.10108151308060.610-100000@sun1307.ssd.usa.alcatel.com" -->
+<!-- inreplyto="1D2B2C77C9CF964EB1331ABEB51562E1AB893D@ukntsvr2.uk.drte.com" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Mike McCarty (<a href="mailto:jmccarty_at_ssd.usa.alcatel.com?Subject=RE:%20Re[2]:%20[cc65]%20Graphics%20library"><em>jmccarty_at_ssd.usa.alcatel.com</em></a>)<br>
+<strong>Date:</strong> 2001-08-15 20:15:21
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0664.html">Mike McCarty: "Re: Re[4]: [cc65] Graphics library"</a>
+<li><strong>Previous message:</strong> <a href="0662.html">Arvid Norberg: "Re: Re[2]: [cc65] Graphics library"</a>
+<li><strong>In reply to:</strong> <a href="0659.html">Keates, Mark: "RE: Re[2]: [cc65] Graphics library"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0666.html">groepaz: "Re[4]: [cc65] Graphics library"</a>
+<li><strong>Reply:</strong> <a href="0666.html">groepaz: "Re[4]: [cc65] Graphics library"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Wed, 15 Aug 2001, Keates, Mark wrote:
+
+&gt; (I'm losing it... replying to myself ;-)
+&gt; 
+&gt; &gt; DrawLine(x1,y1,x2,y2)
+&gt; &gt; {
+&gt; &gt; 	switch (getsystype())
+&gt; &gt; 	{
+&gt; &gt; 		case SYS_ATARI: atari_DrawLine(x1,y1,x2,y2); break;
+&gt; &gt; 		case SYS_CBM64: cbm64_DrawLine(x1,y1,x2,y2); break;
+&gt; &gt; 		...
+&gt; &gt; 	}
+&gt; &gt; }
+&gt; &gt; 
+&gt; &gt; I guess this could work if each function was in its own .o file.
+&gt; &gt; Does LD65 handle this?
+&gt; 
+&gt; This isn't possible because the DrawLine function HAS a reference
+&gt; to each implementation and so everything will be linked.
+&gt; 
+&gt; Therefore you DO need to build a lib for each target.
+&gt; 
+&gt; Therefore I think Mike's argument of fgets() not having the same 
+&gt; implementation on Sun/Solaris as on the 6502 is immaterial as 
+&gt; the host would never link with the other's library.
+&gt; 
+&gt; Mark
+
+My point was that the term &quot;library&quot; means simply that a bunch of stuff
+is put into one repository, and has *nothing* to do with the
+implementation.
+
+One could, in building a program, put his special particular main()
+function into a library.
+
+I was addressing the comment that perhaps the term &quot;library&quot; should be
+dropped from the discussion, and the word &quot;interface&quot; substituted for
+it.
+
+Now, if we want to discuss trying to build a common library which would
+work for all targets, that seems simple to me. When compiling for any
+given target, one would pass the compiler the name of the target. This
+could be done via define. Then the include file would generate macros
+for each interface which expand to different names based on the
+intended target. No magic here. And no run-time decisions. The linker
+simply does its job, no special mods needed. This type of thing is
+routinely done on other machines, though not always with macros. For
+example, the Borland compilers allow one to use hardware floating
+point, or one of two different software floating point emulations (one
+completely compatible, one faster). On the VAX, one can choose the size
+of double by means of a switch.
+
+I'm not sure it is desirable to build a single library which would work
+for all targets. One library per target seems reasonable to me. Well,
+one library per target for each library. One might want a separate
+graphics library, and not put the graphics code into the common
+library. This is the usual case for UNIX-like systems, which segregate
+the math library, for example.
+
+Mike
+-- 
+char *p=&quot;char *p=%c%s%c;main(){printf(p,34,p,34);}&quot;;main(){printf(p,34,p,34);}
+This message made from 100% recycled bits.
+I can explain it for you, but I can't understand it for you.
+I don't speak for Alcatel      &lt;- They make me say that.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=RE:%20Re[2]:%20[cc65]%20Graphics%20library">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0664.html">Mike McCarty: "Re: Re[4]: [cc65] Graphics library"</a>
+<li><strong>Previous message:</strong> <a href="0662.html">Arvid Norberg: "Re: Re[2]: [cc65] Graphics library"</a>
+<li><strong>In reply to:</strong> <a href="0659.html">Keates, Mark: "RE: Re[2]: [cc65] Graphics library"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0666.html">groepaz: "Re[4]: [cc65] Graphics library"</a>
+<li><strong>Reply:</strong> <a href="0666.html">groepaz: "Re[4]: [cc65] Graphics library"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:41 CET</em>
+</em>
+</small>
+</body>
+</html>

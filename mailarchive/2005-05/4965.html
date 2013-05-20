@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Hello and ca65 questions</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Hello and ca65 questions" />
+<meta name="Date" content="2005-05-09" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Hello and ca65 questions</h1>
+<!-- received="Mon May  9 13:52:21 2005" -->
+<!-- isoreceived="20050509115221" -->
+<!-- sent="Mon, 9 May 2005 13:52:13 +0200" -->
+<!-- isosent="20050509115213" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Hello and ca65 questions" -->
+<!-- id="20050509115213.GA9189@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="opsqhzy1w04jhyy0&#64;smtp.monlynx.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4966.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] va_copy(): Any alternatives&quot;">Next message</a> ]
+[ <a href="4964.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Forcing absolute adressing mode instead of zeropage?&quot;">Previous message</a> ]
+[ <a href="4962.html" title="42Bastian Schick: &quot;[cc65] Hello and ca65 questions&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4967.html" title="Mats Andrén: &quot;Re: [cc65] Hello and ca65 questions&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Hello%20and%20ca65%20questions">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-05-09 13:52:13</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Mon, May 09, 2005 at 09:48:27AM +0200, 42Bastian Schick wrote:
+&gt; Since the Lynx part of cc65 is now included I decided to enter this list
+&gt; as well.
+
+Welcome!
+
+&gt; One thing (I fixed myself) are variables.
+&gt;
+&gt; Many assemblers offer this (using the pseudo I introduced into ca65 :-)
+&gt;
+&gt; ab == 10
+&gt; 	lda #ab
+&gt;
+&gt; ab == ab +10
+&gt;
+&gt; 	lda #ab
+&gt;
+&gt; The resulting code has lda #10 and lda #20.
+&gt;
+&gt; This works fine for absolute references and could be nicely integrated
+&gt; into ca65 w/o touching too much.
+
+Not really. ca65 is a one pass assembler, and as such delays evaluation of
+many expressions until end of assembly. If the expression changes several
+times, which one should be evaluated in the end?
+
+In general, there's a problem with forward references and variables. As an
+extreme example, how should the following get evaluated?
+
+        foo = bar + 10
+                .word   foo             ; ?
+        foo = foo + 10
+                .word   foo             ; ?
+        bar = foo + 10
+                .word   bar             ; ?
+        foo = bar + 10
+                .word   foo             ; ?
+        bar = 3
+
+&gt; The second thing I have (not yet) found is a way to use macro-parameters
+&gt; to construct e.g. labels.
+
+There is currently no way to &quot;build&quot; identifiers. But you are right, this
+would be a useful addition.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon May  9 13:52:21 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4966.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] va_copy(): Any alternatives"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4964.html" title="Previous message in the list">Spiro Trikaliotis: "Re: [cc65] Forcing absolute adressing mode instead of zeropage?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4962.html" title="Message to which this message replies">42Bastian Schick: "[cc65] Hello and ca65 questions"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4967.html" title="Next message in this discussion thread">Mats Andrén: "Re: [cc65] Hello and ca65 questions"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4967.html" title="Message sent in reply to this message">Mats Andrén: "Re: [cc65] Hello and ca65 questions"</a></li>
+<li><dfn>Reply</dfn>:  <a href="4969.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Re: [cc65] Hello and ca65 questions"</a></li>
+<li><dfn>Reply</dfn>:  <a href="4972.html" title="Message sent in reply to this message">42Bastian Schick: "Re: [cc65] Hello and ca65 questions"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4965" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4965" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4965" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-05-09 13:52:24 CEST
+</em></small></p>
+</body>
+</html>

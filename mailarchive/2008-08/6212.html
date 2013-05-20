@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Passing variables from asm</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Passing variables from asm to c and vice versa" />
+<meta name="Date" content="2008-08-05" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Passing variables from asm to c and vice versa</h1>
+<!-- received="Tue Aug  5 22:17:12 2008" -->
+<!-- isoreceived="20080805201712" -->
+<!-- sent="Tue, 5 Aug 2008 22:17:01 +0200" -->
+<!-- isosent="20080805201701" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Passing variables from asm to c and vice versa" -->
+<!-- id="20080805201701.GA20289@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="200808052159.42438.groepaz&#64;gmx.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6213.html" title="Groepaz: &quot;Re: [cc65] Passing variables from asm to c and vice versa&quot;">Next message</a> ]
+[ <a href="6211.html" title="Groepaz: &quot;Re: [cc65] Passing variables from asm to c and vice versa&quot;">Previous message</a> ]
+[ <a href="6211.html" title="Groepaz: &quot;Re: [cc65] Passing variables from asm to c and vice versa&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6213.html" title="Groepaz: &quot;Re: [cc65] Passing variables from asm to c and vice versa&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Passing%20variables%20from%20asm%20to%20c%20and%20vice%20versa">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-08-05 22:17:01</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Tue, Aug 05, 2008 at 09:59:42PM +0200, Groepaz wrote:
+&gt; eeeeeh did you actually link a proper second file that has these pointers?
+
+The source will not even compile, so there's no chance to link a second file.
+
+&gt; i am using a similar (almost exactly the same) construct to include all my
+&gt; binary data in dozens of projects, all compiled with gcc :)
+
+Maybe your variables weren't declared &quot;static&quot;?
+
+This is what the standard says about constant initializers:
+
+-----------------------------------------------------------------------------
+6.6 Constant expressions
+[...]
+6 An integer constant expression shall have integer type and shall only have
+  operands that are integer constants, enumeration constants, character
+  constants, sizeof expressions whose results are integer constants, and
+  floating constants that are the immediate operands of casts. Cast operators
+  in an integer constant expression shall only convert arithmetic types to
+  integer types, except as part of an operand to the sizeof operator.
+
+7 More latitude is permitted for constant expressions in initializers. Such a
+  constant expression shall be, or evaluate to, one of the following:
+
+  - an arithmetic constant expression,
+
+  - a null pointer constant,
+
+  - an address constant, or
+
+  - an address constant for an object type plus or minus an integer constant
+    expression.
+
+[...]
+6.7.8 Initialization
+[...]
+4 All the expressions in an initializer for an object that has static storage
+  duration shall be constant expressions or string literals.
+-----------------------------------------------------------------------------
+
+&gt; or i am missing something =P
+
+Probably yes:-)
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Aug  5 22:17:12 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6213.html" title="Next message in the list">Groepaz: "Re: [cc65] Passing variables from asm to c and vice versa"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6211.html" title="Previous message in the list">Groepaz: "Re: [cc65] Passing variables from asm to c and vice versa"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6211.html" title="Message to which this message replies">Groepaz: "Re: [cc65] Passing variables from asm to c and vice versa"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6213.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] Passing variables from asm to c and vice versa"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6213.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] Passing variables from asm to c and vice versa"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6214.html" title="Message sent in reply to this message">Stefan: "Re: [cc65] Passing variables from asm to c and vice versa"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6212" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6212" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6212" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-08-05 22:17:14 CEST
+</em></small></p>
+</body>
+</html>

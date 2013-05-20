@@ -1,0 +1,651 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] printf for ca65</title>
+<meta name="Author" content="MagerValp (MagerValp1cling.gu.se)" />
+<meta name="Subject" content="[cc65] printf for ca65" />
+<meta name="Date" content="2005-03-22" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] printf for ca65</h1>
+<!-- received="Tue Mar 22 14:51:11 2005" -->
+<!-- isoreceived="20050322135111" -->
+<!-- sent="Tue, 22 Mar 2005 14:51:07 +0100" -->
+<!-- isosent="20050322135107" -->
+<!-- name="MagerValp" -->
+<!-- email="MagerValp1cling.gu.se" -->
+<!-- subject="[cc65] printf for ca65" -->
+<!-- id="16960.8907.267630.656720@panini.cling.gu.se" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="16952.29906.937446.240103&#64;panini.cling.gu.se" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4825.html" title="MagerValp: &quot;[cc65] Macro label scoping (Was: printf for ca65)&quot;">Next message</a> ]
+[ <a href="4823.html" title="MagerValp: &quot;Re: [cc65] macro woes&quot;">Previous message</a> ]
+[ <a href="4823.html" title="MagerValp: &quot;Re: [cc65] macro woes&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4825.html" title="MagerValp: &quot;[cc65] Macro label scoping (Was: printf for ca65)&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: MagerValp &lt;<a href="mailto:MagerValp1cling.gu.se?Subject=Re:%20[cc65]%20printf%20for%20ca65">MagerValp1cling.gu.se</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-03-22 14:51:07</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Using a little bit of macro magic, I managed to convince ca65 to allow
+printf-like calls in assembly code:
+
+	jsr fs_dir_root
+	jsr fs_dir_open
+  &#64;readdir:
+	jsr fs_dir_read
+	bcs &#64;eod
+
+	printf &quot;%04x%04x\t%s\n&quot;, fs_dir_node, fs_dir_node + 2, fs_dir_name
+	jmp &#64;readdir
+  &#64;eod:
+
+It saves A/X/Y, making it simple to use inside loops, and it's a lot
+more readable (imho) than a bunch of calls to console_out/strout/
+hexout. The printf macro translates the line above into:
+
+	pha
+	phx
+	phy
+	ldax #arglist
+	jsr console_printf
+	ply
+	plx
+	pla
+
+	.pushseg
+	.rodata
+  string:
+	.asciiz &quot;%04x%04x\t%s\n&quot;
+  arglist:
+	.addr string
+	.addr fs_dir_node + 2
+	.addr fs_dir_node
+	.addr fs_dir_name
+
+	.popseg
+
+The code I'm working on now is all asm and doesn't use the C runtime
+(and thus no argument stack), so it only works almost, but not quite,
+like the printf we all know and love. The following argument types are
+supported:
+
+	%s	null terminated string
+	%d	16-bit unsigned int, printed in decimal
+	%x	16-bit unsigned int, printed in hex
+	%c	8-bit char
+
+%d and %x support leading 0s, and field widths. The rest are left as
+an excercise for the reader :) The following escape chars are also
+translated to ascii (at runtime):
+
+	\e	escape (27)
+	\a	bell (7)
+	\b	backspace (g)
+	\f	formfeed (12)
+	\n	newline (10)
+	\r	return (13)
+	\t	tab (9)
+	\\	backslash (92)
+
+The code expects console_out to print the char in A (so just point it
+to $ffd2 or similar), and console_strout is fed a pointer to a null
+terminated string in A/X.
+
+Enjoy!
+
+
+---------------------------- begin ldax.i ------------------------------
+; load A/X
+	.macro ldax arg
+	.if (.match (.left (1, arg), #))	; immediate mode
+	lda #&lt;(.right (.tcount (arg)-1, arg))
+	ldx #&gt;(.right (.tcount (arg)-1, arg))
+	.else					; assume absolute or zero page
+	lda arg
+	ldx 1+(arg)
+	.endif
+	.endmacro
+
+; store A/X
+	.macro stax arg
+	sta arg
+	stx 1+(arg)
+	.endmacro	
+----------------------------- end ldax.i -------------------------------
+
+--------------------------- begin printf.i -----------------------------
+	.import console_printf
+
+
+	.macro printfargs arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
+	.ifnblank arg1
+	    .addr arg1
+	    printfargs arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
+	.endif
+	.endmacro
+
+	.macro printf str, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
+
+	.local arglist
+	.local string
+
+	pha
+	.ifpc02
+	phx
+	phy
+	.else
+	txa
+	pha
+	tya
+	pha
+	.endif
+	ldax #arglist
+	jsr console_printf
+	.ifpc02
+	ply
+	plx
+	.else
+	pla
+	tay
+	pla
+	tax
+	.endif
+	pla
+
+	.pushseg
+	.rodata
+	.if (.match(str, &quot;&quot;))
+string:
+	    .asciiz str
+arglist:
+	    .addr string
+	.else
+arglist:
+	    .addr str
+	.endif
+
+	printfargs arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
+
+	.popseg
+
+	.endmacro
+---------------------------- end printf.i ------------------------------
+
+--------------------------- begin printf.s -----------------------------
+	.include &quot;ldax.i&quot;
+
+
+	.export console_printf
+
+
+	.import console_out
+	.import console_strout
+
+
+	.zeropage
+
+strptr:		.res 2
+argptr:		.res 2
+valptr:		.res 2
+ysave:		.res 1
+arg:		.res 1
+fieldwidth:	.res 1
+fieldwcnt:	.res 1
+leadzero:	.res 1
+argtemp:	.res 1
+int:		.res 2
+num:		.res 5
+ext:		.res 2
+
+
+	.code
+
+console_printf:
+	stax argptr
+	ldy #0
+	lda (argptr),y
+	sta strptr
+	iny
+	lda (argptr),y
+	sta strptr + 1
+	iny
+	sty arg
+
+	ldy #0
+&#64;nextchar:
+	lda (strptr),y
+	bne :+
+	rts
+:
+	cmp #'%'
+	beq &#64;printarg
+
+	cmp #'\'
+	beq &#64;printescape
+
+	jsr console_out
+
+&#64;next:
+	iny
+	bne &#64;nextchar
+
+	inc strptr + 1
+	jmp &#64;nextchar
+
+&#64;printescape:
+	iny
+	bne :+
+	inc strptr + 1
+:	lda (strptr),y
+	ldx #esc_count - 1
+:	cmp esc_code,x
+	beq &#64;escmatch
+	dex
+	bpl :-
+	bmi &#64;next
+&#64;escmatch:
+	lda esc_char,x
+	jsr console_out
+	jmp &#64;next
+
+&#64;printarg:
+	lda #0
+	sta fieldwidth
+	sta leadzero
+	lda #$ff
+	sta fieldwcnt
+&#64;argnext:
+	iny
+	bne :+
+	inc strptr + 1
+:
+	tya
+	pha
+
+	lda (strptr),y
+
+	cmp #'0'		; check for field width
+	bcc &#64;notdigit
+	cmp #'9'+1
+	bcs &#64;notdigit
+	and #$0f
+	bne :+			; check for leading 0
+	inc fieldwcnt
+	bne :+
+	lda #$80
+	sta leadzero
+	pla
+	tay
+	jmp &#64;argnext
+:
+	pha			; multiply old value by 10
+	asl fieldwidth
+	lda fieldwidth
+	asl
+	asl
+	clc
+	adc fieldwidth
+	sta fieldwidth
+	pla
+	clc			; add new value
+	adc fieldwidth
+	sta fieldwidth
+	pla
+	tay
+	jmp &#64;argnext
+
+&#64;notdigit:
+	cmp #'s'
+	beq &#64;argstr
+
+	cmp #'d'
+	beq &#64;argint
+
+	cmp #'x'
+	beq &#64;arghex
+
+	cmp #'c'
+	beq &#64;argchar
+
+&#64;argdone:
+	pla
+	tay
+	jmp &#64;next
+
+&#64;argstr:
+	jsr &#64;argax
+	jsr console_strout
+
+	jmp &#64;argdone
+
+&#64;argint:
+	jsr &#64;argax
+	stax valptr
+	jsr &#64;valax
+	jsr printint
+
+	jmp &#64;argdone
+
+&#64;arghex:
+	jsr &#64;argax
+	stax valptr
+	jsr &#64;valax
+	jsr printhex
+
+	jmp &#64;argdone
+
+&#64;argchar:
+	jsr &#64;argax
+	stax valptr
+	ldy #0
+	lda (valptr),y
+	jsr console_out
+
+	jmp &#64;argdone
+
+&#64;argax:
+	ldy arg
+	lda (argptr),y
+	pha
+	iny
+	lda (argptr),y
+	tax
+	iny
+	sty arg
+	pla
+	rts
+
+&#64;valax:
+	ldy #0
+	lda (valptr),y
+	pha
+	iny
+	lda (valptr),y
+	tax
+	pla
+	rts
+
+&#64;printx:
+	txa
+	lsr
+	lsr
+	lsr
+	lsr
+	tay
+	lda hex2asc,y
+	jsr console_out
+	txa
+	and #$0f
+	tay
+	lda hex2asc,y
+	jmp console_out
+
+
+; print 16-bit hexadecimal number
+printhex:
+	tay
+	and #$0f
+	sta num + 3
+	tya
+	lsr
+	lsr
+	lsr
+	lsr
+	sta num + 2
+
+	txa
+	and #$0f
+	sta num + 1
+	txa
+	lsr
+	lsr
+	lsr
+	lsr
+	sta num
+
+	lda #4
+	sec
+	sbc fieldwidth
+	tax
+	bpl :+
+	jsr printlong
+:
+	cpx #4
+	beq &#64;nowidth
+
+&#64;printlead:
+	lda num,x
+	bne &#64;printrest
+	lda #' '
+	bit leadzero
+	bpl :+
+	lda #'0'
+:	jsr console_out
+	inx
+	cpx #3
+	bne &#64;printlead
+
+&#64;nowidth:
+	ldx #0
+:	lda num,x
+	bne &#64;printrest
+	inx
+	cpx #4
+	bne :-
+	lda #'0'
+	jsr console_out
+	rts
+
+&#64;printrest:
+	lda num,x
+	tay
+	lda hex2asc,y
+	jsr console_out
+	inx
+	cpx #4
+	bne &#64;printrest
+	rts
+
+
+printlong:
+	lda #' '
+	bit leadzero
+	bpl :+
+	lda #'0'
+:	jsr console_out
+	inx
+	bne :-
+	rts
+
+
+; print a 16-bit integer
+printint:
+	stax int
+
+	ldx #4
+&#64;next:
+	lda #0
+	sta num,x
+	jsr div10
+	lda ext
+	sta num,x
+	dex
+	bpl &#64;next
+
+	lda fieldwidth
+	beq &#64;nowidth
+	lda #5
+	sec
+	sbc fieldwidth
+	tax
+	bpl :+
+	jsr printlong
+:
+&#64;printlead:
+	lda num,x
+	bne &#64;print
+
+	lda #' '
+	bit leadzero
+	bpl :+
+	lda #'0'
+:	jsr console_out
+	inx
+	cpx #5
+	bne &#64;printlead
+	beq &#64;printzero
+
+&#64;nowidth:
+	inx
+	cpx #5
+	beq &#64;printzero
+	lda num,x
+	beq &#64;nowidth
+
+&#64;print:
+	clc
+	adc #'0'
+	jsr console_out
+	inx
+	cpx #5
+	beq &#64;done
+&#64;printall:
+	lda num,x
+	jmp &#64;print
+
+&#64;done:
+	rts
+
+&#64;printzero:
+	lda #'0'
+	jmp console_out
+
+
+; 16/16-bit division, from the fridge
+; int/aux -&gt; int, remainder in ext
+div10:
+	lda #0
+	sta ext+1
+	ldy #$10
+&#64;dloop:
+	asl int
+	rol int+1
+	rol
+	rol ext+1
+	pha
+	cmp #10
+	lda ext+1
+	sbc #0		; is this a nop?
+	bcc &#64;div2
+	sta ext+1
+	pla
+	sbc #10
+	pha
+	inc int
+&#64;div2:
+	pla
+	dey
+	bne &#64;dloop
+	sta ext
+	rts
+
+
+	.rodata
+
+msg_unimplemented:
+	.byte &quot;&lt;unimplemented&gt;&quot;,0
+
+hex2asc:
+	.byte &quot;0123456789abcdef&quot;
+
+esc_code:
+	.byte &quot;eabfnrt&quot;, '\'
+esc_count	= * - esc_code
+esc_char:
+	.byte 27, 7, 8, 12, 10, 13, 9, '\'
+---------------------------- end printf.s ------------------------------
+
+-- 
+    ___          .     .  .         .       . +  .         .      o   
+  _|___|_   +   .  +     .     +         .  Per Olofsson, arkadspelare
+    o-o    .      .     .   o         +          MagerValp&#64;cling&#46;<!--nospam-->gu.se
+     -       +            +    .     <a href="http://www.cling.gu.se/~cl3polof/">http://www.cling.gu.se/~cl3polof/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Mar 22 14:51:11 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4825.html" title="Next message in the list">MagerValp: "[cc65] Macro label scoping (Was: printf for ca65)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4823.html" title="Previous message in the list">MagerValp: "Re: [cc65] macro woes"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4823.html" title="Message to which this message replies">MagerValp: "Re: [cc65] macro woes"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4825.html" title="Next message in this discussion thread">MagerValp: "[cc65] Macro label scoping (Was: printf for ca65)"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4825.html" title="Message sent in reply to this message">MagerValp: "[cc65] Macro label scoping (Was: printf for ca65)"</a></li>
+<li><dfn>Reply</dfn>:  <a href="4828.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] printf for ca65"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4824" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4824" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4824" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-03-22 14:51:18 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] GeneralPlus-SunPlus...</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] GeneralPlus-SunPlus..." />
+<meta name="Date" content="2009-09-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] GeneralPlus-SunPlus...</h1>
+<!-- received="Wed Sep 23 09:28:31 2009" -->
+<!-- isoreceived="20090923072831" -->
+<!-- sent="Wed, 23 Sep 2009 09:27:38 +0200" -->
+<!-- isosent="20090923072738" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] GeneralPlus-SunPlus..." -->
+<!-- id="20090923072738.GA25850@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="083201ca3bf8$79104cc0$6b30e640$&#64;com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6956.html" title="Thomas Giesel: &quot;[cc65] library path&quot;">Next message</a> ]
+[ <a href="6954.html" title="Ted Larson: &quot;[cc65] GeneralPlus-SunPlus...&quot;">Previous message</a> ]
+[ <a href="6954.html" title="Ted Larson: &quot;[cc65] GeneralPlus-SunPlus...&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20GeneralPlus-SunPlus...">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-09-23 09:27:38</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Tue, Sep 22, 2009 at 07:49:28PM -0700, Ted Larson wrote:
+&gt; I am new to the list.  I have been hunting around for a C compiler that
+&gt; could be used to develop for the GPC1 series (GeneralPlus / SunPlus) chips.
+&gt; CC65 looks ideal, because it looks like it can generate an assembly file
+&gt; that I could pump through the GeneralPlus macro assembler and linker.  I did
+&gt; some Google searches, and found some super old posts about this.  Is there
+&gt; anyone out there currently doing this that can give me any pointers or
+&gt; helpful ideas?
+
+That's difficult without knowing the assembler program. My assumption is that
+your chances are a lot better if you add the sunplus instruction set to the
+ca65 assembler. This has been done before, so it should be manageable.
+
+The compiler emits a lot of ca65 specific things, like segments and forced
+imports. I doubt that this will go through the Sunplus assembler without
+conversion.
+
+&gt; My initial thought was to do some simple programs, compile them, pull them
+&gt; into the Fortis IDE (GPlus tools), and assemble them for a test to link in
+&gt; the necessary stuff.  I did a Hello World type program, and the .s file it
+&gt; generates looks good to go.  It looks like memory management will really be
+&gt; the biggest challenge.especially getting the bank switching in there
+&gt; somehow.  Maybe I am being naïve or missing something.
+
+The code output by the compiler references quite some runtime routines, so you
+will have to convert and manage the runtime library, too.
+
+Regards
+
+
+	Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Sep 23 09:28:31 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6956.html" title="Next message in the list">Thomas Giesel: "[cc65] library path"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6954.html" title="Previous message in the list">Ted Larson: "[cc65] GeneralPlus-SunPlus..."</a></li>
+<li><dfn>In reply to</dfn>: <a href="6954.html" title="Message to which this message replies">Ted Larson: "[cc65] GeneralPlus-SunPlus..."</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6955" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6955" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6955" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-09-23 09:28:33 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] gfx modules</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="[cc65] gfx modules">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] gfx modules</h1>
+<!-- received="Sun Nov 24 04:19:57 2002" -->
+<!-- isoreceived="20021124031957" -->
+<!-- sent="Sun, 24 Nov 2002 04:19:53 +0100" -->
+<!-- isosent="20021124031953" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="[cc65] gfx modules" -->
+<!-- id="833708339.20021124041953@gmx.net" -->
+<!-- inreplyto="8619655596.20021124002543@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20gfx%20modules"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2002-11-24 04:19:53
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1780.html">groepaz: "Re[2]: [cc65] warez gallore :)"</a>
+<li><strong>In reply to:</strong> <a href="1780.html">groepaz: "Re[2]: [cc65] warez gallore :)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1783.html">Ullrich von Bassewitz: "Re: [cc65] gfx modules"</a>
+<li><strong>Next in thread:</strong> <a href="1782.html">Ullrich von Bassewitz: "Re: [cc65] warez gallore :)"</a>
+<li><strong>Reply:</strong> <a href="1783.html">Ullrich von Bassewitz: "Re: [cc65] gfx modules"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Yo again... :)
+
+UvB&gt;&gt; The current snapshot contains the 320*200*2 driver for the C64. The only
+[snip]
+
+ok, i've looked at it... gotta add some things to my own last mail :)
+
+g&gt; mmmh just two chars to describe unique modes? thats very little if you
+g&gt; ask me ;=P
+
+g&gt; also, why put that restriction on a platform that dont need it when
+g&gt; you translate from constants to real filenames anyway? (and also
+g&gt; drivers would only work on one specific platform)
+
+that looks even less necessary to me now i've looked at it :) first of
+all i see no problem with having a tgi_modetable.s (or whatever it was
+:=)) for each target, and second..mmh, wouldnt it be better to have a
+function that scans the drive for available drivers and builts that
+table at runtime? ie, any non-trivial application might want to do
+that sorta thing anyway, and any trivial prog wont suffer from the
+additional overhead :)
+
+g&gt; also wouldnt it be smarter to embed the type of resolution (or any
+g&gt; other capabilities) into the module-file so the application really
+g&gt; doesnt need to know which drivers are present?
+
+ok i see thats the case :) i also noticed you added sth that can deal
+with double-buffering (wasnt there last time i checked). cool... think
+i'll convert the 128x128x2 mode then first to check that out :) might
+take some time though, or is there an easy lazy way to drop in some c
+code into those modules? :) or should i maybe go for adding some
+emulation stuff in the gfx kernal instead? (i guess that can be done
+with c code easier?)
+
+g&gt; (to me its an important
+g&gt; point that additional drivers can be developed and used even with
+g&gt; applications whose source is not available...and that also means they
+g&gt; cannot be relinked against updated libs that know about new drivers)
+
+i can second that :) having to recompile a table of known drivers into
+an application statically makes no sence to me, not only because that
+would waste unnecessary memory (not much of a problem with the gfx
+stuff maybe, because we wont have tons of different drivers there...
+but the module thing could be extended to eg stuff godot does, loaders
+or viewers for different picture formats etc... and with the 100+
+modules one can think of in that case such tables would easily grow larger
+than you wanted ;=)) imho there should be functions like
+
+- one that takes a gfx mode, in order to convert it into a
+target-specific filename. like the tgi_modetable, but a simple routine
+that encodes the gfx-mode constants into a reasonable unique and
+descriptive name.
+
+- one that takes a filename, in order to load a matching driver or
+return failure.
+
+- one that takes a gfx mode, in order to load a matching driver or
+return failure. like the current one does, but built of the previous
+two functions.
+
+- one that takes a filename, in order to return the drivers
+capabilities. this would be used by applications that support more
+than one driver and let the user select one interactivly. (programmer
+would have to scan the directory for *.tgi files and pass matching
+files to this function in order to built data for a menu or sth, and
+later load the driver by name)
+
+notice that in this sheme only drivers requestable by the application
+(ie standard gfx modes) need to match the naming-sheme...any &quot;special&quot;
+drivers might have different descriptive names and would still be useable
+in applications that allow to select them interactivly, and even be
+loadable by name by any other apps. (ie whatever you hack for testing
+the driver or sth :=))
+
+maybe i'm just missing something, but how would i do the
+interactive-selection thing with the current interface? :)
+
+UvB&gt;&gt; You can take the source of the existing driver as an example. Some of the
+[snip]
+
+checked that aswell... actually quickly converted the 3dcube thingy to
+work with your driver, works nice...also clipping seems to work ok -
+and its even faster (well ofcoz it is ;=P) than what i did
+before...whopping 5fps now :)
+
+oh and.... maybe the makefile in the samples dir should also copy the
+tgi driver(s) to the disc :o)
+
+enough for tonite :=P zzzzZZZZZz :)
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20gfx%20modules">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20gfx%20modules">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1780.html">groepaz: "Re[2]: [cc65] warez gallore :)"</a>
+<li><strong>In reply to:</strong> <a href="1780.html">groepaz: "Re[2]: [cc65] warez gallore :)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1783.html">Ullrich von Bassewitz: "Re: [cc65] gfx modules"</a>
+<li><strong>Next in thread:</strong> <a href="1782.html">Ullrich von Bassewitz: "Re: [cc65] warez gallore :)"</a>
+<li><strong>Reply:</strong> <a href="1783.html">Ullrich von Bassewitz: "Re: [cc65] gfx modules"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-11-24 04:20:11 CET</em>
+</em>
+</small>
+</body>
+</html>

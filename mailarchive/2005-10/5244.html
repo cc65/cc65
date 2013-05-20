@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Makefiles again</title>
+<meta name="Author" content="MagerValp (MagerValp1cling.gu.se)" />
+<meta name="Subject" content="[cc65] Makefiles again" />
+<meta name="Date" content="2005-10-11" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Makefiles again</h1>
+<!-- received="Tue Oct 11 10:15:54 2005" -->
+<!-- isoreceived="20051011081554" -->
+<!-- sent="Tue, 11 Oct 2005 10:15:47 +0200" -->
+<!-- isosent="20051011081547" -->
+<!-- name="MagerValp" -->
+<!-- email="MagerValp1cling.gu.se" -->
+<!-- subject="[cc65] Makefiles again" -->
+<!-- id="17227.29875.922686.248630@panini.cling.gu.se" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5245.html" title="Raj Wurttemberg: &quot;[cc65] C64 drive direct access question&quot;">Next message</a> ]
+[ <a href="5243.html" title="MagerValp: &quot;Re: [cc65] C64 drive direct access question&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="../2005-11/5276.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Makefiles again&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: MagerValp &lt;<a href="mailto:MagerValp1cling.gu.se?Subject=Re:%20[cc65]%20Makefiles%20again">MagerValp1cling.gu.se</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-10-11 10:15:47</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On my laptop I ran into the same problem with stdint/C99 that I did on
+my Mac. Here's a proposed fix that will make the makefiles in src/
+inherit CC and CFLAGS from the top level makefile:
+
+First a perl oneliner that removes all occurences of CC = gcc, and
+changes -g -O2 -Wall -W into $(CFLAGS).
+
+  perl -i -p -e 's/^CFLAGS\s+= (-g -O2|-O2 -g) -Wall( -W)?/CFLAGS = \$(CFLAGS)/; s/^CC\s*=.*$//;' src/*/make/gcc.mak src/make/gcc.mak src/sim65/chips/make/gcc.mak
+
+Then the patch to make/gcc.mak:
+
+-------------------------------- make/gcc.mak --------------------------------
+
+--- gcc.mak.org	2005-10-11 09:56:06.000000000 +0200
++++ gcc.mak	2005-10-11 10:11:09.000000000 +0200
+&#64;&#64; -29,6 +29,10 &#64;&#64;
+ CC65INC		= $(CC65DATA)/include
+ CC65LIB		= $(CC65DATA)/lib
+ 
++# The compiler and flags
++CC		= gcc -std=gnu99
++CFLAGS		= -g -O2 -Wall -W
++
+ # Programs
+ 
+ MKDIR		= mkdir -m 755
+&#64;&#64; -51,30 +55,30 &#64;&#64;
+ all:	bins libs docs $(SYS:%=samples tests)
+ 
+ bins:
+-	&#64;$(MAKE) -C src -f make/gcc&#46;<!--nospam-->mak
++	&#64;$(MAKE) CC=&quot;$(CC)&quot; CFLAGS=&quot;$(CFLAGS)&quot; -C src -f make/gcc&#46;<!--nospam-->mak
+ 
+ libs:
+-	&#64;$(MAKE) -C libsrc
++	&#64;$(MAKE) CC=&quot;$(CC)&quot; CFLAGS=&quot;$(CFLAGS)&quot; -C libsrc
+ 
+ # A host system might not have LinuxDoc Tools, so this rule ignores errors.
+ docs:
+-	-&#64;$(MAKE) -C doc html
++	-&#64;$(MAKE) CC=&quot;$(CC)&quot; CFLAGS=&quot;$(CFLAGS)&quot; -C doc html
+ 
+ # Some platforms cannot compile all of the sample and library-test programs.
+ # So, these rules ignore errors.
+ 
+ samples:
+-	-&#64;$(MAKE) -k -C samples $(SYS:%=SYS=%)
++	-&#64;$(MAKE) -k CC=&quot;$(CC)&quot; CFLAGS=&quot;$(CFLAGS)&quot; -C samples $(SYS:%=SYS=%)
+ 
+ tests:
+-	-&#64;$(MAKE) -k -C testcode/lib $(SYS:%=SYS=%)
++	-&#64;$(MAKE) -k CC=&quot;$(CC)&quot; CFLAGS=&quot;$(CFLAGS)&quot; -C testcode/lib $(SYS:%=SYS=%)
+ 
+ clean zap:
+-	$(MAKE) -C src -f make/gcc.mak $&#64;
+-	$(MAKE) -C libsrc $&#64;
+-	$(MAKE) -C doc $&#64;
+-	$(MAKE) -C samples $&#64;
+-	$(MAKE) -C testcode/lib $&#64; $(SYS:%=SYS=%)
++	$(MAKE) CC=&quot;$(CC)&quot; CFLAGS=&quot;$(CFLAGS)&quot; -C src -f make/gcc.mak $&#64;
++	$(MAKE) CC=&quot;$(CC)&quot; CFLAGS=&quot;$(CFLAGS)&quot; -C libsrc $&#64;
++	$(MAKE) CC=&quot;$(CC)&quot; CFLAGS=&quot;$(CFLAGS)&quot; -C doc $&#64;
++	$(MAKE) CC=&quot;$(CC)&quot; CFLAGS=&quot;$(CFLAGS)&quot; -C samples $&#64;
++#	$(MAKE) CC=&quot;$(CC)&quot; CFLAGS=&quot;$(CFLAGS)&quot; -C testcode/lib $&#64; $(SYS:%=SYS=%)
+ 
+ uninstall:	install-test
+ 	cd $(bindir) &amp;&amp; $(RM) ar65 ca65 cc65 cl65 co65 da65 ld65 od65 grc ca65html
+
+-------------------------------- make/gcc.mak --------------------------------
+
+
+Also, there's no clean target in testcode/lib (actually no makefile at
+all):
+
+  make[1]: Entering directory `/cygdrive/c/prog/cc65-2.11.0/testcode/lib'
+  make[1]: *** No rule to make target `clean'.  Stop.
+  make[1]: Leaving directory `/cygdrive/c/prog/cc65-2.11.0/testcode/lib'
+  make: *** [clean] Error 2
+
+I commented out the cleaning of testcode/lib in the makefile patch.
+
+-- 
+    ___          .     .  .         .       . +  .         .      o   
+  _|___|_   +   .  +     .     +         .  Per Olofsson, arkadspelare
+    o-o    .      .     .   o         +          MagerValp&#64;cling&#46;<!--nospam-->gu.se
+     -       +            +    .     <a href="http://www.cling.gu.se/~cl3polof/">http://www.cling.gu.se/~cl3polof/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Oct 11 10:15:54 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5245.html" title="Next message in the list">Raj Wurttemberg: "[cc65] C64 drive direct access question"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5243.html" title="Previous message in the list">MagerValp: "Re: [cc65] C64 drive direct access question"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="../2005-11/5276.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Makefiles again"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="../2005-11/5276.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Makefiles again"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5244" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5244" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5244" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-10-11 10:15:56 CEST
+</em></small></p>
+</body>
+</html>

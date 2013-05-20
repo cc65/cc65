@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] cc65/C questions</title>
+<meta name="Author" content="Shawn Jefferson (jefferson_shawn_a8bit1yahoo.com)" />
+<meta name="Subject" content="Re: [cc65] cc65/C questions" />
+<meta name="Date" content="2006-09-09" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] cc65/C questions</h1>
+<!-- received="Sat Sep  9 05:32:28 2006" -->
+<!-- isoreceived="20060909033228" -->
+<!-- sent="Fri, 8 Sep 2006 20:32:19 -0700 (PDT)" -->
+<!-- isosent="20060909033219" -->
+<!-- name="Shawn Jefferson" -->
+<!-- email="jefferson_shawn_a8bit1yahoo.com" -->
+<!-- subject="Re: [cc65] cc65/C questions" -->
+<!-- id="20060909033219.64507.qmail@web54611.mail.yahoo.com" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="F6A4B27866404E2A8742A4064C2A5424&#64;tommy" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5572.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] cc65/C questions&quot;">Next message</a> ]
+[ <a href="5570.html" title="Bryan Pope: &quot;Re: [cc65] cc65/C questions&quot;">Previous message</a> ]
+[ <a href="5568.html" title="Tom Watt: &quot;[cc65] cc65/C questions&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5572.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] cc65/C questions&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Shawn Jefferson &lt;<a href="mailto:jefferson_shawn_a8bit1yahoo.com?Subject=Re:%20[cc65]%20cc65/C%20questions">jefferson_shawn_a8bit1yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2006-09-09 05:32:19</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Here's a routine I use in some of my project, albeit
+for the atari 8-bit.  You may have to change it
+slightly for the c64.
+
+/* text_input
+ *
+ * Get some text input from the user.  Pass in the max
+number of characters
+ * to be accepted, and a pointer to a string that is
+at least as big plus one
+ * for the null terminator to hold the string.
+ *
+ * Rudimentary editing is supported (backspace,
+ctrl-arrows) when a non-empty
+ * string is passed in.
+ *
+ * Returns the number of characters entered if
+everything went ok
+ * and the user pressed return, 0 if the user pressed
+Escape.  Also the first character of the string is set
+to 27 to denote the user pressed Escape.
+ */
+unsigned char __fastcall__ text_input(unsigned char x,
+unsigned char y, char *text, unsigned char max)
+{
+  char c;
+  unsigned char i;
+
+
+  //--- Initialize ---//
+  i = 0;
+  cursor(1);
+  cputsxy(x, y, text);                  // show text
+  gotoxy(x, y); 
+
+  while (1) {
+    c = cgetc();
+
+    switch(c) {
+      case 27:                          // user
+pressed escape
+	text[0] = 27;                   // flag that user
+pressed escape 
+	cursor(0);                      // since a blank
+string and escape 
+	return(0);                      // both have a return
+value of zero
+	break;
+
+      case 155:                         // user
+pressed return
+	text[strlen(text)] = '\0';
+	cursor(0);
+	return(strlen(text));
+	break;
+
+      case 126:                         // user
+pressed backspace 
+	if (i != 0) {
+	  --i;
+	  if (i == (strlen(text)-1))
+	    text[i] = '\0';
+	  else
+	    text[i] = ' ';
+	  //cclearxy(x+i, y, 1);
+	  cputcxy(x+i, y, ' ');
+	  gotoxy(x+i, y);
+	}
+	break;
+
+      case 30:                          // user
+pressed left arrow
+	if (i != 0) {
+	  --i;
+	  gotoxy(x+i, y);
+	}
+	break;
+
+      case 31:                          // user
+pressed right arrow
+	if (i &lt; strlen(text)) {
+	  ++i;
+	  gotoxy(x+i, y); 
+	}
+
+      default:
+	if (i == max) continue;                     // maxed
+out
+
+	if (isprint(c)) {                           // is a
+printable char
+	  text[i] = c;
+	  cputc(c);
+	  ++i;
+	}
+	break;
+    }
+  }
+  // end of function
+}
+
+Shawn
+
+--- Tom Watt &lt;tom&#64;awhost&#46;<!--nospam-->biz&gt; wrote:
+
+&gt; 2. I'm using the following function to get text at a
+&gt; prompt.  It works fine
+&gt; except if you backspace too much the cursor keeps
+&gt; going and will go up to
+&gt; the next line.  Is there an easy way to fix that?
+
+
+__________________________________________________
+Do You Yahoo!?
+Tired of spam?  Yahoo! Mail has the best spam protection around 
+<a href="http://mail.yahoo.com">http://mail.yahoo.com</a> 
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Sep  9 05:32:28 2006</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5572.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] cc65/C questions"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5570.html" title="Previous message in the list">Bryan Pope: "Re: [cc65] cc65/C questions"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5568.html" title="Message to which this message replies">Tom Watt: "[cc65] cc65/C questions"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5572.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] cc65/C questions"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5571" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5571" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5571" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2006-09-09 05:32:31 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] [ca65] Relative addressing acr</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="[cc65] [ca65] Relative addressing across segments" />
+<meta name="Date" content="2012-08-16" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] [ca65] Relative addressing across segments</h1>
+<!-- received="Thu Aug 16 22:19:53 2012" -->
+<!-- isoreceived="20120816201953" -->
+<!-- sent="Thu, 16 Aug 2012 22:19:25 +0200" -->
+<!-- isosent="20120816201925" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="[cc65] [ca65] Relative addressing across segments" -->
+<!-- id="20120816201925.GA13811@trikaliotis.net" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10708.html" title="Egan Ford: &quot;[cc65] ld65: Warning: Segment `CODE' in module `foo.o' requires larger alignment&quot;">Next message</a> ]
+[ <a href="10706.html" title="Oliver Schmidt: &quot;Re: [cc65] Uniform mass storage device discovery and file locations&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10710.html" title="Groepaz: &quot;Re: [cc65] [ca65] Relative addressing across segments&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20[cc65]%20[ca65]%20Relative%20addressing%20across%20segments">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-08-16 22:19:25</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello,
+
+I just found out that a relative branch across segments does not work.
+That is, the following does not compile:
+
+
+        .segment &quot;CODE1&quot;
+start:  lda #0
+        jmp patch
+patchback:
+;         ..... some more code
+
+        .segment &quot;PATCH&quot;
+patch:  sta $dd01
+        beq patchback
+
+
+The assembler complains about the branch target out of range, although
+this is not necessarily true. This depends upon the linker config.
+
+I take this as a limitation in the object file format and/or the linker,
+that is not able to handle these relative relocations. Am I right? Or
+should it work?
+
+If it is a limitation, are there plans to work on this?
+
+Regards,
+Spiro.
+
+-- 
+Spiro R. Trikaliotis
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Aug 16 22:19:53 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10708.html" title="Next message in the list">Egan Ford: "[cc65] ld65: Warning: Segment `CODE' in module `foo.o' requires larger alignment"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10706.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Uniform mass storage device discovery and file locations"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10710.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] [ca65] Relative addressing across segments"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10710.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] [ca65] Relative addressing across segments"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10712.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] [ca65] Relative addressing across segments"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10707" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10707" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10707" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-08-16 22:19:56 CEST
+</em></small></p>
+</body>
+</html>

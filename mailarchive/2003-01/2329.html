@@ -1,0 +1,156 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] const/volatile</title>
+<meta name="Author" content="Christian Krüger (christian.krueger_at_pace.de)">
+<meta name="Subject" content="Re: [cc65] const/volatile">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] const/volatile</h1>
+<!-- received="Wed Jan 22 14:18:48 2003" -->
+<!-- isoreceived="20030122131848" -->
+<!-- sent="Wed, 22 Jan 2003 14:18:38 +0100" -->
+<!-- isosent="20030122131838" -->
+<!-- name="Christian Krüger" -->
+<!-- email="christian.krueger_at_pace.de" -->
+<!-- subject="Re: [cc65] const/volatile" -->
+<!-- id="DCE2904C62EF104F9B2C76252D63EDB1032FAE@paceserver1.pace.de" -->
+<!-- inreplyto="[cc65] const/volatile" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Christian Krüger (<a href="mailto:christian.krueger_at_pace.de?Subject=Re:%20[cc65]%20const/volatile"><em>christian.krueger_at_pace.de</em></a>)<br>
+<strong>Date:</strong> 2003-01-22 14:18:38
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2328.html">Groepaz: "Re: [cc65] Directory reading functions"</a>
+<li><strong>Maybe in reply to:</strong> <a href="2289.html">Christian Krüger: "Re: [cc65] const/volatile"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2346.html">Ullrich von Bassewitz: "Re: [cc65] const/volatile"</a>
+<li><strong>Reply:</strong> <a href="2346.html">Ullrich von Bassewitz: "Re: [cc65] const/volatile"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi,
+
+&gt;So if I need it, but don't fetch it again, how do I get the value?
+&gt;Values don't come from nowhere, so I would have to remember the value
+&gt;somewhere. And since the 6502 doesn't have many registers, there is no
+&gt;place, where a value can be remembered effectively. Which in turn means
+&gt;that the optimization does not work on the 6502 architecture.
+
+what I tried to explain was, that especially in conjunction with
+fastcall 'const' can be used to save some code &amp; cycles.
+
+Last try to show that out: ;-)
+
+The following C sample code...
+--8&lt;------------------------
+
+void __fastcall__ SetForeground(const unsigned char value);
+void __fastcall__ SetBackground(const unsigned char value);
+
+void
+func(void)
+{
+	unsigned char color = 42;
+	
+	SetForeground(color);
+	SetBackground(color);
+}
+--8&lt;------------------------
+
+...will be translated to...
+
+--8&lt;------------------------
+
+...(header skipped)...
+; ---------------------------------------------------------------
+; void func (void)
+; ---------------------------------------------------------------
+
+.segment	&quot;CODE&quot;
+
+.proc	_func
+
+.segment	&quot;CODE&quot;
+
+	lda     #$2A
+	jsr     pusha
+	ldy     #$00
+	lda     (sp),y
+	jsr     _SetForeground
+	ldy     #$00             ; NO NEED TO DO THAT!!!
+	lda     (sp),y           ; &quot;   &quot;   &quot;  &quot;   &quot;
+	jsr     _SetBackground
+	jsr     incsp1
+	rts
+
+.endproc
+--8&lt;------------------------
+
+When 'const' mean, that no change to the given value
+is allowed, and the given value is in accu/x, then
+cc65 can rely on, that accu/x won't change inside the
+function!
+To go further, I mentioned, that the optimizer may can
+proof if inside of any function are register *writes*
+to avoid useless save and restore cycles of registers
+- independent from 'const'.
+
+But to come back to the floor ;^), when somebody ask
+me what I like to see first, I would grab my old wish
+out of the box: inline functions (even when I have worse
+assumptions, which problems are tied to that feature...)
+
+Anyhow, after a long, long idle time, my Lynx contribution
+takes (slowly) shape... 
+
+Thx for listening
+chrisker
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20const/volatile">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2328.html">Groepaz: "Re: [cc65] Directory reading functions"</a>
+<li><strong>Maybe in reply to:</strong> <a href="2289.html">Christian Krüger: "Re: [cc65] const/volatile"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2346.html">Ullrich von Bassewitz: "Re: [cc65] const/volatile"</a>
+<li><strong>Reply:</strong> <a href="2346.html">Ullrich von Bassewitz: "Re: [cc65] const/volatile"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-01-22 14:21:02 CET</em>
+</em>
+</small>
+</body>
+</html>

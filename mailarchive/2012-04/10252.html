@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] NESICIDE + VICE for Linux</title>
+<meta name="Author" content="Christopher Pow (christopher.s.pow1gmail.com)" />
+<meta name="Subject" content="[cc65] NESICIDE + VICE for Linux" />
+<meta name="Date" content="2012-04-20" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] NESICIDE + VICE for Linux</h1>
+<!-- received="Fri Apr 20 04:51:03 2012" -->
+<!-- isoreceived="20120420025103" -->
+<!-- sent="Thu, 19 Apr 2012 21:50:36 -0500" -->
+<!-- isosent="20120420025036" -->
+<!-- name="Christopher Pow" -->
+<!-- email="christopher.s.pow1gmail.com" -->
+<!-- subject="[cc65] NESICIDE + VICE for Linux" -->
+<!-- id="CAKDufpBJqkitbywef5h1-mV18vKgoGYzPOJ5FBPxgPxVCiT6Sw@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10253.html" title="Johan Kotlinski: &quot;[cc65] fwrite disk full detection&quot;">Next message</a> ]
+[ <a href="10251.html" title="Oliver Schmidt: &quot;[cc65] AppleCommander with Apple GEOS support&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10256.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] NESICIDE + VICE for Linux&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Christopher Pow &lt;<a href="mailto:christopher.s.pow1gmail.com?Subject=Re:%20[cc65]%20NESICIDE%20%2B%20VICE%20for%20Linux">christopher.s.pow1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-04-20 04:50:36</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I've uploaded Debian packages (4 of them) for NESICIDE on Linux.
+
+You need these three if you want to do C=64 stuff:
+<a href="https://sites.google.com/site/nesicideproject/documents/nesicide_1.015-1_i386.deb">https://sites.google.com/site/nesicideproject/documents/nesicide_1.015-1_i386.deb</a>
+<a href="https://sites.google.com/site/nesicideproject/documents/libnes-emulator_1.004-1_i386.deb">https://sites.google.com/site/nesicideproject/documents/libnes-emulator_1.004-1_i386.deb</a>
+<a href="https://sites.google.com/site/nesicideproject/documents/libc64-emulator_1.000-1_i386.deb">https://sites.google.com/site/nesicideproject/documents/libc64-emulator_1.000-1_i386.deb</a>
+
+You only need this one if you want to run the NES emulator by itself
+as an application [without all the IDE overhead]:
+<a href="https://sites.google.com/site/nesicideproject/documents/nes-emulator_1.005-1_i386.deb">https://sites.google.com/site/nesicideproject/documents/nes-emulator_1.005-1_i386.deb</a>
+
+I forgot to hook up the UI elements to specify the kernal, basic, and
+character ROMs for VICE, so for now just put:
+
+-kernal &lt;location-of-kernal.rom&gt; -basic &lt;location-of-basic.rom&gt;
+-chargen &lt;location-of-char.rom&gt;
+
+in the additional VICE options [in Emulator Preferences].
+
+Please let me know if there are issues with these...I'm no packaging expert.
+
+Christopher
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Apr 20 04:51:03 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10253.html" title="Next message in the list">Johan Kotlinski: "[cc65] fwrite disk full detection"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10251.html" title="Previous message in the list">Oliver Schmidt: "[cc65] AppleCommander with Apple GEOS support"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10256.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] NESICIDE + VICE for Linux"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10256.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] NESICIDE + VICE for Linux"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10252" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10252" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10252" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-04-20 04:51:07 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Problem with generating o6</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Problem with generating o65 files" />
+<meta name="Date" content="2005-01-19" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Problem with generating o65 files</h1>
+<!-- received="Wed Jan 19 22:43:51 2005" -->
+<!-- isoreceived="20050119214351" -->
+<!-- sent="Wed, 19 Jan 2005 22:43:45 +0100" -->
+<!-- isosent="20050119214345" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Problem with generating o65 files" -->
+<!-- id="20050119214345.GA13031@trixie.musoftware.de" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="20050119211717.GA21995&#64;mail.trikaliotis.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4772.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Problem with generating o65 files&quot;">Next message</a> ]
+[ <a href="4770.html" title="Spiro Trikaliotis: &quot;[cc65] Problem with generating o65 files&quot;">Previous message</a> ]
+[ <a href="4770.html" title="Spiro Trikaliotis: &quot;[cc65] Problem with generating o65 files&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4772.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Problem with generating o65 files&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Problem%20with%20generating%20o65%20files">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-01-19 22:43:45</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Wed, Jan 19, 2005 at 10:17:17PM +0100, Spiro Trikaliotis wrote:
+&gt; What am I doing wrong?
+
+Order is important here. FILES and FORMATS have to go to the end of the linker
+config. The reason for the error message is, that output files are specified
+in the MEMORY section. When the linker reads a filename in the FILES section
+(%O in this case), it tries to find that file in the list of output files, but
+since no output files have been defined, it cannot be found.
+
+BTW: Why aren't you using -t lunix on the command line, or just use the Lunix
+linker configuration as a starting point? This could have saved you quite some
+trouble:-)
+
+&gt; BTW: Can ld65 handle such (André Fachat's) o65 files as inputs? I would
+&gt;      have tested myself, but as you see from above, I was not able yet
+&gt;      to generate such files. ;-)
+
+ld65 cannot use o65 files as input, but co65 is able to translate o65 files
+back into assembler files, which can then be passed through ca65 to generate
+native object files, which in turn can be used with ld65. I haven't tested
+this with o65 files generated with xa (André Fachats Assembler), and there may
+be format limitations (no &quot;large modell&quot; o65 files), but I think it *should*
+work. The program cascade gets rather long in this case,
+
+                 xa             co65           ca65           ld65
+        test.xa ----&gt; test.o65 ------&gt; test.s ------&gt; test.o ------&gt; a.out
+
+but a Makefile should do wonders:-)
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Jan 19 22:43:51 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4772.html" title="Next message in the list">Spiro Trikaliotis: "Re: [cc65] Problem with generating o65 files"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4770.html" title="Previous message in the list">Spiro Trikaliotis: "[cc65] Problem with generating o65 files"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4770.html" title="Message to which this message replies">Spiro Trikaliotis: "[cc65] Problem with generating o65 files"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4772.html" title="Next message in this discussion thread">Spiro Trikaliotis: "Re: [cc65] Problem with generating o65 files"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4772.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Re: [cc65] Problem with generating o65 files"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4771" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4771" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4771" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-01-19 22:44:02 CET
+</em></small></p>
+</body>
+</html>

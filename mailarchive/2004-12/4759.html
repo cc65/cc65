@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] abc music specification</title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="Re: [cc65] abc music specification" />
+<meta name="Date" content="2004-12-22" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] abc music specification</h1>
+<!-- received="Wed Dec 22 02:52:25 2004" -->
+<!-- isoreceived="20041222015225" -->
+<!-- sent="Wed, 22 Dec 2004 02:48:19 +0100" -->
+<!-- isosent="20041222014819" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="Re: [cc65] abc music specification" -->
+<!-- id="200412220248.19479.groepaz@gmx.net" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="20041209135739.GB9085&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4760.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Apple ][ user contribution&quot;">Next message</a> ]
+[ <a href="4758.html" title="Willi Kusche: &quot;Re: [cc65] Apple ][ user contribution&quot;">Previous message</a> ]
+[ <a href="4748.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] abc music specification&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4761.html" title="Karri Kaksonen: &quot;Re: [cc65] abc music specification&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20abc%20music%20specification">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-12-22 02:48:19</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Thursday 09 December 2004 14:57, Ullrich von Bassewitz wrote:
+
+&gt; Beware: There is no sense in choosing a spec before it is clear that the spec
+&gt; can be implemented on all important platforms without major problems. I would
+&gt; prefer studing the different platforms, determine their abilities, and then
+&gt; come up with a spec that can be implemented by a large subset. Choosing a spec
+&gt; by its features without looking at the platforms where this spec will have to
+&gt; be implemented won't give satisfying results.
+&gt; 
+&gt; So before agreeing to the specs as base for music within cc65, I would like to
+&gt; get some comments from people programming for other platforms. My personal
+&gt; feeling is that the format is rather complex, and even platforms like the C64
+&gt; (which has a quite capable sound chip) won't be able to support all of it.
+&gt; Plus, the spec is not free, you need permission to use it. The advantage of
+&gt; the format is that it's a somewhat official spec, so music would be portable
+&gt; even on non cc65 platforms. And, that it seems to be quite capable.
+
+first of all, i havent looked at the ABC format...but however, a while ago i
+have attempted to write a music-player that works on both the c64 and the vic20
+to include it in my tetris thingy...
+
+to make it short, i'm not quite sure if such a generic player is worth the effort.
+it will be very bulky, huge, slow and sound mid-quality at best. plus it will be
+next to impossible to find someone to compuse tunes for you, unless you write
+a decent editor too :=P
+
+however, developing a generic format and player(s) might be interisting anyway, but
+imho this needs to be discussed a lot, needs comments from the atari and apple ppl
+etc pp. the hard part will be to define something that can be replayed with minimum
+effort even on the not-so-capable targets (like the vic20 for example, or even the pet) 
+and which is still &quot;rich&quot; enough to not sound like total crap on the targets with lots of 
+ram and decent soundchip.
+
+tjam, a thing that would be entire possible, and much easier to define and implement would
+be a driver to play samples though...maybe we should start with that. (i might be able to
+contribute a modded version of SAM *cough* :=P)
+
+gpz
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Dec 22 02:52:25 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4760.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Apple ][ user contribution"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4758.html" title="Previous message in the list">Willi Kusche: "Re: [cc65] Apple ][ user contribution"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4748.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] abc music specification"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4761.html" title="Next message in this discussion thread">Karri Kaksonen: "Re: [cc65] abc music specification"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4761.html" title="Message sent in reply to this message">Karri Kaksonen: "Re: [cc65] abc music specification"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4759" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4759" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4759" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-12-22 02:52:34 CET
+</em></small></p>
+</body>
+</html>

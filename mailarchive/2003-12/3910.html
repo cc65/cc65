@@ -1,0 +1,160 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Compiling Code to load at</title>
+<meta name="Author" content="Payton Byrd (kingdurin_at_yahoo.com)">
+<meta name="Subject" content="Re: [cc65] Compiling Code to load at $C000">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Compiling Code to load at $C000</h1>
+<!-- received="Wed Dec 31 18:21:43 2003" -->
+<!-- isoreceived="20031231172143" -->
+<!-- sent="Wed, 31 Dec 2003 09:21:40 -0800 (PST)" -->
+<!-- isosent="20031231172140" -->
+<!-- name="Payton Byrd" -->
+<!-- email="kingdurin_at_yahoo.com" -->
+<!-- subject="Re: [cc65] Compiling Code to load at $C000" -->
+<!-- id="20031231172140.96171.qmail@web40614.mail.yahoo.com" -->
+<!-- inreplyto="200312311808.17080.groepaz@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Payton Byrd (<a href="mailto:kingdurin_at_yahoo.com?Subject=Re:%20[cc65]%20Compiling%20Code%20to%20load%20at%20$C000"><em>kingdurin_at_yahoo.com</em></a>)<br>
+<strong>Date:</strong> 2003-12-31 18:21:40
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3909.html">Groepaz: "Re: [cc65] Compiling Code to load at $C000"</a>
+<li><strong>In reply to:</strong> <a href="3909.html">Groepaz: "Re: [cc65] Compiling Code to load at $C000"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3911.html">Groepaz: "Re: [cc65] Compiling Code to load at $C000"</a>
+<li><strong>Reply:</strong> <a href="3911.html">Groepaz: "Re: [cc65] Compiling Code to load at $C000"</a>
+<li><strong>Reply:</strong> <a href="3912.html">Ullrich von Bassewitz: "Re: [cc65] Compiling Code to load at $C000"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+This makes sense.  What if I was targeting a C= 128? 
+Would it be possible to leave all of the basic RAM
+allocated as normal to Bank 0 and have all of my C
+targeted to Bank 1?  Wouldn't that solve the tight
+memory problems?  I haven't reached a point of no
+return yet on my design and would actually prefer to
+target the C= 128.
+
+What would be nice is if someone with that already has
+the knowledge of how to do this kind of stuff would
+write a Howto about it so that those of us who are new
+to C and especially C on C= platforms could hit the
+ground running.  Maybe such documentation already
+exists???
+
+--- Groepaz &lt;<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Compiling%20Code%20to%20load%20at%20$C000">groepaz_at_gmx.net</a>&gt; wrote:
+&gt; On Wednesday 31 December 2003 17:48, Ullrich von
+&gt; Bassewitz wrote:
+&gt; &gt; Hi!
+&gt; &gt;
+&gt; &gt; On Wed, Dec 31, 2003 at 07:51:23AM -0800, Payton
+&gt; Byrd wrote:
+&gt; &gt; &gt; I'm trying to write a BBS in CC65 and want to be
+&gt; able
+&gt; &gt; &gt; to target a specific memory address such as
+&gt; $C000 so
+&gt; &gt; &gt; that I can simply load the program on a C64 from
+&gt; my
+&gt; &gt; &gt; BBS and sys49152 to run it without the BBS being
+&gt; &gt; &gt; removed from memory.  Does anyone have any
+&gt; &gt; &gt; recommendations for this?
+&gt; &gt;
+&gt; &gt; You will have to use your own linker configuration
+&gt; and startup file. The
+&gt; &gt; documentation for the linker contains information
+&gt; on how to write your own
+&gt; &gt; linker config. For the startup file, it should be
+&gt; enough to use the
+&gt; &gt; existing one and remove the BASIC stub.
+&gt; 
+&gt; however, if what you want is an ordinary basic
+&gt; program plus &quot;modules&quot; written
+&gt; in C, i would suggest the following:
+&gt; 
+&gt; a) make it so cc65 uses the memory from ~$9f00 -
+&gt; $cfff (just modify the start
+&gt; address in the linker config)
+&gt; b) use the usual pokes to limit the basic memory for
+&gt; your main program to
+&gt; $0800 - $9eff
+&gt; 
+&gt; that way you can call cc65 compiled programs from
+&gt; basic easily, and you can
+&gt; make use of the otherwhise unused memory under
+&gt; basic-rom ($a000-$bfff). ($c000-$cfff
+&gt; only is *very* tight and probably not very practical
+&gt; for C programs)
+&gt; 
+&gt; oh and if you dont even want to waste those $100 or
+&gt; so bytes at the end of the
+&gt; basic memory, you could aswell put the startupcode
+&gt; into the casette buffer or
+&gt; sth. (mmmmh....isnt that how &quot;c*base&quot; called
+&gt; external modules? mmmh :))
+&gt; 
+&gt; gpz 
+&gt; 
+&gt;
+----------------------------------------------------------------------
+&gt; To unsubscribe from the list send mail to
+&gt; <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Compiling%20Code%20to%20load%20at%20$C000">majordomo_at_musoftware.de</a> with
+&gt; the string &quot;unsubscribe cc65&quot; in the body(!) of the
+mail.
+
+
+__________________________________
+Do you Yahoo!?
+Find out what made the Top Yahoo! Searches of 2003
+<a href="http://search.yahoo.com/top2003">http://search.yahoo.com/top2003</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Compiling%20Code%20to%20load%20at%20$C000">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3909.html">Groepaz: "Re: [cc65] Compiling Code to load at $C000"</a>
+<li><strong>In reply to:</strong> <a href="3909.html">Groepaz: "Re: [cc65] Compiling Code to load at $C000"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3911.html">Groepaz: "Re: [cc65] Compiling Code to load at $C000"</a>
+<li><strong>Reply:</strong> <a href="3911.html">Groepaz: "Re: [cc65] Compiling Code to load at $C000"</a>
+<li><strong>Reply:</strong> <a href="3912.html">Ullrich von Bassewitz: "Re: [cc65] Compiling Code to load at $C000"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-12-31 18:21:53 CET</em>
+</em>
+</small>
+</body>
+</html>

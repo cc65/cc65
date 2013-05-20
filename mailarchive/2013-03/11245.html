@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] .macro related error</title>
+<meta name="Author" content="silverdr1wfmh.org.pl (silverdr1wfmh.org.pl)" />
+<meta name="Subject" content="[cc65] .macro related error" />
+<meta name="Date" content="2013-03-17" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] .macro related error</h1>
+<!-- received="Sun Mar 17 19:04:53 2013" -->
+<!-- isoreceived="20130317180453" -->
+<!-- sent="Sun, 17 Mar 2013 19:04:40 +0100" -->
+<!-- isosent="20130317180440" -->
+<!-- name="silverdr1wfmh.org.pl" -->
+<!-- email="silverdr1wfmh.org.pl" -->
+<!-- subject="[cc65] .macro related error" -->
+<!-- id="E884D405-74F7-4DAB-9D1F-7F589FDF6D52@wfmh.org.pl" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11246.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] .macro related error&quot;">Next message</a> ]
+[ <a href="11244.html" title="David Schmidt: &quot;Re: [cc65] Closing down&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="11246.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] .macro related error&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:silverdr1wfmh.org.pl?Subject=Re:%20[cc65]%20.macro%20related%20error">silverdr1wfmh.org.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2013-03-17 19:04:40</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>The situation:
+
+file: ui.i
+-----------------
+.import ui_system_status_code
+.macro ui_status status_code, status_msg
+	ldx # status_code
+.ifnblank	status_msg
+	lda #&lt; status_msg
+	ldy #&gt; status_msg
+.endif
+	jsr ui_system_status_code
+.endmacro
+
+
+file: status.i
+-------------------
+.enum
+	SCANNING_DEVICES
+	LOADING_DRIVERS
+.endenum
+
+
+file: load_drivers.s
+------------------------
+.include &quot;../ui.i&quot;
+.include &quot;../status.i&quot;
+[...]
+	ui_status (LOADING_DRIVERS, msg_status_loading_drivers)
+[...]
+
+
+Generates upon building:
+
+ui.i(6): Note: Macro was defined here
+load_drivers.s(25): Error: Unexpected trailing garbage characters
+ui.i(8): Note: Macro was defined here
+load_drivers.s(25): Note: Macro parameter came from here
+load_drivers.s(25): Error: Unexpected trailing garbage characters
+ui.i(9): Note: Macro was defined here
+load_drivers.s(25): Note: Macro parameter came from here
+
+But when I invoke the same macro without parentheses, it seem to compile fine. What is the problem with parentheses here? Or is it the combination with .enum? causing troubles?
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Mar 17 19:04:53 2013</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11246.html" title="Next message in the list">silverdr1wfmh.org.pl: "Re: [cc65] .macro related error"</a></li>
+<li><dfn>Previous message</dfn>: <a href="11244.html" title="Previous message in the list">David Schmidt: "Re: [cc65] Closing down"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="11246.html" title="Next message in this discussion thread">silverdr1wfmh.org.pl: "Re: [cc65] .macro related error"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="11246.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] .macro related error"</a></li>
+<li><dfn>Reply</dfn>:  <a href="11251.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] .macro related error"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#11245" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#11245" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#11245" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2013-03-17 19:04:56 CET
+</em></small></p>
+</body>
+</html>

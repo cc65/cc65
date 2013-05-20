@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] tgi and joystick experimen</title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="Re: [cc65] tgi and joystick experiment" />
+<meta name="Date" content="2004-10-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] tgi and joystick experiment</h1>
+<!-- received="Mon Oct 25 18:10:44 2004" -->
+<!-- isoreceived="20041025161044" -->
+<!-- sent="Mon, 25 Oct 2004 18:08:49 +0200" -->
+<!-- isosent="20041025160849" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="Re: [cc65] tgi and joystick experiment" -->
+<!-- id="200410251808.50230.groepaz@gmx.net" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="Pine.LNX.4.58.0410251533360.5269&#64;kosh.sipo.fi" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4660.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] tgi and joystick experiment&quot;">Next message</a> ]
+[ <a href="4658.html" title="Karri Kaksonen: &quot;Re: [cc65] tgi and joystick experiment&quot;">Previous message</a> ]
+[ <a href="4658.html" title="Karri Kaksonen: &quot;Re: [cc65] tgi and joystick experiment&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+[ <a href="4648.html" title="Christian Groessler: &quot;Re: [cc65] tgi and joystick experiment&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20tgi%20and%20joystick%20experiment">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-10-25 18:08:49</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Monday 25 October 2004 15:11, Karri Kaksonen wrote:
+&gt; I got some mail about a tsi-sound library also (Tiny Sound Interface).
+&gt; 
+&gt; Personally I would like to have a multilevel sound interface API where the
+&gt; lowest level driver could answer to TSI-requests like:
+&gt; 
+&gt; ; for digitized sound
+&gt; tsi_sample(sample)
+
+i would make samples a seperate and independent driver. then samples might
+have simelar functions as the regular music driver, except the &quot;instrument&quot;
+call which then would set the actual sample.
+
+&gt; ; for synthesized sound
+&gt; tsi_note_on(channel, note)
+&gt; tsi_note_off(channel)
+&gt; tsi_volume(channel, volume)
+&gt; tsi_waveform(channel, waveform) ; Choose waveform from pre-defined
+&gt; settings
+&gt; 
+&gt; ; for hardware understanding envelopes (attack, fade)
+&gt; tsi_envelope(channel, attack, hold, fade)
+
+i dont think setting envelope and waveform makes sence in such an api...i
+would suggest using predefined instruments. the different machines are
+way to different to make anything else imho.
+ 
+&gt; The top level midi or abc-notation interface could then use the lower
+&gt; level tsi-library functions.
+&gt; 
+&gt; abc_play_tune(channel, tune)
+&gt; midi_play_tune(tune)
+
+mind you, all that must handle the maximum available channels, and possibly
+other things....and a midi player is probably totally out of the question :=P
+ 
+&gt; The sprite-api if hopefully compatible with the way the Lynx handles
+&gt; sprites. I already used the CONTROL entry in the tgi-driver for the low
+&gt; level sprite drawing like:
+&gt; 
+&gt; #define tgi_sprite(sprite) tgi_ioctl(0, sprite)
+&gt; 
+&gt; The &quot;sprite&quot; is a structure containing things like the position on screen.
+
+sprites might be kinda tricky....since it various a LOT how they
+work on different platforms....mmmmh.... maybe we should start
+collecting the capabilities of the various platforms before we
+even think about this one...
+
+gpz
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Oct 25 18:10:44 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4660.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] tgi and joystick experiment"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4658.html" title="Previous message in the list">Karri Kaksonen: "Re: [cc65] tgi and joystick experiment"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4658.html" title="Message to which this message replies">Karri Kaksonen: "Re: [cc65] tgi and joystick experiment"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4648.html" title="Next message in this discussion thread">Christian Groessler: "Re: [cc65] tgi and joystick experiment"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4659" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4659" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4659" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-10-25 18:10:53 CEST
+</em></small></p>
+</body>
+</html>

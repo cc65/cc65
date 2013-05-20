@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Linker is not following co</title>
+<meta name="Author" content="silverdr1wfmh.org.pl (silverdr1wfmh.org.pl)" />
+<meta name="Subject" content="Re: [cc65] Linker is not following configuration file" />
+<meta name="Date" content="2012-01-26" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Linker is not following configuration file</h1>
+<!-- received="Thu Jan 26 13:13:51 2012" -->
+<!-- isoreceived="20120126121351" -->
+<!-- sent="Thu, 26 Jan 2012 13:06:57 +0100" -->
+<!-- isosent="20120126120657" -->
+<!-- name="silverdr1wfmh.org.pl" -->
+<!-- email="silverdr1wfmh.org.pl" -->
+<!-- subject="Re: [cc65] Linker is not following configuration file" -->
+<!-- id="5F05DF6A-1ABE-4493-9A3C-64B9FA3D0A59@wfmh.org.pl" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="CACT=u70c+4rH_3Kq76r+YXkK5k0EBXqmMEbw5p4kS8Dd8zMM5Q&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9980.html" title="Oliver Schmidt: &quot;Re: [cc65] Linker is not following configuration file&quot;">Next message</a> ]
+[ <a href="9978.html" title="Oliver Schmidt: &quot;Re: [cc65] Linker is not following configuration file&quot;">Previous message</a> ]
+[ <a href="9977.html" title="Oliver Schmidt: &quot;Re: [cc65] Linker is not following configuration file&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9980.html" title="Oliver Schmidt: &quot;Re: [cc65] Linker is not following configuration file&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:silverdr1wfmh.org.pl?Subject=Re:%20[cc65]%20Linker%20is%20not%20following%20configuration%20file">silverdr1wfmh.org.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-01-26 13:06:57</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 2012-01-26, at 11:53, Oliver Schmidt wrote:
+
+&gt; But to be honest I still don't really get the point: So the VIC has
+&gt; never access to $1000-$3000. But don't C64 programs have stuff like
+&gt; code and non-VIC/non-SID data to store?
+
+Since we talk mostly about the &quot;entertainment&quot; pieces of software, the answer is that there is either code, data (like tables for effects and co.) sound stuff, gfx stuff. While VIC is not used there due to limitations in every second VIC bank, that leaves us with code, data, sound stuff.
+
+&gt; I stll can't see why it is
+&gt; &quot;obvious&quot; to waste bytes &quot;here and there&quot; be tying stuff to fixed
+&gt; locations
+
+It is certainly not &quot;obvious&quot; but it is quite &quot;typical&quot; because the players are ready, the sound data is ready, the interface to the player is ready. And it contains &quot;useful stuff&quot; like code (for the player) and SID data. Making it relocatable would require noticeable effort and caution in order to not run into troubles. So - no, it is not &quot;obvious&quot;, not &quot;optimal&quot;, and not even &quot;very good&quot; way but rather a &quot;least effort compromise&quot;.
+
+&gt; when after all it's only about keeping VIC-relevant data out
+&gt; of $1000-$3000. Anyway there's surely no point in discuss ing this
+&gt; (here (with me))...
+
+OK - no more ;-)
+
+&gt; My takeaway is that for the 6510 this is perfectly ordinary memory and
+&gt; therefore my advice of not just loading dummy bytes there but rather
+&gt; load some initial sound data there was useful/correct :-)
+
+Sure! Undoubtedly. :-)
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Jan 26 13:13:51 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9980.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Linker is not following configuration file"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9978.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Linker is not following configuration file"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9977.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] Linker is not following configuration file"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9980.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Linker is not following configuration file"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9980.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Linker is not following configuration file"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9979" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9979" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9979" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-01-26 13:13:54 CET
+</em></small></p>
+</body>
+</html>

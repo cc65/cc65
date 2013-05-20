@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] building under cygwin</title>
+<meta name="Author" content="silverdr1inet.com.pl (silverdr1inet.com.pl)" />
+<meta name="Subject" content="Re: [cc65] building under cygwin" />
+<meta name="Date" content="2007-06-16" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] building under cygwin</h1>
+<!-- received="Sat Jun 16 22:24:01 2007" -->
+<!-- isoreceived="20070616202401" -->
+<!-- sent="Sat, 16 Jun 2007 22:23:44 +0200" -->
+<!-- isosent="20070616202344" -->
+<!-- name="silverdr1inet.com.pl" -->
+<!-- email="silverdr1inet.com.pl" -->
+<!-- subject="Re: [cc65] building under cygwin" -->
+<!-- id="462ED49A-E082-4267-806C-F94654EF855A@inet.com.pl" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="20070615163401.GA5062&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5739.html" title="Johan Kotlinski: &quot;Re: [cc65] building under cygwin&quot;">Next message</a> ]
+[ <a href="5737.html" title="Spiro Trikaliotis: &quot;Re: [cc65] building under cygwin&quot;">Previous message</a> ]
+[ <a href="5731.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] building under cygwin&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5739.html" title="Johan Kotlinski: &quot;Re: [cc65] building under cygwin&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:silverdr1inet.com.pl?Subject=Re:%20[cc65]%20building%20under%20cygwin">silverdr1inet.com.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-06-16 22:23:44</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 2007-06-15, at 18:34, Ullrich von Bassewitz wrote:
+
+&gt;
+&gt; On Fri, Jun 15, 2007 at 02:25:25PM +0200, silverdr&#64;inet&#46;<!--nospam-->com.pl wrote:
+&gt;&gt; Thus - making the rpm or deb target install into /usr (even if I am
+&gt;&gt; not fan of it unless the package becomes part of the global
+&gt;&gt; distribution) does not disturb that own builds from the sources may
+&gt;&gt; still install into /usr/local. In some cases I'd even say that it
+&gt;&gt; properly complements.
+&gt;
+&gt; The reason for installing in /usr/local is to distinguish &quot;local&quot;  
+&gt; files from
+&gt; &quot;official&quot; ones. With the availability of package management  
+&gt; systems like rpm
+&gt; or deb, this distinction is no longer necessary:
+
+Yes and no. Please take the general example that I gave in the  
+previous post.
+
+&gt; The package manager can
+&gt; always tell, which package a file belongs to and who built the  
+&gt; package.
+&gt; Dependencies make sure that a packages cannot be installed if the  
+&gt; necessary
+&gt; prerequisites aren't matched. Instead of installing into /usr/ 
+&gt; local, my
+&gt; suggestion is therefore to build and install packages.
+
+If someone wants it that way - sure! But... we are talking about RPM  
+now. How about PKG, DEB, SIS, INST and, and...? Thus, unless someone  
+does all the work to allow easy building of packages for all the  
+supported systems - building binaries from sources is much more  
+&quot;safe&quot; option. BTW. I usually do my builds into &quot;local&quot; also because  
+overwriting something at the &quot;global&quot; level is easy, while returning  
+to the earlier stage in such case is much more difficult.
+
+&gt; This is in fact what I
+&gt; do with foreign software. I don't know about .deb files, but  
+&gt; building RPMs is
+&gt; rather easy, and it enables me to remove ALL files that are part of an
+&gt; application suite, even after a year or so, when I have forgotten  
+&gt; about it.
+
+Again - take the generic example I gave in the previous post. There  
+are cases where it is much safer or even desired to keep the &quot;local&quot;  
+version separate.
+
+&gt; Regarding the default setting in the master makefile: I'm not using  
+&gt; it to
+&gt; build the RPM packages. So I can live easily with /usr/local as  
+&gt; default if
+&gt; this is the wish of the majority. On the other side, changing a  
+&gt; line in the
+&gt; makefile or calling make with &quot;prefix=/usr/local&quot; on the command  
+&gt; line is not
+&gt; what I would call a real effort, so I don't see it as a big issue.
+
+It's not a big issue but... once I occasionally forget about doing  
+it, because practically all other builds install into local - I end  
+up with a situation, which is clearly bad. Manual cleaning (and being  
+sure that nothing gets omitted/overwritten/deleted) is an additional,  
+unnecessary and error prone work.
+
+And last but not least that manual change requires (at least required  
+not that long ago) also adding CC65_INC=/usr/local/lib/cc65/include  
+CC65_LIB=/usr/local/lib/cc65/lib to the envars. Another thing that is  
+quite uncommon and easily gets forgotten. Then, only after digging up  
+the reasons for something not working, it comes back to mind.
+
+Please don't get me wrong - we are talking about actually a minor  
+change that IMHO makes the situation much more comfortable for (I  
+presume) most people willing to build from sources, while not doing  
+any harm to people willing to install from RPM.
+
+1. default &quot;prefix&quot; to be /usr/local
+2. taking care of the LIB and INC paths at the Makefile/build level
+
+With best regards.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Jun 16 22:24:01 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5739.html" title="Next message in the list">Johan Kotlinski: "Re: [cc65] building under cygwin"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5737.html" title="Previous message in the list">Spiro Trikaliotis: "Re: [cc65] building under cygwin"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5731.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] building under cygwin"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5739.html" title="Next message in this discussion thread">Johan Kotlinski: "Re: [cc65] building under cygwin"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5739.html" title="Message sent in reply to this message">Johan Kotlinski: "Re: [cc65] building under cygwin"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5738" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5738" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5738" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-06-16 22:24:04 CEST
+</em></small></p>
+</body>
+</html>

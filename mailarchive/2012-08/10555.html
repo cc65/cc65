@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] C64 POSIX dirent stuff act</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="Re: [cc65] C64 POSIX dirent stuff actually working?" />
+<meta name="Date" content="2012-08-07" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] C64 POSIX dirent stuff actually working?</h1>
+<!-- received="Tue Aug  7 17:18:17 2012" -->
+<!-- isoreceived="20120807151817" -->
+<!-- sent="Tue, 7 Aug 2012 17:16:23 +0200" -->
+<!-- isosent="20120807151623" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="Re: [cc65] C64 POSIX dirent stuff actually working?" -->
+<!-- id="20120807151623.GF2717@trikaliotis.net" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="20120806193458.GA12650&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10556.html" title="Joseph Rose: &quot;[cc65] inline union def.&quot;">Next message</a> ]
+[ <a href="10554.html" title="A.Fachat: &quot;Re: [cc65] C64 POSIX dirent stuff actually working?&quot;">Previous message</a> ]
+[ <a href="10553.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] C64 POSIX dirent stuff actually working?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10558.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] C64 POSIX dirent stuff actually working?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20[cc65]%20C64%20POSIX%20dirent%20stuff%20actually%20working?">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-08-07 17:16:23</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello Uz,
+
+* On Mon, Aug 06, 2012 at 09:34:58PM +0200 Ullrich von Bassewitz wrote:
+&gt; 
+&gt; On Mon, Aug 06, 2012 at 09:14:09PM +0200, Spiro Trikaliotis wrote:
+&gt; &gt; r5804? Well, LOAD &quot;$:*,R&quot;,8 does not work as you expect, indeed...
+&gt; 
+&gt; It does, but &quot;$0,R&quot; does not.
+
+I agree with André: This is just an implementation detail of the 1541,
+not something you should rely on.
+
+It makes even sense: With &quot;$:*,R&quot;, there IS a filename specified (&quot;*&quot;).
+Thus, the parser (which is shared between file handling and directory
+handling here, as André remembered correctly) accepts the &quot;,R&quot;, as it is
+something you can specify when opening files.
+
+Not so with &quot;$,R&quot; or &quot;$0,R&quot;: In this case, there is no file
+specification available (no colon). Thus, the directory commands parses
+the command itself and expects the end of the command. However, there is
+no, because &quot;,R&quot; was appended.
+
+The &quot;,R&quot; is nowhere documented for the $ command. Thus, in order to be
+on the safe side (think about other drives like 1581, CMD), you should
+ommit the &quot;,R&quot; for &quot;$&quot;. So, IMHO, r5804 is right (in the sense of using
+only documented behaviour), and r5805 is wrong.
+
+ 
+&gt; Does anybody have an &quot;official&quot; guide to what the CBM drives accept? Doing all
+&gt; this stuff with try&amp;error is a bit tiring.
+
+More official than the handbook and the ROM code? No.
+
+The 1541/1571 ROM does the following:
+
+When opening a file, $d7b4 handled it.
+
+It checks  the secondary address and jumps to $d7f3 if it is not zero
+(not reading). That's wierd. [1]
+
+Then it checks if the file name starts with &quot;*&quot;. If not, it jumps to
+$d7f3. This is the case if we open the directory, thus, I will proceed
+there.
+
+Now, $d7f3 checks if the file name starts with &quot;$&quot;. It does, thus, we
+proceed at $f7f7, checking the secondary address for 0. If it is not 0
+(= reading), it proceeds with processing and avoids the directory
+handling.
+
+If it is reading, $f7fc jumps to $da55 which does the actual directory
+processing.
+
+Then, it jumps to $da55 which does the real dir-processing.
+
+Here, we check the length of the command:
+- Is it 1 (only &quot;$&quot; was given), then we proceed at $da6d.
+- Is it 2 (&quot;$x&quot; was given), then we proceed at $da65.
+- Is it longer, then we proceed at $da86.
+
+At $da65 (processing of &quot;$x&quot;), it is tested if the second byte is a drive
+number (&quot;0&quot; or &quot;1&quot;). If it is not, then we proceed at $da86, thus, we do
+the same as for file names that are longer than 2.
+
+Now, we are at $da6d. Thus, we are here ifeither the file name was 1
+byte long, or if it was 2 byte long and the second byte was a drive
+number.
+
+Now, the code does something interesting: It writes &quot;**&quot; at the
+beginning of the command string (yes, TWO asterisk), does some
+housekeeping to let the parser start at the beginning of the command
+string (instead of where it is already in processing), and jumps to $da90.
+
+$da90 is part of the processing of the longer command strings ($da86 as
+mentioned in the &quot;case&quot; above).
+
+So, to make a long story short:
+
+If you would send &quot;$&quot; or &quot;$0&quot; only, then the command would be replaced
+by &quot;*&quot; or &quot;**&quot;, leading to the dir command finding a string.
+
+The problem with &quot;$,R&quot; is that the command is not recognised as being
+send without a filename (because the string is too long). Thus, the
+parser expects a filename which is not there. Thus, it cannot find any
+file with the speecified name: It returns an empty directory.
+
+An additional artefact when looking at $da86-$da90: The colon is not
+really needed. Thus, you can also specify LOAD &quot;$abc*&quot;, and it work like
+LOAD &quot;$:abc*&quot;. However, this will NOT work if the first character is a
+&quot;0&quot; or an &quot;1&quot;. In this case, you would have to use LOAD &quot;$00*&quot; to do the
+equivalent of &quot;LOAD &quot;$0:0*&quot; - weird syntax, isn't it?
+
+Now, why is the &quot;,R&quot; accepted in the first place? For finding the file
+to show, the dir command uses the same routine that is used when
+searching a file to load ($daa4-&gt;$c49d-&gt;$c5ab), and the routine to PARSe
+the file is also the same ($c398). Thus, preventing the &quot;,R&quot; in the
+first place would reuquire additional logic. That's the reason why we
+have this undefined (in the sense of &quot;not contractual&quot;) behaviour.
+
+
+&gt; &gt; BTW, I generated new debian packages of r5804. Thus, I am up-to-date
+&gt; &gt; again.
+&gt; 
+&gt; Not really. r5805 is 45 minutes old :-)
+
+Well, at least at the time I wrote that, I thought I was up-todate. ;)
+
+Regards,
+Spiro.
+
+-- 
+Spiro R. Trikaliotis
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Aug  7 17:18:17 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10556.html" title="Next message in the list">Joseph Rose: "[cc65] inline union def."</a></li>
+<li><dfn>Previous message</dfn>: <a href="10554.html" title="Previous message in the list">A.Fachat: "Re: [cc65] C64 POSIX dirent stuff actually working?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10553.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] C64 POSIX dirent stuff actually working?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10558.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] C64 POSIX dirent stuff actually working?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10558.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] C64 POSIX dirent stuff actually working?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10555" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10555" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10555" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-08-07 17:18:21 CEST
+</em></small></p>
+</body>
+</html>

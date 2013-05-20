@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Commodore file i/o (was:</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Commodore file i/o (was: and another....)">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Commodore file i/o (was: and another....)</h1>
+<!-- received="Tue Oct  8 18:58:07 2002" -->
+<!-- isoreceived="20021008165807" -->
+<!-- sent="Tue, 8 Oct 2002 18:58:12 +0200" -->
+<!-- isosent="20021008165812" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Commodore file i/o (was: and another....)" -->
+<!-- id="20021008165812.GA28036@trixie.musoftware.de" -->
+<!-- inreplyto="36092351.20021008184331@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Commodore%20file%20i/o%20(was:%20and%20another....)"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-10-08 18:58:12
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1599.html">groepaz: "Re: [cc65] Commodore file i/o (was: and another....)"</a>
+<li><strong>In reply to:</strong> <a href="1599.html">groepaz: "Re: [cc65] Commodore file i/o (was: and another....)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1601.html">groepaz: "Re[2]: [cc65] Commodore file i/o (was: and another....)"</a>
+<li><strong>Next in thread:</strong> <a href="../2002-07/1536.html">Greg King: "Re: [cc65] Alignment"</a>
+<li><strong>Reply:</strong> <a href="1601.html">groepaz: "Re[2]: [cc65] Commodore file i/o (was: and another....)"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Tue, Oct 08, 2002 at 06:43:31PM +0200, groepaz wrote:
+&gt; ??? please explain... it implements open/close/read/write basically,
+&gt; and also a ton of (dos/borland style) highlevel routines.
+
+I cannot find anything named open, close, read or write in your sources.
+However, there are some other functions like fs_printf(). And, assuming the
+POSIX low level functions were available, these would not be needed, because
+fprintf would work in this case.
+
+&gt; oh, and maybe that old version is missing certain bits aswell, i dont
+&gt; remember....been a while since i uploaded that one ,)
+
+This may be the case, I don't know:-)
+
+[loadable modules]
+&gt; does that mean dropping in open/read/close would do the trick?
+
+All the stdio stuff is based on open/read/write/close. This means that having
+these routines, fopen, fprintf, fread, fwrite and all others will
+automagically start working. The later routines are not system dependent,
+which is very nice in my eyes, because it minimizes the amount of platform
+dependent code. And, it allows to port programs that use the POSIX interface
+instead of the C file routines.
+
+The current implementation of tgi_load() (the function that loads graphics
+drivers into memory) calls cbm_load, but this is a hack, because cbm_load
+is non standard and works only on CBMs. I will change that to use fopen, fread
+and fclose, so it is usable with any platform that has file i/o.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Commodore%20file%20i/o%20(was:%20and%20another....)">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Commodore%20file%20i/o%20(was:%20and%20another....)">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1599.html">groepaz: "Re: [cc65] Commodore file i/o (was: and another....)"</a>
+<li><strong>In reply to:</strong> <a href="1599.html">groepaz: "Re: [cc65] Commodore file i/o (was: and another....)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1601.html">groepaz: "Re[2]: [cc65] Commodore file i/o (was: and another....)"</a>
+<li><strong>Next in thread:</strong> <a href="../2002-07/1536.html">Greg King: "Re: [cc65] Alignment"</a>
+<li><strong>Reply:</strong> <a href="1601.html">groepaz: "Re[2]: [cc65] Commodore file i/o (was: and another....)"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-10-08 18:58:20 CEST</em>
+</em>
+</small>
+</body>
+</html>

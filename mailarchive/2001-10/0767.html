@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Interrupts and break</title>
+<meta name="Author" content="Daniel Berntsson (danbe628_at_student.liu.se)">
+<meta name="Subject" content="Re: [cc65] Interrupts and break">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Interrupts and break</h1>
+<!-- received="Mon Oct  1 14:20:23 2001" -->
+<!-- isoreceived="20011001122023" -->
+<!-- sent="Mon, 01 Oct 2001 14:20:23 +0200" -->
+<!-- isosent="20011001122023" -->
+<!-- name="Daniel Berntsson" -->
+<!-- email="danbe628_at_student.liu.se" -->
+<!-- subject="Re: [cc65] Interrupts and break" -->
+<!-- id="3BB85F87.7EA624A0@student.liu.se" -->
+<!-- inreplyto="[cc65] Interrupts and break" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Daniel Berntsson (<a href="mailto:danbe628_at_student.liu.se?Subject=Re:%20[cc65]%20Interrupts%20and%20break"><em>danbe628_at_student.liu.se</em></a>)<br>
+<strong>Date:</strong> 2001-10-01 14:20:23
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0768.html">Ullrich von Bassewitz: "Re: [cc65] Interrupts and break"</a>
+<li><strong>Previous message:</strong> <a href="../2001-09/0766.html">Ullrich von Bassewitz: "Re: [cc65] Interrupts and break"</a>
+<li><strong>Maybe in reply to:</strong> <a href="../2001-09/0762.html">Daniel Berntsson: "[cc65] Interrupts and break"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0768.html">Ullrich von Bassewitz: "Re: [cc65] Interrupts and break"</a>
+<li><strong>Reply:</strong> <a href="0768.html">Ullrich von Bassewitz: "Re: [cc65] Interrupts and break"</a>
+<li><strong>Reply:</strong> <a href="0769.html">Ullrich von Bassewitz: "Re: [cc65] Interrupts and break"</a>
+<li><strong>Reply:</strong> <a href="0772.html">Ullrich von Bassewitz: "Re: [cc65] Interrupts and break"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Ullrich von Bassewitz wrote:
+
+&gt; As you can see, it cannot be done without some assembler code. For many
+&gt; applications, the wrapper code is more than what has to be done in the
+&gt; interrupt handler itself, so I do usually suggest to think about writing the
+&gt; interrupt handler in assembler (provided it is rather short). If you don't
+&gt; want to do this for some reason or another, you may want to have a look at the
+&gt; break handler. It contains all code that would also be needed for an interrupt
+&gt; handler (saving registers and zero page locations, calling a C function).
+
+Do you mean break_handler in libsrc/c64/break.s? As far as I can see
+that just saves a, x, y, pc and the flags, no zero page saving? 
+
+&gt; You don't need to save the contents of the stack, but switching the stack
+&gt; itself is needed. This is because the routines that manipulate the stack
+&gt; pointer are not reentrant (they work on 8 bits per insn while the stack
+&gt; pointer is a 16 bit value)
+
+It is? According to the Commodore 64 Programmer's Reference Guide it is
+8 bits and the stack is always at 0100-01ff. And the vice monitor only
+shows a byte..
+
+
+/ Daniel Berntsson
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Interrupts%20and%20break">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0768.html">Ullrich von Bassewitz: "Re: [cc65] Interrupts and break"</a>
+<li><strong>Previous message:</strong> <a href="../2001-09/0766.html">Ullrich von Bassewitz: "Re: [cc65] Interrupts and break"</a>
+<li><strong>Maybe in reply to:</strong> <a href="../2001-09/0762.html">Daniel Berntsson: "[cc65] Interrupts and break"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0768.html">Ullrich von Bassewitz: "Re: [cc65] Interrupts and break"</a>
+<li><strong>Reply:</strong> <a href="0768.html">Ullrich von Bassewitz: "Re: [cc65] Interrupts and break"</a>
+<li><strong>Reply:</strong> <a href="0769.html">Ullrich von Bassewitz: "Re: [cc65] Interrupts and break"</a>
+<li><strong>Reply:</strong> <a href="0772.html">Ullrich von Bassewitz: "Re: [cc65] Interrupts and break"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:42 CET</em>
+</em>
+</small>
+</body>
+</html>

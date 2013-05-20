@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Relocating RODATA</title>
+<meta name="Author" content="Stefan Wessels (swessels1email.com)" />
+<meta name="Subject" content="[cc65] Relocating RODATA" />
+<meta name="Date" content="2011-04-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Relocating RODATA</h1>
+<!-- received="Sat Apr 23 18:50:58 2011" -->
+<!-- isoreceived="20110423165058" -->
+<!-- sent="Sat, 23 Apr 2011 09:45:39 -0700" -->
+<!-- isosent="20110423164539" -->
+<!-- name="Stefan Wessels" -->
+<!-- email="swessels1email.com" -->
+<!-- subject="[cc65] Relocating RODATA" -->
+<!-- id="D113E315-A411-4C93-9587-01C7C7FE6506@email.com" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9354.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Relocating RODATA&quot;">Next message</a> ]
+[ <a href="9352.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] How to write drivers?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9354.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Relocating RODATA&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Stefan Wessels &lt;<a href="mailto:swessels1email.com?Subject=Re:%20[cc65]%20Relocating%20RODATA">swessels1email.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-04-23 18:45:39</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+I am having trouble relocating the RODATA segment.  In my generated code, the __RODATA_RUN__ and __RODATA_LOAD__ end up having the same address which can't be right.
+
+I am making a game and I want to use the VIC pointing at bank 2 ($4000).  For this to work, I must split the RAM.  My config has these definitions in MEMORY:
+  RAM2:     file = %O, 			   start = $080d, size = $39b2;
+  RAM:      file = %O, define = yes, start = $8000, size = $5000 - __STACKSIZE__;
+
+I have this line in SEGMENTS:
+  RODATA:   load = RAM,      type = ro, define = yes;
+
+The line I compile with looks like this:
+cl65 -t c64 -m Snake.prg.map -o Snake.prg globals.c plat.c render.c game.c frontend.c main.c crt0.s -C snakec64.cfg
+
+The program runs, but the opening front end screen is supposed to show text, and that text isn't there (but the game itself runs fine).  If I don't use the custom crt0.s &amp; cfg file, everything works as expected (not a bug in my code that the text isn't there ;)
+
+I made a copy of the standard crt0.s file and added the following:
+.import		__RODATA_LOAD__, __RODATA_RUN__, __RODATA_SIZE__	; Linker generated
+The code to move the RODATA starts like this (Added right after jsr zerobss):
+	lda	#&lt;__RODATA_RUN__
+	sta	ptr1
+	lda	#&gt;__RODATA_RUN__
+	sta	ptr1+1
+	lda #&lt;__RODATA_LOAD__
+	sta ptr2
+	lda #&gt;__RODATA_LOAD__
+	sta ptr2+1
+
+The code that's generated starts like this:
+.C:0823   A9 00      LDA #$00
+.C:0825   85 0A      STA $0A
+.C:0827   A9 80      LDA #$80
+.C:0829   85 0B      STA $0B
+.C:082b   A9 00      LDA #$00
+.C:082d   85 0C      STA $0C
+.C:082f   A9 80      LDA #$80
+.C:0831   85 0D      STA $0D
+
+Notice that __RODATA_LOAD__ and __RODATA_RUN__ both came out to be $8000.  I see the text at around $3a00 (somewhere around there is where I would think _RODATA_LOAD would be).  The Snake.prg file is 14818 bytes meaning it didn't load past 0x41E3 so something went wrong.
+
+Anyone see where I went wrong, or is the problem somewhere else?
+
+Thank you
+Stefan
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Apr 23 18:50:58 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9354.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Relocating RODATA"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9352.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] How to write drivers?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9354.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Relocating RODATA"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9354.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Relocating RODATA"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9366.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] Relocating RODATA"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9353" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9353" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9353" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-04-23 18:51:01 CEST
+</em></small></p>
+</body>
+</html>

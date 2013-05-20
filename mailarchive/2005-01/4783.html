@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Re: Problem with generatin</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Re: Problem with generating o65 files" />
+<meta name="Date" content="2005-01-21" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Re: Problem with generating o65 files</h1>
+<!-- received="Fri Jan 21 23:41:44 2005" -->
+<!-- isoreceived="20050121224144" -->
+<!-- sent="Fri, 21 Jan 2005 23:41:38 +0100" -->
+<!-- isosent="20050121224138" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Re: Problem with generating o65 files" -->
+<!-- id="20050121224138.GA19786@trixie.musoftware.de" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="20050121191538.GB2919&#64;mail.trikaliotis.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4784.html" title="Spiro Trikaliotis: &quot;[cc65] Re: Problem with generating o65 files&quot;">Next message</a> ]
+[ <a href="4782.html" title="Spiro Trikaliotis: &quot;[cc65] Re: Problem with generating o65 files&quot;">Previous message</a> ]
+[ <a href="4782.html" title="Spiro Trikaliotis: &quot;[cc65] Re: Problem with generating o65 files&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4784.html" title="Spiro Trikaliotis: &quot;[cc65] Re: Problem with generating o65 files&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Re:%20Problem%20with%20generating%20o65%20files">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-01-21 23:41:38</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Fri, Jan 21, 2005 at 08:15:38PM +0100, Spiro Trikaliotis wrote:
+&gt; I mean the &quot;OS version&quot; of the (x)o65 file format. André's page
+&gt; describes two types (OSA/65, Lunix), and I know from the conversation
+&gt; with you that there is a third, official one, cc65-module.
+
+The official OS name is &quot;cc65&quot; (at least I hope so:-). Currently I'm using it
+only for cc65 modules.
+
+&gt; BTW: Would cc65-module be a suitable &quot;OS version&quot; for my work, or should
+&gt; I go and try to &quot;register&quot; another one?
+
+This is up to André to decide. When generating cc65 modules, ld65 adds a 16
+bit word as OS data, which can be set using ID=xxx in the linker config. So
+another possibility would be to use this ID to distinguish your modules from
+loadable cc65 modules. This would need a small change in the linker, because
+currently no exports and imports are allowed when generating cc65 modules. For
+example, I could allow exports and imports for ids &gt;= $8000, so you could use
+
+        os = cc65, id = $8000, type = small;
+
+for your modules. Since this is nothing more than just another id, so you can
+also talk to André to register your own OS id. But even this would need
+changes in the linker, because it does currently not allow other than the
+three known ids.
+
+Of course you can also ignore the whole issue, and just use the Lunix or
+OS/A65 ids:-)
+
+&gt; &gt; BTW: cc65 doesn't define __STDC_VERSION__ either, but the case is somewhat
+&gt; &gt; different ...
+&gt;
+&gt; Well, don't you support C99? (just kidding)
+
+I'm still fighting:-) Seriously: While it would be possible, it doesn't make
+sense. The 64 bit integer type and a complex floating point type is just too
+much for an 8 bit machine. Actually, this is one of my biggest objections: The
+standard is no longer suited for small machines. And since the C99 standard
+declares all older C standards void (the C89 standard is actually no longer an
+official standard), most compilers for small machines won't be standards
+compliant.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Jan 21 23:41:44 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4784.html" title="Next message in the list">Spiro Trikaliotis: "[cc65] Re: Problem with generating o65 files"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4782.html" title="Previous message in the list">Spiro Trikaliotis: "[cc65] Re: Problem with generating o65 files"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4782.html" title="Message to which this message replies">Spiro Trikaliotis: "[cc65] Re: Problem with generating o65 files"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4784.html" title="Next message in this discussion thread">Spiro Trikaliotis: "[cc65] Re: Problem with generating o65 files"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4784.html" title="Message sent in reply to this message">Spiro Trikaliotis: "[cc65] Re: Problem with generating o65 files"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4783" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4783" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4783" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-01-21 23:41:55 CET
+</em></small></p>
+</body>
+</html>

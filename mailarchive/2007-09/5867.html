@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] cl65 -t apple2 works, but </title>
+<meta name="Author" content="Scott Alfter (scott1alfter.us)" />
+<meta name="Subject" content="Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't" />
+<meta name="Date" content="2007-09-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't</h1>
+<!-- received="Mon Sep 10 12:17:40 2007" -->
+<!-- isoreceived="20070910101740" -->
+<!-- sent="Mon, 10 Sep 2007 03:17:24 -0700" -->
+<!-- isosent="20070910101724" -->
+<!-- name="Scott Alfter" -->
+<!-- email="scott1alfter.us" -->
+<!-- subject="Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't" -->
+<!-- id="46E519B4.4000309@alfter.us" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="f97798c20709100152q41519589ye5d8540903614e6b&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5868.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't&quot;">Next message</a> ]
+[ <a href="5866.html" title="Oliver Schmidt: &quot;Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't&quot;">Previous message</a> ]
+[ <a href="5866.html" title="Oliver Schmidt: &quot;Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5869.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Scott Alfter &lt;<a href="mailto:scott1alfter.us?Subject=Re:%20[cc65]%20cl65%20-t%20apple2%20works,%20but%20cl65%20-C%20apple2.cfg%20doesn't">scott1alfter.us</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-09-10 12:17:24</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Oliver Schmidt wrote:
+&gt;&gt; I can edit it to change the start
+&gt;&gt; address (moving it to $2000 and resaving the binary with type SYS instead of
+&gt;&gt; $00 creates a file that can be double-clicked from the Finder to launch, though
+&gt;&gt; it crashes to the Monitor when it exits...there's probably a ProDOS MLI call or
+&gt;&gt; something that can be hacked in at the end of main() to fix that).
+&gt; 
+&gt; I'd rather stay clear from trying to hack a BIN file into a SYS file...
+&gt; 
+&gt; The contribution section contains a ProDOS loader that is a
+&gt; less-than-512-byte SYS file loading the BIN files created by the cc65
+&gt; toolchain.
+
+I know about that.  Using two files where one would do seems less than optimal,
+but I suppose that's a matter of opinion.
+
+&gt; The benefit of this approach is that the final binary starting at $800
+&gt; has $1800 more RAM available.
+
+That's admittedly a nice bonus.
+
+&gt; - As long as a cc65 binary doesn't use file I/O it may run as DOS 3.3
+&gt; binary, as ProDOS binary launched from BASIC.SYSTEM ans via the loader
+&gt; as ProDOS SYS file.
+
+I don't think I've used DOS 3.3 on a regular basis in more than 20 years; since
+there's so much stuff I use (hard drives, network, etc.) that doesn't work
+under DOS 3.3, compatibility with it is a non-issue.
+
+&gt;&gt; I can also build and load tgidemo, but it runs into a problem when it tries to
+&gt;&gt; load the TGI driver.
+&gt; 
+&gt; Works fine for me.
+&gt; 
+&gt;&gt; ld65: Error: File `a2e.hi.tgi' has unknown type
+&gt; 
+&gt; Surely, it's not an object file. It's a dynamically loadable module.
+&gt; Check out the cc65 docs.
+
+I kinda figured that out, but the TGI documentation (including such small
+details as how projects that use it should be built, what driver file(s) need
+to accompany the executable, what it should be named, and the correct filetype
+and auxtype for such files) is pretty much nonexistent.  Here's the output from
+grep on the contents of /usr/share/doc/cc65-2.11.9.20070903/html when searching
+for &quot;tgi&quot; (search is case-insensitive):
+
+apple2-5.html:&lt;DT&gt;&lt;B&gt;&lt;CODE&gt;a2.lo.tgi&lt;/CODE&gt;&lt;/B&gt;&lt;DD&gt;&lt;P&gt;This driver was written
+by Stefan Haubenthal. It features a resolution of
+apple2-5.html:&lt;DT&gt;&lt;B&gt;&lt;CODE&gt;a2.hi.tgi&lt;/CODE&gt;&lt;/B&gt;&lt;DD&gt;&lt;P&gt;This driver was written
+by Stefan Haubenthal. It features a resolution of
+apple2enh-5.html:&lt;DT&gt;&lt;B&gt;&lt;CODE&gt;a2e.lo.tgi&lt;/CODE&gt;&lt;/B&gt;&lt;DD&gt;&lt;P&gt;This driver was
+written by Stefan Haubenthal. It features a resolution of
+apple2enh-5.html:&lt;DT&gt;&lt;B&gt;&lt;CODE&gt;a2e.hi.tgi&lt;/CODE&gt;&lt;/B&gt;&lt;DD&gt;&lt;P&gt;This driver was
+written by Stefan Haubenthal. It features a resolution of
+atmos-5.html:&lt;DT&gt;&lt;B&gt;&lt;CODE&gt;atmos-240-200-2.tgi&lt;/CODE&gt;&lt;/B&gt;&lt;DD&gt;&lt;P&gt;This driver was
+written by Stefan Haubenthal. It features a resolution of
+c128-5.html:&lt;DT&gt;&lt;B&gt;&lt;CODE&gt;c128-vdc.tgi&lt;/CODE&gt;&lt;/B&gt;&lt;DD&gt;&lt;P&gt;This driver was written
+by Maciej Witkowiak. It uses the 80 column display
+c128-5.html:&lt;DT&gt;&lt;B&gt;&lt;CODE&gt;c128-vdc2.tgi&lt;/CODE&gt;&lt;/B&gt;&lt;DD&gt;&lt;P&gt;This driver was written
+by Maciej Witkowiak. This driver uses the 80 column
+c64-5.html:&lt;P&gt;&lt;EM&gt;Note:&lt;/EM&gt; All available graphics drivers for the TGI
+interface will use
+c64-5.html:&lt;DT&gt;&lt;B&gt;&lt;CODE&gt;c64-hi.tgi&lt;/CODE&gt;&lt;/B&gt;&lt;DD&gt;&lt;P&gt;This driver features a
+resolution of 320*200 with two colors and an
+geos-1.html:&lt;P&gt;&lt;CODE&gt;tgi&lt;/CODE&gt; - TGI driver for GEOS that supports both 40 and
+80 columns modes but mode can not be
+geos-1.html:changed between &lt;CODE&gt;tgi_init&lt;/CODE&gt; and &lt;CODE&gt;tgi_done&lt;/CODE&gt;.&lt;/P&gt;
+geos-1.html:&lt;CODE&gt;assert.h, conio.h, dio.h, errno.h, em.h, geos.h, joystick.h,
+modload.h, mouse.h, stdlib.h, string.h, tgi.h, time.h&lt;/CODE&gt;&lt;/P&gt;
+lynx-5.html:&lt;P&gt;A TGI driver for the standard graphics mode (160&amp;times;102 in 16
+colors) is
+lynx-5.html:&lt;P&gt;The TGI driver is implemented as a dual buffering device. To use
+it as a
+lynx-5.html:&lt;P&gt;The TGI driver has a few Lynx-specific extensions.&lt;/P&gt;
+lynx-5.html:&lt;P&gt;Calling tgi_ioctl(0, spr) will display a standard Lynx sprite on
+screen.&lt;/P&gt;
+lynx-5.html:&lt;P&gt;Calling tgi_ioctl(1, 0) will do a flip screen. If you decide to
+flip the
+lynx-5.html:&lt;P&gt;Calling tgi_ioctl(2, bgindex) will set the text background color
+to the index
+
+BTW, my name's not Shirley. :-)
+
+&gt;&gt; Since the documentation for the Apple II libraries says file I/O isn't working
+&gt;&gt; yet, maybe this is to be expected.
+&gt; 
+&gt; You obviously are looking at quite outdated docs.
+
+The documentation on the website is outdated?  Perhaps it should be brought up
+to date.  A project's website is where I tend to look first for documentation.
+
+That said, as indicated above, I've found newer documentation installed locally
+that got installed along with a newer version...see below.
+
+&gt;&gt; Time to unpack the Apple II books so I can
+&gt;&gt; figure out what I need to do.
+&gt; 
+&gt; Or just grab the latest cc65 snapshot. It has comprehensive file I/O
+&gt; support based on the ProDOS MLI. The TGIDEMO runs nicely dynamically
+&gt; loading the .tgi driver.
+
+I've already done that...someone pointed me toward an ebuild that pulled a
+newer version than what I had been using.  My usual inclination is to stick
+with released versions instead of the bleeding edge (especially with the
+warning the index file gives WRT the contents of the snapshot directory), and
+since the newest version listed under <a href="ftp://ftp.musoftware.de/pub/uz/cc65/">ftp://ftp.musoftware.de/pub/uz/cc65/</a> is
+2.11.0, that's what I had started with.
+
+Here's what I've done to try getting it to work:
+
+cc65 -t apple2enh tgidemo.c
+ca65 tgidemo.s
+ld65 -t apple2enh --start-addr 0x4000 -o tgidemo tgidemo.o apple2enh.o \
+  apple2enh.lib
+
+tgidemo and a2e.hi.tgi were then pulled across the LAN to the root directory of
+my IIGS's boot drive.  Upon going into BASIC.SYSTEM, I then punched in this
+(copying files created on the Linux box to the GS results in the filetype
+returned by netatalk being set to $00 instead of BIN):
+
+bload tgidemo,a$4000,b4,t$00
+call 16384
+
+It then asks you to press Y if the driver (a2e.hi.tgi, presumably...this string
+shows up in a hexdump of tgidemo) is present in the same directory.  I press Y;
+it then outputs the following:
+
+Ok. Please wait patiently...
+tgi_load: 1
+
+...and then it drops back to the prompt.  Presumably, the non-zero return code
+from tgi_load() indicates failure of some sort.
+
+&gt; Generally I'd stop presuming that everything is broken and/or incomplete.
+
+I thought I've been reasonably polite here while trying to get this toolchain
+up and running.  Your condescension isn't warranted.  (I was about to make a
+wisecrack about how cryptic, unhelpful remarks with no real answers to the
+question at hand are best left unposted, but decided against it. :-) )
+
+In any case, it's past 3 AM now and I have to go in to work in a few
+hours...time to call it a night and see what further clues
+
+Scott Alfter
+scott&#64;alfter&#46;<!--nospam-->us
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Sep 10 12:17:40 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5868.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5866.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5866.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5869.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5869.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5867" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5867" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5867" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-09-10 12:17:43 CEST
+</em></small></p>
+</body>
+</html>

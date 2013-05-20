@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] CBM kernal disk I/O?</title>
+<meta name="Author" content="Joseph Rose (rose.joseph121yahoo.com)" />
+<meta name="Subject" content="Re: [cc65] CBM kernal disk I/O?" />
+<meta name="Date" content="2011-02-21" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] CBM kernal disk I/O?</h1>
+<!-- received="Mon Feb 21 00:12:30 2011" -->
+<!-- isoreceived="20110220231230" -->
+<!-- sent="Sun, 20 Feb 2011 15:12:12 -0800 (PST)" -->
+<!-- isosent="20110220231212" -->
+<!-- name="Joseph Rose" -->
+<!-- email="rose.joseph121yahoo.com" -->
+<!-- subject="Re: [cc65] CBM kernal disk I/O?" -->
+<!-- id="528416.25207.qm@web120603.mail.ne1.yahoo.com" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="201102202336.05398.marc&#64;rintsch.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9291.html" title="Joseph Rose: &quot;[cc65] Word on My Text Adventure&quot;">Next message</a> ]
+[ <a href="9289.html" title="Marc 'BlackJack' Rintsch: &quot;Re: [cc65] CBM kernal disk I/O?&quot;">Previous message</a> ]
+[ <a href="9289.html" title="Marc 'BlackJack' Rintsch: &quot;Re: [cc65] CBM kernal disk I/O?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Joseph Rose &lt;<a href="mailto:rose.joseph121yahoo.com?Subject=Re:%20[cc65]%20CBM%20kernal%20disk%20I/O?">rose.joseph121yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-02-21 00:12:12</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Thank you.  That should be useful.  Sorry about my stupidity!  :(
+
+
+
+----- Original Message ----
+From: Marc 'BlackJack' Rintsch &lt;marc&#64;rintsch&#46;<!--nospam-->de&gt;
+To: cc65&#64;musoftware&#46;<!--nospam-->de
+Sent: Sun, February 20, 2011 5:35:45 PM
+Subject: Re: [cc65] CBM kernal disk I/O?
+
+Hi Joseph,
+
+&gt; I want to load bytes from disk one at a time and do a little
+&gt; processing before using it.  So far, when I read a byte from an open
+&gt; file, I've been using cbm_read() to load a byte into a char variable
+&gt; as a buffer.  I tried to use the kernal functions to do it, but it
+&gt; took information from the keyboard and started moving the cursor to
+&gt; column 3.  Can anybody tell me how to use the kernal functions to
+&gt; read and write information more directly?
+
+Just look at the source code of the cbm_* functions how they use the 
+kernel functions.  In the case of `cbm_read()` you will even find a C 
+implementation in the comments of the assembler source file.
+
+&gt; I am unwilling to reveal my code until its beta version.  Any help
+&gt; would be appreciated.
+
+If you don't want to show the actual code then reduce the code to a 
+small but runnable example which still has the problem.
+
+Ciao,
+    Marc 'BlackJack' Rintsch
+-- 
+The Python debugger has a 'break' command;
+why doesn't it have 'fix' command too?
+
+
+
+      
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Feb 21 00:12:30 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9291.html" title="Next message in the list">Joseph Rose: "[cc65] Word on My Text Adventure"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9289.html" title="Previous message in the list">Marc 'BlackJack' Rintsch: "Re: [cc65] CBM kernal disk I/O?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9289.html" title="Message to which this message replies">Marc 'BlackJack' Rintsch: "Re: [cc65] CBM kernal disk I/O?"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9290" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9290" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9290" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-02-21 00:12:32 CET
+</em></small></p>
+</body>
+</html>

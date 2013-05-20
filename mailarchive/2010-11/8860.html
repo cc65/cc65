@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Linker config for assembler us</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="[cc65] Linker config for assembler users (was: ca65 for stand-alone asm projects)" />
+<meta name="Date" content="2010-11-13" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Linker config for assembler users (was: ca65 for stand-alone asm projects)</h1>
+<!-- received="Sat Nov 13 19:09:31 2010" -->
+<!-- isoreceived="20101113180931" -->
+<!-- sent="Sat, 13 Nov 2010 19:09:21 +0100" -->
+<!-- isosent="20101113180921" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="[cc65] Linker config for assembler users (was: ca65 for stand-alone asm projects)" -->
+<!-- id="20101113180921.GA6892@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="AANLkTikNK99168N_PDW8XDZcQGsh5a_d7tdYqdo3SU97&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8861.html" title="Groepaz: &quot;Re: [cc65] Linker config for assembler users (was: ca65 for stand-alone asm projects)&quot;">Next message</a> ]
+[ <a href="8859.html" title="Oliver Schmidt: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">Previous message</a> ]
+[ <a href="8747.html" title="Oliver Schmidt: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8861.html" title="Groepaz: &quot;Re: [cc65] Linker config for assembler users (was: ca65 for stand-alone asm projects)&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Linker%20config%20for%20assembler%20users%20(was:%20ca65%20for%20stand-alone%20asm%20projects)">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-11-13 19:09:21</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Wed, Nov 03, 2010 at 11:57:34AM +0100, Oliver Schmidt wrote:
+&gt; a) There could be a new (per target) secondary linker config making
+&gt; only minimal assumptions on the program.
+
+Using the new linker features, I'm currently experimenting with such a linker
+config for assembler programmers (for the C64 as a first take). When doing so,
+a few questions came up:
+
+1. What is a reasonable default start address for a config targeted to
+   assembler programmers? $801? $C000? $4000?
+
+2. How about the usable RAM area? Should it be limited to $A000 by default?
+   My current version uses $FFFF, which means that any errors will go
+   undetected.
+
+3. Is it desirable to have an optional BASIC SYS header, or is this used so
+   rarely that people are better served with a less complex linker config?
+
+4. How about the SYS token, is it the same on all existing 65xx Commodore
+   machines? In other words: Is a BASIC SYS header module portable across
+   all CBM machines? I do think so, but I'm not 100% sure.
+
+5. Segments: What I'm currently doing is to make all standard segments
+   optional. Apart from the missing error detection, is there anything that
+   speaks against this approach?
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Nov 13 19:09:31 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8861.html" title="Next message in the list">Groepaz: "Re: [cc65] Linker config for assembler users (was: ca65 for stand-alone asm projects)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8859.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8747.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8861.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] Linker config for assembler users (was: ca65 for stand-alone asm projects)"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8861.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] Linker config for assembler users (was: ca65 for stand-alone asm projects)"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8862.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] Linker config for assembler users (was: ca65 for stand-alone asm projects)"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8869.html" title="Message sent in reply to this message">Per Olofsson: "Re: [cc65] Linker config for assembler users (was: ca65 for stand-alone asm projects)"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8860" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8860" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8860" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-11-13 19:09:33 CET
+</em></small></p>
+</body>
+</html>

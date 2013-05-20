@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Lynx target</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Lynx target">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Lynx target</h1>
+<!-- received="Wed Feb 26 00:43:43 2003" -->
+<!-- isoreceived="20030225234343" -->
+<!-- sent="Wed, 26 Feb 2003 00:43:37 +0100" -->
+<!-- isosent="20030225234337" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Lynx target" -->
+<!-- id="20030225234337.GA14438@trixie.musoftware.de" -->
+<!-- inreplyto="se5b7086.083@gwmail.sd62.bc.ca" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Lynx%20target"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-02-26 00:43:37
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2506.html">Shawn Jefferson: "Re: [cc65] Lynx target"</a>
+<li><strong>In reply to:</strong> <a href="2506.html">Shawn Jefferson: "Re: [cc65] Lynx target"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2536.html">Stephan Lesch: "[cc65] fastcall"</a>
+<li><strong>Next in thread:</strong> <a href="2511.html">Memblers: "Re: [cc65] Lynx target"</a>
+<li><strong>Next in thread:</strong> <a href="2508.html">Shawn Jefferson: "Re: [cc65] Lynx target"</a>
+<li><strong>Reply:</strong> <a href="2536.html">Stephan Lesch: "[cc65] fastcall"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Tue, Feb 25, 2003 at 01:32:46PM -0800, Shawn Jefferson wrote:
+&gt; Could you clarify this for me?  I am running into some problems, namely that
+&gt; simple code that looks good (to me) will not run in Handy.  Sometimes turning
+&gt; on optimizations -O will cause it to start functioning.  Should I compile the
+&gt; runtime stuff without the --cpu 65C02 switch?
+
+The optimizer has knowledge about runtime functions. And this knowledge may be
+wrong when the runtime library is translated for the 65C02, because
+
+    (a) register usage differs, and
+    (b) no one has ever tested a library compiled for the 65C02.
+
+But since these problems are triggered by using the optimizer, and you state
+that the problems vanish when doing so, I would say that your problems have a
+different cause.
+
+&gt; So if I have a function that is somefunc(char a, char b) and use popax I can
+&gt; get both arguments with one call?  The arguements are pushed on the stack a, b
+&gt; so would I be right in assuming that the A register contains b and the X
+&gt; register contains a?
+
+Yes.
+
+&gt; Hmmmm, any reason *not* to use __fastcall__ ?
+
+Fastcall functions may not called without a prototype in scope. This is also
+true for most non fastcall functions, but with a fastcall function it will
+definitely fail. And, there may be problems with function pointers when mixing
+__fastcall__ and non __fastcall__ functions. But programs experiencing
+problems should be *really* rare.
+
+&gt; Another question: I have setup a _mikey.h and _suzy.h file with a struct
+&gt; layout of the hardware address used by those chips (as per the _antic.h file)
+&gt; and I have a #define SUZY (*(struct __suzy *) 0xFC00) in my lynx.h file.  How
+&gt; do I use this structure?  If I do var = SUZY.joystick in my code the compiler
+&gt; complains bitterly.
+
+Just using the struct as any other struct variable should work. You may have
+an error somewhere in your definition, but since &quot;the compiler complains
+bitterly&quot; is just as good as &quot;it does not work&quot;, I'm not able to diagnose
+anything else:-)
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Lynx%20target">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Lynx%20target">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2506.html">Shawn Jefferson: "Re: [cc65] Lynx target"</a>
+<li><strong>In reply to:</strong> <a href="2506.html">Shawn Jefferson: "Re: [cc65] Lynx target"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2536.html">Stephan Lesch: "[cc65] fastcall"</a>
+<li><strong>Next in thread:</strong> <a href="2511.html">Memblers: "Re: [cc65] Lynx target"</a>
+<li><strong>Next in thread:</strong> <a href="2508.html">Shawn Jefferson: "Re: [cc65] Lynx target"</a>
+<li><strong>Reply:</strong> <a href="2536.html">Stephan Lesch: "[cc65] fastcall"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-02-26 00:45:16 CET</em>
+</em>
+</small>
+</body>
+</html>

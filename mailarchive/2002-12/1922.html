@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] wrong colors in conio</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] wrong colors in conio">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] wrong colors in conio</h1>
+<!-- received="Mon Dec  9 22:36:10 2002" -->
+<!-- isoreceived="20021209213610" -->
+<!-- sent="Mon, 9 Dec 2002 22:36:09 +0100" -->
+<!-- isosent="20021209213609" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] wrong colors in conio" -->
+<!-- id="20021209213609.GA30118@trixie.musoftware.de" -->
+<!-- inreplyto="87lm2yx5tt.fsf@power.cnet.aladdin.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20wrong%20colors%20in%20conio"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-12-09 22:36:09
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1921.html">Christian Groessler: "Re: [cc65] wrong colors in coniodte"</a>
+<li><strong>In reply to:</strong> <a href="1921.html">Christian Groessler: "Re: [cc65] wrong colors in coniodte"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Mon, Dec 09, 2002 at 10:03:58PM +0100, Christian Groessler wrote:
+&gt; But removing textcolor() or doing nothing in it leaves the Atari port
+&gt; with no way to set the text bightness.
+&gt; I could add a textluminance() or similar function which does it, but
+&gt; then all other ports would need a new (empty?) textluminance()
+&gt; function.
+
+Since the Atari is the only platform that has this sort of behaviour, and I
+don't think there are many others, textluminance() should be Atari specific.
+
+&gt; Can't we just document the different behaviour of textcolor() for the
+&gt; Atari and leave it in so Atari users can set the brightness of the
+&gt; text?
+&gt; It appears to me to be less hassle this way.
+
+It may be less hassle on the first view, but it would be very short sighted.
+If we start having each function behave differently on one or more platforms,
+we will effectively undermine the whole portability goal. It is a different
+thing for a function to be unavailable on a specific platform, and to behave
+differently. Think about it yourself. If bgcolor wouldn't return the old color
+on one platform, cputc wouldn't move the cursor on another, cputs wouldn't
+interpret a carriage return on a third platform, and gotoxy would measure
+coordinates relative to 1/1 instead of 0/0 on a fourth: Even if all these
+special behaviours were documented somewhere, it would nevertheless be almost
+impossible to write a conio based program that runs on all platforms.
+
+So I would like to ask you to make the necessary changes. The changes (rename
+textcolor to textluminance and define textcolor to be an alias for return0) do
+not seem to be complex, so if you're busy with other things, I can as well
+make these changes. I promise I'll try not to break anything:-)
+
+Please get me right: It is not my intent to cripple the Atari port. Having an
+Atari specific function to set the text luminance would be a good idea. But
+since this function *is* special, it should be clear to anyone using it, that
+it is not portable, and that it does not behave as expected from textcolor().
+
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20wrong%20colors%20in%20conio">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20wrong%20colors%20in%20conio">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1921.html">Christian Groessler: "Re: [cc65] wrong colors in coniodte"</a>
+<li><strong>In reply to:</strong> <a href="1921.html">Christian Groessler: "Re: [cc65] wrong colors in coniodte"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-12-09 22:36:18 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] abc music specification</title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="Re: [cc65] abc music specification" />
+<meta name="Date" content="2004-12-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] abc music specification</h1>
+<!-- received="Thu Dec 23 03:03:55 2004" -->
+<!-- isoreceived="20041223020355" -->
+<!-- sent="Thu, 23 Dec 2004 02:59:45 +0100" -->
+<!-- isosent="20041223015945" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="Re: [cc65] abc music specification" -->
+<!-- id="200412230259.46090.groepaz@gmx.net" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="Pine.LNX.4.58.0412221123540.11493&#64;kosh.sipo.fi" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4763.html" title="Karri Kaksonen: &quot;Re: [cc65] abc music specification&quot;">Next message</a> ]
+[ <a href="4761.html" title="Karri Kaksonen: &quot;Re: [cc65] abc music specification&quot;">Previous message</a> ]
+[ <a href="4761.html" title="Karri Kaksonen: &quot;Re: [cc65] abc music specification&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4763.html" title="Karri Kaksonen: &quot;Re: [cc65] abc music specification&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20abc%20music%20specification">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-12-23 02:59:45</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Wednesday 22 December 2004 10:51, Karri Kaksonen wrote:
+
+&gt; Wrong. There is several decent editors already. I have a few thousand
+&gt; tunes in this format already that I downloaded from the net. And there is
+&gt; conversion programs freely available to convert form midi and other
+&gt; formats.
+
+well i wasnt talking about the ABC format, but about any format in general. so
+assuming that format isnt perfect for us, we'd need to create an editor :)
+
+but indeed you've just mentioned a big plus of generic formats in general -
+there are usually editors for them widely available :)
+ 
+&gt; Plus it is not bulky, slow or anything related to that. My version for the
+&gt; Lynx using 4 simultaneous channels as taken from my map-file is:
+&gt; 
+&gt; abcmusic.o:
+&gt;     CODE              Offs = 000A0D   Size = 00046D
+&gt;     RODATA            Offs = 00002C   Size = 00003D
+&gt;     DATA              Offs = 00006D   Size = 00003E
+&gt; 
+&gt; And this is lousy code as I am a lousy assembler coder.
+&gt; 
+&gt; In the hands of a capable coder it could probably drop in half.
+
+ok that doesnt look _that_ bad. to come up with some figures, the &quot;common&quot; c64
+tune takes about 0x1000 bytes for the player AND all music data. on the vic20, 
+you'd want less than that, maybe not more than 0x800 or so. so how memory intense
+are those tunes commonly?
+
+and as for speed, &quot;modern&quot; c64 player typically run at about $18 rasterlines per frame,
+which means 63*$18=1512 cycles per player call. can you give a simelar figure for yours?
+
+&gt; &gt; imho this needs to be discussed a lot, needs comments from the atari and apple ppl
+&gt; 
+&gt; Hard to argue with this comment...
+
+*G*
+
+i think this is very important. every target has its own unique sound hardware, restrictions
+and whatnot. imho it wouldnt be very wise to start without having heard opinions and suggestions
+from all directions. so speak up ppl! :)
+
+&gt; &gt; tjam, a thing that would be entire possible, and much easier to define and implement would
+&gt; &gt; be a driver to play samples though...maybe we should start with that. (i might be able to
+&gt; &gt; contribute a modded version of SAM *cough* :=P)
+&gt; 
+&gt; This is a different thing that is also needed. The Lynx hardware can be
+&gt; set up
+&gt; 1) to support samples be giving access to a D/A circuit directly
+&gt; 2) or to control oscillators and shift registers for producing the sound.
+&gt; 
+&gt; I feel that samples should provide a different set of drivers to do the job.
+&gt; The alternative 1 costs CPU-time while alternative 2 is virtually free. So
+&gt; for calculation intensive games I prefer alternative 2.
+
+yes thats probably the same on all targets. samples are rarely used, most of the times
+ for occasional sound fx or additional voices in a title-screen tune (where cpu doesnt
+matter). samples also take a relativly huge amount of ram on most targets so using
+them is rather the exception than the rule.
+ 
+&gt; So I vote for keeping a music player driver separate from a sample player.
+&gt; And I would also like to see both drivers available on the cc65 compiler.
+
+agreed :)
+
+however if we keep the sample player seperate, another idea (i'm not sure if good
+or not) would be to keep a &quot;chip voice&quot; driver seperate aswell. that one would
+be capable to just play a single note on the soundchip. then the musicplayer
+itself could be in a third module, which in turn could use the chip-driver,
+the sample-player, or both.
+
+oh, and we shouldnt forget about sound effects. ie the driver should provide funtions
+to play predefined sounds independently from each other, and with- or without the
+music playing at the same time.
+
+gpz
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Dec 23 03:03:55 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4763.html" title="Next message in the list">Karri Kaksonen: "Re: [cc65] abc music specification"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4761.html" title="Previous message in the list">Karri Kaksonen: "Re: [cc65] abc music specification"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4761.html" title="Message to which this message replies">Karri Kaksonen: "Re: [cc65] abc music specification"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4763.html" title="Next message in this discussion thread">Karri Kaksonen: "Re: [cc65] abc music specification"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4763.html" title="Message sent in reply to this message">Karri Kaksonen: "Re: [cc65] abc music specification"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4762" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4762" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4762" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-12-23 03:04:06 CET
+</em></small></p>
+</body>
+</html>

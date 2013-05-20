@@ -1,0 +1,200 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] Version 2.6.0 released</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="[cc65] Version 2.6.0 released">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] Version 2.6.0 released</h1>
+<!-- received="Tue Dec 19 00:05:12 2000" -->
+<!-- isoreceived="20001218230512" -->
+<!-- sent="Tue, 19 Dec 2000 00:05:18 +0100" -->
+<!-- isosent="20001218230518" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="[cc65] Version 2.6.0 released" -->
+<!-- id="20001219000518.A15643@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Version%202.6.0%20released"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2000-12-19 00:05:18
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0214.html">Nikkinen: "Re: [cc65] Version 2.6.0 released"</a>
+<li><strong>Previous message:</strong> <a href="0212.html">Groepaz: "Re: [cc65] bug?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0214.html">Nikkinen: "Re: [cc65] Version 2.6.0 released"</a>
+<li><strong>Reply:</strong> <a href="0214.html">Nikkinen: "Re: [cc65] Version 2.6.0 released"</a>
+<li><strong>Reply:</strong> <a href="0216.html">Dominique Biesmans: "Re: [cc65] Version 2.6.0 released"</a>
+<li><strong>Maybe reply:</strong> <a href="0221.html">Greg King: "Re: [cc65] Version 2.6.0 released"</a>
+<li><strong>Maybe reply:</strong> <a href="0304.html">Greg King: "Re: [cc65] Version 2.6.0 released"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Version 2.6.0 of the compiler and tools are finally done and packaged. One of
+the most visible difference is that the packages are splitted now. Most files
+that are needed for the target platforms are now in separate packages, so you
+need the base package (the compiler and tools) plus the target machine
+package. Have a look at the ftp server and you will get the idea.
+
+I've appended the announcement below. Thanks for all the help with this
+release! Have fun!
+
+Regards
+
+
+	Uz
+
+									
+
+--------------------------------------------------------------------------
+
+I'm proud to announce version 2.6 of CC65, a C crosscompiler /
+crossassembler combo for 6502 systems.
+
+CC65 has C and runtime library support for many of the old 6502 machines,
+including
+
+  - The Commodore C64, C128 and the C16, C116, Plus/4 machines.
+  - The CBM 600/700 family (programs run in bank 1).
+  - Newer PET machines (not 2001)
+  - The Apple ][ (library support by Kevin Ruland &lt;<a href="mailto:kevin_at_rodin.wustl.edu?Subject=Re:%20[cc65]%20Version%202.6.0%20released">kevin_at_rodin.wustl.edu</a>&gt;)
+  - The Atari 8 bit machines (thanks to the Atari team)
+  - GEOS for the C64 and C128 (GEOSLib by Maciej Witkowiak &lt;<a href="mailto:ytm_at_elysium.pl?Subject=Re:%20[cc65]%20Version%202.6.0%20released">ytm_at_elysium.pl</a>&gt;)
+
+The libraries are fairly portable, so creating a version for other 6502s
+shouldn't be too much work.
+
+
+New in this version:
+
+  * All bugs mentioned on the bugs web page for version 2.5 are fixed.
+
+  * Several new commands/features for the assembler, including a repeat
+    statement and target specific character sets.
+
+  * More 65C02 support.
+
+  * Module constructors/destructors (assembler/linker).
+
+  * `const' is honored in most places now, `const' data goes into the RODATA
+    segment by default.
+
+  * Lots of larger library routines rewritten in assembler for speed and size
+    (heap management, printf family).
+
+  * New object dump utility.
+
+  * New disassembler and assembler --&gt; HTML converter (beta!).
+
+  * New low level disk I/O module for the Atari, thanks to Christian
+    Groessler, &lt;<a href="mailto:cpg_at_aladdin.de?Subject=Re:%20[cc65]%20Version%202.6.0%20released">cpg_at_aladdin.de</a>&gt;.
+
+  * New mouse routines for the Atari machines by Christian Groessler and
+    Freddy Offenga, &lt;<a href="mailto:F.Offenga_at_student.kun.nl?Subject=Re:%20[cc65]%20Version%202.6.0%20released">F.Offenga_at_student.kun.nl</a>&gt;. The mouse routines for the
+    C64 are now debugged and should work (but still beta).
+
+  * Other stuff.
+
+
+There is still no support for the following features:
+
+  * Floats and bit fields.
+
+  * File routines on most systems. The 8 bit Ataris are the first
+    machines that do have full file I/O support (besides the ACE port
+    which was dropped some time ago). Please note that the complete CBM
+    family doesn't have file I/O support!
+
+  * The 80 column mode on the C128 is not supported by the conio library.
+
+
+Available packages:
+
+As usual I will provide the complete sources and several binary packages,
+including RPMs for RedHat Linux. Linux is the primary development platform,
+so the sources do compile out of the box on Linux machines.
+
+Please note that there are now separate RPMs for the compiler proper and
+the target specific libraries. To develop for one of the predefined target
+systems you need the compiler RPM package *and* one of the target machine
+packages.
+
+Binaries for DOS and and Windows will follow or may already be available at
+the time you read this. OS/2 packages will again be available, but since
+there are almost no downloads for OS/2, so the host platform may get
+dropped in the near future (again).
+
+
+Download:
+
+More information information and a download link, please visit the cc65 web
+page at
+
+	<a href="http://www.cc65.org/">http://www.cc65.org/</a>
+
+
+Thanks to all who sent feedback and suggestions and of course to anyone who
+helped developing cc65!
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Version%202.6.0%20released">uz_at_musoftware.de</a>
+
+
+</pre>
+<hr noshade>
+<ul>
+<li>application/pgp-signature attachment: <a href="../att-0213/01-part">stored</a>
+</ul>
+<!-- attachment="01-part" -->
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Version%202.6.0%20released">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0214.html">Nikkinen: "Re: [cc65] Version 2.6.0 released"</a>
+<li><strong>Previous message:</strong> <a href="0212.html">Groepaz: "Re: [cc65] bug?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0214.html">Nikkinen: "Re: [cc65] Version 2.6.0 released"</a>
+<li><strong>Reply:</strong> <a href="0214.html">Nikkinen: "Re: [cc65] Version 2.6.0 released"</a>
+<li><strong>Reply:</strong> <a href="0216.html">Dominique Biesmans: "Re: [cc65] Version 2.6.0 released"</a>
+<li><strong>Maybe reply:</strong> <a href="0221.html">Greg King: "Re: [cc65] Version 2.6.0 released"</a>
+<li><strong>Maybe reply:</strong> <a href="0304.html">Greg King: "Re: [cc65] Version 2.6.0 released"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:37 CET</em>
+</em>
+</small>
+</body>
+</html>

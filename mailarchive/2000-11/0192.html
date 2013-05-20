@@ -1,0 +1,156 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] lcc port to the c64</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] lcc port to the c64">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] lcc port to the c64</h1>
+<!-- received="Thu Nov 30 14:17:17 2000" -->
+<!-- isoreceived="20001130131717" -->
+<!-- sent="Thu, 30 Nov 2000 14:17:20 +0100" -->
+<!-- isosent="20001130131720" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] lcc port to the c64" -->
+<!-- id="20001130141720.A14380@trixie.musoftware.de" -->
+<!-- inreplyto="3A2649E2.47FBD2EF@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20lcc%20port%20to%20the%20c64"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2000-11-30 14:17:20
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0193.html">Mike McCarty: "Re: [cc65] lcc port to the c64"</a>
+<li><strong>Previous message:</strong> <a href="0191.html">MagerValp: "Re: [cc65] lcc port to the c64"</a>
+<li><strong>In reply to:</strong> <a href="0190.html">Groepaz: "Re: [cc65] lcc port to the c64"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0191.html">MagerValp: "Re: [cc65] lcc port to the c64"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Thu, Nov 30, 2000 at 01:36:50PM +0100, Groepaz wrote:
+&gt; btw... i recently started using ca65 somewhat more intensive, and i noticed
+&gt; that the missing 'repeat' type of thing really _IS_ a horrible thing ;/
+
+The next release *will* have a .repeat statement. It will also have some other
+goodies that make the macro facility something like a meta programming
+language in the assembler.
+
+Here is an example what is possible. The macro &quot;BasicString&quot; will take a
+string argument, will output all characters but the last one as is, and will
+set bit 7 on the last character:
+
+	.macro	BasicString 	Arg
+
+		; Check type of argument
+		.if (.not .match (Arg, &quot;&quot;))
+		.error &quot;String argument expected&quot;
+		.exitmacro
+		.endif
+
+		; Check for an empty string
+		.if (.strlen (Arg) = 0)
+		.error &quot;BasicString: argument cannot be the empty string&quot;;
+		.exitmacro
+		.endif
+
+		; Warn for strings of length 1 since this is rather unusual
+		.if (.strlen (Arg) = 1)
+		.warning &quot;BasicString: argument has length 1&quot;;
+		.endif
+
+		; Output all bytes up to the last one
+		.repeat	.strlen (Arg)-1, I
+		.byte	.strat (Arg, I)
+		.endrep
+
+		; Do the last byte
+		.byte	.strat (Arg, .strlen(Arg)-1) | $80
+	.endmacro
+
+If you're able to compile the package from the sources, I would suggest to
+give the latest snapshot a try. For one, it has several new features, second,
+I'm as usual glad about any feedback:-)
+
+&gt; whatever, besides that..... ca65/ld65 ROX ;=)
+
+Thanks!
+
+&gt; ps: while i am porting some code written in tasm, i am writing down all
+&gt;     the traps that came across my way.... i could supply that document
+&gt;     if you want to include that with your docs (a whole lot of ppl are
+&gt;     used to tasm so it might make sence)
+
+I've already added a &quot;.feature&quot; command that allows to emulate several
+features used by older assemblers. Having labels without leading colons is one
+example, assignment to the PC pseudo variable (* = $2000) is another. While
+ca65 can and will not emulate all other assemblers around, the .feature
+command (which is also available as --feature command line option) makes
+porting old sources easier. So, yes, I'm very interested in that document, and
+if it is possible to add more such emulation features without breaking
+anything in ca65, I will do it.
+
+Regards
+
+
+	Uz							 
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20lcc%20port%20to%20the%20c64">uz_at_musoftware.de</a>
+
+
+</pre>
+<hr noshade>
+<ul>
+<li>application/pgp-signature attachment: <a href="../att-0192/01-part">stored</a>
+</ul>
+<!-- attachment="01-part" -->
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20lcc%20port%20to%20the%20c64">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0193.html">Mike McCarty: "Re: [cc65] lcc port to the c64"</a>
+<li><strong>Previous message:</strong> <a href="0191.html">MagerValp: "Re: [cc65] lcc port to the c64"</a>
+<li><strong>In reply to:</strong> <a href="0190.html">Groepaz: "Re: [cc65] lcc port to the c64"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0191.html">MagerValp: "Re: [cc65] lcc port to the c64"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:37 CET</em>
+</em>
+</small>
+</body>
+</html>

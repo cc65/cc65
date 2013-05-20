@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Help!,does anyone know how</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Help!,does anyone know how to use NES joystick with cc65" />
+<meta name="Date" content="2009-02-17" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Help!,does anyone know how to use NES joystick with cc65</h1>
+<!-- received="Tue Feb 17 13:48:10 2009" -->
+<!-- isoreceived="20090217124810" -->
+<!-- sent="Tue, 17 Feb 2009 13:46:37 +0100" -->
+<!-- isosent="20090217124637" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Help!,does anyone know how to use NES joystick with cc65" -->
+<!-- id="20090217124637.GA26634@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="17e97a5a0902170440j1017fdeft916c15c97a799dbf&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6505.html" title="Groepaz: &quot;Re: [cc65] Help!,does anyone know how to use NES joystick with cc65&quot;">Next message</a> ]
+[ <a href="6503.html" title="zhblue (newsclan): &quot;[cc65] Help!,does anyone know how to use NES joystick with cc65&quot;">Previous message</a> ]
+[ <a href="6503.html" title="zhblue (newsclan): &quot;[cc65] Help!,does anyone know how to use NES joystick with cc65&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6505.html" title="Groepaz: &quot;Re: [cc65] Help!,does anyone know how to use NES joystick with cc65&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Help!,does%20anyone%20know%20how%20to%20use%20NES%20joystick%20with%20cc65">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-02-17 13:46:37</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Tue, Feb 17, 2009 at 08:40:14PM +0800, zhblue (newsclan) wrote:
+&gt; void testjoy(){
+&gt;    char err=0;
+&gt;    const char * stdjoy=&quot;nes-stdjoy.joy&quot;;
+&gt;    err=joy_load_driver(stdjoy);
+&gt;    cprintf(&quot;%u&quot;,err);
+&gt; }
+[...]
+&gt; Unresolved external `_close' referenced in:
+&gt;  joy_load.s(18)
+&gt; Unresolved external `_open' referenced in:
+&gt;  joy_load.s(16)
+&gt; Unresolved external `_read' referenced in:
+
+The NES doesn't have disks and/or file systems. You will need to statically
+link the driver to the executable.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Feb 17 13:48:10 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6505.html" title="Next message in the list">Groepaz: "Re: [cc65] Help!,does anyone know how to use NES joystick with cc65"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6503.html" title="Previous message in the list">zhblue (newsclan): "[cc65] Help!,does anyone know how to use NES joystick with cc65"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6503.html" title="Message to which this message replies">zhblue (newsclan): "[cc65] Help!,does anyone know how to use NES joystick with cc65"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6505.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] Help!,does anyone know how to use NES joystick with cc65"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6504" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6504" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6504" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-02-17 13:48:13 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Unresolved external `tosas</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Unresolved external `tosasra0'" />
+<meta name="Date" content="2004-09-28" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Unresolved external `tosasra0'</h1>
+<!-- received="Tue Sep 28 21:35:40 2004" -->
+<!-- isoreceived="20040928193540" -->
+<!-- sent="Tue, 28 Sep 2004 21:35:35 +0200" -->
+<!-- isosent="20040928193535" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Unresolved external `tosasra0'" -->
+<!-- id="20040928193535.GB14807@trixie.musoftware.de" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="183652049.20040928022247&#64;student.liu.se" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4582.html" title="Mats Andrén: &quot;Re[2]: [cc65] Unresolved external `tosasra0'&quot;">Next message</a> ]
+[ <a href="4580.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] pre processor #define and assembler constants&quot;">Previous message</a> ]
+[ <a href="4566.html" title="Mats Andrén: &quot;[cc65] Unresolved external `tosasra0'&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4582.html" title="Mats Andrén: &quot;Re[2]: [cc65] Unresolved external `tosasra0'&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Unresolved%20external%20`tosasra0'">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-09-28 21:35:35</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Tue, Sep 28, 2004 at 02:22:47AM +0200, Mats Andrén wrote:
+&gt; Sorry to spam this list with questions..
+
+No problem, that's what it was made for.
+
+&gt; When I try to do either &quot;intvar &gt;&gt; 8&quot; and &quot;intvar / 256&quot; I get the
+&gt; following error from the linker:
+
+This is a problem in the development version. The calling semantics for the
+runtime shift functions have been changed, but the compiler does still call
+the old functions when optimizing for size. The problem should go away when
+using -Oi or --codesize x with x &gt; 100.
+
+&gt; ------------------------------------
+&gt; Linker version:
+&gt; ld65 V2.10.1 - (C) Copyright 1998-2002 Ullrich von Bassewitz
+&gt; ------------------------------------
+&gt; ..and the libsrc is built from cc65-snapshot-2.10.5.20040918.
+
+In general, it is not a good idea to mix different versions. This may work and
+is not the case of your problem, but it may also cause strange errors.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Sep 28 21:35:40 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4582.html" title="Next message in the list">Mats Andrén: "Re[2]: [cc65] Unresolved external `tosasra0'"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4580.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] pre processor #define and assembler constants"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4566.html" title="Message to which this message replies">Mats Andrén: "[cc65] Unresolved external `tosasra0'"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4582.html" title="Next message in this discussion thread">Mats Andrén: "Re[2]: [cc65] Unresolved external `tosasra0'"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4582.html" title="Message sent in reply to this message">Mats Andrén: "Re[2]: [cc65] Unresolved external `tosasra0'"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4581" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4581" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4581" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-09-28 21:35:49 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] # of local variables allo</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] # of local variables allowed?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] # of local variables allowed?</h1>
+<!-- received="Sat Mar  1 13:38:00 2003" -->
+<!-- isoreceived="20030301123800" -->
+<!-- sent="Sat, 1 Mar 2003 13:37:57 +0100" -->
+<!-- isosent="20030301123757" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] # of local variables allowed?" -->
+<!-- id="20030301123757.GA31247@trixie.musoftware.de" -->
+<!-- inreplyto="20030301131418.A3088@ws" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20#%20of%20local%20variables%20allowed?"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-03-01 13:37:57
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2556.html">M Ancher: "Re: [cc65] # of local variables allowed?"</a>
+<li><strong>In reply to:</strong> <a href="2556.html">M Ancher: "Re: [cc65] # of local variables allowed?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2558.html">Groepaz: "[cc65] testsuite - compiler bugs!"</a>
+<li><strong>Reply:</strong> <a href="2558.html">Groepaz: "[cc65] testsuite - compiler bugs!"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Sat, Mar 01, 2003 at 01:14:18PM +0100, M Ancher wrote:
+&gt; Since I have two functions which are recursive, I cannot just use the
+&gt; »--static-locals«-switch on all code. I thought about moving the
+&gt; recursive code into another ».c«-file and compile that without
+&gt; »--static-locals«. (It could be linked later, right?)
+&gt;
+&gt; This is one option, but is it better to:
+&gt;
+&gt; I could move the functions that gives the error »Too many local
+&gt; variables« into another ».c«-file. This way only the »troublesome« code
+&gt; is compiled with »--static-locals«. This solution would save more memory
+&gt; at runtime, since it will only allocate memory when needed, right?
+
+There's also a
+
+        #pragma staticlocals(on|off)
+
+command that will command the compiler to place local variables into the .bss
+segment or onto the stack respectively. Using this pragma, you can compile one
+function this way and another the other way. The #pragma command is described
+in more depth in the documentation.
+
+Using &quot;--static-locals&quot; will need more memory for data, because memory for
+local variables is allocated statically, so it is needed even when the
+function is never called. On the other side, accessing this data is easier and
+faster, because the address is known and no index register and indirect
+addressing mode is needed. So while &quot;--static-locals&quot; needs more memory for
+data, the code is usually somewhat smaller and faster. Some of the sample demo
+programs are compiled with static locals for this reason, because a few cycles
+in a tight loop can add up considerably.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20#%20of%20local%20variables%20allowed?">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20#%20of%20local%20variables%20allowed?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2556.html">M Ancher: "Re: [cc65] # of local variables allowed?"</a>
+<li><strong>In reply to:</strong> <a href="2556.html">M Ancher: "Re: [cc65] # of local variables allowed?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2558.html">Groepaz: "[cc65] testsuite - compiler bugs!"</a>
+<li><strong>Reply:</strong> <a href="2558.html">Groepaz: "[cc65] testsuite - compiler bugs!"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-03-01 13:38:06 CET</em>
+</em>
+</small>
+</body>
+</html>

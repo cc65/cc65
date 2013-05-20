@@ -1,0 +1,43 @@
+# HG changeset patch
+# User Daniel Serpell <daniel.serpell@gmail.com>
+# Date 1260020465 10800
+# Branch trunk
+# Node ID 2a51326fd5b76ba55ba87ff32a42f51ae34d4464
+# Parent  ee56a3bc075ad670cbc2d25aabe56e4941b722bb
+Don't use _strupr to uppercase filename, use shorter inlined loop.
+
+diff --git a/libsrc/atari/ucase_fn.s b/libsrc/atari/ucase_fn.s
+--- a/libsrc/atari/ucase_fn.s
++++ b/libsrc/atari/ucase_fn.s
+@@ -23,7 +23,7 @@
+ 	.import	__defdev
+ .endif
+ 	.importzp tmp3,ptr4,sp
+-	.import	_strupr,subysp
++	.import	subysp
+ 	.export	ucase_fn
+ 
+ .proc   ucase_fn
+@@ -97,10 +97,19 @@
+ hasdev2:
+ .endif
+ 	; uppercase the temp. filename
+-	ldx	sp+1
+-	lda	sp
+-	jsr	_strupr
++	ldy	#0
+ 
++ucloop:	lda	(sp),y	; get character
++	beq	uc_end		; jump if done
++	bmi	L1		; Not lowercase (also, invalid, should reject)
++	cmp	#'a'
++	bcc	L1		; Not lowercase
++	and	#$DF		; make upper case char, assume ASCII chars
++	sta	(sp),y		; store back
++L1:	iny	    		; next char
++	bne	ucloop
++
++uc_end:
+ 	; leave A and X pointing to the modified filename
+ 	lda	sp
+ 	ldx	sp+1

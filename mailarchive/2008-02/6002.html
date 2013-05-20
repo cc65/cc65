@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Questions for CBM guys</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] Questions for CBM guys" />
+<meta name="Date" content="2008-02-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Questions for CBM guys</h1>
+<!-- received="Fri Feb 29 16:34:32 2008" -->
+<!-- isoreceived="20080229153432" -->
+<!-- sent="Fri, 29 Feb 2008 16:27:39 +0100" -->
+<!-- isosent="20080229152739" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] Questions for CBM guys" -->
+<!-- id="f97798c20802290727h613ed29djcef6aac79c60a824@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6003.html" title="Groepaz: &quot;Re: [cc65] Questions for CBM guys&quot;">Next message</a> ]
+[ <a href="6001.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Possible bug? Assmebler exports lower case only.&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6003.html" title="Groepaz: &quot;Re: [cc65] Questions for CBM guys&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Questions%20for%20CBM%20guys">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-02-29 16:27:39</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+I'm currently working on improving the Contiki 2.x web server for the
+C64/C128... (You can see it live at www.c64web.com.)
+
+I've seen in the cc65 C-library source that there is a maximum of 8
+open files for the POSIX file I/O functions. So I'd like to be able to
+serve 8 concurrent HTTP requests. My question are:
+
+1. Is it correct to presume that the underlying &quot;DOS&quot; supports (at
+least) 8 open files so that the C-library limit can be used up?
+
+2. Is it possible to open the very same file several times? Maybe if
+it is opened only for reading? The web server calls POSIX open() with
+O_RDONLY.
+
+3. In order to be able to use all 8 POSIX files for serving HTTP
+request the 3 standard files (in / out / err) are closed right at the
+beginning of main(). However there's a need to write some logging
+information to the screen. The conio library is both a little
+heavyweight and doesn't support scrolling.
+
+So I'm looking for the &quot;standard&quot; ROM (aka Kernal ?) routine for
+putting a character (or a null-terminated string) to the &quot;current
+cursor position and advance that&quot;. I'm sure you know what I mean. It's
+not about speed but about simplicity. It would especially be great if
+there were one routine usable both for the 40 and 80 col display on
+the C128.
+
+Im totally new to CBM low level programming so any hints on
+prerequisites for calling that routine (banking ?) are appreciated -
+obviously the same is true for register settings an entry / exit.
+
+Thanks in advance for your support, Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Feb 29 16:34:32 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6003.html" title="Next message in the list">Groepaz: "Re: [cc65] Questions for CBM guys"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6001.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Possible bug? Assmebler exports lower case only."</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6003.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] Questions for CBM guys"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6003.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] Questions for CBM guys"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6002" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6002" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6002" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-02-29 16:34:35 CET
+</em></small></p>
+</body>
+</html>

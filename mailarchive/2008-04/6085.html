@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] New release?</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] New release?" />
+<meta name="Date" content="2008-04-09" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] New release?</h1>
+<!-- received="Wed Apr  9 21:03:54 2008" -->
+<!-- isoreceived="20080409190354" -->
+<!-- sent="Wed, 9 Apr 2008 21:03:44 +0200" -->
+<!-- isosent="20080409190344" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] New release?" -->
+<!-- id="20080409190344.GA11179@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="18428.45046.574411.499699&#64;hal.cling.gu.se" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6086.html" title="Oliver Schmidt: &quot;Re: [cc65] New release?&quot;">Next message</a> ]
+[ <a href="6084.html" title="Groepaz: &quot;Re: [cc65] New release?&quot;">Previous message</a> ]
+[ <a href="6082.html" title="MagerValp: &quot;[cc65] New release?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6086.html" title="Oliver Schmidt: &quot;Re: [cc65] New release?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20New%20release?">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-04-09 21:03:44</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Good evening!
+
+On Wed, Apr 09, 2008 at 02:00:54PM +0200, MagerValp wrote:
+&gt; The latest cc65 release is now 2.5 years old, and there are 20
+&gt; released patches. Is 2.12 close to release?
+
+It depends. Releasing a bugfixed 2.11 version is not really an option, because
+Oliver made quite some changes, and as far as I know the current Contiki
+sources won't build for the apple with a bugfixed 2.11. On the other side, the
+development trunk has some known problems, for example
+
+        static unsigned char Buf[10];
+        int main (void)
+        {
+            unsigned char* B = &amp;Buf;
+            ...
+        }
+
+does not work. I don't seem to be able to finish bigger changes, because of
+time constraints. Oliver told me that having POSIX opendir/readdir/closedir
+functions for the CBMs would be useful, so I had a look into it and found that
+it is not too much work. Started to write opendir() - and wasn't able to spent
+a single minute on it the last five days or so. Just as an example ...
+
+But the snapshot is probably better than the old 2.11 release, so it would be
+possible to release it as 2.12 knowing that there are some problems.
+
+How about this: I will give another 10 days for everyone to test the current
+snapshot for serious problems and will release it as 2.12 after that. Would
+that be acceptable?
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Apr  9 21:03:54 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6086.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] New release?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6084.html" title="Previous message in the list">Groepaz: "Re: [cc65] New release?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6082.html" title="Message to which this message replies">MagerValp: "[cc65] New release?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6086.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] New release?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6086.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] New release?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6087.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] New release?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6089.html" title="Message sent in reply to this message">Karri Kaksonen: "Re: [cc65] New release?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6091.html" title="Message sent in reply to this message">MagerValp: "Re: [cc65] New release?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6085" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6085" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6085" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-04-09 21:03:56 CEST
+</em></small></p>
+</body>
+</html>

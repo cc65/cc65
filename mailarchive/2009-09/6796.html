@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Own parameter call stack?</title>
+<meta name="Author" content="Karri Kaksonen (karri1sipo.fi)" />
+<meta name="Subject" content="Re: [cc65] Own parameter call stack?" />
+<meta name="Date" content="2009-09-02" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Own parameter call stack?</h1>
+<!-- received="Wed Sep  2 07:16:55 2009" -->
+<!-- isoreceived="20090902051655" -->
+<!-- sent="Wed, 02 Sep 2009 08:16:44 +0300" -->
+<!-- isosent="20090902051644" -->
+<!-- name="Karri Kaksonen" -->
+<!-- email="karri1sipo.fi" -->
+<!-- subject="Re: [cc65] Own parameter call stack?" -->
+<!-- id="4A9DFFBC.4060901@sipo.fi" -->
+<!-- charset="UTF-8" -->
+<!-- inreplyto="20090901211653.GA23592&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6797.html" title="Groepaz: &quot;Re: [cc65] Own parameter call stack?&quot;">Next message</a> ]
+[ <a href="6795.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Own parameter call stack?&quot;">Previous message</a> ]
+[ <a href="6795.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Own parameter call stack?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6798.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Own parameter call stack?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Karri Kaksonen &lt;<a href="mailto:karri1sipo.fi?Subject=Re:%20[cc65]%20Own%20parameter%20call%20stack?">karri1sipo.fi</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-09-02 07:16:44</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Ullrich von Bassewitz wrote:
+&gt; Hi!
+&gt;
+&gt; On Tue, Sep 01, 2009 at 07:53:48PM +0300, Karri Kaksonen wrote:
+&gt;   
+&gt;&gt; In case you want to have a look at a really big cc65 project (the source
+&gt;&gt; is also included) in
+&gt;&gt; <a href="http://www.atariage.com/forums/topic/121303-solitare-card-games-for-the-lynx/page__view__findpost__p__1827706">http://www.atariage.com/forums/topic/121303-solitare-card-games-for-the-lynx/page__view__findpost__p__1827706</a>
+&gt;&gt;     
+&gt;
+&gt; Whow, that's really respectable. Would you mind testing this thing with the
+&gt; new version once a release candidate is available?
+&gt;
+&gt; Regards
+&gt;
+&gt;
+&gt;         Uz
+&gt;
+&gt;
+&gt;   
+
+I would really like to do it. There are so many good details in the 
+current cc65 suite of tools that I would hate to lose functionality.
+
+To compile my sources you need only one program outside the cc65 suite. 
+It is the sprite packer &quot;sprpck&quot; to convert the sprites from bmp format 
+to a binary that you can include using .include statement. All the other 
+tools are included in the cc65 release.
+
+I wonder if we could create a resource compiler for cc65 that could 
+compile 1-bit, 2-bit, 3-bit and 4-bit bitmaps to compressed sprites?
+
+It should be able to output three objects:
+- unsigned char  name_bits_per_pixel
+- unsigned char name_pal[16]
+- unsigned char name_sprite[] or unsigned char name_sprite_000_000[]
+from an input image &quot;name&quot;
+
+Naturally this resource compiler needs to have a few inputs like
+- &quot;desired bits per pixel&quot;
+- sys = lynx
+- segment = GAME_RODATA
+- anchor = (x, y)  the location of 0,0 in the sprite
+- offset = (x, y) the pixel location where the first sprite starts in 
+the input bitmap
+- size = (w, h) size of one sprite
+- tiles = (n, m) layout of the sprites in the bitmap n = horisontal 
+sprites, m= vertical sprites
+You don't have to support lots of different formats. Just one format 
+like indexed png would be ok.
+
+After this I would not need any tools outside the cc65 suite for writing 
+code for the Lynx.
+
+In the future I would like to try to create a symbolic debugger at the 
+C-level using Code::Blocks IDE. It would further speed up development of 
+Lynx games.
+--
+Thank you for a great compiler,
+
+Karri
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Sep  2 07:16:55 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6797.html" title="Next message in the list">Groepaz: "Re: [cc65] Own parameter call stack?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6795.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Own parameter call stack?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6795.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Own parameter call stack?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6798.html" title="Next message in this discussion thread">silverdr1wfmh.org.pl: "Re: [cc65] Own parameter call stack?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6798.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] Own parameter call stack?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6796" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6796" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6796" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-09-02 07:16:58 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] ca65: .sizeof() doesn't re</title>
+<meta name="Author" content="Stefan Wessels (swessels1email.com)" />
+<meta name="Subject" content="Re: [cc65] ca65: .sizeof() doesn't return correct values?" />
+<meta name="Date" content="2011-05-08" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] ca65: .sizeof() doesn't return correct values?</h1>
+<!-- received="Sun May  8 19:00:47 2011" -->
+<!-- isoreceived="20110508170047" -->
+<!-- sent="Sun, 8 May 2011 09:55:26 -0700" -->
+<!-- isosent="20110508165526" -->
+<!-- name="Stefan Wessels" -->
+<!-- email="swessels1email.com" -->
+<!-- subject="Re: [cc65] ca65: .sizeof() doesn't return correct values?" -->
+<!-- id="E844D4C2-44AB-4A18-B51E-34E9E94D4FD6@email.com" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="4DC6BD14.7050002&#64;jade.plala.or.jp" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9402.html" title="Yutaka Amanai: &quot;Re: [cc65] ca65: .sizeof() doesn't return correct values?&quot;">Next message</a> ]
+[ <a href="9400.html" title="Yutaka Amanai: &quot;Re: [cc65] ca65: .sizeof() doesn't return correct values?&quot;">Previous message</a> ]
+[ <a href="9400.html" title="Yutaka Amanai: &quot;Re: [cc65] ca65: .sizeof() doesn't return correct values?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9402.html" title="Yutaka Amanai: &quot;Re: [cc65] ca65: .sizeof() doesn't return correct values?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Stefan Wessels &lt;<a href="mailto:swessels1email.com?Subject=Re:%20[cc65]%20ca65:%20.sizeof()%20doesn't%20return%20correct%20values?">swessels1email.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-05-08 18:55:26</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+On 2011-05-08, at 8:56 AM, Yutaka Amanai wrote:
+
+&gt; 2011/05/09 0:31 Groepaz wrote:
+&gt;&gt; On Sonntag 08 Mai 2011, you wrote:
+&gt;&gt;&gt; According to this listing, .sizeof(FOO)=2 and .sizeof(BAR)=0. And, if
+&gt;&gt;&gt; you uncomment the line &quot;lda BAZ,x&quot;, ca65 causes an error: &quot;Size of `BAZ'
+&gt;&gt;&gt; is unknown&quot;. Is this intended behavior? Or am I making a wrong use of
+&gt;&gt;&gt; .sizeof() ?
+&gt;&gt; 
+&gt;&gt; what exactly do you expect the size of a label to be? IMHO the (correct)
+&gt;&gt; result is always 2, for c64 at least :)
+&gt; 
+&gt; I always expect 2 (about FOO, BAR, and BAZ). I understand that .sizeof()
+&gt; should be independent of newlines.
+&gt; 
+
+The documentation for .sizeof says newlines do matter:
+&quot;...this is the size of the data declared on the same source line as the label&quot;
+
+I think what you want is simply: lda     #BAR-FOO
+
+Stefan
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun May  8 19:00:47 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9402.html" title="Next message in the list">Yutaka Amanai: "Re: [cc65] ca65: .sizeof() doesn't return correct values?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9400.html" title="Previous message in the list">Yutaka Amanai: "Re: [cc65] ca65: .sizeof() doesn't return correct values?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9400.html" title="Message to which this message replies">Yutaka Amanai: "Re: [cc65] ca65: .sizeof() doesn't return correct values?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9402.html" title="Next message in this discussion thread">Yutaka Amanai: "Re: [cc65] ca65: .sizeof() doesn't return correct values?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9402.html" title="Message sent in reply to this message">Yutaka Amanai: "Re: [cc65] ca65: .sizeof() doesn't return correct values?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9428.html" title="Message sent in reply to this message">Stefan Wessels: "[cc65] Snake Byte release"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9401" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9401" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9401" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-05-08 19:00:51 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Input string routine for a</title>
+<meta name="Author" content="Joseph Rose (rose.joseph121yahoo.com)" />
+<meta name="Subject" content="Re: [cc65] Input string routine for a line of data?" />
+<meta name="Date" content="2011-06-08" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Input string routine for a line of data?</h1>
+<!-- received="Wed Jun  8 17:43:17 2011" -->
+<!-- isoreceived="20110608154317" -->
+<!-- sent="Wed, 8 Jun 2011 08:43:03 -0700 (PDT)" -->
+<!-- isosent="20110608154303" -->
+<!-- name="Joseph Rose" -->
+<!-- email="rose.joseph121yahoo.com" -->
+<!-- subject="Re: [cc65] Input string routine for a line of data?" -->
+<!-- id="946373.79265.qm@web120603.mail.ne1.yahoo.com" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="596132F6-E899-41D0-8C85-A2252824D7E1&#64;wfmh.org.pl" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9514.html" title="Marc 'BlackJack' Rintsch: &quot;Re: [cc65] Input string routine for a line of data?&quot;">Next message</a> ]
+[ <a href="9512.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Input string routine for a line of data?&quot;">Previous message</a> ]
+[ <a href="9512.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Input string routine for a line of data?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9521.html" title="Joseph Rose: &quot;Re: [cc65] Input string routine for a line of data?&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Joseph Rose &lt;<a href="mailto:rose.joseph121yahoo.com?Subject=Re:%20[cc65]%20Input%20string%20routine%20for%20a%20line%20of%20data?">rose.joseph121yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-06-08 17:43:03</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Maybe I need to upgrade cc65.  Thank you, silverdr&#64;wfmh&#46;<!--nospam-->org.pl.
+
+
+From: &quot;silverdr&#64;wfmh&#46;<!--nospam-->org.pl&quot; &lt;silverdr&#64;wfmh&#46;<!--nospam-->org.pl&gt;
+To: cc65&#64;musoftware&#46;<!--nospam-->de
+Sent: Wednesday, June 8, 2011 11:32 AM
+Subject: Re: [cc65] Input string routine for a line of data?
+
+
+On 2011-06-08, at 14:55, Joseph Rose wrote:
+
+&gt; This is my latest version of the example routine:
+
+C00l!
+
+&gt; printf (&quot;Type in name of file to compress: &quot;);
+&gt; fgets(f,17,stdin);
+&gt; putchar ('\n');
+&gt; strcat (f,&quot;,p&quot;);
+&gt; Does it work onyour system?
+
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt; 
+int main()
+{
+    char f[20];
+    printf (&quot;Type in name of file to compress: &quot;);
+    fgets(f,17,stdin);
+    putchar ('\n');
+    strcat (f,&quot;,p&quot;);
+    printf(&quot;\ntext = \&quot;%s\&quot;\n&quot;, f);
+    return 0;
+}
+
+does work. Even if you probably want to strip newline from the input string first. Something like..
+
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt; 
+int main()
+{
+    char f[20];
+    char *newline;
+    printf (&quot;Type in name of file to compress: &quot;);
+    fgets(f,17,stdin);
+    putchar ('\n');
+    if(newline = strchr(f, '\n'))
+        *newline = '\0';
+    strcat (f,&quot;,p&quot;);
+    printf(&quot;\ntext = \&quot;%s\&quot;\n&quot;, f);
+    return 0;
+}
+
+-- 
+SD!
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Jun  8 17:43:17 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9514.html" title="Next message in the list">Marc 'BlackJack' Rintsch: "Re: [cc65] Input string routine for a line of data?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9512.html" title="Previous message in the list">silverdr1wfmh.org.pl: "Re: [cc65] Input string routine for a line of data?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9512.html" title="Message to which this message replies">silverdr1wfmh.org.pl: "Re: [cc65] Input string routine for a line of data?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9521.html" title="Next message in this discussion thread">Joseph Rose: "Re: [cc65] Input string routine for a line of data?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9513" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9513" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9513" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-06-08 17:43:21 CEST
+</em></small></p>
+</body>
+</html>

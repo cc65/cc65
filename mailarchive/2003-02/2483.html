@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Machines with switchable</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Machines with switchable clock">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Machines with switchable clock</h1>
+<!-- received="Thu Feb 20 22:35:04 2003" -->
+<!-- isoreceived="20030220213504" -->
+<!-- sent="Thu, 20 Feb 2003 22:35:00 +0100" -->
+<!-- isosent="20030220213500" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Machines with switchable clock" -->
+<!-- id="20030220213500.GD28810@trixie.musoftware.de" -->
+<!-- inreplyto="3E54DCA1.48B4CF97@web.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Machines%20with%20switchable%20clock"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-02-20 22:35:00
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2482.html">Memblers: "[cc65] NES support in cc65"</a>
+<li><strong>In reply to:</strong> <a href="2472.html">Tim Schürmann: "Re: [cc65] Machines with switchable clock"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2486.html">Stephan Lesch: "Re: [cc65] Machines with switchable clock"</a>
+<li><strong>Next in thread:</strong> <a href="2475.html">Christian Krüger: "Re: [cc65] Machines with switchable clock"</a>
+<li><strong>Reply:</strong> <a href="2486.html">Stephan Lesch: "Re: [cc65] Machines with switchable clock"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Thu, Feb 20, 2003 at 02:48:17PM +0100, Tim Schürmann wrote:
+&gt; The Sinclair ZX80 and ZX81 (with a Z80 CPU) are working similar: with video
+&gt; turned off, the cpu runs faster (because the CPU has to do all the graphics).
+&gt; So, the ZX80 has two modes: fast and slow.
+
+This is not exactly what I meant. I was talking about a user switchable clock.
+
+Maybe I should have explained what I was thinking about: I've added slow() and
+fast() functions for the C128. These functions mimic the BASIC counterparts
+and switch between 1 and 2MHz CPU clock. Pure 2MHz clock can only be used in
+80 column mode, because the VIC, which is responsible for the 40 column mode
+as in the C64, needs half of the clock cycle (and in some cases even more) to
+access the graphics data in main memory. Having 2MHz clock does not leave any
+time slots for the VIC, so there is no 40 column graphics output in 2MHz mode.
+However, it is possible to install an interrupt handler, that switches to 1MHz
+when the VIC rasterline displays the visual parts of the screen, and to 2MHz
+when the VIC drawd the invisible parts. While this needs some code, it will
+give a speed increase of about 40% on a PAL machine - not perfect, but also
+nothing to sniff at, especially if all you have to do is to call a library
+function from your C program. The nice thing about the latter is that it does
+also work for C64 programs when running in C64 mode on a C128 (provided that
+they can detect a C128 at runtime, but this problem has been solved by the
+nice guys on the CBM hackers mailing list).
+
+Now, instead of the slow() and fast() functions, I was trying to find an API
+that would allow all this to work with one function call. And, if there are
+other machines with a switchable CPU clock, it would be nice if this function
+would also cover any specifics of other machines. 
+
+All this was the reason for my question about machines with switchable clocks.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Machines%20with%20switchable%20clock">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Machines%20with%20switchable%20clock">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2482.html">Memblers: "[cc65] NES support in cc65"</a>
+<li><strong>In reply to:</strong> <a href="2472.html">Tim Schürmann: "Re: [cc65] Machines with switchable clock"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2486.html">Stephan Lesch: "Re: [cc65] Machines with switchable clock"</a>
+<li><strong>Next in thread:</strong> <a href="2475.html">Christian Krüger: "Re: [cc65] Machines with switchable clock"</a>
+<li><strong>Reply:</strong> <a href="2486.html">Stephan Lesch: "Re: [cc65] Machines with switchable clock"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-02-20 22:35:07 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] float and double support</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] float and double support - libraries?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] float and double support - libraries?</h1>
+<!-- received="Sat Mar  8 00:19:43 2003" -->
+<!-- isoreceived="20030307231943" -->
+<!-- sent="Sat, 8 Mar 2003 00:19:37 +0100" -->
+<!-- isosent="20030307231937" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] float and double support - libraries?" -->
+<!-- id="20030307231937.GA20781@trixie.musoftware.de" -->
+<!-- inreplyto="Pine.SOL.4.30.0303071650490.28913-100000@mion.elka.pw.edu.pl" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20float%20and%20double%20support%20-%20libraries?"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-03-08 00:19:37
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2651.html">Piotr Fusik: "Re: [cc65] float and double support - libraries?"</a>
+<li><strong>In reply to:</strong> <a href="2649.html">Piotr Fusik: "Re: [cc65] float and double support - libraries?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2666.html">David Holz: "[cc65] IEEE vs nonstandard floats"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Fri, Mar 07, 2003 at 05:10:44PM +0100, Piotr Fusik wrote:
+&gt; I started writing IEEE-compliant 32-bit floats 6502 routines (integer
+&gt; conversion, comparision). Sign and 7 bits of exponent in A, lsb of
+&gt; exponent in X, mantissa in X, sreg and sreg+1.
+&gt;
+&gt; The problem is what routines are needed?
+
+For a start: add, sub, mul, div, compares.
+
+Calling conventions should be similar to the existing long routines, that is
+lhs is on stack and rhs is passed in the primary register. The return value is
+passed back in the primary register. With these calling conventions, the
+functions are also C callable, which is nice in a first stage when there is no
+compiler support:
+
+        double __fastcall__ sub (double lhs, double rhs);
+
+&gt; char-&gt;float conversion is smaller and faster than long-&gt;float, but this
+&gt; way we will get many routines: signed char -&gt; float, unsigned char -&gt; float,
+&gt; int -&gt; float, unsigned -&gt; float, long -&gt; float and unsigned long -&gt; float
+&gt; (and as many float -&gt; ... routines).
+
+Since the overhead of a conversion from 8 or 16 bit to a 32 bit data type is
+neglectible compared to the actual floating point operations, I would say that
+conversions from long -&gt; float and unsigned long -&gt; float are the only ones
+that are required.
+
+&gt; The comparision is a bit tricky - there are signed 0s, infinites and NaNs.
+&gt; Optimizing single comparision operator routines isn't probably the good
+&gt; way - there should be some common code for comparision. Note that some
+&gt; optimizations are not legal for IEEE floats (e.g. !(a&gt;=b) is not
+&gt; neccessarily (a&lt;b)).
+
+I've already started to add support for signals, so in the near future, you
+can raise SIGFPE. Implementing core dumps is left as an excercise for
+interested users:-)
+
+Adding lots of optimizations for floats is probably not worth the trouble
+(floats are similar to longs in this respect): While the feature should be
+available, the 6502 is definitely the wrong platform for number crunching.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20float%20and%20double%20support%20-%20libraries?">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20float%20and%20double%20support%20-%20libraries?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2651.html">Piotr Fusik: "Re: [cc65] float and double support - libraries?"</a>
+<li><strong>In reply to:</strong> <a href="2649.html">Piotr Fusik: "Re: [cc65] float and double support - libraries?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2666.html">David Holz: "[cc65] IEEE vs nonstandard floats"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-03-08 00:20:09 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] cc65 2.5 beta</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="[cc65] cc65 2.5 beta">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] cc65 2.5 beta</h1>
+<!-- received="Thu Jun 22 15:45:38 2000" -->
+<!-- isoreceived="20000622134538" -->
+<!-- sent="Thu, 22 Jun 2000 15:45:22 +0200" -->
+<!-- isosent="20000622134522" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="[cc65] cc65 2.5 beta" -->
+<!-- id="20000622154522.A28981@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%202.5%20beta"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2000-06-22 15:45:22
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0127.html">David Lloyd: "Re: [cc65] cc65 2.5 beta"</a>
+<li><strong>Previous message:</strong> <a href="0125.html">David Lloyd: "Re: [cc65] Hmm, addressing mode problem"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0127.html">David Lloyd: "Re: [cc65] cc65 2.5 beta"</a>
+<li><strong>Reply:</strong> <a href="0127.html">David Lloyd: "Re: [cc65] cc65 2.5 beta"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+My TODO list for version 2.5 of the compiler is finally empty! There are still
+a few things left (an extension for the assembler, and two problems with
+library routines), but I think it's time to enter beta phase.
+
+If you are working with the compiler, and if you are able to translate the
+source package yourself, I would like to request that you give the beta
+version a try and report any problems you may experience.
+
+Here is a (probably incomplete) list of changes for the new release:
+
+  * Completely rewritten symbol table handling for the compiler. This gives a
+    few benefits now (see below) and hopefully many more in the future, since
+    the new code is easier to maintain and to extend. Having the new symbol
+    table handling means that some restrictions are gone: Structs may now have
+    the same names as other symbols. Variables in inner blocks may now have
+    the same names as in outer blocks, and the same is true for labels. The
+    new code will also emit warnings for a few more suspicious constructs.
+
+  * A lot of code cleanups in other places of the compiler sources. -T should
+    now be usable without fear of generating wrong code.
+
+  * Several other compiler features: Support for signed characters,
+    experimental support for 65C02 code generation, improved code in some
+    situations (don't expect too much - there is no chance for real
+    improvements as long as the old parser is in place).
+
+  * A whole bunch of new features for the assembler. Listing support, search
+    file path, several new pseudo OPs to allow easier transition from other
+    assemblers, new token handling functions to write more powerful macros,
+    unnamed labels and much more...
+
+  * The linker is now able to generate an import map.
+
+  * Long option support, several new options for the tools.
+
+  * The code should now be 64 bit clean (thanks to Christian Groessler!).
+
+  * A lot more code is now shared between the tools. This simplifies
+    maintenance and should result in less bugs.
+
+  * Support for the Atari 8 bits thanks to Christian Groessler, Mark Keates
+    and Freddy Offenga! The Atari machines are the first machines to have
+    actual file support, something which is still lacking for the CBMs.
+
+  * The GEOS library from Maciej Witkowiak is now included. This means that
+    you can write GEOS programs with cc65.
+
+  * New directory structure for the source package. The binaries will now
+    build with one &quot;make&quot; invocation.
+
+  * All bugs from the &quot;known bugs&quot; page (and several more) are fixed.
+
+  * Added the FreeBSD patch (ha!).
+
+
+There are also a two limitations for this version, none of them should be too
+serious:
+
+  * The compiler generates non working programs for sources that contain gotos
+    that jump into or out of an inner block that declares local variables that
+    live on the stack (class &quot;auto&quot; if -Cl not given). If you don't understand
+    that, don't care:-)
+
+  * Register variables are gone for now. The compiler options and the register
+    keyword are still accepted, so your sources should compile without
+    problems.
+
+The beta code is available as cc65-sources-beta-2.5-01.tar.gz from the
+musoftware ftp server. I do appreciate comments and feedback.
+
+Regards
+
+
+	Uz
+
+
+
+P.S.: Im currently in the process of upgrading my permanent internet
+      connection. This may lead to temporary problems in the next few
+      weeks. So if you have problems accessing the ftp or web server,
+      just wait some time and try again.
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%202.5%20beta">uz_at_musoftware.de</a>
+
+
+</pre>
+<hr noshade>
+<ul>
+<li>application/pgp-signature attachment: <a href="../att-0126/01-part">stored</a>
+</ul>
+<!-- attachment="01-part" -->
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%202.5%20beta">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0127.html">David Lloyd: "Re: [cc65] cc65 2.5 beta"</a>
+<li><strong>Previous message:</strong> <a href="0125.html">David Lloyd: "Re: [cc65] Hmm, addressing mode problem"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0127.html">David Lloyd: "Re: [cc65] cc65 2.5 beta"</a>
+<li><strong>Reply:</strong> <a href="0127.html">David Lloyd: "Re: [cc65] cc65 2.5 beta"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:36 CET</em>
+</em>
+</small>
+</body>
+</html>

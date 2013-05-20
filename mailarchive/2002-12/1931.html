@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] VIC20 conio</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] VIC20 conio">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] VIC20 conio</h1>
+<!-- received="Tue Dec 10 12:40:36 2002" -->
+<!-- isoreceived="20021210114036" -->
+<!-- sent="Tue, 10 Dec 2002 14:06:25 +0100" -->
+<!-- isosent="20021210130625" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] VIC20 conio" -->
+<!-- id="200212101406.25484.groepaz@gmx.net" -->
+<!-- inreplyto="20021210095336.GA23236@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20VIC20%20conio"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2002-12-10 14:06:25
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1930.html">Groepaz: "Re: [cc65] conio - keyboard repeat"</a>
+<li><strong>In reply to:</strong> <a href="1925.html">Ullrich von Bassewitz: "Re: [cc65] VIC20 conio"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1941.html">Ullrich von Bassewitz: "Re: [cc65] VIC20 conio"</a>
+<li><strong>Next in thread:</strong> <a href="1897.html">Ullrich von Bassewitz: "Re: [cc65] 65tris 0.0.1"</a>
+<li><strong>Reply:</strong> <a href="1941.html">Ullrich von Bassewitz: "Re: [cc65] VIC20 conio"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Tuesday 10 December 2002 10:53, Ullrich von Bassewitz wrote:
+
+&gt; External symbols that just point to the kernal are located in kernal.s. If
+&gt; additional code for a function is needed, it will go into a file with the
+&gt; name of the function and a 'k' prepended, so the new plot function can be
+&gt; found in kplot.s.
+
+ok, i see :) 
+
+&gt; &gt; &gt; BTW: The code for calculating the color ram pointers is already in the
+&gt; &gt; &gt; kernal ROM at $EAB2, so there's no need to reimplement it.
+&gt; &gt;
+&gt; &gt; oh there is? mmmmh :)
+&gt;
+&gt; Yes. &quot;VC20 intern&quot; rulez:-)
+
+you dont have decent ocr software handy and a slave to ocr the book? :o) 
+*grin*
+
+&gt; &gt; btw, what do you think about adding a default expanded-vic target? seems
+&gt; &gt; to be much more useful to me than unexpanded (3.5k is tight even for
+&gt; &gt; assembly ;=P)
+&gt;
+&gt; Yes, that would be a very good idea. Unfortunately, in the current state
+&gt; this would mean to add a new target to the linker, and I'm trying to avoid
+&gt; such a proliferation. I've already added a new feature to the linker that
+&gt; allows to add a default value for the start address, but this is only one
+&gt; additional step needed. So it will happen, but not now.
+
+no problem ofcoz :o) but it would for sure make sence. (a fully expanded 
+vic20, including low and top memory bank, is actually a quite nice target...)
+
+btw in that context,is it possible to place the stack and/or heap into a 
+seperate section (i think it is, right? ;=))... would make lotta sence here 
+to put stack into low, and heap into high memory or sth like that... (leaving 
+all the usual basic mem for the actual program)
+
+-- 
+          ___ ___ .___________________ .___________ _______.
+    c=64 /   |   \|   \__    ___/     \ \_   _____/ \      \ [groepaz]
+     gb /    '    \   | |    | /  \ /  \ |    __)_  /   |   \ gp32
+    cgb \    .    /   | |    |/    '    \|        \/    |    \ psx
+     gba \___|_  /|___| |____|\____|__  /_______  /\____|__  / dc
+          -----\/-----'---------------\/--------\/---------\/
+       <a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    Hitmen WWW Headquarters
+       <a href="http://fly.to/hitmen-groepaz">http://fly.to/hitmen-groepaz</a>     my personal playground
+       <a href="http://rr.c64.org/silversurfer">http://rr.c64.org/silversurfer</a>   home of the RR debugger
+       ftp.musoftware.de/pub/groepaz    cc65 dump site
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20VIC20%20conio">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1930.html">Groepaz: "Re: [cc65] conio - keyboard repeat"</a>
+<li><strong>In reply to:</strong> <a href="1925.html">Ullrich von Bassewitz: "Re: [cc65] VIC20 conio"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1941.html">Ullrich von Bassewitz: "Re: [cc65] VIC20 conio"</a>
+<li><strong>Next in thread:</strong> <a href="1897.html">Ullrich von Bassewitz: "Re: [cc65] 65tris 0.0.1"</a>
+<li><strong>Reply:</strong> <a href="1941.html">Ullrich von Bassewitz: "Re: [cc65] VIC20 conio"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-12-10 12:41:09 CET</em>
+</em>
+</small>
+</body>
+</html>

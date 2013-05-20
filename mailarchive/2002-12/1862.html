@@ -1,0 +1,261 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] Think I found a cc65 bug</title>
+<meta name="Author" content="MagerValp (MagerValp_at_cling.gu.se)">
+<meta name="Subject" content="[cc65] Think I found a cc65 bug">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] Think I found a cc65 bug</h1>
+<!-- received="Tue Dec  3 18:34:49 2002" -->
+<!-- isoreceived="20021203173449" -->
+<!-- sent="Tue, 3 Dec 2002 18:34:05 +0100" -->
+<!-- isosent="20021203173405" -->
+<!-- name="MagerValp" -->
+<!-- email="MagerValp_at_cling.gu.se" -->
+<!-- subject="[cc65] Think I found a cc65 bug" -->
+<!-- id="15852.60173.48479.833328@panini.cling.gu.se" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> MagerValp (<a href="mailto:MagerValp_at_cling.gu.se?Subject=Re:%20[cc65]%20Think%20I%20found%20a%20cc65%20bug"><em>MagerValp_at_cling.gu.se</em></a>)<br>
+<strong>Date:</strong> 2002-12-03 18:34:05
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1861.html">Ullrich von Bassewitz: "Re: [cc65] Warn me"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1863.html">MagerValp: "Re: [cc65] Think I found a cc65 bug"</a>
+<li><strong>Reply:</strong> <a href="1863.html">MagerValp: "Re: [cc65] Think I found a cc65 bug"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+cc65 results:
+NewMenu returns: 1953
+NewMenu()
+menu: 1953
+-&gt;visible: 0
+-&gt;numitems: 0
+-&gt;current: 0
+-&gt;title: 0
+-&gt;firstitem: 0
+SetMenuTitle: 1953
+title: 1785
+-&gt;title: 1785
+SetMenuTitle()
+-&gt;visible: 0
+-&gt;numitems: 0
+-&gt;current: 0
+-&gt;title: 1785
+-&gt;firstitem: 0
+Firstitem is NULL
+item malloced at 1959
+Firstitem is 1959
+Firstitem is still 1959
+after item-&gt;next firstitem is 59     &lt;- hey now
+Firstitem is still 59
+Firstitem is still 59
+Firstitem is still 59
+Firstitem is still 59
+
+
+gcc results:
+
+NewMenu returns: a0100e0
+NewMenu()
+menu: a0100e0
+-&gt;visible: 0
+-&gt;numitems: 0
+-&gt;current: 0
+-&gt;title: 0
+-&gt;firstitem: 0
+SetMenuTitle: a0100e0
+title: 4014e6
+-&gt;title: 4014e6
+SetMenuTitle()
+menu: a0100e0
+-&gt;visible: 0
+-&gt;numitems: 0
+-&gt;current: 0
+-&gt;title: 4014e6
+-&gt;firstitem: 0
+Firstitem is NULL
+item malloced at a0104f8
+Firstitem is a0104f8
+Firstitem is still a0104f8
+after item-&gt;next firstitem is a0104f8
+Firstitem is still a0104f8
+Firstitem is still a0104f8
+Firstitem is still a0104f8
+Firstitem is still a0104f8
+
+
+test code:
+
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+
+
+
+typedef enum itemstates {
+  ISTATE_NORMAL,
+  ISTATE_INACTIVE
+} ItemState;
+
+typedef struct item {
+  struct item *next;
+  unsigned char id;
+  unsigned char *name;
+  ItemState state;
+} Item;
+
+typedef struct menu {
+  unsigned char visible;
+  unsigned char numitems;
+  unsigned char current;
+  unsigned char *title;
+  Item *firstitem;
+} Menu;
+
+
+void DebugMenu(Menu *menu, unsigned char *s);
+
+Menu *NewMenu(void);
+
+void SetMenuTitle(Menu *menu, unsigned char *title);
+
+char AddMenuItem(Menu *menu, unsigned char id, ItemState state, unsigned char *name);
+
+
+void DebugMenu(Menu *menu, unsigned char *s) {
+  printf(&quot;%s\r\n&quot;, s);
+  printf(&quot;menu: %x\r\n&quot;, menu);
+  printf(&quot;-&gt;visible: %d\r\n&quot;, menu-&gt;visible);
+  printf(&quot;-&gt;numitems: %d\r\n&quot;, menu-&gt;numitems);
+  printf(&quot;-&gt;current: %d\r\n&quot;, menu-&gt;current);
+  printf(&quot;-&gt;title: %x\r\n&quot;, menu-&gt;title);
+  printf(&quot;-&gt;firstitem: %x\r\n&quot;, menu-&gt;firstitem);
+}
+
+
+Menu *NewMenu(void) {
+  Menu *menu;
+
+  if ((menu = malloc(sizeof(menu))) == NULL) {
+    return(NULL);
+  }
+  menu-&gt;visible = 0;
+  menu-&gt;numitems = 0;
+  menu-&gt;current = 0;
+  menu-&gt;title = NULL;
+  menu-&gt;firstitem = NULL;
+  printf(&quot;NewMenu returns: %x\r\n&quot;, menu);
+  return(menu);
+}
+
+
+void SetMenuTitle(Menu *menu, unsigned char *title) {
+  printf(&quot;SetMenuTitle: %x\r\n&quot;, menu);
+  printf(&quot;title: %x\r\n&quot;, title);
+  menu-&gt;title = title;
+  printf(&quot;-&gt;title: %x\r\n&quot;, menu-&gt;title);
+}
+
+
+char AddMenuItem(Menu *menu, unsigned char id, ItemState state, unsigned char *name) {
+  Item *item;
+
+  if (menu-&gt;firstitem == NULL) {
+    printf(&quot;Firstitem is NULL\r\n&quot;);
+    if ((menu-&gt;firstitem = malloc(sizeof(item))) == NULL) {
+      return(-1);
+    }
+    item = menu-&gt;firstitem;
+    printf(&quot;item malloced at %x\r\n&quot;, item);
+    printf(&quot;Firstitem is %x\r\n&quot;, menu-&gt;firstitem);
+  } else {
+    printf(&quot;Firstitem is %x, finding last\r\n&quot;, menu-&gt;firstitem);
+    item = menu-&gt;firstitem;
+    while (item-&gt;next) {
+      item = item-&gt;next;
+    }
+    printf(&quot;Lastitem is %x\r\n&quot;, item);
+    if ((item-&gt;next = malloc(sizeof(item))) == NULL) {
+      return(-1);
+    }
+    printf(&quot;item malloced at %x\r\n&quot;, item);
+    item = item-&gt;next;
+  }
+  printf(&quot;Firstitem is still %x\r\n&quot;, menu-&gt;firstitem);
+  item-&gt;next = NULL;                                              &lt;- something's wrong here
+  printf(&quot;after item-&gt;next firstitem is %x\r\n&quot;, menu-&gt;firstitem);
+  item-&gt;id = id;
+  printf(&quot;Firstitem is still %x\r\n&quot;, menu-&gt;firstitem);
+  item-&gt;name = name;
+  printf(&quot;Firstitem is still %x\r\n&quot;, menu-&gt;firstitem);
+  item-&gt;state = state;
+  printf(&quot;Firstitem is still %x\r\n&quot;, menu-&gt;firstitem);
+  ++(menu-&gt;numitems);
+  printf(&quot;Firstitem is still %x\r\n&quot;, menu-&gt;firstitem);
+  return(0);
+}
+
+void main(void) {
+  Menu *menu;
+
+  menu = NewMenu();
+  DebugMenu(menu, &quot;NewMenu()&quot;);
+  SetMenuTitle(menu, &quot;Main Menu&quot;);
+  DebugMenu(menu, &quot;SetMenuTitle()&quot;);
+  AddMenuItem(menu, 13, ISTATE_NORMAL, &quot;File Menu...&quot;);
+}
+
+-- 
+    ___          .     .  .         .       . +  .         .      o   
+  _|___|_   +   .  +     .     +         .  Per Olofsson, arkadspelare
+    o-o    .      .     .   o         +          <a href="mailto:MagerValp_at_cling.gu.se?Subject=Re:%20[cc65]%20Think%20I%20found%20a%20cc65%20bug">MagerValp_at_cling.gu.se</a>
+     -       +            +    .     <a href="http://www.cling.gu.se/~cl3polof/">http://www.cling.gu.se/~cl3polof/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Think%20I%20found%20a%20cc65%20bug">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1861.html">Ullrich von Bassewitz: "Re: [cc65] Warn me"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1863.html">MagerValp: "Re: [cc65] Think I found a cc65 bug"</a>
+<li><strong>Reply:</strong> <a href="1863.html">MagerValp: "Re: [cc65] Think I found a cc65 bug"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-12-03 18:34:52 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] THE Makefile V1.2 availabl</title>
+<meta name="Author" content="Greg King (greg.king41verizon.net)" />
+<meta name="Subject" content="Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies" />
+<meta name="Date" content="2011-06-01" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies</h1>
+<!-- received="Wed Jun  1 19:44:34 2011" -->
+<!-- isoreceived="20110601174434" -->
+<!-- sent="Wed, 01 Jun 2011 12:44:21 -0400" -->
+<!-- isosent="20110601164421" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king41verizon.net" -->
+<!-- subject="Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies" -->
+<!-- id="000901cc207b$30e3bf40$f50ebf47@monarch" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="BANLkTikozaiJSuVEDMd4HeJmsN00==LtcQ&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9484.html" title="Oliver Schmidt: &quot;Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies&quot;">Next message</a> ]
+[ <a href="../2011-05/9482.html" title="thefox xofeht: &quot;Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies&quot;">Previous message</a> ]
+[ <a href="../2011-05/9482.html" title="thefox xofeht: &quot;Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9484.html" title="Oliver Schmidt: &quot;Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king41verizon.net?Subject=Re:%20[cc65]%20THE%20Makefile%20V1.2%20available%20-%20was:%20automatic%20generation%20of%20makefile%20dependencies">greg.king41verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-06-01 18:44:21</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: &quot;thefox xofeht&quot;; on Mon., May 30, 2011; at 03:04 PM -0400
+&gt;
+&gt; On Sat, May 28, 2011 at 5:18 PM,  &lt;silverdr&#64;wfmh&#46;<!--nospam-->org.pl&gt; wrote:
+&gt; &gt; Isn't it easier/better just to install the lib?
+&gt;
+&gt; It's kind of a problem for me since I'm using my own customized
+&gt; version of the library; so, there would be conflicts. I guess the
+&gt; &quot;proper&quot; solution indeed is to set the target as &quot;none&quot;.
+
+You can install an empty &quot;nes.lib&quot;.  Create the archive with one module,
+delete that module, then put the archive where ld65 looks for libraries.
+It won't conflict with your custom lib.; and, ld65 won't complain.
+
+&gt;
+&gt; On Sat, May 28, 2011 at 11:46 PM, Oliver Schmidt &lt;ol.sc&#64;web&#46;<!--nospam-->de&gt; wrote:
+&gt; &gt;&gt; (of course
+&gt; &gt;&gt; make from MinGW/whatever is required, as well). That would mean
+&gt; &gt;&gt; replacing mkdir/rmdir/rm/etc. with Windows equivalents when Windows
+&gt; &gt;&gt; is detected. It's up to you if you want to pursue that or not.
+&gt; &gt;
+&gt; &gt; I personally don't see any point in doing so. Where ever you get
+&gt; &gt; your make from should be a great place to get mkdir/rmdir/rm from.
+&gt;
+&gt; Yeah, I understand you completely. In the case of cmd.exe, the problem
+&gt; isn't getting mkdir/rmdir/rm, however; it's that it implements
+&gt; built-in versions of mkdir/rmdir that (AFAIK) can't be overridden
+&gt; without specifying the full path to the executables -- correct me if
+&gt; I'm wrong.
+&gt;
+&gt; Because of that, if nothing else, it might be good to give the user a
+&gt; warning if cmd.exe is used; because, there's just no way &quot;mkdir -p&quot; is
+&gt; going to work when run from cmd.exe!
+
+To Oliver:
+
+The &quot;mkdir&quot; and &quot;rmdir&quot; commands should be handled in the same way that
+&quot;rm&quot; is handled.  Define and use:
+
+MKDIR ?= mkdir -p
+RMDIR ?= rmdir
+
+Then, thefox can redefine MKDIR in his permanent environment.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Jun  1 19:44:34 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9484.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies"</a></li>
+<li><dfn>Previous message</dfn>: <a href="../2011-05/9482.html" title="Previous message in the list">thefox xofeht: "Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies"</a></li>
+<li><dfn>In reply to</dfn>: <a href="../2011-05/9482.html" title="Message to which this message replies">thefox xofeht: "Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9484.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9484.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9492.html" title="Message sent in reply to this message">thefox xofeht: "Re: [cc65] THE Makefile V1.2 available - was: automatic generation of makefile dependencies"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9483" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9483" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9483" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-06-01 19:44:38 CEST
+</em></small></p>
+</body>
+</html>

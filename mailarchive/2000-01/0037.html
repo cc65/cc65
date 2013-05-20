@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: Sv: [cc65] Back on Track</title>
+<meta name="Author" content="Spiro Trikaliotis (Spiro.Trikaliotis_at_gmx.de)">
+<meta name="Subject" content="Re: Sv: [cc65] Back on Track">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: Sv: [cc65] Back on Track</h1>
+<!-- received="Sat Jan 22 19:08:22 2000" -->
+<!-- isoreceived="20000122180822" -->
+<!-- sent="Sat, 22 Jan 2000 17:04:00 +0100" -->
+<!-- isosent="20000122160400" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="Spiro.Trikaliotis_at_gmx.de" -->
+<!-- subject="Re: Sv: [cc65] Back on Track" -->
+<!-- id="000801bf6503$9fa32640$0171a8c0@bonn" -->
+<!-- inreplyto="Sv: [cc65] Back on Track" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Spiro Trikaliotis (<a href="mailto:Spiro.Trikaliotis_at_gmx.de?Subject=Re:%20Sv:%20[cc65]%20Back%20on%20Track"><em>Spiro.Trikaliotis_at_gmx.de</em></a>)<br>
+<strong>Date:</strong> 2000-01-22 17:04:00
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0038.html">Ullrich von Bassewitz: "Re: [cc65] cc65 and VICE"</a>
+<li><strong>Previous message:</strong> <a href="0036.html">Groepaz: "Re: Sv: [cc65] Back on Track"</a>
+<li><strong>Maybe in reply to:</strong> <a href="0029.html">Martin Ancher Holm - Bankdata: "Sv: [cc65] Back on Track"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi again Groepaz,
+
+&gt;With 'slow' seeks i was referring to the speed one could be expecting from eg
+&gt;a pc hd. on a 1541 ofcoz, you can hardly do any faster ;=P
+
+Ok, now I got it.
+
+&gt;this way no more data than necessary has to travel the serial bus ;=) (which is
+&gt;the bottleneck in the cbm setup ;=)
+
+Yes, that's what I meant.
+
+
+&gt;well, what you are thinking of is async-operations and YES it will be ofcoz
+&gt;possible to improve the disc-driver to use it.... however, due to the nature
+&gt;of the 'generalized' kernal and kernal-disc drivers its out of the question at
+&gt;this time.... but something to remember for the 1541-specific driver ;=)
+
+Well, yes, that's something thas has to be adopted to the used floppy,
+but it will be worth if, I believe.
+
+
+&gt;well...for a 664 blox file it would require 664*2 bytes for buffering the
+&gt;whole link-list.... maybe its too much you are right ... mmmhhhh, i have to
+&gt;think about some mechanism that retrieves the list when needed ;=P
+
+Well, I did not think about the memory needed (which is quite a lot with
+664 blocks, you're right) but the time needed!
+
+If such a file were opened, you had to read the whole disc at startup
+only to get the complete list, w/o possibility to read anything before
+that!
+
+
+I think of a solution in the following way:
+With every read using a new sector, you transfer the link contents of
+the sector to the host machine, so seeks up to the point you're
+currently at could be handled this way.
+
+When seeking, you do the same: Reading only the links up to the point
+you actually need them.
+
+A good option would be to program the floppy to collect this infor-
+mation in its idle time.
+
+
+&gt;&gt; Well, now I'm not sure, but I believe you should only close() _one_
+&gt;&gt; pre-defined file handle at a time and re-open it immediately.
+
+&gt;this will also work. it will also be 'safer' than the way i mentioned above i
+&gt;think
+&gt;since it'll also work if stdin/out/err are NOT fd=0,1,2
+
+Yes, this 'safety' is IHMO the reason why only one pre-defined handle
+should be handled at once.
+
+
+Gruﬂ,
+   Spiro.
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20Sv:%20[cc65]%20Back%20on%20Track">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0038.html">Ullrich von Bassewitz: "Re: [cc65] cc65 and VICE"</a>
+<li><strong>Previous message:</strong> <a href="0036.html">Groepaz: "Re: Sv: [cc65] Back on Track"</a>
+<li><strong>Maybe in reply to:</strong> <a href="0029.html">Martin Ancher Holm - Bankdata: "Sv: [cc65] Back on Track"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:35 CET</em>
+</em>
+</small>
+</body>
+</html>

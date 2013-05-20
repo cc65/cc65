@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] How to link in most of the</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] How to link in most of the C-library" />
+<meta name="Date" content="2006-02-14" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] How to link in most of the C-library</h1>
+<!-- received="Tue, 14 Feb 2006 20:17:19 +0100" -->
+<!-- isoreceived="20060214191719" -->
+<!-- sent="Tue, 14 Feb 2006 20:17:19 +0100" -->
+<!-- isosent="20060214191719" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] How to link in most of the C-library" -->
+<!-- id="20060214191719.GC6625@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="43F1A64B.70803&#64;sipo.fi" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5421.html" title="Mike Hawkey: &quot;[cc65] Compiled For PDAs&quot;">Next message</a> ]
+[ <a href="5419.html" title="Oliver Schmidt: &quot;Re: [cc65] How to link in most of the C-library&quot;">Previous message</a> ]
+[ <a href="5417.html" title="Karri Kaksonen: &quot;[cc65] How to link in most of the C-library&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5421.html" title="Mike Hawkey: &quot;[cc65] Compiled For PDAs&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20How%20to%20link%20in%20most%20of%20the%20C-library">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2006-02-14 20:17:19</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Good evening!
+
+On Tue, Feb 14, 2006 at 11:43:39AM +0200, Karri Kaksonen wrote:
+&gt; My question is:
+&gt; Is it possible to force the entire C-library into my RAM-segment somehow
+&gt; so that future EEPROM-based gamed would not need additions to the
+&gt; resident RAM-segment?
+
+There's no direct support for it. What you can try: Extract all object files
+from the library. Run od65 with the --dump-exports switch on each of the
+object files and use a script (perl comes to mind) to extract the names of the
+symbols from the output. Let this script generate one big assembler file with
+lots of .FORCEIMPORT statements, as suggested by Oliver. If you assemble and
+link this file, you will get a binary that contains all of the library.
+
+From the debug info file of this binary, you can then generate a new assembler
+module that contains definitions for all of the exports. If you link this
+module to your EEPROM based game instead of the C library, the code will jump
+directly to the location, where the subroutine lies in memory. As Oliver
+already pointed out, Kontiki uses this method to let the loadable module reuse
+library routines that are already linked to the main program.
+
+&gt; Or perhaps &quot;everything&quot; is too much for the limited ram space.
+
+This may be true but is easily solved by removing lesser needed routines from
+the .FORCEIMPORT list.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue, 14 Feb 2006 20:17:19 +0100</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5421.html" title="Next message in the list">Mike Hawkey: "[cc65] Compiled For PDAs"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5419.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] How to link in most of the C-library"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5417.html" title="Message to which this message replies">Karri Kaksonen: "[cc65] How to link in most of the C-library"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5421.html" title="Next message in this discussion thread">Mike Hawkey: "[cc65] Compiled For PDAs"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5420" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5420" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5420" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2006-02-14 20:17:36 CET
+</em></small></p>
+</body>
+</html>

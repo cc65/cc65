@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] dummy questions...</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] dummy questions...">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] dummy questions...</h1>
+<!-- received="Thu Feb 14 16:54:55 2002" -->
+<!-- isoreceived="20020214155455" -->
+<!-- sent="Thu, 14 Feb 2002 16:54:45 +0100" -->
+<!-- isosent="20020214155445" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] dummy questions..." -->
+<!-- id="17021043100.20020214165445@gmx.net" -->
+<!-- inreplyto="20020214163746.B6623@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20dummy%20questions..."><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2002-02-14 16:54:45
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1095.html">Ullrich von Bassewitz: "Re: [cc65] dummy questions..."</a>
+<li><strong>In reply to:</strong> <a href="1095.html">Ullrich von Bassewitz: "Re: [cc65] dummy questions..."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1097.html">Ullrich von Bassewitz: "Re: [cc65] dummy questions..."</a>
+<li><strong>Next in thread:</strong> <a href="1085.html">Matt Ackeret: "Re: [cc65] library header bug correction - and some compiler hazzle"</a>
+<li><strong>Reply:</strong> <a href="1097.html">Ullrich von Bassewitz: "Re: [cc65] dummy questions..."</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+Thursday, February 14, 2002, 4:37:46 PM, you wrote:
+
+UvB&gt; I've removed read.s from the C64 Makefile, so it exists but is not included in
+UvB&gt; the C64 library. The reason is that it does not behave like it should, so
+UvB&gt; people complained and I thought that it would be better to have no read() at
+UvB&gt; all, than a read() that doesn't work correctly.
+
+mmmmmh bummer ;( never had a problem with that one (actually using it
+in some of my programs aswell.... args) what'd be the most convinient
+way to add it back to get those tests compile aswell? for now i hacked
+some little wrapper-functions for getchar() (which is the only
+function in those tests that needs read()) so its getting input from
+keyboard...... would be cool to be able to make the thing work without
+such &quot;internal&quot; modifications though....
+
+&gt;&gt; - i remember it was mentioned on the list before.....couldnt find it
+&gt;&gt; in the docs either ;/ i'd like the compiler to do ascii=&gt;petscii
+&gt;&gt; conversion for strings/character constants.... how?
+
+UvB&gt; If you use the &quot;-t platform&quot; option, the compiler will do character set
+UvB&gt; translation.
+
+oh i am doing that! however, would it also translate those weird chars
+(underscore etc) aswell? (and is there a prog to verify that
+charset-conversion is actually working ok? if not, i could come up
+with one i guess ;D)
+
+UvB&gt; The compiler comes with the &quot;sieve&quot; benchmark in the samples directory. It is
+UvB&gt; of course written in a way that favours cc65. I hope this is legal :-)
+
+hehe well.... rewriting some parts of dhrystone for example explicitly
+is _NOT_ legal, all measuring loops and most of the glue-code must
+stay as is to get a result that is compareable to others... gotta find
+some other smaller ones :o)
+
+oh btw.... before i forget it, i stumbled about some weird behaviour
+of printf() yesterday evening...... in one of the tests is a statemnt
+like:
+
+printf(&quot;blabla: &lt;some whitespace/spaces here&gt; %d\n&quot;,bla);
+
+and the compiler seems to ignore the whitespace! (as in, it doesnt
+print spaces where it should!)
+
+maybe thats also related to not-so-well-working charset translation?
+:o)
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20dummy%20questions...">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20dummy%20questions...">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1095.html">Ullrich von Bassewitz: "Re: [cc65] dummy questions..."</a>
+<li><strong>In reply to:</strong> <a href="1095.html">Ullrich von Bassewitz: "Re: [cc65] dummy questions..."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1097.html">Ullrich von Bassewitz: "Re: [cc65] dummy questions..."</a>
+<li><strong>Next in thread:</strong> <a href="1085.html">Matt Ackeret: "Re: [cc65] library header bug correction - and some compiler hazzle"</a>
+<li><strong>Reply:</strong> <a href="1097.html">Ullrich von Bassewitz: "Re: [cc65] dummy questions..."</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-02-14 16:54:59 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] start adress</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] start adress" />
+<meta name="Date" content="2004-04-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] start adress</h1>
+<!-- received="Thu Apr 29 10:52:09 2004" -->
+<!-- isoreceived="20040429085209" -->
+<!-- sent="Thu, 29 Apr 2004 10:52:06 +0200" -->
+<!-- isosent="20040429085206" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] start adress" -->
+<!-- id="20040429085206.GB24632@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="002c01c42dc0$c3148850$4c0906d5&#64;acer5j0jdwij8z" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4102.html" title="carlos: &quot;[cc65] cc65 macros&quot;">Next message</a> ]
+[ <a href="4100.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Support for the EMMA II system?&quot;">Previous message</a> ]
+[ <a href="4099.html" title="carlos: &quot;[cc65] start adress&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20start%20adress">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-04-29 10:52:06</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Thu, Apr 29, 2004 at 10:05:38AM +0200, carlos wrote:
+&gt; as i'm porting some old code, which was written with turbo assembler on the c64, i don't want always to use the linker config file.
+&gt; there is the command line option for ld65 -S xxxx, with which you can pass a start adress. it works only with cpu type none, which is correct. if you use ld65 --start-addr xxxx it won't work. if you use cl65 --start-addr it won't be passed to the linker.
+&gt; this is ok for now, because you can work around with using seperate calls to ca65 and ld65.
+
+The start address *is* passed to the linker, but only the &quot;none&quot; builtin
+config file makes use of it. The start address is inserted into the config
+file where the %S key is found. Evaluating %S in other standard configs but
+&quot;none&quot; won't work, because the startup code and several pieces of the platform
+code depend on a specific memory layout. But you are of course free to change
+that for your own purposes: All you have to do is to create a config file that
+uses %S in the right places, and you will be able to pass the start address to
+the configuration.
+
+&gt; but in ca65, the second version, where there is a space between the macro name and the first bracket will be interpreted like the first one of the #define macros. so the assembler complains about not closed brackets and so on.
+
+The C preprocessor is a very old concept that is unclean and non ortoghonal in
+some places. Do you now any other place in a C program where &quot;missing
+whitespace&quot; does make a difference? The answer is of course &quot;no&quot;. No one would
+expect
+
+	while(1) {
+
+to behave differently than
+
+	while (1) {
+
+or
+
+	while( 1 ) {
+
+ca65 doesn't have a real &quot;preprocessor&quot;. The .define style macros are
+implemented as part of the parser. This means that tokenization adheres to the
+same rules as in the remainder of the program. As a consequence, whitespace
+between tokens is optional - not in a few places, not in most places, but
+everywhere.
+
+&gt; if often use the defines likethis:
+
+.define style macros where never thought for this. They are NOT the same as C
+style #define macros and usage of .define style macros is strongly
+discouraged. The reason why these macros do exist is NOT to mimic C style
+macros. They were added when I got payed by a company to make ca65 a
+replacement for a proprietary assembler. Instead of branching ca65, adding the
+necessary stuff and then forget this version, I thought of concepts, how to
+interact with the low level assembler parts to emulate or mimic features of
+other assemblers. One result was the .feature command, another were .define
+style macros.
+
+So the first rule for .define style macros is: 
+
+	Don't use them.
+
+And the second rule for .define style macros is: 
+
+	If you do really need to use them, never ever complain if you shoot
+	yourself in the foot, because .define style macros are made especially
+	for this purpose.
+
+&gt; .define scrw 40
+&gt; .define scrn $400
+&gt; .define x ??
+&gt; .define y ??; any numbers ok
+&gt; .define adr y*scrw+x+scrn
+
+This is a typical example for a misuse of these macros. Use
+
+	scrw = 40
+	scrn = $400
+	xpos = ??
+	ypos = ??    	; any numbers ok
+	adr  = (ypos * scrw + xpos + scrn)
+
+and all your problems will vanish. In addition, the symbols will adhere
+scoping rules. Look at this example:
+
+	.define	xpos	4
+	...
+	...
+	.struct	point
+	     	xpos	.word
+	     	ypos	.word
+	     	color	.byte
+	.endstruct
+
+misuse.s(2345): Error: Invalid storage allocator in struct/union
+
+Who would realize what the real reason for the error mesage is, if the two
+declarations above are burried in a source file with a few thousand lines of
+code?
+
+Regards
+
+
+	Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Apr 29 10:52:09 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4102.html" title="Next message in the list">carlos: "[cc65] cc65 macros"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4100.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Support for the EMMA II system?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4099.html" title="Message to which this message replies">carlos: "[cc65] start adress"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4101" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4101" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4101" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-04-29 10:52:15 CEST
+</em></small></p>
+</body>
+</html>

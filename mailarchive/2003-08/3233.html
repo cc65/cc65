@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] linker cfg files</title>
+<meta name="Author" content="Greg King (gngking_at_erols.com)">
+<meta name="Subject" content="Re: [cc65] linker cfg files">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] linker cfg files</h1>
+<!-- received="Sat Aug 16 07:03:53 2003" -->
+<!-- isoreceived="20030816050353" -->
+<!-- sent="Sat, 16 Aug 2003 00:48:29 -0400" -->
+<!-- isosent="20030816044829" -->
+<!-- name="Greg King" -->
+<!-- email="gngking_at_erols.com" -->
+<!-- subject="Re: [cc65] linker cfg files" -->
+<!-- id="000101c363b3$e2e10780$da672c42@palace" -->
+<!-- inreplyto="[cc65] linker cfg files" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Greg King (<a href="mailto:gngking_at_erols.com?Subject=Re:%20[cc65]%20linker%20cfg%20files"><em>gngking_at_erols.com</em></a>)<br>
+<strong>Date:</strong> 2003-08-16 06:48:29
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3232.html">Greg King: "Re: [cc65] linker cfg files"</a>
+<li><strong>Maybe in reply to:</strong> <a href="../2003-04/2867.html">3843416: "[cc65] linker cfg files"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3235.html">Maciej Witkowiak: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="3235.html">Maciej Witkowiak: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="3236.html">Groepaz: "Re: [cc65] linker cfg files"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+From: Maciej Witkowiak; on Date: Monday, August 11, 2003, 06:19 PM
+&gt;
+&gt; Ullrich von Bassewitz dnia 11 sie 2003 o 21:59 +0200 napisal:
+&gt; &gt;  3. [This is only loosely related to your idea.] I don't have access to
+&gt; &gt;     anything Lunix related but the linker config.,
+&gt; &gt;     so I do not even know how the startup code must be changed
+&gt; &gt;     to support a new configuration.  Wouldn't it be a good idea to make
+&gt; &gt;     at least the Lunix startup code part of cc65?  Otherwise,
+&gt; &gt;     it doesn't make much sense to have a built-in Lunix linker config.,
+&gt; &gt;     since both must always match, or programs will not work correctly.
+&gt;
+&gt; LNG linker-config. uses $1000 instead of %S (just to virtualize
+&gt; the address).
+
+LUnix can load programs anywhere in RAM (it depends on the program's size,
+and on what else was loaded previously).  My lunix.cfg uses &quot;start=%S&quot; so
+that we can make the labels file match where LUnix happens to put a
+program.  The plan is:
+
+1. Build the program -- with the default address.
+2. Launch that program in LUnix.
+3. Use (VICE's) monitor to find out where LUnix put it.
+4. Relink the program -- using that discoverred address.
+5. Run that program, again.
+6. Load the labels file into the monitor.
+   Then, you can see where things are while you are debugging.
+
+&gt;
+&gt; (off-topic: whenever I look at that crt0.s, I realize how silly of me it
+&gt; was to think about sophisticated way to get dynamic address for C-stack
+&gt; in LUnix instead of what is used there.)
+
+Memory-fragmentation is the reason why we should use an allocated stack.
+C programs are big; adding a static stack to them would make them even
+bigger.  After a lot of unpredictable allocating, freeing, and
+re-allocating, LUnix's free memory-blocks might become scatterred and
+smaller.  There might not be any single blocks that are big enough to
+hold a C-program-plus-stack.  Separating the program and the stack makes
+it more likely that they can be put into RAM.
+
+From: Groepaz; on Date: Monday, August 11, 2003, 06:27 PM
+&gt;
+&gt; I'm waiting myself for the dude that said he had my
+&gt; tetris thingy running in lunix, for releasing his libs and stuff.
+
+The previous version of Tetris works with my library.  I haven't tested
+the more recent version.
+
+I redesigned lunix.cfg, again.  I want to make the configuration easy and
+natural to use, in _both_ the cc65 and LUnix programming environments.
+I agree, the library that is used by C programs should go into cc65's
+package.  And, the sample programs that show how to send code through
+LUnix's preprocessor, and then, through ca65 and ld65, should go into
+LUnix's package.
+
+You can look at:
+    <a href="http://mysite.verizon.net/vze4nxfk/">http://mysite.verizon.net/vze4nxfk/</a>
+if you really want to see my LUnix library.
+
+Be careful if you choose to play with it!  The archive is not designed to
+be dropped directly into the official cc65 distribution.  Some of my
+include-files would replace those in the distribution.  Mine work a little
+differently than the way that Uz does things (I tried to make them
+completely compatible, but I don't guarantee it).  Don't try to load
+dynamic-modules; LUnix needs patches that I have not sent in, yet.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20linker%20cfg%20files">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3232.html">Greg King: "Re: [cc65] linker cfg files"</a>
+<li><strong>Maybe in reply to:</strong> <a href="../2003-04/2867.html">3843416: "[cc65] linker cfg files"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3235.html">Maciej Witkowiak: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="3235.html">Maciej Witkowiak: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="3236.html">Groepaz: "Re: [cc65] linker cfg files"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-08-16 07:05:19 CEST</em>
+</em>
+</small>
+</body>
+</html>

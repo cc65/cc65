@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] bug report: pass-by-value </title>
+<meta name="Author" content="Greg King (gngking1erols.com)" />
+<meta name="Subject" content="Re: [cc65] bug report: pass-by-value of structs destroys stack" />
+<meta name="Date" content="2005-12-07" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] bug report: pass-by-value of structs destroys stack</h1>
+<!-- received="Wed Dec  7 13:53:44 2005" -->
+<!-- isoreceived="20051207125344" -->
+<!-- sent="Wed, 7 Dec 2005 03:26:57 -0500" -->
+<!-- isosent="20051207082657" -->
+<!-- name="Greg King" -->
+<!-- email="gngking1erols.com" -->
+<!-- subject="Re: [cc65] bug report: pass-by-value of structs destroys stack" -->
+<!-- id="000001c5fb2d$4ac5bc20$ed682c42@palace" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="[cc65] bug report: pass-by-value of structs destroys stack" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5330.html" title="Greg King: &quot;Re: [cc65] Need help getting started with cc65 NES&quot;">Next message</a> ]
+[ <a href="5328.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65 Z80 support&quot;">Previous message</a> ]
+[ <a href="../2005-11/5306.html" title="Sidney Cadot: &quot;[cc65] bug report: pass-by-value of structs destroys stack&quot;">Maybe in reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:gngking1erols.com?Subject=Re:%20[cc65]%20bug%20report:%20pass-by-value%20of%20structs%20destroys%20stack">gngking1erols.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-12-07 09:26:57</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: Sidney Cadot; on November 29, 2005, at 04:56 PM -0500
+&gt;
+&gt; Passing a struct as a function parameter destroys the stack.
+
+From: Ullrich von Bassewitz; on November 30, 2005, at 03:42 AM -0500
+&gt;
+&gt; On Wed, Nov 30, 2005 at 09:11:41AM +0100, Groepaz wrote:
+&gt; &gt; Is it really that much of a problem to make this work?
+&gt; &gt; Uhm ... not that I would ever use or even need it; but anyway, :)
+&gt; &gt; the compiler has reached an amazing level of standard compliance
+&gt; &gt; already, would be pretty cool to get rid of the remaining few bits. :=P
+&gt;
+&gt; Adding the capability to pass structs is not too much work.
+&gt; Returning structs by value is more work.
+
+Here is a bit of useless trivia.  A work-around lets Sidney's example work
+properly with cc65:
+
+#include &lt;stdio.h&gt;
+
+struct TestStruct {
+    int a;
+    int b;
+    };
+
+static void testfunc(struct TestStruct ts) {
+    printf(&quot;ts.a = %d, ts.b = %d\n&quot;, ts.a, ts.b);
+    }
+
+static struct TestStruct tm;
+
+int main(void) {
+    int x = 1;
+
+    tm.a = 2;
+    tm.b = 3;
+
+    /* Fake a testfunc(tm) call. */
+    {
+        struct TestStruct _temp;
+        _temp = tm;
+        ((void (*)(void))testfunc)();
+        goto skip_stack_pop;
+        }
+  skip_stack_pop:
+
+    printf(&quot;x = %d\n&quot;, x);
+
+    return 0;
+    }
+
+I call it &quot;useless trivia&quot; because the pass-struct-by-value feature is not
+worth the trouble of writing that work-around.  But, it does show how easy,
+as Uz said, it would be to implement that feature in the compiler.
+
+--------
+Hey Uz, when I lengthen the structure, to force &quot;_temp = tm;&quot; to do a
+memcpy(), the first argument is wrong!  It is _temp's first word, instead
+of its address.  I vaguely recall seeing that bug before, so I think that
+it is in version 2.11.0 of cc65.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Dec  7 13:53:44 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5330.html" title="Next message in the list">Greg King: "Re: [cc65] Need help getting started with cc65 NES"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5328.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] ca65 Z80 support"</a></li>
+<li><dfn>Maybe in reply to</dfn>: <a href="../2005-11/5306.html" title="Message to which this message replies">Sidney Cadot: "[cc65] bug report: pass-by-value of structs destroys stack"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5329" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5329" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5329" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-12-07 13:53:46 CET
+</em></small></p>
+</body>
+</html>

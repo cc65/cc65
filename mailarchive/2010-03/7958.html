@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="ISO-8859-2"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-2" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] some patches</title>
+<meta name="Author" content="Kajtár Zsolt (kajtarzsolt1googlemail.com)" />
+<meta name="Subject" content="Re: [cc65] some patches" />
+<meta name="Date" content="2010-03-16" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] some patches</h1>
+<!-- received="Tue Mar 16 17:47:10 2010" -->
+<!-- isoreceived="20100316164710" -->
+<!-- sent="Tue, 16 Mar 2010 17:45:22 +0100" -->
+<!-- isosent="20100316164522" -->
+<!-- name="Kajtár Zsolt" -->
+<!-- email="kajtarzsolt1googlemail.com" -->
+<!-- subject="Re: [cc65] some patches" -->
+<!-- id="4B9FB5A2.1080307@googlemail.com" -->
+<!-- charset="ISO-8859-2" -->
+<!-- inreplyto="20100315223247.GB2175&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7959.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] some patches&quot;">Next message</a> ]
+[ <a href="7957.html" title="Kajtár Zsolt: &quot;Re: [cc65] some patches&quot;">Previous message</a> ]
+[ <a href="7956.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] some patches&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7959.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] some patches&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Kajtár Zsolt &lt;<a href="mailto:kajtarzsolt1googlemail.com?Subject=Re:%20[cc65]%20some%20patches">kajtarzsolt1googlemail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-03-16 17:45:22</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+&gt;&gt; At the beginning of a the user's program would redefine a few routine calls to
+&gt;&gt; alternative versions in the library header files (stdio.h, unistd.h) for
+&gt;&gt; read/write and possibly seek.
+&gt; 
+&gt; That doesn't work.
+&gt; 
+&gt; If you use printf, write() is called internally. printf calls fprintf which
+&gt; calls vfprintf, which calls write. In this call chain, the address of write is
+&gt; part of the precompiled library and a simple #define in the user code won't
+&gt; change the contents of the library you're linking to your application.
+
+Blockread/write only makes sense with bulk data transfers, and printf is
+usually not used like that.
+
+&gt;&gt; What is the reason for the final RESTOR? Interrupts are restored already,
+&gt;&gt; anything else?
+&gt; 
+&gt; The call to RESTOR is probably a relict from older versions that didn't have
+&gt; destructors.  Some parts of the library set their own vectors (the debugger
+&gt; for example takes over the BREAK vector). RESTOR is called so that even in
+&gt; case of a program abort, the machine is not left in an unstable state. I
+&gt; haven't checked the code, it may be possible to add destructors if they're not
+&gt; already present and remove the call.
+
+Ok, I see.
+
+&gt;&gt;&gt; So we will have to live with the fact that the cc65 do only cover the most
+&gt;&gt;&gt; common case. If it is cheap, they can also cover a few less common ones, too.
+&gt;&gt; There would be no cost if it's not selected.
+&gt; 
+&gt; How are you going to &quot;select&quot; it? As said above, using #defines won't work.
+&gt; The only thing that works is a separate library, but ...
+&gt; 
+&gt;&gt; I'm not sure if this is a good idea, at least I would not do it.
+&gt; 
+&gt; ... that doesn't seem to get your approval :-)
+
+Because probably I would not update it often enough.
+
+Ok, so I know the answers now, thanks!
+
+- --
+						    -soci-
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAkuftaIACgkQyBOVYiJltRZzhgCfY5QvzPZKJ4Jgh7nXfPzVFZOe
+KhYAn1HMWQdhcrenOAMDF9V8O+lV9/lc
+=HByk
+-----END PGP SIGNATURE-----
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Mar 16 17:47:10 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7959.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] some patches"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7957.html" title="Previous message in the list">Kajtár Zsolt: "Re: [cc65] some patches"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7956.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] some patches"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7959.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] some patches"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7959.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] some patches"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7958" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7958" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7958" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-03-16 17:47:13 CET
+</em></small></p>
+</body>
+</html>

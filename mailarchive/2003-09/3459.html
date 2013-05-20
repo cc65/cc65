@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] feature questions...</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] feature questions...">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] feature questions...</h1>
+<!-- received="Thu Sep 25 20:30:37 2003" -->
+<!-- isoreceived="20030925183037" -->
+<!-- sent="Thu, 25 Sep 2003 20:30:32 +0200" -->
+<!-- isosent="20030925183032" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] feature questions..." -->
+<!-- id="20030925183032.GA15370@trixie.musoftware.de" -->
+<!-- inreplyto="200309251843.42382.groepaz@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20feature%20questions..."><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-09-25 20:30:32
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3458.html">Ullrich von Bassewitz: "Re: [cc65] Platform specific docs"</a>
+<li><strong>In reply to:</strong> <a href="3456.html">Groepaz: "Re: [cc65] feature questions..."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3463.html">Groepaz: "Re: [cc65] feature questions..."</a>
+<li><strong>Next in thread:</strong> <a href="3451.html">Ullrich von Bassewitz: "Re: [cc65] Platform specific docs"</a>
+<li><strong>Reply:</strong> <a href="3463.html">Groepaz: "Re: [cc65] feature questions..."</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Thu, Sep 25, 2003 at 06:43:42PM +0200, Groepaz wrote:
+&gt; maybe its still possible to output the list file in a less &quot;compact&quot; format
+&gt; (currently for eg .repeat statements and alike arent exactly emitted as they
+&gt; appear in the actual binary...) ? i could probably come up with a script then
+&gt; that strips away what i dont want :)
+
+It's not only .repeat, it is any macro. I'm sorry but I don't see an easy way
+to do that.
+
+&gt; mmmmh..any simple reason why that must fail? 
+
+Because it changes
+
+                        long int l;
+to                      long myint l;
+which in turn is        long long int l;
+
+&gt; yesyes... i just was wondering that you are suggesting to use that emulation
+&gt; feature with xa65... AFAIK programmcounter assignments work the same as in
+&gt; TASS there. (i've personally never seen an assembler that uses progcount
+&gt; assignments in the sence of &quot;.org&quot; - and i've tried a whole lot of
+&gt; crossassemblers :=P)
+
+The problem is that ca65 doesn't is not able to emulate the .org command of
+other assemblers, because it has no information about code placement. So the
+best emulation is to translate an assignment to the PC counter into .org.
+
+&gt; mmmmmh.... any pointers to some docs? (i have it installed but &quot;man linuxDoc&quot;
+&gt; doesnt give any results :/)
+
+        /usr/share/doc/linuxdoc-tools-0.9.16/
+
+(adjust version number) has some information and a &quot;guide.txt&quot; file that
+contains an overview.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20feature%20questions...">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20feature%20questions...">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3458.html">Ullrich von Bassewitz: "Re: [cc65] Platform specific docs"</a>
+<li><strong>In reply to:</strong> <a href="3456.html">Groepaz: "Re: [cc65] feature questions..."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3463.html">Groepaz: "Re: [cc65] feature questions..."</a>
+<li><strong>Next in thread:</strong> <a href="3451.html">Ullrich von Bassewitz: "Re: [cc65] Platform specific docs"</a>
+<li><strong>Reply:</strong> <a href="3463.html">Groepaz: "Re: [cc65] feature questions..."</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-09-25 20:30:43 CEST</em>
+</em>
+</small>
+</body>
+</html>

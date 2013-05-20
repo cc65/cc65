@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] zero page</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] zero page">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] zero page</h1>
+<!-- received="Tue Oct 19 19:55:52 1999" -->
+<!-- isoreceived="19991019175552" -->
+<!-- sent="Tue, 19 Oct 1999 19:55:31 +0200 (CEST)" -->
+<!-- isosent="19991019175531" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] zero page" -->
+<!-- id="199910191755.TAA32371@trixie.musoftware.de" -->
+<!-- inreplyto="19991019.082127.13334.2.tbsilvey@juno.com" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20zero%20page"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 1999-10-19 19:55:31
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="1025.html">troy silvey: "Re: [cc65] Bug in malloc()"</a>
+<li><strong>Previous message:</strong> <a href="1023.html">troy silvey: "[cc65] zero page"</a>
+<li><strong>In reply to:</strong> <a href="1023.html">troy silvey: "[cc65] zero page"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+&gt; I used to do much ASM on 65xx and I was wondering how
+&gt; zeropage is handled in C and with cc65. I know some
+&gt; optimization by cc65 probably tries to use this space
+&gt; when possible, but is it possible I can access this
+&gt; when I want to. If I decide to free and use areas like the
+&gt; basic and tape space in zeropage, can I let cc65 know
+&gt; to use this space for optimization?
+
+The current development version uses 26 bytes in the zeropage. About half of
+this space is temporary storage, used by many of the library routines. The
+other half is used for specific purposes like the stackpointer (the runtime
+uses a software stack) or an extended accumulator.
+
+A new feature in the development version is the use of register variables. If
+register variables are enabled, a few zero page cells are used to store local
+variables with storage class &quot;register&quot;. However, this has some drawbacks,
+since the old contents of the zeropage locations have to be saved on the stack
+on function entry and restored on function exit.
+
+If you really need to use zero page locations within your program, you have
+two possibilities:
+
+1. Use fixed memory locations. You may define pseudo variables using fixed
+   addresses with the help of macros like this:
+
+   	/* X/Y value of pacman sprite stored in $FB/$FC */
+   	#define	PacmanX		(*((unsigned char*)0xFB))
+       	#define	PacmanY		(*((unsigned char*)0xFC))
+
+   Then use it like normal variables:
+
+   	PacmanX = 10;
+   	PacmanY = 10;
+   	...
+   	if (PacmanY &gt; 200) ...
+
+   You may also put complete structs or arrays into specific memory locations
+   using this method. For an example, have a look into the c64.h include file.
+   It declares several macros that places structs at the hardware register
+   addresses. You may then use stuff like:
+
+	static void StartNoise (void)
+	/* Start noise if configured */
+	{
+	    /* Configure noise on voice three if requested */
+	    if (Effects &amp; efNoise) {
+	      	SID.v3.freq  = 0x4000;
+	      	SID.v3.ad    = 0x00;
+	      	SID.v3.sr    = 0xA8;
+	      	SID.flt_freq = 0xA000;
+	      	SID.flt_ctrl = 0x44;
+	      	SID.amp	     = 0x1F;
+	      	SID.v3.ctrl  = 0x81;
+	    }
+	}
+
+   (This was taken from the morse trainer software).
+
+2. Define zero pages variables in an assembler file and declare them via a
+   normal C extern declaration (do not forget to prepend the underscore in the
+   assembler file). You have to place the segment containing the variables in
+   the zero page by a linker configuration file. To make sure that the
+   variables are actually imported as zeropage variables, use the zpsym
+   #pragma:
+
+	extern unsigned char PacmanX;
+	extern unsigend char PacmanY;
+	#pragma zpsym (&quot;PacmanX&quot;);
+	#pragma zpsym (&quot;PacmanY&quot;);
+
+The first solution is probably the easier one for small programs. You may want
+to put the macros into a header file, so that all modules access the same
+memory locations. Be sure not use use any of the zero page locations that are
+used by the compiler!
+
+Regards
+
+
+	Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20zero%20page">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20zero%20page">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="1025.html">troy silvey: "Re: [cc65] Bug in malloc()"</a>
+<li><strong>Previous message:</strong> <a href="1023.html">troy silvey: "[cc65] zero page"</a>
+<li><strong>In reply to:</strong> <a href="1023.html">troy silvey: "[cc65] zero page"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:45 CET</em>
+</em>
+</small>
+</body>
+</html>

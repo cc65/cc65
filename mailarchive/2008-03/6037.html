@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Re: Questions for CBM guys</title>
+<meta name="Author" content="silverdr1inet.com.pl (silverdr1inet.com.pl)" />
+<meta name="Subject" content="Re: [cc65] Re: Questions for CBM guys" />
+<meta name="Date" content="2008-03-04" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Re: Questions for CBM guys</h1>
+<!-- received="Tue Mar  4 14:05:31 2008" -->
+<!-- isoreceived="20080304130531" -->
+<!-- sent="Tue, 4 Mar 2008 14:05:20 +0100" -->
+<!-- isosent="20080304130520" -->
+<!-- name="silverdr1inet.com.pl" -->
+<!-- email="silverdr1inet.com.pl" -->
+<!-- subject="Re: [cc65] Re: Questions for CBM guys" -->
+<!-- id="DFA85CE1-49B0-45F8-9440-5DB9BDE65014@inet.com.pl" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="080304115504&#64;arcade.demon.co.uk" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6038.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Re: Questions for CBM guys&quot;">Next message</a> ]
+[ <a href="6036.html" title="Jonathan Graham Harston: &quot;[cc65] Re: Questions for CBM guys&quot;">Previous message</a> ]
+[ <a href="6036.html" title="Jonathan Graham Harston: &quot;[cc65] Re: Questions for CBM guys&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6043.html" title="silverdr1inet.com.pl: &quot;[cc65] A bug? (was: Questions for CBM guys)&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:silverdr1inet.com.pl?Subject=Re:%20[cc65]%20Re:%20Questions%20for%20CBM%20guys">silverdr1inet.com.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-03-04 14:05:20</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 2008-03-04, at 11:53, Jonathan Graham Harston wrote:
+
+&gt; I checked the documentation before posting to check that
+&gt; the C64 was similar to the Acorn world:
+&gt;
+&gt; Commodore 64 Programmer's Reference Guide:
+&gt;
+&gt; &quot;If no punctuation finishes the list, a carriage-return
+&gt; and a line- feed are printed at the end of the data. If
+&gt; a comma or semicolon terminates the output-list, the
+&gt; carriage-return and line-feed are suppressed.&quot;
+
+This is the part which tells about PRINT# BASIC statement. What does  
+it have to do with screen &quot;driver&quot;? Sure you can OPEN the screen  
+device and PRINT# to it but why would you? OTOH similar description  
+applies to PRINT statement - again: how does this refers to what byte  
+is sent to screen driver?
+
+&gt; [...]
+&gt; That clearly indicates that line-feed and carriage-return
+&gt; are two seperate functions.
+
+I wrote exactly this: &quot;CR and LF are in fact separate functions and  
+treating them as such does make a lot of sense&quot;. This doesn't mean  
+that screen device driver in a C64 treats it as separate.
+
+&gt; Remember, I'm talking about /screen/ drivers here, not
+&gt; teletypes, printers, typing input, etc.
+
+Those are very much similar but the situation at least in the cbm  
+world is quite opposite than what you wrote. Printing to /screen/  
+allows you to send $0d to achieve both CR and LF. &lt;-- period. Printing  
+to other devices can (and often is) different. Many printers included  
+even a switch (either hardware DIP switch or software) to add LF after  
+receiving CR from the computer. This just because sending the same  
+data that would work on the /screen/ (just $0d) would make everything  
+printed on one line when sent to printer.
+
+&gt;
+&gt; Character 13 - CR - repeatedly moves left until in the
+&gt;  lefthand column
+
+on CBM it does also change the line
+
+&gt;
+&gt; Character 8 moves left one
+
+On CBM it is either custom extension or NOP. To move left you send $9d
+
+&gt;
+&gt; Character 9 moves right one
+
+On CBM it is either custom extension or NOP. To move right you send $1d
+
+&gt; Character 10 moves down one
+
+On CBM $11
+
+&gt; Character 11 moves up one
+
+On CBM $91
+
+Ever tried those on a CBM, or Atari, or...?
+
+&gt; The only system I knew before this thread where this does
+&gt; not happen is the Sinclair computers, where CHR$13 moves
+&gt; down and left, the equivalent of CR/LF, so making it
+&gt; impossible to do a LF or a CR.
+
+I don't know how Sinclair machines handle it but this is easily  
+verifiable and quite probably it is also possible to do LF and other  
+functions, just maybe not with stabdard LF ASCII code there.
+
+&gt;&gt; MSDOS   : $0d$0a
+&gt;&gt; CBM     : $0d
+&gt;&gt; Amiga   : $0a
+&gt;&gt; Atari   : $9b
+&gt;&gt; Unix    : $0a
+&gt;&gt; Mac[*]  : $0d
+&gt;
+&gt; Nope, I've used a Mac, and PRINT CHR$13; moves to the
+&gt; lefthand column without moving down, and PRINT CHR$10;
+
+How did you check this on a classic Macos?
+
+&gt; moves down without changing the column, and the Unix
+&gt; systems I've used that have a screen driver (/not/ a
+&gt; teletype driver) do the same.
+
+We might have a misunderstanding about what you call &quot;screen driver&quot;  
+here. To me this is the subsystem, which interprets the stream of  
+textual data in order to present it on the screen, in any size of  
+window (small, big, fullscreen). One very common use of this is to  
+present text files. Just send a text file to the raw screen driver and  
+see how it interprets the line endings. Most &quot;raw&quot; screen editors use  
+this subsystem as well. I guess you might be talking exactly about  
+&quot;teletype driver&quot; or &quot;terminal emulator&quot;, where adhering to standards  
+is/was crucial. Internal &quot;screen drivers&quot; did how someone once created  
+them, not necessarily adhering to ASCII or other standards but rather  
+taking shortcuts or implementing own extensions. One of the most  
+common shortcuts was to use CR as shortcut for CRLF and this is how  
+the screen driver in C64 behaves. You send $0d to it and it does both  
+CR and LF, whether you like it or not.
+
+&gt; If the others do perform as you say, then how on earth
+&gt; do you move the cursor down without changing the column?
+
+On CBM you send $11
+
+&gt; And how on earth do you move to the lefthand column without
+&gt; moving down a line?
+
+On Atari you send $9c
+
+Now - having said that - I got interested and shall have to check how  
+cc65's runtime lib achieves &quot;\r&quot; on the CBM. I don't remember a simple  
+&quot;one shot&quot; way of doing it on a C64.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Mar  4 14:05:31 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6038.html" title="Next message in the list">Spiro Trikaliotis: "Re: [cc65] Re: Questions for CBM guys"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6036.html" title="Previous message in the list">Jonathan Graham Harston: "[cc65] Re: Questions for CBM guys"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6036.html" title="Message to which this message replies">Jonathan Graham Harston: "[cc65] Re: Questions for CBM guys"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6043.html" title="Next message in this discussion thread">silverdr1inet.com.pl: "[cc65] A bug? (was: Questions for CBM guys)"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6043.html" title="Message sent in reply to this message">silverdr1inet.com.pl: "[cc65] A bug? (was: Questions for CBM guys)"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6037" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6037" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6037" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-03-04 14:05:33 CET
+</em></small></p>
+</body>
+</html>

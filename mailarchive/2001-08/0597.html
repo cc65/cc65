@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Scrolling</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Scrolling">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Scrolling</h1>
+<!-- received="Sun Aug 12 20:07:31 2001" -->
+<!-- isoreceived="20010812180731" -->
+<!-- sent="Sun, 12 Aug 2001 20:07:35 +0200" -->
+<!-- isosent="20010812180735" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Scrolling" -->
+<!-- id="20010812200735.A23640@trixie.musoftware.de" -->
+<!-- inreplyto="1598107115.20010812161204@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Scrolling"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2001-08-12 20:07:35
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0598.html">groepaz: "Re[2]: [cc65] Scrolling"</a>
+<li><strong>Previous message:</strong> <a href="0596.html">groepaz: "Re[2]: [cc65] Scrolling"</a>
+<li><strong>In reply to:</strong> <a href="0596.html">groepaz: "Re[2]: [cc65] Scrolling"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0598.html">groepaz: "Re[2]: [cc65] Scrolling"</a>
+<li><strong>Reply:</strong> <a href="0598.html">groepaz: "Re[2]: [cc65] Scrolling"</a>
+<li><strong>Reply:</strong> <a href="0602.html">Maciej Witkowiak: "Re: [cc65] Scrolling"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!				      
+
+On Sun, Aug 12, 2001 at 04:12:04PM +0200, groepaz wrote:
+&gt; so what does that mean as a consequence then.... i guess the way it is
+&gt; then is that all ram under kernal and i/o ($d000-$ffff) is currently
+&gt; unused in a c64 setup ?
+
+Yes. However, several library routines expect the kernal ROM and I/O to be
+banked in, so you cannot change this without some effort.
+
+&gt; or do library calls that use the kernal bank
+&gt; the memory as needed?
+
+No. The kernal is expected to be banked in. The kernal is not only called
+directly by several library routines, the kernal interrupt handler, keyboard
+handling, ..., is also used. One could use the memory below I/O and kernal for
+some special purpose, but this is not portable and there is no library support
+for this.
+
+&gt; (which leads to another question... IF that is
+&gt; the case, it would be more or less easy-peasy to port some simple
+&gt; gfx-functions i got and put them into a small library..... is there any
+&gt; interest for that ? (i dont really need that myself but got the routines
+&gt; laying around anyway))
+
+I've thought about a graphics library for some time, but I would prefer one
+with a consistent interface across all supported platforms (at least the one
+that support graphics). The C64 and the C128 could be handled by the same
+code, the Plus4/C16/C116 has an almost identical memory layout in hires mode,
+so these machines should be able to share quite some code with the C64
+implementation. With some effort, it should also be possible to design these
+routines so that they can be used by the P500 (which does also have the VIC
+but uses a strange, CPU supported banking scheme) without too much changes. As
+usual, I don't have enough knowledge about the Atari and the Apple to say what
+is possible here.
+
+If you think that the interface of your code is worth looking at, I would be
+glad if you could send me a copy via email.
+
+Regards
+
+
+        Uz
+
+	
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Scrolling">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Scrolling">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0598.html">groepaz: "Re[2]: [cc65] Scrolling"</a>
+<li><strong>Previous message:</strong> <a href="0596.html">groepaz: "Re[2]: [cc65] Scrolling"</a>
+<li><strong>In reply to:</strong> <a href="0596.html">groepaz: "Re[2]: [cc65] Scrolling"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0598.html">groepaz: "Re[2]: [cc65] Scrolling"</a>
+<li><strong>Reply:</strong> <a href="0598.html">groepaz: "Re[2]: [cc65] Scrolling"</a>
+<li><strong>Reply:</strong> <a href="0602.html">Maciej Witkowiak: "Re: [cc65] Scrolling"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:41 CET</em>
+</em>
+</small>
+</body>
+</html>

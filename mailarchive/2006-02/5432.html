@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Proposal for CA65 improvement(</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="[cc65] Proposal for CA65 improvement(?): .maclib directive" />
+<meta name="Date" content="2006-02-21" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Proposal for CA65 improvement(?): .maclib directive</h1>
+<!-- received="Tue Feb 21 10:56:47 2006" -->
+<!-- isoreceived="20060221095647" -->
+<!-- sent="Tue, 21 Feb 2006 10:56:32 +0100" -->
+<!-- isosent="20060221095632" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="[cc65] Proposal for CA65 improvement(?): .maclib directive" -->
+<!-- id="20060221095632.GF5621@trikaliotis.net" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5433.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] &quot;thought experiment&quot;, would it be possible to write a c64-kernal replacement with cc65? [scanned]&quot;">Next message</a> ]
+[ <a href="5431.html" title="Markus Stehr: &quot;[cc65] &quot;thought experiment&quot;, would it be possible to write a c64-kernal replacement with cc65? [scanned]&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5434.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Proposal for CA65 improvement(?): .maclib directive&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20[cc65]%20Proposal%20for%20CA65%20improvement(?):%20.maclib%20directive">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2006-02-21 10:56:32</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello,
+
+having seen this on another assembler (for Motorola/Freescale DSP56K), I
+want to propose something that I think is very handy (and &quot;in the same
+sense&quot; as the .macpack directive).
+
+I am citing from the assembler manual
+(<a href="http://www.freescale.com/files/dsp/doc/ref_manual/DSPASMRM.pdf">http://www.freescale.com/files/dsp/doc/ref_manual/DSPASMRM.pdf</a>):
+
+   5.2 MACRO LIBRARIES
+   The Motorola DSP Assembler allows for the maintenance of macro
+   libraries with the MACLIB directive. This directive is used to
+   specify the pathname (as defined by the host operating system) of a
+   directory that contains macro definitions. Each macro definition must
+   be in a separate file, and the file must be named the same as the
+   macro with the extension .ASM added. For example, BLOCKMV.ASM would
+   be a file that contained the definition of the macro called BLOCKMV.
+
+   If a MACLIB directive has been specified in the source code and the
+   Assembler encounters a name in the operation field that is not a
+   previously defined macro or is not contained in the directive or
+   mnemonic tables, the directory specified in the MACLIB directive will
+   be searched for a file of that name (with the .ASM extension added).
+   If such a file is found, the current source line will be saved, and
+   the file will be opened for input as an INCLUDE file. When the end of
+   the file is encountered, the source line is restored and processing
+   is resumed.
+
+   Because the source line is restored, the processed file must have a
+   macro definition of the unknown name, or an error will result when
+   the source line is restored and processed.  However, the processed
+   file is not limited to macro definitions, and can include any legal
+   source code statements. Multiple MACLIB directives may be given, in
+   which case the Assembler will search each directory in the order in
+   which they were specified.
+
+I find this very handy. Additionally, it is like some &quot;superset&quot; of what
+the current .macpack directive already does, allowing not only the use
+of predefinied &quot;macro packages&quot;, but adding user-defined &quot;macro
+libraries&quot;, too.
+
+What do you think?
+
+Regards,
+   Spiro.
+
+-- 
+Spiro R. Trikaliotis
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Feb 21 10:56:47 2006</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5433.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] &quot;thought experiment&quot;, would it be possible to write a c64-kernal replacement with cc65? [scanned]"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5431.html" title="Previous message in the list">Markus Stehr: "[cc65] &quot;thought experiment&quot;, would it be possible to write a c64-kernal replacement with cc65? [scanned]"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5434.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Proposal for CA65 improvement(?): .maclib directive"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5434.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Proposal for CA65 improvement(?): .maclib directive"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5432" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5432" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5432" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2006-02-21 10:56:50 CET
+</em></small></p>
+</body>
+</html>

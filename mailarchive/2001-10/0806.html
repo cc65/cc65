@@ -1,0 +1,169 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] cc65 v2.7.0 released</title>
+<meta name="Author" content="MagerValp (MagerValp_at_cling.gu.se)">
+<meta name="Subject" content="Re: [cc65] cc65 v2.7.0 released">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] cc65 v2.7.0 released</h1>
+<!-- received="Sun Oct 14 13:31:02 2001" -->
+<!-- isoreceived="20011014113102" -->
+<!-- sent="Sun, 14 Oct 2001 13:29:14 +0200" -->
+<!-- isosent="20011014112914" -->
+<!-- name="MagerValp" -->
+<!-- email="MagerValp_at_cling.gu.se" -->
+<!-- subject="Re: [cc65] cc65 v2.7.0 released" -->
+<!-- id="15305.30474.140780.551211@panini.cling.gu.se" -->
+<!-- inreplyto="20011014102917.A30270@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> MagerValp (<a href="mailto:MagerValp_at_cling.gu.se?Subject=Re:%20[cc65]%20cc65%20v2.7.0%20released"><em>MagerValp_at_cling.gu.se</em></a>)<br>
+<strong>Date:</strong> 2001-10-14 13:29:14
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0807.html">Spiro Trikaliotis: "[cc65] access order when doing int operation"</a>
+<li><strong>Previous message:</strong> <a href="0805.html">Ullrich von Bassewitz: "[cc65] cc65 v2.7.0 released"</a>
+<li><strong>In reply to:</strong> <a href="0805.html">Ullrich von Bassewitz: "[cc65] cc65 v2.7.0 released"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0808.html">Ullrich von Bassewitz: "Re: [cc65] cc65 v2.7.0 released"</a>
+<li><strong>Reply:</strong> <a href="0808.html">Ullrich von Bassewitz: "Re: [cc65] cc65 v2.7.0 released"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+&gt;&gt;&gt;&gt;&gt; &quot;UvB&quot; == Ullrich von Bassewitz &lt;<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%20v2.7.0%20released">uz_at_musoftware.de</a>&gt; writes:
+
+UvB&gt; <a href="ftp://ftp.musoftware.de/pub/uz/cc65/">ftp://ftp.musoftware.de/pub/uz/cc65/</a>
+
+UvB&gt; Thanks to all who helped developing and testing this release!
+
+I'm afraid I didn't have time to test the beta earlier, and I get the
+following error when trying to compile the libraries on a Solaris 8
+machine:
+
+CC=../../../src/cc65/cc65 \
+AS=../../../src/ca65/ca65 \
+AR=../../src/ar65/ar65 \
+CFLAGS=&quot;-Osir -g -T -t geos -I../../include&quot; \
+AFLAGS=&quot;-t geos&quot; \
+gmake -C geos || exit 1
+gmake[2]: Entering directory `/ufs/local/src/cc65-2.7.0/libsrc/geos'
+gmake[3]: Entering directory `/ufs/local/src/cc65-2.7.0/libsrc/geos/common'
+abort.c(9): Error: Include file `stdlib.h' not found
+abort.c(10): Error: Include file `geos.h' not found
+abort.c(14): Warning: Function call without a prototype
+abort.c(14): Error: Undefined symbol: `CBOLDON'
+abort.c(14): Error: `)' expected
+abort.c(14): Error: `;' expected
+abort.c(14): Error: `;' expected
+abort.c(14): Error: Undefined symbol: `CPLAINTEXT'
+abort.c(14): Error: `;' expected
+abort.c(14): Error: Expression expected
+abort.c(14): Error: `;' expected
+abort.c(14): Error: Expression expected
+abort.c(14): Fatal: Too many errors
+gmake[3]: *** [abort.o] Error 1
+
+It still compiles the rest of the stuff, and generates the following
+libraries:
+
+malachai(26)&gt; ls -l *.lib
+-rw-r--r--   1 pelle    staff     297982 Oct 14 13:06 apple2.lib
+-rw-r--r--   1 pelle    staff     739800 Oct 14 13:07 atari.lib
+-rw-r--r--   1 pelle    staff     351133 Oct 14 13:07 c128.lib
+-rw-r--r--   1 pelle    staff     359364 Oct 14 13:07 c64.lib
+-rw-r--r--   1 pelle    staff     383817 Oct 14 13:07 cbm510.lib
+-rw-r--r--   1 pelle    staff     360353 Oct 14 13:08 cbm610.lib
+-rw-r--r--   1 pelle    staff     274726 Oct 14 13:09 geos.lib
+-rw-r--r--   1 pelle    staff     323235 Oct 14 13:10 pet.lib
+-rw-r--r--   1 pelle    staff     327642 Oct 14 13:10 plus4.lib
+malachai(27)&gt; cksum *.lib
+1316417084 297982 apple2.lib
+344311704 739800 atari.lib
+4244432698 351133 c128.lib
+4269306921 359364 c64.lib
+312727141 383817 cbm510.lib
+4218750804 360353 cbm610.lib
+483025335 274726 geos.lib
+1915580379 323235 pet.lib
+3410494488 327642 plus4.lib
+
+I'm suspecting that geos.lib won't work too well, but I don't even
+have GEOS so I can't tell.
+
+And here's a patch to fix another small bug... :)
+
+*** version.org Thu Oct 11 15:16:46 2001
+--- version.h   Sun Oct 14 13:26:30 2001
+***************
+*** 45,52 ****
+  
+  
+  #define VER_MAJOR     2U
+! #define VER_MINOR     6U
+! #define VER_PATCH     9U
+  
+
+  
+--- 45,52 ----
+  
+  
+  #define VER_MAJOR     2U
+! #define VER_MINOR     7U
+! #define VER_PATCH     0U
+
+
+
+-- 
+    ___          .     .  .         .       . +  .         .      o   
+  _|___|_   +   .  +     .     +         .   .  Per Olofsson, konstnär
+    o-o    .      .     .   o         +          <a href="mailto:MagerValp_at_cling.gu.se?Subject=Re:%20[cc65]%20cc65%20v2.7.0%20released">MagerValp_at_cling.gu.se</a>
+     -       +            +    .     <a href="http://www.cling.gu.se/~cl3polof/">http://www.cling.gu.se/~cl3polof/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%20v2.7.0%20released">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0807.html">Spiro Trikaliotis: "[cc65] access order when doing int operation"</a>
+<li><strong>Previous message:</strong> <a href="0805.html">Ullrich von Bassewitz: "[cc65] cc65 v2.7.0 released"</a>
+<li><strong>In reply to:</strong> <a href="0805.html">Ullrich von Bassewitz: "[cc65] cc65 v2.7.0 released"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0808.html">Ullrich von Bassewitz: "Re: [cc65] cc65 v2.7.0 released"</a>
+<li><strong>Reply:</strong> <a href="0808.html">Ullrich von Bassewitz: "Re: [cc65] cc65 v2.7.0 released"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:42 CET</em>
+</em>
+</small>
+</body>
+</html>

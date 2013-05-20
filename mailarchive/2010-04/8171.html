@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Zero page, C stack, and interr</title>
+<meta name="Author" content="Steve Davison (64subnet1gmail.com)" />
+<meta name="Subject" content="[cc65] Zero page, C stack, and interrupts" />
+<meta name="Date" content="2010-04-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Zero page, C stack, and interrupts</h1>
+<!-- received="Sun Apr 25 16:21:15 2010" -->
+<!-- isoreceived="20100425142115" -->
+<!-- sent="Sun, 25 Apr 2010 07:21:11 -0700" -->
+<!-- isosent="20100425142111" -->
+<!-- name="Steve Davison" -->
+<!-- email="64subnet1gmail.com" -->
+<!-- subject="[cc65] Zero page, C stack, and interrupts" -->
+<!-- id="j2o6c36ebcc1004250721s82f48a44w130c63dde3757e5a@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8172.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Zero page, C stack, and interrupts&quot;">Next message</a> ]
+[ <a href="8170.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] How to prototype an assembler function?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8172.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Zero page, C stack, and interrupts&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Steve Davison &lt;<a href="mailto:64subnet1gmail.com?Subject=Re:%20[cc65]%20Zero%20page,%20C%20stack,%20and%20interrupts">64subnet1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-04-25 16:21:11</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hey guys,
+
+I'm starting my first project using the cc65 suite.  I've
+figured out a lot on my own, but I think it's time to get some
+help.
+
+My program needs to co-exists with the ROM OS, and with BASIC
+programs.  On the surface, this seems like a very Unnatural
+Thing for cc65, requiring that I swap the cc65 ZP area every
+time I transition into or out of cc65 code.  Also, it looks like
+calling into any library code from an ISR would require separate
+parameter stacks as well (except for maybe single-param fastcall
+functions).
+
+I haven't found any information on choosing a good location for
+ZP.  It seems to be arbitrary?  Then if a kernal call is made
+(for example, cbm_load), wouldn't the cc65 runtime vars corrupt
+the Kernal's data area, and vice versa.  I tried to see what
+cbm_load might do to deal with it, but I can't find where
+cbm_k_load is defined.  (It's declared in cbm.h, and called by
+cbm_load, but from there it falls off the radar.)
+
+I guess that's what I really need to get nailed down first: how
+do cc65 and the kernal coexist?
+
+Thanks for any help!
+// Steve
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Apr 25 16:21:15 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8172.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Zero page, C stack, and interrupts"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8170.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] How to prototype an assembler function?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8172.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Zero page, C stack, and interrupts"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8172.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Zero page, C stack, and interrupts"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8171" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8171" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8171" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-04-25 16:21:18 CEST
+</em></small></p>
+</body>
+</html>

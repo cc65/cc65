@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Macros in inline assembler</title>
+<meta name="Author" content="Andreas Rückert (a_rueckert1gmx.net)" />
+<meta name="Subject" content="[cc65] Macros in inline assembler" />
+<meta name="Date" content="2012-01-19" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Macros in inline assembler</h1>
+<!-- received="Thu Jan 19 14:38:06 2012" -->
+<!-- isoreceived="20120119133806" -->
+<!-- sent="Thu, 19 Jan 2012 14:37:55 +0100" -->
+<!-- isosent="20120119133755" -->
+<!-- name="Andreas Rückert" -->
+<!-- email="a_rueckert1gmx.net" -->
+<!-- subject="[cc65] Macros in inline assembler" -->
+<!-- id="20120119133755.91030@gmx.net" -->
+<!-- charset="utf-8" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9898.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Macros in inline assembler&quot;">Next message</a> ]
+[ <a href="9896.html" title="Gábor Lénárt: &quot;[cc65] linking to o65&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9898.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Macros in inline assembler&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Andreas Rückert &lt;<a href="mailto:a_rueckert1gmx.net?Subject=Re:%20[cc65]%20Macros%20in%20inline%20assembler">a_rueckert1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-01-19 14:37:55</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+I want to optimize some sha256 code, since I couldn't get the compiler
+to generate some optmized code to speed up the hash computation.
+
+So I'd like to unroll this loop:
+=========
+	/* Unpack the block into 64 32-bit words */
+	for(t = 0; t &lt; 16; ++t)	{
+	  datap = &amp;data[t&lt;&lt;2];
+		W[t] = (((uint32)*datap) &lt;&lt; 24) |
+		       (((uint32)*++datap) &lt;&lt; 16) |
+		       (((uint32)*++datap) &lt;&lt;  8) |
+		       ((uint32)*++datap); 
+=========
+
+and defined me a macro:
+
+=========
+#define swapCopyULong(INDEX) \
+  __asm__( &quot;lda _data+(&quot; ## #INDEX ## &quot;*16+3)\n&quot; \
+		 &quot;sta _W+(&quot; ## #INDEX ## &quot;q*4)\n&quot;               \
+		 &quot;lda _data+(&quot; ## #INDEX ## &quot;*16+2)\n&quot;		\
+		 &quot;sta _W+&quot;( ## #INDEX ## &quot;*4+1)\n&quot;		\
+		 &quot;lda _data+(&quot; ## #INDEX ## &quot;*16+1)\n&quot;		\
+		 &quot;sta _W+( &quot; ## #INDEX ## &quot;*4+2)\n&quot;		\
+		 &quot;lda _data+(&quot; ## #INDEX ## &quot;*16)\n&quot;		\
+		 &quot;sta _W+(&quot; ## #INDEX ## &quot;*4+3)\n&quot; )
+=========
+
+, that I call for each long:
+
+=========
+	swapCopyULong(0);
+	swapCopyULong(1);
+	...
+=========
+
+, but this doesn't work so far, because the macro parameter is
+not expanded and the linker complains about unresolved externals
+_data and _W .
+
+Could I split the macro into 1 asm statement per line and pass
+2 arguments to it? (data and INDEX or W and index)?
+How do I access those vars? %v2, or so?
+
+I also tried to write a ca65 macro in the inline assembly, but
+I got complains, that it's not supported at this place?
+
+Or is there a way to expand macro parameters within a string, so
+I get something like sta _W+(3*4+3), which could be used as an
+absolute address? (_W is a local var, but static as I understand it).
+
+Thanks for any hint,
+Andreas
+
+-- 
+Empfehlen Sie GMX DSL Ihren Freunden und Bekannten und wir
+belohnen Sie mit bis zu 50,- Euro! <a href="https://freundschaftswerbung.gmx.de">https://freundschaftswerbung.gmx.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Jan 19 14:38:06 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9898.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Macros in inline assembler"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9896.html" title="Previous message in the list">Gábor Lénárt: "[cc65] linking to o65"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9898.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Macros in inline assembler"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9898.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Macros in inline assembler"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9897" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9897" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9897" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-01-19 14:38:08 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] ca65 for stand-alone asm p</title>
+<meta name="Author" content="Christian Grössler (chris1groessler.org)" />
+<meta name="Subject" content="Re: [cc65] ca65 for stand-alone asm projects" />
+<meta name="Date" content="2010-11-12" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] ca65 for stand-alone asm projects</h1>
+<!-- received="Fri Nov 12 20:20:03 2010" -->
+<!-- isoreceived="20101112192003" -->
+<!-- sent="Fri, 12 Nov 2010 20:19:58 +0100" -->
+<!-- isosent="20101112191958" -->
+<!-- name="Christian Grössler" -->
+<!-- email="chris1groessler.org" -->
+<!-- subject="Re: [cc65] ca65 for stand-alone asm projects" -->
+<!-- id="4CDD935E.30409@groessler.org" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="4CDB8566.80900&#64;gmx.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8850.html" title="Christian Grössler: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">Next message</a> ]
+[ <a href="8848.html" title="Per Olofsson: &quot;Re: [cc65] Forced imports by linker config&quot;">Previous message</a> ]
+[ <a href="8831.html" title="Daniel Pralle: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+[ <a href="8832.html" title="Oliver Schmidt: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Christian Grössler &lt;<a href="mailto:chris1groessler.org?Subject=Re:%20[cc65]%20ca65%20for%20stand-alone%20asm%20projects">chris1groessler.org</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-11-12 20:19:58</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 11.11.10 06:55, Daniel Pralle wrote:
+&gt;
+&gt; IMHO its enuff to ive the warning. There are cases when you do not need a DOS and want to use all memory from $600 upwards. Maybe we can copy $700-$26ff to $e000-$ffff so teh program can exit cleanly. When you use the DOS memeory for dynamic data (aka after the C prgram has loaded) it would even be loadable from DOS ;)
+
+You mean to swap out (save it under the OS ROM area) the parts of DOS which will get overwritten?
+This might work, unless, due to the low load address, the parts of DOS which load the EXE chunk
+are overwritten in the process of loading this chunk.
+
+&gt;&gt;
+&gt;
+&gt; Ermmm... maybe your explaination is wrong worded, but when we copy the ROM ($c000-$cfff and $e000-$ffff) into teh underlaying ROM (same memroy regions) how do we gain more memory for the C program? We wouldl get more RAM when we copy C functions under the ROM and have a possibility to call them in a special way (switching off OS/IRQs, calling, switching on OS/IRQs after return).
+
+I was referring to <a href="http://www.cc65.org/mailarchive/2009-11/7591.html">http://www.cc65.org/mailarchive/2009-11/7591.html</a> .
+I was under the impression that parts of the OS which aren't normally used, could be assigned to the
+heap or linker segments after the OS was copied to RAM. Reading the mail
+message again it might not be the case. But then it might be possible
+to implement something like HIGHMEM for the Atari.
+
+I have to think about it...
+
+chris
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Nov 12 20:20:03 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8850.html" title="Next message in the list">Christian Grössler: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8848.html" title="Previous message in the list">Per Olofsson: "Re: [cc65] Forced imports by linker config"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8831.html" title="Message to which this message replies">Daniel Pralle: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8832.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8849" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8849" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8849" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-11-12 20:20:06 CET
+</em></small></p>
+</body>
+</html>

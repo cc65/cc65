@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Re: 6502 runtime relocation</title>
+<meta name="Author" content="Jonathan Graham Harston (jgh1arcade.demon.co.uk)" />
+<meta name="Subject" content="[cc65] Re: 6502 runtime relocation" />
+<meta name="Date" content="2005-06-27" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Re: 6502 runtime relocation</h1>
+<!-- received="Mon Jun 27 02:00:12 2005" -->
+<!-- isoreceived="20050627000012" -->
+<!-- sent="27 Jun 2005 00:11:19 +0100" -->
+<!-- isosent="20050626231119" -->
+<!-- name="Jonathan Graham Harston" -->
+<!-- email="jgh1arcade.demon.co.uk" -->
+<!-- subject="[cc65] Re: 6502 runtime relocation" -->
+<!-- id="050627005504@arcade.demon.co.uk" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="../2005-07/5088.html" title="dominic beesley: &quot;[cc65] gloal __fastcall__&quot;">Next message</a> ]
+[ <a href="5086.html" title="dominic beesley: &quot;Re: [cc65] 6502 runtime relocation&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Jonathan Graham Harston &lt;<a href="mailto:jgh1arcade.demon.co.uk?Subject=Re:%20[cc65]%20Re:%206502%20runtime%20relocation">jgh1arcade.demon.co.uk</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-06-27 01:11:19</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt; Message-ID: &lt;20050622212448.GB22030&#64;trixie&#46;<!--nospam-->musoftware.de&gt;
+ 
+Ullrich von Bassewitz &lt;uz&#64;musoftware&#46;<!--nospam-->de&gt; wrote:
+&gt; On Wed, Jun 22, 2005 at 01:58:23PM +0100, Jonathan Graham Harston wrote:
+&gt; &gt; until runtime. I've got some code that relocates a 6502 program
+&gt; &gt; loaded into the middle of memory to the bottom and jumps to it.
+&gt; 
+&gt; Probably the most versatile solution would be to generate o65 output and
+&gt; write a relocator that runs on arbitrary memory addresses. I don't know
+&gt; how your relocator works, but if it disassembles the code, there are
+&gt; pieces of code it won't handle correctly.
+ 
+I was thinking something like the following, which is a
+generalised version of the specific-case relocator in the Master
+MOS 3.50. The program is compiled/assembled to load in the middle
+of memory, eg &amp;4000. It is entered at the relocator at the end of
+the program code, which finds out the lowest memory address and
+copies the code down there, modifying bytes indicated in the
+bitmap table.
+ 
+The easiest way of generating the bitmap table is to assembled the
+code at two addresses 256 bytes apart and scan through the object
+code for bytes that are different.
+ 
+.start
+; program code to be relocated
+;
+.enter
+; enter here, to relocator after program code
+;
+; (src) =start of code to relocate
+; (dst) =destination
+; (len) =length of code to relocate
+; (rel) =relocation table
+; offset=page offset
+; bitmap=relocation bitmap
+;
+LDX #start AND 255:LDY #start DIV 256  ; XY=start of loaded code
+STX src:STY src+1
+LDA #&amp;82:JSR osbyte                    ; Get OSHWM to relocate to
+STX dst:STY dst+1                      ; OSHWM is always &amp;xx00
+DEY:TYA:PHA:LDA #&amp;FF:PHA               ; Push OSHWM-1 to 'RTS' to
+SEC:LDA src+1:SBC dst+1:STA offset     ; Calculate relocation offset
+SEC:LDA #enter AND 255:SBC #start AND 255:STA len
+LDA #enter DIV 256:SBC #start DIV 256:STA len+1 ; code length
+LDX #table AND 255:LDY #table DIV 256  ; Start of relocation table
+STX rel:STY rel+1
+LDY #0:LDX #1
+.loop
+DEX:BNE copy
+LDA (rel,X):STA bitmap:LDX #7
+INC rel:BNE P%+5:INC rel+1
+.copy
+LDA (src),Y                            ; Fetch byte
+ROL bitmap:BCC P%+5:SBC offset         ; Subtract offset if needed
+STA (dst),Y                            ; Store byte
+INY:BNE P%+7:INC src+1:INC dst+1       ; Update src/dst
+LDA len:SEC:SBC #1:STA len             ; len=len-1
+LDA len+1:SBC #0:STA len+1
+ORA len:BNE                            ; loop until len=0
+RTS                                    ; Jump to relocated start
+.table
+; table of relocation bitmaps
+; %76543210 - if bit set, subtract offset when copying
+;             b7=first byte, b6=second byte, etc.
+ 
+-- 
+J.G.Harston - jgh&#64;arcade&#46;<!--nospam-->demon.co.uk - mdfs.net/User/JGH
+BBC IDE Hard Drive Interface - <a href="http://mdfs.net/Info/Comp/BBC/IDE">http://mdfs.net/Info/Comp/BBC/IDE</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Jun 27 02:00:12 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="../2005-07/5088.html" title="Next message in the list">dominic beesley: "[cc65] gloal __fastcall__"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5086.html" title="Previous message in the list">dominic beesley: "Re: [cc65] 6502 runtime relocation"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5087" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5087" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5087" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-06-27 02:00:15 CEST
+</em></small></p>
+</body>
+</html>

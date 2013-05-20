@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Please critique this makef</title>
+<meta name="Author" content="Greg King (greg.king41verizon.net)" />
+<meta name="Subject" content="Re: [cc65] Please critique this makefile" />
+<meta name="Date" content="2010-04-24" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Please critique this makefile</h1>
+<!-- received="Sat Apr 24 13:26:21 2010" -->
+<!-- isoreceived="20100424112621" -->
+<!-- sent="Sat, 24 Apr 2010 07:20:34 -0400" -->
+<!-- isosent="20100424112034" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king41verizon.net" -->
+<!-- subject="Re: [cc65] Please critique this makefile" -->
+<!-- id="015101cae3a1$111f8a80$443efea9@monarch" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="w2i1002edb71004240236sabab205axb83447aeec4e83b8&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8148.html" title="Oliver Schmidt: &quot;Re: [cc65] Please critique this makefile&quot;">Next message</a> ]
+[ <a href="8146.html" title="Oliver Schmidt: &quot;Re: [cc65] --create-dep for ca65?&quot;">Previous message</a> ]
+[ <a href="8142.html" title="Oliver Schmidt: &quot;Re: [cc65] Please critique this makefile&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8148.html" title="Oliver Schmidt: &quot;Re: [cc65] Please critique this makefile&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king41verizon.net?Subject=Re:%20[cc65]%20Please%20critique%20this%20makefile">greg.king41verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-04-24 13:20:34</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: &quot;Oliver Schmidt&quot;; on Sat., April 24, 2010; at 05:36 AM -0400
+&gt;
+&gt; &gt;&gt; Sorry, now I understand your issue! You're, of course, right.
+&gt; &gt;&gt; The second line should look as you show it.
+&gt; &gt;&gt; I've no idea, right now, what's going on. Is it reproducable?
+&gt; &gt;
+&gt; &gt; Yes, it is. That is what remains in the &quot;obj/&quot; dir. every
+&gt; &gt; time after issuing &quot;make&quot;.
+&gt;
+&gt; I can't reproduce that issue here, using Cygwin 1.7 on WinXP.
+
+silverdr,
+Double-check your make-file.  Maybe, it has a typo -- it might not be
+giving &quot;sed&quot; the proper commands (it's easy to misplace some of that
+punctuation).
+
+WOW!  After typing the text above, I took another look at the makefile.
+And -- BAM! -- it hit me in the face! ;-)
+
+It's the back-slashes -- they aren't &quot;quoted&quot;!  Therefore, &quot;sed&quot; is
+matching against the letter &quot;t&quot;, not the TAB character.
+
+&quot;Double&quot; those back-slashes.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Apr 24 13:26:21 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8148.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Please critique this makefile"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8146.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] --create-dep for ca65?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8142.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] Please critique this makefile"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8148.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Please critique this makefile"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8148.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Please critique this makefile"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8147" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8147" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8147" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-04-24 13:26:23 CEST
+</em></small></p>
+</body>
+</html>

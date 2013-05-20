@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] New major version</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="[cc65] New major version" />
+<meta name="Date" content="2005-08-22" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] New major version</h1>
+<!-- received="Mon Aug 22 19:35:04 2005" -->
+<!-- isoreceived="20050822173504" -->
+<!-- sent="Mon, 22 Aug 2005 19:34:50 +0200" -->
+<!-- isosent="20050822173450" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="[cc65] New major version" -->
+<!-- id="20050822173450.GA13137@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5183.html" title="Johan Kotlinski: &quot;Re: [cc65] New major version&quot;">Next message</a> ]
+[ <a href="5181.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] include file search path&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5183.html" title="Johan Kotlinski: &quot;Re: [cc65] New major version&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20New%20major%20version">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-08-22 19:34:50</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>After comparing the big topics on my todo list to the current state of the
+modules in question, I have decided that the list will have to wait, since I
+cannot give a realistic time schedule for these features. This means that I
+there will be a new major version in the next few weeks, provided that there
+is nothing really important missing.
+
+So:
+
+  - if you have any things you want to contribute, please hurry.
+
+  - if you have made any contributions and not already done so, please check
+    if they're included in the current snapshot and in the state you expect
+    them to be.
+
+  - if you have sent me bug reports, that are important for you, please
+    recheck that I have fixed the problems.
+
+  - if you need a specific feature, make sure it's in the snapshot, since
+    otherwise it won't be in the next version.
+
+  - if you're a candidate for the CREDITS file and not already included there,
+    please tell me.
+
+There is still JRD code left in expr.c that won't get removed, so the next
+version will be named 2.11 despite the large changes compared to 2.10.
+
+I will attach the list of changes compared to 2.10 at the bottom of the mail.
+If you notice any missing items, please tell me.
+
+Regards
+
+
+        Uz
+
+                                                                            
+----------------------------------------------------------------------------
+
+  * Assembler:
+
+    - New feature missing_char_term.
+
+    - New feature ubiquitous_idents.
+
+    - Optional curly braces allowed as delimiters for token lists.
+      Incompatible change: Brace matching in some cases is gone.
+
+    - New 6502X cpu that includes 6502 illegal opcodes.
+
+    - Better error messages in case of a range error.
+
+    - Assembler defines target system symbols (__C64__ etc.) similar to the
+      C compiler.
+
+    - Handle foreign newline sequences (cr/lf under Unix) more gracefully.
+
+    - Fixed problems with unnamed labels.
+
+    - The assembler does now support the SWEET16 16 bit pseudo CPU.
+
+    - Support for zilog/intel style hex numbers (trailing 'h').
+
+    - New .ident and .sprintf pseudo functions.
+
+    - Variable symbols using .set.
+
+
+
+
+  * Compiler:
+
+    - Rewrite of input and preprocessor routines. Among other things, this
+      adds variadic macros and removes the input line limit.
+
+    - Stackable pragmas using #pragma(push, val) and #pragma(pop)
+
+    - New pragmas codesize, optimize, regvars, and warn (all stackable)
+
+    - New option --writable-strings
+
+    - Rewrote part of the parser allowing better code generation in a few
+      places.
+
+    - The &quot;inline standard functions&quot; option (-Os) has slightly changed its
+      meaning: In older versions it controlled inlining. Now, the compiler
+      will always inline if it considers it safe to do so, and the flag does
+      only control inlining in situations where inlining is not always
+      completely safe.
+
+    - More and better inlining of known standard functions. The following
+      functions may get inlined: strcpy, strlen, memcpy, memset.
+
+    - Inline assembly can now reference C labels with the %g format specifier.
+
+    - The -A and --ansi switches are gone, together with the __STRICT_ANSI__
+      predefined macro. Instead there is now a command line option --standard
+      that allows to set c89, c99 or cc65 as language standard. The compiler
+      defines a macro __CC65_STD__ that is one of __CC65_STD_C89__,
+      __CC65_STD_C99__ or __CC65_STD_CC65__ depending on the command line
+      option. Default is cc65 (all extensions) as before.
+
+    - Improved code for shifts.
+
+
+
+  * Linker
+
+    - Start Oric programs at $500 (Stefan Haubenthal)
+
+    - Added library groups (this feature is not available from cl65).
+
+    - Simple expressions now supported in the config files.
+
+
+
+  * cl65 utility:
+
+    - Extended to support additional command line switches of the
+      underlying tools as needed.
+
+    - New -Wa and -Wl switches to pass options to the assembler and linker.
+
+
+
+  * Disassembler
+
+    - New &quot;asminc&quot; directive that allows to read in a file containing assembler
+      symbol assignments in the form &quot;name = value&quot;.
+
+    - New &quot;comment&quot; attribute for several directives.
+
+
+
+  * ca65html
+
+
+
+  * Library
+
+    - Mouse support as loadable drivers
+
+    - Changed command line argument syntax for C64.
+
+    - Command line parameters are now working for: C64, C128, Plus/4, C16,
+      VIC20
+
+    - ungetc is available. Read functions on streams support pushed back
+      characters.
+
+    - New apple2enh target by Oliver Schmidt.
+
+    - Lots of Apple2 improvements by Oliver Schmidt.
+
+    - Oric TGI driver by Stefan Haubenthal.
+
+    - New _heapblocksize function that returns the size of an allocated block.
+
+    - New lynx target by Karri Kaksonen and Shawn Jefferson based on
+      Bastian Schicks cc65 port.
+
+    - Joystick and TGI drivers do now have an interrupt entry. The API version
+      has been changed which means that old drivers will need an update.
+
+    - Full set of scanf functions available (base work by me, lots of
+      improvements by Greg King).
+
+    - scanf functions for conio (Greg King).
+
+    - New function posix_memalign.
+
+
+
+  * Documentation
+
+    - Lots of additions to the function reference.
+
+    - Several target specific docs (one prominent contributor was Stefan
+      Haubenthal).
+
+
+  * Other
+
+    - Poor mans windows installer.
+
+    - The output of --help goes to stdout instead of stderr.
+
+----------------------------------------------------------------------------
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Aug 22 19:35:04 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5183.html" title="Next message in the list">Johan Kotlinski: "Re: [cc65] New major version"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5181.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] include file search path"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5183.html" title="Next message in this discussion thread">Johan Kotlinski: "Re: [cc65] New major version"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5183.html" title="Message sent in reply to this message">Johan Kotlinski: "Re: [cc65] New major version"</a></li>
+<li><dfn>Reply</dfn>:  <a href="5184.html" title="Message sent in reply to this message">Spiro Trikaliotis: "[cc65] compile problem of current snapshot (was: New major version)"</a></li>
+<li><dfn>Reply</dfn>:  <a href="5190.html" title="Message sent in reply to this message">Gábor Lénárt: "Re: [cc65] New major version"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5182" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5182" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5182" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-08-22 19:35:07 CEST
+</em></small></p>
+</body>
+</html>

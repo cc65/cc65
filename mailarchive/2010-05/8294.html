@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Relative paths during comp</title>
+<meta name="Author" content="silverdr1wfmh.org.pl (silverdr1wfmh.org.pl)" />
+<meta name="Subject" content="Re: [cc65] Relative paths during compilation" />
+<meta name="Date" content="2010-05-02" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Relative paths during compilation</h1>
+<!-- received="Sun May  2 20:36:30 2010" -->
+<!-- isoreceived="20100502183630" -->
+<!-- sent="Sun, 2 May 2010 20:36:25 +0200" -->
+<!-- isosent="20100502183625" -->
+<!-- name="silverdr1wfmh.org.pl" -->
+<!-- email="silverdr1wfmh.org.pl" -->
+<!-- subject="Re: [cc65] Relative paths during compilation" -->
+<!-- id="97D00C81-7734-487E-B527-2F1749C72785@wfmh.org.pl" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="20100502182125.GA7479&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8295.html" title="Spiro Trikaliotis: &quot;Re: [cc65] .import struct link_node&quot;">Next message</a> ]
+[ <a href="8293.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Relative paths during compilation&quot;">Previous message</a> ]
+[ <a href="8293.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Relative paths during compilation&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+[ <a href="8291.html" title="Oliver Schmidt: &quot;Re: [cc65] Relative paths during compilation&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:silverdr1wfmh.org.pl?Subject=Re:%20[cc65]%20Relative%20paths%20during%20compilation">silverdr1wfmh.org.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-05-02 20:36:25</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 2010-05-02, at 20:21, Ullrich von Bassewitz wrote:
+
+&gt;&gt; Maybe a stupid question but don't you have to process the different path
+&gt;&gt; styles in various places already? Don't you have any #ifdefs related to the
+&gt;&gt; target host platform?
+&gt; 
+&gt; No, there are no target host specific defines. There are a few places where
+&gt; measures are taken to cope with different compilers, but not with target
+&gt; operating systems. But that doesn't mean that the sources will compile on
+&gt; absolutely arbitrary systems. It is assumed that '/' or '\' is a path
+&gt; separator, and it is assumed that the operating system is able to understand
+&gt; '/' as a path separator. Or in other words, when checking for a path
+&gt; separator, the software checks for '/' or '\', and it uses '/' when inserting
+&gt; one. This works for all major operating systems(*) and even a few not-so-major
+&gt; ones:-)
+&gt; 
+&gt;&gt; If not at all then it would really be a pity to lose
+&gt;&gt; this &quot;cleanness&quot; but (without checking the sources) I somehow doubt it.
+&gt; 
+&gt; I think I mentioned more than one time that I don't like #ifdefs, so I've
+&gt; tried hard to avoid them. Which - in case of a compiler or other command line
+&gt; tools - is not too hard. So you must not doubt any longer, just believe it:-)
+
+I surely believe you! I also loathe the #ifdefs, and OTOH admire highly that there is e.g. no need for any configuration required to build current cc65 on various platforms. But these are often two things: &quot;not liking&quot; or &quot;trying hard to avoid&quot; this approach, and being able to get fully rid of them. SInce you managed that - in such case it would indeed be a wrong way to (re-)introduce such stuff. No further questions on that.
+
+With best regards,
+
+-- 
+SD!----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun May  2 20:36:30 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8295.html" title="Next message in the list">Spiro Trikaliotis: "Re: [cc65] .import struct link_node"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8293.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Relative paths during compilation"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8293.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Relative paths during compilation"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8291.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Relative paths during compilation"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8294" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8294" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8294" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-05-02 20:36:33 CEST
+</em></small></p>
+</body>
+</html>

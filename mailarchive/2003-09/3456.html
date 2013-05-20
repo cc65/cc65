@@ -1,0 +1,190 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] feature questions...</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] feature questions...">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] feature questions...</h1>
+<!-- received="Thu Sep 25 18:48:31 2003" -->
+<!-- isoreceived="20030925164831" -->
+<!-- sent="Thu, 25 Sep 2003 18:43:42 +0200" -->
+<!-- isosent="20030925164342" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] feature questions..." -->
+<!-- id="200309251843.42382.groepaz@gmx.net" -->
+<!-- inreplyto="20030925085126.GB22843@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20feature%20questions..."><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2003-09-25 18:43:42
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3455.html">Groepaz: "Re: [cc65] Platform specific docs"</a>
+<li><strong>In reply to:</strong> <a href="3452.html">Ullrich von Bassewitz: "Re: [cc65] feature questions..."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3459.html">Ullrich von Bassewitz: "Re: [cc65] feature questions..."</a>
+<li><strong>Next in thread:</strong> <a href="3451.html">Ullrich von Bassewitz: "Re: [cc65] Platform specific docs"</a>
+<li><strong>Reply:</strong> <a href="3459.html">Ullrich von Bassewitz: "Re: [cc65] feature questions..."</a>
+<li><strong>Reply:</strong> <a href="3472.html">Ullrich von Bassewitz: "Re: [cc65] feature questions..."</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Thursday 25 September 2003 10:51, Ullrich von Bassewitz wrote:
+&gt; On Wed, Sep 24, 2003 at 06:16:50AM +0200, Groepaz wrote:
+&gt; &gt; so is there a possibility to make ca65 ouput the &quot;preprocessed&quot; assembler
+&gt; &gt; code? something like the list-file, but in a format that can be assembled
+&gt; &gt; by ca65 again?
+&gt;
+&gt; No, sorry. It is possible but not easy, so in my opinion the
+&gt; effort/usefulness ratio is too bad.
+
+mmh ok :) thought so :)
+
+maybe its still possible to output the list file in a less &quot;compact&quot; format 
+(currently for eg .repeat statements and alike arent exactly emitted as they 
+appear in the actual binary...) ? i could probably come up with a script then 
+that strips away what i dont want :)
+
+&gt; Same as above: Possible but too much work just to have a small debugging
+&gt; help. Problem is that this influences pointer arithmetic as well, because
+&gt; currently the result of ptr-ptr is an int (which is not standard compliant
+&gt; but ok for a 6502 platform).
+
+ok...mmmmh.... another thing i tried was just putting
+
+typedef signed long myint;
+#define int myint
+
+at the top of that particular source, but still didnt get the expected results 
+(the source IS self-contained so its not beeing messed up by library calls or 
+sth)
+
+mmmmh..any simple reason why that must fail? :o) or possibly a problem with 
+32bit arithmetic in the compiler? (i suspect the latter actually :/ ...that 
+testsuite thing suggests that aswell :/) 
+
+&gt; Well, it is my personal opinion that using the emulation features to mimic
+&gt; other assemblers is a Bad Thing(tm). 
+
+mine too, however the &quot;professional&quot; approach of ca65 (ie an assembler/linker 
+combo) can be quite confusing if you have used TASS for 15 years before :o) 
+so its still kinda useful if you are coming from a simplier dev 
+environment.... you'll switch to the full thing sooner or later anyway :)
+
+&gt; And your text is rather specific, so I
+&gt; don't think adding it to the FAQ is a good idea. If I start adding it, I
+&gt; will also have to add information on how to convert from xa, xasm, acme and
+&gt; all other assemblers out in the wild.
+
+add JA and CASM to that list - thats all my table shows then :o)
+
+but ofcoz you are right...maybe the faq is just the wrong place for this :)
+
+&gt; But how about a new section in the ca65 docs &quot;Porting sources from other
+&gt; assemblers&quot;? The ca65 docs would be the perfect place for such a text,
+&gt; adding information about other assemblers is no problem, because there's no
+&gt; reason to be brief, and I can add a pointer to the FAQ.
+
+sounds like a good idea to me. 
+
+however its done.... the info shouldnt be hidden in the documentation of the 
+&quot;.feature&quot; directive :=P
+
+&gt;
+&gt; &gt; oh and in ca65 docs you suggest using &quot;pc_assignment&quot; for emulating
+&gt; &gt; xa65... are you sure about this? in TASS (and several crossassembler that
+&gt; &gt; are clones of it) atleast a programmcounter assignment really moves the
+&gt; &gt; programcounter (ie, both run AND load address) and not only the
+&gt; &gt; (run-)address (eh tricky terminology here...so whats the correct term for
+&gt; &gt; &quot;the address we are assembling to&quot; and &quot;the address we are currently
+&gt; &gt; assembling at&quot; ? :=P)
+&gt;
+&gt; Assignment to PC with &quot;.feature pc_assignment&quot; enabled is the same as using
+&gt; a .org directive. It may not be the same as a PC assignment in TASM, but it
+&gt; is rather difficult to mimic every feature in every assembler out there.
+
+yesyes... i just was wondering that you are suggesting to use that emulation 
+feature with xa65... AFAIK programmcounter assignments work the same as in 
+TASS there. (i've personally never seen an assembler that uses progcount 
+assignments in the sence of &quot;.org&quot; - and i've tried a whole lot of 
+crossassemblers :=P)
+
+&gt; &gt; tjam...that reminds me of the &quot;ca65 vs other assemblers&quot; table i have
+&gt; &gt; started once...maybe i should bring it into a useable state too :=P
+&gt;
+&gt; How about adding it to the same section in the ca65 docs?
+
+yeah, makes sence :)
+
+&gt; &gt; (can anyone
+&gt; &gt; recommend a way to layout a large table? its currently in html, but not
+&gt; &gt; really useful due to its size - lots of scrolling involved etc :/)
+&gt;
+&gt; Split it into several tables that each have the same layout, but do compare
+&gt; just one assembler to ca65. 
+
+mmmh yeah that could work better
+
+&gt; This way, we can have a section &quot;Porting
+&gt; sources from other assemblers&quot;, with one assembler per subsection, and each
+&gt; subsection can contain such a table. The only problem is that I haven't
+&gt; managed to create tables using LinuxDoc until now:-(
+
+mmmmmh.... any pointers to some docs? (i have it installed but &quot;man linuxDoc&quot; 
+doesnt give any results :/)
+
+gpz
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20feature%20questions...">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3455.html">Groepaz: "Re: [cc65] Platform specific docs"</a>
+<li><strong>In reply to:</strong> <a href="3452.html">Ullrich von Bassewitz: "Re: [cc65] feature questions..."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3459.html">Ullrich von Bassewitz: "Re: [cc65] feature questions..."</a>
+<li><strong>Next in thread:</strong> <a href="3451.html">Ullrich von Bassewitz: "Re: [cc65] Platform specific docs"</a>
+<li><strong>Reply:</strong> <a href="3459.html">Ullrich von Bassewitz: "Re: [cc65] feature questions..."</a>
+<li><strong>Reply:</strong> <a href="3472.html">Ullrich von Bassewitz: "Re: [cc65] feature questions..."</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-09-25 18:48:42 CEST</em>
+</em>
+</small>
+</body>
+</html>

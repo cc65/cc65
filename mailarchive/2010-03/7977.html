@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Re: some patches</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Re: some patches" />
+<meta name="Date" content="2010-03-17" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Re: some patches</h1>
+<!-- received="Wed Mar 17 23:03:52 2010" -->
+<!-- isoreceived="20100317220352" -->
+<!-- sent="Wed, 17 Mar 2010 23:03:45 +0100" -->
+<!-- isosent="20100317220345" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Re: some patches" -->
+<!-- id="f97798c21003171503p7f77ef98m22ed2e9789182a47@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20100317185358.GQ12616&#64;arwen.poofy.goof.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7978.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Re: some patches&quot;">Next message</a> ]
+[ <a href="7976.html" title="Aaron J. Grier: &quot;Re: [cc65] Re: some patches&quot;">Previous message</a> ]
+[ <a href="7972.html" title="Aaron J. Grier: &quot;[cc65] Re: some patches&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7980.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Re: some patches&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Re:%20some%20patches">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-03-17 23:03:45</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+1. From my perspective there are quite some reasons to have a concept
+for libraries overriding parts of other libraries:
+
+As far as I understand currently any symbol referenced from a module
+in a certain library will always searched first inside that library.
+This means in example that it isn't possible to override
+open/read/write/close from the C library when they are referenced by
+fopen/fread/fwrite/fclose.
+
+Maybe the semantics of --start-group / --end-group could be modified
+in a way that a library mentioned inside a group _before_ a second
+library is searched _before_ that second library for symbols
+referenced in that second library. This would allow to override
+symbols from the C library.
+
+2. cc65 features loadable drivers for several hardware/interface
+classes. But what is the usecase of loadable drivers (compared to
+libraries)? If the program is only intended to run on a single machine
+then there's no difference. But if the program is intended to run on
+many machines then the loadable drivers can avoid generating several
+variants of the program linked with several libraries. Rather the
+individual user can select the loadable driver suitable for his
+hardware.
+
+I'm no CBM insider but I seem to understand that there are quite some
+diverse solutions regarding disk I/O. From that perspective disk I/O
+clearly is a usecase for loadable drivers - at least on the CBMs. The
+only special thing is that there needs to be a default driver to
+actually load the loadable driver. But as far as I understand the
+Kernal allows for such a default driver to be very simple and very
+small. BTW: Contiki 1.x implemented this way a &quot;fastloader&quot; loadable
+driver loaded by the Kernal. And for PCs it's totally normal to use
+the INT13 BIOS calls to load disk drivers.
+
+Clearly not every cc65 program doing disk I/O requires addional
+capabilities beyond the current implementation. So it's clearly not
+desirable to have the module loading code inlcuded into every program
+doing disk I/O.
+
+As a result 1.) and 2.) could be combined: A library implementing
+open/read/write/close overriding the implementations in the C library.
+The implementation in that library loads a disk I/O driver called
+'std.dsk' (if found). Users can choose among the exsisting disk I/O
+drivers the one matching their needs/their hardware and copy it as
+'std.dsk' to the disk/image in question.
+
+Maybe a true case of german over-engineering, but maybe the solution
+to the seemingly broad range of disk I/O approaches on the CBMs.
+
+Regards, Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Mar 17 23:03:52 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7978.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Re: some patches"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7976.html" title="Previous message in the list">Aaron J. Grier: "Re: [cc65] Re: some patches"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7972.html" title="Message to which this message replies">Aaron J. Grier: "[cc65] Re: some patches"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7980.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Re: some patches"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7980.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Re: some patches"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7977" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7977" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7977" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-03-17 23:03:54 CET
+</em></small></p>
+</body>
+</html>

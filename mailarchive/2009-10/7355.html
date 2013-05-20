@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Colormania (was: TGI summa</title>
+<meta name="Author" content="Daniel Serpell (daniel.serpell1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] Colormania (was: TGI summary)" />
+<meta name="Date" content="2009-10-27" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Colormania (was: TGI summary)</h1>
+<!-- received="Tue Oct 27 20:20:06 2009" -->
+<!-- isoreceived="20091027192006" -->
+<!-- sent="Tue, 27 Oct 2009 16:19:57 -0300" -->
+<!-- isosent="20091027191957" -->
+<!-- name="Daniel Serpell" -->
+<!-- email="daniel.serpell1gmail.com" -->
+<!-- subject="Re: [cc65] Colormania (was: TGI summary)" -->
+<!-- id="f0796bb70910271219h4e3115eegd8f68c3f4265786f@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20091027180222.GB10905&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7356.html" title="Groepaz: &quot;Re: [cc65] Tgi circle and font size magnification&quot;">Next message</a> ]
+[ <a href="7354.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Tgi circle and font size magnification&quot;">Previous message</a> ]
+[ <a href="7348.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Colormania (was: TGI summary)&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7357.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Colormania (was: TGI summary)&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Daniel Serpell &lt;<a href="mailto:daniel.serpell1gmail.com?Subject=Re:%20[cc65]%20Colormania%20(was:%20TGI%20summary)">daniel.serpell1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-10-27 20:19:57</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Tue, Oct 27, 2009 at 3:02 PM, Ullrich von Bassewitz &lt;uz&#64;musoftware&#46;<!--nospam-->de&gt; wrote:
+&gt;
+[...]
+&gt;
+&gt; There is a case that cannot be covered by reassigning palette indices. Assume
+&gt; a four color driver and an eight color driver, where the four color palette is
+&gt; not a subset of the eight color palette. In this case, the colors are not
+&gt; platform, but driver depdendent, so there cannot be platform speficic
+&gt; TGI_COLOR_XXX #defines for a platform.
+&gt;
+
+This is what happens in the Atari:
+*  Mode 8 (hi-res) have palette with index &quot;0&quot; for background, index &quot;1&quot; for
+    foreground, so you should set TGI_COLOR_WHITE to &quot;1&quot; and set the
+    palette accordingly.
+* Mode 9 (grayscale) hasn't palette, index '0' is BLACK and index '15' is
+   white. Here, the driver should convert index &quot;1&quot; to &quot;15&quot; on setcolor.
+* Mode 11 (color) also hasn't palette, index '0' is BLACK and index '1' to
+  '15' are different colors, there is NO white. Here, the driver should
+  convert index &quot;1&quot; to, for example, index &quot;14&quot; (yellow).
+
+The problem with the above is that a program that is designed to
+run on the Atari mode 9 normally expects index 0 to be black and
+index 15 to be white, with all the 14 grays in between, and this
+mapping will break the expectations.
+
+Perhaps a new api could be designed modeled on, for example,
+how X11 works:
+
+* There is a call &quot;tgi_alloc_color&quot;, that takes R, G and B values and
+  returns the index with the closest color available. If the mode has a
+  palette, one index of the palette is reserved, the palette is set to the
+  best approximation of the R,G,B values and the new index is returned.
+* There is a corresponding call &quot;tgi_free_color&quot; that takes the index
+  (as returned from &quot;tgi_alloc_color&quot;) and frees it, so new calls to
+  alloc_color can use it again.
+* The argument to pass to setcolor is the index returned from alloc_color.
+
+With this calls, you can do:
+
+unsigned char black = tgi_alloc_color(0,0,0);
+unsigned char white = tgi_alloc_color(255,255,255);
+
+tgi_setcolor(white);
+// Now, draw with white color...
+tgi_setcolor(black);
+// Now, draw with black color...
+
+For compatibility, at startup all two color drivers should set the
+palette to white on black.
+
+    Daniel.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Oct 27 20:20:06 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7356.html" title="Next message in the list">Groepaz: "Re: [cc65] Tgi circle and font size magnification"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7354.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Tgi circle and font size magnification"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7348.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Colormania (was: TGI summary)"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7357.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Colormania (was: TGI summary)"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7357.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Colormania (was: TGI summary)"</a></li>
+<li><dfn>Reply</dfn>:  <a href="7367.html" title="Message sent in reply to this message">Shawn Jefferson: "RE: [cc65] Colormania (was: TGI summary)"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7355" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7355" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7355" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-10-27 20:20:08 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Apple2 file io - here: mem</title>
+<meta name="Author" content="jim (jsymolon011comcast.net)" />
+<meta name="Subject" content="Re: [cc65] Apple2 file io - here: memory management questions" />
+<meta name="Date" content="2004-07-30" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Apple2 file io - here: memory management questions</h1>
+<!-- received="Fri Jul 30 03:10:23 2004" -->
+<!-- isoreceived="20040730011023" -->
+<!-- sent="Thu, 29 Jul 2004 21:09:47 -0400" -->
+<!-- isosent="20040730010947" -->
+<!-- name="jim" -->
+<!-- email="jsymolon011comcast.net" -->
+<!-- subject="Re: [cc65] Apple2 file io - here: memory management questions" -->
+<!-- id="41099FDB.8000307@comcast.net" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="001a01c475bb$18dfc9b0$0200a8c0&#64;pc" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4347.html" title="Shawn Jefferson: &quot;Re: [cc65] assembly subroutine return value&quot;">Next message</a> ]
+[ <a href="4345.html" title="Greg King: &quot;Re: [cc65] Atari: Loading code with DOS 2.0 help?&quot;">Previous message</a> ]
+[ <a href="4343.html" title="Oliver Schmidt: &quot;[cc65] Apple2 file io - here: memory management questions&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4350.html" title="Oliver Schmidt: &quot;Re: [cc65] Apple2 file io - here: memory management questions&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: jim &lt;<a href="mailto:jsymolon011comcast.net?Subject=Re:%20[cc65]%20Apple2%20file%20io%20-%20here:%20memory%20management%20questions">jsymolon011comcast.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-07-30 03:09:47</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Oliver Schmidt wrote:
+
+&gt;Hi,
+&gt;
+&gt;as memory is always a very precious resource on the Apple2 I'd like to shed
+&gt;some light on the memory management side of file io...
+&gt;
+&gt;The Apple2 has lower memory from $0000 to $BFFF (48 k). At least for text
+&gt;mode programs $0800 to $BFFF (46 k) is available. Then there is a memory
+&gt;mapped io area from $C000 to $CFFF (4 k). From $D000 to $FFFF (12 k) we have
+&gt;upper memory.
+&gt;
+&gt;
+&gt;  
+&gt;
+I agree.  Depending on the machine - the ROMs are in the $D000-FFFF 
+range,  the IIc, IIe &amp; IIGS have auxillary memory to play with.
+
+&gt;1. scenario: DOS 3.3 : $800 - $9600
+&gt;  
+&gt;
+&lt;snip&gt; I assume most people using 3.3 would be here.  Might be another 
+target (.cfg) though.
+
+&gt;2. scenario: DOS 3.3 in upper memory
+&gt;  
+&gt;
+&lt;snip&gt;
+
+&gt;3. scenario: ProDOS 8 with command interpreter
+&gt;  
+&gt;
+&lt;snip&gt;
+
+&gt;4. scenario: ProDOS 8 without command interpreter
+&gt;
+&gt;  
+&gt;
+&lt;snip&gt;
+
+I assume that the simplest scenario for both is $2000-$9600 which is  
+29.5 K. Once the file io tests pass, then I'll start putting in the 
+extras. Out of that 29.5K, I allocate 8K for static buffers.  Overkill ? 
+Maybe.  Which leaves 21.5K for a text program.  Someone who wants to use 
+hires will lose another 8 - 16K for ~22K total or 13.5K program - buffers.
+
+&gt;- The application has to call a special quit API on exit. The called quit
+&gt;routine will then allow the user to load the next application (for example
+&gt;the command interpreter).
+&gt;
+&gt;  
+&gt;
+The crt0.s is per library - there really is nothing stopping us from 
+adding a jsr to a __filecleanup which can close files and &quot;quit&quot; instead 
+of a &quot;JMP RESTOR&quot; or back to basic.  The DOS 3.3 cleanup would be back 
+to basic.
+
+    jsr __closeallfiles
+
+; put back zero page stuff
+    ...
+    jmp __dos_quit  ; used to be a jmp   RESTOR
+
+Most of the functions will have the same signature which will be 
+structured as  (synopsis of the last couple of emails)
+
+Apple2 -&gt; main functions
+                  dos33 (dir) -&gt; dos 3.3 functions
+                  pdos8 (dir) -&gt; ProDOS 8 functions
+
+Make file will build main apple2.o &amp; apple2.lib with a2dos33.o 
+a2dos33.lib and a2pdos8.o a2pdos8.lib
+
+Most developers will have to :
+   cl65 -t apple2 -L a2dos33 myprog.c
+OR
+   cl65 -t apple2 -L a2pdos8 myprog.c
+
+Problem: What if developers don't want a DOS link ? A nodos directory 
+with __dos_quit ?
+
+&gt;Results for ProDOS 8
+&gt;
+&gt;As scenario 3. leaves only 35,5 k for a text mode program it is desirable to
+&gt;support scenario 4. with 45,7 k of available memory. For applications with
+&gt;large amounts of CODE + RODATA + DATA (in other words a large binary file)
+&gt;it may simply be impossible to load the file at $2000. Therefore the
+&gt;approach with a small loader seems to be appropriate.
+&gt;
+&gt;The major part of this loader could be written in C and use the new file io
+&gt;library to load the main binary at $0800 and jump to it. It would have a
+&gt;custom startup code relocating the loader from $2000 to let's say $B000.
+&gt;This area would then wiped out later by the BSS, heap or stack of the main
+&gt;executable.
+&gt;
+&gt;  
+&gt;
+$D000 - $FFFF : Bank Switched memory &amp; ROMs
+$C000 - $CFFF : Slot &amp; softswitches
+$9600 - $BFFF : Misc use. A ProDOS &quot;System&quot; program can use.
+$6000 - $9600 : available
+$4000 - $5FFF : hires 2
+$2000 - $3FFF : hires 1
+$0800 - $1FFF : available (~6k)  OR $0C00 - $1FFF : available (3K)
+                                                            $0800 - 
+$0BFF is text screen 2
+
+I need to read up on the config file again.  I was thinking of:
+    RAMLOW: start=$800, size=$17FF;
+    RAM: start = $2000, size = $7600, file = %O;
+    HIRES1: start = $2000, size = $1FFF;
+    HIRES2: start = $4000, size = $1FFF;
+    RAMHIGH: start = $6000, size = $3600; # $9600 begin prodos
+
+HIRES1 &amp; 2 could be &quot;DATA&quot;
+
+&gt;The loader would be identical for all cc65 applications and just have a
+&gt;different name. ProDOS 8 supports &quot;argv[0]&quot; so the loader could detect from
+&gt;that the path of the main binary with a pattern like MYAPP.SYSTEM for the
+&gt;loader and MYAPP.BINARY for the main binary.
+&gt;  
+&gt;
+Loader - hrrmmm...  load into HIRES1, run from RAMLOW ?  I'm not sure 
+how this will work -yet.
+
+&gt;A benefit of this approach would be that the startup code for DOS 3.3
+&gt;binaries and ProDOS 8 main binaries could be shared. Just the last call at
+&gt;the very end of the startup code would have to go into the file i/o
+&gt;libraries instead of being hardcoded in crt0.s. A destructor which never
+&gt;returns doesn't look like a clean solution - does it?
+&gt;
+&gt;Setting up a RESET handler for closing files 
+&gt;
+Again - the crt0.s can be modifed to call &quot;quit&quot; .  I need to understand 
+&quot;condes&quot; better.
+
+&gt;Oliver
+&gt;  
+&gt;
+
+Great stuff !  Gives me a lot to consider.
+
+Thanks
+Jim
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Jul 30 03:10:23 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4347.html" title="Next message in the list">Shawn Jefferson: "Re: [cc65] assembly subroutine return value"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4345.html" title="Previous message in the list">Greg King: "Re: [cc65] Atari: Loading code with DOS 2.0 help?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4343.html" title="Message to which this message replies">Oliver Schmidt: "[cc65] Apple2 file io - here: memory management questions"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4350.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Apple2 file io - here: memory management questions"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4350.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Apple2 file io - here: memory management questions"</a></li>
+<li><dfn>Reply</dfn>:  <a href="4354.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Apple2 file io - here: memory management questions"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4346" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4346" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4346" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-07-30 03:10:32 CEST
+</em></small></p>
+</body>
+</html>

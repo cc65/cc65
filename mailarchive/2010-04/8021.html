@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] floating point support redux</title>
+<meta name="Author" content="Kevin Schuetz (scrapdog1runbox.com)" />
+<meta name="Subject" content="[cc65] floating point support redux" />
+<meta name="Date" content="2010-04-02" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] floating point support redux</h1>
+<!-- received="Fri Apr  2 07:14:53 2010" -->
+<!-- isoreceived="20100402051453" -->
+<!-- sent="Fri, 02 Apr 2010 00:14:43 -0500" -->
+<!-- isosent="20100402051443" -->
+<!-- name="Kevin Schuetz" -->
+<!-- email="scrapdog1runbox.com" -->
+<!-- subject="[cc65] floating point support redux" -->
+<!-- id="4BB57D43.4080704@runbox.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8022.html" title="rhurst1bidmc.harvard.edu: &quot;[cc65] cc65 package for RPM Fusion&quot;">Next message</a> ]
+[ <a href="8020.html" title="maspethrose71aol.com: &quot;[cc65] Feedback req. about my programs--Harry Potter&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8026.html" title="Groepaz: &quot;Re: [cc65] floating point support redux&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Kevin Schuetz &lt;<a href="mailto:scrapdog1runbox.com?Subject=Re:%20[cc65]%20floating%20point%20support%20redux">scrapdog1runbox.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-04-02 07:14:43</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Not much has been said about floating point support for a while now.
+
+Maybe it is time to revive the discussion?
+
+Before even a decision is made on what formats to use for floating point 
+support, there exists the problem of the compiler treating floating 
+point expressions the same way that the target does.
+
+What do you think of these two ideas?
+
+-----------------------------------
+
+1.  A 6502 simulator that can be employed by the compiler, linker, and 
+assembler at compile/link/assemble-time.  This simulator would execute 
+the same 6502 routines that will be used in runtime library for floating 
+point operations.
+
+Pros:  the floating point routines would only have to be written 
+*once*... in 6502.  And they will behave the same regardless of the 
+environment that the compiler is running on.  Changing formats would 
+only require rewriting the 6502 routines.
+
+Cons:  requires the simulator.  Not a huge con, as that could be fun to 
+write. :-)
+And this might introduce a chicken-and-egg problem in building CC65, but 
+I'm sure this could be solved with some cleverness.
+
+-----------------------------------
+
+2.  Link the compiler with MPFR/GMP
+
+Pros:  platform-independent floating point support for the compiler.  
+Could easily support any format decided on without having to care about 
+the compiler environment.
+
+Cons:  floating point routines would still need to be written for the 
+6502.  Two extra dependencies to make CC65 more difficult to build.  
+Possible licensing issues.
+
+-----------------------------------
+
+Regards
+Kevin
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Apr  2 07:14:53 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8022.html" title="Next message in the list">rhurst1bidmc.harvard.edu: "[cc65] cc65 package for RPM Fusion"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8020.html" title="Previous message in the list">maspethrose71aol.com: "[cc65] Feedback req. about my programs--Harry Potter"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8026.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] floating point support redux"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8026.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] floating point support redux"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8029.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] floating point support redux"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="../2010-05/8264.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] floating point support redux"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8021" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8021" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8021" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-04-02 07:14:56 CEST
+</em></small></p>
+</body>
+</html>

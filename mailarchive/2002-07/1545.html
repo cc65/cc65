@@ -1,0 +1,309 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] preprocessor hazzle...</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] preprocessor hazzle...">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] preprocessor hazzle...</h1>
+<!-- received="Tue Jul 30 04:28:26 2002" -->
+<!-- isoreceived="20020730022826" -->
+<!-- sent="Tue, 30 Jul 2002 04:28:10 +0200" -->
+<!-- isosent="20020730022810" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] preprocessor hazzle..." -->
+<!-- id="1826106093.20020730042810@gmx.net" -->
+<!-- inreplyto="20020729062001.GA12492@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20preprocessor%20hazzle..."><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2002-07-30 04:28:10
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1544.html">Ullrich von Bassewitz: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>In reply to:</strong> <a href="1544.html">Ullrich von Bassewitz: "Re: [cc65] preprocessor hazzle..."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1546.html">Ullrich von Bassewitz: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Next in thread:</strong> <a href="1542.html">MagerValp: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Reply:</strong> <a href="1546.html">Ullrich von Bassewitz: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Reply:</strong> <a href="../2002-10/1591.html">Ullrich von Bassewitz: "Re: [cc65] preprocessor hazzle..."</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+Monday, July 29, 2002, 8:20:01 AM, you wrote:
+
+UvB&gt; Hi!
+
+UvB&gt; On Fri, Jul 26, 2002 at 11:56:51PM +0200, groepaz wrote:
+&gt;&gt; coolio :o) btw, i guess i can safely assume that the snapshots you
+&gt;&gt; generate each nite (i guess? looks like it atleast ;=P) always have
+&gt;&gt; all those patches applied?
+
+UvB&gt; Unfortunately not .There are situations where the development sources are in a
+UvB&gt; state that does not allow to apply the patch, or sometimes I choose a
+UvB&gt; different solution for the development sources.
+
+uhoh..... ok, i understand ;=P
+
+UvB&gt; Works here. The only thing that does not work is something like this:
+
+UvB&gt;         int bar;
+
+UvB&gt;         void foo (void)
+UvB&gt;         {
+UvB&gt;             extern int bar;
+UvB&gt;         }
+                          
+UvB&gt; So as long as you don't have both, a declaration and an extern definition in
+UvB&gt; your sources, they should be ok.
+
+well yes, its (ofcoz) like you say :o) there are global variables
+defined all over the source and then they are declared as extern in
+every function that uses them. (just as a sidenote, what benefit is
+expected from this way of declaring things? (instead of simply
+referring to the globals?) seen that in a couple of sources already,
+the testsuite for example uses this extensivly)
+
+&gt;&gt; and then &quot;bla&quot; is somewhere reused in an expression where the size of
+&gt;&gt; &quot;bla&quot; must be known..... resulting in an &quot;size of &quot;bla&quot; unknown&quot;
+&gt;&gt; error. i am not sure here, but afaik &quot;bla[]&quot; equals &quot;*bla&quot; in an
+&gt;&gt; expression and thus its size (the size of the pointer) _is_ known and
+&gt;&gt; such an error shouldnt occur. (ok i could come up with a testprog
+&gt;&gt; aswell here but maybe you know where to look already :o))
+
+UvB&gt; If the size of bla[] is the size of a pointer, what would you expect from
+UvB&gt; sizeof(bla[3])? I don't know about the code you're testing, but gcc does not
+UvB&gt; accept this construct either:
+
+UvB&gt;         t.c:6: sizeof applied to an incomplete type
+
+oh yes, you are right.... my attempt on explaining what was going
+wrong probably didnt turn out to well :o)
+
+i have knocked up a testprog that shows the problem more exactly (and
+another problem aswell).... attached at the bottom of this mail :)
+
+&gt;&gt; btw! i tried compiling with an oldish mingw32 install aswell (cygwin
+&gt;&gt; compiled binaries are kinda sloooooooow ;=P) and noticed that
+&gt;&gt; somewhere the code relies on fork() and friends and maybe some other
+&gt;&gt; things used to spawn a sub-process in *nix.... is there a way to
+&gt;&gt; compile the source for a target that has simple &quot;spawn...&quot; functions
+&gt;&gt; but no fork() already?
+
+UvB&gt; The Windows version uses spawn() from it's own library. The unix version has
+UvB&gt; an additional module that implements spawn().
+
+oh! have to look closer again then....
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20preprocessor%20hazzle...">groepaz_at_gmx.net</a>
+
+
+------ testprog
+
+#include &lt;stdio.h&gt;
+
+/*
+  check behaviour on incompletely declared arrays
+*/
+
+#ifndef __CC65__
+// cc65: Error: Variable `i1' has unknown size
+char i1[];
+#endif
+
+void test1(void) {
+int a;
+
+//int bla[];
+//gcc: array size missing in &quot;bla&quot;
+//      a=sizeof(bla);
+//      printf(&quot;%04x\n&quot;,a);
+//gcc: array size missing in &quot;bla&quot;
+//      a=sizeof(bla[0]);
+//      printf(&quot;%04x\n&quot;,a);
+
+//gcc:  sizeof applied to an incomplete type
+//      a=sizeof(i1);
+//      printf(&quot;%04x\n&quot;,a);
+
+#ifndef __CC65__ // cc65 dont compile this
+//gcc: warning: array `i1' assumed to have one element
+//
+// this is probably undefined behavior ?
+//
+        a=sizeof(i1[0]);
+        printf(&quot;%04x - &quot;,a);
+        if(sizeof(i1[0])==sizeof(char)) {
+                // gcc gives size of element
+                printf(&quot;sizeof(i1[0]) gives size of element\n&quot;);
+        }
+        if(sizeof(i1[0])==sizeof(char*)) {
+                printf(&quot;sizeof(i1[0]) gives size of pointer to element\n&quot;);
+        }
+#endif
+
+}
+
+/*
+  check behaviour on string init
+*/
+
+char t1[]=&quot;abcde&quot;;
+// cc65 Warning: Converting pointer to integer without a cast
+// (?! eh ?!)
+char t2[]={&quot;abcde&quot;};
+
+#ifndef __CC65__
+// cc65 Error: Expression expected
+char *t3=&quot;abcde&quot;;
+// cc65 Error: Expression expected
+char *t4={&quot;abcde&quot;};
+#else
+// just to make it compile, the test will fail anyway ;=P
+char t3[]=&quot;.....&quot;;
+char t4[]=&quot;.....&quot;;
+#endif
+
+void test2(void) {
+char c1,c2,c3,c4;
+int i,e=0;
+        for(i=0;i&lt;5;i++){
+                c1=t1[i];c2=t2[i];c3=t3[i];c4=t4[i];
+                printf(&quot;%02x %02x %02x %02x\n&quot;,c1,c2,c3,c4);
+                if(!((c1==c2)&amp;(c1==c3)&amp;(c1==c4))) e=1;
+        }
+        if(e) printf(&quot;test2 failed.\n&quot;);
+        else printf(&quot;test2 ok.\n&quot;);
+}
+
+/*
+  check behaviour on extern-declarations inside functions
+*/
+
+typedef struct {
+  char *name;
+  void *func;
+} A3;
+
+#ifdef __CC65__
+
+A3 a3[] = {
+  { &quot;test3&quot;, (void*) NULL },
+  { &quot;test3&quot;, (void*) NULL },
+};
+
+#else
+//gcc warning: missing braces around initializer (near initialization for `a3[0]')
+// this type of struct-initialization seems to be kinda common so
+// causes lotta stuff to not compile with cc65 ;/
+A3 a3[] = {
+    &quot;test3&quot;, (void*) NULL  ,
+    &quot;test3&quot;, (void*) NULL  ,
+};
+#endif
+
+void test3a(A3 *list, int number){
+        printf(&quot;%s %d\n&quot;,list-&gt;name,number);
+}
+
+// original variation, works ok with gcc
+#if 0
+static void test3(void)
+{
+        // cc65:  Error: Variable `a3' has unknown size
+    extern A3 a3[];
+    test3a(a3, -1);
+}
+#endif
+
+#if 0
+// this variation compiles with cc65 if test3()
+// is not called from main()...probably also if a3 would be REALLY extern
+static void test3(void)
+{
+        // cc65: Error #41: Symbol `_a3' is already defined
+    extern A3 *a3;
+    test3a(a3, -1);
+}
+#endif
+
+#if 1
+// this works with cc65
+static void test3(void)
+{
+    test3a(a3, -1);
+}
+#endif
+
+/*
+  todo: add test on function pointers in the form of (*func)(arg) ...
+  cc65 seems to have problems here aswell ;/
+*/
+
+int main(void) {
+
+        test1();
+        test2();
+    test3();
+
+    /* return OK */
+    return(0);
+
+}
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20preprocessor%20hazzle...">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1544.html">Ullrich von Bassewitz: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>In reply to:</strong> <a href="1544.html">Ullrich von Bassewitz: "Re: [cc65] preprocessor hazzle..."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1546.html">Ullrich von Bassewitz: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Next in thread:</strong> <a href="1542.html">MagerValp: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Reply:</strong> <a href="1546.html">Ullrich von Bassewitz: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Reply:</strong> <a href="../2002-10/1591.html">Ullrich von Bassewitz: "Re: [cc65] preprocessor hazzle..."</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-07-30 04:29:40 CEST</em>
+</em>
+</small>
+</body>
+</html>

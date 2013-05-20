@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] zpsave in data segment?</title>
+<meta name="Author" content="Sidney Cadot (cadot1science-and-technology.nl)" />
+<meta name="Subject" content="Re: [cc65] zpsave in data segment?" />
+<meta name="Date" content="2005-04-11" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] zpsave in data segment?</h1>
+<!-- received="Mon Apr 11 15:02:42 2005" -->
+<!-- isoreceived="20050411130242" -->
+<!-- sent="Mon, 11 Apr 2005 15:02:02 +0200" -->
+<!-- isosent="20050411130202" -->
+<!-- name="Sidney Cadot" -->
+<!-- email="cadot1science-and-technology.nl" -->
+<!-- subject="Re: [cc65] zpsave in data segment?" -->
+<!-- id="6b3f8faa0022344f8eec8fcf3cb5864e@science-and-technology.nl" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="20050411102456.GA6748&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4922.html" title="MagerValp: &quot;[cc65] weird range error&quot;">Next message</a> ]
+[ <a href="4920.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] zpsave in data segment?&quot;">Previous message</a> ]
+[ <a href="4920.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] zpsave in data segment?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Sidney Cadot &lt;<a href="mailto:cadot1science-and-technology.nl?Subject=Re:%20[cc65]%20zpsave%20in%20data%20segment?">cadot1science-and-technology.nl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-04-11 15:02:02</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Apr 11, 2005, at 12:24, Ullrich von Bassewitz wrote:
+
+&gt;
+&gt; Hi!
+&gt;
+&gt; On Mon, Apr 11, 2005 at 12:15:01PM +0200, Sidney Cadot wrote:
+&gt;&gt; Indeed, most platforms declare &quot;spsave&quot; (which saves the S register)
+&gt;&gt; inside the BSS segment already; I can think of no good reason why 
+&gt;&gt; there
+&gt;&gt; would be a difference between spsave and zpsave in this respect.
+&gt;
+&gt; The bss segment is cleared *after* saving the zeropage registers into 
+&gt; zpsave.
+&gt; Placing zpsave into bss would effectively destroy its contents when 
+&gt; zerobss is
+&gt; called. The stack pointer on the other side is saved after clearing 
+&gt; bss, so it
+&gt; is save to place spsave there.
+
+Ah, yes, I see now. What was I thinking.
+
+Regards, Sidney
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Apr 11 15:02:42 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4922.html" title="Next message in the list">MagerValp: "[cc65] weird range error"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4920.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] zpsave in data segment?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4920.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] zpsave in data segment?"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4921" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4921" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4921" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-04-11 15:02:45 CEST
+</em></small></p>
+</body>
+</html>

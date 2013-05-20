@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Modules with self modifyin</title>
+<meta name="Author" content="Gábor Lénárt (lgb1lgb.hu)" />
+<meta name="Subject" content="Re: [cc65] Modules with self modifying code" />
+<meta name="Date" content="2011-02-04" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Modules with self modifying code</h1>
+<!-- received="Fri Feb  4 15:47:16 2011" -->
+<!-- isoreceived="20110204144716" -->
+<!-- sent="Fri, 4 Feb 2011 15:47:02 +0100" -->
+<!-- isosent="20110204144702" -->
+<!-- name="Gábor Lénárt" -->
+<!-- email="lgb1lgb.hu" -->
+<!-- subject="Re: [cc65] Modules with self modifying code" -->
+<!-- id="20110204144702.GC21289@vega.lgb.hu" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="20110204142244.GA30460&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9207.html" title="Groepaz: &quot;Re: [cc65] Modules with self modifying code&quot;">Next message</a> ]
+[ <a href="9205.html" title="Johan Kotlinski: &quot;Re: [cc65] Modules with self modifying code&quot;">Previous message</a> ]
+[ <a href="9203.html" title="Ullrich von Bassewitz: &quot;[cc65] Modules with self modifying code&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9209.html" title="Oliver Schmidt: &quot;Re: [cc65] Modules with self modifying code&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Gábor Lénárt &lt;<a href="mailto:lgb1lgb.hu?Subject=Re:%20[cc65]%20Modules%20with%20self%20modifying%20code">lgb1lgb.hu</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-02-04 15:47:02</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+On Fri, Feb 04, 2011 at 03:22:44PM +0100, Ullrich von Bassewitz wrote:
+&gt; In the past, I've refrained from using self modifying code, because it is not
+&gt; romable, quite difficult to debug, and has more potential for errors in my
+&gt; experience. In addition, some of the functions that would benefit most from
+&gt; smc are inlined by the compiler, so the library function is never called. And,
+&gt; there are platforms that have programs in ROM, so they can use these modules
+&gt; only with tricks.
+&gt; 
+&gt; On the other side, there are definitely cases, where problems are almost
+&gt; impossible to solve without self modifying code, and there are other cases,
+&gt; where smc gives a huge performance increase.
+
+Yeah. With a CPU like 6502, every possibilities must be used to gain some
+speed, not a much big deal on a modern CPU with clock rate in the GHz scale
+... Even if self modifying is &quot;ugly&quot; sometimes ...
+
+However there are disadvantages too, for sure. I think it's nice to have
+those _IF_ there are alternatives too (not self modifying code), then user
+can choose (also because of ROMable/RAM code, etc etc). I would say, it's a
+bit risky to accept self modifying code if there is no alternative or making
+self modifying code by default, also because it was not the default before.
+
+So I would vote for point 2 or 3 ... Point 4 is still risky, because of the
+word &quot;usually&quot; :) Also with points 2/3, user is much more capable of knowing
+what he/she really does.
+
+&gt;   1. Don't accept modules/changes containing smc. There's nothing that
+&gt;      prevents programmers to use smc on their own as it was before. To support
+&gt;      people writing their own modules, Christians include files could be
+&gt;      incorporated into the library, so there's a base to build on.
+&gt; 
+&gt;   2. Accept replacement functions using smc, but let them have different
+&gt;      names, so a programmer must explicitly call the smc version.
+&gt; 
+&gt;   3. Accept replacement functions and create a separate library together with
+&gt;      a small script that allows an end user to replace the modules in a target
+&gt;      library with smc versions.
+&gt; 
+&gt;   4. Accept replacement functions and add them by default to the target
+&gt;      libraries of the platforms where programs are usually run in RAM. Since a
+&gt;      programmer must still be able to write romable code, there must be some
+&gt;      measure to create a library without smc code.
+&gt; 
+&gt; A disadvantage of options 2-4 is that it's probably me who is expected to
+&gt; implement them:-)
+
+:)
+
+&gt; Anyway, are there more options? Opinions in favour of one of the options
+&gt; listed above? In favour or against self modifying code?
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Feb  4 15:47:16 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9207.html" title="Next message in the list">Groepaz: "Re: [cc65] Modules with self modifying code"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9205.html" title="Previous message in the list">Johan Kotlinski: "Re: [cc65] Modules with self modifying code"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9203.html" title="Message to which this message replies">Ullrich von Bassewitz: "[cc65] Modules with self modifying code"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9209.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Modules with self modifying code"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9206" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9206" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9206" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-02-04 15:47:18 CET
+</em></small></p>
+</body>
+</html>

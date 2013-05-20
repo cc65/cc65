@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Common macros for dirent.d</title>
+<meta name="Author" content="A. Fachat (fachat1web.de)" />
+<meta name="Subject" content="Re: [cc65] Common macros for dirent.d_type" />
+<meta name="Date" content="2012-07-07" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Common macros for dirent.d_type</h1>
+<!-- received="Sat Jul  7 12:55:51 2012" -->
+<!-- isoreceived="20120707105551" -->
+<!-- sent="Sat, 07 Jul 2012 12:54:56 +0200" -->
+<!-- isosent="20120707105456" -->
+<!-- name="A. Fachat" -->
+<!-- email="fachat1web.de" -->
+<!-- subject="Re: [cc65] Common macros for dirent.d_type" -->
+<!-- id="4624268.La3ZSRynjn@euler" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="201207071220.57974.groepaz&#64;gmx.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10482.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Common macros for dirent.d_type&quot;">Next message</a> ]
+[ <a href="10480.html" title="Groepaz: &quot;Re: [cc65] Common macros for dirent.d_type&quot;">Previous message</a> ]
+[ <a href="10480.html" title="Groepaz: &quot;Re: [cc65] Common macros for dirent.d_type&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10482.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Common macros for dirent.d_type&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: A. Fachat &lt;<a href="mailto:fachat1web.de?Subject=Re:%20[cc65]%20Common%20macros%20for%20dirent.d_type">fachat1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-07-07 12:54:56</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt; yet every program i remember that determines what files on a disk it can use
+&gt; for whatever, does that by looking at the filename (except geos maybe? :)).
+&gt; the filetype is always implied.
+
+So what is the problem here? After all, the disk drives find the files without 
+the type being specified in the OPEN, no matter the file type. So it's not a 
+matter of open (not creating) at all.
+
+So what about creating files...:
+
+&gt; well, as i said, its not so much about what is specified somewhere, but what
+&gt; ppl did since 1985. and as for that, &quot;SEQ file&quot; has even become a synonym
+&gt; for &quot;petsci text, maybe with C/G graphics&quot; in large parts of the commodore
+&gt; world. there is a reason for why eg jiffy dos even has a wedge command to
+&gt; display seq files as text - it was incredibly common at some point.
+
+I don't know about &quot;large part of the Commodore world&quot;. However, what are you 
+talking about? BASIC programs that run on the CBM machines? Machine language 
+programs that run on the CBM? Are we going to compile them with cc65? I guess 
+not, so there is no compatibility issue here.
+
+So that leaves &quot;legacy&quot; C programs compiled on/for the PET. Those compilers 
+probably wouldn't have a default file type either, but the user defining the file 
+type with the file name extension (like adding &quot;,U&quot;).
+
+Just please tell me the name of some &quot;legacy&quot; C-compiled programs for the CBM 
+that would not compile on cc65 due to that file type? It probably won't compile 
+due to many other incompatibilities of the old C compilers. They would have to 
+be adopted anyway.
+
+So in my not so humble opinion the C compiler should not add/use a default file 
+type at all. Let the floppy handle it. And if someone needs special file types, 
+the file name extension is the way - so there is not even a way to set a 
+special global variable just to change the default file type.
+
+André
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Jul  7 12:55:51 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10482.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10480.html" title="Previous message in the list">Groepaz: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10480.html" title="Message to which this message replies">Groepaz: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10482.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10482.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10483.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10481" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10481" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10481" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-07-07 12:55:54 CEST
+</em></small></p>
+</body>
+</html>

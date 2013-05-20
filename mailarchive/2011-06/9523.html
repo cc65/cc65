@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Debug info changes</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="[cc65] Debug info changes" />
+<meta name="Date" content="2011-06-13" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Debug info changes</h1>
+<!-- received="Mon Jun 13 21:06:55 2011" -->
+<!-- isoreceived="20110613190655" -->
+<!-- sent="Mon, 13 Jun 2011 21:06:43 +0200" -->
+<!-- isosent="20110613190643" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="[cc65] Debug info changes" -->
+<!-- id="20110613190643.GA18502@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9524.html" title="Joseph Rose: &quot;[cc65] Give TempCMod1 a Chance&quot;">Next message</a> ]
+[ <a href="9522.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Input string routine for a line of data?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Debug%20info%20changes">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-06-13 21:06:43</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Since I do not know how many other tools use the dbginfo API that comes with
+the cc65 package, I will post the following to the list:
+
+The debug info API has been extended to allow access to size information for
+symbols. This means that the value returned by .sizeof for a symbol is now
+also available to a debugger or similar. This is probably most useful for data
+or anything within a .proc.
+
+As a consequence, the format of the object files and the debug info has
+changed[1]. The new dbginfo module is downwards compatible and can read the
+old (1.1) format but not vice versa. So if you're using this module, I would
+suggest an upgrade, otherwise users of newer snapshot versions might complain,
+because your tool cannot read newer files.
+
+I've also tried to improve cross version compatibility between different minor
+versions of the debug info. The new version of the dbginfo module should be
+smarter when unknown keywords in the debug info files are encountered, that
+may have been introduced in newer versions. But it is of course impossible to
+have older software read and understand newer formats, so there might still be
+problems in the future, at least as long as the format and the features are
+evolving. I will try to keep the module downards compatible within minor
+version changes, so as long as you have the most recent module, your users may
+also feed it with older debug info files. At least this is my intention:-)
+
+Besides that I'm still waiting for a decent CBM emulator to support source
+level debugging. Any takers? I might donate a few bitcoins once I have some:-)
+
+Regards
+
+
+        Uz
+
+
+
+[1] Not much. For symbols where size information is available, there's now
+    an additional size=n attribute.
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Jun 13 21:06:55 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9524.html" title="Next message in the list">Joseph Rose: "[cc65] Give TempCMod1 a Chance"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9522.html" title="Previous message in the list">silverdr1wfmh.org.pl: "Re: [cc65] Input string routine for a line of data?"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9523" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9523" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9523" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-06-13 21:06:58 CEST
+</em></small></p>
+</body>
+</html>

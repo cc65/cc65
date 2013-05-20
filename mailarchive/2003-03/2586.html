@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Finished product:  FAST S</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?</h1>
+<!-- received="Wed Mar  5 16:42:40 2003" -->
+<!-- isoreceived="20030305154240" -->
+<!-- sent="Wed, 5 Mar 2003 16:06:25 +0100" -->
+<!-- isosent="20030305150625" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?" -->
+<!-- id="200303051606.25226.groepaz@gmx.net" -->
+<!-- inreplyto="006801c2e2c4$a96ee640$8001a8c0@ENDEAVOR" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Finished%20product:%20%20FAST%20ShellSort%20demo%20for%20c64%20(working%20:)%20)%20-%20feedback?"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2003-03-05 16:06:25
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2585.html">Groepaz: "Re: [cc65] Function prototyping - different in CC65?"</a>
+<li><strong>In reply to:</strong> <a href="2577.html">Greg Long: "[cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2589.html">Greg Long: "RE: [cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?"</a>
+<li><strong>Reply:</strong> <a href="2589.html">Greg Long: "RE: [cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Wednesday 05 March 2003 04:09, Greg Long wrote:
+&gt; The Shell Sort, invented by Donald Shell, is one of the fastest sorting
+&gt; routines available. Others, such as the Quick Sort, involve too much
+&gt; recursion to be practical on the 64. The Merge and Quick sort algorithms
+&gt; are faster, but waste memory...up to twice the ammount of the original
+&gt; array.
+
+mmmh, the testsuite i am working on contains a quicksort implementation 
+actually :O)
+
+in practice i have never seen anything but &quot;bubble sort&quot; and &quot;straight 
+insertion&quot; though....maybe a little bit of heap-sort or shell-sort with one 
+of the previous ones in a last pass. on c64 you would mostly want an 
+algorithm that sorts small, mostly &quot;pre-sorted&quot; (not entire random spread) 
+arrays at maximum speed...atleast in a game or demo atleast. actually i cant 
+remember offhand where i would use anything but a bubblesort (because of easy 
+and small implementation), except for a sprite-multiplexer (most ppl use a 
+combination of shellsort and bubblesort here). things that arent 
+speed-critical at all (sorting hiscorelist is prime example) often even use 
+the least efficient straight insertion :)
+
+&gt; It can be seen that this routine can be modifed to sort strings without
+&gt; much difficulty.  (Now how do I overload the &lt; and &gt; operators in C?)
+
+you dont :) overloading is a C++ feature... use strcmp() instead. you may also 
+look at the c-standard library and how the quicksort thing is implemented 
+there using functionpointers for that problem.
+
+&gt; 1) cprintf does not appear to work properly :  replace \r with \n and
+&gt; watch the results.
+
+it does for pretty damned sure work right :o)
+
+1) as magervalp said, you should use &quot;\n&quot; AND &quot;\r&quot; when working with conio. \n 
+goes to a new line (practically same as &quot;cursor down&quot;) and \r goes to the 
+start of current line (=carriage return).
+2) keep in mind that the conio routienes can not handle scrolling the screen 
+when you print beyond the bottom of the screen....in that case it will just 
+crash. (most likely, atleast behave funny :o))
+
+&gt; 2) If the code is executed a second time, it crashes.  Don't know
+&gt; why...It may be due to the writing to RAM beneath the BASIC interpreter.
+&gt; I went with 19,000 integers because in a BASIC routine, that was the
+&gt; most that would fit in the standard 38,911 bytes available.  Does CCS65
+&gt; modify and make calls to the BASIC interpreter?
+
+it calls the kernal, but not the basic-interpreter which is banked out.... 
+however the reason for a program no more working when started twice is that 
+the initialized data section is kept only once in memory. ie, if you rerun 
+the program it will start with values that might eventually have been 
+modified in the previous run...which again may result in unexpected 
+behaviour. you can probably get around this limitation by creating a slightly 
+modified crt0.s and linkerscript, but it will result in (depending on size of 
+your data section) enormous waste of memory. (because most programs arent 
+expected to be run more than once)
+
+gpz
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Finished%20product:%20%20FAST%20ShellSort%20demo%20for%20c64%20(working%20:)%20)%20-%20feedback?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2585.html">Groepaz: "Re: [cc65] Function prototyping - different in CC65?"</a>
+<li><strong>In reply to:</strong> <a href="2577.html">Greg Long: "[cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2589.html">Greg Long: "RE: [cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?"</a>
+<li><strong>Reply:</strong> <a href="2589.html">Greg Long: "RE: [cc65] Finished product:  FAST ShellSort demo for c64 (working :) ) - feedback?"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-03-05 16:45:14 CET</em>
+</em>
+</small>
+</body>
+</html>

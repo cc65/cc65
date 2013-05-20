@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Zeropage Addressing?</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Zeropage Addressing?" />
+<meta name="Date" content="2009-11-13" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Zeropage Addressing?</h1>
+<!-- received="Fri Nov 13 14:32:01 2009" -->
+<!-- isoreceived="20091113133201" -->
+<!-- sent="Fri, 13 Nov 2009 14:31:56 +0100" -->
+<!-- isosent="20091113133156" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Zeropage Addressing?" -->
+<!-- id="20091113133156.GF32609@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="BDB37793-2F0C-4C09-B700-DDA473F5E84D&#64;wfmh.org.pl" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7581.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Zeropage Addressing?&quot;">Next message</a> ]
+[ <a href="7579.html" title="Oliver Schmidt: &quot;Re: [cc65] TGI preview&quot;">Previous message</a> ]
+[ <a href="7571.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Zeropage Addressing?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7581.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Zeropage Addressing?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Zeropage%20Addressing?">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-11-13 14:31:56</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Fri, Nov 13, 2009 at 10:57:08AM +0100, silverdr&#64;wfmh&#46;<!--nospam-->org.pl wrote:
+&gt; &gt; Warning: Didn't use zeropage addressing for `dli'
+[...]
+&gt; It is not THAT new. I was bugging Uz about it (and he introduced it) quite
+&gt; some time ago already ;-) To eliminate it, either don't use forward references
+&gt; or don't use zeropage.
+
+There's also a third way: In cases where the assembler cannot deduce the
+addressing mode from the instruction, you can add an address size override
+prefix.
+
+-----------------------------------------------------------------------------
+sym1    = $1234
+
+; Following this declaration, sym1 is known, sym2 and sym3 are unknown
+
+        lda     sym1    ; Assemble as absolute, since sym1 is known
+        lda     sym2    ; Assemble as absolute, since sym2 is unknown. May
+                        ; also be zero page, but don't know so act safely
+
+        lda     z:sym2  ; Assemble as zero page
+        lda     z:sym1  ; (1) Range error
+        lda     a:sym2  ; Assemble as absolute even if zero page possible
+        lda     z:sym3  ; (2) Range error
+        lda     (sym2),y; (3) Assemble as zeropage caused by addressing mode
+        lda     (sym3),y; (4) Error
+
+sym2    := $02
+sym3    := $4321
+-----------------------------------------------------------------------------
+
+Please note the difference between (1) and (2): The first one can be decided
+by the assembler when it encounters the instruction, for the second, the
+assembler makes an assumption and checks this assumption at the end of
+assembly. Similar for (4). (3) is also checked at the end of assembly, but
+found correct.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Nov 13 14:32:01 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7581.html" title="Next message in the list">silverdr1wfmh.org.pl: "Re: [cc65] Zeropage Addressing?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7579.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] TGI preview"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7571.html" title="Message to which this message replies">silverdr1wfmh.org.pl: "Re: [cc65] Zeropage Addressing?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7581.html" title="Next message in this discussion thread">silverdr1wfmh.org.pl: "Re: [cc65] Zeropage Addressing?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7581.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] Zeropage Addressing?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7580" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7580" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7580" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-11-13 14:32:03 CET
+</em></small></p>
+</body>
+</html>

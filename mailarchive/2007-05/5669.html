@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Creating a Cartridge Program w</title>
+<meta name="Author" content="Bill Katsak (bill1katsak.com)" />
+<meta name="Subject" content="[cc65] Creating a Cartridge Program with cc65" />
+<meta name="Date" content="2007-05-01" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Creating a Cartridge Program with cc65</h1>
+<!-- received="Tue May  1 14:04:52 2007" -->
+<!-- isoreceived="20070501120452" -->
+<!-- sent="Tue, 1 May 2007 08:04:39 -0400" -->
+<!-- isosent="20070501120439" -->
+<!-- name="Bill Katsak" -->
+<!-- email="bill1katsak.com" -->
+<!-- subject="[cc65] Creating a Cartridge Program with cc65" -->
+<!-- id="D6A9DEC492BA1748B89E48B2FC5147B24B0E@server.fox56.local" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5670.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Creating a Cartridge Program with cc65&quot;">Next message</a> ]
+[ <a href="../2007-04/5668.html" title="Shawn Jefferson: &quot;RE: [cc65] Atari Library dosdetect.s&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5670.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Creating a Cartridge Program with cc65&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Bill Katsak &lt;<a href="mailto:bill1katsak.com?Subject=Re:%20[cc65]%20Creating%20a%20Cartridge%20Program%20with%20cc65">bill1katsak.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-05-01 14:04:39</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello,
+
+            I have developed a program for C64 for a project that I am
+doing. It runs beautifully as a .prg file, but I would like to run it
+from a ROM cartridge. I have spent quite a few afternoons already trying
+to get this to run from a cartridge on the CCS64 emulator. However, I am
+not strong with assembly language.
+
+ 
+
+I have changed around the linker configuration to try to get something
+that works. If I compile a hello world program into a binary, load it
+like a prg file and do a SYS command to start the code from the $8000
+range location, it runs fine. However, if I change the headers around,
+adjust the offsets, and load the same program as a cartridge ROM, it
+just comes back to READY and never runs.
+
+ 
+
+Am I going about this all wrong? Has anyone had some experience with
+this? I also know that I will have a problem once I get my real program
+going because I will need to copy my DATA segment from ROM to RAM, and I
+am not sure how to modify my startup code to do this.
+
+ 
+
+ 
+
+Thanks very much in advance for any help.
+
+ 
+
+Bill Katsak
+
+Student
+
+Bloomsburg University of Pennsylvania
+
+bill&#64;katsak&#46;<!--nospam-->com
+
+ 
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue May  1 14:04:52 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5670.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Creating a Cartridge Program with cc65"</a></li>
+<li><dfn>Previous message</dfn>: <a href="../2007-04/5668.html" title="Previous message in the list">Shawn Jefferson: "RE: [cc65] Atari Library dosdetect.s"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5670.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Creating a Cartridge Program with cc65"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5670.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Creating a Cartridge Program with cc65"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="5671.html" title="Message sent in reply to this message">Bill Katsak: "RE: [cc65] Creating a Cartridge Program with cc65"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5669" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5669" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5669" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-05-01 14:05:00 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] C64 POSIX dirent stuff actuall</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] C64 POSIX dirent stuff actually working?" />
+<meta name="Date" content="2012-07-22" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] C64 POSIX dirent stuff actually working?</h1>
+<!-- received="Sun Jul 22 23:52:06 2012" -->
+<!-- isoreceived="20120722215206" -->
+<!-- sent="Sun, 22 Jul 2012 23:50:39 +0200" -->
+<!-- isosent="20120722215039" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] C64 POSIX dirent stuff actually working?" -->
+<!-- id="CACT=u72MKsic6PKJWwkeJp71ubeABavYacyoxDff3hAQA0A+NQ@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10513.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] C64 POSIX dirent stuff actually working?&quot;">Next message</a> ]
+[ <a href="10511.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Overriding library routines?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10513.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] C64 POSIX dirent stuff actually working?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20C64%20POSIX%20dirent%20stuff%20actually%20working?">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-07-22 23:50:39</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+I'm working with the snapshot 2.13.9.20120720-1 and this program:
+
+====================
+#include &lt;stdio.h&gt;
+#include &lt;dirent.h&gt;
+
+void main(void)
+{
+    DIR* dir;
+    struct dirent* ent;
+
+    dir = opendir(&quot;.&quot;);
+    while (ent = readdir(dir)) {
+        printf(&quot;%s\n&quot;, ent-&gt;d_name);
+    }
+    closedir(dir);
+}
+====================
+
+I'm putting the program on an image file using 'c1541 -attach test.d64
+-write test' and then I'm using the 'File | Autostart' menu option in
+VICE. I have 'True Drive Emulation' checked.
+
+I'd expect two lines of output: One for the disk label and one for the
+program itself. However I don't get any output at all :-(
+
+BTW: On the Apple II I get the expected results from the very same source.
+
+Any hints are appreciated,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Jul 22 23:52:06 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10513.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] C64 POSIX dirent stuff actually working?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10511.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Overriding library routines?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10513.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] C64 POSIX dirent stuff actually working?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10513.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] C64 POSIX dirent stuff actually working?"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="../2012-08/10540.html" title="Message sent in reply to this message">A.Fachat: "Re: [cc65] C64 POSIX dirent stuff actually working?"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="../2012-08/10547.html" title="Message sent in reply to this message">A.Fachat: "Re: [cc65] C64 POSIX dirent stuff actually working?"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="../2012-08/10554.html" title="Message sent in reply to this message">A.Fachat: "Re: [cc65] C64 POSIX dirent stuff actually working?"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="../2012-08/10779.html" title="Message sent in reply to this message">Chris Cureau: "Re: [cc65] C64 POSIX dirent stuff actually working?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10512" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10512" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10512" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-07-22 23:52:10 CEST
+</em></small></p>
+</body>
+</html>

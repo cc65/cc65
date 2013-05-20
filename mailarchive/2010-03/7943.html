@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="ISO-8859-2"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-2" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] some patches</title>
+<meta name="Author" content="Kajtár Zsolt (kajtarzsolt1googlemail.com)" />
+<meta name="Subject" content="[cc65] some patches" />
+<meta name="Date" content="2010-03-14" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] some patches</h1>
+<!-- received="Sun Mar 14 14:05:59 2010" -->
+<!-- isoreceived="20100314130559" -->
+<!-- sent="Sun, 14 Mar 2010 14:03:59 +0100" -->
+<!-- isosent="20100314130359" -->
+<!-- name="Kajtár Zsolt" -->
+<!-- email="kajtarzsolt1googlemail.com" -->
+<!-- subject="[cc65] some patches" -->
+<!-- id="4B9CDEBF.1050201@googlemail.com" -->
+<!-- charset="ISO-8859-2" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7944.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Bug in C preprocessor with newline in macro expansion (?)&quot;">Next message</a> ]
+[ <a href="7942.html" title="Oliver Schmidt: &quot;[cc65] Bug in C preprocessor with newline in macro expansion (?)&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7946.html" title="Groepaz: &quot;Re: [cc65] some patches&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Kajtár Zsolt &lt;<a href="mailto:kajtarzsolt1googlemail.com?Subject=Re:%20[cc65]%20some%20patches">kajtarzsolt1googlemail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-03-14 14:03:59</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+
+Hello all!
+
+I've just subscribed to the mailing list, to send in some of my old patches.
+
+dont-restore-vectors.patch
+# Do not restore vectors, as this breaks cartridge extensions.
+# IRQ and BRK is restored elsewhere anyway.
+
+filename-optimization.patch
+# Same function, only shorter.
+
+read-write-optimization.patch
+# Some optimization for read/write on cbm.
+
+restore-devnum.patch
+# Don't forget to restore the device number before exit, otherwise it's
+# destroyed by the close all files routine elsewhere.
+
+ide64-read-write.patch
+# Add blockread/write support if IDE64 is present.
+# This makes a big difference in I/O speed.
+# Only for C64, to not bloat the other archs.
+
+This last patch makes a copy of read.s, write.s and rwcommon.s to the c64
+directory. This is not nice, but I haven't found an easy way to not have the
+IDE64 code compiled in for other cbm machines.
+
+$ sha1sum *
+577c58a292c35e1bc7858343a2d2002ee6141d3f  dont-restore-vectors.patch
+f9b7b01caf88038114b92f3644a7e733d5d971bd  filename-optimization.patch
+8fae5b45e9ad38f73735b288fd6f8c4d90a8f5e6  ide64-read-write.patch
+13be9d16279a7cb8d6b54995446e16edf166fe0b  read-write-optimization.patch
+22e2385d0706d7539b67f6d418487dce269b0a64  restore-devnum.patch
+
+- --
+						    -soci-
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAkuc3r8ACgkQyBOVYiJltRYdxwCeMOa6UyuJBUdZBeFX8zbhs5GT
+ck0AoKb3o836sy3PicakhgQdojAVTZaV
+=heDa
+-----END PGP SIGNATURE-----
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<div>
+<ul>
+<li>text/x-patch attachment: <a href="../att-7943/dont-restore-vectors.patch">dont-restore-vectors.patch</a></li>
+</ul>
+<!-- attachment="dont-restore-vectors.patch" -->
+<ul>
+<li>text/x-patch attachment: <a href="../att-7943/filename-optimization.patch">filename-optimization.patch</a></li>
+</ul>
+<!-- attachment="filename-optimization.patch" -->
+<ul>
+<li>text/x-patch attachment: <a href="../att-7943/ide64-read-write.patch">ide64-read-write.patch</a></li>
+</ul>
+<!-- attachment="ide64-read-write.patch" -->
+<ul>
+<li>text/x-patch attachment: <a href="../att-7943/read-write-optimization.patch">read-write-optimization.patch</a></li>
+</ul>
+<!-- attachment="read-write-optimization.patch" -->
+<ul>
+<li>text/x-patch attachment: <a href="../att-7943/restore-devnum.patch">restore-devnum.patch</a></li>
+</ul>
+<!-- attachment="restore-devnum.patch" -->
+</div>
+<span id="received"><dfn>Received on</dfn> Sun Mar 14 14:05:59 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7944.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Bug in C preprocessor with newline in macro expansion (?)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7942.html" title="Previous message in the list">Oliver Schmidt: "[cc65] Bug in C preprocessor with newline in macro expansion (?)"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7946.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] some patches"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7946.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] some patches"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7943" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7943" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7943" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-03-14 14:06:02 CET
+</em></small></p>
+</body>
+</html>

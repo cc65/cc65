@@ -1,0 +1,170 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] File I/O on C64</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] File I/O on C64">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] File I/O on C64</h1>
+<!-- received="Fri Nov 15 17:09:59 2002" -->
+<!-- isoreceived="20021115160959" -->
+<!-- sent="Fri, 15 Nov 2002 17:09:58 +0100" -->
+<!-- isosent="20021115160958" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] File I/O on C64" -->
+<!-- id="20021115160958.GA7150@trixie.musoftware.de" -->
+<!-- inreplyto="15828.60748.905642.418755@panini.cling.gu.se" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20File%20I/O%20on%20C64"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-11-15 17:09:58
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1712.html">MagerValp: "Re: [cc65] File I/O on C64"</a>
+<li><strong>In reply to:</strong> <a href="1712.html">MagerValp: "Re: [cc65] File I/O on C64"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1715.html">BlackJack/Civitas: "Re: [cc65] File I/O on C64"</a>
+<li><strong>Reply:</strong> <a href="1715.html">BlackJack/Civitas: "Re: [cc65] File I/O on C64"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Fri, Nov 15, 2002 at 01:49:16PM +0100, MagerValp wrote:
+&gt; BB&gt; At the same time, it would be way more desirable to be programming
+&gt; BB&gt; with stdio for portability reasons on the game I'm working on.
+&gt;
+&gt; Unless you're trying to port existing code to the C64, stdio isn't
+&gt; really useful. Trying to get a 1 MHz C64 with a 400 cps disk drive to
+&gt; conform to the stdio API is just inefficient. The kernal call wrappers
+&gt; in cbm.h allow you to use the native API for disk I/O, and there's
+&gt; conio for user I/O. If you want to stay compatible with other plat-
+&gt; forms simply #ifdef your way around the problem and user wrapper
+&gt; functions.
+
+IMHO Brian has an important point here. stdio *is* definitely useful, not only
+when porting existing code. Using stdio means that your code will run on all
+other machines with a standard compliant C compiler, including other 6502
+machines.
+
+Being able to port code between the different 6502 machines easily is
+important, because all users benefit from it. Especially today, as less and
+less new software is being written for the old 8 bit machines, being able to
+share code between the platforms is a good method to increase the amount of
+available programs.
+
+Yes, it is true that not all programs can be written in C and not all programs
+can be written in a portable way. However, a lot of programs can, and from the
+remainder, a big percentage could be made portable by separating the non
+portable code into small modules that can be rewritten for other machines,
+while the major part of the program does not have platform dependencies.
+
+It is also true that cc65 generates larger and slower code than hand tuned
+assembly. However, many programs written today are not limited by memory or
+speed, but nevertheless most programmers think that they have to write even
+simple &quot;hello world&quot; type programs in optimized assembly language.
+
+Many people think that C is a language. While this is true, it is much more
+important to notice that C is also a library. And, the library part is usually
+much more important than the compiler itself. I've got many mails asking me &quot;I
+want to port the cc65 compiler to machine xy, how do I do that?&quot;. The answer
+is: You do not need to port the compiler. The compiler generates 6502 code, so
+if the target machine has a 6502 CPU, the compiler output will run on this
+machine. What has to be ported is the library (at least the system dependent
+parts, and I've tried to keep them as small as possible). Until today, a lot
+more work was spent on the library than on the compiler proper. So it would be
+stupid to throw away all this work and just use the compiler.
+
+Look at Adam Dunkels uip TCP/IP stack for example: It is written in C (with
+the exception of the checksuming code), and runs without changes on the C64,
+the C128, the Atari, and several other non 6502 platforms. Because the code is
+written in C, you can use this code easily for your own projects, improve it
+and build on it, similar as you can build on the library that comes with cc65.
+It was Isaac Newton who said: &quot;If I have seen further ... it is by standing on
+the shoulders of giants.&quot; What he meant was, that he could do new things,
+because others had already done quite some work, and he could build on that
+work. As I see it, the chances that lie within portable code are currently
+underestimated. With a wide range of portable C modules, it would be easier to
+write new programs for all platforms, so each piece of portable code is not
+only good for itself, but also because it may be the base for other programs,
+that would have never been written without this base.
+
+Having no C file I/O is starting to become a limiting factor, even for the
+libraries that come with cc65 itself: The next cc65 version will support
+loadable modules, which can and will be used as some form of drivers for all
+sorts of hardware. You can think of loadable modules as overlays, but these
+overlays are relocatable, so they must not be loaded to a specific address. No
+C file I/O means that the CBMs won't have loadable modules, at least not
+without some ugly workarounds.
+
+Regarding the cbm specific file I/O: While I'm definitely glad that Marc wrote
+it , and while I'm using it myself, I consider it as a workaround. Having C
+file I/O, there would only rarely be a need to use it, and the C code doing
+file I/O would be portable without #ifdef'ing large parts of the code
+(remember: the CBM routines are rather low level, you have to add device
+communication to read the control channel of the drive and other stuff). Yes,
+having standard file I/O would add a few hundred bytes of code. But since file
+I/O on the CBMs is slow like hell anyway, the additional CPU time needed is no
+problem, and in most cases the additional code will not harm.
+
+&gt; I think one or two people on this list have been hacking away a bit on
+&gt; this, sooner or later something might turn up. Until then, use the
+&gt; kernal call wrappers and treat the C64 as a C64 :)
+
+Unfortunately I don't have a better advice for now:-)
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20File%20I/O%20on%20C64">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20File%20I/O%20on%20C64">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1712.html">MagerValp: "Re: [cc65] File I/O on C64"</a>
+<li><strong>In reply to:</strong> <a href="1712.html">MagerValp: "Re: [cc65] File I/O on C64"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1715.html">BlackJack/Civitas: "Re: [cc65] File I/O on C64"</a>
+<li><strong>Reply:</strong> <a href="1715.html">BlackJack/Civitas: "Re: [cc65] File I/O on C64"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-11-15 17:10:12 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] bitwise not broken in ca65?</title>
+<meta name="Author" content="Simon Scott (scotty1amnet.net.au)" />
+<meta name="Subject" content="[cc65] bitwise not broken in ca65?" />
+<meta name="Date" content="2011-12-24" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] bitwise not broken in ca65?</h1>
+<!-- received="Sat Dec 24 13:19:51 2011" -->
+<!-- isoreceived="20111224121951" -->
+<!-- sent="Sat, 24 Dec 2011 19:51:21 +0800" -->
+<!-- isosent="20111224115121" -->
+<!-- name="Simon Scott" -->
+<!-- email="scotty1amnet.net.au" -->
+<!-- subject="[cc65] bitwise not broken in ca65?" -->
+<!-- id="1324727481.19841.8.camel@g4.WAG320N" -->
+<!-- charset="UTF-8" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9839.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] bitwise not broken in ca65?&quot;">Next message</a> ]
+[ <a href="9837.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] ASCII, PETSCII, SCREEN and UNICODE (PetMe64 font)&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9839.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] bitwise not broken in ca65?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Simon Scott &lt;<a href="mailto:scotty1amnet.net.au?Subject=Re:%20[cc65]%20bitwise%20not%20broken%20in%20ca65?">scotty1amnet.net.au</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-12-24 12:51:21</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi all, long time user, first time poster :)
+
+Just trying to compile opencbm, which uses ca65 I believe in order to
+compile some 6502 bits. Unfortunately Ive come a bit unstuck.
+
+Firstly, let me specify that I compiled cc65 etc from a git clone
+yesterday.
+
+When I try to build opencbm, it throws an error:
+
+tdchange.a65(151): Error: Range error (-9 not in [0..255])
+tdchange.a65(169): Error: Range error (-5 not in [0..255])
+
+
+Those 2 lines are:
+
+and #~drDriveLED
+
+AND
+
+and #~drDriveMotor
+
+
+
+in common.i65:
+
+drDriveLED      = $08                   ;Drive LED control
+
+AND
+
+drDriveMotor    = $04                   ;Drive motor control
+
+
+so, it looks like ca65 is resolving ~$08 as -9, and ~$04 and -5 (ie, 2's
+complement) rather than an actual bitwise NOT.
+
+Thoughts?
+
+thanks
+
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Dec 24 13:19:51 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9839.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] bitwise not broken in ca65?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9837.html" title="Previous message in the list">silverdr1wfmh.org.pl: "Re: [cc65] ASCII, PETSCII, SCREEN and UNICODE (PetMe64 font)"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9839.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] bitwise not broken in ca65?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9839.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] bitwise not broken in ca65?"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="9842.html" title="Message sent in reply to this message">Simon Scott: "Re: [cc65] bitwise not broken in ca65?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9838" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9838" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9838" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-12-24 13:19:56 CET
+</em></small></p>
+</body>
+</html>

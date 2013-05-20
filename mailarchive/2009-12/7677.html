@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] CLRCH necessary for the CB</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="Re: [cc65] CLRCH necessary for the CBMs?" />
+<meta name="Date" content="2009-12-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] CLRCH necessary for the CBMs?</h1>
+<!-- received="Thu Dec 10 21:25:53 2009" -->
+<!-- isoreceived="20091210202553" -->
+<!-- sent="Thu, 10 Dec 2009 21:25:30 +0100" -->
+<!-- isosent="20091210202530" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="Re: [cc65] CLRCH necessary for the CBMs?" -->
+<!-- id="20091210202530.GA28814@trikaliotis.net" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="f97798c20912101029l790e18ecneb2ccc45ba17debf&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7678.html" title="Oliver Schmidt: &quot;Re: [cc65] CLRCH necessary for the CBMs?&quot;">Next message</a> ]
+[ <a href="7676.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] CLRCH necessary for the CBMs?&quot;">Previous message</a> ]
+[ <a href="7675.html" title="Oliver Schmidt: &quot;Re: [cc65] CLRCH necessary for the CBMs?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7678.html" title="Oliver Schmidt: &quot;Re: [cc65] CLRCH necessary for the CBMs?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20[cc65]%20CLRCH%20necessary%20for%20the%20CBMs?">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-12-10 21:25:30</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello Oliver,
+
+* On Thu, Dec 10, 2009 at 07:29:32PM +0100 Oliver Schmidt wrote:
+
+&gt; &gt; Ok, thanks a lot! I will then remove the calls to CLRCH from all Commodore
+&gt; &gt; targets.
+[...]
+&gt; &gt;From that perspective it might be preferable to just comment-out the
+&gt; call with a notice that it is already done by the BASIC interpreter
+&gt; (thus serving as a hint to activate the call in a non-BASIC scenario).
+
+To add to what Uz said: In general, the CLRCH(N) is not necessary at
+all. You would only need it if
+
+1. someone deliberately opened files and set input and output to that
+   (CHKIN, CHKOUT in assembly, or CMD x in BASIC)
+
+2. (possibly) if an error occurred in a previous command and the error
+   handling code forgot to catch it and close the channels
+
+No. 2 seems very unlikely to me, and no. 1 is exactly what Uz wants to
+be able to achieve: Let the user be able to redirect input and output.
+
+Thus, IMHO, the CLRCHN should go completely.
+
+YMMV.
+
+Regards,
+Spiro.
+
+-- 
+Spiro R. Trikaliotis                              <a href="http://opencbm.sf.net/">http://opencbm.sf.net/</a>
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>                     <a href="http://www.viceteam.org/">http://www.viceteam.org/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Dec 10 21:25:53 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7678.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] CLRCH necessary for the CBMs?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7676.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] CLRCH necessary for the CBMs?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7675.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] CLRCH necessary for the CBMs?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7678.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] CLRCH necessary for the CBMs?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7678.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] CLRCH necessary for the CBMs?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7677" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7677" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7677" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-12-10 21:25:56 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Think I found a cc65 bug</title>
+<meta name="Author" content="MagerValp (MagerValp_at_cling.gu.se)">
+<meta name="Subject" content="Re: [cc65] Think I found a cc65 bug">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Think I found a cc65 bug</h1>
+<!-- received="Wed Dec  4 12:22:41 2002" -->
+<!-- isoreceived="20021204112241" -->
+<!-- sent="Wed, 4 Dec 2002 12:21:57 +0100" -->
+<!-- isosent="20021204112157" -->
+<!-- name="MagerValp" -->
+<!-- email="MagerValp_at_cling.gu.se" -->
+<!-- subject="Re: [cc65] Think I found a cc65 bug" -->
+<!-- id="15853.58709.906369.701803@panini.cling.gu.se" -->
+<!-- inreplyto="20021203212005.GB634@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> MagerValp (<a href="mailto:MagerValp_at_cling.gu.se?Subject=Re:%20[cc65]%20Think%20I%20found%20a%20cc65%20bug"><em>MagerValp_at_cling.gu.se</em></a>)<br>
+<strong>Date:</strong> 2002-12-04 12:21:57
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1880.html">Ullrich von Bassewitz: "Re: [cc65] SimpleMenu 1.0"</a>
+<li><strong>In reply to:</strong> <a href="1868.html">Ullrich von Bassewitz: "Re: [cc65] Think I found a cc65 bug"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1883.html">Ullrich von Bassewitz: "Re: [cc65] Think I found a cc65 bug"</a>
+<li><strong>Reply:</strong> <a href="1883.html">Ullrich von Bassewitz: "Re: [cc65] Think I found a cc65 bug"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+&gt;&gt;&gt;&gt;&gt; &quot;UvB&quot; == Ullrich von Bassewitz &lt;<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Think%20I%20found%20a%20cc65%20bug">uz_at_musoftware.de</a>&gt; writes:
+
+UvB&gt; BTW, here is a cc65 specific suggestion for your code: Pointers
+UvB&gt; like &quot;item&quot; are ideal candidates for the &quot;register&quot; keyword. It
+UvB&gt; does no harm when used with older compiler versions, so the code
+UvB&gt; will still compile with 2.8.0. However, using &quot;register&quot; in the
+UvB&gt; code and -Or (or better) on the command line will decrease code
+UvB&gt; size and increase speed.
+
+I just compiled the source with the latest snapshot, and now it looks
+like this:
+
+  <a href="http://www.cling.gu.se/~cl3polof/simple285.png">http://www.cling.gu.se/~cl3polof/simple285.png</a>
+
+No code changes yet, just a straight recompile. It redraws the menu
+correctly when I move around with the cursor,
+
+        DrawItem(item, menu-&gt;xpos + 1, menu-&gt;ypos + menu-&gt;current + 3, 0);
+        item = item-&gt;next;
+        ++(menu-&gt;current);
+        DrawItem(item, menu-&gt;xpos + 1, menu-&gt;ypos + menu-&gt;current + 3, 1);
+
+but not when it's initially drawn:
+
+        item = menu-&gt;firstitem;
+        while (item) {
+          DrawItem(item, menu-&gt;xpos + 1, menu-&gt;ypos + l + 3, menu-&gt;current == l ? 1 : 0);
+          item = item-&gt;next;
+          ++l;
+        }
+
+Adding
+
+        gotoxy(0,l);
+        cprintf(&quot;x: %d, y: %d\r\n&quot;, menu-&gt;xpos, menu-&gt;ypos);
+
+before DrawItem changes the position (x correct, y off by 2).
+
+Any ideas?
+
+-- 
+    ___          .     .  .         .       . +  .         .      o   
+  _|___|_   +   .  +     .     +         .  Per Olofsson, arkadspelare
+    o-o    .      .     .   o         +          <a href="mailto:MagerValp_at_cling.gu.se?Subject=Re:%20[cc65]%20Think%20I%20found%20a%20cc65%20bug">MagerValp_at_cling.gu.se</a>
+     -       +            +    .     <a href="http://www.cling.gu.se/~cl3polof/">http://www.cling.gu.se/~cl3polof/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Think%20I%20found%20a%20cc65%20bug">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1880.html">Ullrich von Bassewitz: "Re: [cc65] SimpleMenu 1.0"</a>
+<li><strong>In reply to:</strong> <a href="1868.html">Ullrich von Bassewitz: "Re: [cc65] Think I found a cc65 bug"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1883.html">Ullrich von Bassewitz: "Re: [cc65] Think I found a cc65 bug"</a>
+<li><strong>Reply:</strong> <a href="1883.html">Ullrich von Bassewitz: "Re: [cc65] Think I found a cc65 bug"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-12-04 12:22:45 CET</em>
+</em>
+</small>
+</body>
+</html>

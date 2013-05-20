@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Re: Porting to CC65</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Re: Porting to CC65" />
+<meta name="Date" content="2010-10-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Re: Porting to CC65</h1>
+<!-- received="Sun Oct 10 20:29:23 2010" -->
+<!-- isoreceived="20101010182923" -->
+<!-- sent="Sun, 10 Oct 2010 20:29:16 +0200" -->
+<!-- isosent="20101010182916" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Re: Porting to CC65" -->
+<!-- id="20101010182916.GA12608@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="AANLkTimjFLzj9LQR1PdwH8pH5nQnaowRVRrh10y7fabV&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8671.html" title="doynax: &quot;Re: [cc65] Re: Porting to CC65&quot;">Next message</a> ]
+[ <a href="8669.html" title="doynax: &quot;Re: [cc65] Re: Porting to CC65&quot;">Previous message</a> ]
+[ <a href="8669.html" title="doynax: &quot;Re: [cc65] Re: Porting to CC65&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8671.html" title="doynax: &quot;Re: [cc65] Re: Porting to CC65&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Re:%20Porting%20to%20CC65">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-10-10 20:29:16</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Sun, Oct 10, 2010 at 04:18:28PM +0200, doynax wrote:
+&gt; Here's an example of a typical usage in the player state-machine:
+&gt;
+&gt; state := *+1
+&gt;     jmp (states)
+&gt;
+&gt;     single_page 5*2
+&gt; states:
+&gt; st_dead = &lt;*
+&gt;     .word do_nothing
+&gt; st_walk = &lt;*
+&gt;     .word do_walk
+&gt; st_jump = &lt;*
+&gt;     .word do_jump
+&gt; st_crawl = &lt;*
+&gt;     .word do_crawl
+&gt; st_climb = &lt;*
+&gt;     .word do_climb
+
+Are you sure this table must be within a single page? A can only see a
+requirement for word alignment, caused by the 6502 bug in conjunction with the
+indirect jmp.
+
+&gt; Granted it's not a critical operation, and for really large stuff like
+&gt; full-page tables I can set up a separate segment, but I've got dozens
+&gt; of these so a less wasteful approach than a direct .align would be
+&gt; nice. Of course ideally I would have liked to place the aligned block
+&gt; in a scope and avoid hard-coding a size, but the limitations of ACME
+&gt; forced this approach.
+
+A simple approach would be to replace the macro contents by an .assert, which
+just checks if the data is within a page. This won't do any alignment, but
+notify you about a page cross when linking.
+
+You can also combine this with single segments for each table and place them
+into their own memory area. This allows you to move the tables around without
+touching the code when the linker notifies you about a page cross.
+
+For word aligned data as in the case above (I assume), I would place all these
+tables into one segment and make the segment word aligned. So you're wasting
+just one byte for the alignment of the segment and not one byte per table.
+
+There may be more solutions depending on your needs, but if you do really need
+page alignment, there is probably no solution that works perfect without
+manual intervention.
+
+&gt; Looking at the code it seems to align relative to the start of the
+&gt; segment within the object file and exports a minimum alignment
+&gt; requirement, yet the linker script still needs an alignment attribute.
+&gt; Is the segment alignment forced on each fragment from every object
+&gt; file?
+
+A memory area that contains aligned segments needs itself an alignment that is
+at least as large as the largest alignment of the segments contained within.
+The alignment is not forced on each fragment, just on the sections (= part of
+a segment that comes from one object file). This could be improved but is the
+current state.
+
+&gt; Here's an example of the sort of thing I mean. This macros is used to
+&gt; generate sector interleave tables for the drive-code by recursively
+&gt; ticking off bits in a bit-mask representing the track:
+
+The macro looks like it should work with ca65. Can you show me one that
+doesn't work? I have had cases where it is better to split up a macro into two
+or three to make it clean and working.
+
+&gt; Oh, and I realize that you're swamped with feature requests but better
+&gt; error messages for macro expansions would be really nice.
+
+I know that, but thanks anyway:-) If it were easy to do I would have added it
+already. So I cannot promise anything.
+
+&gt; Also an alternative macro pseudo-op (say .xmac) with pre-evaluated
+&gt; parameters (or perhaps a per-argument operator) would be great as it's
+&gt; awfully easy to forget to parenthesize expressions. I suppose I should
+&gt; be used to this from all those years of writing C code but I still
+&gt; managed to get bitten in that interleave macro ;)
+
+You can already emulate that by using a wrapper macro and/or local symbols for
+evaluation. And once you are familiar with it, it is no longer a problem:-)
+
+&gt; That sounds like exactly what I am trying to do, the equivalent of C
+&gt; header files, except I tried to export functions within a scope. So I
+&gt; might for instance refer access all loader-related functions and
+&gt; constants through a loader:: namespace, and ended up with colliding
+&gt; scope definitions in the include file and the module code.
+&gt; Being able to define the labels outside of the scope they belong to
+&gt; would kind of solve this problem but I'd lose the convenience of
+&gt; leaving out the prefixes within module itself, so I'll probably go
+&gt; back to prefixing my labels with &quot;ld_&quot; instead. Frankly namespaces in
+&gt; C++ also always seemed to cause more problems than they solved.
+
+The reason for scopes not being as consistent as one would expect them are
+historical. ca65 was once a rewrite (with some additional features) of a DOS
+based 6502/65816 assembler. Relocative code and exports/imports were there
+from day one, but scopes were added later. If I had to do it again, I would
+change this and a few other things. But even as it is, it is probably one of
+the most capable assemblers out there. Unfortunately its feature richness
+comes with the price of additional complexity. But especially for larger
+projects I think it's well worth the effort.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Oct 10 20:29:23 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8671.html" title="Next message in the list">doynax: "Re: [cc65] Re: Porting to CC65"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8669.html" title="Previous message in the list">doynax: "Re: [cc65] Re: Porting to CC65"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8669.html" title="Message to which this message replies">doynax: "Re: [cc65] Re: Porting to CC65"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8671.html" title="Next message in this discussion thread">doynax: "Re: [cc65] Re: Porting to CC65"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8671.html" title="Message sent in reply to this message">doynax: "Re: [cc65] Re: Porting to CC65"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8670" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8670" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8670" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-10-10 20:29:27 CEST
+</em></small></p>
+</body>
+</html>

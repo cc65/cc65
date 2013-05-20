@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Atari port of cc65</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Atari port of cc65">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Atari port of cc65</h1>
+<!-- received="Fri Mar 10 10:19:31 2000" -->
+<!-- isoreceived="20000310091931" -->
+<!-- sent="Fri, 10 Mar 2000 10:19:19 +0100 (CET)" -->
+<!-- isosent="20000310091919" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Atari port of cc65" -->
+<!-- id="200003100919.KAA21014@trixie.musoftware.de" -->
+<!-- inreplyto="4125689E.000494F2.00@saturn.aladdin.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Atari%20port%20of%20cc65"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2000-03-10 10:19:19
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0075.html">Sidney Cadot: "[cc65] bug in shifts of long-type values"</a>
+<li><strong>Previous message:</strong> <a href="0073.html">cpg_at_aladdin.de: "RE: [cc65] Atari port of cc65"</a>
+<li><strong>In reply to:</strong> <a href="0073.html">cpg_at_aladdin.de: "RE: [cc65] Atari port of cc65"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+&gt; I don't think I've used overly much of the original Dunning
+&gt; code. The patch I've sent to you moves those files into an
+&gt; &quot;old&quot; directory, therefore they appear very prominently in
+&gt; the patch file...
+
+I had a discussion about using Johns code with Mark lately. My position on
+this is: Don't use it. The most prominent argument against it is the
+copyright: It is not as free as it could be. In addition, the code is old and
+does need a rewrite in many places anyway, so it is not much more work to just
+leave it alone and write your own (maybe better) stuff.
+
+I have tried to keep the library clean in this respect and it would be a pity
+to reintroduce old license with the atari port.
+
+I have to admit that this is a personal preference (licensing issues for open
+source stuff are usually an almost religious issue anyway:-). I was in the
+situation more than once, that I could not use a piece of code for a freeware
+project because it was GPLed. So I'm somewhat sensitive when it comes to
+licensing issues. Of course anyone may choose the license he likes best for
+his own code, but this does not mean that I don't have any preferences:-)
+
+&gt; One of the  biggest differences I found is in cputc.s. You use the CIO
+&gt; for this, my version writes directly to screen. I also had a CIO
+&gt; version before, but I changed it, because I think the conio stuff
+&gt; (and so cputc, compared to putc) is optimized for speed!?
+&gt; What do you (and others) think?
+
+I don't know anything about CIO, but what I had in mind with the conio module
+was to give fast and easy low level access to screen and keyboard. For the
+CBMs (and the Apple) this was not possible without using direct access. Some
+of the interface definitions for the conio functions disallow using kernal
+functions on the CBMs. An example is cputc: It should be possible to write to
+the lower right screen position without scrolling. Without this, it is
+impossible to use conio for building screen masks.
+
+I don't know if the CIO interface allows this level of control. If so, it
+would be ok to use it. On the other side, it is often not a good idea to mix
+different access levels to a device, because using high level functions on one
+side and accessing stuff directly on the other may not work well together.
+
+The standard C functions (putc, getc, printf, ...) were thought to do the high
+level access. On the CBMs they should use the official kernal functions (or at
+least, be compatible with these functions). Because these functions do not
+exist for now, the difference may not be that obvious.
+
+&gt; I here define a EXEHDR segment, which contains
+&gt; the data for the Atari DOS EXE header, and an additional
+&gt; segment  AUTOSTRT, which provides autostart when
+&gt; loaded from plain DOS. (see crt0.s on how both are
+&gt; set up).
+
+I like the idea to put the header in a separate segment. This would also allow
+to have two different headers for different types of executables and throw
+away the headers not needed by assigning an empty output file.
+
+&gt; I would prefer a possibility to define an address at
+&gt; link time  (this works with %S), and fall back to some
+&gt; default value (specified here in target.c) if no &quot;-S&quot;
+&gt; switch is given at link time. I don't know whether
+&gt; this is possible with current ld scripts?  (Uz?)
+&gt; Similarly I would like to specify the size of  RAM
+&gt; to something like &quot;$c000-start&quot;. Is this possible?
+
+This is currently not possible, but a minor change in the linker. All that the
+linker has to do is to treat the default start address as target specific. So,
+as an example, if the atari target is enabled, 0xB00 is assigned to the start
+address and %S is used in the linker config file. If no start address is
+specified, the default one is used.
+
+&gt; PS: we're still using/adapting much JRD stuff. Does anybody
+&gt; know about his current whereabouts?
+
+I would also be glad if someone had an mail/postal address so I could try to
+contact him.
+
+Regards
+
+
+	Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Atari%20port%20of%20cc65">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Atari%20port%20of%20cc65">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0075.html">Sidney Cadot: "[cc65] bug in shifts of long-type values"</a>
+<li><strong>Previous message:</strong> <a href="0073.html">cpg_at_aladdin.de: "RE: [cc65] Atari port of cc65"</a>
+<li><strong>In reply to:</strong> <a href="0073.html">cpg_at_aladdin.de: "RE: [cc65] Atari port of cc65"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:35 CET</em>
+</em>
+</small>
+</body>
+</html>

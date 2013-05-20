@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] compiler problem?</title>
+<meta name="Author" content="Christian Groessler (chris1groessler.org)" />
+<meta name="Subject" content="[cc65] compiler problem?" />
+<meta name="Date" content="2004-10-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] compiler problem?</h1>
+<!-- received="Sun Oct 10 00:55:50 2004" -->
+<!-- isoreceived="20041009225550" -->
+<!-- sent="10 Oct 2004 00:55:42 +0200" -->
+<!-- isosent="20041009225542" -->
+<!-- name="Christian Groessler" -->
+<!-- email="chris1groessler.org" -->
+<!-- subject="[cc65] compiler problem?" -->
+<!-- id="87mzyvlcwh.fsf@strommasten.groessler.org" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4615.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] --forget-inc-paths doesn't work for cl65&quot;">Next message</a> ]
+[ <a href="4613.html" title="Christian Groessler: &quot;[cc65] --forget-inc-paths doesn't work for cl65&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4616.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] compiler problem?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Christian Groessler &lt;<a href="mailto:chris1groessler.org?Subject=Re:%20[cc65]%20compiler%20problem?">chris1groessler.org</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-10-10 00:55:42</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Uz,
+
+consider the following program:
+
+-------------------
+#include &lt;stdio.h&gt;
+#include &lt;conio.h&gt;
+#include &lt;string.h&gt;
+
+char hello[] = &quot;Hi there!\n&quot;;
+
+void myputs(char *string)
+{
+  printf(&quot;string before: %p\n&quot;, string);
+
+  /*while (*string) putchar(*string++);*/
+  while (*string) cputc(*string++);
+  /*while (*string) printf(&quot;%c&quot;, *string++);*/
+
+  printf(&quot;\nstring after: %p\n&quot;, string);
+}
+
+
+int main(void)
+{
+  myputs(hello);
+  return 0;
+}
+-------------------
+
+myputs() doesn't print the output string and the &quot;string after&quot; value
+is way off. The same problem occurs if I use putchar instead of cputc
+to do the output.
+It works fine if I use printf to do the output.
+
+regards,
+chris
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Oct 10 00:55:50 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4615.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] --forget-inc-paths doesn't work for cl65"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4613.html" title="Previous message in the list">Christian Groessler: "[cc65] --forget-inc-paths doesn't work for cl65"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4616.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] compiler problem?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4616.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] compiler problem?"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="4617.html" title="Message sent in reply to this message">Christian Groessler: "Re: [cc65] compiler problem?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4614" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4614" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4614" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-10-10 00:55:59 CEST
+</em></small></p>
+</body>
+</html>

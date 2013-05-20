@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Apple2 Libraries - Current</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Apple2 Libraries - Current status of file io ?" />
+<meta name="Date" content="2004-07-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Apple2 Libraries - Current status of file io ?</h1>
+<!-- received="Thu Jul 29 13:43:43 2004" -->
+<!-- isoreceived="20040729114343" -->
+<!-- sent="Thu, 29 Jul 2004 13:43:39 +0200" -->
+<!-- isosent="20040729114339" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Apple2 Libraries - Current status of file io ?" -->
+<!-- id="20040729114339.GA31093@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="4108D55D.3040205&#64;comcast.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4333.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Apple2 Libraries - Current status of file io ?&quot;">Next message</a> ]
+[ <a href="4331.html" title="jim: &quot;Re: [cc65] Apple2 Libraries - Current status of file io ?&quot;">Previous message</a> ]
+[ <a href="4330.html" title="jim: &quot;Re: [cc65] Apple2 Libraries - Current status of file io ?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+[ <a href="4315.html" title="Greg King: &quot;Re: [cc65] Apple2 Libraries - Current status of file io ?&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Apple2%20Libraries%20-%20Current%20status%20of%20file%20io%20?">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-07-29 13:43:39</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Thu, Jul 29, 2004 at 06:45:49AM -0400, jim wrote:
+&gt; errno.inc - additions:
+&gt; ENOTDIR        =    20    ; A component is not a directory
+
+Can be mapped to ENOENT or EINVAL.
+
+&gt; EROFS        =    21    ; Read only file system &amp; write requested
+
+Can be mapped to EACCES.
+
+&gt; EBADF        =    22    ; fd not a valid file descp or not open for writing
+
+Can be mapped to EINVAL.
+
+The reason why I'm trying to keep the number of different error codes low is
+because
+
+  1. the strerrno function gets larger with each error code added, and
+
+  2. for debugging, the system dependent error code can be checked which
+     is available anyway, and describes the error better.
+
+&gt; I've checked the 2.10 version and seen that the SEEK codes are already
+&gt; there so that change doesn't need to be done.
+
+2.10 is old already. When developing new stuff, you should have a look at the
+current development snapshot, since this is the codebase on which new stuff
+will finally running.
+
+&gt; Uz,  do you have any documentation on the new loadable modules and how
+&gt; it's supposed to work ?  Without such functionality I was thinking of
+&gt; having two Apple DOS libraries, however, with loadable modules it is
+&gt; possible to load just what is wanted from a developer point of view.
+
+As I said before: You cannot load disk drivers as loadable modules. The most
+prominent reason is that the modules are loaded from disk, and if you cannot
+access the disk, because the module is missing, you cannot load said module
+from the disk ...
+
+There are several more reasons that make loadable modules not very attractive
+for disk access:
+
+  * Writing loadable modules in C has a high overhead, because the runtime is
+    not shared between a program and the module.
+
+  * Loadable modules cannot call application code or access application data
+    easily. This means that you cannot set __oserror, __errno or whatever, and
+    you cannot call any functions that are statically linked to the
+    application.
+
+  * Loadable modules cannot load or call other loadable modules, so you cannot
+    &quot;stack&quot; them.
+
+  * While the linker includes just includes the needed stuff when statically
+    linking, with a loadable module, one does always get the whole module,
+    even if part of it is not used. This means that loadable modules have a
+    bigger memory footprint compared to statically linked code.
+
+My suggestion would therefore be to forget loadable modules for your purpose.
+They are nice, but the wrong tool in the given case.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Jul 29 13:43:43 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4333.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4331.html" title="Previous message in the list">jim: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4330.html" title="Message to which this message replies">jim: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4315.html" title="Next message in this discussion thread">Greg King: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4332" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4332" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4332" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-07-29 13:43:52 CEST
+</em></small></p>
+</body>
+</html>

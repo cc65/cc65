@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] assembly subroutine return val</title>
+<meta name="Author" content="Shawn Jefferson (jefferson_shawn_a8bit1yahoo.com)" />
+<meta name="Subject" content="[cc65] assembly subroutine return value" />
+<meta name="Date" content="2004-07-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] assembly subroutine return value</h1>
+<!-- received="Thu, 29 Jul 2004 08:48:47 -0700 (PDT)" -->
+<!-- isoreceived="20040729154847" -->
+<!-- sent="Thu, 29 Jul 2004 08:48:47 -0700 (PDT)" -->
+<!-- isosent="20040729154847" -->
+<!-- name="Shawn Jefferson" -->
+<!-- email="jefferson_shawn_a8bit1yahoo.com" -->
+<!-- subject="[cc65] assembly subroutine return value" -->
+<!-- id="20040729154847.35986.qmail@web52208.mail.yahoo.com" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4335.html" title="Adam Thornton: &quot;Re: [cc65] Apple2 Libraries - Current status of file io ?&quot;">Next message</a> ]
+[ <a href="4333.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Apple2 Libraries - Current status of file io ?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4337.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] assembly subroutine return value&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Shawn Jefferson &lt;<a href="mailto:jefferson_shawn_a8bit1yahoo.com?Subject=Re:%20[cc65]%20assembly%20subroutine%20return%20value">jefferson_shawn_a8bit1yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-07-29 17:48:47</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+From within a C function I am calling an assembly
+language subroutine that puts its return value in the
+A reg on return.
+
+Is the following correct code to get that put into a
+local variable called &quot;ret&quot; ?
+
+asm(&quot;jsr $C812&quot;);
+asm(&quot;ldy %o&quot;, ret);
+asm(&quot;sta (sp),y&quot;);
+
+Thanks,
+Shawn Jefferson
+
+
+
+		
+__________________________________
+Do you Yahoo!?
+New and Improved Yahoo! Mail - Send 10MB messages!
+<a href="http://promotions.yahoo.com/new_mail">http://promotions.yahoo.com/new_mail</a> 
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu, 29 Jul 2004 08:48:47 -0700 (PDT)</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4335.html" title="Next message in the list">Adam Thornton: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4333.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4337.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] assembly subroutine return value"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4337.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] assembly subroutine return value"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="4344.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] assembly subroutine return value"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4334" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4334" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4334" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-07-29 17:49:00 CEST
+</em></small></p>
+</body>
+</html>

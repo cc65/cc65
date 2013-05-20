@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] range error (was: bitwise </title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="Re: [cc65] range error (was: bitwise not broken in ca65?)" />
+<meta name="Date" content="2012-01-13" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] range error (was: bitwise not broken in ca65?)</h1>
+<!-- received="Fri Jan 13 17:19:05 2012" -->
+<!-- isoreceived="20120113161905" -->
+<!-- sent="Fri, 13 Jan 2012 17:18:55 +0100" -->
+<!-- isosent="20120113161855" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="Re: [cc65] range error (was: bitwise not broken in ca65?)" -->
+<!-- id="201201131718.55600.groepaz@gmx.net" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="4F0F45B1.5000804&#64;spruck.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9880.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] range error (was: bitwise not broken in ca65?)&quot;">Next message</a> ]
+[ <a href="9878.html" title="Björn Spruck: &quot;[cc65] range error (was: bitwise not broken in ca65?)&quot;">Previous message</a> ]
+[ <a href="9878.html" title="Björn Spruck: &quot;[cc65] range error (was: bitwise not broken in ca65?)&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9880.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] range error (was: bitwise not broken in ca65?)&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20range%20error%20(was:%20bitwise%20not%20broken%20in%20ca65?)">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-01-13 17:18:55</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Thursday 12 January 2012, you wrote:
+&gt; &gt;The range error check in older versions of the assembler did miss all
+&gt; 
+&gt; cases where the number was negative, which is why some &gt;constructs
+&gt; worked when they shouldn't have worked. To see why the old assembler
+&gt; version was wrong, just try lda #-300 It is silently &gt;truncated to &quot;$A9
+&gt; $D4&quot;. This has now been fixed, which results in a diagnostic for old
+&gt; code that exploits the behaviour.
+&gt; 
+&gt; &gt; I can of course add a &quot;truncate any number until it fits&quot; flag to the
+&gt; &gt; assembler, but I'm pretty sure most people won't be happy with that.
+&gt; &gt; 
+&gt; &gt; Of course I can see your problem, and I'm very sorry for introducing the
+&gt; &gt; error in the first place. I know that fixing it now causes trouble, but
+&gt; &gt; I'm sure it's better this way than accepting and silently truncating
+&gt; &gt; numbers that are out of range.
+&gt; 
+&gt; just my few cents:
+&gt; 
+&gt; if
+&gt; .byte 3,2,1,0,-1,-2,-3
+&gt; is not compiling I find this annoying
+
+down to the point where i am thinking about switching toolchain infact =P
+
+-- 
+
+<a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    <a href="http://magicdisk.untergrund.net">http://magicdisk.untergrund.net</a>
+<a href="http://www.pokefinder.org">http://www.pokefinder.org</a>        <a href="http://ftp.pokefinder.org">http://ftp.pokefinder.org</a>
+
+Modern art is what happens when painters stop looking at girls and persuade 
+themselves that they have a better idea. 
+&lt;John Ciardi&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Jan 13 17:19:05 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9880.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] range error (was: bitwise not broken in ca65?)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9878.html" title="Previous message in the list">Björn Spruck: "[cc65] range error (was: bitwise not broken in ca65?)"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9878.html" title="Message to which this message replies">Björn Spruck: "[cc65] range error (was: bitwise not broken in ca65?)"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9880.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] range error (was: bitwise not broken in ca65?)"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9879" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9879" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9879" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-01-13 17:19:09 CET
+</em></small></p>
+</body>
+</html>

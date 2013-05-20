@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Need some help with a memo</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="Re: [cc65] Need some help with a memory leak" />
+<meta name="Date" content="2010-05-05" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Need some help with a memory leak</h1>
+<!-- received="Wed May  5 20:59:52 2010" -->
+<!-- isoreceived="20100505185952" -->
+<!-- sent="Wed, 5 May 2010 20:59:40 +0200" -->
+<!-- isosent="20100505185940" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="Re: [cc65] Need some help with a memory leak" -->
+<!-- id="20100505185940.GD29756@trikaliotis.net" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="i2qf7655a611005041557n995b388bu5c0e96ebbfcb1be2&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8354.html" title="Daniel Pralle: &quot;Re: [cc65] C128 Bank Switching and cc65&quot;">Next message</a> ]
+[ <a href="8352.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Re: C128 Bank Switching and cc65&quot;">Previous message</a> ]
+[ <a href="8343.html" title="Johan Kotlinski: &quot;Re: [cc65] Need some help with a memory leak&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8359.html" title="Chiron Bramberger: &quot;[cc65] - object oriented style&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20[cc65]%20Need%20some%20help%20with%20a%20memory%20leak">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-05-05 20:59:40</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello Johan,
+
+* On Wed, May 05, 2010 at 12:57:09AM +0200 Johan Kotlinski wrote:
+&gt; &gt; if(currentNode-&gt;dir_entry != NULL)
+&gt; &gt; {
+&gt; &gt;    free(currentNode-&gt;dir_entry);
+&gt; &gt; }
+&gt; 
+&gt; One suggestion: You could remove this unnecessary NULL check. free()
+&gt; does nothing when passed a null pointer.
+
+But what if anyone wants to compile the code with a pre-ANSI compiler?
+
+Naw, just kidding.
+
+However, personally, I still prefer the free() with a check. It tells me
+that some thought has been done by the programmer that the pointer might
+be zero. (&quot;Wrong code should look wrong.&quot;)
+
+Only if I am really sure the pointer cannot be NULL, I write it without
+the if. Additionally, I prefer something like an assert() to ensure this
+through debugging, and again, telling a reader of my code that I
+considered this.
+
+Of course, you are right, free() is required to be a no-op for NULL
+pointers since 1989. However, this is not true for every function. Why
+should we distinguish between them? It only makes it harder to find out
+that something is wrong.
+
+(Now, don't look at any of my code and tell me: &quot;But there, you did it
+differently.&quot; Yes, I know it. My personal taste and coding style changes
+from different factors over the time.)
+
+Regards,
+Spiro.
+
+-- 
+Spiro R. Trikaliotis                              <a href="http://opencbm.sf.net/">http://opencbm.sf.net/</a>
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>                     <a href="http://www.viceteam.org/">http://www.viceteam.org/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed May  5 20:59:52 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8354.html" title="Next message in the list">Daniel Pralle: "Re: [cc65] C128 Bank Switching and cc65"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8352.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Re: C128 Bank Switching and cc65"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8343.html" title="Message to which this message replies">Johan Kotlinski: "Re: [cc65] Need some help with a memory leak"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8359.html" title="Next message in this discussion thread">Chiron Bramberger: "[cc65] - object oriented style"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8353" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8353" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8353" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-05-05 20:59:55 CEST
+</em></small></p>
+</body>
+</html>

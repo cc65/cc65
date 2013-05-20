@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] a question about the write</title>
+<meta name="Author" content="Jac Ato (jaxatwork11gmail.com)" />
+<meta name="Subject" content="Re: [cc65] a question about the write function" />
+<meta name="Date" content="2007-02-13" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] a question about the write function</h1>
+<!-- received="Tue Feb 13 05:13:39 2007" -->
+<!-- isoreceived="20070213041339" -->
+<!-- sent="Mon, 12 Feb 2007 23:13:32 -0500" -->
+<!-- isosent="20070213041332" -->
+<!-- name="Jac Ato" -->
+<!-- email="jaxatwork11gmail.com" -->
+<!-- subject="Re: [cc65] a question about the write function" -->
+<!-- id="1c282c9d0702122013r6971417fvc9c3ac69b599a5ea@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="1c282c9d0702121850uee3f5f8s1c9934af2680b735&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5640.html" title="Apple2Stuff: &quot;[cc65] Include paths?&quot;">Next message</a> ]
+[ <a href="5638.html" title="Jac Ato: &quot;Re: [cc65] a question about the write function&quot;">Previous message</a> ]
+[ <a href="5638.html" title="Jac Ato: &quot;Re: [cc65] a question about the write function&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5640.html" title="Apple2Stuff: &quot;[cc65] Include paths?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Jac Ato &lt;<a href="mailto:jaxatwork11gmail.com?Subject=Re:%20[cc65]%20a%20question%20about%20the%20write%20function">jaxatwork11gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-02-13 05:13:32</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Problem fixed: the latest snapshop for the nes library did it. I had
+to go all the way to 2005: &quot;[cc65] Need help getting started with cc65
+NES&quot; thread specifically.
+
+Please update the nes.zip from the download section. I really think
+that naive people (like me) would download this version first...
+
+anyway thanks for all the help!
+
+JA
+
+On 2/12/07, Jac Ato &lt;jaxatwork1&#64;gmail&#46;<!--nospam-->com&gt; wrote:
+&gt; Hi,
+&gt;
+&gt; I was able to find a fix for it:
+&gt;
+&gt; The loader seems to create a wrong .nes file, with two bad addresses.
+&gt; Maybe its with my configuration (im using the built-in NES
+&gt; configuration file). But doing this fix allows me to pipe the printf
+&gt; to my serial port successfully.
+&gt;
+&gt; First, I need to get the __DESTRUCTOR_TABLE__ address from my map.txt
+&gt; file. Once ive got this, i change the data at the addresses: $801F and
+&gt; $8023 to reflect the right address. I dont have a clue why ld65 is
+&gt; putting in the wrong address, but once this is done, then it runs
+&gt; perfectly. Is there anything that I am missing or doing wrong? Why is
+&gt; it that the wrong addresses are inserted in the STARTUP code?
+&gt;
+&gt; $801E:A9 0B     LDA #$..;here is the wrong address
+&gt; $8020:85 0A     STA $000A = #$9A
+&gt; $8022:A9 8E     LDA #$..;and here too!
+&gt; $8024:85 0B     STA $000B = #$8C
+&gt;
+&gt; If someone knows the right way of doing this, I would really, really appreciate.
+&gt;
+&gt; The bad thing is that we have deployed some applications successfully
+&gt; without ever noticing that there was something wrong (UIP actually
+&gt; works smoothly without any patch).
+&gt;
+&gt; Many thanks!
+&gt; JA
+&gt;
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Feb 13 05:13:39 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5640.html" title="Next message in the list">Apple2Stuff: "[cc65] Include paths?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5638.html" title="Previous message in the list">Jac Ato: "Re: [cc65] a question about the write function"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5638.html" title="Message to which this message replies">Jac Ato: "Re: [cc65] a question about the write function"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5640.html" title="Next message in this discussion thread">Apple2Stuff: "[cc65] Include paths?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5640.html" title="Message sent in reply to this message">Apple2Stuff: "[cc65] Include paths?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5639" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5639" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5639" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-02-13 05:13:43 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] cl65 -t apple2 works, but </title>
+<meta name="Author" content="Greg King (greg.king41verizon.net)" />
+<meta name="Subject" content="Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't" />
+<meta name="Date" content="2007-09-11" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't</h1>
+<!-- received="Tue Sep 11 09:44:16 2007" -->
+<!-- isoreceived="20070911074416" -->
+<!-- sent="Tue, 11 Sep 2007 00:48:50 -0400" -->
+<!-- isosent="20070911044850" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king41verizon.net" -->
+<!-- subject="Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't" -->
+<!-- id="008d01c7f447$8d5baf80$443efea9@monarch" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="20070910163448.GA10358&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5872.html" title="German Gonzalez: &quot;Re: [cc65] Variables + Local Static&quot;">Next message</a> ]
+[ <a href="5870.html" title="Scott Alfter: &quot;SOLVED: Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't&quot;">Previous message</a> ]
+[ <a href="5868.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5874.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king41verizon.net?Subject=Re:%20[cc65]%20cl65%20-t%20apple2%20works,%20but%20cl65%20-C%20apple2.cfg%20doesn't">greg.king41verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-09-11 06:48:50</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: &quot;Ullrich von Bassewitz&quot;; on Monday, September 10, 2007; at 12:34
+PM -0400
+&gt;
+&gt; This is what happens on my machine with a fresh 2.11.0 install:
+&gt;
+&gt; -------------------------------------------------------------------------
+&gt; uz&#64;trixie:~/samples$ cl65 -C apple2-tgi&#46;<!--nospam-->cfg tgidemo.c
+&gt; ld65: Warning: apple2-tgi.cfg(7): Segment `EXEHDR' does not exist
+&gt; -------------------------------------------------------------------------
+&gt;
+&gt; I've also looked at the sources, and there is no import of __RAM_SIZE__
+&gt; in line 13 of crt0.s (as your error message says).  In fact,
+&gt; the apple start-up file has never used __RAM_SIZE__ at all.
+
+Yes, that is half of the reason for those error messages.  The other half is
+that his command didn't link the Apple 2's start-up file -- it linked the
+C64's file (which does want __RAM_SIZE__, and doesn't create EXEHDR.)!
+
+
+Scott,
+you would need to put _both_ of the &quot;-t&quot; and &quot;-C&quot; options on the command
+line:
+
+cl65 -t apple2 -C apple2-tgi.cfg tgidemo.c
+
+cl65 is the tool-chain manager; it runs other programs (depending on what
+types of files you have at the start of the command's execution, and what
+types you want to have at the end).  In the above example,
+cl65 gives the &quot;-t&quot; option to cc65 and ca65; then it gives the &quot;-C&quot; option
+to ld65.  Also, cl65 looks at the &quot;-t&quot; option when it chooses which start-up
+and library files to link with your program.
+
+If you don't put a &quot;-t&quot; option in a cl65 command-line, then cl65 will assume
+that you wanted &quot;-t c64&quot;.  It isn't smart enough to figure out what a &quot;-C&quot;
+option can imply about &quot;-t&quot;.  You must tell it explicitly which
+platform-type you want.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Sep 11 09:44:16 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5872.html" title="Next message in the list">German Gonzalez: "Re: [cc65] Variables + Local Static"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5870.html" title="Previous message in the list">Scott Alfter: "SOLVED: Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5868.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5874.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5874.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5871" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5871" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5871" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-09-11 09:44:18 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] ca65 syntax problems</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] ca65 syntax problems">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] ca65 syntax problems</h1>
+<!-- received="Tue Nov  6 12:14:07 2001" -->
+<!-- isoreceived="20011106111407" -->
+<!-- sent="Tue, 6 Nov 2001 12:10:06 +0100" -->
+<!-- isosent="20011106111006" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] ca65 syntax problems" -->
+<!-- id="1381181377.20011106121006@gmx.net" -->
+<!-- inreplyto="20011106103426.E27061@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20ca65%20syntax%20problems"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2001-11-06 12:10:06
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0926.html">Mike McCarty: "Re: [cc65] ca65 syntax problems"</a>
+<li><strong>Previous message:</strong> <a href="0924.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<li><strong>In reply to:</strong> <a href="0924.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0929.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<li><strong>Reply:</strong> <a href="0929.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+Tuesday, November 06, 2001, 10:34:26 AM, you wrote:
+
+
+UvB&gt; On Mon, Nov 05, 2001 at 08:51:09PM +0100, groepaz wrote:
+&gt;&gt; err?! why does polling incorporate bad handshake? ;=) 16bytes FIFO
+&gt;&gt; should give more than enough time to raise RTS in time (maybe its a
+&gt;&gt; problem with the AICA having no fifo, but its definetly not with the 16c550)
+
+UvB&gt; How does your application know, it has to enable flow control, just because it
+UvB&gt; outputs something to the screen?
+
+no ;o) the current &quot;driver&quot; keeps RTS _always_ on, unless you want to
+get a byte from the serial line, for that matter it drops the RTS line
+to low for a few cycles (enough for a character to arrive) and then
+reads the character. from my understanding, this is what polling is
+all about (anything that would loose data under whatever circumstances
+is neither polling nor whatever but its WRONG code ;=P)
+
+&gt;&gt; i get about 8k/sec though, which i think aint that bad anyway.
+
+UvB&gt; Yes, but it depends heavily on the application and requires knowledge of the
+UvB&gt; application about the underlying driver architecture.
+
+NO... why in particular should it make a difference anyway? all the
+application needs to know is what functions to call to read (or send)
+a byte - the application basically shouldnt give a fuck what technique
+the driver uses to work no? ;=P
+
+UvB&gt; Interrupt driven code
+UvB&gt; would work automagically without the application knowing what's going on
+UvB&gt; (including hardware flow control!).
+
+same for my routines :o) has nothing to do with using interupts or not
+really ;=P (i really wonder why you think that actually)
+
+UvB&gt; Admitted, for your purpose polling may be ok, but for my taste it's not
+UvB&gt; generic enough to be used as general purpose code.
+
+yes, true.... well... like i said before, i have never ever used a
+different method in plenty of years doing that kinda datatransfer crap
+so i'd say, unless you are writing sth like a &quot;real&quot; high-performance
+driver for an operating system or so, you can get of with polling
+pretty well ;o) (and yes, for sth like a terminal-program its probably
+not the worst thing to use interupts either ;=))
+
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20ca65%20syntax%20problems">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20ca65%20syntax%20problems">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0926.html">Mike McCarty: "Re: [cc65] ca65 syntax problems"</a>
+<li><strong>Previous message:</strong> <a href="0924.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<li><strong>In reply to:</strong> <a href="0924.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0929.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<li><strong>Reply:</strong> <a href="0929.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:44 CET</em>
+</em>
+</small>
+</body>
+</html>

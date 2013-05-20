@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] CBM POSIX I/O - USR Files</title>
+<meta name="Author" content="silverdr1wfmh.org.pl (silverdr1wfmh.org.pl)" />
+<meta name="Subject" content="Re: [cc65] CBM POSIX I/O - USR Files" />
+<meta name="Date" content="2010-03-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] CBM POSIX I/O - USR Files</h1>
+<!-- received="Mon Mar 29 01:02:59 2010" -->
+<!-- isoreceived="20100328230259" -->
+<!-- sent="Mon, 29 Mar 2010 01:02:49 +0200" -->
+<!-- isosent="20100328230249" -->
+<!-- name="silverdr1wfmh.org.pl" -->
+<!-- email="silverdr1wfmh.org.pl" -->
+<!-- subject="Re: [cc65] CBM POSIX I/O - USR Files" -->
+<!-- id="B5D18C97-C5FF-4161-A3B4-3442C2A4A5F7@wfmh.org.pl" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="f97798c21003281416r7380f851i9d16d7648feb5db3&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7996.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] CBM POSIX I/O - USR Files&quot;">Next message</a> ]
+[ <a href="7994.html" title="Groepaz: &quot;Re: [cc65] CBM POSIX I/O - USR Files&quot;">Previous message</a> ]
+[ <a href="7993.html" title="Oliver Schmidt: &quot;[cc65] CBM POSIX I/O - USR Files&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8003.html" title="Oliver Schmidt: &quot;Re: [cc65] CBM POSIX I/O - USR Files&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:silverdr1wfmh.org.pl?Subject=Re:%20[cc65]%20CBM%20POSIX%20I/O%20-%20USR%20Files">silverdr1wfmh.org.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-03-29 01:02:49</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 2010-03-28, at 23:16, Oliver Schmidt wrote:
+
+&gt; If I use cc65's POSIX I/O functions on the C64 to create a file, it
+&gt; has the file type USR. According to what I found out this file type is
+&gt; quite special
+
+Not really. PRG is probably more special as it has (ar rather is being  
+expected to have) two bytes loading address at the beginning of the  
+file.
+
+&gt; - PRG ans SEQ are much more common.
+
+That's true, indeed. Simply most programmers didn't find any real use  
+for USR files.
+
+&gt; So my question is:
+&gt; Why USR? I found a hint that both PRG and SEQ are limited in size,
+&gt; maybe USR not?
+
+I think there is no real difference in the limits. REL files have  
+different limits but they are generally different.
+
+&gt;
+&gt; BTW: I was looking in VICE' 1541 tool for an option to set the desired
+&gt; file type when writing files into disk images. There was none
+&gt; documented so I checked out the source to find that PRG is hardcoded
+&gt; there.
+
+As default, that is.
+
+&gt; All this leaves me (as a non-CBM insider) quite puzzled: If non-PRG
+&gt; files play a significant role, then why does a supposed-to-be-mature
+&gt; tool like 1541 not support them ?!?
+
+? Of course it does.. ;-)
+
+c1541 #8&gt; attach image.d64
+c1541 #8&gt; dir
+0 &quot;hobby           &quot; hb 2a
+Empty image
+664 blocks free.
+
+c1541 #8&gt; write .profile profile
+Writing file `.PROFILE' as `PROFILE' to unit 8.
+
+c1541 #8&gt; dir
+0 &quot;hobby           &quot; hb 2a
+1     &quot;profile         &quot;  prg
+663 blocks free.
+
+c1541 #8&gt; write .profile profiles,s
+Writing file `.PROFILE' as `PROFILES,S' to unit 8.
+c1541 #8&gt; dir
+0 &quot;hobby           &quot; hb 2a
+1     &quot;profile         &quot;  prg
+1     &quot;profiles        &quot;  seq
+662 blocks free.
+
+c1541 #8&gt; write .profile profileu,u
+Writing file `.PROFILE' as `PROFILEU,U' to unit 8.
+c1541 #8&gt; dir
+0 &quot;hobby           &quot; hb 2a
+1     &quot;profile         &quot;  prg
+1     &quot;profiles        &quot;  seq
+1     &quot;profileu        &quot;  usr
+661 blocks free.
+
+-- 
+SD!
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Mar 29 01:02:59 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7996.html" title="Next message in the list">silverdr1wfmh.org.pl: "Re: [cc65] CBM POSIX I/O - USR Files"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7994.html" title="Previous message in the list">Groepaz: "Re: [cc65] CBM POSIX I/O - USR Files"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7993.html" title="Message to which this message replies">Oliver Schmidt: "[cc65] CBM POSIX I/O - USR Files"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8003.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] CBM POSIX I/O - USR Files"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8003.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] CBM POSIX I/O - USR Files"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7995" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7995" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7995" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-03-29 01:03:02 CEST
+</em></small></p>
+</body>
+</html>

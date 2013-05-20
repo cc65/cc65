@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Atari file i/o more info</title>
+<meta name="Author" content="Christian Groessler (cpg_at_aladdin.de)">
+<meta name="Subject" content="Re: [cc65] Atari file i/o more info">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Atari file i/o more info</h1>
+<!-- received="Thu May 16 17:45:27 2002" -->
+<!-- isoreceived="20020516154527" -->
+<!-- sent="16 May 2002 17:45:07 +0200" -->
+<!-- isosent="20020516154507" -->
+<!-- name="Christian Groessler" -->
+<!-- email="cpg_at_aladdin.de" -->
+<!-- subject="Re: [cc65] Atari file i/o more info" -->
+<!-- id="87n0v0ksfw.fsf@power.cnet.aladdin.de" -->
+<!-- inreplyto="[cc65] Atari file i/o more info" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Christian Groessler (<a href="mailto:cpg_at_aladdin.de?Subject=Re:%20[cc65]%20Atari%20file%20i/o%20more%20info"><em>cpg_at_aladdin.de</em></a>)<br>
+<strong>Date:</strong> 2002-05-16 17:45:07
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1327.html">Spiro Trikaliotis: "Re: [cc65] sizeof(&quot;string&quot;) gives wrong results"</a>
+<li><strong>Maybe in reply to:</strong> <a href="1314.html">Shawn Jefferson: "[cc65] Atari file i/o more info"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1330.html">Shawn Jefferson: "Re: [cc65] Atari file i/o more info"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi,
+
+On 05/14/2002 02:28:36 PM MST &quot;Shawn Jefferson&quot; wrote:
+&gt;
+&gt;Ok, I've done some more testing on this and here is what I found:
+&gt;
+&gt;Opening a file in SpartaDOS with the &quot;r+&quot; flag won't trigger feof
+&gt;during a read.  AtariDOS 2.5 seems to work fine.
+&gt;
+&gt;Reading until EOF, then trying to write to the file doesn't seem
+&gt;work, even in AtariDOS.
+
+The feof() works fine here on both DOSes (like you said in your last
+mail), but with my test, writing after reaching eof did not work in
+AtariDOS but did work with SpartaDOS.
+
+fyi, here's my test program:
+
+----------------
+/*
+ * feof test program
+ * 2002, cpg
+ */
+
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;conio.h&gt;
+
+char text[] = &quot;This is the file contents1\n&quot;;
+
+int main(int argc, char **argv)
+{
+    char *filename,*x;
+    char buf[20];
+    FILE *file;
+    size_t n;
+
+    if (argc &lt;= 1) {
+        printf(&quot;\nfilename: &quot;);
+        x = fgets(buf,19,stdin);
+        printf(&quot;\n&quot;);
+        if (!x) {
+            return(0);
+        }
+        filename = x;
+    }
+    else {
+        filename = *(argv+1);
+    }
+
+    printf(&quot;Length of data: %d\n&quot;, strlen(text));
+
+    /* create new file and write something into it */
+    file = fopen(filename,&quot;wb&quot;);
+    if (!file) {
+        fprintf(stderr,&quot;cannot open %s: %s\n&quot;,filename,strerror(errno));
+        return(1);
+    }
+
+    if (fwrite(text, 1, strlen(text), file) != strlen(text)) {
+        fprintf(stderr,&quot;short write, aborted\n&quot;);
+        fclose(file);
+        return(1);
+    }
+    fclose(file);
+
+    /*file = fopen(filename,&quot;r&quot;);*/
+    file = fopen(filename,&quot;r+&quot;);
+    if (!file) {
+        fprintf(stderr,&quot;cannot open %s: %s\n&quot;,filename,strerror(errno));
+        return(1);
+    }
+
+    while (! feof(file)) {
+        n = fread(buf, 1, 2, file);
+        printf(&quot;%ld bytes read: &quot;, (long)n);
+        if (n == 1) printf(&quot;0x%02X&quot;, buf[0]);
+        else if (n == 2) printf(&quot;0x%02X, 0x%02X&quot;, buf[0], buf[1]);
+        printf(&quot;\n&quot;);
+    }
+
+#if 1
+#define WHATS_WRITTEN &quot;&lt;-- even more data --&gt;&quot;
+
+    /* now write s/th */
+    printf(&quot;len to write: %d\n&quot;, strlen/*sizeof*/(WHATS_WRITTEN));
+    n = fwrite(WHATS_WRITTEN, 1, strlen/*sizeof*/(WHATS_WRITTEN), file);
+    printf(&quot;wrote additional %d bytes\n&quot;, n);
+#endif
+
+    fclose(file);
+    printf(&quot;hit return to quit&quot;);
+    cgetc(); printf(&quot;\n&quot;);
+    return(0);
+}
+----------------
+
+regards,
+chris
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Atari%20file%20i/o%20more%20info">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1327.html">Spiro Trikaliotis: "Re: [cc65] sizeof(&quot;string&quot;) gives wrong results"</a>
+<li><strong>Maybe in reply to:</strong> <a href="1314.html">Shawn Jefferson: "[cc65] Atari file i/o more info"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1330.html">Shawn Jefferson: "Re: [cc65] Atari file i/o more info"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-05-16 17:45:31 CEST</em>
+</em>
+</small>
+</body>
+</html>

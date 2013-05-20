@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] linker cfg files</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] linker cfg files">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] linker cfg files</h1>
+<!-- received="Fri Apr 25 00:37:30 2003" -->
+<!-- isoreceived="20030424223730" -->
+<!-- sent="Fri, 25 Apr 2003 00:33:50 +0200" -->
+<!-- isosent="20030424223350" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] linker cfg files" -->
+<!-- id="200304250033.50136.groepaz@gmx.net" -->
+<!-- inreplyto="20030424210323.GB17382@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20linker%20cfg%20files"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2003-04-25 00:33:50
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2897.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<li><strong>In reply to:</strong> <a href="2896.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2900.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<li><strong>Next in thread:</strong> <a href="2886.html">Groepaz: "[cc65] ca65 bug..."</a>
+<li><strong>Reply:</strong> <a href="2900.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Thursday 24 April 2003 23:03, Ullrich von Bassewitz wrote:
+
+&gt; &gt; i fail to see the problem with that :o)
+&gt;
+&gt; It violates 2.: Needs extensions and is not easy. How is the linker
+&gt; supposed to know that __STACKSIZE__ defines the size of the stack? This is
+&gt; what I mean with expressions, a reasonable implementation would need
+&gt; something like
+&gt;
+&gt; MEMORY {
+&gt;     RAM: start = $7FF, size = $c001, define = yes, file = %O;
+&gt;     STACK: start = __RAM_START__ + __RAM_SIZE__, size = __STACKSIZE__,
+&gt;            define = yes, file = &quot;&quot;;
+&gt;     ...
+&gt; }
+
+exactly what i said, you insist on doing the dodgy calculation as is, but in 
+the linker script :) i say its not needed. tell the linker to read the size 
+from the symbols and all is fine. please explain why you think what i say is 
+not sufficient coz i really dont get it. except that other linkers work like 
+you say, what is the reason not to do it like i suggested? ofcoz the linker 
+can know about __STACKSIZE__ if you tell him, it must read the linkerscript 
+at first (unless my understanding of the inner workings of the linker is 
+totally wrong) and then it knows about the values of defined symbols. it can 
+then link everything, including the stack segment (whose size is known). it 
+only needs to know that the heap segment gets linked last, since the linker 
+must know the remaining space in the memory area you load the heap segment 
+into. (if the heap size is specified in linkerscript, heap can be linked like 
+any other segment). 
+
+however, if you just dont like the idea of having a few things like 
+&quot;__STACKSIZE__&quot; hardcoded in the linker (your comment suggests that :=)) and 
+would prefer the generic (imho overkill here) approach you will indeed need 
+expressions and calculate things in the linkerscript like you say....i'm not 
+quite sure if that wouldnt be shooting a fly with a cannonball though :=) no 
+doubt, beeing able to use expressions would add a LOAD of flexibility over my 
+simple approach...the question is, what would be impossible with the simple 
+variant and how much would that rare exception justify the lot of work for 
+the implementation of the expression stuff...i dont quite recall ever having 
+calculated anything but stack/heap stuff in linkerscripts to be honest (and 
+i've written a bunch of them for various consoles etc)
+
+oh well :=P maybe i just like kludges in linkercode better than in the library 
+:=) (this hax0red _heap.s in nes stuff really sux eh? :=P)
+
+gpz
+
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20linker%20cfg%20files">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2897.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<li><strong>In reply to:</strong> <a href="2896.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2900.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<li><strong>Next in thread:</strong> <a href="2886.html">Groepaz: "[cc65] ca65 bug..."</a>
+<li><strong>Reply:</strong> <a href="2900.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-04-25 00:40:30 CEST</em>
+</em>
+</small>
+</body>
+</html>

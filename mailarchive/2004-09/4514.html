@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] RLE Toolkit</title>
+<meta name="Author" content="MagerValp (MagerValp1cling.gu.se)" />
+<meta name="Subject" content="[cc65] RLE Toolkit" />
+<meta name="Date" content="2004-09-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] RLE Toolkit</h1>
+<!-- received="Thu Sep 23 23:34:47 2004" -->
+<!-- isoreceived="20040923213447" -->
+<!-- sent="Thu, 23 Sep 2004 23:34:44 +0200" -->
+<!-- isosent="20040923213444" -->
+<!-- name="MagerValp" -->
+<!-- email="MagerValp1cling.gu.se" -->
+<!-- subject="[cc65] RLE Toolkit" -->
+<!-- id="16723.16756.943272.492598@panini.cling.gu.se" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4515.html" title="Ormund Williams: &quot;[cc65] Porting cc65 to embedded system that has no OS, boot ROM or monitor&quot;">Next message</a> ]
+[ <a href="4513.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Re: Print heart character on C64?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4517.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] RLE Toolkit&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: MagerValp &lt;<a href="mailto:MagerValp1cling.gu.se?Subject=Re:%20[cc65]%20RLE%20Toolkit">MagerValp1cling.gu.se</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-09-23 23:34:44</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I've written a small RLE compression library for a cc65 project, and
+now there's a beta for everyone to test:
+
+  <a href="http://www.paradroid.net/rle/rletoolkit-beta1.zip">http://www.paradroid.net/rle/rletoolkit-beta1.zip</a>
+
+It has NOT been tested extensively, and might corrupt your files or
+set your cat on fire. Bug reports, optimization tips, and comments are
+welcome.
+
+readme.txt follows:
+
+
+RLE Toolkit for CC65
+--------------------
+
+RLE Toolkit consists of:
+
+  * a small RLE compression library for CC65
+  * commandline utilities to pack and unpack files
+  * sample code that shows you how to use it
+
+
+Compression API
+---------------
+
+There are two functions, rle_pack and rle_unpack, that can be called
+from both C and assembler.
+
+C interface:
+
+  unsigned int __fastcall__ rle_pack(unsigned char *dest, unsigned char
+				     *src, unsigned int length);
+
+  unsigned int __fastcall__ rle_unpack(unsigned char *dest, unsigned
+				       char *src);
+
+Assembler interface:
+
+	.import rle_pack
+	.importzp src, dest
+	.import srclen, destlen
+
+	; set source pointer
+	lda #&lt;sourcedata
+	sta src
+	lda #&gt;sourcedata
+	sta src + 1
+
+	; set destination pointer
+	lda #&lt;destbuffer
+	sta dest
+	lda #&gt;destbuffer
+	sta dest + 1
+
+	; set length of source data when packing
+	; parameter is ignored when unpacking
+	lda #&lt;datalen
+	sta srclen
+	lda #&gt;datalen
+	sta srclen + 1
+
+	jsr rle_pack
+	  or
+	jsr rle_unpack
+
+	; length of output is returned in destlen
+
+
+Packed stream format
+--------------------
+
+When two or more consecutive bytes are identical, they are replaced by
+&lt;BYTE&gt; &lt;BYTE&gt; &lt;COUNT&gt;. A COUNT of 0 indicates End Of Stream. A COUNT
+of 1 indicates that two bytes should be written, a COUNT of 2
+indicates three bytes, and so on.
+
+
+Commandline tools
+-----------------
+
+  rlepack infile outfile
+  rleunpack infile outfile
+
+Self explanatory. Right?
+
+
+Sample code
+-----------
+
+  loadimage.prg
+
+Loads a packed koala image and displays it. Thanks, again, to TMR for
+the image.
+
+
+License
+-------
+
+The RLE Toolkit is released under a slightly modified BSD license:
+
+Copyright (c) 2004, Per Olofsson
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+&quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+-- 
+    ___          .     .  .         .       . +  .         .      o   
+  _|___|_   +   .  +     .     +         .  Per Olofsson, arkadspelare
+    o-o    .      .     .   o         +          MagerValp&#64;cling&#46;<!--nospam-->gu.se
+     -       +            +    .     <a href="http://www.cling.gu.se/~cl3polof/">http://www.cling.gu.se/~cl3polof/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Sep 23 23:34:47 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4515.html" title="Next message in the list">Ormund Williams: "[cc65] Porting cc65 to embedded system that has no OS, boot ROM or monitor"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4513.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Re: Print heart character on C64?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4517.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] RLE Toolkit"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4517.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] RLE Toolkit"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4514" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4514" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4514" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-09-23 23:34:56 CEST
+</em></small></p>
+</body>
+</html>

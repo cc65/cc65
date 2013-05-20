@@ -1,0 +1,191 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Simple PEEK &amp; POKE qu</title>
+<meta name="Author" content="Mike McCarty (jmccarty_at_ssd.usa.alcatel.com)">
+<meta name="Subject" content="Re: [cc65] Simple PEEK &amp; POKE question.">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Simple PEEK &amp; POKE question.</h1>
+<!-- received="Mon Mar  5 20:34:23 2001" -->
+<!-- isoreceived="20010305193423" -->
+<!-- sent="Mon, 5 Mar 2001 13:33:55 -0600 (CST)" -->
+<!-- isosent="20010305193355" -->
+<!-- name="Mike McCarty" -->
+<!-- email="jmccarty_at_ssd.usa.alcatel.com" -->
+<!-- subject="Re: [cc65] Simple PEEK &amp; POKE question." -->
+<!-- id="Pine.SOL.4.10.10103051314360.1715-100000@sun1307.ssd.usa.alcatel.com" -->
+<!-- inreplyto="20010305200324.A8838@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Mike McCarty (<a href="mailto:jmccarty_at_ssd.usa.alcatel.com?Subject=Re:%20[cc65]%20Simple%20PEEK%20&amp;%20POKE%20question."><em>jmccarty_at_ssd.usa.alcatel.com</em></a>)<br>
+<strong>Date:</strong> 2001-03-05 20:33:55
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0428.html">Raj Wurttemberg: "RE: [cc65] Simple PEEK &amp; POKE question."</a>
+<li><strong>Previous message:</strong> <a href="0426.html">Ullrich von Bassewitz: "Re: [cc65] Simple PEEK &amp; POKE question."</a>
+<li><strong>In reply to:</strong> <a href="0426.html">Ullrich von Bassewitz: "Re: [cc65] Simple PEEK &amp; POKE question."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0431.html">Ullrich von Bassewitz: "Re: [cc65] Simple PEEK &amp; POKE question."</a>
+<li><strong>Reply:</strong> <a href="0431.html">Ullrich von Bassewitz: "Re: [cc65] Simple PEEK &amp; POKE question."</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+My message was not intended to be an attack.
+
+On Mon, 5 Mar 2001, Ullrich von Bassewitz wrote:
+
+&gt; 
+&gt; On Mon, Mar 05, 2001 at 11:24:47AM -0600, Mike McCarty wrote:
+&gt; &gt; 	For better readability you may want to use macros:
+&gt; &gt;
+&gt; &gt; 	#define POKE(addr,val)	(*(unsigned char *)(addr)=(val))
+&gt; &gt;
+&gt; &gt; This definitely REDUCES readability and obscures what the code
+&gt; &gt; is doing.
+&gt; &gt;
+&gt; &gt; Which code is easier for you to read?
+&gt; &gt;
+&gt; &gt; (a)	VideoMode = VIDEO_REVERSE;
+&gt; &gt;
+&gt; &gt; (b)	POKE(199,1)	/* Set video mode to reverse */
+&gt; 
+&gt; Your quote is completely out of context (or my english is even worse than I
+&gt; thought). The sentence &quot;For better readability you may want to use macros&quot; on
+
+What I saw was a section headed by the statement followed by
+two sets of macros. Since no restriction was made on the statement
+regarding *which* macros enhanced readability, I thought it
+was obvious that it applied to both.
+
+&gt; the page references the example above (in the FAQ), where memory access is
+&gt; done in full length. Which code is easier for you to read?
+&gt; 
+&gt;   (a)	*(unsigned char*)199 = 1;
+&gt; 
+&gt;   (b)   POKE (199, 1);
+
+I like neither of those two lines, but the first makes more sense
+to a C programmer. It at least states what is being done. Both of them
+suffer from having direct numbers in them. I prefer
+
+POKE(VideoMode,REVERSE_VIDEO);
+
+to either of them, and prefer
+
+VideoMode = REVERSE_VIDEO;
+
+to all the others put together.
+
+&gt; And, later on I'm proposing predefined variables for hardware access, saying
+&gt; that this is the most readable way. So where is the difference between your
+&gt; statements and mine?
+
+This I didn't see.
+
+&gt; &gt; I recommend that people NOT implement PEEK and POKE at all. The direct C
+&gt; &gt; is more readable than the macros. Even better is to implement macros
+&gt; &gt; which make the code understandable without having to add comments.
+&gt; 
+&gt; For someone with a BASIC background (and many people programming the old
+&gt; machines do have BASIC knowledge), PEEK and POKE are completely readable and
+
+People who have a BASIC background, and are making a transition to  C, would
+be well advised to abandon some of the bad practices common in BASIC. This 
+is one of them.
+
+&gt; do have a meaning. It is easy to translate BASIC programs using PEEK and POKE,
+&gt; this would be another reason to use them. So while I would recommend to use
+
+You mean it is easy to get a program which is equivalent and has
+whatever defects were present in the original, whether forced by the
+language or not. When I modify code, and am spending time with it as
+much as is required to make it work in another language, I want to
+improve it if I can.
+
+&gt; fixed memory variables as I have done in the FAQ and in posts to this list, I
+&gt; don't think that PEEK and POKE are evil. Just use what is best in a given
+&gt; situation.
+
+&quot;Evil&quot; is a strong word; I wouldn't use it. In my mind, though, they
+are on a par with code written like this in C (all variables are
+global, of course)
+
+L100:   Count = 1;
+L110:	if (Count &gt;= 11) goto L200;
+L120:	Gosub500();
+L130:	Count = Count+1;
+L140:	goto L100;
+L200:
+...
+
+void	Gosub500() {
+L510:	printf(&quot;Count = %d\n&quot;,Count);
+L520:	return
+	}
+...
+
+It may be easy to do, but it is not desirable to do, and incorporates
+some of the poorer features of a cruder language into a more refined
+language. It is gauche.
+
+It also presumes that one can modify a program without understanding
+what it does. Taking the time to understand the program may reveal that
+it actually does not work properly. In the projects which involve
+translation from assembly to C that I have been involved in, several
+serious defects were found in the original code and repaired, due to
+having to spend the time to  understand what the code does. Often very
+tangled logic got raveled and turned into clean easy to read code.
+BASIC (in its early incarnations) forced a very assembly type
+programming style.
+
+Mike
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Simple%20PEEK%20&amp;%20POKE%20question.">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0428.html">Raj Wurttemberg: "RE: [cc65] Simple PEEK &amp; POKE question."</a>
+<li><strong>Previous message:</strong> <a href="0426.html">Ullrich von Bassewitz: "Re: [cc65] Simple PEEK &amp; POKE question."</a>
+<li><strong>In reply to:</strong> <a href="0426.html">Ullrich von Bassewitz: "Re: [cc65] Simple PEEK &amp; POKE question."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0431.html">Ullrich von Bassewitz: "Re: [cc65] Simple PEEK &amp; POKE question."</a>
+<li><strong>Reply:</strong> <a href="0431.html">Ullrich von Bassewitz: "Re: [cc65] Simple PEEK &amp; POKE question."</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:39 CET</em>
+</em>
+</small>
+</body>
+</html>

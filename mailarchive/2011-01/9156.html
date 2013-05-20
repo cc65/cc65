@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] rodata alignment independe</title>
+<meta name="Author" content="Gábor Lénárt (lgb1lgb.hu)" />
+<meta name="Subject" content="Re: [cc65] rodata alignment independent from ld.cfg" />
+<meta name="Date" content="2011-01-15" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] rodata alignment independent from ld.cfg</h1>
+<!-- received="Sat Jan 15 10:49:09 2011" -->
+<!-- isoreceived="20110115094909" -->
+<!-- sent="Sat, 15 Jan 2011 10:48:58 +0100" -->
+<!-- isosent="20110115094858" -->
+<!-- name="Gábor Lénárt" -->
+<!-- email="lgb1lgb.hu" -->
+<!-- subject="Re: [cc65] rodata alignment independent from ld.cfg" -->
+<!-- id="20110115094858.GB15886@vega.lgb.hu" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="20110114192621.GA5560&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9157.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] DIO.H on CBM&quot;">Next message</a> ]
+[ <a href="9155.html" title="Oliver Schmidt: &quot;Re: [cc65] DIO.H on CBM&quot;">Previous message</a> ]
+[ <a href="9153.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] rodata alignment independent from ld.cfg&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+[ <a href="9148.html" title="Thomas Giesel: &quot;Re: [cc65] rodata alignment independent from ld.cfg&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Gábor Lénárt &lt;<a href="mailto:lgb1lgb.hu?Subject=Re:%20[cc65]%20rodata%20alignment%20independent%20from%20ld.cfg">lgb1lgb.hu</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-01-15 10:48:58</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Fri, Jan 14, 2011 at 08:26:21PM +0100, Ullrich von Bassewitz wrote:
+&gt; 
+&gt; On Fri, Jan 14, 2011 at 08:15:37PM +0100, Ullrich von Bassewitz wrote:
+&gt; &gt;
+&gt; &gt;         .align  4, $90
+&gt; 
+&gt; Make that
+&gt; 
+&gt;         .align  4, $EA
+
+
+Hmm, nothing, it was my fault then, sorry :( To be honest I have never tried
+this, because I thought it's not possible to give alignment at all at
+assembly level (with ca65), just the WHOLE segment can be aligned (at once, its
+beginning is aligned then) in the linker configuration. That was the reason
+I told that I need &quot;hundreds of segments&quot; because I thought I need a new one
+at every alignment point. Sorry about the misunderstanding, it was not clear
+to me till now, that alignment can be specified in the linker configuration
+but also in assembler level, just in this second case I need the alignment
+of the seg itself too, since the assembler keeps track the alignment only
+referenced inside the seg, but it's the linker's task that the whole seg
+should be at aligned address then this to work correctly. If I understand
+this correctly now. Thanks!
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Jan 15 10:49:09 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9157.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] DIO.H on CBM"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9155.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] DIO.H on CBM"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9153.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] rodata alignment independent from ld.cfg"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9148.html" title="Next message in this discussion thread">Thomas Giesel: "Re: [cc65] rodata alignment independent from ld.cfg"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9156" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9156" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9156" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-01-15 10:49:12 CET
+</em></small></p>
+</body>
+</html>

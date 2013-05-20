@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] TGI mode switch without tgi_cl</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] TGI mode switch without tgi_clear()" />
+<meta name="Date" content="2010-01-24" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] TGI mode switch without tgi_clear()</h1>
+<!-- received="Sun Jan 24 16:33:19 2010" -->
+<!-- isoreceived="20100124153319" -->
+<!-- sent="Sun, 24 Jan 2010 16:33:02 +0100" -->
+<!-- isosent="20100124153302" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] TGI mode switch without tgi_clear()" -->
+<!-- id="f97798c21001240733x57e702c6lb922e89fc46890e9@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7767.html" title="Karri Kaksonen: &quot;Re: [cc65] TGI mode switch without tgi_clear()&quot;">Next message</a> ]
+[ <a href="7765.html" title="Jakub: &quot;Re: [cc65] Atari linker problem 2.13&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7767.html" title="Karri Kaksonen: &quot;Re: [cc65] TGI mode switch without tgi_clear()&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20TGI%20mode%20switch%20without%20tgi_clear()">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-01-24 16:33:02</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+on the Apple2 the RAM areas used to store the text screen content and
+hires graphics screen content are disjunct. Therefore it makes sense
+to be able to switch between text and graphics mode without clearing
+neither screen.
+
+One of many usecases are programs to visualize some data that allow to
+switch between the data editor and the visualization result.
+
+My first question is if this sort of an Apple2 specific feature or
+rather a common option for cc65 targets with TGI driver(s).
+
+Up to this point you might think the viable options are:
+a) a new &quot;official&quot; TGI API allowing to switch between graphics and text or
+b) just an Apple2 specific tgi_ioctl() allowing the same
+
+However there's a special usecase that makes things somewhat more difficult:
+
+The Apple2 hires screen RAM area lies unfortunately &quot;in the middle&quot; of
+the RAM typically used by cc65 programs. I'd like to add another
+option to the already existing ones to deal with that problem: A
+secondary linker config file that uses the linker 'fill' and/or
+'start' features to create programs that start below the hires screen
+RAM and just &quot;load over&quot; the hires screen RAM.
+
+In that scenario it would of course be a pity to have 8kB of zeros in
+the program file. Rather one would want to include a splash screen or
+some immutable background screen into the program file. So far so good
+:-)
+
+But how to switch into the graphics mode and show the content already
+in the hires screen RAM if tgi_init() obligatory calls tgi_clear() ?
+Not calling tgi_init() at all but the rather the &quot;pure&quot; mode swith
+function discussed above doesn't seem clever as tgi_init() initializes
+quite some stuff.
+
+So at this point my actual proposal is to _not_ have an additional
+switch function whatsoever but have tgi_init() _not_ call tgi_clear().
+That would allow to switch between text and graphics mode using
+tgi_init() and tgi_done().
+
+Another option might be to add a parameter to tgi_init() controlling
+the call of tgi_clear().
+
+What are your opinions?
+
+Best, Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Jan 24 16:33:19 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7767.html" title="Next message in the list">Karri Kaksonen: "Re: [cc65] TGI mode switch without tgi_clear()"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7765.html" title="Previous message in the list">Jakub: "Re: [cc65] Atari linker problem 2.13"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7767.html" title="Next message in this discussion thread">Karri Kaksonen: "Re: [cc65] TGI mode switch without tgi_clear()"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7767.html" title="Message sent in reply to this message">Karri Kaksonen: "Re: [cc65] TGI mode switch without tgi_clear()"</a></li>
+<li><dfn>Reply</dfn>:  <a href="7768.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] TGI mode switch without tgi_clear()"</a></li>
+<li><dfn>Reply</dfn>:  <a href="7774.html" title="Message sent in reply to this message">Fatih Aygün: "Re: [cc65] TGI mode switch without tgi_clear()"</a></li>
+<li><dfn>Reply</dfn>:  <a href="7780.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] TGI mode switch without tgi_clear()"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7766" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7766" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7766" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-01-24 16:33:22 CET
+</em></small></p>
+</body>
+</html>

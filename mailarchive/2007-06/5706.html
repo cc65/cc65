@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] da65 hangs in infinite loo</title>
+<meta name="Author" content="Dan (opendtv1yahoo.com)" />
+<meta name="Subject" content="Re: [cc65] da65 hangs in infinite loop" />
+<meta name="Date" content="2007-06-12" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] da65 hangs in infinite loop</h1>
+<!-- received="Tue Jun 12 04:17:12 2007" -->
+<!-- isoreceived="20070612021712" -->
+<!-- sent="Mon, 11 Jun 2007 19:16:59 -0700 (PDT)" -->
+<!-- isosent="20070612021659" -->
+<!-- name="Dan" -->
+<!-- email="opendtv1yahoo.com" -->
+<!-- subject="Re: [cc65] da65 hangs in infinite loop" -->
+<!-- id="17886.94932.qm@web56207.mail.re3.yahoo.com" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="18029.55428.277555.18090&#64;hal.cling.gu.se" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5707.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] da65 hangs in infinite loop&quot;">Next message</a> ]
+[ <a href="5705.html" title="MagerValp: &quot;[cc65] da65 hangs in infinite loop&quot;">Previous message</a> ]
+[ <a href="5705.html" title="MagerValp: &quot;[cc65] da65 hangs in infinite loop&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5707.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] da65 hangs in infinite loop&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Dan &lt;<a href="mailto:opendtv1yahoo.com?Subject=Re:%20[cc65]%20da65%20hangs%20in%20infinite%20loop">opendtv1yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-06-12 04:16:59</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>The problem is with DoTable in data.c. In the case
+where Count &lt; MemberSize (due to hitting a label), the
+PC is not advanced, thus causing the infinite loop.
+
+However, advancing the PC creates a new problem, which
+is that the table becomes misaligned. So a more
+complicated fix is required, such as:
+
+static unsigned GetSpanOffset (attr_t Style)
+/* Get the offset into a given style */
+{
+    unsigned RemainingBytes = PC - CodeStart;
+
+    unsigned Count = 0;
+    while (Count &lt; RemainingBytes) {
+	if (GetStyleAttr (PC-Count-1) != Style) {
+	    break;
+     	}
+	++Count;
+    }
+
+    /* Return the number of bytes */
+    return Count;
+}
+
+static unsigned DoTable (attr_t Style, unsigned
+MemberSize, void (*TableFunc) (unsigned))
+/* Output a table of bytes */
+{
+    unsigned BytesLeft;
+
+    /* Count how many bytes may be output. */
+    unsigned Count = GetSpan (Style);
+
+	unsigned offset = GetSpanOffset (Style);
+	unsigned alignment = offset &amp; (MemberSize-1);
+	if (alignment) {
+		unsigned newcount = MemberSize - alignment;
+		if (newcount &lt; Count)
+			Count = newcount;
+	}
+
+    /* If the count is less than the member size,
+print a row of Count data
+     * bytes. We assume here that there is no member
+with a size that is less
+     * than BytesPerLine.
+     */
+    if (Count &lt; MemberSize) {
+	DataByteLine (Count);
+	PC += Count;
+	return Count;
+    }
+
+
+
+ 
+____________________________________________________________________________________
+Looking for earth-friendly autos? 
+Browse Top Cars by &quot;Green Rating&quot; at Yahoo! Autos' Green Center.
+<a href="http://autos.yahoo.com/green_center/">http://autos.yahoo.com/green_center/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Jun 12 04:17:12 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5707.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] da65 hangs in infinite loop"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5705.html" title="Previous message in the list">MagerValp: "[cc65] da65 hangs in infinite loop"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5705.html" title="Message to which this message replies">MagerValp: "[cc65] da65 hangs in infinite loop"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5707.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] da65 hangs in infinite loop"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5706" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5706" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5706" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-06-12 04:17:17 CEST
+</em></small></p>
+</body>
+</html>

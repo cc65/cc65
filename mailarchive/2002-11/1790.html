@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] gfx modules</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] gfx modules">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] gfx modules</h1>
+<!-- received="Mon Nov 25 18:56:34 2002" -->
+<!-- isoreceived="20021125175634" -->
+<!-- sent="Mon, 25 Nov 2002 18:56:32 +0100" -->
+<!-- isosent="20021125175632" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] gfx modules" -->
+<!-- id="20021125175632.GA18558@trixie.musoftware.de" -->
+<!-- inreplyto="614752610.20021124234610@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20gfx%20modules"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-11-25 18:56:32
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1789.html">MagerValp: "Re: [cc65] Register variables are back"</a>
+<li><strong>In reply to:</strong> <a href="1784.html">groepaz: "Re[2]: [cc65] gfx modules"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1794.html">groepaz: "Re[2]: [cc65] gfx modules"</a>
+<li><strong>Next in thread:</strong> <a href="1782.html">Ullrich von Bassewitz: "Re: [cc65] warez gallore :)"</a>
+<li><strong>Reply:</strong> <a href="1794.html">groepaz: "Re[2]: [cc65] gfx modules"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Sun, Nov 24, 2002 at 11:46:10PM +0100, groepaz wrote:
+&gt; ok, so the only good way to do it is creating a (almost) complete new
+&gt; driver right?
+
+Yes. My first idea was to add emulation for several functions, but then I
+noticed that this gives also a lot of dead code, and is always slower than the
+same function implemented in the driver.
+
+&gt; UvB&gt; I will definitely NOT add bloat to the API before it is even released. Using
+&gt;
+&gt; if only more developers would think like that :o)
+
+It's not only the API that has not seen an official release, the underlying
+technology (relocatable modules) are no official feature either.
+
+&gt; mmmh well, i probably had to much of another thing in mind when i
+&gt; wrote it. that is, i always wanted to do some sort of gfx-editor which
+&gt; can handle all bitmap-based gfx-modes from plain hires up to ifli...
+&gt; things like display-routines and loaders would go into loadables
+&gt; modules here...uh :) you are probably right about the small amount of
+&gt; gfx-drivers though.... ah, nevermind :)
+
+The problem is not the number of drivers. The problem is that graphic modes
+may differ in
+
+   * resolution
+
+   * aspect ratio
+
+   * number of colors available
+
+   * the colors itself
+
+With all these numbers being variable, it is almost impossible to write an
+application that accepts any driver. And even if it would be possible, the
+code will be a lot larger because there are no fixed coordinates.
+
+Please note: I'm not against a function that lists available drivers with
+their capabilities - provided that someone proves me that this function is
+really necessary. It is just that I think such a function would be bloat
+because no one will use it for a good purpose.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20gfx%20modules">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20gfx%20modules">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1789.html">MagerValp: "Re: [cc65] Register variables are back"</a>
+<li><strong>In reply to:</strong> <a href="1784.html">groepaz: "Re[2]: [cc65] gfx modules"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1794.html">groepaz: "Re[2]: [cc65] gfx modules"</a>
+<li><strong>Next in thread:</strong> <a href="1782.html">Ullrich von Bassewitz: "Re: [cc65] warez gallore :)"</a>
+<li><strong>Reply:</strong> <a href="1794.html">groepaz: "Re[2]: [cc65] gfx modules"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-11-25 18:56:37 CET</em>
+</em>
+</small>
+</body>
+</html>

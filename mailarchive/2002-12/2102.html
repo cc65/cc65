@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] 65tris on ATARI</title>
+<meta name="Author" content="cas_at_strotmann.de (cas_at_strotmann.de)">
+<meta name="Subject" content="Re: [cc65] 65tris on ATARI">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] 65tris on ATARI</h1>
+<!-- received="Thu Dec 19 17:12:20 2002" -->
+<!-- isoreceived="20021219161220" -->
+<!-- sent="Thu, 19 Dec 2002 16:52:49 +0100 (CET)" -->
+<!-- isosent="20021219155249" -->
+<!-- name="cas_at_strotmann.de" -->
+<!-- email="cas_at_strotmann.de" -->
+<!-- subject="Re: [cc65] 65tris on ATARI" -->
+<!-- id="64013.213.61.11.169.1040313169.squirrel@213.61.11.174" -->
+<!-- inreplyto="20021219130411.GA27924@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> <a href="mailto:cas_at_strotmann.de?Subject=Re:%20[cc65]%2065tris%20on%20ATARI"><em>cas_at_strotmann.de</em></a><br>
+<strong>Date:</strong> 2002-12-19 16:52:49
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2101.html">shubel, paul: "RE: [cc65] 65tris on ATARI"</a>
+<li><strong>In reply to:</strong> <a href="2096.html">Ullrich von Bassewitz: "Re: [cc65] 65tris on ATARI"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2104.html">Ullrich von Bassewitz: "Re: [cc65] 65tris on ATARI"</a>
+<li><strong>Next in thread:</strong> <a href="2059.html">Groepaz: "Re: [cc65] 65tris on ATARI"</a>
+<li><strong>Reply:</strong> <a href="2104.html">Ullrich von Bassewitz: "Re: [cc65] 65tris on ATARI"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi,
+
+&gt;
+&gt; On Tue, Dec 17, 2002 at 10:26:25PM +0100, Carsten Strotmann wrote:
+&gt;&gt; If it's ok for you I will put the code into the ATARI readjoy.s,
+&gt;&gt; selectable by a &quot;define&quot; (at this time).
+&gt;
+&gt; Personally, I don't like defines, because they make the code difficult
+&gt; to read and to test. But Christian will have to decide this.
+
+Ok, I understand, defines are bad (TM).
+
+&gt;
+&gt; If the code is able to distinguish between a machine with and without
+&gt; the multi joystick interface, my suggestion would be to do just this and
+&gt; accept higher joystick numbers for the readjoy function.
+
+One problem we have to find a solution is that the multijoy needs
+initialization. before first use, the 2nd ATARI Joystick port must be
+switched into write mode (6 instructions, 15 Byte) the init could be done
+every time a joystick is read, but  this is overhead for games.
+
+I'. thinking of an init_joy function. This function can return the number
+of joysticks attached, so it's also useful for normal joystick ports. The
+init routine could also be used to switch from normal joystick to multijoy
+or other input devices. The readjoy function would then read a global flag
+set by the init routine and branch to different code.
+
+Games can present a menu for all known Joystick Options available for the
+platforms and set the choosen one with the init_joy function accordingly.
+
+After init, the joystick api can be used transparent with any valid number
+of joysticks. If the init routine set/change a vector to the joystick
+code, the additional cost is one JMP instruction, which is ok even for
+games.
+
+Is the use of function vectors supported by cc65? (Sorry if this is a dump
+question, I'm not a 'C' wizard)
+
+Only accept higher joystick numbers would not work with every joystick
+hardware extension, because, for example, when using multijoy, the code
+for reading the 2nd to 4th joystick is differnt than reading from the
+build-in joystick device.
+
+&gt;
+&gt; Another transparent solution is to enocde the interface into the
+&gt; joystick number. For example, the lower nibble could be the joystick
+&gt; number while the high nibble could be the type of the joystick. This
+&gt; way, we don't have to change the API, just add some additional defines
+&gt; in the form
+&gt;
+&gt;         #define JOY_STANDARD    0x00
+&gt;         #define JOY_MULTI       0x10
+&gt;
+&gt; Both solutions wouldn't need any defines in the sources, which is an
+&gt; additional advantage:-)
+
+I fear that this would lead to different &quot;high-nibble-flags&quot; on different
+hardware plattforms, so a 8 joystick multiplayer game would not be
+(easily) portable from ATARI to, for example C64 Joystrick extensions.
+
+I will work on a proposal and sample source for the &quot;init&quot; solution, which
+for my view gives least speed-penalty and no evil defines.
+
+Regards
+
+Carsten
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%2065tris%20on%20ATARI">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2101.html">shubel, paul: "RE: [cc65] 65tris on ATARI"</a>
+<li><strong>In reply to:</strong> <a href="2096.html">Ullrich von Bassewitz: "Re: [cc65] 65tris on ATARI"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2104.html">Ullrich von Bassewitz: "Re: [cc65] 65tris on ATARI"</a>
+<li><strong>Next in thread:</strong> <a href="2059.html">Groepaz: "Re: [cc65] 65tris on ATARI"</a>
+<li><strong>Reply:</strong> <a href="2104.html">Ullrich von Bassewitz: "Re: [cc65] 65tris on ATARI"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-12-19 17:12:38 CET</em>
+</em>
+</small>
+</body>
+</html>

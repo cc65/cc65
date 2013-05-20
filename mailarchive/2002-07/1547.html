@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] preprocessor hazzle...</title>
+<meta name="Author" content="Greg King (gngking_at_erols.com)">
+<meta name="Subject" content="Re: [cc65] preprocessor hazzle...">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] preprocessor hazzle...</h1>
+<!-- received="Wed Jul 31 00:22:40 2002" -->
+<!-- isoreceived="20020730222240" -->
+<!-- sent="Tue, 30 Jul 2002 18:22:14 -0400" -->
+<!-- isosent="20020730222214" -->
+<!-- name="Greg King" -->
+<!-- email="gngking_at_erols.com" -->
+<!-- subject="Re: [cc65] preprocessor hazzle..." -->
+<!-- id="000e01c23817$a89c1600$d0692c42@palace" -->
+<!-- inreplyto="[cc65] preprocessor hazzle..." -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Greg King (<a href="mailto:gngking_at_erols.com?Subject=Re:%20[cc65]%20preprocessor%20hazzle..."><em>gngking_at_erols.com</em></a>)<br>
+<strong>Date:</strong> 2002-07-31 00:22:14
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1546.html">Ullrich von Bassewitz: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Maybe in reply to:</strong> <a href="1537.html">groepaz: "[cc65] preprocessor hazzle..."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="../2002-08/1550.html">Ullrich von Bassewitz: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Next in thread:</strong> <a href="1549.html">Greg King: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Next in thread:</strong> <a href="1506.html">Shawn Jefferson: "Re: Re: [cc65] Strange problem"</a>
+<li><strong>Reply:</strong> <a href="../2002-08/1550.html">Ullrich von Bassewitz: "Re: [cc65] preprocessor hazzle..."</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+-----Original Message-----
+From: Ullrich von Bassewitz &lt;<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20preprocessor%20hazzle...">uz_at_musoftware.de</a>&gt;
+Date: Monday, July 29, 2002 02:28 AM
+&gt;
+&gt; On Fri, Jul 26, 2002 at 11:56:51PM +0200, groepaz wrote:
+&gt;
+&gt; &gt; BTW!  I tried compiling with an oldish mingw32 install, as well (cygwin-
+&gt; &gt; compiled binaries are kinda sloooooooow ;=P), and noticed that
+&gt; &gt; somewhere the code relies on fork() and friends, and maybe some other
+&gt; &gt; things used to spawn a sub-process in *nix.  Is there a way to
+&gt; &gt; compile the source for a target that has simple &quot;spawn...&quot; functions
+&gt; &gt; but no fork() already?
+&gt;
+&gt; The Windows version uses spawn() from it's own library.  The unix version has
+&gt; an additional module that implements spawn().
+
+Cl65 uses fork()...exec() or spawn() to run the other tools.  A preprocessor #if
+directive in &quot;cc65/src/cl65/main.c&quot; chooses between &lt;process.h&gt; [for the
+system's spawn()] and &quot;spawn.h&quot; [for CC65's spawn()].  But, a choice is not done
+in the make-file -- it always links &quot;spawn-unix.o&quot;!  Try removing that line from
+the make-file.
+
+By the way, Uz, that &quot;main.c&quot; file needs three patches:
+
+1) Add &quot;defined(_DJGPP_)&quot; to that #if.
+
+2) Merge &quot;spawn.h&quot; into the &quot;spawn-*.c&quot; files, then #include those C files,
+   instead of linking an object file.
+
+3) Add an #ifdef directive that will choose which &quot;spawn-*.c&quot; file to #include.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20preprocessor%20hazzle...">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1546.html">Ullrich von Bassewitz: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Maybe in reply to:</strong> <a href="1537.html">groepaz: "[cc65] preprocessor hazzle..."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="../2002-08/1550.html">Ullrich von Bassewitz: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Next in thread:</strong> <a href="1549.html">Greg King: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Next in thread:</strong> <a href="1506.html">Shawn Jefferson: "Re: Re: [cc65] Strange problem"</a>
+<li><strong>Reply:</strong> <a href="../2002-08/1550.html">Ullrich von Bassewitz: "Re: [cc65] preprocessor hazzle..."</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-07-31 00:23:21 CEST</em>
+</em>
+</small>
+</body>
+</html>

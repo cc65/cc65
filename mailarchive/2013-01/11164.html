@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] linker config Qs..</title>
+<meta name="Author" content="silverdr1wfmh.org.pl (silverdr1wfmh.org.pl)" />
+<meta name="Subject" content="Re: [cc65] linker config Qs.." />
+<meta name="Date" content="2013-01-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] linker config Qs..</h1>
+<!-- received="Tue Jan 29 13:15:05 2013" -->
+<!-- isoreceived="20130129121505" -->
+<!-- sent="Tue, 29 Jan 2013 13:14:56 +0100" -->
+<!-- isosent="20130129121456" -->
+<!-- name="silverdr1wfmh.org.pl" -->
+<!-- email="silverdr1wfmh.org.pl" -->
+<!-- subject="Re: [cc65] linker config Qs.." -->
+<!-- id="776F1DE1-10D1-4A8A-A450-533034F7D2DE@wfmh.org.pl" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="CACT=u70uD5pqi8Em_jXDxeTKuw09oVcr0Th0zVe5BzGxEoPOQw&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11165.html" title="Oliver Schmidt: &quot;Re: [cc65] linker config Qs..&quot;">Next message</a> ]
+[ <a href="11163.html" title="Oliver Schmidt: &quot;Re: [cc65] linker config Qs..&quot;">Previous message</a> ]
+[ <a href="11163.html" title="Oliver Schmidt: &quot;Re: [cc65] linker config Qs..&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="11165.html" title="Oliver Schmidt: &quot;Re: [cc65] linker config Qs..&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:silverdr1wfmh.org.pl?Subject=Re:%20[cc65]%20linker%20config%20Qs..">silverdr1wfmh.org.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2013-01-29 13:14:56</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 2013-01-29, at 13:06, Oliver Schmidt wrote:
+
+&gt;&gt; What happens when there is more than one segment with different load/run addresses and define attribute set to true?
+&gt; 
+&gt; Answer A: Nothing.
+&gt; 
+&gt; Answer B: Assuming that you're wondering about symbols defined
+&gt; multiple times: The name of the segment is part of the symbol created.
+&gt; So __DATA_LOAD__ refers to the load addr of the segment DATA.
+
+I was more wondering about what values will be assigned to those symbols as multiple definition is out of question ;-) So - now correct me if I am wrong: __DATA_LOAD__ refers only to .segment &quot;DATA&quot; aka .data. And if I have a segment called &quot;FOO&quot; then setting attribute &quot;define&quot; to true will define symbols like __FOO_LOAD__. True or not?
+
+-- 
+SD!----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Jan 29 13:15:05 2013</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11165.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] linker config Qs.."</a></li>
+<li><dfn>Previous message</dfn>: <a href="11163.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] linker config Qs.."</a></li>
+<li><dfn>In reply to</dfn>: <a href="11163.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] linker config Qs.."</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="11165.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] linker config Qs.."</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="11165.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] linker config Qs.."</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#11164" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#11164" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#11164" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2013-01-29 13:15:09 CET
+</em></small></p>
+</body>
+</html>

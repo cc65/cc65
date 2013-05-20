@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Re: wprot? cc65 change?</title>
+<meta name="Author" content="Greg King (gngking1erols.com)" />
+<meta name="Subject" content="Re: [cc65] Re: wprot? cc65 change?" />
+<meta name="Date" content="2006-11-03" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Re: wprot? cc65 change?</h1>
+<!-- received="Fri Nov  3 09:48:12 2006" -->
+<!-- isoreceived="20061103084812" -->
+<!-- sent="Fri, 3 Nov 2006 03:46:28 -0500" -->
+<!-- isosent="20061103084628" -->
+<!-- name="Greg King" -->
+<!-- email="gngking1erols.com" -->
+<!-- subject="Re: [cc65] Re: wprot? cc65 change?" -->
+<!-- id="000f01c6ff24$d3874140$e3662c42@palace" -->
+<!-- charset="UTF-8" -->
+<!-- inreplyto="[cc65] Re: wprot? cc65 change?" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5612.html" title="Sebastian Gutsfeld: &quot;Re: [cc65] Problems playing Goattracker BIN files&quot;">Next message</a> ]
+[ <a href="5610.html" title="Johan Kotlinski: &quot;[cc65] Re: wprot? cc65 change?&quot;">Previous message</a> ]
+[ <a href="5610.html" title="Johan Kotlinski: &quot;[cc65] Re: wprot? cc65 change?&quot;">Maybe in reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:gngking1erols.com?Subject=Re:%20[cc65]%20Re:%20wprot?%20cc65%20change?">gngking1erols.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2006-11-03 09:46:28</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: Johan Kotlinski; on Thursday, November 02, 2006; at 02:53 PM -0500
+&gt;
+&gt; &gt; First  problem I get is with &quot;STARTUP: load = BASIC, type = wprot;&quot;,
+&gt; &gt; where it says &quot;Error: type expected&quot;.  After changing from
+&gt; &gt; wprot to ro, I get an overflow in BASIC/STARTUP with 52 bytes.  And,
+&gt; &gt; after growing BASIC memory, it complaints about unresolved externals
+&gt; &gt; &quot;___INTERRUPTOR_COUNT__&quot; and &quot;___INTERRUPTOR_TABLE___&quot;,
+&gt; &gt; referenced from &quot;callirq.s&quot;.
+&gt;
+&gt; Well, of course, I got it working now, by adding INTERRUPTOR_COUNT and
+&gt; INTERRUPTOR_TABLE to the features list. :-)
+&gt;
+&gt; Now, the question is, why I had to add this unknown &quot;feature&quot;, and grow
+&gt; BASIC area.  And, how does it make my life better?  I guess there has
+&gt; to be a good reason.
+
+&quot;wprot&quot; and &quot;wp&quot; was a feature that could be used when debugging programs
+in the VICE emulator.  But, it was removed from VICE; so, Uz took it out of
+ld65.
+
+Interruptors are a recent addition to the cc65 system.  They are mentioned
+in the ca65 and ld65 documents -- briefly.  They provide a way to use
+interrupt-handlers that is easier than the traditional method.  You don't
+need to write as much code to connect those handlers to a platform's
+interrupt mechanism -- most of that code already is in the library.  You
+can make your handlers look like &quot;ordinary&quot; subroutines.
+
+The graphics, joystick, mouse, and serial-port drivers use interruptors.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Nov  3 09:48:12 2006</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5612.html" title="Next message in the list">Sebastian Gutsfeld: "Re: [cc65] Problems playing Goattracker BIN files"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5610.html" title="Previous message in the list">Johan Kotlinski: "[cc65] Re: wprot? cc65 change?"</a></li>
+<li><dfn>Maybe in reply to</dfn>: <a href="5610.html" title="Message to which this message replies">Johan Kotlinski: "[cc65] Re: wprot? cc65 change?"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5611" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5611" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5611" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2006-11-03 09:48:15 CET
+</em></small></p>
+</body>
+</html>

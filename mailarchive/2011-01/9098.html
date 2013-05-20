@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: RE: [cc65] cc65 + tcp/ip howto and/or</title>
+<meta name="Author" content="Dan Winslow (DWinslow1aiminstitute.org)" />
+<meta name="Subject" content="RE: [cc65] cc65 + tcp/ip howto and/or example" />
+<meta name="Date" content="2011-01-03" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>RE: [cc65] cc65 + tcp/ip howto and/or example</h1>
+<!-- received="Mon Jan  3 15:13:04 2011" -->
+<!-- isoreceived="20110103141304" -->
+<!-- sent="Mon, 3 Jan 2011 07:46:11 -0600" -->
+<!-- isosent="20110103134611" -->
+<!-- name="Dan Winslow" -->
+<!-- email="DWinslow1aiminstitute.org" -->
+<!-- subject="RE: [cc65] cc65 + tcp/ip howto and/or example" -->
+<!-- id="F276036850359C4D8F93F7B19189838205668CD1@exchmbox.omaha.org" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="AANLkTinjJAWadFZ2AX9tUtNQ2YFVGMaM0r2qRb835Rj_&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9099.html" title="Gábor Lénárt: &quot;Re: [cc65] cc65 + tcp/ip howto and/or example&quot;">Next message</a> ]
+[ <a href="9097.html" title="Oliver Schmidt: &quot;Re: [cc65] cc65 + tcp/ip howto and/or example&quot;">Previous message</a> ]
+[ <a href="9095.html" title="Oliver Schmidt: &quot;Re: [cc65] cc65 + tcp/ip howto and/or example&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9102.html" title="Oliver Schmidt: &quot;Re: [cc65] cc65 + tcp/ip howto and/or example&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Dan Winslow &lt;<a href="mailto:DWinslow1aiminstitute.org?Subject=RE:%20[cc65]%20cc65%20%2B%20tcp/ip%20howto%20and/or%20example">DWinslow1aiminstitute.org</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-01-03 14:46:11</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Oliver, I wasn't disrespecting uIP. uIP is obviously a great success,
+although the argument from popularity is somewhat moot, as uIP is about
+the only one out there. By 'convoluted' I meant that the coding style is
+not as clean ( in my opinion ) as it could be, and there are a lot of
+generalizations that I don't need as I am targeting a specific machine.
+I am using a lot of machine specific things and have no desire to be
+generalized in the way uIP is. 
+
+I am familiar with event driven programming, and you certainly are
+correct that this is the basic architecture that must be used. But uIP
+is not the perfect solution for all small TCP needs.
+
+Contiki is a fine system, but has a huge amount of overhead if all you
+want to do is write a TCP driver. By the time Contiki finishes loading
+on an Atari, there is very little application space left.
+
+My goal is to write a small, machine-specific driver for supporting
+TCP-IP on the Atari. If it's been done already, well then so be it,
+after I'm done we'll have another, and extra options never hurt.
+
+Dan Winslow
+Director of Information Technology, AIM INSTITUTE
+1905 Harney Street, Suite 700
+Omaha, NE 68102
+402-345-5025 x156
+dwinslow&#64;aiminstitute&#46;<!--nospam-->org
+www.aiminstitute.org
+
+-----Original Message-----
+From: owner-cc65&#64;musoftware&#46;<!--nospam-->de [mailto:owner-cc65&#64;musoftware&#46;<!--nospam-->de] On
+Behalf Of Oliver Schmidt
+Sent: Monday, January 03, 2011 7:23 AM
+To: cc65&#64;musoftware&#46;<!--nospam-->de
+Subject: Re: [cc65] cc65 + tcp/ip howto and/or example
+
+Hi Dan,
+
+&gt; I am doing a stack for the Atari at the moment. I looked at uIP and
+IP65
+&gt; both. I found uIP too convoluted to use directly. IP65 seemed a lot
+cleaner
+&gt; but I didn't want to have to do it all in ML, as I'm lazy. So I took
+uIP
+&gt; apart and used bits of it to start what I have now. As a starting
+point, uIP
+&gt; was very helpful.
+
+Just some thoughts...
+
+If uIP would be too convoluted would it be then the by far most
+popular TCP/IP stack for really small machines? Maybe it is in fact
+rather well designed. Probably because the creator implemented already
+several other TCP/IP stacks before and put all his experience into
+uIP. Possibly this is the reason why i.e. CISCO choose uIP as basis
+for their IPv6-for-small-devices investments.
+
+Every non-trivial network application needs to react on theese three
+things:
+1. network traffic
+2. user interaction
+3. timeout
+The only way to do this in a both flexible and efficient manner is
+event driven programming. So from this perspective alone it is already
+evident that the event based uIP API is the right choice as it allows
+for easy integration into any event driven program.
+
+Additionally the event based uIP API allows for a non-buffering
+copy-free handling of things like retransmissions. So it is the right
+choice even for minimal programs not requiring an event driven
+archtecture otherwise.
+
+So I can't follow at all any argumentation saying uIP is &quot;to much&quot;.
+Rather it is in many/most cases still &quot;to little&quot;. And therefore the
+uIP creators don't supply uIP standalone anymore but only as part of
+Contiki.
+
+The Contiki core is about dispatching events. The event senders and
+receivers are called processes. A typical Contiki program hosts
+several processes:
+1. One process polling the network card for new frames and placing
+them in &quot;the&quot; buffer.
+2. One process polling the keyboard (and mouse) and broadcasting user
+events on user interaction.
+3. One process polling the current timme and broadcasting timer events
+on timeouts.
+4. One process hosting uIP polling &quot;the&quot; buffer and sending events to
+the uIP user process.
+5. One (or several) process(es) hosting the actual application code
+working in a pure event driven way (no polling at all).
+
+So the several &quot;internal&quot; processes basically act as converters
+abstracting from different low level inputs to a common uniform event
+system.
+
+Interestingly this basic/classic/pure Contiki core is better suited to
+cc65 targets then to the targets it is supposed to run on today
+(embedded devices, especially wireless sensors). Those devices make
+heavy usage of interrupts trying to put the main processor to sleep as
+much as possible to save engery. Getting Contiki to work in these
+environments requires some additional tricks.
+
+The cc65 C library on the other hand doesn't offer interrupt based
+APIs (apart from the mouse cursor handlers) so the classic Contiki is
+a perfect fit by calling keypressed() for user interaction polling and
+clock() for timeout polling. And regarding the network it happens to
+be just the same. The CS8900A chip doesn't support interrupts in 8-bit
+I/O mode so Contiki is a perfect fit by polling the chip.
+
+So from my perspective there's no artificial / unnecessary overhead in
+any area at all. Rather the cc65 C library, uIP, Contiki and the
+CS8900A chip work together perfectly smooth as they all follow the
+same paradigm :-)
+
+There's only one minor exception - which I already mentioned in
+another thread before: uIP/Contiki put great effort in avoiding to use
+the C heap but the cc65 module loader is hardwired to load modules on
+the C heap. Allowing to provide the cc65 module loader with an
+allocator callback function (in the same way there is a read callback
+function) would allow avoid that unncessary linking-in of the C heap
+code.
+
+Certainly one can pull together some networking code and have some
+packets sent/received but when I see i.e. a blocking function for
+getting an IP address via DHCP which then internally calls the C64
+kernal keyboard handler now and then in order to allow the user to
+interrupt the waiting for a DHCP reply then this at best a hack to me
+but certainly no framework to build something real upon.
+
+The Breadbox64 twitter client on the other hand is a perfect example
+that Contiki allows to write portable, really usefully, reliable,
+interactive and responsive network apps without being a Contiki
+insider - and moving Breadbox64 to IPv6 will be a piece of cake :-)
+
+Just my two (quite lenghty) cents,
+Oliver
+
+P.S.: I ported Contiki to the Atari in a few days (after understanding
+enough of the Atari). It's in the CVS and works out-of-the-box with
+the Atari Ethernet solution. So I personally see more need in the
+getting that Ethernet solution out to the people than in creating yet
+another TCP/IP stack ;-))
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Jan  3 15:13:04 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9099.html" title="Next message in the list">Gábor Lénárt: "Re: [cc65] cc65 + tcp/ip howto and/or example"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9097.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] cc65 + tcp/ip howto and/or example"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9095.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] cc65 + tcp/ip howto and/or example"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9102.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] cc65 + tcp/ip howto and/or example"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9102.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] cc65 + tcp/ip howto and/or example"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9098" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9098" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9098" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-01-03 15:13:07 CET
+</em></small></p>
+</body>
+</html>

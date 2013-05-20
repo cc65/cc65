@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] --create-dep for ca65?</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] --create-dep for ca65?" />
+<meta name="Date" content="2010-05-02" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] --create-dep for ca65?</h1>
+<!-- received="Sun May  2 18:01:53 2010" -->
+<!-- isoreceived="20100502160153" -->
+<!-- sent="Sun, 2 May 2010 18:01:43 +0200" -->
+<!-- isosent="20100502160143" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] &ndash;&ndash;create&ndash;dep for ca65?" -->
+<!-- id="h2y1002edb71005020901w64c173dcoc4e96fa1d4014a33@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="3C8B8A97-1442-4185-892B-8BCF4A9D0DDC&#64;wfmh.org.pl" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8289.html" title="Groepaz: &quot;Re: [cc65] floating point support redux&quot;">Next message</a> ]
+[ <a href="8287.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Relative paths during compilation&quot;">Previous message</a> ]
+[ <a href="8283.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] --create-dep for ca65?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8292.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] --create-dep for ca65?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20--create-dep%20for%20ca65?">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-05-02 18:01:43</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt; With the exception of the (AFAIR recently discussed but don't remember the conclusion) paths
+&gt; for the included files, which seem to be relative to the directory of compiler/assembler invocation
+&gt; rather than the location of the source file - everything seems to work perfectly OK!
+
+- The conclusion was that there's no spec saying that what the cc65
+compiler/assembler is doing is wrong. It's just not what the user
+expects - simply because most other C compilers (i.e. all I personally
+know of) do it differently.
+
+- The -I $(SOURCEDIR) options in the Makefile are supposed to
+workaround that successfully. Don't they?
+
+&gt; <a href="http://zennon.internetdsl.pl/cc65projtest.tar.bz2">http://zennon.internetdsl.pl/cc65projtest.tar.bz2</a>
+
+Some remarks:
+
+- As the set of .d files is now identical to the set of .o files I
+don't see a reason for a DEPENDS variable anymore. In case you don't
+agree with me I'd set DEPENDS := $(OBJECTS:.o=.d)
+
+- 'test' is a phony target too.
+
+- The .d files don't need to be parsed for 'love' too, but I don't
+think that optimization is worth the complication...
+
+- '--create-full-deps' isn't necessary and turns the Makefile most
+certainly useless for Windows users. Uz explicitly added the
+capability to omit the system headers using --create-deps for this
+reason.
+
+- The use of $* (the stem) is sort of deprecated - the GNU Make
+Manual: &quot;You should generally avoid using `$*' except in implicit
+rules or static pattern rules.&quot;
+
+- Refering to $(OBJECTDIR)/ unnecessarily reduces the reusability of
+the cl65 commands. Beside that $(&#64;:&#46;<!--nospam-->o=.d) just describes the idea
+better.
+
+Regards,
+Oliver
+
+PROGRAM :=
+CC65_TARGET :=
+
+SOURCEDIR :=
+OBJECTDIR :=
+
+CFLAGS  =
+ASFLAGS =
+LDFLAGS =
+#LDFLAGS = -m $&#64;&#46;<!--nospam-->map
+
+EMULATOR := x64
+EMUFLAGS = -kernal kernal -VICIIdsize -keymap 1 +autostart-warp
+-soundsync 2 -autoload $(PROGRAM)
+
+### DO NOT EDIT BELOW THIS LINE, UNLESS YOU REALLY KNOW WHAT YOU ARE DOING! ###
+###############################################################################
+# Defaults to be used if nothing defined above                                #
+###############################################################################
+ifeq ($(PROGRAM),)
+PROGRAM := $(notdir $(CURDIR))
+endif
+
+ifeq ($(CC65_TARGET),)
+CC65_TARGET := c64
+endif
+
+ifeq ($(SOURCEDIR),)
+SOURCEDIR := src
+endif
+
+ifeq ($(OBJECTDIR),)
+OBJECTDIR := obj
+endif
+
+ifdef $(CC65_HOME)
+CC := $(CC65_HOME)/bin/cl65
+else
+CC := cl65
+endif
+
+###############################################################################
+### The magic begins                                                        ###
+###############################################################################
+SOURCES := $(wildcard $(SOURCEDIR)/*.c)
+SOURCES += $(wildcard $(SOURCEDIR)/*.s)
+OBJECTS := $(addsuffix .o,$(basename $(addprefix
+$(OBJECTDIR)/,$(notdir $(SOURCES)))))
+
+.SUFFIXES:
+.PHONY: all clean test love
+all: $(PROGRAM)
+
+ifneq ($(MAKECMDGOALS),clean)
+-include $(OBJECTS:.o=.d)
+endif
+
+$(OBJECTDIR):
+	mkdir $&#64;
+
+$(OBJECTDIR)/%.o: $(SOURCEDIR)/%.c | $(OBJECTDIR)
+	$(CC) -t $(CC65_TARGET) -I $(SOURCEDIR) $(CFLAGS) --create-dep
+$(&#64;:&#46;<!--nospam-->o=.d) -c -o $&#64; $&lt;
+
+$(OBJECTDIR)/%.o: $(SOURCEDIR)/%.s | $(OBJECTDIR)
+	$(CC) -t $(CC65_TARGET) -I $(SOURCEDIR) $(ASFLAGS) --create-dep
+$(&#64;:&#46;<!--nospam-->o=.d) -c -o $&#64; $&lt;
+
+$(PROGRAM): $(OBJECTS)
+	$(CC) -t $(CC65_TARGET) $(LDFLAGS) -o $&#64; $^
+
+clean:
+	rm -f $(OBJECTS) $(OBJECTS:.o=.d) $(PROGRAM) $(PROGRAM).map
+	rmdir $(OBJECTDIR)
+
+test: $(PROGRAM)
+	$(EMULATOR) $(EMUFLAGS)
+
+love:
+	&#64;echo &quot;Not war, eh?&quot;
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun May  2 18:01:53 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8289.html" title="Next message in the list">Groepaz: "Re: [cc65] floating point support redux"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8287.html" title="Previous message in the list">silverdr1wfmh.org.pl: "Re: [cc65] Relative paths during compilation"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8283.html" title="Message to which this message replies">silverdr1wfmh.org.pl: "Re: [cc65] --create-dep for ca65?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8292.html" title="Next message in this discussion thread">silverdr1wfmh.org.pl: "Re: [cc65] --create-dep for ca65?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8292.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] --create-dep for ca65?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8288" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8288" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8288" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-05-02 18:01:55 CEST
+</em></small></p>
+</body>
+</html>

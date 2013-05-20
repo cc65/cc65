@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Question about linking ass</title>
+<meta name="Author" content="silverdr1wfmh.org.pl (silverdr1wfmh.org.pl)" />
+<meta name="Subject" content="Re: [cc65] Question about linking assembler to specific address" />
+<meta name="Date" content="2010-05-13" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Question about linking assembler to specific address</h1>
+<!-- received="Thu May 13 19:57:08 2010" -->
+<!-- isoreceived="20100513175708" -->
+<!-- sent="Thu, 13 May 2010 19:56:58 +0200" -->
+<!-- isosent="20100513175658" -->
+<!-- name="silverdr1wfmh.org.pl" -->
+<!-- email="silverdr1wfmh.org.pl" -->
+<!-- subject="Re: [cc65] Question about linking assembler to specific address" -->
+<!-- id="E6A93C40-FB93-4077-887A-54359B1D0247@wfmh.org.pl" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="AANLkTinpU5Wekeb161GVvFh6WdW19ECWOOshOfP987Ne&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8386.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] cc65 on MacOS&quot;">Next message</a> ]
+[ <a href="8384.html" title="Payton Byrd: &quot;[cc65] Question about linking assembler to specific address&quot;">Previous message</a> ]
+[ <a href="8384.html" title="Payton Byrd: &quot;[cc65] Question about linking assembler to specific address&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8407.html" title="Greg King: &quot;Re: [cc65] Question about linking assembler to specific address&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:silverdr1wfmh.org.pl?Subject=Re:%20[cc65]%20Question%20about%20linking%20assembler%20to%20specific%20address">silverdr1wfmh.org.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-05-13 19:56:58</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 2010-05-13, at 19:00, Payton Byrd wrote:
+
+&gt; I want to have an assembler program that I can compile and link that  
+&gt; starts at $1400 and only contains the code in my .S file.  Reading  
+&gt; up on the ld65 docs, it appears I should do the following:
+&gt;
+&gt; ld65 -t none -S $1400 -o outputfile input.s
+
+And what does ld65 says if you treat it with source files?
+
+&gt;
+&gt; However, when I load outputfile on the C64 using load&quot;outputfile&quot;, 
+&gt; 8,1 and then go to the monitor, the code does not exist at $1400,  
+&gt; there is simply zeroes as far as the eye can see.  Here's the code  
+&gt; I'm trying to compile.
+&gt;
+&gt; .word $1400
+&gt;
+&gt; 		LDA #$48
+&gt; 		JSR $FFD2
+&gt; 		LDA #$49
+&gt; 		JSR $FFD2
+&gt; 		LDA #$0D
+&gt; 		JSR $FFD2
+&gt; 		JSR $FFCF
+&gt; 		BRK
+&gt;
+&gt; Please help.
+
+$ ca65 input.s
+$ ld65 -t none -S $1400 -o outputfile input.o
+
+Works.
+
+-- 
+SD!
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu May 13 19:57:08 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8386.html" title="Next message in the list">silverdr1wfmh.org.pl: "Re: [cc65] cc65 on MacOS"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8384.html" title="Previous message in the list">Payton Byrd: "[cc65] Question about linking assembler to specific address"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8384.html" title="Message to which this message replies">Payton Byrd: "[cc65] Question about linking assembler to specific address"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8407.html" title="Next message in this discussion thread">Greg King: "Re: [cc65] Question about linking assembler to specific address"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8407.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] Question about linking assembler to specific address"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8385" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8385" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8385" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-05-13 19:57:10 CEST
+</em></small></p>
+</body>
+</html>

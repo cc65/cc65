@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Specific Memory Addresses </title>
+<meta name="Author" content="Zen Tom (zentom1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] Specific Memory Addresses at Compilation" />
+<meta name="Date" content="2012-10-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Specific Memory Addresses at Compilation</h1>
+<!-- received="Tue Oct 23 14:29:32 2012" -->
+<!-- isoreceived="20121023122932" -->
+<!-- sent="Tue, 23 Oct 2012 13:29:16 +0100" -->
+<!-- isosent="20121023122916" -->
+<!-- name="Zen Tom" -->
+<!-- email="zentom1gmail.com" -->
+<!-- subject="Re: [cc65] Specific Memory Addresses at Compilation" -->
+<!-- id="CAHsKwE8Vt8JPEWmMoMfEYrNOJaoFk+RTYp-jW8kfvimfPL2CCg@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="CAHsKwE_ytGnQPGiHtmVFfHrQF=S-zvNjYqu=ZDFWc5LjVQO8Cw&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10971.html" title="Marc 'BlackJack' Rintsch: &quot;Re: [cc65] Specific Memory Addresses at Compilation&quot;">Next message</a> ]
+[ <a href="10969.html" title="Oliver Schmidt: &quot;Re: [cc65] Color palettes&quot;">Previous message</a> ]
+[ <a href="10906.html" title="Zen Tom: &quot;[cc65] Specific Memory Addresses at Compilation&quot;">Maybe in reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10971.html" title="Marc 'BlackJack' Rintsch: &quot;Re: [cc65] Specific Memory Addresses at Compilation&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Zen Tom &lt;<a href="mailto:zentom1gmail.com?Subject=Re:%20[cc65]%20Specific%20Memory%20Addresses%20at%20Compilation">zentom1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-10-23 14:29:16</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>OK, I've been rethinking this:
+
+The natural way to do what I want would be to generate a raw data file
+&quot;data.raw&quot; containing my data and be able to place that at compile/linking
+time into a specific address.
+
+So for example - what I'd like to do is to use an assembler/memory monitor
+to curate the data I want between $4000 and $8000 into a raw data file.
+That's traditional C64 coding practice and well documented around the place.
+
+Once my raw data is set, I want to be able to specify a reserved memory
+area in my config.cfg file
+
+e.g:
+
+MEMORY {
+    ZP:  start = $0002, size = $001A, type = rw, define = yes;
+    RAM:  start = $07FF, size = $3800, file = %O, define = yes;
+    RAWDATA: start = $4000, size = $3FFF, file = %O, define = yes;
+    RAM2: start = $8000, size = $4FFF, file = %O, define = yes;
+}
+
+Next, what I want the linker to do is to load up the raw data file I've
+saved down in data.raw and load it into the RAWDATA memory location
+specified in the config file?
+
+It seems there's a method for doing this using an assembler file - but
+that's not what I want to do - I just want to be able to do a &quot;binary load&quot;
+type operation, from raw into a preset location - like in an old machine
+code monitor - obviously I need to reserve that space so no program code is
+placed in there, which is why I'm guessing this is something that would use
+the linker cfg file to organise.
+
+Is this something I can do with the current assembler/linker/compiler code,
+or do I need to write myself a routine to do this at runtime? The downside
+being that in writing a runtime routine, I need to write different code for
+different i/o devices etc (tape, disk etc) and for now for convenience I'd
+like to be able to pre-load my data at compile time.
+
+Any thoughts on achieving the above?
+
+If I can't load the raw data directly - then the second option is to mirror
+that raw data in an array, but I need to specify to the compiler that I
+want that data in very specific/inviolate memory location. One way of doing
+that would be to do something like:
+
+typedef byte SpriteData[190][64]; /* I've got 190 sprites each of which
+take up 64 bytes */
+
+#define Sprites  (*(SpriteData*)0x4800)
+
+then define my data elsewhere in an array, and read that data into the
+location defined above.
+
+But I'm not convinced that
+
+a) 0x4800 to 0x8000 is reserved by the linker
+
+b) I don't want to have to store my data twice - once in some random
+location, from where I will have to read it and copy it to where I want it
+to reside.
+
+The reason for all this nonsense is that I want to try and use the hardware
+sprite capabilities of the C64, but they require certain data structures to
+be placed at particular locations in the RAM,
+
+Kind regards,
+Tom
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Oct 23 14:29:32 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10971.html" title="Next message in the list">Marc 'BlackJack' Rintsch: "Re: [cc65] Specific Memory Addresses at Compilation"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10969.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Color palettes"</a></li>
+<li><dfn>Maybe in reply to</dfn>: <a href="10906.html" title="Message to which this message replies">Zen Tom: "[cc65] Specific Memory Addresses at Compilation"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10971.html" title="Next message in this discussion thread">Marc 'BlackJack' Rintsch: "Re: [cc65] Specific Memory Addresses at Compilation"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10971.html" title="Message sent in reply to this message">Marc 'BlackJack' Rintsch: "Re: [cc65] Specific Memory Addresses at Compilation"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10970" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10970" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10970" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-10-23 14:29:35 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Optimizer bug found</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] Optimizer bug found" />
+<meta name="Date" content="2009-09-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Optimizer bug found</h1>
+<!-- received="Thu, 10 Sep 2009 23:19:34 +0200" -->
+<!-- isoreceived="20090910211934" -->
+<!-- sent="Thu, 10 Sep 2009 23:19:34 +0200" -->
+<!-- isosent="20090910211934" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] Optimizer bug found" -->
+<!-- id="f97798c20909101419t9ec92f0gaa890b41e360ee9e@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6900.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Building with custom CC and CFLAGS&quot;">Next message</a> ]
+[ <a href="6898.html" title="Christian Grössler: &quot;Re: [cc65] Building with custom CC and CFLAGS&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6908.html" title="Groepaz: &quot;Re: [cc65] Optimizer bug found&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Optimizer%20bug%20found">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-09-10 23:19:34</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Uz,
+
+After spending a &quot;little&quot; time I finally succeeded in isolating an
+(maybe THE) optimizer bug causing Contiki to fail.
+
+From my user perspective it is very interesting that the bug shows up
+with compiler option -O but does _not_ show up with -Oi.
+
+&#64;Groepaz: Maybe your tests should be repeated with different optimizer
+settings...
+
+Here's the source:
+
+====================
+
+#include &lt;stdio.h&gt;
+
+unsigned htons(unsigned val)
+{
+  return (((unsigned) (val)) &lt;&lt; 8) | (((unsigned) (val)) &gt;&gt; 8);
+}
+
+void main(void)
+{
+  printf(&quot;%x -&gt; %x\n&quot;, 0x1234, htons(0x1234));
+}
+
+====================
+
+With 2.12.9.20090910-1 using -O the output is
+
+1234 -&gt; 1212
+
+instead of the expected
+
+1234 -&gt; 3412
+
+Have fun ;-)
+
+Best, Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu, 10 Sep 2009 23:19:34 +0200</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6900.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Building with custom CC and CFLAGS"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6898.html" title="Previous message in the list">Christian Grössler: "Re: [cc65] Building with custom CC and CFLAGS"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6908.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] Optimizer bug found"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6908.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] Optimizer bug found"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6911.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Optimizer bug found"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6899" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6899" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6899" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-09-10 23:19:44 CEST
+</em></small></p>
+</body>
+</html>

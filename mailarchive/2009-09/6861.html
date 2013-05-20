@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Re: New 80 col switch API</title>
+<meta name="Author" content="Jonathan Graham Harston (jgh1arcade.demon.co.uk)" />
+<meta name="Subject" content="[cc65] Re: New 80 col switch API" />
+<meta name="Date" content="2009-09-08" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Re: New 80 col switch API</h1>
+<!-- received="Tue Sep  8 01:01:21 2009" -->
+<!-- isoreceived="20090907230121" -->
+<!-- sent="07 Sep 2009 23:43:25 +0100" -->
+<!-- isosent="20090907224325" -->
+<!-- name="Jonathan Graham Harston" -->
+<!-- email="jgh1arcade.demon.co.uk" -->
+<!-- subject="[cc65] Re: New 80 col switch API" -->
+<!-- id="090907235513@arcade.demon.co.uk" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6862.html" title="Groepaz: &quot;Re: [cc65] Re: New 80 col switch API&quot;">Next message</a> ]
+[ <a href="6860.html" title="Jonathan Graham Harston: &quot;[cc65] Re: New 80 col switch API&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6862.html" title="Groepaz: &quot;Re: [cc65] Re: New 80 col switch API&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Jonathan Graham Harston &lt;<a href="mailto:jgh1arcade.demon.co.uk?Subject=Re:%20[cc65]%20Re:%20New%2080%20col%20switch%20API">jgh1arcade.demon.co.uk</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-09-08 00:43:25</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt; Message-ID: &lt;f97798c20909070031t214e42e3k470da093a972b265&#64;mail&#46;<!--nospam-->gmail.com&gt;
+ 
+Oliver Schmidt wrote:
+&gt; From my understanding non of the cc65 targets can produce arbitrary
+&gt; numbers of lines and columns. Having the users provide numbers
+&gt; directly enforces the impression that many numbers works.
+ 
+The BBC can have 20, 40 or 80 columns and 25 or 32 rows.
+ 
+&gt; to come up with here. A replacement for toggle_videomode should still
+ 
+What does toggle_videomode do?
+ 
+&gt; #define VIDEOMODE_40COL 0x??
+&gt; #define VIDEOMODE_80COL 0x??
+&gt; 
+&gt; These two defines should be available for all targets supporting this
+&gt; type of switching to allow for target independent programming.
+ 
+Exactly, viz:
+ 
+#define VIDEOMODE_40COL 0x28   /* ie, 40 */
+#define VIDEOMODE_80COL 0x50   /* ie, 80 */
+ 
+so 
+  videomode(VIDEOMODE_40COL);
+is expanded by the preprocessor to
+  videomode(0x28);
+which is the same as
+  videomode(40);
+ 
+which by Oliver's scheme is: select a 40-column screen mode, let
+the system decide how many rows it has, any by my scheme is: select
+a 40-column screen mode, I don't care how many rows it has, let the
+system decide how many rows it has.
+ 
+Targetting the BBC, that becomes:
+ 
+; videomode(int size)
+; -------------------
+; x=lsb size  [1]
+;
+__videomode
+lda #22
+jsw osrwch
+lda #128
+cpx #60
+bcs ~videomode1
+lda #131
+~videomode1
+jmp oswrch
+ 
+[1] Small-C passes b0-b7 of the top parameters in X, I haven't
+checked how cc65 does it. Adjust to fit.
+ 
+&gt; #define VIDEOMODE_40x25 0x??
+&gt; #define VIDEOMODE_80x25 0x??
+&gt; #define VIDEOMODE_??x?? 0x??
+ 
+You #define whatever you normally need for the implementation.
+Having the API pass a parameter that has some relationship to what
+it represents gives the code more sense, consistancy and future
+proofness.
+ 
+&gt; least two of them with values identical to VIDEOMODE_40COL and
+&gt; VIDEOMODE_80COL.
+ 
+The default standard implementation would just need
+#define VIDEOMODE_40COL 40 and #define VIDEOMODE_80COL 80.
+ 
+-- 
+J.G.Harston - jgh&#64;arcade&#46;<!--nospam-->demon.co.uk - mdfs.net/User/JGH
+A Review of Sheffield City Council's Members' Allowances Scheme
+                                  See <a href="http://mdfs.net/payreform">http://mdfs.net/payreform</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Sep  8 01:01:21 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6862.html" title="Next message in the list">Groepaz: "Re: [cc65] Re: New 80 col switch API"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6860.html" title="Previous message in the list">Jonathan Graham Harston: "[cc65] Re: New 80 col switch API"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6862.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] Re: New 80 col switch API"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6862.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] Re: New 80 col switch API"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6867.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Re: New 80 col switch API"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6861" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6861" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6861" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-09-08 01:01:24 CEST
+</em></small></p>
+</body>
+</html>

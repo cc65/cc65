@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] VICE/NESICIDE integration</title>
+<meta name="Author" content="Gábor Lénárt (lgb1lgb.hu)" />
+<meta name="Subject" content="Re: [cc65] VICE/NESICIDE integration" />
+<meta name="Date" content="2012-03-28" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] VICE/NESICIDE integration</h1>
+<!-- received="Wed Mar 28 12:19:07 2012" -->
+<!-- isoreceived="20120328101907" -->
+<!-- sent="Wed, 28 Mar 2012 12:18:43 +0200" -->
+<!-- isosent="20120328101843" -->
+<!-- name="Gábor Lénárt" -->
+<!-- email="lgb1lgb.hu" -->
+<!-- subject="Re: [cc65] VICE/NESICIDE integration" -->
+<!-- id="20120328101843.GE10030@vega.lgb.hu" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="201203281138.09876.groepaz&#64;gmx.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10216.html" title="Groepaz: &quot;Re: [cc65] VICE/NESICIDE integration&quot;">Next message</a> ]
+[ <a href="10214.html" title="Groepaz: &quot;Re: [cc65] VICE/NESICIDE integration&quot;">Previous message</a> ]
+[ <a href="10214.html" title="Groepaz: &quot;Re: [cc65] VICE/NESICIDE integration&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10216.html" title="Groepaz: &quot;Re: [cc65] VICE/NESICIDE integration&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Gábor Lénárt &lt;<a href="mailto:lgb1lgb.hu?Subject=Re:%20[cc65]%20VICE/NESICIDE%20integration">lgb1lgb.hu</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-03-28 12:18:43</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Wed, Mar 28, 2012 at 11:38:09AM +0200, Groepaz wrote:
+&gt; On Wednesday 28 March 2012, you wrote:
+&gt; &gt; The external &quot;debugger&quot; (or whatever
+&gt; &gt; we want to name it as) must know this too (also what happens with some
+&gt; &gt; &quot;exotic&quot; stuffs like cartridge emulation with custom ROM, etc).
+&gt; 
+&gt; cartridges are one reason for why this can not work with shared memory in a 
+&gt; generic way - the debugger would have to know how every single emulated 
+&gt; cartridge works and access memory accordingly.
+&gt; 
+&gt; ie, even the vice builtin monitor has a hard time doing it correctly (its 
+&gt; infact still not correct in all cases).
+
+Hmm, that was I had the idea to export all the memory, and then the external
+&quot;client&quot; must/should issue a command which makes VICE to list &quot;memory
+mapping&quot; based on areas. This way, maybe no need for read every byte etc,
+since banking/etc pages larger memory areas usually, not bytes.
+
+Eg, some stupid example (just for example):
+
+monitor command: list_mem
+
+RAM:	shm_id   rw
+KERNAL:	shm_id   ro
+[...]
+
+monitor command: list_mem_mapping
+
+E000-FFFF  KERNAL 0000 r
+E000-FFFF  RAM    E000 w
+
+So the first command lists all memories, this should not change unless VICE
+is reconfigured to emulate different HWs, or restarted to have other SHM
+ids, whatever.
+
+The second can change, it is used to query memory configuration:
+
+The first is the &quot;C64 memory address range&quot;, the second is a reference for
+the memories, the third is the offset within that memory, and the last field
+is the access type the information is valid for.
+
+This looks really ugly, but still, it's maybe faster then quering the memory
+all the time with memory dumping monitor command and parsing the output.
+
+However I am not sure it's a good idea: what happens if memory mapping is
+changed, and monitor hasn't queried the memory mapping state since the last
+yet. Maybe a better way is to eliminate at least the second command, and
+export that data via SHM too! SO it's always availbale! Only some race
+condiition can occur here, that external debugger client can use that
+information than doing the r/w in the memory while memory mapping is changed
+by the program run by VICE between these two steps.
+
+According to these examples, using SHM would mean that VICE can &quot;export&quot;
+their internals which can be used by the client any time.
+
+Anyway, it seems to be a bit complex solution, maybe it's even similier and
+faster to extend remote monitor protocol for quering information returned
+in raw byte stream, it's still true that SHM memory is faster to use, but
+since you need to know mapping information etc, I am not sure it will be
+faster than, and at least it's quite complex task then ...
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Mar 28 12:19:07 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10216.html" title="Next message in the list">Groepaz: "Re: [cc65] VICE/NESICIDE integration"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10214.html" title="Previous message in the list">Groepaz: "Re: [cc65] VICE/NESICIDE integration"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10214.html" title="Message to which this message replies">Groepaz: "Re: [cc65] VICE/NESICIDE integration"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10216.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] VICE/NESICIDE integration"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10216.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] VICE/NESICIDE integration"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10219.html" title="Message sent in reply to this message">Christopher Pow: "Re: [cc65] VICE/NESICIDE integration"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10215" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10215" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10215" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-03-28 12:19:12 CEST
+</em></small></p>
+</body>
+</html>

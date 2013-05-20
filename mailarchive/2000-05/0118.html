@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] repeating code blocks</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] repeating code blocks">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] repeating code blocks</h1>
+<!-- received="Tue May 23 00:36:45 2000" -->
+<!-- isoreceived="20000522223645" -->
+<!-- sent="Tue, 23 May 2000 00:35:49 +0200" -->
+<!-- isosent="20000522223549" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] repeating code blocks" -->
+<!-- id="3929B645.9C1CA240@gmx.net" -->
+<!-- inreplyto="20000523000143.A3148@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20repeating%20code%20blocks"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2000-05-23 00:35:49
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0119.html">Ullrich von Bassewitz: "Re: [cc65] repeating code blocks"</a>
+<li><strong>Previous message:</strong> <a href="0117.html">Ullrich von Bassewitz: "Re: [cc65] repeating code blocks"</a>
+<li><strong>In reply to:</strong> <a href="0117.html">Ullrich von Bassewitz: "Re: [cc65] repeating code blocks"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0119.html">Ullrich von Bassewitz: "Re: [cc65] repeating code blocks"</a>
+<li><strong>Reply:</strong> <a href="0119.html">Ullrich von Bassewitz: "Re: [cc65] repeating code blocks"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+&gt; I have explained it in some older mail, but here is it again:
+&gt; 
+&gt; There is a difference between relocation and placement. The linker does both,
+&gt; but it is not the same. You may relocate a piece of code to run at address
+&gt; $1000 but place it at address $2000. The address given in the memory area
+&gt; statement is the relocation address. Code put into this area is relocated to
+&gt; run at the given address. The placement of the code is a result of several
+&gt; other statements and the load address of the resulting binary file.
+&gt; 
+&gt; Most other 6502 development tools don't make a difference between relocation
+&gt; and placement (in fact, many available tools do not even support relocatable
+&gt; intermediate files). This may be the reason, why the concept looks strange on
+&gt; the first glance.
+
+well i understand the concept behind this pretty much, and i believe its really
+powerful and useable in big projects were you have code-overlayes, maybe you
+are also writing code that will end up in an eprom etc.... BUT, i guess most
+programs written by most programmers arent really those bigass projects, but
+rather some small handy tool or graphical effect. also using fixed memory
+adresses
+for stuff like screens,bitmaps etc pp isnt really an exotic thing to do.
+actually
+the good old drive-code example is the ONLY thing that comes to mind for using
+a different placement and relocation adress.
+ 
+&gt; fill=yes would mean that you will *always* get a file with the size of the
+&gt; memory area. This means that any assembler program that uses something like
+&gt; the standard memory configuration will be 54K in size, even a simple &quot;hello
+&gt; world&quot; with 40 bytes of code+data. I don't think that people will like this
+&gt; default, and that it will cause a lot of questions.
+
+well you can always add a switch (and make it default aswell) that would pad the
+resulting binary to its smallest possible size (cutting unused space at start
+and
+end of the used memory config) 
+
+...
+...
+
+anyway, maybe its just a matter of taste anyway ;=P
+
+gimme that .rept thing at least ;=P
+
+gpz
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20repeating%20code%20blocks">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0119.html">Ullrich von Bassewitz: "Re: [cc65] repeating code blocks"</a>
+<li><strong>Previous message:</strong> <a href="0117.html">Ullrich von Bassewitz: "Re: [cc65] repeating code blocks"</a>
+<li><strong>In reply to:</strong> <a href="0117.html">Ullrich von Bassewitz: "Re: [cc65] repeating code blocks"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0119.html">Ullrich von Bassewitz: "Re: [cc65] repeating code blocks"</a>
+<li><strong>Reply:</strong> <a href="0119.html">Ullrich von Bassewitz: "Re: [cc65] repeating code blocks"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:36 CET</em>
+</em>
+</small>
+</body>
+</html>

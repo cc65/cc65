@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] OT: SIN/LOG/EXP/SQR calcul</title>
+<meta name="Author" content="Karri Kaksonen (karri1sipo.fi)" />
+<meta name="Subject" content="Re: [cc65] OT: SIN/LOG/EXP/SQR calculations?" />
+<meta name="Date" content="2012-03-22" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] OT: SIN/LOG/EXP/SQR calculations?</h1>
+<!-- received="Thu Mar 22 20:37:07 2012" -->
+<!-- isoreceived="20120322193707" -->
+<!-- sent="Thu, 22 Mar 2012 21:36:58 +0200" -->
+<!-- isosent="20120322193658" -->
+<!-- name="Karri Kaksonen" -->
+<!-- email="karri1sipo.fi" -->
+<!-- subject="Re: [cc65] OT: SIN/LOG/EXP/SQR calculations?" -->
+<!-- id="4F6B7F5A.1000609@sipo.fi" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="1332436536.2758.YahooMailNeo&#64;web120601.mail.ne1.yahoo.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10147.html" title="Willi Kusche: &quot;[cc65] Does this remind you of anyone?&quot;">Next message</a> ]
+[ <a href="10145.html" title="Joseph Rose: &quot;[cc65] Ocean Cartridge format issues&quot;">Previous message</a> ]
+[ <a href="10143.html" title="Joseph Rose: &quot;[cc65] OT: SIN/LOG/EXP/SQR calculations?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10154.html" title="Andreas Rückert: &quot;Re: [cc65] OT: SIN/LOG/EXP/SQR calculations?&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Karri Kaksonen &lt;<a href="mailto:karri1sipo.fi?Subject=Re:%20[cc65]%20OT:%20SIN/LOG/EXP/SQR%20calculations?">karri1sipo.fi</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-03-22 20:36:58</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 03/22/2012 07:15 PM, Joseph Rose wrote:
+&gt; Sorry about the OT question, but I want to calculate the functions in 
+&gt; the subject heading for future work with graphics.  I could probably 
+&gt; use other functions as well.  I have only a high-school education; 
+&gt; otherwise, I wouldn't be asking here.  :(
+
+The easiest way is to use a table.
+
+;
+; NB : each table is indexed by a 5 bit 2's comp number, and provides 32
+; entries for trig tables in radians with the 5 bits commencing 3 after the
+; decimal point
+;
+         .global SinLow
+         .global SinHigh
+SinLow:
+.byte $00, $3f, $7f, $bf, $ff, $3f, $7f, $bf, $ff, $3f, $7f, $bf, $ff, 
+$3f, $7f, $bf
+.byte $01, $41, $81, $c1, $01, $41, $81, $c1, $01, $41, $81, $c1, $01, 
+$41, $81, $c1
+SinHigh:
+.byte $00, $00, $00, $00, $00, $01, $01, $01, $01, $02, $02, $02, $02, 
+$03, $03, $03
+.byte $fc, $fc, $fc, $fc, $fd, $fd, $fd, $fd, $fe, $fe, $fe, $fe, $ff, 
+$ff, $ff, $ff
+
+ From this table you can get values between fc01 (negative number) to 
+03bf (positive number)
+
+-
+Karri
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Mar 22 20:37:07 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10147.html" title="Next message in the list">Willi Kusche: "[cc65] Does this remind you of anyone?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10145.html" title="Previous message in the list">Joseph Rose: "[cc65] Ocean Cartridge format issues"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10143.html" title="Message to which this message replies">Joseph Rose: "[cc65] OT: SIN/LOG/EXP/SQR calculations?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10154.html" title="Next message in this discussion thread">Andreas Rückert: "Re: [cc65] OT: SIN/LOG/EXP/SQR calculations?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10146" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10146" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10146" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-03-22 20:37:11 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] tgi primitives...</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] tgi primitives..." />
+<meta name="Date" content="2004-10-27" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] tgi primitives...</h1>
+<!-- received="Wed Oct 27 10:46:03 2004" -->
+<!-- isoreceived="20041027084603" -->
+<!-- sent="Wed, 27 Oct 2004 10:46:00 +0200" -->
+<!-- isosent="20041027084600" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] tgi primitives..." -->
+<!-- id="20041027084600.GA15605@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="Pine.LNX.4.58.0410270829070.7988&#64;kosh.sipo.fi" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4668.html" title="Karri Kaksonen: &quot;Re: [cc65] tgi primitives...&quot;">Next message</a> ]
+[ <a href="4666.html" title="Karri Kaksonen: &quot;[cc65] tgi primitives...&quot;">Previous message</a> ]
+[ <a href="4666.html" title="Karri Kaksonen: &quot;[cc65] tgi primitives...&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4668.html" title="Karri Kaksonen: &quot;Re: [cc65] tgi primitives...&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20tgi%20primitives...">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-10-27 10:46:00</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Wed, Oct 27, 2004 at 08:48:27AM +0300, Karri Kaksonen wrote:
+&gt; But the circle does not seem to have any kind of hardware support on any
+&gt; platforms.
+
+Hardware support has never been a reason for adding something to a TGI driver
+(or not). Most platforms don't have any hardware support for graphics at all,
+so if this would be required, the TGI API would consist of nothing but loading
+and unloading a driver:-)
+
+One serious problem is the code overhead involved when calling tgi_setpixel.
+So most primitives have to go into the driver, because implementing them
+externally by repeated calls to tgi_setpixel will make them too slow. In
+addition, the video memory configuration for common platforms does allow for
+some optimizations, which means that not all address calculations have to be
+repeated when steping from one to the next pixel. For example, implementing
+the tgi_circle routine in C would be at least 3 times slower than the current
+implementation in the C64 driver. Most other 6502 platforms with a simple
+graphics chip are comparable in this respect, so honouring your request and
+moving circle support out of the driver would have a serious performance
+impact.
+
+When developing TGI, I planned to &quot;steal&quot; an idea from the Borland BGI
+interface: emulation. A BGI driver is not required to implement several high
+level functions, ellipse and bar among them. If the function is not available
+in the driver, the BGI library will emulate these routines outside the driver
+by calling device independent routines that themselves call simpler driver
+functions (like setpixel, line, or whatever). In early times of the TGI
+interface, there was emulation for the BAR routine as a test case. I removed
+it and required all drivers to implement BAR natively, because it proved to
+have mostly disadvantages: Since the program does not know if the driver, that
+will be loaded at runtime, will have support for the emulated routines, it
+must link code for these routines to the executable. This will add several KB
+to the program (and we're talking about platforms with an average of 32K
+available RAM for programs!). Even a naive implementation of BAR, CIRCLE or
+whatever in the driver itself, will always be faster and smaller than the same
+code outside the driver. This is the reason why CIRCLE, BAR and friends are
+required in todays TGI specification.
+
+I would suggest to add a simple circle implementation to the driver. Just make
+it work, no need to make it fast. If no one uses it, there's no problem with a
+slow implementation. If people use it and feel it is too slow, someone will
+hopefully come up with faster code. That's the advantage of open source:-)
+
+&gt; I would like to see a filled triangle there instead of the circle. A
+&gt; filled triangle can be generated by the Lynx hardware from a pixel that is
+&gt; tilted and stretched by the hardware.
+
+No specification is perfect, and the TGI API was crafted for platforms without
+hardware acceleration in mind. In these cases (which cover ALL existing
+platforms besides the Lynx), drawing triangles is rather slow, so there was no
+need for this primitive. I admit that this is a drawback for the Lynx, but
+there's no way to make something fit for everyone.
+
+&gt; Another curiosity is the text. I don't believe that the text should be in
+&gt; the tgi-library.
+
+As with circle, practical purposes where the reason for implementing text.
+Most graphical programs want to plot text somewhere on the screen. And,
+implementing text outside of the driver would mean that the font would not
+match the screen resolution, and plotting would be slow like hell, because
+pixel for pixel has to be set by calls to tgi_setpixel. Many platforms are
+able to implement text quite somewhat faster, at least if the text is aligned
+to text coordinates. This was the reason for moving text output into the
+driver. I can see that there are no advantages for the Lynx, but this is
+different for many other platforms.
+
+In general, there's always some personal taste involved in these decisions, so
+I don't claim that my decisions are perfect. But for most existing platforms
+they are ok, I think. Just assume, the TGI specs would have been crafted with
+your suggestions in mind. That is, triangles instead if circle, and text
+rendered by the high level API. This would be quite a performance hit for all
+other platforms. Circles - which are used much more likely than triangles -
+are several times slower, text is even more slower, and triangles are also
+slow, because they have to be rendered by the CPU. Because triangles are not
+used very often, but are implemented in the driver, we will also end up with
+larger programs.
+
+So please do not judge what has to go into the driver from just looking at the
+Lynx. In fact, the Lynx is quite untypical. It would be nice to have special
+Lynx features supported, but improving the situation for the Lynx while at the
+same time worsening the situation for all other platforms is not the way to
+go.
+
+&gt; For a system like Lynx I would like to create a text
+&gt; font. But it should be usable by the text tools like console I/O.
+
+Most other systems do have something like &quot;text mode&quot; (for some, it's the only
+mode supported). &quot;Text mode&quot; is usually different from graphics mode. So both
+things are implement differently. I know that there are some platforms, where
+text mode is just emulated (the system is actually running in graphics mode
+all the time), but this is not the rule.
+
+To solve most of your problems, I would suggest to implement the required
+functions in the driver, so people can use it, and otherwise ressort to the
+tgi_ioctl call to implement Lynx specifics. I'm sorry that this is a bit
+awkward, but I see no better way, if we want to keep support for other
+platforms as good as it is.
+
+Maybe we can come up with a few common driver extensions (like triangle) and
+move a few ioctls into the TGI header file. So we would have
+
+    1. the definitive TGI API using the tgi_... functions,
+
+    2. some optional functions implemented using tgi_ioctl. These functions
+       should behave nearly identical when implemented; necessary definitions
+       will go into the TGI header file. And
+
+    3. a set of platform or driver specific functions. Definitions for these
+       functions should go into the platform header file.
+   
+This approach wouldn't require a change of the API, while at the same time
+allowing Lynx programs to use the special features of the hardware (at the
+expense of portability).
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Oct 27 10:46:03 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4668.html" title="Next message in the list">Karri Kaksonen: "Re: [cc65] tgi primitives..."</a></li>
+<li><dfn>Previous message</dfn>: <a href="4666.html" title="Previous message in the list">Karri Kaksonen: "[cc65] tgi primitives..."</a></li>
+<li><dfn>In reply to</dfn>: <a href="4666.html" title="Message to which this message replies">Karri Kaksonen: "[cc65] tgi primitives..."</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4668.html" title="Next message in this discussion thread">Karri Kaksonen: "Re: [cc65] tgi primitives..."</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4668.html" title="Message sent in reply to this message">Karri Kaksonen: "Re: [cc65] tgi primitives..."</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4667" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4667" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4667" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-10-27 10:46:13 CEST
+</em></small></p>
+</body>
+</html>

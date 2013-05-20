@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] da65: segments, asminc, and lo</title>
+<meta name="Author" content="MagerValp (MagerValp1cling.gu.se)" />
+<meta name="Subject" content="[cc65] da65: segments, asminc, and load address" />
+<meta name="Date" content="2007-06-20" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] da65: segments, asminc, and load address</h1>
+<!-- received="Wed Jun 20 13:54:25 2007" -->
+<!-- isoreceived="20070620115425" -->
+<!-- sent="Wed, 20 Jun 2007 13:54:14 +0200" -->
+<!-- isosent="20070620115414" -->
+<!-- name="MagerValp" -->
+<!-- email="MagerValp1cling.gu.se" -->
+<!-- subject="[cc65] da65: segments, asminc, and load address" -->
+<!-- id="18041.5478.957004.407644@hal.cling.gu.se" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5747.html" title="silverdr1inet.com.pl: &quot;Re: [cc65] building under cygwin&quot;">Next message</a> ]
+[ <a href="5745.html" title="MagerValp: &quot;Re: [cc65] building under cygwin&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5750.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] da65: segments, asminc, and load address&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: MagerValp &lt;<a href="mailto:MagerValp1cling.gu.se?Subject=Re:%20[cc65]%20da65:%20segments,%20asminc,%20and%20load%20address">MagerValp1cling.gu.se</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-06-20 13:54:14</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Would it be possible to add a way of specifying linker segments in
+info files? E.g.
+
+  RANGE { START $07ff; END $08ff; SEGMENT &quot;STARTUP&quot;; };
+
+would emit a
+
+	.segment &quot;STARTUP&quot;
+
+before $07ff. If range syntax doesn't allow you to do that (overlaps
+and whatnot), maybe just a SEGMENT &quot;STARTUP&quot; to the GLOBAL segment?
+
+Also, when using ASMINC, would it be possible to make da65 emit a
+.include statement (if flagged as EMIT_INCLUDE to the ASMINC), instead
+of just adding the labels to the dictionary?
+
+And last, any chance of adding explicit support for PRG load
+addresses? Something along the lines of
+
+  GLOBAL {
+	LOADADDRESS	&quot;init&quot;;
+  }
+
+that would emit
+
+	.addr init
+
+init:
+
+and eat up the first two bytes (assuming that they match *+2 of
+course). If no label name is given, emit &quot;.addr * + 2&quot;.
+
+The goal here is to minimize the amount of editing needed when going
+from disassembly to reassembly.
+
+-- 
+    ___          .     .  .         .       . +  .         .      o   
+  _|___|_   +   .  +     .     +         .  Per Olofsson, arkadspelare
+    o-o    .      .     .   o         +          MagerValp&#64;cling&#46;<!--nospam-->gu.se
+     -       +            +    .     <a href="http://www.cling.gu.se/~cl3polof/">http://www.cling.gu.se/~cl3polof/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Jun 20 13:54:25 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5747.html" title="Next message in the list">silverdr1inet.com.pl: "Re: [cc65] building under cygwin"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5745.html" title="Previous message in the list">MagerValp: "Re: [cc65] building under cygwin"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5750.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] da65: segments, asminc, and load address"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5750.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] da65: segments, asminc, and load address"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5746" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5746" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5746" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-06-20 13:54:27 CEST
+</em></small></p>
+</body>
+</html>

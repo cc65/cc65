@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Label file</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Label file">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Label file</h1>
+<!-- received="Thu Aug  2 21:46:00 2001" -->
+<!-- isoreceived="20010802194600" -->
+<!-- sent="Thu, 2 Aug 2001 21:46:06 +0200" -->
+<!-- isosent="20010802194606" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Label file" -->
+<!-- id="20010802214606.A18527@trixie.musoftware.de" -->
+<!-- inreplyto="1D2B2C77C9CF964EB1331ABEB51562E1AB8927@ukntsvr2.uk.drte.com" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Label%20file"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2001-08-02 21:46:06
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0575.html">groepaz: "Re[2]: [cc65] Label file"</a>
+<li><strong>Previous message:</strong> <a href="0573.html">Mike McCarty: "RE: [cc65] Label file"</a>
+<li><strong>In reply to:</strong> <a href="0571.html">Keates, Mark: "RE: [cc65] Label file"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0575.html">groepaz: "Re[2]: [cc65] Label file"</a>
+<li><strong>Reply:</strong> <a href="0575.html">groepaz: "Re[2]: [cc65] Label file"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Thu, Aug 02, 2001 at 02:06:02PM -0400, Keates, Mark wrote:
+&gt; Surely the fact the address &lt; $100 identifies this?
+&gt; I think it can be left to the emulator import process
+&gt; to work this out.
+
+The emulator is not able to make a difference between a label in the zero page
+and a constant with a value less than $100, because symbols are not marked as
+being labels or other constants. But this would be easy to add once it is
+actually used by an emulator (see my notes about cleanup in the last mail).
+
+&gt; Whoa, how would that work? Map address ranges to filename/line pairs?
+&gt; Or even as far as statement start/end position within a line? E.g.
+
+The current implementation is pretty similar to what you were describing. The
+following C file (which does not make sense, it is just a relict from some
+testing):
+
+---------------------------------------------------------------------------
+1: int main (void)
+2: {
+3:     unsigned char I, J = 0;
+4:     for (I = 0; I &lt; 10; ++I) {
+5:         ++J;
+6:     }
+7:     return 0;
+8: }
+---------------------------------------------------------------------------
+
+generates this line info file:
+
+---------------------------------------------------------------------------
+file	&quot;crt0.s&quot;, 2790, 984062856
+file	&quot;c64.inc&quot;, 4163, 959521248
+file	&quot;../cbm/cbm.inc&quot;, 648, 959521248
+file	&quot;test.s&quot;, 1034, 996780975
+file	&quot;test.c&quot;, 114, 996780975
+line	&quot;test.c&quot;, 3, 000061-000068
+line	&quot;test.c&quot;, 4, 00007E-000087
+line	&quot;test.c&quot;, 4, 000069-000074
+line	&quot;test.c&quot;, 5, 000075-00007D
+line	&quot;test.c&quot;, 7, 000088-00008B
+line	&quot;test.c&quot;, 8, 00008C-00008E
+file	&quot;zerobss.s&quot;, 465, 975017720
+file	&quot;condes.s&quot;, 1947, 975367900
+file	&quot;decsp1.s&quot;, 206, 972502655
+file	&quot;incsp2.s&quot;, 691, 975367891
+file	&quot;pusha.s&quot;, 374, 975418377
+file	&quot;pushax.s&quot;, 568, 985451080
+---------------------------------------------------------------------------
+
+Each &quot;file&quot; statement identifies a source file, it's size and it's time of
+last modification (the decimal value of a POSIX time_t). You can use this to
+check if the file loaded by the emulator is really the one used to compile the
+binary (and maybe display a warning to alert the user).
+
+The &quot;line&quot; statement specifies a source line. As you can see, the for()
+statement (line 4) needs actually two code ranges.
+
+&gt; This begs the question &quot;What if I'm writing both C and assembler?&quot;
+
+Assembler code does not output line info for now. but this is not too
+difficult to add, since it is already present in the object file.
+
+&gt; I would recommend that the C file generates the above syntax, but
+&gt; for assembler programming the .LINEPOS could be allowed to have
+&gt; no arguments, e.g. use the current line number (and pos=0).
+&gt; I think you'll might also need something to end a range.
+
+It is really interesting to see that there are quite some similarities between
+my implementation and your suggestions. Yes, there is something like .LINEPOS
+and yes, there is a command to end a range.
+
+&gt; Is it overkill for the assembler to generate a range for each
+&gt; line of code? This clogs up emulator memory/serach time.
+&gt; (but then again this is running on a well spec'd PC).
+
+When adding line info for assembler code, it is necessary to add line
+information for each line. Anything else would be quite useless, and even
+older DOS debuggers (Turbo Assembler for example) were able to handle this.
+
+&gt; Then, how do you determine whether the emulator should load the
+&gt; 'C' file or the 'S' file (as 'C' compiles to 'S' assembles to 'O')
+&gt; to highlight the code being executed? This would have to be
+&gt; specified in the assembler file's header, e.g. similar to
+&gt; '.debuginfo&lt;tab&gt;off' use '.sourcefile&lt;tab&gt;filename.c'
+
+This is one of the reasons, the linker does not emit line info for assembler
+code: It does not know which is more important and should be used.
+
+Regards
+
+
+        Uz
+
+
+--						       
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Label%20file">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Label%20file">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0575.html">groepaz: "Re[2]: [cc65] Label file"</a>
+<li><strong>Previous message:</strong> <a href="0573.html">Mike McCarty: "RE: [cc65] Label file"</a>
+<li><strong>In reply to:</strong> <a href="0571.html">Keates, Mark: "RE: [cc65] Label file"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0575.html">groepaz: "Re[2]: [cc65] Label file"</a>
+<li><strong>Reply:</strong> <a href="0575.html">groepaz: "Re[2]: [cc65] Label file"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:40 CET</em>
+</em>
+</small>
+</body>
+</html>

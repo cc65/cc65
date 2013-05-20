@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] using screen codes instead</title>
+<meta name="Author" content="Gábor Lénárt (lgb1lgb.hu)" />
+<meta name="Subject" content="Re: [cc65] using screen codes instead of PETSCII" />
+<meta name="Date" content="2011-11-28" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] using screen codes instead of PETSCII</h1>
+<!-- received="Mon Nov 28 15:30:42 2011" -->
+<!-- isoreceived="20111128143042" -->
+<!-- sent="Mon, 28 Nov 2011 15:30:22 +0100" -->
+<!-- isosent="20111128143022" -->
+<!-- name="Gábor Lénárt" -->
+<!-- email="lgb1lgb.hu" -->
+<!-- subject="Re: [cc65] using screen codes instead of PETSCII" -->
+<!-- id="20111128143022.GA20708@vega.lgb.hu" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="20111127104812.GB8888&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9716.html" title="Gábor Lénárt: &quot;[cc65] .IFDEF, .DEFINED for checking existance of macros?&quot;">Next message</a> ]
+[ <a href="9714.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] using screen codes instead of PETSCII&quot;">Previous message</a> ]
+[ <a href="9714.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] using screen codes instead of PETSCII&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9718.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] using screen codes instead of PETSCII&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Gábor Lénárt &lt;<a href="mailto:lgb1lgb.hu?Subject=Re:%20[cc65]%20using%20screen%20codes%20instead%20of%20PETSCII">lgb1lgb.hu</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-11-28 15:30:22</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Sun, Nov 27, 2011 at 11:48:12AM +0100, Ullrich von Bassewitz wrote:
+&gt; 
+&gt; On Sun, Nov 27, 2011 at 06:39:56AM +0200, thefox xofeht wrote:
+&gt; &gt; I'm not sure what exactly you mean by &quot;screen codes&quot;, but .repeat
+&gt; &gt; comes in handy when using .charmap.
+&gt; 
+&gt; Nice idea. I didn't even realize that this works - and I'm the creator :-)
+
+It's nice for me this way :)
+
+.REPEAT 26,l
+.CHARMAP l+97,l+1 ; lower case
+.CHARMAP l+65,l+65 ; upper case
+.ENDREP
+.CHARMAP 64,0  ; &#64;
+.CHARMAP 95,100   ; _
+
+I have something like this for now. However it would be handy, if .CHARMAP
+supports mapping a &quot;pool&quot; not just one character, like this:
+
+.CHARMAP 1..9, 11..19   ; map 1..9 -&gt; 11..19
+
+Maybe the second ..20 is not even needed as length of the range is already
+defined by the first parameter. I don't even dare to mention too much to
+allow multiple values with a single .CHARMAP like:
+
+.CHARMAP 1..9,11..19,   20,23 ; map 1..9-&gt;11..19, and 20 -&gt; 23
+
+Well, I think it's a bit odd in syntax (the .. is that as well), so maybe
+it's not even a good idea to implement at all ...
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Nov 28 15:30:42 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9716.html" title="Next message in the list">Gábor Lénárt: "[cc65] .IFDEF, .DEFINED for checking existance of macros?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9714.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] using screen codes instead of PETSCII"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9714.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] using screen codes instead of PETSCII"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9718.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] using screen codes instead of PETSCII"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9718.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] using screen codes instead of PETSCII"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9715" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9715" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9715" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-11-28 15:30:46 CET
+</em></small></p>
+</body>
+</html>

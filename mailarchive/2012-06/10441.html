@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] .bank with imported symbol</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] .bank with imported symbols" />
+<meta name="Date" content="2012-06-30" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] .bank with imported symbols</h1>
+<!-- received="Sat Jun 30 19:23:01 2012" -->
+<!-- isoreceived="20120630172301" -->
+<!-- sent="Sat, 30 Jun 2012 19:22:52 +0200" -->
+<!-- isosent="20120630172252" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] .bank with imported symbols" -->
+<!-- id="20120630172252.GA6250@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="CA+eVkH6jVm8euv_TEGD=UkD5LtAnHJrztQ17c=OFuRmJy=W-aQ&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10442.html" title="thefox xofeht: &quot;Re: [cc65] .bank with imported symbols&quot;">Next message</a> ]
+[ <a href="10440.html" title="thefox xofeht: &quot;Re: [cc65] .bank with imported symbols&quot;">Previous message</a> ]
+[ <a href="10440.html" title="thefox xofeht: &quot;Re: [cc65] .bank with imported symbols&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10442.html" title="thefox xofeht: &quot;Re: [cc65] .bank with imported symbols&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20.bank%20with%20imported%20symbols">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-06-30 19:22:52</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Fri, Jun 29, 2012 at 06:47:18PM +0300, thefox xofeht wrote:
+&gt; Thanks for the workaround, it should do for now! However, there seems
+&gt; to be a bug in the linker:
+
+That was actually a bug in the assembler, and it was easier to move evaluation
+of the argument for .BANK into the linker than to fix the assembler problems.
+
+So, your original code should work when using the next snapshot. Be sure to
+delete all object files, since the internal format has changed.
+
+Please let me know if there are any problems. One minor thing is already
+known: The diagnostics in case of problems are not very good. If you use .BANK
+and there's something wrong, the linker won't tell you the exact location of
+the problem. I might fix that in the future.
+
+Thanks for testing and the reports!
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Jun 30 19:23:01 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10442.html" title="Next message in the list">thefox xofeht: "Re: [cc65] .bank with imported symbols"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10440.html" title="Previous message in the list">thefox xofeht: "Re: [cc65] .bank with imported symbols"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10440.html" title="Message to which this message replies">thefox xofeht: "Re: [cc65] .bank with imported symbols"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10442.html" title="Next message in this discussion thread">thefox xofeht: "Re: [cc65] .bank with imported symbols"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10442.html" title="Message sent in reply to this message">thefox xofeht: "Re: [cc65] .bank with imported symbols"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10441" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10441" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10441" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-06-30 19:23:05 CEST
+</em></small></p>
+</body>
+</html>

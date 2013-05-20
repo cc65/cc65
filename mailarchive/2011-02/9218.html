@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Modules with self modifyin</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Modules with self modifying code" />
+<meta name="Date" content="2011-02-05" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Modules with self modifying code</h1>
+<!-- received="Sat Feb  5 12:18:38 2011" -->
+<!-- isoreceived="20110205111838" -->
+<!-- sent="Sat, 5 Feb 2011 12:18:29 +0100" -->
+<!-- isosent="20110205111829" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Modules with self modifying code" -->
+<!-- id="20110205111828.GB32576@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="143FBBB0-DAB7-4E06-B138-F1634B5BBE15&#64;wfmh.org.pl" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9219.html" title="Oliver Schmidt: &quot;Re: [cc65] Modules with self modifying code&quot;">Next message</a> ]
+[ <a href="9217.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Modules with self modifying code&quot;">Previous message</a> ]
+[ <a href="9215.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Modules with self modifying code&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9220.html" title="Oliver Schmidt: &quot;Re: [cc65] Modules with self modifying code&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Modules%20with%20self%20modifying%20code">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-02-05 12:18:29</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Sat, Feb 05, 2011 at 01:09:40AM +0100, silverdr&#64;wfmh&#46;<!--nospam-->org.pl wrote:
+&gt; If my two pennies are of any value then I find
+&gt;
+&gt; &gt;  2. Accept replacement functions using smc, but let them have different
+&gt; &gt;     names, so a programmer must explicitly call the smc version.
+&gt;
+&gt; most appealing. Reasons for that:
+
+In the current situation, I do also see this as the most appealing approach:
+
+  - There's a well defined place for contributions, so work is not lost.
+
+  - Programmers must explicitly choose to use self modifying code, which is
+    hopefully like signing &quot;I know what I do and I promise to be careful&quot;.
+
+  - It is open for future changes, which means we can easily change to option
+    3 or 4 later, because the code is already there and tested.
+
+  - It does not interfere with inlining by the compiler, since the names of
+    the functions are different.
+
+  - Using one define and a few macros (probably in one additional header file)
+    it is possible for a programmer to switch between smc and non smc
+    versions. This allows easier debugging in case of problems[1].
+
+  - And it is not too much work for me :-)
+
+So how about an include file smc.h and a function prefix of smc_, which would
+mean functions are named smc_memset() and similar?
+
+Platform specific functions should still go into the platform header files,
+even if they use self modifying code. Usage of smc in platform specific
+functions should be documented in the function reference.
+
+Does that sound ok?
+
+I'm not sure about the segment question, Oliver brought up. When choosing
+option 2, where a programmer must explitly include and call smc functions, I
+would even find it acceptable to place these functions in the CODE segment.
+But that doesn't cover target specific functions with smc. We can also use
+another segment like SMCCODE, but the segment list in the config files is
+already quite large and it's difficult for a newcomer to understand the
+purpose of all the segments.
+
+Regards
+
+
+        Uz
+
+
+
+[1] I had quite some functions using self modifying code in Elite 128, but
+removed most of them, because they were ugly to debug. I had a memory
+overwrite somewhere that freezed the machine sometimes after about 15 minutes
+of playing and could not find it. VICE is able to break if a write inside a
+certain address range occurs, but if your whole code is full of writes to
+itself, the function is of almost no help.
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Feb  5 12:18:38 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9219.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Modules with self modifying code"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9217.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Modules with self modifying code"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9215.html" title="Message to which this message replies">silverdr1wfmh.org.pl: "Re: [cc65] Modules with self modifying code"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9220.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Modules with self modifying code"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9220.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Modules with self modifying code"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9221.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] Modules with self modifying code"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9222.html" title="Message sent in reply to this message">Shawn Jefferson: "RE: [cc65] Modules with self modifying code"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9224.html" title="Message sent in reply to this message">Christian Krüger: "Re: [cc65] Modules with self modifying code"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9218" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9218" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9218" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-02-05 12:18:41 CET
+</em></small></p>
+</body>
+</html>

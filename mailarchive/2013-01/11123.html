@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] How to properly use a .uni</title>
+<meta name="Author" content="Payton Byrd (plbyrd1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] How to properly use a .union" />
+<meta name="Date" content="2013-01-22" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] How to properly use a .union</h1>
+<!-- received="Tue Jan 22 08:47:11 2013" -->
+<!-- isoreceived="20130122074711" -->
+<!-- sent="Tue, 22 Jan 2013 01:46:40 -0600" -->
+<!-- isosent="20130122074640" -->
+<!-- name="Payton Byrd" -->
+<!-- email="plbyrd1gmail.com" -->
+<!-- subject="Re: [cc65] How to properly use a .union" -->
+<!-- id="CAJm6qqcNRJckOHW+dEjrVsN7Em7PfW6Z+3r3KeobvFxU=YLz+w@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="CAJm6qqepVC+jOfPGcTLQRNqsr0emtBo0k3TWY_M9Q3_HhpeVNA&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11124.html" title="thefox xofeht: &quot;Re: [cc65] How to properly use a .union&quot;">Next message</a> ]
+[ <a href="11122.html" title="Payton Byrd: &quot;Re: [cc65] How to properly use a .union&quot;">Previous message</a> ]
+[ <a href="11122.html" title="Payton Byrd: &quot;Re: [cc65] How to properly use a .union&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="11125.html" title="Payton Byrd: &quot;Re: [cc65] How to properly use a .union&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Payton Byrd &lt;<a href="mailto:plbyrd1gmail.com?Subject=Re:%20[cc65]%20How%20to%20properly%20use%20a%20.union">plbyrd1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2013-01-22 08:46:40</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>What I currently have is this:
+
+.struct font
+	Baseline	.byte
+	TotalWidth	.word
+	Height		.byte
+	IndexPtr	.word
+	FontDataPtr	.word
+.endstruct
+
+
+fontRowLength = _ormand+font::TotalWidth
+fontIndex := _ormand + _ormand+font::IndexPtr
+fontData := _ormand + _ormand+font::FontDataPtr
+fontHeight := _ormand+font::Height
+
+.rodata
+_ormand:
+	.incbin &quot;..\res\ormand.geosfont&quot;
+
+
+Unfortunately, the value in fontIndex is the address of _ormand and
+IndexPtr added together.  I need fontIndex to contain the address of
+_ormand and the value of IndexPtr added together.
+
+
+
+On Tue, Jan 22, 2013 at 1:43 AM, Payton Byrd &lt;plbyrd&#64;gmail&#46;<!--nospam-->com&gt; wrote:
+
+&gt; Yes, this is very much what I'm looking for with one change.
+&gt;
+&gt; When I reference _ormand+font::IndexPtr, I want the actual value in
+&gt; fontIndex, not the memory location.  I don't see how to do this.
+&gt;
+&gt;
+&gt; On Tue, Jan 22, 2013 at 1:21 AM, thefox xofeht &lt;thefox&#64;aspekt&#46;<!--nospam-->fi&gt; wrote:
+&gt;
+&gt;&gt; On Tue, Jan 22, 2013 at 7:30 AM, Payton Byrd &lt;plbyrd&#64;gmail&#46;<!--nospam-->com&gt; wrote:
+&gt;&gt;
+&gt;&gt;&gt; Hello,
+&gt;&gt;&gt;
+&gt;&gt;&gt; I have a scenario where I want to be able to define a font in a file and
+&gt;&gt;&gt; then overlay a struct on top of the loaded file such that I can access the
+&gt;&gt;&gt; values of the file as struct values.  To that end I've created the
+&gt;&gt;&gt; following code, which compiles:
+&gt;&gt;&gt;
+&gt;&gt;&gt; .struct font
+&gt;&gt;&gt; 	Baseline	.byte
+&gt;&gt;&gt; 	TotalWidth	.word
+&gt;&gt;&gt; 	Height		.byte
+&gt;&gt;&gt; 	IndexPtr	.word
+&gt;&gt;&gt; 	FontDataPtr	.word
+&gt;&gt;&gt; .endstruct
+&gt;&gt;&gt;
+&gt;&gt;&gt; .union Ormand
+&gt;&gt;&gt; 	Font .tag font
+&gt;&gt;&gt;
+&gt;&gt;&gt;
+&gt;&gt;&gt;
+&gt;&gt;&gt;
+&gt;&gt;&gt;
+&gt;&gt;&gt; .endunion
+&gt;&gt;&gt;
+&gt;&gt;&gt; fontRowLength = _ormand+font::TotalWidth
+&gt;&gt;&gt; fontIndex = _ormand + _ormand+font::IndexPtr
+&gt;&gt;&gt; fontData = _ormand + _ormand+font::FontDataPtr
+&gt;&gt;&gt;
+&gt;&gt;&gt; .rodata
+&gt;&gt;&gt; _ormand: .tag Ormand
+&gt;&gt;&gt; 	.incbin &quot;..\res\ormand.geosfont&quot;
+&gt;&gt;&gt;
+&gt;&gt;&gt;
+&gt;&gt;&gt; The problem I'm having is that the values I retrieve from the
+&gt;&gt;&gt; fontRowLength, fontIndex, and fontData variables do not reflect the data in
+&gt;&gt;&gt; the file.  What am I doing wrong here?  I've searched google (including the
+&gt;&gt;&gt; mailing list) and found no answer.
+&gt;&gt;&gt;
+&gt;&gt;
+&gt;&gt; Hi,
+&gt;&gt;
+&gt;&gt; I'm guessing you want something like this:
+&gt;&gt;
+&gt;&gt;  .struct font
+&gt;&gt; Baseline .byte
+&gt;&gt;  TotalWidth .word
+&gt;&gt; Height .byte
+&gt;&gt;  IndexPtr .word
+&gt;&gt; FontDataPtr .word
+&gt;&gt; .endstruct
+&gt;&gt;
+&gt;&gt; fontRowLength = _ormand+font::TotalWidth
+&gt;&gt; fontIndex = _ormand+font::IndexPtr
+&gt;&gt; fontData = _ormand+font::FontDataPtr
+&gt;&gt;
+&gt;&gt; .rodata
+&gt;&gt; _ormand:
+&gt;&gt;  .incbin &quot;..\res\ormand.geosfont&quot;
+&gt;&gt;
+&gt;&gt; No need for union. And note that .tag actually allocates memory, so if
+&gt;&gt; you put .tag in rodata, it will allocate bunch of zeroes from it according
+&gt;&gt; to the data structure given to it.
+&gt;&gt;
+&gt;&gt; -thefox
+&gt;&gt;
+&gt;&gt;
+&gt;
+&gt;
+&gt; --
+&gt; Payton Byrd
+&gt; &lt;<a href="http://www.paytonbyrd.com">http://www.paytonbyrd.com</a>&gt;
+&gt; &lt;<a href="http://it.toolbox.com/blogs/paytonbyrd">http://it.toolbox.com/blogs/paytonbyrd</a>&gt;
+&gt;
+
+
+
+-- 
+Payton Byrd
+&lt;<a href="http://www.paytonbyrd.com">http://www.paytonbyrd.com</a>&gt;
+&lt;<a href="http://it.toolbox.com/blogs/paytonbyrd">http://it.toolbox.com/blogs/paytonbyrd</a>&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Jan 22 08:47:11 2013</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11124.html" title="Next message in the list">thefox xofeht: "Re: [cc65] How to properly use a .union"</a></li>
+<li><dfn>Previous message</dfn>: <a href="11122.html" title="Previous message in the list">Payton Byrd: "Re: [cc65] How to properly use a .union"</a></li>
+<li><dfn>In reply to</dfn>: <a href="11122.html" title="Message to which this message replies">Payton Byrd: "Re: [cc65] How to properly use a .union"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="11125.html" title="Next message in this discussion thread">Payton Byrd: "Re: [cc65] How to properly use a .union"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="11125.html" title="Message sent in reply to this message">Payton Byrd: "Re: [cc65] How to properly use a .union"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#11123" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#11123" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#11123" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2013-01-22 08:47:15 CET
+</em></small></p>
+</body>
+</html>

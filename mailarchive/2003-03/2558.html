@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] testsuite - compiler bugs!</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="[cc65] testsuite - compiler bugs!">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] testsuite - compiler bugs!</h1>
+<!-- received="Mon Mar  3 05:24:02 2003" -->
+<!-- isoreceived="20030303042402" -->
+<!-- sent="Mon, 3 Mar 2003 05:29:24 +0100" -->
+<!-- isosent="20030303042924" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="[cc65] testsuite - compiler bugs!" -->
+<!-- id="200303030529.25250.groepaz@gmx.net" -->
+<!-- inreplyto="20030301123757.GA31247@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20testsuite%20-%20compiler%20bugs!"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2003-03-03 05:29:24
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2557.html">Ullrich von Bassewitz: "Re: [cc65] # of local variables allowed?"</a>
+<li><strong>In reply to:</strong> <a href="2557.html">Ullrich von Bassewitz: "Re: [cc65] # of local variables allowed?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2565.html">Ullrich von Bassewitz: "Re: [cc65] testsuite - compiler bugs!"</a>
+<li><strong>Reply:</strong> <a href="2565.html">Ullrich von Bassewitz: "Re: [cc65] testsuite - compiler bugs!"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+hyho!
+
+as another &quot;cleaning out the closet&quot; project i have worked a little on making 
+that testsuite (which was in my earlier clumsy snapshot) somewhat useful in 
+practice....
+
+1) it now builds without the need of &quot;external&quot; files, except for what comes 
+with cc65, plus pucrunch to pack the files and the &quot;c1541&quot; tool to generate 
+the final .d81 image (unfortunatly they wont fit on a d64 image even when 
+packed :/)
+
+2) the complete testsuite runs in &quot;one shot&quot;. each program tries to load and 
+execute the next file on disc. the only manual interaction needed atm is 
+loading the first test (a bug in vice makes autorun fail :/) and run it...and 
+closing the emulator window when all tests are finished. all tests write 
+their output to disc instead of printing it out.
+
+3) i have written some little script that will take care of building the 
+testsuite, launching emulator, grabbing the written output from the d81 
+image, and generating a somewhat pretty (or not :=P) report in html format. 
+(oh this uses petcat, but you have that if you have c1541 :=P)...i'm 
+currently generating a brief overview page which basically tells which tests 
+passed and which didnt, plus a page with detailed info for each file
+
+tjam...so if you got any ideas/wishes/wild dreams let me know before i upload, 
+coz i probably will never touch it again after that :=P
+
+however, what i can already tell are two bugs which the testsuite reports: (oh 
+i have upgraded to latest snapshot two or three days ago)...
+
+1) in section &quot;strings&quot;
+
+  if( &quot;.\&quot;.&quot;[1] != '&quot;' )
+  {
+	printf(&quot;shouldnt come here\n&quot;);
+  }
+
+ok its not the type of code everyone writes, but still... :O)
+
+2) in section &quot;bitwise/logical operators&quot;
+
+long list of errors here actually....for example:
+
+  if(((char)12 | (short)10) != 14) {
+	printf(&quot;shouldnt come here\n&quot;);
+  }
+  if(((char)12 ^ (short)10) !=  6) {
+	printf(&quot;shouldnt come here\n&quot;);
+  }
+  if(((char)12 | (int)10) != 14) {
+	printf(&quot;shouldnt come here\n&quot;);
+  }
+  if(((char)12 ^ (int)10) !=  6) {
+	printf(&quot;shouldnt come here\n&quot;);
+  }
+  if(((short)12 | (char)10) != 14) {
+	printf(&quot;shouldnt come here\n&quot;);
+  }
+  if(((short)12 ^ (char)10) !=  6) {
+	printf(&quot;shouldnt come here\n&quot;);
+  }
+
+...etc, a bunch more of that kind.
+
+this might however be a problem with typecasting and not the 
+operators....maybe both :=P
+
+anyway, its nice to see that the compiler passes all other test (of which some 
+contain quite screwed code :=P) fine (this wasnt the case last time i checked 
+:=))...well except some minor problems caused by some characters missing on 
+c64 (i will try to work around this so these tests report &quot;passed&quot; aswell). 
+its also cool to see that the compiler _compiles_ all tests, since that kinda 
+proofs that it can do what the standard says (except some features which are 
+explicitly defined out...basically struct limitations,no bitfields,no 
+floats).
+
+so long,
+
+gpz
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20testsuite%20-%20compiler%20bugs!">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2557.html">Ullrich von Bassewitz: "Re: [cc65] # of local variables allowed?"</a>
+<li><strong>In reply to:</strong> <a href="2557.html">Ullrich von Bassewitz: "Re: [cc65] # of local variables allowed?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2565.html">Ullrich von Bassewitz: "Re: [cc65] testsuite - compiler bugs!"</a>
+<li><strong>Reply:</strong> <a href="2565.html">Ullrich von Bassewitz: "Re: [cc65] testsuite - compiler bugs!"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-03-03 05:24:51 CET</em>
+</em>
+</small>
+</body>
+</html>

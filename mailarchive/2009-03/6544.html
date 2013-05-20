@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] controlling location of litera</title>
+<meta name="Author" content="Winslow, Dan D (US SSA) (dan.winslow1baesystems.com)" />
+<meta name="Subject" content="[cc65] controlling location of literal storage" />
+<meta name="Date" content="2009-03-11" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] controlling location of literal storage</h1>
+<!-- received="Wed Mar 11 19:14:35 2009" -->
+<!-- isoreceived="20090311181435" -->
+<!-- sent="Wed, 11 Mar 2009 11:14:24 -0700" -->
+<!-- isosent="20090311181424" -->
+<!-- name="Winslow, Dan D (US SSA)" -->
+<!-- email="dan.winslow1baesystems.com" -->
+<!-- subject="[cc65] controlling location of literal storage" -->
+<!-- id="7b4c32$2kei7a@dmzms99801.na.baesystems.com" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6545.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] controlling location of literal storage&quot;">Next message</a> ]
+[ <a href="6543.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] any sample of tgi lib&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6545.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] controlling location of literal storage&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Winslow, Dan D (US SSA) &lt;<a href="mailto:dan.winslow1baesystems.com?Subject=Re:%20[cc65]%20controlling%20location%20of%20literal%20storage">dan.winslow1baesystems.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-03-11 19:14:24</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I am trying to locate some data ( char *'s and initialization literals )
+all in one file, separate from the main %O file. Defined as follows :
+
+#include &lt;conio.h&gt;
+
+#pragma codeseg(push,&quot;BANK0SEG&quot;)
+#pragma dataseg(push,&quot;BANK0DAT&quot;);
+#pragma rodataseg(push,&quot;BANK0ROD&quot;);
+Char *some1=&quot;aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&quot;;
+char *some2=&quot;aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&quot;;
+char *some3=&quot;aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&quot;;
+char *some4=&quot;aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&quot;;
+void bank0( void )
+{
+	gotoxy(0,2);
+	cprintf(&quot;hello from bank0!&quot;);
+	bank_call(1,&quot;bank1&quot;);
+}
+#pragma rodataseg(pop)
+#pragma dataseg(pop)
+#pragma codeseg(pop)
+
+The config file in use maps these segment names to a separate file
+&quot;bank0.bnk&quot;. My question is about the ability to control the storage
+location for the initialization literals above. The actual variables
+some1, some2, etc. do appear in the bank0.bnk file, but the literals are
+stored in the main file.
+
+Is there a way to force these literals to be in the same output file as
+the variables that point to them are?
+
+Dan Winslow
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Mar 11 19:14:35 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6545.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] controlling location of literal storage"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6543.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] any sample of tgi lib"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6545.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] controlling location of literal storage"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6545.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] controlling location of literal storage"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6544" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6544" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6544" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-03-11 19:14:38 CET
+</em></small></p>
+</body>
+</html>

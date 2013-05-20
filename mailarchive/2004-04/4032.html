@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Linker output for EPROM im</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Linker output for EPROM image files" />
+<meta name="Date" content="2004-04-12" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Linker output for EPROM image files</h1>
+<!-- received="Mon Apr 12 14:20:33 2004" -->
+<!-- isoreceived="20040412122033" -->
+<!-- sent="Mon, 12 Apr 2004 14:20:29 +0200" -->
+<!-- isosent="20040412122029" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Linker output for EPROM image files" -->
+<!-- id="20040412122029.GA22613@trixie.musoftware.de" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="000501c42064$587aae70$f337fe91&#64;GROUNDHOG" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4033.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] linker&quot;">Next message</a> ]
+[ <a href="4031.html" title="gerhard: &quot;[cc65] linker&quot;">Previous message</a> ]
+[ <a href="4030.html" title="Christian Krüger: &quot;[cc65] Linker output for EPROM image files&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4034.html" title="David Holz: &quot;Re: [cc65] Linker output for EPROM image files&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Linker%20output%20for%20EPROM%20image%20files">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-04-12 14:20:29</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Mon, Apr 12, 2004 at 10:01:11AM +0200, Christian Krüger wrote:
+&gt; I have the following problem:
+&gt;
+&gt; When the code in block $400 is bigger than $12 bytes
+&gt; I didn't get a warning that there is code which will
+&gt; do some harm...
+
+Why do you expect a warning? There's nothing wrong with the code. The first
+piece is assembled for a fixed start address of $400, the second one for a
+fixed start address of $412. There's nothing that tells the assembler that the
+first piece of code should not exceed 18 bytes. It would be completely legal
+to have 20 pieces of code all located at $400 (think about overlays for
+example), so the assembler cannot know.
+
+&gt; When I link this code, space between the blocks won't
+&gt; filled up (e.g. with zeros) to give an suitable burn
+&gt; file.
+
+As far as the linker is concerned, there are no &quot;blocks&quot; in your code, so you
+cannot expect the space between the non existing blocks to be filled with
+something.
+
+&gt; This is quite uncomfortable and I ask myself and
+&gt; now this group if there is a more convenient way?
+
+I would suggest reading the FAQ, because this is where these things are
+explained:
+
+        <a href="http://www.cc65.org/faq.php#ORG">http://www.cc65.org/faq.php#ORG</a>
+
+&gt; PS: Uz, it seems that I cannot post anymore to this list or to you,
+&gt;
+&gt; when using my usual account at 'pace.de'. I get the following error:
+[...]
+&gt; Transcript of session:
+&gt; RCPT TO:&lt;cc65&#64;musoftware&#46;<!--nospam-->de&gt;
+&gt; 450 Client host rejected: cannot find your hostname, [217.9.112.74]
+
+The IP address of your mail server doesn't have a valid reverse DNS:
+
+    uz&#64;trixie:~$ host 217&#46;<!--nospam-->9.112.74
+    Host 74.112.9.217.in-addr.arpa not found: 3(NXDOMAIN)
+    uz&#64;trixie:~$
+
+&gt; What can I, our sysad or you do to resolve this problem?
+
+Ask your admin to add a reverse DNS mapping (a PTR record in the in-addr.arpa
+zone) for the mail server. This is considered to be good style. BTW: None of
+the hosts in your IP range has a valid reverse DNS. There may be a problem
+with your admin.
+
+I'm sorry about the inconvenience, but without such filtering, I would get
+more than 400 Spam mails daily!
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Apr 12 14:20:33 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4033.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] linker"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4031.html" title="Previous message in the list">gerhard: "[cc65] linker"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4030.html" title="Message to which this message replies">Christian Krüger: "[cc65] Linker output for EPROM image files"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4034.html" title="Next message in this discussion thread">David Holz: "Re: [cc65] Linker output for EPROM image files"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4032" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4032" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4032" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-04-12 14:20:39 CEST
+</em></small></p>
+</body>
+</html>

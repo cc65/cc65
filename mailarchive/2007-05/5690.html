@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: RE: [cc65] C64 Cartridge Program</title>
+<meta name="Author" content="Bill Katsak (bill1katsak.com)" />
+<meta name="Subject" content="RE: [cc65] C64 Cartridge Program" />
+<meta name="Date" content="2007-05-18" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>RE: [cc65] C64 Cartridge Program</h1>
+<!-- received="Fri May 18 13:03:13 2007" -->
+<!-- isoreceived="20070518110313" -->
+<!-- sent="Fri, 18 May 2007 07:02:07 -0400" -->
+<!-- isosent="20070518110207" -->
+<!-- name="Bill Katsak" -->
+<!-- email="bill1katsak.com" -->
+<!-- subject="RE: [cc65] C64 Cartridge Program" -->
+<!-- id="D6A9DEC492BA1748B89E48B2FC5147B24B2D@server.fox56.local" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="[cc65] C64 Cartridge Program" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5691.html" title="Greg King: &quot;Re: [cc65] C64 Cartridge Program&quot;">Next message</a> ]
+[ <a href="5689.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] C64 Cartridge Program&quot;">Previous message</a> ]
+[ <a href="5687.html" title="Bill Katsak: &quot;[cc65] C64 Cartridge Program&quot;">Maybe in reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5693.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] C64 Cartridge Program&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Bill Katsak &lt;<a href="mailto:bill1katsak.com?Subject=RE:%20[cc65]%20C64%20Cartridge%20Program">bill1katsak.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-05-18 13:02:07</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I will get more details tomorrow, I have to leave for work shortly, but
+the switch to lowercase is still in there. It just does not happen for
+some reason.
+
+Here is the startup code as I am using it:
+
+;
+; Startup code for cc65 (C64 version)
+;
+; This must be the *first* file on the linker command line
+;
+
+	.export		_exit
+	.import		initlib, donelib, callirq
+       	.import	       	zerobss
+	.import	     	callmain
+        .import         RESTOR, BSOUT, CLRCH
+	.import	       	__INTERRUPTOR_COUNT__
+	.import		__RAM_START__, __RAM_SIZE__	; Linker
+generated
+	.import copydata
+        .include        &quot;zeropage.inc&quot;
+	.include     	&quot;c64.inc&quot;
+
+
+;
+------------------------------------------------------------------------
+; Place the startup code in a special segment.
+
+.segment       	&quot;STARTUP&quot;
+
+; BASIC header with a SYS call
+
+;        .word   Head            ; Load address
+;Head:   .word   &#64;Next
+;        .word   .version        ; Line number
+;        .byte   $9E,&quot;2061&quot;      ; SYS 2061
+;        .byte   $00             ; End of BASIC line
+;&#64;Next:  &#46;<!--nospam-->word   0               ; BASIC end marker
+
+;Cartridge AUTOSTART header
+.byte $09,$80
+.byte $19,$80
+.byte $c3,$c2,$cd,$38,$30
+
+;Kernal init routines.
+stx $d016
+jsr $fda3
+jsr $fd50
+jsr $fd15
+jsr $ff5b
+cli
+
+;These are BASIC init routines, I just tried them for the heck of it.
+;jsr $e453
+;jsr $e3bf
+;jsr $e422
+;ldx #$fb
+;txs
+
+;
+------------------------------------------------------------------------
+; Actual code
+
+	ldx    	#zpspace-1
+L1:	lda	sp,x
+   	sta	zpsave,x	; Save the zero page locations we need
+	dex
+       	bpl	L1
+
+; Close open files
+
+	jsr	CLRCH
+
+; Switch to second charset
+
+	lda	#14
+	jsr	BSOUT
+
+; Switch off the BASIC ROM
+
+;	lda	$01
+;       	pha                     ; Remember the value
+;	and	#$F8
+;       	ora	#$06		; Enable kernal+I/O, disable
+basic
+;	sta	$01
+
+; Clear the BSS data
+
+	jsr	zerobss
+	
+; Copy DATA to RAM
+
+	jsr copydata
+	
+; Save system settings and setup the stack
+
+        pla
+        sta	mmusave      	; Save the memory configuration
+
+       	tsx
+       	stx    	spsave 		; Save the system stack ptr
+
+	lda    	#&lt;(__RAM_START__ + __RAM_SIZE__)
+	sta	sp
+	lda	#&gt;(__RAM_START__ + __RAM_SIZE__)
+       	sta	sp+1   		; Set argument stack ptr
+
+; Call module constructors
+
+	jsr	initlib
+
+; If we have IRQ functions, chain our stub into the IRQ vector
+
+        lda     #&lt;__INTERRUPTOR_COUNT__
+      	beq	NoIRQ1
+      	lda	IRQVec
+       	ldx	IRQVec+1
+      	sta	IRQInd+1
+      	stx	IRQInd+2
+      	lda	#&lt;IRQStub
+      	ldx	#&gt;IRQStub
+      	sei
+      	sta	IRQVec
+      	stx	IRQVec+1
+      	cli
+
+; Push arguments and call main
+
+NoIRQ1: jsr     callmain
+
+; Back from main (This is also the _exit entry). Reset the IRQ vector if
+we
+; chained it.
+
+_exit: 	pha  			; Save the return code on stack
+	lda     #&lt;__INTERRUPTOR_COUNT__
+	beq	NoIRQ2
+	lda	IRQInd+1
+	ldx	IRQInd+2
+	sei
+	sta	IRQVec
+	stx	IRQVec+1
+	cli
+
+; Run module destructors
+
+NoIRQ2: jsr	donelib
+
+; Copy back the zero page stuff
+
+       	ldx	#zpspace-1
+L2:   	lda	zpsave,x
+      	sta	sp,x
+      	dex
+       	bpl	L2
+
+; Place the program return code into ST
+
+	pla
+	sta	ST
+
+; Restore system stuff
+
+  	ldx	spsave
+	txs	       	  	; Restore stack pointer
+       	ldx    	mmusave
+	stx	$01    	  	; Restore memory configuration
+
+; Reset changed vectors, back to basic
+
+	jmp	RESTOR
+
+;
+------------------------------------------------------------------------
+; The IRQ vector jumps here, if condes routines are defined with type 2.
+
+IRQStub:
+	cld    	       		   	; Just to be sure
+       	jsr    	callirq                 ; Call the functions
+       	jmp    	IRQInd			; Jump to the saved IRQ vector
+
+;
+------------------------------------------------------------------------
+; Data
+
+.data
+
+zpsave:	.res	zpspace
+IRQInd: jmp     $0000
+
+.bss
+
+spsave:	.res	1
+mmusave:.res	1
+
+
+
+
+Thanks,
+Bill
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri May 18 13:03:13 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5691.html" title="Next message in the list">Greg King: "Re: [cc65] C64 Cartridge Program"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5689.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] C64 Cartridge Program"</a></li>
+<li><dfn>Maybe in reply to</dfn>: <a href="5687.html" title="Message to which this message replies">Bill Katsak: "[cc65] C64 Cartridge Program"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5693.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] C64 Cartridge Program"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5693.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] C64 Cartridge Program"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5690" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5690" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5690" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-05-18 13:03:16 CEST
+</em></small></p>
+</body>
+</html>

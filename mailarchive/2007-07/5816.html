@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Charset handling question.</title>
+<meta name="Author" content="Greg King (greg.king41verizon.net)" />
+<meta name="Subject" content="Re: [cc65] Charset handling question..." />
+<meta name="Date" content="2007-07-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Charset handling question...</h1>
+<!-- received="Sun Jul 29 15:35:05 2007" -->
+<!-- isoreceived="20070729133505" -->
+<!-- sent="Sun, 29 Jul 2007 09:34:32 -0400" -->
+<!-- isosent="20070729133432" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king41verizon.net" -->
+<!-- subject="Re: [cc65] Charset handling question..." -->
+<!-- id="000701c7d1e5$4bd64cc0$443efea9@monarch" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="46AC4EBA.9060103&#64;kochandreas.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="../2007-08/5817.html" title="stefan: &quot;Re: [cc65] optimizations&quot;">Next message</a> ]
+[ <a href="5815.html" title="Andreas Koch: &quot;Re: [cc65] Charset handling question...&quot;">Previous message</a> ]
+[ <a href="5813.html" title="Andreas Koch: &quot;[cc65] Charset handling question...&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king41verizon.net?Subject=Re:%20[cc65]%20Charset%20handling%20question...">greg.king41verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-07-29 15:34:32</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: &quot;Andreas Koch&quot;; on Sunday, July 29, 2007; at 04:24 AM -0400
+&gt;
+&gt; I'm in the process of writing an app. that is going to be ported to
+&gt; various platforms and compilers/assemblers.
+&gt; It internally works using ASCII, and uses various access methods
+&gt; (including, on the C64, direct screen-memory access) for in/output.
+&gt;
+&gt; I already defined some ASCII-Code &lt;-&gt; C64-Screencode translation tables
+&gt; (Like a=01 (C64) vs. a=97 (ASCII)).
+&gt;
+&gt; Now, while
+&gt;   poke(SCREEN+0,Ascii2Screen['a']);
+&gt; works quite nicely,
+&gt;   poke(SCREEN+1,Ascii2Screen['T']);
+&gt; unfortunately doesn't -- 'T' seems to be 212 (0xD4) in CC65, not 84 as
+&gt; in ASCII.
+&gt;
+&gt; So:
+&gt; 1) In what encoding does CC65, by default, store string/char literals?
+
+CC65's compiler and assembler store those literals in each platform's native
+code-set (eg., PETSCII on CBM machines, ATASCII on Atari machines).
+
+&gt; 2) Is this a CC65 specialty, or can I expect to find non-ASCII storage in
+&gt; other compilers, as well?
+
+It's a CC65 specialty.  Most other compilers use the code-set that's in the
+source files that they process.  (CC65 defines the __CC65__ preprocessor
+&quot;macro&quot;.)
+
+&gt; 3) Can I switch CC65 to store as ASCII?
+
+Yes, but usually by compiling a source file for an ASCII platform.  However,
+that method changes some of the values that some of CC65's header files
+define!  So, you must be careful about which files you compile for which
+platform.
+
+&gt; 4) Is there some more sensible way to handle this [I can't just use
+&gt; printf(), etc. because I really need various in/output methods, including
+&gt; rendering text to graphics, processing files in ASCII or PETSCII, and
+&gt; processing interpreted code working on that ASCII text].
+
+It is easy to handle the literal-text problem:
+Put the code that uses PETSCII text in one file, and put the code that uses
+ASCII text in a second file.  Compile the PETSCII file for one of the CBM
+machines; compile the ASCII file for the &quot;none&quot; platform.  Then, link the
+object files together.
+
+But, you would have problems with library functions.  You would want to take
+character functions (the &lt;ctype.h&gt; functions, for example) from the library
+of an ASCII machine.  But, you would want to link, at the same time, to
+functions that exist in only a non-ASCII library (the CBM file functions,
+for example).
+
+It probably would be easier to be portable in the opposite direction; that
+is, your program would use a native code-set internally, and would convert
+text from/to the non-native files.
+
+Preprocessor directives could choose the appropriate source code that knows
+which code-set is native and which set is not.
+
+Or, you could isolate, into their own functions, the program codes that need
+to know the difference.  Then, you could build different libraries that
+handle the different character-code sets.  Link to the appropriate library
+when you build the final program.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Jul 29 15:35:05 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="../2007-08/5817.html" title="Next message in the list">stefan: "Re: [cc65] optimizations"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5815.html" title="Previous message in the list">Andreas Koch: "Re: [cc65] Charset handling question..."</a></li>
+<li><dfn>In reply to</dfn>: <a href="5813.html" title="Message to which this message replies">Andreas Koch: "[cc65] Charset handling question..."</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5816" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5816" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5816" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-07-29 15:35:07 CEST
+</em></small></p>
+</body>
+</html>

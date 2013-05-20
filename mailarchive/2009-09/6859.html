@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] testsuite results ...</title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="Re: [cc65] testsuite results ..." />
+<meta name="Date" content="2009-09-08" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] testsuite results ...</h1>
+<!-- received="Tue Sep  8 00:32:05 2009" -->
+<!-- isoreceived="20090907223205" -->
+<!-- sent="Tue, 8 Sep 2009 00:31:58 +0200" -->
+<!-- isosent="20090907223158" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="Re: [cc65] testsuite results ..." -->
+<!-- id="200909080031.58345.groepaz@gmx.net" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="20090907171356.GA29493&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6860.html" title="Jonathan Graham Harston: &quot;[cc65] Re: New 80 col switch API&quot;">Next message</a> ]
+[ <a href="6858.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Re: New 80 col switch API&quot;">Previous message</a> ]
+[ <a href="6854.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] testsuite results ...&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6872.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] testsuite results ...&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20testsuite%20results%20...">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-09-08 00:31:58</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Montag 07 September 2009, Ullrich von Bassewitz wrote:
+&gt; fields.c should now work but there are still differences between gcc and
+&gt; cc65 output. This is because ISO/IEC 9899:1999 (E) says in 6.7.2.1
+&gt; &quot;Structure and union specifiers&quot;, footnote 104:
+&gt;
+&gt;   &quot;As specified in 6.7.2 above, if the actual type specifier used is int or
+&gt; a typedef-name defined as int, then it is implementation-defined whether
+&gt; the bit-field is signed or unsigned.&quot;
+&gt;
+&gt; gcc chooses signed bit-fields, while cc65 implements unsigned bit-fields
+&gt; for obvious reasons. This causes a difference in two numbers of the output.
+&gt; If you want the same output, you may change the code to declare the
+&gt; bit-fields as unsigned (instead of int).
+
+aaaaah ok. good to know :) yes, i will change the test so it doesnt fail 
+anymore (or rather, add some option for this behaviour)
+
+&gt; &gt; &gt; I had already a look at yacc.c, but for the test, the input file
+&gt; &gt; &gt; yacc.in is missing, so I cannot run it here. So I hoped this was fixed
+&gt; &gt; &gt; when I fixed the other errors, which was seemingly wrong. Can you send
+&gt; &gt; &gt; me the file in private mail or point me to a download link?
+&gt; &gt;
+&gt; &gt; the input file contains a single line: (i'll add links to them on the
+&gt; &gt; report pages... :))
+&gt;
+&gt; I still cannot get it running with the error message in your report. For
+&gt; me, it just hangs, and the code is somewhat wicked (means: I do not
+&gt; understand it:-)
+
+yes, it doesnt produce that error here either with versin 4120 - i added 
+a &quot;start of test here&quot; message because of it :) and yes, the code (and 
+especially the generated asm) is kinda horrible =D
+
+&gt; &gt; apropos... cc65090726.c contains some passing of struct pointers to
+&gt; &gt; functions which take a different type - cc65 errors out on them. i have
+&gt; &gt; now made it skip those 3, i assumed that this behavior (giving an error
+&gt; &gt; instead of just a warning) is completely &quot;legal&quot; ... am i correct?
+&gt;
+&gt; The C standard doesn't talk about &quot;errors&quot; and &quot;warnings&quot;, all it knows are
+&gt; &quot;diagnostics&quot;. It is up to the compiler writer to specify what is a
+&gt; &quot;diagnostic&quot;. Passing a pointer of the wrong type is in my eyes such a
+&gt; strong sign for an error in the program, that I decided, not to generate
+&gt; output in this case. The gcc creators decided that it is worth generating
+&gt; an executable for reasons unknown to me. Both approaches are correct
+&gt; according to the C standard, since both compilers output a &quot;diagnostic&quot;.
+
+ok, thats exactly what i thought, written out more precisely =)
+
+so well, i did another quick check with 4130, it shows same results as 
+before ... i am going through a bunch of oooold things i have written when 
+cc65 still was quite bugged and add more tests to the testsuite (i might have 
+found one case that still doesnt work right, have to recheck... :)) ... 
+trying to update the webpage later tonite :)
+
+ps: btw, are you interisted in the output generated when compiling cc65 
+itself... like the warnings it produces? (i am running on amd64 here, and i 
+am seeing one or two related warnings)
+
+pps:
+
+in the runtime: (4130)
+
+../../../include/geos/gstruct.h(123): Error: Size of data type is unknown
+../../../include/geos/gstruct.h(136): Error: Size of data type is unknown
+../../../include/geos/gstruct.h(142): Error: Size of data type is unknown
+
+all of them failing because of
+
+sometype_t  arg[];
+
+it works if replaced by
+
+sometype_t  *arg;
+
+ppps:
+
+sidenote: one of my little test programs that dont fit into the testsuite (i 
+should put those online too ...), which is a simple mandelbrot calculated in 
+16 bit fixedpoint, runs in ~1800 seconds now, as opposed to ~2500 seconds 
+with the older compiler. quite a nice improvement =)
+
+-- 
+
+<a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    <a href="http://magicdisk.untergrund.net">http://magicdisk.untergrund.net</a>
+<a href="http://www.pokefinder.org">http://www.pokefinder.org</a>        <a href="http://ftp.pokefinder.org">http://ftp.pokefinder.org</a>
+
+It is more profitable for your congressman to support the tobacco industry 
+than your life. 
+&lt;Jackie Mason&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Sep  8 00:32:05 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6860.html" title="Next message in the list">Jonathan Graham Harston: "[cc65] Re: New 80 col switch API"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6858.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Re: New 80 col switch API"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6854.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] testsuite results ..."</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6872.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] testsuite results ..."</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6872.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] testsuite results ..."</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6859" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6859" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6859" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-09-08 00:32:07 CEST
+</em></small></p>
+</body>
+</html>

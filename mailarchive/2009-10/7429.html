@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] tgi_outtext, one more ques</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] tgi_outtext, one more question :)" />
+<meta name="Date" content="2009-10-30" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] tgi_outtext, one more question :)</h1>
+<!-- received="Fri Oct 30 10:41:45 2009" -->
+<!-- isoreceived="20091030094145" -->
+<!-- sent="Fri, 30 Oct 2009 10:34:57 +0100" -->
+<!-- isosent="20091030093457" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] tgi_outtext, one more question :)" -->
+<!-- id="20091030093457.GA12487@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="717546.26828.qm&#64;web56502.mail.re3.yahoo.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7430.html" title="Karri Kaksonen: &quot;Re: [cc65] tgi_outtext, one more question :)&quot;">Next message</a> ]
+[ <a href="7428.html" title="Fatih Aygün: &quot;[cc65] tgi_outtext, one more question :)&quot;">Previous message</a> ]
+[ <a href="7428.html" title="Fatih Aygün: &quot;[cc65] tgi_outtext, one more question :)&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7430.html" title="Karri Kaksonen: &quot;Re: [cc65] tgi_outtext, one more question :)&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20tgi_outtext,%20one%20more%20question%20:)">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-10-30 10:34:57</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Fri, Oct 30, 2009 at 01:35:50AM -0700, Fatih AygÃ¼n wrote:
+&gt; How should I interpret magx and magy when the text is vertical? Suppose
+&gt; that magx=1 and magy=2. And suppose that we're outputting the &quot;|&quot; character
+&gt; vertically. Should it be like a fat &quot;-&quot; or like a wide &quot;-&quot;?
+&gt;
+&gt; In other words, do magx and magy refer to scaling in terms of the screen
+&gt; or in terms of the glyphs?
+
+You're right, the naming is confusing. So lets rename them:
+
+    void __fastcall__ tgi_textstyle (unsigned char magwidth,
+                                     unsigned char magheight,
+                                     unsigned char dir);
+    /* Set the style for text output. */
+
+; ------------------------------------------------------------------------
+; TEXTSTYLE: Set the style used when calling OUTTEXT. Text scaling for
+; font width/height is passed in X/Y, the text direction is passed in A.
+;
+; Must set an error code: NO
+;
+
+&gt; I would prefer to use the screen terms (wide &quot;-&quot;), it would make the upcoming
+&gt; pixel aspect ratio feature more useful to output undistorted text.
+
+I think it's better to actually scale the font using a width/height scaling
+factor:
+
+  * Scaling doesn't change it's meaning if the direction changes. So
+
+        textstyle (2, 3, TGI_TEXT_HORIZONTAL);
+
+    must not be rewritten as
+
+        textstyle (3, 2, TGI_TEXT_VERTICAL);
+
+    just because the direction has changed. Changing the direction while using
+    the same font size is still
+
+        textstyle (3, 2, TGI_TEXT_HORIZONTAL);
+
+    which seems logical.
+
+  * I'm not sure how you want to scale bit fonts using the aspect ratio. But
+    for the vector fonts, applying the scale to the width or height is easier,
+    because each of the vectors has an Y part and an X part, and the code for
+    scaling doesn't change if I use the height/width approach.
+
+While thinking about it:
+
+    void __fastcall__ tgi_textstyle (unsigned char magwidth,
+                                     unsigned char magheight,
+                                     unsigned char dir);
+    /* Set the style for text output. */
+
+may actually become
+
+    void __fastcall__ tgi_textstyle (unsigned magwidth,
+                                     unsigned magheight,
+                                     unsigned char dir);
+    /* Set the style for text output. */
+
+using 8.8 fixed point values as scaling factors. However, this would have no
+consequences for the driver, since the wrapper will pass rounded values to the
+driver, but use the exact values for the vector fonts.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Oct 30 10:41:45 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7430.html" title="Next message in the list">Karri Kaksonen: "Re: [cc65] tgi_outtext, one more question :)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7428.html" title="Previous message in the list">Fatih Aygün: "[cc65] tgi_outtext, one more question :)"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7428.html" title="Message to which this message replies">Fatih Aygün: "[cc65] tgi_outtext, one more question :)"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7430.html" title="Next message in this discussion thread">Karri Kaksonen: "Re: [cc65] tgi_outtext, one more question :)"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7430.html" title="Message sent in reply to this message">Karri Kaksonen: "Re: [cc65] tgi_outtext, one more question :)"</a></li>
+<li><dfn>Reply</dfn>:  <a href="7432.html" title="Message sent in reply to this message">Fatih Aygün: "[cc65] tgi_outtext, no more questions, hopefully :)"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7429" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7429" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7429" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-10-30 10:41:47 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] brk_handler</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] brk_handler">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] brk_handler</h1>
+<!-- received="Mon Feb 28 00:02:21 2000" -->
+<!-- isoreceived="20000227230221" -->
+<!-- sent="Mon, 28 Feb 2000 00:01:57 +0100 (CET)" -->
+<!-- isosent="20000227230157" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] brk_handler" -->
+<!-- id="200002272301.AAA08483@trixie.musoftware.de" -->
+<!-- inreplyto="41256892.007A54F3.00@saturn.aladdin.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20brk_handler"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2000-02-28 00:01:57
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="../2000-03/0062.html">Ullrich von Bassewitz: "Re: [cc65] ld65 Config Question"</a>
+<li><strong>Previous message:</strong> <a href="0060.html">Christian Groessler: "[cc65] brk_handler"</a>
+<li><strong>In reply to:</strong> <a href="0060.html">Christian Groessler: "[cc65] brk_handler"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+				 
+&gt; I just noticed that the handler routine installed by set_brk, remembers
+&gt; the PC as pointing to the BRK opcode.
+&gt; I this intentional? I would have expected it to point after
+&gt; the BRK command, so returning from user handler will
+&gt; continue the program.
+
+This is intentional. IMHO it is not the job of the breakpoint handler to
+decide what to do in this situation, since it cannot know, for which purpose
+the BRK was inserted.
+
+For example, the debugger module that comes with cc65 will insert temporary
+breakpoints when single stepping through the code. These breakpoints are
+invisible for the user and replaced by the original instruction when the
+debugger is re-entered. Since the break handler does not know the length of
+the original opcode, skipping would always be wrong in this situation. The
+same is true for user inserted breakpoints or when the CPU starts executing
+random bytes (because of a bad pointer or similar): The low level handler has
+no knowledge about the situation and cannot handle this correctly.
+
+On the other side, I have to admit that it does not really matter which
+behaviour the handler has, since the debugger can always correct it (provided
+that the handler does not act at random). The current design was choosen,
+because I wrote the break handler for the debugger module, and it uses BRK for
+breakpoints (both, user and temporary), so having the PC point to the BRK
+instruction was easier for the high level code. Apart from that, it seemed
+more logical to me (it stresses the usage of BRK as a breakpoint), even if it
+does not mirror the exact behaviour of the CPU.
+
+But you are right, this behaviour is somewhat confusing, since it is not what
+a low level programmer would expect. I did not think about this when writing
+the break handler code. It should certainly be documented somewhere.
+
+&gt; Or should the user handler fiddle with _brk_pc?
+
+Yes. Just set it to whatever address you want before returning. This is also
+true for the registers or flags. If you change the values, the program will
+continue with the changed values.
+
+Regards
+
+
+	Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20brk_handler">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20brk_handler">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="../2000-03/0062.html">Ullrich von Bassewitz: "Re: [cc65] ld65 Config Question"</a>
+<li><strong>Previous message:</strong> <a href="0060.html">Christian Groessler: "[cc65] brk_handler"</a>
+<li><strong>In reply to:</strong> <a href="0060.html">Christian Groessler: "[cc65] brk_handler"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:35 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] 2.13 problem atari.lib?</title>
+<meta name="Author" content="Daniel Serpell (daniel.serpell1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] 2.13 problem atari.lib?" />
+<meta name="Date" content="2013-02-27" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] 2.13 problem atari.lib?</h1>
+<!-- received="Wed Feb 27 19:51:57 2013" -->
+<!-- isoreceived="20130227185157" -->
+<!-- sent="Wed, 27 Feb 2013 15:51:46 -0300" -->
+<!-- isosent="20130227185146" -->
+<!-- name="Daniel Serpell" -->
+<!-- email="daniel.serpell1gmail.com" -->
+<!-- subject="Re: [cc65] 2.13 problem atari.lib?" -->
+<!-- id="CANepG=PqDFKR3jiXgJwKc13-01j0vgv7FH=txTjLKDAs249Lrg@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="CAG2DyiZOU_wRc3Bzma0bueufh4crC=UerWomNviaRWMOt9pj4w&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11226.html" title="Greg King: &quot;Re: [cc65] Another linker Q/R&quot;">Next message</a> ]
+[ <a href="11224.html" title="Dan Winslow: &quot;[cc65] 2.13 problem atari.lib?&quot;">Previous message</a> ]
+[ <a href="11224.html" title="Dan Winslow: &quot;[cc65] 2.13 problem atari.lib?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Daniel Serpell &lt;<a href="mailto:daniel.serpell1gmail.com?Subject=Re:%20[cc65]%202.13%20problem%20atari.lib?">daniel.serpell1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2013-02-27 19:51:46</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!,
+
+On Wed, Feb 27, 2013 at 11:08 AM, Dan Winslow &lt;dwinslow&#64;aiminstitute&#46;<!--nospam-->org&gt; wrote:
+&gt; Hi Folks. I recently restarted coding in cc65, and have installed 2.13 on a
+&gt; Windows 7 box. In testing, I ran across a strange issue :
+&gt;
+&gt; #include &lt;stdio.h&gt;
+&gt; int main()
+&gt; {
+&gt;     printf(&quot;hi there, %s\n&quot;,&quot;dan&quot;);
+&gt;     return 0;
+&gt; }
+&gt;
+&gt;
+&gt; compiled with
+&gt; cl65 test.c -t atari -o test.com -Osir
+
+The &quot;cl65&quot; program is sensitive to the order of arguments, the correct command
+line is:
+  cl65 -t atari -Osir -o test.com test.c
+
+Your example don't work because test.c is compiled to a c64 (default) target
+and then linked to the atari runtime.... not good :-)
+
+Also, in the atari target, the program exits to DOS, so if you don't use a
+comand-line DOS you don't see the output. Try loading in bw-dos or
+spartaDOS, or simply adding a &quot;while(1);&quot;.
+
+    Daniel.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Feb 27 19:51:57 2013</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11226.html" title="Next message in the list">Greg King: "Re: [cc65] Another linker Q/R"</a></li>
+<li><dfn>Previous message</dfn>: <a href="11224.html" title="Previous message in the list">Dan Winslow: "[cc65] 2.13 problem atari.lib?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="11224.html" title="Message to which this message replies">Dan Winslow: "[cc65] 2.13 problem atari.lib?"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#11225" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#11225" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#11225" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2013-02-27 19:52:01 CET
+</em></small></p>
+</body>
+</html>

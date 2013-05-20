@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] drive code with shared segment</title>
+<meta name="Author" content="MagerValp (MagerValp1cling.gu.se)" />
+<meta name="Subject" content="[cc65] drive code with shared segments" />
+<meta name="Date" content="2005-04-19" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] drive code with shared segments</h1>
+<!-- received="Tue Apr 19 09:07:42 2005" -->
+<!-- isoreceived="20050419070742" -->
+<!-- sent="Tue, 19 Apr 2005 09:07:35 +0200" -->
+<!-- isosent="20050419070735" -->
+<!-- name="MagerValp" -->
+<!-- email="MagerValp1cling.gu.se" -->
+<!-- subject="[cc65] drive code with shared segments" -->
+<!-- id="16996.44599.567000.170285@panini.cling.gu.se" -->
+<!-- charset="iso-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4930.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Possible bug with for() while using joystick driver [scanned]&quot;">Next message</a> ]
+[ <a href="4928.html" title="Markus Stehr: &quot;[cc65] Possible bug with for() while using joystick driver [scanned]&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4931.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] drive code with shared segments&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: MagerValp &lt;<a href="mailto:MagerValp1cling.gu.se?Subject=Re:%20[cc65]%20drive%20code%20with%20shared%20segments">MagerValp1cling.gu.se</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-04-19 09:07:35</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I'm experimenting with irq loaders, and I've written some code based
+on Lasse Öörni's rant at covertbitops. I added support for more drives
+than the 1541, and now I need an efficient way of storing them in
+memory, since the drive code is loaded without a fastloader (at least
+in theory). I have four code versions (1541, 1581, cmd hd, cmd fd),
+and they all share the first 200 bytes or so, only the last 100 bytes
+are unique to each driver. What I would like is for the common code to
+only be included once, followed by the custom code for each drive. The
+problem is that the size of the common segment is not known, as I'm
+still working on the code. To get the linker to do its magic, I have
+to include (common + 1541), (common + 1581), etc, instead of common,
+1541, 1581, and so on. Is there a solution for this, apart from
+tweaking the segment size manually each time I assemble? I could write
+a script that generates the linker config, but that would be a hassle.
+
+-- 
+    ___          .     .  .         .       . +  .         .      o   
+  _|___|_   +   .  +     .     +         .  Per Olofsson, arkadspelare
+    o-o    .      .     .   o         +          MagerValp&#64;cling&#46;<!--nospam-->gu.se
+     -       +            +    .     <a href="http://www.cling.gu.se/~cl3polof/">http://www.cling.gu.se/~cl3polof/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Apr 19 09:07:42 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4930.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Possible bug with for() while using joystick driver [scanned]"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4928.html" title="Previous message in the list">Markus Stehr: "[cc65] Possible bug with for() while using joystick driver [scanned]"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4931.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] drive code with shared segments"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4931.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] drive code with shared segments"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="4938.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] drive code with shared segments"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4929" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4929" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4929" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-04-19 09:07:44 CEST
+</em></small></p>
+</body>
+</html>

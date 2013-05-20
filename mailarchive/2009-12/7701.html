@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: RE: [cc65] How smart is the linker?</title>
+<meta name="Author" content="Rick Cortese (brewboy1frys.com)" />
+<meta name="Subject" content="RE: [cc65] How smart is the linker?" />
+<meta name="Date" content="2009-12-16" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>RE: [cc65] How smart is the linker?</h1>
+<!-- received="Wed, 16 Dec 2009 10:36:28 -0800" -->
+<!-- isoreceived="20091216183628" -->
+<!-- sent="Wed, 16 Dec 2009 10:36:28 -0800" -->
+<!-- isosent="20091216183628" -->
+<!-- name="Rick Cortese" -->
+<!-- email="brewboy1frys.com" -->
+<!-- subject="RE: [cc65] How smart is the linker?" -->
+<!-- id="000001ca7e7e$b0df6550$129e2ff0$@com" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="A20411BA7C3D4FD288453227E52E428D&#64;hq.eset.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7702.html" title="Spiro Trikaliotis: &quot;[cc65] Does 4529 TGI library compile?&quot;">Next message</a> ]
+[ <a href="7700.html" title="Groepaz: &quot;Re: [cc65] How smart is the linker?&quot;">Previous message</a> ]
+[ <a href="7698.html" title="Jakub: &quot;[cc65] How smart is the linker?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7703.html" title="Christian Grössler: &quot;Re: [cc65] How smart is the linker?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Rick Cortese &lt;<a href="mailto:brewboy1frys.com?Subject=RE:%20[cc65]%20How%20smart%20is%20the%20linker?">brewboy1frys.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-12-16 19:36:28</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt;From: owner-cc65&#64;musoftware&#46;<!--nospam-->de [mailto:owner-cc65&#64;musoftware&#46;<!--nospam-->de] On Behalf
+Of Jakub
+
+&gt;I have to define a lot of aligned segments because of 8bit Atari
+limitations 
+&gt;(aligned segment for sprites, fonts, screen data in display list etc.)
+
+I don't know how gracefully cc65 handles return of control to DOS. Assuming
+it works right, the way to handle this is with the LOAD/INIT/RUN feature of
+DOS and the OS. I have mostly done this in assembler so it wasn't necessary
+for me to use the DUP.SYS for this except on one or two programs from other
+people that I only had the binaries for.
+
+Been a while and I don't have an Atari set up to check the exact procedure
+but it goes something like:
+
+Depending on technique, use a disk with a MEM SAV.
+
+Let's say you decide to put your character set, DL, and P/M graphic data in
+high memory. You start with a short program that just lowers RAMTOP so you
+have enough room, fills the space with your data, terminates, and returns to
+DOS.
+
+If you need to you may have to edit the last couple of bytes to switch a
+CC65 compiled program from using the RUN vector to INIT vector, only 4
+bytes.
+
+Do your main program with everything pointing to the RAM locations you used
+in the first program.
+
+From DOS use the COPY with the append option(/A) to copy the main program
+onto the end of the first.
+
+It should be load and go now. The two programs can actually use the same
+load address. Once the first program runs to set up data area and fills it.
+
+Something similar could even be done *NOT* even using code for the first
+part in the final program. Just run the first program and return to DOS
+menu. USE the BINARY SAVE option and just give it the address of your data.
+Let's say you have your character set and P/M graphics starting at $B400.
+You just use something like
+$B400, $B900,,
+For the address. The load vectors will automatically be put into the file
+and the ',,' just leaves the LOAD and INIT vectors out.
+
+For you final file you would have one program that just lowers RAMTOP,
+another with RAW character set and graphic data, and the third with your
+actual program. After appending the three files, when run:  DOS runs the
+first file, sees more bytes in the file and loads the next.  Not seeing a
+RUN or INIT at the end of the second file but seeing more bytes DOS proceeds
+to load and go with the third.
+
+The reason you may want a MEM save is if DOS steps on your code. For
+instance if you overwrite the area you are trying to save with DUP.SYS.
+
+Rick
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed, 16 Dec 2009 10:36:28 -0800</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7702.html" title="Next message in the list">Spiro Trikaliotis: "[cc65] Does 4529 TGI library compile?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7700.html" title="Previous message in the list">Groepaz: "Re: [cc65] How smart is the linker?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7698.html" title="Message to which this message replies">Jakub: "[cc65] How smart is the linker?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7703.html" title="Next message in this discussion thread">Christian Grössler: "Re: [cc65] How smart is the linker?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7703.html" title="Message sent in reply to this message">Christian Grössler: "Re: [cc65] How smart is the linker?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7701" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7701" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7701" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-12-16 19:36:55 CET
+</em></small></p>
+</body>
+</html>

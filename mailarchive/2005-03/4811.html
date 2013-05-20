@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Problem with 16/32-bit variabl</title>
+<meta name="Author" content="Carlos Sánchez de La Lama (csanchez1sidsa.es)" />
+<meta name="Subject" content="[cc65] Problem with 16/32-bit variables and conditions" />
+<meta name="Date" content="2005-03-11" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Problem with 16/32-bit variables and conditions</h1>
+<!-- received="Fri Mar 11 13:05:12 2005" -->
+<!-- isoreceived="20050311120512" -->
+<!-- sent="Fri, 11 Mar 2005 13:04:36 +0100" -->
+<!-- isosent="20050311120436" -->
+<!-- name="Carlos Sánchez de La Lama" -->
+<!-- email="csanchez1sidsa.es" -->
+<!-- subject="[cc65] Problem with 16/32-bit variables and conditions" -->
+<!-- id="42318954.3070203@sidsa.es" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4812.html" title="MagerValp: &quot;Re: [cc65] Problem with 16/32-bit variables and conditions&quot;">Next message</a> ]
+[ <a href="../2005-02/4810.html" title="Christian Groessler: &quot;Re: [cc65] dio density detection&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4812.html" title="MagerValp: &quot;Re: [cc65] Problem with 16/32-bit variables and conditions&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Carlos Sánchez de La Lama &lt;<a href="mailto:csanchez1sidsa.es?Subject=Re:%20[cc65]%20Problem%20with%2016/32-bit%20variables%20and%20conditions">csanchez1sidsa.es</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-03-11 13:04:36</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello,
+
+I have a problem with this piece of code, I think the compiler is 
+generating wrong assembler.
+
+-------- code begin --------
+
+int
+test(unsigned long a)
+{
+    if (a)
+    {
+        return 1;
+    }
+    return 0;
+}
+
+-------- code end --------
+
+the generates assembler is:
+
+-------- code begin --------
+
+.proc   _test: near
+
+.segment        &quot;CODE&quot;
+
+;
+; if (a)
+;
+        .dbg    line, &quot;test.c&quot;, 4
+        jsr     ldeax0sp
+        beq     L0003            &lt;-- problem
+;
+; return 1;
+;
+        .dbg    line, &quot;test.c&quot;, 6
+        ldx     #$00
+        lda     #$01
+        jmp     incsp4
+;
+; return 0;
+;
+        .dbg    line, &quot;test.c&quot;, 9
+L0003:  ldx     #$00
+        txa
+;
+; }
+;
+        .dbg    line, &quot;test.c&quot;, 10
+        jmp     incsp4
+        .dbg    line
+
+.endproc
+
+-------- code end --------
+
+As long as I understand, this will only test the last byte of &quot;a&quot; for a 
+zero value, because the Zero flag will be set in the last (8-bit) load 
+instruction in the ldeax0sp subroutine. If I call the test function with 
+a=0xff00 the condition would be (incorrectly) found to be false.
+
+Am I right?
+
+Thank you in advance and best regards,
+
+--
+Carlos Sánchez de La Lama &lt;csanchez&#64;sidsa&#46;<!--nospam-->es&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Mar 11 13:05:12 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4812.html" title="Next message in the list">MagerValp: "Re: [cc65] Problem with 16/32-bit variables and conditions"</a></li>
+<li><dfn>Previous message</dfn>: <a href="../2005-02/4810.html" title="Previous message in the list">Christian Groessler: "Re: [cc65] dio density detection"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4812.html" title="Next message in this discussion thread">MagerValp: "Re: [cc65] Problem with 16/32-bit variables and conditions"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4812.html" title="Message sent in reply to this message">MagerValp: "Re: [cc65] Problem with 16/32-bit variables and conditions"</a></li>
+<li><dfn>Reply</dfn>:  <a href="4814.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Problem with 16/32-bit variables and conditions"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4811" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4811" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4811" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-03-11 13:05:19 CET
+</em></small></p>
+</body>
+</html>

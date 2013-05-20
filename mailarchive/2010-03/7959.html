@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] some patches</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] some patches" />
+<meta name="Date" content="2010-03-16" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] some patches</h1>
+<!-- received="Tue Mar 16 19:01:26 2010" -->
+<!-- isoreceived="20100316180126" -->
+<!-- sent="Tue, 16 Mar 2010 19:01:13 +0100" -->
+<!-- isosent="20100316180113" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] some patches" -->
+<!-- id="20100316180113.GA5090@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="4B9FB5A2.1080307&#64;googlemail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7960.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] some patches&quot;">Next message</a> ]
+[ <a href="7958.html" title="Kajt·r Zsolt: &quot;Re: [cc65] some patches&quot;">Previous message</a> ]
+[ <a href="7958.html" title="Kajt·r Zsolt: &quot;Re: [cc65] some patches&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7960.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] some patches&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20some%20patches">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-03-16 19:01:13</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Tue, Mar 16, 2010 at 05:45:22PM +0100, Kajt√°r Zsolt wrote:
+&gt; &gt; If you use printf, write() is called internally. printf calls fprintf which
+&gt; &gt; calls vfprintf, which calls write. In this call chain, the address of write is
+&gt; &gt; part of the precompiled library and a simple #define in the user code won't
+&gt; &gt; change the contents of the library you're linking to your application.
+&gt;
+&gt; Blockread/write only makes sense with bulk data transfers, and printf is
+&gt; usually not used like that.
+
+That is not the problem. Sorry for not being clear enough.
+
+If you use printf, fprintf, fwrite, puts, putc or whatever, the necessary
+modules are linked to the application. These modules are contained in the C64
+library and were compiled with standard settings. Which means that they
+reference an identifier named &quot;write&quot;. Any #defines can only change
+identifiers in the code where they're active. So if you compile your
+application with __USE_IDE64, which causes &quot;write&quot; to be replaced by
+&quot;write_ide64&quot;, this will only take effect for the compiled code, but not for
+the modules in the library.
+
+So any code that uses __USE_IDE64 and one of the functions above (or any other
+functions that calls one of these), will have not only the larger ide64
+version of write() linked in, but also the standard C64 version. Which is the
+ultimate bloat.
+
+The only real solution for that problem is to replace the module that contains
+write by one that exports the same identifier and functionality. Which in fact
+means another, ide64 specific library.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Mar 16 19:01:26 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7960.html" title="Next message in the list">silverdr1wfmh.org.pl: "Re: [cc65] some patches"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7958.html" title="Previous message in the list">Kajt·r Zsolt: "Re: [cc65] some patches"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7958.html" title="Message to which this message replies">Kajt·r Zsolt: "Re: [cc65] some patches"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7960.html" title="Next message in this discussion thread">silverdr1wfmh.org.pl: "Re: [cc65] some patches"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7960.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] some patches"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7959" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7959" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7959" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-03-16 19:01:29 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] New stable release</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="[cc65] New stable release" />
+<meta name="Date" content="2012-02-08" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] New stable release</h1>
+<!-- received="Wed Feb  8 14:00:52 2012" -->
+<!-- isoreceived="20120208130052" -->
+<!-- sent="Wed, 8 Feb 2012 14:00:42 +0100" -->
+<!-- isosent="20120208130042" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="[cc65] New stable release" -->
+<!-- id="20120208130042.GA21057@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="20120205163143.GA7172&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10043.html" title="Oliver Schmidt: &quot;Re: [cc65] New stable release&quot;">Next message</a> ]
+[ <a href="10041.html" title="Shawn Jefferson: &quot;RE: [cc65] New stable release ahead (was: -O bug in 2.13.2)&quot;">Previous message</a> ]
+[ <a href="10030.html" title="Ullrich von Bassewitz: &quot;[cc65] New stable release ahead (was: -O bug in 2.13.2)&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10043.html" title="Oliver Schmidt: &quot;Re: [cc65] New stable release&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20New%20stable%20release">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-02-08 14:00:42</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Ok. Version 2.13.3 is out:
+
+
+I'm proud to announce version 2.13.3 of cc65. cc65 is a complete cross
+development package for 65(C)02 systems, including a powerful macro assembler,
+a C compiler, linker, librarian and several other tools.
+
+cc65 has C and runtime library support for many of the old 6502 machines,
+including
+
+  - the following Commodore machines:
+
+        VIC20
+        C16/C116 and Plus/4
+        C64
+        C128
+        CBM 510 (aka P500)
+        the 600/700 family
+        newer PET machines (not 2001).
+
+  - the Apple ][ and successors.
+
+  - the Atari 8 bit machines.
+
+  - GEOS for the C64 and C128.
+
+  - the Nintendo Entertainment System (NES).
+
+  - the Supervision console.
+
+  - the Oric Atmos.
+
+  - the Lynx Console.
+
+The libraries are fairly portable, so creating a version for other 6502s
+shouldn't be too much work.
+
+This version is a bugfix release against 2.13.2. It includes about 40 bug
+and documentation fixes and some minor improvements:
+
+  * Fixed some macro issues (cc65).
+
+  * Static const local data goes into RODATA, not DATA (cc65).
+
+  * Fix error handling in .LEFT (ca65)
+
+  * Fixed problems with 80 column mode (C128 library).
+
+  * Fix problem when converting function to void pointer (cc65).
+
+  * Fix register info for several runtime functions. Result was invalid code
+    (cc65).
+
+  * Fix smbx and rmbx instructions (da65).
+
+  * Fix problem with .REPEAT (ca65).
+
+  * Fix an error in the runtime division routine (cc65).
+
+  * Fix problem with alignments &gt;= 256 bytes (ca65).
+
+  * The LINE function mistakenly enabled the BASIC ROM (TGI driver for C64).
+
+  * Fix internal error caused by error recovery (or lack of) (cc65).
+
+  * Fix invalid handling of signed int types in some cases (cc65).
+
+  * Fix some issues with conio scrolling (C128 library).
+
+  * Fix and improve the code for compares (cc65).
+
+  * Fix some macro issues (ca65).
+
+  * Fixed/improved several error messages (all tools).
+
+  * Disallow __asm__ on global level (cc65).
+
+  * Remove final jump to RESTOR for all CBM platforms (cc65 libraries).
+
+  * Add missing export for CBM510 platform (cbm510 library).
+
+  * Fix problem with access to structs returned by functions (cc65).
+
+  * Fix an internal error in the code generator (cc65).
+
+  * Merge back POSIX directory routines for the Atari (atari library).
+
+  * Merge back Olivers C interrupt handling code (cc65 libraries).
+
+  * Several documentation changes.
+
+  * Several documentation fixes and improvements.
+
+Precompiled binaries are available for the most common platforms. On many
+other host platforms, the sources compile out of the box, so you'll able to
+create your own binaries.
+
+For RedHat Enterprise Linux 5, ready made RPM packages are available. These
+packages may also work on other rpm-based Linux systems. Please note that
+there are separate RPMs for the compiler proper, the docs, and the target
+specific libraries. To develop code for one of the target machines, you need
+the compiler RPM package *and* one of the target machine packages. Be sure to
+download the documentation package if you're new to cc65.
+
+For windows users, there's a user friendly installer package (the one with the
+.exe extension). All subpackages are selectable from within the installer
+dialogue. The installer will also setup the necessary environment variables
+and start menu entries. It is recommended that Windows users choose this
+package instead of the .ZIP files.
+
+Precompiled binaries for DOS, OS/2 and Windows are available in ZIP archives.
+As with the RPM packages, you need the package for the development host system
+(Windows or whatever) *and* one or more of the target machine packages, plus
+optionally the doc package.
+
+All packages are available from the MU software FTP server:
+
+        <a href="ftp://ftp.musoftware.de/pub/uz/cc65/">ftp://ftp.musoftware.de/pub/uz/cc65/</a>
+
+More information on cc65 can be found on the cc65 web page at
+
+     	<a href="http://www.cc65.org/">http://www.cc65.org/</a>
+
+There is also a mailing list for discussing cc65 related issues (programming,
+suggestions, bugs, ...). See
+
+        <a href="http://www.cc65.org/#List">http://www.cc65.org/#List</a>
+
+for information on how to subscribe to this list.
+
+While I'm the main developer of cc65, it is actually a joint effort. I would
+like to thank the target library developers, all the people on the cc65
+mailing list, all those sending suggestions and feedback, and even those
+bugging me for a new stable release:-) The CREDITS file is probably
+incomplete, but you know who you are.
+
+Thank you!
+
+
+       	Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Feb  8 14:00:52 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10043.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] New stable release"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10041.html" title="Previous message in the list">Shawn Jefferson: "RE: [cc65] New stable release ahead (was: -O bug in 2.13.2)"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10030.html" title="Message to which this message replies">Ullrich von Bassewitz: "[cc65] New stable release ahead (was: -O bug in 2.13.2)"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10043.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] New stable release"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10043.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] New stable release"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10044.html" title="Message sent in reply to this message">Gábor Lénárt: "Re: [cc65] New stable release"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10042" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10042" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10042" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-02-08 14:00:56 CET
+</em></small></p>
+</body>
+</html>

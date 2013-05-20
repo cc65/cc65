@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Question about ca65 objec</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Question about ca65 object files">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Question about ca65 object files</h1>
+<!-- received="Fri Jun 23 22:47:35 2000" -->
+<!-- isoreceived="20000623204735" -->
+<!-- sent="Fri, 23 Jun 2000 22:47:14 +0200" -->
+<!-- isosent="20000623204714" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Question about ca65 object files" -->
+<!-- id="20000623224714.A1381@trixie.musoftware.de" -->
+<!-- inreplyto="Pine.LNX.4.21.0006231015090.18970-100000@saruman.ws.inxpress.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Question%20about%20ca65%20object%20files"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2000-06-23 22:47:14
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0142.html">AlanRDickey_at_cs.com: "Re: [cc65] cc65 2.5 beta (update)"</a>
+<li><strong>Previous message:</strong> <a href="0140.html">David Lloyd: "Re: [cc65] Question about ca65 object files"</a>
+<li><strong>In reply to:</strong> <a href="0140.html">David Lloyd: "Re: [cc65] Question about ca65 object files"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0147.html">David Lloyd: "Re: [cc65] Question about ca65 object files"</a>
+<li><strong>Reply:</strong> <a href="0147.html">David Lloyd: "Re: [cc65] Question about ca65 object files"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Fri, Jun 23, 2000 at 11:03:47AM -0500, David Lloyd wrote:
+&gt; Hmmm, well, the idea is I'm generating a ROM image, and the user of the
+&gt; software would receive the source, not the image.  They would then be able
+&gt; to choose what capabilities they want included in the ROM image.  The
+&gt; problem is, to include all the capabilities would make a ROM image larger
+&gt; than the target ROM device!  So the idea is to let the user pick and
+&gt; choose, and at the same time tell them how much space each option uses and
+&gt; how much is remaining.
+
+If you run the assembler with the -v (verbose) switch given at least twice, it
+will output the sizes of the segments together with a dump of the fragments (=
+little pieces of code and expressions) in this segment. Here is a sample for a
+short piece of code:
+
+New segment: CODE
+  Literal: A9 00 A6
+  Expression (1):  zpimp imp $0003 + *
+
+  Literal: 8D
+  Expression (2):  imp
+
+  Literal: 00
+  End PC = $0008
+New segment: RODATA
+  End PC = $0000
+New segment: BSS
+  End PC = $0000
+New segment: DATA
+  End PC = $0000
+New segment: ZEROPAGE
+  End PC = $0000
+New segment: NULL
+  End PC = $0000
+
+
+The value listed under &quot;End PC&quot; is the size of a section (= part of a segment
+that comes from one object file). The other stuff is the data in the segment
+(expression trees are dumped in RPN).
+
+Maybe this information can be used for your purposes. The disadvantage of this
+method is that the fragment dump will create quite a lot of output.
+
+Regards
+
+				 
+	Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Question%20about%20ca65%20object%20files">uz_at_musoftware.de</a>
+
+
+</pre>
+<hr noshade>
+<ul>
+<li>application/pgp-signature attachment: <a href="../att-0141/01-part">stored</a>
+</ul>
+<!-- attachment="01-part" -->
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Question%20about%20ca65%20object%20files">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0142.html">AlanRDickey_at_cs.com: "Re: [cc65] cc65 2.5 beta (update)"</a>
+<li><strong>Previous message:</strong> <a href="0140.html">David Lloyd: "Re: [cc65] Question about ca65 object files"</a>
+<li><strong>In reply to:</strong> <a href="0140.html">David Lloyd: "Re: [cc65] Question about ca65 object files"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0147.html">David Lloyd: "Re: [cc65] Question about ca65 object files"</a>
+<li><strong>Reply:</strong> <a href="0147.html">David Lloyd: "Re: [cc65] Question about ca65 object files"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:36 CET</em>
+</em>
+</small>
+</body>
+</html>

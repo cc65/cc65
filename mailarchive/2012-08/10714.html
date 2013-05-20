@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Uniform mass storage devic</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Uniform mass storage device discovery and file locations" />
+<meta name="Date" content="2012-08-17" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Uniform mass storage device discovery and file locations</h1>
+<!-- received="Fri Aug 17 10:02:16 2012" -->
+<!-- isoreceived="20120817080216" -->
+<!-- sent="Fri, 17 Aug 2012 10:02:08 +0200" -->
+<!-- isosent="20120817080208" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Uniform mass storage device discovery and file locations" -->
+<!-- id="CACT=u721huiKc5Kf-jKBHzeOkehiiWu19W1Ts8qUt9DOKJNXrQ@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="2A368AF7-982D-4F43-A352-C71CBFD8BE86&#64;wfmh.org.pl" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10715.html" title="Groepaz: &quot;Re: [cc65] Uniform mass storage device discovery and file locations&quot;">Next message</a> ]
+[ <a href="10713.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ld65: Warning: Segment `CODE' in module `foo.o' requires larger alignment&quot;">Previous message</a> ]
+[ <a href="10693.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Uniform mass storage device discovery and file locations&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10715.html" title="Groepaz: &quot;Re: [cc65] Uniform mass storage device discovery and file locations&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Uniform%20mass%20storage%20device%20discovery%20and%20file%20locations">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-08-17 10:02:08</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+So far I understand that there is by no means a prepared list of
+devices currently present. One could however &quot;check&quot; the device
+numbers 7-31 for presence.
+
+There were two hints into this direction:
+
+1.
+&gt; just check with a simple LISTEN/SECLISTN/UNLISTEN or
+&gt; similar that a device is there
+
+2.
+&gt; Each successfully open device above #7 is a potential mass storage device. Further identification can be done by sending UI command and parsing returned string.
+
+Could please somebode elaborate on this for a non-CBMer? Do they both
+mean the same?
+
+Again: Ideally this would be a two step process:
+a) Check if the device is present
+b) Check if a (formatted, usable) disk is in the devie.
+
+Maybe it helps if I come up with ideas for a potential API for both steps:
+
+a)
+#define INVALID_DEVICE 255
+unsigned char findnextdevice(unsigned char device);
+
+If called with INVALID_DEVICE returns the first device number. If
+called with with the device number found last returns the next device
+number. If there's no next device returns INVALID_DEVICE.
+
+b)
+#define MAX_DIR &lt;target-specific&gt;
+char *rootdir(unsigned char device, char *buf, size_t size);
+
+Fills 'buf' with the name of the root directory on 'deviceid'. Returns
+a pointer to 'buf' if successful, returns NULL on failure. Is supposed
+to check if the device is ready (i.e. if a formatted disk is in a
+drive). The name can be used as paramter to chdir(). The name is
+target-specific and supposed to have a meaning to users of that
+target.
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Aug 17 10:02:16 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10715.html" title="Next message in the list">Groepaz: "Re: [cc65] Uniform mass storage device discovery and file locations"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10713.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] ld65: Warning: Segment `CODE' in module `foo.o' requires larger alignment"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10693.html" title="Message to which this message replies">silverdr1wfmh.org.pl: "Re: [cc65] Uniform mass storage device discovery and file locations"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10715.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] Uniform mass storage device discovery and file locations"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10715.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] Uniform mass storage device discovery and file locations"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10717.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] Uniform mass storage device discovery and file locations"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10714" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10714" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10714" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-08-17 10:02:19 CEST
+</em></small></p>
+</body>
+</html>

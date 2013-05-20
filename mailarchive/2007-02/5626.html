@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] XML Parser</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="Re: [cc65] XML Parser" />
+<meta name="Date" content="2007-02-04" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] XML Parser</h1>
+<!-- received="Sun Feb  4 10:22:28 2007" -->
+<!-- isoreceived="20070204092228" -->
+<!-- sent="Sun, 4 Feb 2007 10:21:41 +0100" -->
+<!-- isosent="20070204092141" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="Re: [cc65] XML Parser" -->
+<!-- id="20070204092141.GA8253@trikaliotis.net" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="09BFFA99CA604184A702A01215D2D0C3&#64;core2xp" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5627.html" title="Greg King: &quot;Re: [cc65] Another ca65html tweak&quot;">Next message</a> ]
+[ <a href="5625.html" title="Payton Byrd: &quot;[cc65] XML Parser&quot;">Previous message</a> ]
+[ <a href="5625.html" title="Payton Byrd: &quot;[cc65] XML Parser&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20[cc65]%20XML%20Parser">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-02-04 10:21:41</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello Payton,
+
+* On Sat, Feb 03, 2007 at 09:49:34PM -0600 Payton Byrd wrote:
+
+&gt; Has anyone seen an XML parser written for CC65 yet?  If not, does
+&gt; anyone know of a small open source XML parser written in C?  I've
+&gt; found a couple written in C++ (TinyXml, for example) but none that
+&gt; looked like they would be good for CC65 usage.
+
+Note, however, that from a computer science point of view, neither DOM
+nor SAX are parsers. Both DOM and SAX make your program being controlled
+by the &quot;parser&quot;. For a real parser, this is not true. I think in the XML
+world, a &quot;real&quot; parser is sometimes referred to as &quot;pull parser&quot;.
+
+A quick google search showed me some pull parsers. I have not had a
+deeper look in them, so I don't know if they can be used on CC65.
+Anyway, I expect them to have less resource requirements than SAX or
+DOM.
+
+Perhaps, if you tell us what you want to achieve, we can show you that
+this goal is better achieved with something different than XML. ;)
+
+Regards,
+   Spiro.
+
+-- 
+Spiro R. Trikaliotis                              <a href="http://opencbm.sf.net/">http://opencbm.sf.net/</a>
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>                     <a href="http://www.viceteam.org/">http://www.viceteam.org/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Feb  4 10:22:28 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5627.html" title="Next message in the list">Greg King: "Re: [cc65] Another ca65html tweak"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5625.html" title="Previous message in the list">Payton Byrd: "[cc65] XML Parser"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5625.html" title="Message to which this message replies">Payton Byrd: "[cc65] XML Parser"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5626" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5626" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5626" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-02-04 10:22:30 CET
+</em></small></p>
+</body>
+</html>

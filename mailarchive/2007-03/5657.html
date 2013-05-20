@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Makefiles for large projects</title>
+<meta name="Author" content="Karri Kaksonen (karri1sipo.fi)" />
+<meta name="Subject" content="[cc65] Makefiles for large projects" />
+<meta name="Date" content="2007-03-21" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Makefiles for large projects</h1>
+<!-- received="Wed Mar 21 12:35:28 2007" -->
+<!-- isoreceived="20070321113528" -->
+<!-- sent="Wed, 21 Mar 2007 14:04:39 +0200" -->
+<!-- isosent="20070321120439" -->
+<!-- name="Karri Kaksonen" -->
+<!-- email="karri1sipo.fi" -->
+<!-- subject="[cc65] Makefiles for large projects" -->
+<!-- id="46011F57.6070107@sipo.fi" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5658.html" title="Shawn Jefferson: &quot;[cc65] Atari Library dosdetect.s&quot;">Next message</a> ]
+[ <a href="5656.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] &quot;Incompatible pointer types&quot; bug&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Karri Kaksonen &lt;<a href="mailto:karri1sipo.fi?Subject=Re:%20[cc65]%20Makefiles%20for%20large%20projects">karri1sipo.fi</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-03-21 13:04:39</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+I thought of sharing a nice technique for large cc65 projects that I 
+have found useful. And as I want ALL the files to be linked in I cannot 
+use libraries.
+
+When compiling a Multicart that contains hundred of files I split up the 
+  games into seperate directories. In each directory I have a rule im my 
+Makefile like:
+
+objects= \
+	al.o \
+	door1.o \
+	password.o
+
+all: $(objects)
+	$(TOUCH) objlist
+	$(RM) objlist
+	for obj in $(objects); \
+	    do $(ECHO) ../password/$$obj &gt;&gt; objlist; \
+	done
+
+In the final stage where I need to link all these binaries to form a 
+cart I have this in my Makefile:
+
+objects= \
+	lnxhdr.o \
+	encrypt1024.o \
+	directory.o \
+	title.o
+
+objlists = \
+	../resident/objlist \
+	../miniloader/objlist \
+	../abcmusic/objlist \
+	../soundtool/objlist \
+	../intro/objlist \
+	../password/objlist \
+	../chopperx/objlist \
+	../parafly/objlist \
+	../pontiac/objlist \
+	../blackjack/objlist \
+	../lsketch/objlist \
+	../dicee/objlist \
+	../treasure/objlist \
+	../music/objlist
+
+others = \
+	&#64;&#46;<!--nospam-->./resident/objlist \
+	&#64;&#46;<!--nospam-->./miniloader/objlist \
+	&#64;&#46;<!--nospam-->./abcmusic/objlist \
+	&#64;&#46;<!--nospam-->./soundtool/objlist \
+	&#64;&#46;<!--nospam-->./intro/objlist \
+	&#64;&#46;<!--nospam-->./password/objlist \
+	&#64;&#46;<!--nospam-->./chopperx/objlist \
+	&#64;&#46;<!--nospam-->./parafly/objlist \
+	&#64;&#46;<!--nospam-->./pontiac/objlist \
+	&#64;&#46;<!--nospam-->./blackjack/objlist \
+	&#64;&#46;<!--nospam-->./lsketch/objlist \
+	&#64;&#46;<!--nospam-->./dicee/objlist \
+	&#64;&#46;<!--nospam-->./treasure/objlist \
+	&#64;&#46;<!--nospam-->./music/objlist
+
+target = cart.lnx
+
+all: $(target)
+
+$(target) : $(objects) $(objlists)
+	$(CL) -t $(SYS) -o $&#64; -m lynxcart&#46;<!--nospam-->map -C lynxcart.cfg \
+	$(objects) $(others) lynx.lib
+
+The stuff runs from a U3 memory stick on Windows. I have native Windows 
+binaries for &quot;make&quot;, &quot;touch&quot;, &quot;rm&quot;, &quot;echo&quot; etc.
+
+In case you want a closer look at a complete Atari Lynx developers cc65 
+system on an USB stick have a look at <a href="http://sipo.fi/cc65.u3p">http://sipo.fi/cc65.u3p</a>
+It contains most linux shell commands, make, a colored graphical source 
+editor, Handy Lynx emulator and debugger with single-stepping, 
+breakpoints etc. Plus all cc65 and Lynx specific tools of course.
+
+To set the environment variables you need to type &quot;source bashrc&quot; after 
+you click on the cc65 icon on the USB stick.
+
+--
+Karri
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Mar 21 12:35:28 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5658.html" title="Next message in the list">Shawn Jefferson: "[cc65] Atari Library dosdetect.s"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5656.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] &quot;Incompatible pointer types&quot; bug"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5657" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5657" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5657" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-03-21 12:35:31 CET
+</em></small></p>
+</body>
+</html>

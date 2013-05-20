@@ -1,0 +1,145 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: RE: [cc65] Space efficiency?</title>
+<meta name="Author" content="Keates, Mark (Mark.Keates_at_dendrite.com)">
+<meta name="Subject" content="RE: [cc65] Space efficiency?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>RE: [cc65] Space efficiency?</h1>
+<!-- received="Fri May 17 18:23:43 2002" -->
+<!-- isoreceived="20020517162343" -->
+<!-- sent="Fri, 17 May 2002 12:19:47 -0400" -->
+<!-- isosent="20020517161947" -->
+<!-- name="Keates, Mark" -->
+<!-- email="Mark.Keates_at_dendrite.com" -->
+<!-- subject="RE: [cc65] Space efficiency?" -->
+<!-- id="1D2B2C77C9CF964EB1331ABEB51562E1AB8BB1@ukntsvr2.uk.drte.com" -->
+<!-- inreplyto="[cc65] Space efficiency?" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Keates, Mark (<a href="mailto:Mark.Keates_at_dendrite.com?Subject=RE:%20[cc65]%20Space%20efficiency?"><em>Mark.Keates_at_dendrite.com</em></a>)<br>
+<strong>Date:</strong> 2002-05-17 18:19:47
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1337.html">Ullrich von Bassewitz: "Re: [cc65] Space efficiency?"</a>
+<li><strong>Maybe in reply to:</strong> <a href="1335.html">Stephan Lesch: "[cc65] Space efficiency?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1339.html">groepaz: "Re[2]: [cc65] Space efficiency?"</a>
+<li><strong>Reply:</strong> <a href="1339.html">groepaz: "Re[2]: [cc65] Space efficiency?"</a>
+<li><strong>Reply:</strong> <a href="1342.html">Stephan Lesch: "Re: [cc65] Space efficiency?"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi,
+
+What sort of graphics adventure? A text adventure
+with graphics, 'The Pawn', or an interactive one,
+Zelda/Final Fantasy?
+
+For either I'd favour C for most of the game logic as
+you'll be doing lots of array lookups and cross lookups,
+mulitple arrays , string handling etc. These are a pain 
+to manage in assembler. Also, nothing is really time 
+critical here but I note your concerns over space.
+
+I'd also go for using asm routines for displaying graphics, 
+but mainly for the efficiency gained.
+
+Regards,
+
+Mark
+
+P.S. Also using more C means it easier for converting to
+other platforms ;-)
+
+&gt; -----Original Message-----
+&gt; From: Stephan Lesch [mailto:<a href="mailto:slesch_at_studcs.uni-sb.de?Subject=RE:%20[cc65]%20Space%20efficiency?">slesch_at_studcs.uni-sb.de</a>]
+&gt; Sent: 17 May 2002 14:38
+&gt; To: <a href="mailto:cc65_at_musoftware.de?Subject=RE:%20[cc65]%20Space%20efficiency?">cc65_at_musoftware.de</a>
+&gt; Subject: [cc65] Space efficiency?
+&gt; 
+&gt; 
+&gt; Hi,
+&gt; 
+&gt; I and some friends are pondering writing the main parts of a graphics
+&gt; adventure for the 64 using cc65, and we're not sure if it's 
+&gt; really feasible, 
+&gt; or if there are probably some pitfalls, and we should stick 
+&gt; with hand-written 
+&gt; assembly. 
+&gt; 
+&gt; What do you think, can I assume that the size of a compiled C program 
+&gt; (modulo silly programming :)) will be about 1 to 1.5 times that of a 
+&gt; hand-written assembly program for the same purpose, plus ca 3 
+&gt; K for the 
+&gt; library?
+&gt; 
+&gt; Generally, those who already have realized larger projects under cc65,
+&gt; particularly on the c64 and including interfaces to binary 
+&gt; parts like musics
+&gt; and IRQ loaders, could you tell how well it went, and what experiences
+&gt; you made? Does it actually become easier to write a program 
+&gt; like a game
+&gt; in C, compared to assembly, and can you write the major parts in C, or
+&gt; do you end up with a frame program in C, and the rest mostly 
+&gt; written in
+&gt; assembly?
+&gt; 
+&gt; Greetings,
+&gt; Stephan
+&gt; 
+&gt; 
+&gt; 
+&gt; ----------------------------------------------------------------------
+&gt; To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=RE:%20[cc65]%20Space%20efficiency?">majordomo_at_musoftware.de</a> with
+&gt; the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+&gt; 
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=RE:%20[cc65]%20Space%20efficiency?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1337.html">Ullrich von Bassewitz: "Re: [cc65] Space efficiency?"</a>
+<li><strong>Maybe in reply to:</strong> <a href="1335.html">Stephan Lesch: "[cc65] Space efficiency?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1339.html">groepaz: "Re[2]: [cc65] Space efficiency?"</a>
+<li><strong>Reply:</strong> <a href="1339.html">groepaz: "Re[2]: [cc65] Space efficiency?"</a>
+<li><strong>Reply:</strong> <a href="1342.html">Stephan Lesch: "Re: [cc65] Space efficiency?"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-05-17 18:23:48 CEST</em>
+</em>
+</small>
+</body>
+</html>

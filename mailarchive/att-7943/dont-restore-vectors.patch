@@ -1,0 +1,23 @@
+#
+# Do not restore vectors, as this breaks cartridge extensions.
+# IRQ and BRK is restored elsewhere anyway.
+#
+# <soci@c64.rulez.org> Kajtar Zsolt 14.03.2010
+#
+diff -urN cc65-snapshot-2.13.9.20100309/libsrc/c64/crt0.s cc65-snapshot-2.13.9.20100309.new/libsrc/c64/crt0.s
+--- cc65-snapshot-2.13.9.20100309/libsrc/c64/crt0.s	2009-12-10 23:12:24.000000000 +0100
++++ cc65-snapshot-2.13.9.20100309.new/libsrc/c64/crt0.s	2010-03-14 11:20:18.119074298 +0100
+@@ -136,9 +136,9 @@
+        	ldx    	mmusave
+ 	stx	$01    	  	; Restore memory configuration
+ 
+-; Reset changed vectors, back to basic
++; Back to basic
+ 
+-	jmp	RESTOR
++	rts
+ 
+ ; ------------------------------------------------------------------------
+ ; The IRQ vector jumps here, if condes routines are defined with type 2.
+
+

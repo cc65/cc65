@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Announcement: New compile</title>
+<meta name="Author" content="Adam Dunkels (adam_at_sics.se)">
+<meta name="Subject" content="Re: [cc65] Announcement: New compiler release">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Announcement: New compiler release</h1>
+<!-- received="Mon Nov 26 21:59:50 2001" -->
+<!-- isoreceived="20011126205950" -->
+<!-- sent="Mon, 26 Nov 2001 21:59:50 +0100" -->
+<!-- isosent="20011126205950" -->
+<!-- name="Adam Dunkels" -->
+<!-- email="adam_at_sics.se" -->
+<!-- subject="Re: [cc65] Announcement: New compiler release" -->
+<!-- id="200111262059.VAA14123@color.sics.se" -->
+<!-- inreplyto="15362.43281.33646.904581@panini.cling.gu.se" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Adam Dunkels (<a href="mailto:adam_at_sics.se?Subject=Re:%20[cc65]%20Announcement:%20New%20compiler%20release"><em>adam_at_sics.se</em></a>)<br>
+<strong>Date:</strong> 2001-11-26 21:59:50
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0944.html">MagerValp: "Re: [cc65] Announcement: New compiler release"</a>
+<li><strong>Previous message:</strong> <a href="0942.html">MagerValp: "Re: [cc65] Announcement: New compiler release"</a>
+<li><strong>In reply to:</strong> <a href="0942.html">MagerValp: "Re: [cc65] Announcement: New compiler release"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0944.html">MagerValp: "Re: [cc65] Announcement: New compiler release"</a>
+<li><strong>Reply:</strong> <a href="0944.html">MagerValp: "Re: [cc65] Announcement: New compiler release"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Monday 26 November 2001 21:41, you wrote:
+&gt; AD&gt; I would also like to add that the cc65 port in uIP 0.5 is simpler
+&gt; AD&gt; to adapt to new platforms. The 0.4 version used a timer IRQ to
+&gt; AD&gt; drive timer events such as retransmissions. This was changed with
+&gt; AD&gt; 0.5 so that it uses the clock() function and busy waiting instead.
+&gt; AD&gt; Thus is should be simple to port to the Atari and other cc65
+&gt; AD&gt; target architectures.
+&gt;
+&gt; So how &quot;game friendly&quot; is uIP? Is it possible to run it like an IRQ
+&gt; loader; have the game run in IRQs and just have uIP sit in the back-
+&gt; ground and use whatever CPU cycles are left? Then it's just the issue
+&gt; of getting SLIP to work -- most people will want to run it with a
+&gt; Windows host.
+
+There should be no problems with running the uIP in as an idle thread and 
+doing the actual work using IRQs. The RS232 input is done using NMI and it is 
+fed into a 256 byte ring buffer so the timing requirements are quite lax. 
+Cool idea, by the way!
+
+As far as I know, Windows has SLIP support. SLIP is pretty standard in most 
+&quot;server&quot; systems, and I know of at least one successfull attempt at running 
+SLIP together with Windows. I don't know if Windows support IP routing, 
+though. Perhaps the newer versions do, but I am not sure (it *should* support 
+it). 
+
+/adam
+-- 
+Adam Dunkels &lt;<a href="mailto:adam_at_sics.se?Subject=Re:%20[cc65]%20Announcement:%20New%20compiler%20release">adam_at_sics.se</a>&gt;
+<a href="http://www.sics.se/~adam">http://www.sics.se/~adam</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Announcement:%20New%20compiler%20release">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0944.html">MagerValp: "Re: [cc65] Announcement: New compiler release"</a>
+<li><strong>Previous message:</strong> <a href="0942.html">MagerValp: "Re: [cc65] Announcement: New compiler release"</a>
+<li><strong>In reply to:</strong> <a href="0942.html">MagerValp: "Re: [cc65] Announcement: New compiler release"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0944.html">MagerValp: "Re: [cc65] Announcement: New compiler release"</a>
+<li><strong>Reply:</strong> <a href="0944.html">MagerValp: "Re: [cc65] Announcement: New compiler release"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:44 CET</em>
+</em>
+</small>
+</body>
+</html>

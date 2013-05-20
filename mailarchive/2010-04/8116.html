@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Please critique this makef</title>
+<meta name="Author" content="silverdr1wfmh.org.pl (silverdr1wfmh.org.pl)" />
+<meta name="Subject" content="Re: [cc65] Please critique this makefile" />
+<meta name="Date" content="2010-04-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Please critique this makefile</h1>
+<!-- received="Fri Apr 23 13:30:00 2010" -->
+<!-- isoreceived="20100423113000" -->
+<!-- sent="Fri, 23 Apr 2010 13:29:40 +0200" -->
+<!-- isosent="20100423112940" -->
+<!-- name="silverdr1wfmh.org.pl" -->
+<!-- email="silverdr1wfmh.org.pl" -->
+<!-- subject="Re: [cc65] Please critique this makefile" -->
+<!-- id="38BC3746-A515-4493-9013-CF4CBDA30B75@wfmh.org.pl" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="i2v1002edb71004230347vbd0923ecia80dd42d7fdf1ea3&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8117.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Please critique this makefile&quot;">Next message</a> ]
+[ <a href="8115.html" title="Oliver Schmidt: &quot;Re: [cc65] Please critique this makefile&quot;">Previous message</a> ]
+[ <a href="8115.html" title="Oliver Schmidt: &quot;Re: [cc65] Please critique this makefile&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8121.html" title="Oliver Schmidt: &quot;Re: [cc65] Please critique this makefile&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:silverdr1wfmh.org.pl?Subject=Re:%20[cc65]%20Please%20critique%20this%20makefile">silverdr1wfmh.org.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-04-23 13:29:40</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 2010-04-23, at 12:47, Oliver Schmidt wrote:
+
+&gt; Hi,
+&gt;
+&gt;&gt; I added conditionals below so that default values are supplied  
+&gt;&gt; instead of
+&gt;&gt; failing when some variables are not defined. Target choice is  
+&gt;&gt; following the
+&gt;&gt; defaults of cc65 utilities.
+&gt;
+&gt; I intentionally didn't do that. The usefulness of doing so depends
+&gt; from my perspective from the intended scenario. If you i.e. want to
+&gt; integrate the Makefile into some framework than that framework should
+&gt; just always provide the name of the target to build for on the GNU
+&gt; make cmdline. Apart from that:
+&gt;
+&gt; - The C64 default has no technical background and is just guesswork
+&gt; based on some anticipated user preference.
+
+That is correct, yet it is included in the cc65. Therefore I thought  
+it would be OK to follow the same pattern. I would say - I believe  
+this is what a user would expect.
+
+&gt; - The &quot;it's in the path&quot; default typically doesn't get you far as the
+&gt; tools don't find their headers and libraries without environment
+&gt; variables set. On Windows this has always been this way and if I
+&gt; understood a recent discussion on this list right than this is now
+&gt; true on Unix as well.
+
+Luckily - for some time already - not. I recall my bugging here about  
+the default locations for cc65 files and those have been established  
+to follow the common pattern. Currently I don't need (and I don't  
+have) a single CC65_* variable set anymore, which is very much OK. I  
+would have to set variable(s) if I installed CC65 in a non-default  
+location, which is clearly understandable of course.
+
+&gt; Since the last cc65 release CC65_HOME can
+&gt; replace all the other cc65 variables pointing to cc65 subdirectories.
+&gt; Including &lt;cc65&gt;/bin into the path is a nice add-on to reduce typing
+&gt; when running cl65 from the cmdline. But I don't see a point in relying
+&gt; on that in a Makefile.
+&gt;
+&gt;&gt; From my perspective much more useful is something like this (from my
+&gt; Contiki Makefiles):
+&gt;
+&gt; ifndef CC65_HOME
+&gt;  ${error CC65_HOME not defined! You must specify where cc65 resides}
+&gt; endif
+
+I am not sure how it works under Windows - does it work differently? -  
+but the nice fact is that (at least on *nix) it is no longer required,  
+as long as CC65 is installed in its default location. This is one of  
+the examples of my favourite &quot;convention over configuration&quot; approach.
+
+&gt;
+&gt; All in all I'd say that I spent _way_ more time in my worklife finding
+&gt; out why something didn't work because of some default I didn't know of
+&gt; and had to figure out how to override than adding necessary parameters
+&gt; I was asked for...
+&gt;
+
+That I fully agree. Why I wanted it to be there is that the variable  
+is simply not mandatory (necessary) anymore, which can lead to  
+situation where the whole cc65 package works perfectly fine but the  
+Makefile asks for some (UNnecessary) variables. Again - I don't know  
+how is that under Windows.
+
+BTW. I am looking now at your sed voodoo trying to figure out what  
+_exactly_ are you doing there and it never stops amazing me.. I mean I  
+wrote a number of sed one-liners or complex regexps in my life but  
+those things are always &quot;write-only&quot; to me ;-)
+
+I also found that while cc65 has nice (and very much useful here!) '-- 
+create-dep' option, ca65 does not.. If it had, it would be possible to  
+track the dependencies from the assembler files as well. I mean  
+e.g. .INCBINed files, right?
+
+-- 
+SD!
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Apr 23 13:30:00 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8117.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Please critique this makefile"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8115.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Please critique this makefile"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8115.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] Please critique this makefile"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8121.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Please critique this makefile"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8121.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Please critique this makefile"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8116" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8116" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8116" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-04-23 13:30:02 CEST
+</em></small></p>
+</body>
+</html>

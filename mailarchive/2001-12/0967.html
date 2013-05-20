@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: Re[2]: [cc65] Compile problem</title>
+<meta name="Author" content="Adam Dunkels (adam_at_sics.se)">
+<meta name="Subject" content="Re: Re[2]: [cc65] Compile problem">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: Re[2]: [cc65] Compile problem</h1>
+<!-- received="Tue Dec 11 08:44:42 2001" -->
+<!-- isoreceived="20011211074442" -->
+<!-- sent="Tue, 11 Dec 2001 08:45:03 +0100" -->
+<!-- isosent="20011211074503" -->
+<!-- name="Adam Dunkels" -->
+<!-- email="adam_at_sics.se" -->
+<!-- subject="Re: Re[2]: [cc65] Compile problem" -->
+<!-- id="200112110745.IAA07418@color.sics.se" -->
+<!-- inreplyto="9014559459.20011210221311@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Adam Dunkels (<a href="mailto:adam_at_sics.se?Subject=Re:%20Re[2]:%20[cc65]%20Compile%20problem"><em>adam_at_sics.se</em></a>)<br>
+<strong>Date:</strong> 2001-12-11 08:45:03
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0968.html">Ullrich von Bassewitz: "Re: [cc65] Compile problem"</a>
+<li><strong>Previous message:</strong> <a href="0966.html">Jason Robertson: "Re: [cc65] Compile problem"</a>
+<li><strong>In reply to:</strong> <a href="0965.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0969.html">groepaz: "Re[4]: [cc65] Compile problem"</a>
+<li><strong>Reply:</strong> <a href="0969.html">groepaz: "Re[4]: [cc65] Compile problem"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+groepaz,
+
+On Monday 10 December 2001 22:13, you wrote:
+&gt; the problem is, that if i want to include the file (which includes
+&gt; #include &quot;../a/very/long/and/troublesome/path/file.h&quot;) from different
+&gt; locations in the filesystem (for whatever reason, eg generating the
+&gt; main exes in the projects root and some teststuff deep inside another
+&gt; external built tree) ... this would only work with (to me) annoying
+&gt; workarounds, scattering machine-dependend paths around makefiles (i
+&gt; managed to not do so for a coupple of years now so why should i start
+&gt; with that?) etc pp
+&gt;
+&gt; i _KNOW_ that existing options and features can be used to &quot;almost&quot;
+&gt; achive what i want, and i know how to do it - i just think its
+&gt; limiting me in a way it shouldnt.
+
+I guess that I am missing your point, but what do you mean with 
+machine-dependant paths in makefiles? To me it seems quite simple to add a 
+few paths to the makefiles and refrain from usign full pathnames in the 
+#include directives.
+
+&gt; i wrote that in the mail before.... you'll run into troubles when
+&gt; using several files of the same name. (and yeah, i tend to do this
+&gt; heavily)
+
+Having many include files with the same name is definately a problem that can 
+lead to interesting and surprising results. Somehow, one always ends up 
+including the wrong file... One way to fix it is to move such files into 
+dedicated subdirectories. For instance, one usually wants to have a few 
+&quot;debug.h&quot; files for controlling debugging output and such. Instead of always 
+#including &quot;debug.h&quot; and hope to get the right file, I try to put these in 
+subdirectories with descriptive names so that I can #include &quot;proj/debug.h&quot; 
+and &quot;c64/debug.h&quot;, &quot;files/debug.h&quot;, and so on.
+
+/adam
+-- 
+Adam Dunkels &lt;<a href="mailto:adam_at_sics.se?Subject=Re:%20Re[2]:%20[cc65]%20Compile%20problem">adam_at_sics.se</a>&gt;
+<a href="http://www.sics.se/~adam">http://www.sics.se/~adam</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20Re[2]:%20[cc65]%20Compile%20problem">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0968.html">Ullrich von Bassewitz: "Re: [cc65] Compile problem"</a>
+<li><strong>Previous message:</strong> <a href="0966.html">Jason Robertson: "Re: [cc65] Compile problem"</a>
+<li><strong>In reply to:</strong> <a href="0965.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0969.html">groepaz: "Re[4]: [cc65] Compile problem"</a>
+<li><strong>Reply:</strong> <a href="0969.html">groepaz: "Re[4]: [cc65] Compile problem"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:44 CET</em>
+</em>
+</small>
+</body>
+</html>

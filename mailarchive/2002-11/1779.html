@@ -1,0 +1,137 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] warez gallore :)</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] warez gallore :)">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] warez gallore :)</h1>
+<!-- received="Sat Nov 23 22:18:35 2002" -->
+<!-- isoreceived="20021123211835" -->
+<!-- sent="Sat, 23 Nov 2002 22:18:34 +0100" -->
+<!-- isosent="20021123211834" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] warez gallore :)" -->
+<!-- id="20021123211834.GB14250@trixie.musoftware.de" -->
+<!-- inreplyto="569314378.20021123024846@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20warez%20gallore%20:)"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-11-23 22:18:34
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1778.html">Ullrich von Bassewitz: "Re: [cc65] ld65-Script Suggestions."</a>
+<li><strong>In reply to:</strong> <a href="1776.html">groepaz: "Re[2]: [cc65] warez gallore :)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1780.html">groepaz: "Re[2]: [cc65] warez gallore :)"</a>
+<li><strong>Reply:</strong> <a href="1780.html">groepaz: "Re[2]: [cc65] warez gallore :)"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Sat, Nov 23, 2002 at 02:48:46AM +0100, groepaz wrote:
+&gt; well..... should i do sth like
+&gt;
+&gt; /samples/c64/&lt;prog&gt;
+&gt;                    for programs that are c64 specific (ie the plasma,
+&gt;                    fire demo, radial demo)
+
+Many programs are not really platform specific. Making the plasma demo multi
+platform was not very difficult, the same is true for the fire demo. I do even
+think, I can make it run on the Plus/4 without too much trouble.
+
+&gt; guess we should define something that works well for everyone ... also
+&gt; some kind of naming sheme for the archives (i'd prefer timestamp over
+&gt; versionnumbers for that matter ;))
+
+I don't think it makes sense to regulate the directory structure in an
+archive.
+
+&gt; (btw i noticed that snapshot is missing the silversurfer rs232
+&gt; module i made.... gotta add that aswell :o) ... wasnt there some plan
+&gt; about changing the api or sth?)
+
+The RS232 code could also go into a module. This would have the advantage that
+the hardware could be selected at runtime without linking in all the code.
+However, this is a vision of distant future. I would like to test the driver
+concept using the new graphics API. When this works satisfactorily, it is time
+to think about other areas where modules could be used.
+
+&gt; yeah probably... so is there a working example (that runs on the c64)
+&gt; on how to use that stuff yet? shouldnt be a major problem to convert
+&gt; the stuff i've done so far then....
+
+The current snapshot contains the 320*200*2 driver for the C64. The only
+problem is the naming convention. Since there are target platforms with a
+maximum of 6 chars in a filename (+ extension), I've decided to keep my old
+approach only for the source file. So the driver source is named
+c64-320-200-2.s, and is compiled into c64-320-200-2.tgi, but the actual driver
+is later named c64-hi.tgi. The name is important, because one of the
+initialization routines for the graphics can take a constant describing the
+resolution requested. This is then translated into a matching driver name by
+platform specific code. This way, a platform independent program can request a
+graphics mode &quot;320*200, two colors&quot; and will get this mode, if there is a
+driver available.
+
+You can take the source of the existing driver as an example. Some of the
+functions are not complete, and there will be minor changes, but the big
+stucture should be in place. The samples directory contains a program named
+&quot;tgidemo&quot;, that shows how to work with the graphics module. To review the API,
+have a look into the tgi.h header file.
+
+Regards
+
+
+	Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20warez%20gallore%20:)">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20warez%20gallore%20:)">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1778.html">Ullrich von Bassewitz: "Re: [cc65] ld65-Script Suggestions."</a>
+<li><strong>In reply to:</strong> <a href="1776.html">groepaz: "Re[2]: [cc65] warez gallore :)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1780.html">groepaz: "Re[2]: [cc65] warez gallore :)"</a>
+<li><strong>Reply:</strong> <a href="1780.html">groepaz: "Re[2]: [cc65] warez gallore :)"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-11-23 22:18:40 CET</em>
+</em>
+</small>
+</body>
+</html>

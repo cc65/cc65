@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Mouse API Proposals</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Mouse API Proposals" />
+<meta name="Date" content="2009-08-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Mouse API Proposals</h1>
+<!-- received="Tue Aug 25 23:30:00 2009" -->
+<!-- isoreceived="20090825213000" -->
+<!-- sent="Tue, 25 Aug 2009 23:29:51 +0200" -->
+<!-- isosent="20090825212951" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Mouse API Proposals" -->
+<!-- id="f97798c20908251429y3c0d24fcn5f87da89c0ce13fd@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20090825171549.GB3793&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6738.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Mouse API Proposals&quot;">Next message</a> ]
+[ <a href="6736.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Mouse API Proposals&quot;">Previous message</a> ]
+[ <a href="6736.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Mouse API Proposals&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6738.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Mouse API Proposals&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Mouse%20API%20Proposals">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-08-25 23:29:51</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt;&gt; 1. Default bounding box
+
+&gt; Another idea would be to place the information
+&gt; into a know storage in the driver, so the C layer can retrieve it without
+&gt; calling a driver function.
+
+Similiar to the resolution etc. in the tgi drivers? Seems the most
+elegant solution to me :-)
+
+&gt;&gt; 2. Coordinate mapping
+
+&gt; Currently there aren't many programs using the mouse, so stating that the
+&gt; primary use of the mouse is with conio is probably an exaggeration:-) Anyway,
+&gt; it's a possible use case, so such an API is probably helpful.
+
+At least Contiki 2.x could/would make use of it.
+
+&gt; This would mean, all coordinate that go to the driver would be translated via
+&gt; one mouse callback, and all outgoing coordinates by another.
+
+Maybe a misunderstanding. I was thinking about explicit translation
+routine(s). Nothing like &quot;get/set as char pos&quot;...
+
+&gt; Maybe it would be
+&gt; better to have a set of routines that extend the kernel, since translating
+&gt; mouse coordinates is platform independent and can be done by the mouse kernel
+&gt; before passing the coordinates. This keeps the drivers smaller and shared code
+&gt; in the kernel.
+
+The situation on the Apple2 is...
+a) there are two text mode resolutions (40 and 80 col) and the
+translation routine needs to know which one is active (the same for
+the C128 ?).
+b) translating between 280 and 80 requires more than just an integer
+division / multiplication.
+Both aspects seem quite platform specific to me - but not mouse
+specific. Therefore I was thinking about the mouse callbacks as the
+right place.
+
+&gt;&gt; 3. Cursor display
+&gt;&gt;
+&gt; [...]
+&gt;&gt; &gt;From that point of view it doesn't seem correct to have the program
+&gt;&gt; load and configure sprite 0 for use by the mouse callbacks. I strongly
+&gt;&gt; believe that the program shouldn't be required to know anything about
+&gt;&gt; sprites at all.
+&gt;
+&gt; On such small machines that is almost impossible. Ok, if you're using conio
+&gt; and ignore sprites alltogether it would be a good thing to allow the mouse
+&gt; driver to manage sprite 0 completely. But if you're using graphics mode with
+&gt; your own sprites, if you're using collision detection or any other VIC stuff,
+&gt; you need to know and control what the mouse driver is doing. This is the
+&gt; reason why the mouse callbacks can be changed by the user while a common
+&gt; implementation is supplied.
+
+Following this very argumentation (custom mouse callbacks) I would
+come to the conclusion that the default mouse callback should manage
+the sprite for conio and pure TGI programs while programs using
+sprites actively would probably need custom mouse callbacks.
+
+&gt; Also, the mouse driver doesn't know anything about the memory layout of the
+&gt; program. But the sprite data has to go into a specific memory location which
+&gt; depends on the graphics mode and where VIC memory is mapped. I don't think it
+&gt; is possible to let the driver do that transparently without adding lots of
+&gt; code.
+
+I wasn't advocating to have the driver involve into that game. My
+understanding is that the driver is responsible for delivering cursor
+coordinates (and button) state and thus isn't involved in handling the
+actual cursor at all.
+
+On the Apple II (without any hardware sprites / cursors / whatsoever)
+the mouse callback draws _INTO_ the screen and therefore needs to have
+an intimate knowledge of the current video mode. I'm far from knowing
+enough to argue on the other targets.
+
+As you pointed out I'm maybe to text/conio focused so I'd still see a
+benefit in transparent sprite handling, even if it would only work for
+that scenario, but after all I can't decide if this is feasable with
+reasonable overhead.
+
+&gt;&gt; For that purpose the mouse callbacks should have an init and exit
+&gt;&gt; entry point called by the mouse kernel. This would in general be
+&gt;&gt; beneficial as i.e. currently the Apple II default callback use a
+&gt;&gt; constructor to determine the text screen resolution - an approach
+&gt;&gt; failing for sure a soon as the screen mode becomes switchable...
+&gt;
+&gt; Mouse callbacks are called from the driver. That is not true for init and exit
+&gt; (they will be called from the platform independent mouse kernel), so I'm not
+&gt; sure if this is the correct approach. Is there a reason why there is a
+&gt; constructor used instead of doing that inside the driver when INSTALL is
+&gt; called?
+
+The screen resolution is totally independed from the way the mouse
+works and has only to do with displaying the mouse cursor so I
+understand that it shouldn't be involved here, should it?
+
+If we want to stay with paradigm of the driver being the only instance
+calling into the mouse callbacks then it could of course do so in its
+INSTALL / UNINSTALL entry points.
+
+Best, Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Aug 25 23:30:00 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6738.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Mouse API Proposals"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6736.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Mouse API Proposals"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6736.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Mouse API Proposals"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6738.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Mouse API Proposals"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6738.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Mouse API Proposals"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6737" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6737" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6737" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-08-25 23:30:02 CEST
+</em></small></p>
+</body>
+</html>

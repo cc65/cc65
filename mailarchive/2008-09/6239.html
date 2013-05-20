@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] segment address arithmetic</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] segment address arithmetic" />
+<meta name="Date" content="2008-09-21" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] segment address arithmetic</h1>
+<!-- received="Sun Sep 21 13:24:31 2008" -->
+<!-- isoreceived="20080921112431" -->
+<!-- sent="Sun, 21 Sep 2008 13:23:01 +0200" -->
+<!-- isosent="20080921112301" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] segment address arithmetic" -->
+<!-- id="20080921112301.GA4577@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="669CB16F7DF341F8BE025ABA4711B7E5&#64;ORANGE2" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6240.html" title="Stefan: &quot;Re: [cc65] segment address arithmetic&quot;">Next message</a> ]
+[ <a href="6238.html" title="David A. Lyons: &quot;Re: [cc65] segment address arithmetic&quot;">Previous message</a> ]
+[ <a href="6237.html" title="Shawn Jefferson: &quot;[cc65] segment address arithmetic&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6240.html" title="Stefan: &quot;Re: [cc65] segment address arithmetic&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20segment%20address%20arithmetic">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-09-21 13:23:01</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Sat, Sep 20, 2008 at 05:45:38PM -0700, Shawn Jefferson wrote:
+&gt; I'm trying to take the address of one of my segments (or memory areas) and
+&gt; add 1024 to that address.  When I do that using the following code:
+&gt;
+&gt; extern char *_DATA_LOAD__;
+
+__DATA_LOAD__ is an address. What you're doing here is to say that there is a
+char* located at this address, which is wrong. What you want to to is to use
+this address as is. For pointer arithmetics it is easiest to work with char
+pointers, so
+
+    extern char _DATA_LOAD__;
+    #define DATA_LOAD       (&amp;_DATA_LOAD__)
+
+    int main (void)
+    {
+        printf (&quot;%p\n&quot;, DATA_LOAD + 1024)
+        return 0;
+    }
+
+is what you want.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Sep 21 13:24:31 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6240.html" title="Next message in the list">Stefan: "Re: [cc65] segment address arithmetic"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6238.html" title="Previous message in the list">David A. Lyons: "Re: [cc65] segment address arithmetic"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6237.html" title="Message to which this message replies">Shawn Jefferson: "[cc65] segment address arithmetic"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6240.html" title="Next message in this discussion thread">Stefan: "Re: [cc65] segment address arithmetic"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6240.html" title="Message sent in reply to this message">Stefan: "Re: [cc65] segment address arithmetic"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6239" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6239" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6239" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-09-21 13:24:33 CEST
+</em></small></p>
+</body>
+</html>

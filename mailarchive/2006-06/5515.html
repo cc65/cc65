@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="iso-8859-15"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Re: [Contiki-developers] build</title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="[cc65] Re: [Contiki-developers] build problems" />
+<meta name="Date" content="2006-06-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Re: [Contiki-developers] build problems</h1>
+<!-- received="Fri Jun 23 13:15:18 2006" -->
+<!-- isoreceived="20060623111518" -->
+<!-- sent="Fri, 23 Jun 2006 13:15:00 +0200" -->
+<!-- isosent="20060623111500" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="[cc65] Re: [Contiki-developers] build problems" -->
+<!-- id="200606231315.00816.groepaz@gmx.net" -->
+<!-- charset="iso-8859-15" -->
+<!-- inreplyto="449B92C4.1060203&#64;sics.se" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5516.html" title="Adam Dunkels: &quot;[cc65] Re: [Contiki-developers] build problems&quot;">Next message</a> ]
+[ <a href="5514.html" title="Andrew J. Kroll: &quot;Re: [cc65] Apple II No-Slot-Clock&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5516.html" title="Adam Dunkels: &quot;[cc65] Re: [Contiki-developers] build problems&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20Re:%20[Contiki-developers]%20build%20problems">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2006-06-23 13:15:00</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Friday 23 June 2006 09:05, Adam Dunkels wrote:
+
+(crossposted to cc65 list, note for UZ: i volunteered to handle the 2.x port 
+of contiki for the c64, currently trying to just make it compile with cc65)
+
+&gt; The Makefile.include currently contains a lot of gcc-isms since it has
+&gt; only been used with gcc-style compilers. It would be great, however, if
+&gt; it could be entirely generic and work for all C compilers and if any has
+&gt; ideas on how to make things more generic, feel free to share them :-)
+
+one problem i have found is that it is assumed that the compiler understands 
+certain options, such as -c (compile but do not link). not much of a problem 
+with cc65 (because cl65 _does_ understand it, and cl65 pretty much resembles 
+what the &quot;gcc&quot; program does) but it'll be a problem with lesser compilers 
+(such as sdcc *shudder*). [however, maybe some custom rules in the arch 
+specific makefile can overide this behaviour, didnt try because it doesnt 
+bother me right now :=P]
+
+i managed to go a bit further by tweaking the c64 specific files a bit, 
+however this is stopping me from going further:
+
+groepaz&#64;gurke ~/contiki/contiki-2&#46;<!--nospam-->x/examples/webserver $ make TARGET=c64
+cl65 -I. -I../../cpu/6502 -I../../platform/c64/. -I../../platform/c64/apps -I../../platform/c64/ctk -I../../platform/c64/lib -I../../platform/c64/loader -I../../platform/c64/net -I../../apps/webserver -I../../core -DWITH_PETSCII -t 
+c64 --add-source --create-dep -DCTK_HIRES -DWITH_UIP -DWITH_LOADER_ARCH -DWITH_ETHERNET -c ../../core/net/dhcpc.c -o 
+obj_c64/dhcpc.o
+../../core/sys/lc.h(123): Error: `&quot;' or `&lt;' expected
+../../core/sys/pt.h(55): Error: Type expected
+../../core/sys/pt.h(55): Error: `;' expected
+../../core/sys/pt.h(55): Error: Type expected
+../../core/net/dhcpc.c(254): Error: Size of data type is unknown
+../../core/net/dhcpc.c(274): Warning: Function call without a prototype
+../../core/net/dhcpc.c(283): Warning: Function call without a prototype
+../../core/net/dhcpc.c(382): Warning: Function call without a prototype
+../../core/net/dhcpc.c(382): Warning: Function call without a prototype
+../../core/net/dhcpc.c(383): Warning: Parameter `data' is never used
+
+the offending code is:
+
+(somewhere in ./platform/c64/contiki-conf.h)
+#define LC_CONF_INCLUDE &quot;lib/lc-cc65.h&quot;
+
+(in ./core/sys/lc.h)
+#ifdef LC_CONF_INCLUDE
+#include LC_CONF_INCLUDE
+#else /* LC_CONF_INCLUDE */
+#include &quot;sys/lc-switch.h&quot;
+#endif /* LC_CONF_INCLUDE */
+
+...is this even legal? mmmh i can see a lot of lesser compilers fail on this 
+too... maybe some kind of configure script would do the job better than this? 
+(although i can see other kinds of problems with that). args :/
+
+i might try piping stuff through gccs preprocessor, but this smells very hax0r 
+to me and shouldnt be needed :=P
+
+-- 
+
+<a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>
+<a href="http://www.gc-linux.org/docs/yagcd.html">http://www.gc-linux.org/docs/yagcd.html</a>
+<a href="http://www.pokefinder.org">http://www.pokefinder.org</a>
+<a href="http://ftp.pokefinder.org">http://ftp.pokefinder.org</a>
+
+Für das große Chaos haben wir Computer. Die übrigen Fehler machen wir von 
+Hand.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Jun 23 13:15:18 2006</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5516.html" title="Next message in the list">Adam Dunkels: "[cc65] Re: [Contiki-developers] build problems"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5514.html" title="Previous message in the list">Andrew J. Kroll: "Re: [cc65] Apple II No-Slot-Clock"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5516.html" title="Next message in this discussion thread">Adam Dunkels: "[cc65] Re: [Contiki-developers] build problems"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5516.html" title="Message sent in reply to this message">Adam Dunkels: "[cc65] Re: [Contiki-developers] build problems"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5515" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5515" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5515" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2006-06-23 13:15:21 CEST
+</em></small></p>
+</body>
+</html>

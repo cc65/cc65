@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Re: New 80 col switch API</title>
+<meta name="Author" content="Jonathan Graham Harston (jgh1arcade.demon.co.uk)" />
+<meta name="Subject" content="[cc65] Re: New 80 col switch API" />
+<meta name="Date" content="2009-09-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Re: New 80 col switch API</h1>
+<!-- received="Thu Sep 10 21:01:21 2009" -->
+<!-- isoreceived="20090910190121" -->
+<!-- sent="10 Sep 2009 19:30:40 +0100" -->
+<!-- isosent="20090910183040" -->
+<!-- name="Jonathan Graham Harston" -->
+<!-- email="jgh1arcade.demon.co.uk" -->
+<!-- subject="[cc65] Re: New 80 col switch API" -->
+<!-- id="090910195505@arcade.demon.co.uk" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6896.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Building with custom CC and CFLAGS&quot;">Next message</a> ]
+[ <a href="6894.html" title="Jonathan Graham Harston: &quot;[cc65] Re: New 80 col switch API&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Jonathan Graham Harston &lt;<a href="mailto:jgh1arcade.demon.co.uk?Subject=Re:%20[cc65]%20Re:%20New%2080%20col%20switch%20API">jgh1arcade.demon.co.uk</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-09-10 20:30:40</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt; Message-ID: &lt;20090908135637.GA21244&#64;trixie&#46;<!--nospam-->musoftware.de&gt;
+ 
+Ullrich von Bassewitz wrote:
+&gt; &gt; #define VIDEOMODE_40COL         0x11
+&gt; &gt; #define VIDEOMODE_80COL         0x12
+&gt; 
+&gt; Do you think, we can make argument and return code an unsigned, and change
+the
+&gt; #define names to VIDEOMODE_80x25 and VIDEOMODE_40x25 respectively? This
+would
+&gt; give more comfortable upgrade path if required later, while there are no
+real
+&gt; disadvantages now. I would then just ignore the high byte of the passed
+&gt; argument in the C128 routine. The result is already returned in a/x so at
+&gt; least for the C128, there wouldn't be any code changes.
+ 
+That would work, and the 6502 code I posted for the BBC would also
+work unchanged, with BBC-specific #defines.
+ 
+-- 
+J.G.Harston - jgh&#64;arcade&#46;<!--nospam-->demon.co.uk - mdfs.net/User/JGH
+RISC OS Internationalisation - <a href="http://mdfs.net/Software/RISCOS">http://mdfs.net/Software/RISCOS</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Sep 10 21:01:21 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6896.html" title="Next message in the list">Spiro Trikaliotis: "Re: [cc65] Building with custom CC and CFLAGS"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6894.html" title="Previous message in the list">Jonathan Graham Harston: "[cc65] Re: New 80 col switch API"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6895" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6895" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6895" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-09-10 21:01:23 CEST
+</em></small></p>
+</body>
+</html>

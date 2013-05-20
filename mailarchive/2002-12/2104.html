@@ -1,0 +1,164 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] 65tris on ATARI</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] 65tris on ATARI">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] 65tris on ATARI</h1>
+<!-- received="Thu Dec 19 19:48:33 2002" -->
+<!-- isoreceived="20021219184833" -->
+<!-- sent="Thu, 19 Dec 2002 19:48:32 +0100" -->
+<!-- isosent="20021219184832" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] 65tris on ATARI" -->
+<!-- id="20021219184832.GB30729@trixie.musoftware.de" -->
+<!-- inreplyto="64013.213.61.11.169.1040313169.squirrel@213.61.11.174" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%2065tris%20on%20ATARI"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-12-19 19:48:32
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2103.html">MagerValp: "[cc65] 80 column support on the C128"</a>
+<li><strong>In reply to:</strong> <a href="2102.html">cas_at_strotmann.de: "Re: [cc65] 65tris on ATARI"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2114.html">Groepaz: "Re: [cc65] 65tris on ATARI"</a>
+<li><strong>Next in thread:</strong> <a href="2059.html">Groepaz: "Re: [cc65] 65tris on ATARI"</a>
+<li><strong>Reply:</strong> <a href="2114.html">Groepaz: "Re: [cc65] 65tris on ATARI"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Thu, Dec 19, 2002 at 04:52:49PM +0100, <a href="mailto:cas_at_strotmann.de?Subject=Re:%20[cc65]%2065tris%20on%20ATARI">cas_at_strotmann.de</a> wrote:
+&gt; One problem we have to find a solution is that the multijoy needs
+&gt; initialization. before first use, the 2nd ATARI Joystick port must be
+&gt; switched into write mode (6 instructions, 15 Byte) the init could be done
+&gt; every time a joystick is read, but  this is overhead for games.
+
+15 bytes of additional code doesn't seem like anything we really need to worry
+about. It could be decreased further by adding an &quot;initialized&quot; flag, which is
+checked and the initialization code is only executed if this flag is not set.
+
+&gt; I'. thinking of an init_joy function. This function can return the number
+&gt; of joysticks attached, so it's also useful for normal joystick ports. The
+&gt; init routine could also be used to switch from normal joystick to multijoy
+&gt; or other input devices. The readjoy function would then read a global flag
+&gt; set by the init routine and branch to different code.
+
+This would mean that we're about to change the API. Which is nothing bad per
+se, but since I do not even know if this API will stay (see my recent comments
+about loadable modules), I would like to avoid any changes right now.
+
+So if possible, I would prefer a change that has no impact on the API resp.
+other platforms.
+
+Another thing we can do is to decide about the module stuff now. If we make
+this decision now, we can either change the API (if we decide against loadable
+joystick drivers) or use modules (which needs an API change anyway). So here
+are the pros and cons:
+
+Pro loadable modules:
+
+  1. Drivers can be written and distributed by third parties and need not
+     be part of the cc65 package.
+
+  2. Code is only loaded when needed.
+
+  3. Driver can be removed from memory at runtime to make room for other
+     stuff.
+
+  4. Only the code for the joystick needed is in memory, no need to link
+     several different joystick routines to an application.
+
+Contra loadable modules:
+
+  1. Loadable modules need file i/o and the heap routines, so programs
+     which wouldn't otherwise need these libraries will get bigger.
+
+  2. Platforms without file i/o support cannot load drivers, so these
+     machines cannot have joystick support.
+
+  3. Applications need additional files on the disk.
+
+
+Any votes or opinions?
+
+&gt; Is the use of function vectors supported by cc65? (Sorry if this is a dump
+&gt; question, I'm not a 'C' wizard)
+
+Yes.
+
+&gt; I fear that this would lead to different &quot;high-nibble-flags&quot; on different
+&gt; hardware plattforms, so a 8 joystick multiplayer game would not be
+&gt; (easily) portable from ATARI to, for example C64 Joystrick extensions.
+
+That is correct, but without auto-detection, we do always have different flags
+passed to the init routine.
+
+&gt; I will work on a proposal and sample source for the &quot;init&quot; solution, which
+&gt; for my view gives least speed-penalty and no evil defines.
+
+I would suggest deciding about the loadable module proposal first. If we use
+loadable modules in the future, the API will change anyway and the drivers
+will have install/deinstall entry points (as the TGI and EM drivers). 
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%2065tris%20on%20ATARI">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%2065tris%20on%20ATARI">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2103.html">MagerValp: "[cc65] 80 column support on the C128"</a>
+<li><strong>In reply to:</strong> <a href="2102.html">cas_at_strotmann.de: "Re: [cc65] 65tris on ATARI"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2114.html">Groepaz: "Re: [cc65] 65tris on ATARI"</a>
+<li><strong>Next in thread:</strong> <a href="2059.html">Groepaz: "Re: [cc65] 65tris on ATARI"</a>
+<li><strong>Reply:</strong> <a href="2114.html">Groepaz: "Re: [cc65] 65tris on ATARI"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-12-19 19:48:56 CET</em>
+</em>
+</small>
+</body>
+</html>

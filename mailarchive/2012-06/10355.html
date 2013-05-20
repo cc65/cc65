@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Specifying segment for lib</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Specifying segment for library code?" />
+<meta name="Date" content="2012-06-03" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Specifying segment for library code?</h1>
+<!-- received="Sun Jun  3 21:30:13 2012" -->
+<!-- isoreceived="20120603193013" -->
+<!-- sent="Sun, 3 Jun 2012 21:29:33 +0200" -->
+<!-- isosent="20120603192933" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Specifying segment for library code?" -->
+<!-- id="CACT=u73mpysRcg_6z2mDj2-EUMr83Lpi-JyoBBfBdnuDQ0sJOQ@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20120603172006.GA28120&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10356.html" title="Oliver Schmidt: &quot;Re: [cc65] Common macros for dirent.d_type (was: Need to pass drive number in addition to device number to cbm_opendir)&quot;">Next message</a> ]
+[ <a href="10354.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Common macros for dirent.d_type (was: Need to pass drive number in addition to device number to cbm_opendir)&quot;">Previous message</a> ]
+[ <a href="10352.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Specifying segment for library code?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Specifying%20segment%20for%20library%20code?">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-06-03 21:29:33</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Uz,
+
+&gt; That is correct, but most standard functions don't have constructors. Most
+&gt; user programs aren't comparable to Contiki, which aims to be an operating
+&gt; system and therefore has another set of library functions in use.
+
+I don't understand what &quot;other set&quot; you are referring to here. However
+the functions with constructor issues I referred to before were
+standard C library functions. Contiki didn't use constructors by
+itself.
+
+&gt; Yes, and exactly this is where this solution differs from the approach
+&gt; described by me: If an overlay (and only this overlay) needs strncmp, strncmp
+&gt; will get linked to the main program, not to the overlay.
+
+Exactly. I don't disagree by any means. I _did_ however disagree in
+that the &quot;single linker session&quot; approach leads to crashing programs
+as you described before...
+
+To summarize:
+
+1. Placing library functions in an overlay requires some custom build
+&quot;magic&quot; and can cause issues with constructors / destructors.
+2. Placing library functions in the main module uses &quot;their&quot; RAM
+always - even while they not needed.
+3. Placing library functions in an overlay may increase disk usage
+because the same functions may be placed in several overlays.
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Jun  3 21:30:13 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10356.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Common macros for dirent.d_type (was: Need to pass drive number in addition to device number to cbm_opendir)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10354.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Common macros for dirent.d_type (was: Need to pass drive number in addition to device number to cbm_opendir)"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10352.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Specifying segment for library code?"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10355" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10355" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10355" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-06-03 21:30:16 CEST
+</em></small></p>
+</body>
+</html>

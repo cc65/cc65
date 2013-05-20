@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Using asm inline assembly as p</title>
+<meta name="Author" content="Stefan (vorsichtphysiker1gmx.net)" />
+<meta name="Subject" content="[cc65] Using asm inline assembly as part of expression" />
+<meta name="Date" content="2013-01-13" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Using asm inline assembly as part of expression</h1>
+<!-- received="Sun Jan 13 21:26:55 2013" -->
+<!-- isoreceived="20130113202655" -->
+<!-- sent="Sun, 13 Jan 2013 21:21:40 +0100" -->
+<!-- isosent="20130113202140" -->
+<!-- name="Stefan" -->
+<!-- email="vorsichtphysiker1gmx.net" -->
+<!-- subject="[cc65] Using asm inline assembly as part of expression" -->
+<!-- id="20130113202140.55990@gmx.net" -->
+<!-- charset="utf-8" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11089.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Using asm inline assembly as part of expression&quot;">Next message</a> ]
+[ <a href="11087.html" title="Greg King: &quot;Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="11089.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Using asm inline assembly as part of expression&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Stefan &lt;<a href="mailto:vorsichtphysiker1gmx.net?Subject=Re:%20[cc65]%20Using%20asm%20inline%20assembly%20as%20part%20of%20expression">vorsichtphysiker1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2013-01-13 21:21:40</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I have a for loop in my program (Used for a variable amount of nested 
+loops):
+for(*indexarr=0;(++(*indexarr))&lt;=(*max); ){..}
+
+which results in the following code when compiled with -Oirs:
+
+000066r 1  B1 rr            lda     (sp),y
+000068r 1  85 rr            sta     ptr1+1
+00006Ar 1  88               dey
+00006Br 1  B1 rr            lda     (sp),y
+00006Dr 1  85 rr            sta     ptr1
+00006Fr 1  98               tya
+000070r 1  A8               tay
+000071r 1  91 rr            sta     (ptr1),y
+000073r 1  C8               iny
+000074r 1  91 rr            sta     (ptr1),y
+000076r 1  A0 01        L0009:    ldy     #$01
+000078r 1  B1 rr            lda     (sp),y
+00007Ar 1  AA               tax
+00007Br 1  88               dey
+00007Cr 1  B1 rr            lda     (sp),y
+00007Er 1  20 rr rr         jsr     pushax
+000081r 1  85 rr            sta     ptr1
+000083r 1  86 rr            stx     ptr1+1
+000085r 1  A0 01            ldy     #$01
+000087r 1  B1 rr            lda     (ptr1),y
+000089r 1  AA               tax
+00008Ar 1  88               dey
+00008Br 1  B1 rr            lda     (ptr1),y
+00008Dr 1  18               clc
+00008Er 1  69 01            adc     #$01
+000090r 1  90 01            bcc     L0042
+000092r 1  E8               inx
+000093r 1  20 rr rr     L0042:    jsr     staxspidx
+000096r 1  20 rr rr         jsr     pushax
+000099r 1  A0 05            ldy     #$05
+00009Br 1  B1 rr            lda     (sp),y
+00009Dr 1  85 rr            sta     ptr1+1
+00009Fr 1  88               dey
+0000A0r 1  B1 rr            lda     (sp),y
+0000A2r 1  85 rr            sta     ptr1
+0000A4r 1  A0 01            ldy     #$01
+0000A6r 1  B1 rr            lda     (ptr1),y
+0000A8r 1  AA               tax
+0000A9r 1  88               dey
+0000AAr 1  B1 rr            lda     (ptr1),y
+0000ACr 1  20 rr rr         jsr     tosicmp
+0000AFr 1  90 03            bcc     L0043
+0000B1r 1  4C rr rr         jmp     incsp4
+0000B4r 1  A0 03        L0043:    ldy     #$03
+0000B6r 1  
+
+This works in principle, but the compiled code is very ineffective.
+
+Using the inline assembler i want to avoid the unnecessary transfer of *sp 
+to *ptr1 like for example:
+
+asm(&quot;ldy #%o&quot;, indexarr),
+asm(&quot;lda #0&quot;),
+asm(&quot;sta (sp),y&quot;),
+asm(&quot;iny&quot;),
+asm(&quot;sta (sp),y&quot;);
+
+to set *indexarr to zero.
+
+Up to this point it works out. When trying to do that with the comparison, 
+i get 
+the error message &quot;cannot convert from void to something else&quot;.
+
+(unsigned int*) ( asm(&quot;ldy #%o&quot;, indexarr),
+asm(&quot;inc (sp),y&quot;),
+asm(&quot;bne &#64;l0&quot;),
+asm(&quot;iny&quot;),
+asm(&quot;inc (sp),y&quot;),
+asm(&quot;&#64;l0:&quot;),
+asm(&quot;lda (sp),y&quot;),
+asm(&quot;tax&quot;),
+asm(&quot;dey&quot;),
+asm(&quot;lda (sp),y&quot;) /* Result is now in __AX__*/
+&lt;(*max); )
+
+As far i understand from the manual, an asm statement is always of type 
+void and can be part of an expression. This is, what i don't understand:
+
+- If the asm statement is of type void and i cannot convert it to another 
+type, how can it be part of an expression ? Is this a contradiction or am i 
+wrong?
+- What is the right ways of using asm statements as an part of an 
+expression?
+
+Yours Monte Carlos
+
+    
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Jan 13 21:26:55 2013</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11089.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Using asm inline assembly as part of expression"</a></li>
+<li><dfn>Previous message</dfn>: <a href="11087.html" title="Previous message in the list">Greg King: "Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="11089.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Using asm inline assembly as part of expression"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="11089.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Using asm inline assembly as part of expression"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#11088" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#11088" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#11088" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2013-01-13 21:27:00 CET
+</em></small></p>
+</body>
+</html>

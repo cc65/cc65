@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] ca65, 65816 and far label </title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] ca65, 65816 and far label pointers" />
+<meta name="Date" content="2013-01-09" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] ca65, 65816 and far label pointers</h1>
+<!-- received="Wed Jan  9 10:18:25 2013" -->
+<!-- isoreceived="20130109091825" -->
+<!-- sent="Wed, 9 Jan 2013 10:18:18 +0100" -->
+<!-- isosent="20130109091818" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] ca65, 65816 and far label pointers" -->
+<!-- id="20130109091818.GA4191@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="alpine.DEB.2.02.1301081544330.26270&#64;pianoman.cluster.toy" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11065.html" title="Vince Weaver: &quot;Re: [cc65] ca65, 65816 and far label pointers&quot;">Next message</a> ]
+[ <a href="11063.html" title="Oliver Schmidt: &quot;Re: [cc65] Request for feature: Compression of RODATA Segment&quot;">Previous message</a> ]
+[ <a href="11059.html" title="Vince Weaver: &quot;[cc65] ca65, 65816 and far label pointers&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="11065.html" title="Vince Weaver: &quot;Re: [cc65] ca65, 65816 and far label pointers&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20ca65,%2065816%20and%20far%20label%20pointers">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2013-01-09 10:18:18</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Tue, Jan 08, 2013 at 03:49:21PM -0500, Vince Weaver wrote:
+&gt; I'm trying to use the &quot;LDA&quot; instruction with the Absolute Long Indexed, X
+&gt; addressing mode.  I can't seem to get it to work.  It would look something
+&gt; like this:
+&gt;
+&gt;           lda     logo_begin,x
+&gt;
+&gt; where logo_begin was forced to be a 24-bit value.
+
+How did you force it to be a 24-bit value?
+
+The ca65 assembler has the notation of address sizes. A segment does have an
+address size and labels inherit it from the segment they're in. The assembler
+will then choose the instruction size from the address size of the label.
+
+Look at the following example. You may use &quot;ca65 -l test.lst test.s&quot; to
+translate it generating a listing and look at the listing to view the 
+results.
+
+-----------------------------[test.s]-------------------------------------
+        .setcpu &quot;65816&quot;         ; Does also enable far segments
+
+.segment        &quot;FAR&quot; : far
+
+foo:    lda     foo             ; far, because of segment default
+        lda     .LOWORD(foo)    ; abs, because of truncation
+
+.segment        &quot;NEAR&quot; : absolute
+
+bar:    lda     bar             ; abs, because of segment default
+        lda     f:foo           ; far, because of override
+--------------------------------------------------------------------------
+
+In the first case, there is no override for near addressing, since the value
+would be truncated. You will have to use one of the truncation operators to
+use absolute/near addressing.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Jan  9 10:18:25 2013</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11065.html" title="Next message in the list">Vince Weaver: "Re: [cc65] ca65, 65816 and far label pointers"</a></li>
+<li><dfn>Previous message</dfn>: <a href="11063.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Request for feature: Compression of RODATA Segment"</a></li>
+<li><dfn>In reply to</dfn>: <a href="11059.html" title="Message to which this message replies">Vince Weaver: "[cc65] ca65, 65816 and far label pointers"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="11065.html" title="Next message in this discussion thread">Vince Weaver: "Re: [cc65] ca65, 65816 and far label pointers"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="11065.html" title="Message sent in reply to this message">Vince Weaver: "Re: [cc65] ca65, 65816 and far label pointers"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#11064" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#11064" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#11064" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2013-01-09 10:18:29 CET
+</em></small></p>
+</body>
+</html>

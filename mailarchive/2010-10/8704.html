@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] CBM LFN Question</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="Re: [cc65] CBM LFN Question" />
+<meta name="Date" content="2010-10-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] CBM LFN Question</h1>
+<!-- received="Mon Oct 25 11:19:29 2010" -->
+<!-- isoreceived="20101025091929" -->
+<!-- sent="Mon, 25 Oct 2010 11:19:11 +0200" -->
+<!-- isosent="20101025091911" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="Re: [cc65] CBM LFN Question" -->
+<!-- id="20101025091910.GG23228@trikaliotis.net" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="20101024193902.GA10335&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8705.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] CBM LFN Question&quot;">Next message</a> ]
+[ <a href="8703.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] CBM LFN Question&quot;">Previous message</a> ]
+[ <a href="8703.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] CBM LFN Question&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8705.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] CBM LFN Question&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20[cc65]%20CBM%20LFN%20Question">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-10-25 11:19:11</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>* On Sun, Oct 24, 2010 at 09:39:02PM +0200 Ullrich von Bassewitz wrote:
+&gt; 
+&gt; On Sun, Oct 24, 2010 at 09:11:19PM +0200, Spiro Trikaliotis wrote:
+&gt; &gt; BTW: The cc65 runtime could get rid of all the LFN problems by just
+&gt; &gt; &quot;poking&quot; the addresses at the right time. Of course, this would require
+&gt; &gt; some direct calling into the KERNAL (instead of using the KERNAL jump
+&gt; &gt; table) every now and then...
+&gt; 
+&gt; Could you elaborate on this a bit? Do you mean just using one table entry and
+&gt; overwriting it with the necessary lfn info before each kernal call that needs
+&gt; an lfn? 
+
+This would be one option, yes. Another one is the following:
+
+
+First: Note that I will use the addresses in the C64 KERNAL, as I am
+most familiar with that one. At the end, I will list a table for the
+entry points at other CBM computers.
+
+Also note that this is untested, but I do not see any reason why this
+should not work.
+
+The following KERNAL routines need an LFN:
+
+1. SETLFS ($FFBA)
+2. OPEN ($FFC0)
+3. CLOSE ($FFC3)
+4. CHKIN ($FFC6)
+5. CHKOUT ($FFC9)
+
+Note that these routines are also the only ones which use the table of
+open files. All other routines only use LA ($B8), SA ($B9), FA ($BA),
+FNADDR ($BB/$BC), FNLEN ($B7) directly.
+
+Let's have a look at what they are doing (neglecting not important things):
+
+1. SETLFS
+   $FFBA -&gt; $FE00
+   Only stores data in LA ($B8), SA ($B9) and FA ($BA).
+
+2. OPEN
+   $FFC0 -&gt; $F34A
+   - $F34A - $F350: LFN (LA, $B8) == 0 --&gt; return with error &quot;not input file&quot; (?)
+   - $F351 - $F358: find entry with that LFN in table of open files (LAT, SAT, FAT table)
+                    if found -&gt; return with error &quot;file open&quot;
+   - $F359 - $F361: check if there is room for a new entry. Not -&gt; return with error &quot;too many files open&quot;
+   - $F362 - $F376: store LA, SA and FA into table (LAT, SAT, FAT). Note that SA with be ORed with the constant IEEE_OPEN (the constant $60)
+   - $F377 - $F378: If file to open is keyboard -&gt; quit with success
+   - $F379 - $F49D: Handle opening of specific devices
+
+   Thus, to completely avoid using the table of open files, one can do the following:
+
+   - set LA, SA and FA (directly, or via SETLFS), and possibly FNLEN and FNADDR (via SETNAM)
+   - LDA SA
+   - JMP $F377
+
+
+3. CLOSE
+   $FFC3 -&gt; $F291
+   - $F291 - $F297: check if file exists in table of open files (LAT, SAT, FAT).
+                    if not found -&gt; return with success (!)
+   - $F298 - $F29A: jsr SetActiveFile ($F31F) --&gt; copy data from table of open files (LAT, SAT, FAT) into LA, FA, SA
+   - $F29B - $F29C: Push index into table of open files (LAT, SAT, FAT) onto stack
+   - $F29D - $F2F0: Handle CLOSE functionality for specific devices
+   - $F2F1 - $F30E: Delete entry from list of open files (LAT, SAT, FAT) by using the index pushed onto the stack before (in $F29B-$F29C)
+
+   Thus, to completely avoid using the table of open files, one can do the following:
+
+   - PUSH the constant 0 onto the stack (to allow to pop it back at $F2F1, and to make sure it is equal to (LDTND - 1))
+   - Set LDTND ($98) to 1 (number of open files; this will ensure that the number of open files will be 1 afterwards, so, no copy will be done after closing)
+   - set LA, SA and FA (directly, or via SETLFS)
+   - jsr $F29D
+
+4. CHKIN
+   $FFC6 -&gt; $F20E
+
+   - $F20E - $F215: check if file exists in table of open files (LAT, SAT, FAT).
+                    if not found -&gt; return with error &quot;file not open&quot;
+   - $F216 - $F218: jsr SetActiveFile ($F31F) --&gt; copy data from table of open files (LAT, SAT, FAT) into LA, FA, SA
+   - $F219 - $F24F: Process functionality for specific devices
+
+   Thus, to completely avoid using the table of open files, one can do the following:
+
+   - set LA, SA and FA (directly, or via SETLFS)
+   - lda FA (we cannot use the LDA FA at $F219, as it is not available on C128 and Plus/4!)
+   - jsr $F21B
+
+5. CHKOUT
+   $FFC9 -&gt; $F250
+
+   - $F250 - $F257: check if file exists in table of open files (LAT, SAT, FAT).
+                    if not found -&gt; return with error &quot;file not open&quot;
+   - $F258 - $F25A: jsr SetActiveFile ($F31F) --&gt; copy data from table of open files (LAT, SAT, FAT) into LA, FA, SA
+   - $F25B - $F290: Process functionality for specific devices
+
+   Thus, to completely avoid using the table of open files, one can do the following:
+
+   - set LA, SA and FA (directly, or via SETLFS)
+   - lda FA (we cannot use the LDA FA at $F219, as it is not available on C128 and Plus/4!)
+   - jsr $F25D
+
+
+
+The addresses for other Commodore computers are:
+
+            C64    VIC20    C128    PLUS4
+- mOPEN:   $F377   $F437   $EFDF    $EF7B
+- mCLOSE:  $F29D   $F356   $F194    $EE6B
+- mCHKIN:  $F21B   $F2D4   $F10E    $F219
+- mCHKOUT: $F25D   $F316   $F154    $ED6B
+
+- LA        $B8     $B8     $B8      $AC
+- FA        $B9     $B9     $B9      $AD
+- SA        $BA     $BA     $BA      $AE
+- LDTND     $98     $98     $98      $97
+
+I hope I did not miss anything.
+
+Regards,
+Spiro.
+
+-- 
+Spiro R. Trikaliotis                              <a href="http://opencbm.sf.net/">http://opencbm.sf.net/</a>
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>                     <a href="http://www.viceteam.org/">http://www.viceteam.org/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Oct 25 11:19:29 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8705.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] CBM LFN Question"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8703.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] CBM LFN Question"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8703.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] CBM LFN Question"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8705.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] CBM LFN Question"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8705.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] CBM LFN Question"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8704" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8704" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8704" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-10-25 11:19:32 CEST
+</em></small></p>
+</body>
+</html>

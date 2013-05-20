@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Re: New 80 col switch API</title>
+<meta name="Author" content="Jonathan Graham Harston (jgh1arcade.demon.co.uk)" />
+<meta name="Subject" content="[cc65] Re: New 80 col switch API" />
+<meta name="Date" content="2009-09-08" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Re: New 80 col switch API</h1>
+<!-- received="Tue Sep  8 01:00:15 2009" -->
+<!-- isoreceived="20090907230015" -->
+<!-- sent="07 Sep 2009 23:43:24 +0100" -->
+<!-- isosent="20090907224324" -->
+<!-- name="Jonathan Graham Harston" -->
+<!-- email="jgh1arcade.demon.co.uk" -->
+<!-- subject="[cc65] Re: New 80 col switch API" -->
+<!-- id="090907235511@arcade.demon.co.uk" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6861.html" title="Jonathan Graham Harston: &quot;[cc65] Re: New 80 col switch API&quot;">Next message</a> ]
+[ <a href="6859.html" title="Groepaz: &quot;Re: [cc65] testsuite results ...&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6866.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Re: New 80 col switch API&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Jonathan Graham Harston &lt;<a href="mailto:jgh1arcade.demon.co.uk?Subject=Re:%20[cc65]%20Re:%20New%2080%20col%20switch%20API">jgh1arcade.demon.co.uk</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-09-08 00:43:24</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt; Message-ID: &lt;20090907065326.GB26516&#64;trixie&#46;<!--nospam-->musoftware.de&gt;
+ 
+Ullrich von Bassewitz wrote:
+&gt; &gt; How about videomode(unsigned int mode) ? Then you could pass column
+&gt; &gt; and rows.
+&gt; 
+&gt; The idea is nice, but it makes the switching code larger and more complex,
+ 
+The simplest /implementation/ as opposed to /specification/ is to
+ignore the rows parameter, viz:
+ 
+videomode (unsigned int mode)
+{
+if ((mode &amp;&amp; 0xff)==40) { select_40_col_mode }
+  else { select_80_col_mode }
+}
+ 
+&gt; while most programs won't use it. Having just 40x25 and 80x25 chars for now
+ 
+Those program that need fuller access should link to a larger,
+more-complete library. As long as the API lets you pass
+rows&amp;columns, it's largely irrelavanet that the implementation only
+implements columns.
+ 
+&gt; My suggestion would be to implement it as suggested by Oliver. We can still
+ 
+Which is essentially what I expended on, Oliver suggests
+videomode(40) selects a 40-column screen mode with the default set
+numer of rows, I suggest that vidoemode(40) selects a 40-column
+screen mode with no row parameter supplied, so selecting a default
+number of rows. In effect, the same thing.
+ 
+-- 
+J.G.Harston - jgh&#64;arcade&#46;<!--nospam-->demon.co.uk - mdfs.net/User/JGH
+BBC BASIC for Windows and Internationalisation
+  See <a href="http://mdfs.net/Software/BBCBasic/Windows/ProgTips">http://mdfs.net/Software/BBCBasic/Windows/ProgTips</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Sep  8 01:00:15 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6861.html" title="Next message in the list">Jonathan Graham Harston: "[cc65] Re: New 80 col switch API"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6859.html" title="Previous message in the list">Groepaz: "Re: [cc65] testsuite results ..."</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6866.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Re: New 80 col switch API"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6866.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Re: New 80 col switch API"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6860" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6860" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6860" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-09-08 01:00:17 CEST
+</em></small></p>
+</body>
+</html>

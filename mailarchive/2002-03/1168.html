@@ -1,0 +1,146 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] some questions</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] some questions">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] some questions</h1>
+<!-- received="Fri Mar 15 23:14:36 2002" -->
+<!-- isoreceived="20020315221436" -->
+<!-- sent="Fri, 15 Mar 2002 23:14:42 +0100" -->
+<!-- isosent="20020315221442" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] some questions" -->
+<!-- id="20020315231442.A25026@trixie.musoftware.de" -->
+<!-- inreplyto="200203152140.g2FLeqp20921@xcip2.studcs.uni-sb.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20some%20questions"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-03-15 23:14:42
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1167.html">Stephan Lesch: "[cc65] some questions"</a>
+<li><strong>In reply to:</strong> <a href="1167.html">Stephan Lesch: "[cc65] some questions"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1169.html">Matt Ackeret: "Re: [cc65] some questions"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Fri, Mar 15, 2002 at 10:40:52PM +0100, Stephan Lesch wrote:
+&gt; I'm new to the list, and new to cc65 (just made the first experiences).
+&gt; I'm going to write an engine for an adventure on the C64, and I'm a little
+&gt; insecure if I should try writing it in C, or stay with assembler.
+
+My usual suggestion is to start with C. C on the 6502, and its implementation
+(cc65) do have some drawbacks compared with assembly code, but the advantages
+are far greater for most programs. Even if you choose to rewrite all of the
+code in assembler later, you will often be faster, because testing things in C
+is a lot easier and changes are made faster. And the nice thing about cc65 is
+that you don't loose the capability to code any part of your program in
+assembler: C and assembler will work together quite nicely.
+
+If you don't do graphics, you may even be able to make your program portable,
+so that it will run on other platforms supported by cc65. For example, support
+for the Atari is quite good thanks to the help of several Atari programmers.
+
+&gt; 1- How far can I control the memory usage of the compiled C program.
+&gt;    For instance, if my compiled program fits into $2000 bytes, and
+&gt;    I reserve $1000 bytes for the heap, is it possible to place the
+&gt;    compiled program and its heap to $2000-$5000, so that the other
+&gt;    memory areas remain untouched?
+
+You can control memory usage of the program almost as good as with pure
+assembler. You may need to write your own startup code and linker config,
+however. The increased memory footprint (compared to an assembler program) may
+be a problem.
+
+&gt; 2- Can I limit zeropage usage in a similar way, so that only addresses
+&gt;    between e.g. $80 and $ff are used by the C program?
+
+The compiled code plus the C and runtime libraries need 24 bytes in the zero
+page. You can move these locations in the zero page by changing the linker
+configuration and/or the startup code.
+
+&gt;   (The call-stack is located in the zeropage, right?)
+
+The call stack is located in page one, while the argument stack is located
+somewhere in memory (the exact location is defined in the linker config). The
+argument stack grows downwards, its size depends on your program.
+
+&gt; 3- I'd like to combine the C program with independent assembler routines
+&gt;   (mouse driver, loader, raster IRQs, music...) - has anyone used such
+&gt;    routines in combination with a C program on the 64?
+
+The compiler comes with a mouse library that works on several platforms (GEOS,
+Atari, C64, C128 and P500). If you don't know cc65 really well, I would
+suggest to write any interrupt stuff in assembler - there are too many things
+that can go wrong when writing interrupt handlers in C.
+
+&gt; 4- Has anyone successfully used the 64's rom routines for file access and
+&gt;    keyboard input?
+
+Calling ROM routines is not a problem, but Marc Rintsch has written CBM BASIC
+compatible file I/O routines, which offer a far nicer C interface. And the
+Atari library supports file real C I/O, something still missing from the
+Commodore parts. Keyboard input as well as text output is available on almost
+all systems via the conio library. You may want to have a look into the
+conio.h header file for a list of the available functions and a short
+description.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20some%20questions">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20some%20questions">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1167.html">Stephan Lesch: "[cc65] some questions"</a>
+<li><strong>In reply to:</strong> <a href="1167.html">Stephan Lesch: "[cc65] some questions"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1169.html">Matt Ackeret: "Re: [cc65] some questions"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-03-15 23:14:41 CET</em>
+</em>
+</small>
+</body>
+</html>

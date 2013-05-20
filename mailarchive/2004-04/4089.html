@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] command line args</title>
+<meta name="Author" content="carlos (carlosofcascade1gmx.net)" />
+<meta name="Subject" content="[cc65] command line args" />
+<meta name="Date" content="2004-04-27" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] command line args</h1>
+<!-- received="Tue Apr 27 09:14:18 2004" -->
+<!-- isoreceived="20040427071418" -->
+<!-- sent="Tue, 27 Apr 2004 09:13:21 +0200" -->
+<!-- isosent="20040427071321" -->
+<!-- name="carlos" -->
+<!-- email="carlosofcascade1gmx.net" -->
+<!-- subject="[cc65] command line args" -->
+<!-- id="004501c42c27$221b7cf0$28f7fea9@acer5j0jdwij8z" -->
+<!-- charset="iso-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4090.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] C64 command line (again)&quot;">Next message</a> ]
+[ <a href="4088.html" title="Greg King: &quot;Re: [cc65] C64 command line (again)&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4091.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] command line args&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: carlos &lt;<a href="mailto:carlosofcascade1gmx.net?Subject=Re:%20[cc65]%20command%20line%20args">carlosofcascade1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-04-27 09:13:21</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hallo Ullrich, 
+
+this mail is a little bit old now(about one week), but it did't make it into the list for some reason(perhaps it was too long). 
+
+Ok,
+
+there are several problems due to lack in the operating system.
+There is no way to give command line args directly after the run command
+like
+run par1,par2,par3 etc., because the interpreter thinks par1 is a line
+number in the program, where it should be started. so the minimum is a
+colon
+after run. run:par1,par2,par3.
+there is another problem, if you want to pass strings as argument like
+run:str1, str2, str3.
+then a string like &quot;monday&quot; will be tokenized into &quot;m&quot;&lt;on&quot;day&quot;. '&quot;' could
+be used to prevent this instead of rem. tokens have there negativ bit set.
+other chars not(except PI=$ff, one could say Pi is it's token itself).
+after you pressed enter on a line, the basic interpreter puts max. 88
+chars
+into a buffer from $0200.
+so, if you use that buffer the command line args are limited (with the
+run)
+to 88 chars.
+
+if someone wants to do program calls like this: fori=0to10:run:i:next, it
+won't work, not because of the
+routine, which gets the args, but because of the interpreter, which resets
+the next pointer after each run
+(leads to a next without for error).
+there could be other commands in from of a run, but they can't be in a
+basic
+program itself, because the startup line is a basic program. so the
+advantage of allowing this is very limited. there is another possibility
+to
+use basic and compiled c code. if you tag the startup line with a line
+number say 10000, then a call from a basic program doing a gosub
+10000:arg1,
+arg2,... could be possible. but isn't this a way too complicate to
+implement? it would then be better to use sys adr,arg1,arg2,arg3.
+
+the conclusion is:
+if you read from screen, the command line args are limited to max. 1000
+chars, which is quite enough and you don't have the problem with
+tokenization. if there are other basic commands in from of a run, there is
+no use for. so don't allow this. the oddest thing, which may happen to
+code,
+which checks the args to be valid, is that it prints out an error
+message.(it could be: enter run at line start)
+another possibility is to search the line, until a run is found and skip
+every command before. but, if there is a print&quot;something&quot; before, you have
+a
+real problem.anyway, i still don't find any use for other commands before
+run.
+if you want to read from the 88 chars buffer, then use &quot; instead of rem,
+to
+prevent tokenization.
+use the basic rom routines as long as possible in the startup process.
+
+my opinion is, that the first comma and the rem is ugly. if you want to
+test
+your program with different parameters and start it very often, the rem
+and
+the first comma, which you alway forget, slows down the code and test
+cycle
+very much.
+
+Greetings Carlos
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Apr 27 09:14:18 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4090.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] C64 command line (again)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4088.html" title="Previous message in the list">Greg King: "Re: [cc65] C64 command line (again)"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4091.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] command line args"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4091.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] command line args"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4089" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4089" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4089" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-04-27 09:14:26 CEST
+</em></small></p>
+</body>
+</html>

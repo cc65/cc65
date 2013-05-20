@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] Atari DIO</title>
+<meta name="Author" content="Shawn Jefferson (sjefferson_at_sd62.bc.ca)">
+<meta name="Subject" content="[cc65] Atari DIO">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] Atari DIO</h1>
+<!-- received="Wed Oct 23 19:18:42 2002" -->
+<!-- isoreceived="20021023171842" -->
+<!-- sent="Wed, 23 Oct 2002 10:18:04 -0700" -->
+<!-- isosent="20021023171804" -->
+<!-- name="Shawn Jefferson" -->
+<!-- email="sjefferson_at_sd62.bc.ca" -->
+<!-- subject="[cc65] Atari DIO" -->
+<!-- id="sdb67783.089@gwmail.sd62.bc.ca" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Shawn Jefferson (<a href="mailto:sjefferson_at_sd62.bc.ca?Subject=Re:%20[cc65]%20Atari%20DIO"><em>sjefferson_at_sd62.bc.ca</em></a>)<br>
+<strong>Date:</strong> 2002-10-23 19:18:04
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1626.html">Greg King: "Re: [cc65] Segments"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1638.html">Christian Groessler: "Re: [cc65] Atari DIO"</a>
+<li><strong>Reply:</strong> <a href="1638.html">Christian Groessler: "Re: [cc65] Atari DIO"</a>
+<li><strong>Reply:</strong> <a href="1648.html">Shawn Jefferson: "Re: [cc65] Atari DIO"</a>
+<li><strong>Reply:</strong> <a href="1664.html">Shawn Jefferson: "Re: [cc65] Atari DIO"</a>
+<li><strong>Reply:</strong> <a href="1666.html">Christian Groessler: "Re: [cc65] Atari DIO"</a>
+<li><strong>Reply:</strong> <a href="1667.html">Shawn Jefferson: "Re: [cc65] Atari DIO"</a>
+<li><strong>Reply:</strong> <a href="1674.html">Shawn Jefferson: "Re: [cc65] Atari DIO"</a>
+<li><strong>Reply:</strong> <a href="../2002-11/1680.html">Christian Groessler: "Re: [cc65] Atari DIO"</a>
+<li><strong>Reply:</strong> <a href="../2002-11/1682.html">Shawn Jefferson: "Re: [cc65] Atari DIO"</a>
+<li><strong>Reply:</strong> <a href="../2002-11/1685.html">Christian Groessler: "Re: [cc65] Atari DIO"</a>
+<li><strong>Reply:</strong> <a href="../2002-11/1686.html">Christian Groessler: "Re: [cc65] Atari DIO"</a>
+<li><strong>Reply:</strong> <a href="../2002-11/1688.html">Shawn Jefferson: "Re: [cc65] Atari DIO"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi,
+
+I have some questions about the Atari dio routines:
+
+1. What is the syntax for calling dio_open?  The docs say that you use 0 for drive 1, and so on.  I want to open drive 6 for read and drive 7 for write.
+
+2. Trying to open these drives gives me _oserror = 130, nonexistant device.  Am I running into a problem of the library only being able to access 4 drives hard-coded into it?  This is using Sparta where I can have 8-9 drives available at once (16 if you use SpartaDos X IIRC.)
+
+3. Christian, would you be willing to fix the code around sector size, so that it is not hardcoded at 128, but rather we could change it ourselves?  Knowing the sector size in my application is not a problem, so if I could set it manually that would be great!  I'm not worried about autodetecting it.
+
+--
+Thanks,
+Shawn
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Atari%20DIO">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1626.html">Greg King: "Re: [cc65] Segments"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1638.html">Christian Groessler: "Re: [cc65] Atari DIO"</a>
+<li><strong>Reply:</strong> <a href="1638.html">Christian Groessler: "Re: [cc65] Atari DIO"</a>
+<li><strong>Reply:</strong> <a href="1648.html">Shawn Jefferson: "Re: [cc65] Atari DIO"</a>
+<li><strong>Reply:</strong> <a href="1664.html">Shawn Jefferson: "Re: [cc65] Atari DIO"</a>
+<li><strong>Reply:</strong> <a href="1666.html">Christian Groessler: "Re: [cc65] Atari DIO"</a>
+<li><strong>Reply:</strong> <a href="1667.html">Shawn Jefferson: "Re: [cc65] Atari DIO"</a>
+<li><strong>Reply:</strong> <a href="1674.html">Shawn Jefferson: "Re: [cc65] Atari DIO"</a>
+<li><strong>Reply:</strong> <a href="../2002-11/1680.html">Christian Groessler: "Re: [cc65] Atari DIO"</a>
+<li><strong>Reply:</strong> <a href="../2002-11/1682.html">Shawn Jefferson: "Re: [cc65] Atari DIO"</a>
+<li><strong>Reply:</strong> <a href="../2002-11/1685.html">Christian Groessler: "Re: [cc65] Atari DIO"</a>
+<li><strong>Reply:</strong> <a href="../2002-11/1686.html">Christian Groessler: "Re: [cc65] Atari DIO"</a>
+<li><strong>Reply:</strong> <a href="../2002-11/1688.html">Shawn Jefferson: "Re: [cc65] Atari DIO"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-10-23 19:20:05 CEST</em>
+</em>
+</small>
+</body>
+</html>

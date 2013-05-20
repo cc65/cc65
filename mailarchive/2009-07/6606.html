@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] &quot;overlay&quot; files</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] &quot;overlay&quot; files" />
+<meta name="Date" content="2009-07-06" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] &quot;overlay&quot; files</h1>
+<!-- received="Mon Jul  6 09:53:45 2009" -->
+<!-- isoreceived="20090706075345" -->
+<!-- sent="Mon, 6 Jul 2009 09:53:38 +0200" -->
+<!-- isosent="20090706075338" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] &quot;overlay&quot; files" -->
+<!-- id="f97798c20907060053l4d3db4ax2c2edf31661aae5@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20090705212955.GB3896&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6607.html" title="Per Olofsson: &quot;Re: [cc65] &quot;overlay&quot; files&quot;">Next message</a> ]
+[ <a href="6605.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] &quot;overlay&quot; files&quot;">Previous message</a> ]
+[ <a href="6605.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] &quot;overlay&quot; files&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6607.html" title="Per Olofsson: &quot;Re: [cc65] &quot;overlay&quot; files&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20&amp;quot;overlay&amp;quot;%20files">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-07-06 09:53:38</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt; The Contiki version for the apple developed and maintained by Oliver does both
+&gt; things. Maybe he can give you a few hints. Looking at the Contiki sources is
+&gt; another option.
+
+Here we go...
+
+When it comes to loading code at runtime you may first think about the
+loadable modules feature of the cc65 linker. However the special thing
+about these modules is that they are relocatable. But to keep the
+runtime loader/relocator small it does _NOT_ resolve external
+references from the module into the static code. There's a hack used
+in Contiki 1.x to have those references resolved anyway and I can
+provide hints if necessary.
+
+But if you &quot;only&quot; want to load different pieces of code at a fixed
+address known at link time I'd rather suggest to have the cc65 linker
+write several files and load them into that fixed address using
+straight file I/O. I explained this approach in detail incl. sample
+code / sample linker config in a usenet thread:
+<a href="http://groups.google.de/group/comp.sys.apple2.programmer/browse_thread/thread/729db7aa540a74f0">http://groups.google.de/group/comp.sys.apple2.programmer/browse_thread/thread/729db7aa540a74f0</a>
+
+Regarding the initialization I did the initial work in Contiki 1.x
+which I than mostly ported &quot;back&quot; into the cc65 Apple2 C-Library
+startup code. The general idea is to put everything being part of the
+INIT segment at the end of the generated binary file. So it get's
+loaded into memory where later the BSS will reside. The startup code
+copies (not relocates) the INIT segment content behind the BSS and
+then jumps to it. This allows to have all initialization code incl.
+BSS zero-ing etc. to reside in the INIT segment. Later on the INIT
+segment will be overwritten by the heap or stack.
+- If you generally want to have that behaviour on any of the other
+cc65 targets you (or someone else - maybe a target maintainer ;-)
+would need to model the startup code in the way described above. Uz
+however already marked all suitable stuff (i.e. the constructors) in
+the sources shared between the targets as belonging to the INIT
+segment :-)
+- To have your own code be part of that game is technically easy: Just
+put the stuff in question into the INIT segment. However the question
+is, when/how to call it.
+a) As first statement in main() when the heap is still empty and the
+stack still small - dirty but will most probably just work.
+b) As part of the C-Library initialization through a constructor.
+Clean but only for assembler code and requiring additional knowledge
+for instance about the order of constructor execution to make sure
+your code gets called last:
+<a href="http://www.cc65.org/doc/ca65-10.html#ss10.14">http://www.cc65.org/doc/ca65-10.html#ss10.14</a>
+
+Good luck, Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Jul  6 09:53:45 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6607.html" title="Next message in the list">Per Olofsson: "Re: [cc65] &quot;overlay&quot; files"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6605.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] &quot;overlay&quot; files"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6605.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] &quot;overlay&quot; files"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6607.html" title="Next message in this discussion thread">Per Olofsson: "Re: [cc65] &quot;overlay&quot; files"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6606" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6606" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6606" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-07-06 09:53:48 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] Graphics library</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] Graphics library">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] Graphics library</h1>
+<!-- received="Mon Aug 13 22:21:20 2001" -->
+<!-- isoreceived="20010813202120" -->
+<!-- sent="Mon, 13 Aug 2001 22:20:19 +0200" -->
+<!-- isosent="20010813202019" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] Graphics library" -->
+<!-- id="537220059.20010813222019@gmx.net" -->
+<!-- inreplyto="20010813220929.A2511@martin.ancher.org" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20Graphics%20library"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2001-08-13 22:20:19
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0633.html">David M. Lloyd: "Re: [cc65] Graphics library"</a>
+<li><strong>Previous message:</strong> <a href="0631.html">Mike McCarty: "Re: [cc65] Graphics library"</a>
+<li><strong>In reply to:</strong> <a href="0627.html">M Ancher: "Re: [cc65] Graphics library"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0646.html">daniel pralle: "Re: [cc65] Graphics library"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello M,
+
+MA&gt; To be honest, functions like putpixel(int x, int y) are kinda useless.
+
+to be honest, thats nonsence ,=) w/o putpixel(x,y), how do you plot a
+pixel to the screen ? (or any other thing for that matter ,=))
+
+MA&gt; I think most people could use functions that write a whole block of memory.
+MA&gt; The function could be
+MA&gt; void drawMemBlock(int xPos, int yPos, int width, int height, int* memLocation).
+MA&gt; &quot;memLocation&quot; should have the format of simple 2-bit graphics. One bit per
+MA&gt; pixel.
+MA&gt; The routine would be quite simple as bytes could be copied directly if
+MA&gt; (xPos % 8) == 0, else the byte has to be rotated first. (This is very
+MA&gt; simplified, but I do not think it is a complicated routine.)
+
+unless you'd plan to wait ages for your routine to complete, that
+routine will eat PLENTY of memory though.
+
+MA&gt; Secondly I think this routine would be very fast compared to putPixel(x, y).
+
+ONLY ... and ONLY if the memory location of the blocks you are moving
+are strictly aligned to 8x8 boundaries... THEN its a
+simple-as-simple-can-be bytecopy... anything beyond that =&gt; dead slow
+;=)
+
+however, i'd say that blitting a block to gfx memory should be
+considered a standard feature aswell... not because its fast or the
+only needed thing, but because... it IS a standard feature ,=)
+
+(yes, plotting simple TEXT aswell!)
+
+MA&gt; I think people will often need to display some small graphics than display
+MA&gt; lines or cicles, if graphics-routines existed.
+
+well as for me, _I_ wouldnt use any other feature EXCEPT putpixel ;=)
+(since i'd basically checkout/test/develop/playwith some gfx-algo
+which i'd later recode in assembler). as for me, _I_ wouldnt have use
+for a block-blitting routine since ehrm.... what for? ;=)
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20Graphics%20library">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20Graphics%20library">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0633.html">David M. Lloyd: "Re: [cc65] Graphics library"</a>
+<li><strong>Previous message:</strong> <a href="0631.html">Mike McCarty: "Re: [cc65] Graphics library"</a>
+<li><strong>In reply to:</strong> <a href="0627.html">M Ancher: "Re: [cc65] Graphics library"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0646.html">daniel pralle: "Re: [cc65] Graphics library"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:41 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] malloc and Sort.c(26): Error:</title>
+<meta name="Author" content="Greg Long (greg_at_maneuveringspeed.com)">
+<meta name="Subject" content="[cc65] malloc and Sort.c(26): Error: Expression expected">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] malloc and Sort.c(26): Error: Expression expected</h1>
+<!-- received="Tue Mar  4 07:47:30 2003" -->
+<!-- isoreceived="20030304064730" -->
+<!-- sent="Mon, 3 Mar 2003 22:46:20 -0800" -->
+<!-- isosent="20030304064620" -->
+<!-- name="Greg Long" -->
+<!-- email="greg_at_maneuveringspeed.com" -->
+<!-- subject="[cc65] malloc and Sort.c(26): Error: Expression expected" -->
+<!-- id="004f01c2e219$c3b90ea0$8001a8c0@ENDEAVOR" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Greg Long (<a href="mailto:greg_at_maneuveringspeed.com?Subject=Re:%20[cc65]%20malloc%20and%20Sort.c(26):%20Error:%20Expression%20expected"><em>greg_at_maneuveringspeed.com</em></a>)<br>
+<strong>Date:</strong> 2003-03-04 07:46:20
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2558.html">Groepaz: "[cc65] testsuite - compiler bugs!"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2560.html">Marko Mäkelä: "Re: [cc65] malloc and Sort.c(26): Error: Expression expected"</a>
+<li><strong>Reply:</strong> <a href="2560.html">Marko Mäkelä: "Re: [cc65] malloc and Sort.c(26): Error: Expression expected"</a>
+<li><strong>Reply:</strong> <a href="2566.html">Ullrich von Bassewitz: "Re: [cc65] malloc and Sort.c(26): Error: Expression expected"</a>
+<li><strong>Reply:</strong> <a href="2579.html">Christian Krüger: "Re: [cc65] malloc and Sort.c(26): Error: Expression expected"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Is there an unusual syntax for malloc?  I notice it doesn't like to take
+anything but a constant.
+
+The real curious thing is how it generates an error on the line of code
+FOLLOWING the use of malloc. In my example below line 20 is fine
+
+I'm used to ANSI and MS C++, but not C - which I'm brand new to. I
+wouldn't imagine there are any C++ compilers for the 6502?
+
+Having said these gripes...it looks like a wonderful compiler vs. the
+alternative of coding in Assembly...if I can just get anything to
+compile!
+
+My code which has the trouble:
+
+#include &lt;stdlib.h&gt;
+#include &lt;time.h&gt;
+#include &lt;conio.h&gt;
+
+int main()
+{
+	unsigned int size = 5000;
+    
+	unsigned int* ra; //declare array
+	ra = (unsigned int*) malloc(sizeof(unsigned int[size] ));
+	
+	unsigned int i = size;//line 20
+
+	//generate random numbers
+	while(i)
+	{
+		ra[i] = rand();
+		--i;
+	}
+	return 0;
+}
+
+
+/*	The errors:
+ShellSort.c(18): Error: Constant expression expected
+ShellSort.c(20): Error: Expression expected
+ShellSort.c(20): Error: `;' expected
+ShellSort.c(20): Error: Expression expected
+ShellSort.c(20): Error: `;' expected
+ShellSort.c(20): Error: Expression expected
+ShellSort.c(20): Error: `;' expected
+ShellSort.c(20): Error: Expression expected
+ShellSort.c(20): Error: `;' expected
+ShellSort.c(20): Error: Expression expected
+ShellSort.c(20): Error: `;' expected
+ShellSort.c(20): Fatal: Too many errors
+*/
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20malloc%20and%20Sort.c(26):%20Error:%20Expression%20expected">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2558.html">Groepaz: "[cc65] testsuite - compiler bugs!"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2560.html">Marko Mäkelä: "Re: [cc65] malloc and Sort.c(26): Error: Expression expected"</a>
+<li><strong>Reply:</strong> <a href="2560.html">Marko Mäkelä: "Re: [cc65] malloc and Sort.c(26): Error: Expression expected"</a>
+<li><strong>Reply:</strong> <a href="2566.html">Ullrich von Bassewitz: "Re: [cc65] malloc and Sort.c(26): Error: Expression expected"</a>
+<li><strong>Reply:</strong> <a href="2579.html">Christian Krüger: "Re: [cc65] malloc and Sort.c(26): Error: Expression expected"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-03-04 07:48:18 CET</em>
+</em>
+</small>
+</body>
+</html>

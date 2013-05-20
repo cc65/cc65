@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] __IRQFUNC_*__</title>
+<meta name="Author" content="Adam Dunkels (adam1sics.se)" />
+<meta name="Subject" content="Re: [cc65] __IRQFUNC_*__" />
+<meta name="Date" content="2004-09-15" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] __IRQFUNC_*__</h1>
+<!-- received="Wed Sep 15 10:38:41 2004" -->
+<!-- isoreceived="20040915083841" -->
+<!-- sent="Wed, 15 Sep 2004 10:38:06 +0200" -->
+<!-- isosent="20040915083806" -->
+<!-- name="Adam Dunkels" -->
+<!-- email="adam1sics.se" -->
+<!-- subject="Re: [cc65] __IRQFUNC_*__" -->
+<!-- id="1095237486.341.19.camel@strumpa.sics.se" -->
+<!-- inreplyto="16711.63208.564690.983302&#64;panini.cling.gu.se" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4434.html" title="MagerValp: &quot;Re: [cc65] __IRQFUNC_*__&quot;">Next message</a> ]
+[ <a href="4432.html" title="Adam Dunkels: &quot;Re: [cc65] slightly OT: contiki and internet&quot;">Previous message</a> ]
+[ <a href="4431.html" title="MagerValp: &quot;[cc65] __IRQFUNC_*__&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4434.html" title="MagerValp: &quot;Re: [cc65] __IRQFUNC_*__&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Adam Dunkels &lt;<a href="mailto:adam1sics.se?Subject=Re:%20[cc65]%20__IRQFUNC_*__">adam1sics.se</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-09-15 10:38:06</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Wed, 2004-09-15 at 10:01, MagerValp wrote:
+&gt; I get this when trying to compile my code with a recent snapshot:
+&gt; 
+&gt; cl65 -o rsvp.prg -C rsvp.cfg -m rsvp.map -Oirs -t c64 rsvp.o game.o deck.o pointer.o screen.o graphics.o menu.o intro.o levels.o inputline.o hiscore.o
+&gt; ld65: Warning: rsvp.cfg(10): Segment `LOWCODE' does not exist
+&gt; Unresolved external `__IRQFUNC_COUNT__' referenced in:
+&gt;   callirq.s(26)
+&gt;   crt0.s(12)
+&gt; Unresolved external `__IRQFUNC_TABLE__' referenced in:
+&gt;   callirq.s(26)
+&gt; ld65: Error: 2 unresolved external(s) found - cannot create output
+&gt; file
+&gt; make: *** [rsvp.prg] Error 1
+
+I was bitten by this myself some time ago and and added the following
+lines to the FEATURES section in the linker configuration file: 
+
+    # condes functions with type 2 are called in the interrupt
+    CONDES: segment = RODATA,
+            type = 2,
+            label = __IRQFUNC_TABLE__,
+            count = __IRQFUNC_COUNT__;
+
+But I don't really know what they do :-)
+
+/adam
+-- 
+Adam Dunkels &lt;adam&#64;sics&#46;<!--nospam-->se&gt;
+<a href="http://www.sics.se/~adam/">http://www.sics.se/~adam/</a>
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Sep 15 10:38:41 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4434.html" title="Next message in the list">MagerValp: "Re: [cc65] __IRQFUNC_*__"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4432.html" title="Previous message in the list">Adam Dunkels: "Re: [cc65] slightly OT: contiki and internet"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4431.html" title="Message to which this message replies">MagerValp: "[cc65] __IRQFUNC_*__"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4434.html" title="Next message in this discussion thread">MagerValp: "Re: [cc65] __IRQFUNC_*__"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4434.html" title="Message sent in reply to this message">MagerValp: "Re: [cc65] __IRQFUNC_*__"</a></li>
+<li><dfn>Reply</dfn>:  <a href="4437.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] __IRQFUNC_*__"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4433" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4433" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4433" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-09-15 10:38:50 CEST
+</em></small></p>
+</body>
+</html>

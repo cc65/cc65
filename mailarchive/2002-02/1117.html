@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Character set translation</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] Character set translation">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Character set translation</h1>
+<!-- received="Fri Feb 15 11:13:15 2002" -->
+<!-- isoreceived="20020215101315" -->
+<!-- sent="Fri, 15 Feb 2002 11:12:52 +0100" -->
+<!-- isosent="20020215101252" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] Character set translation" -->
+<!-- id="1823930647.20020215111252@gmx.net" -->
+<!-- inreplyto="20020214224229.A12456@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Character%20set%20translation"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2002-02-15 11:12:52
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1116.html">Matt Ackeret: "Re: [cc65] dummy questions..."</a>
+<li><strong>In reply to:</strong> <a href="1115.html">Ullrich von Bassewitz: "[cc65] Character set translation"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1118.html">Ullrich von Bassewitz: "Re: [cc65] Character set translation"</a>
+<li><strong>Next in thread:</strong> <a href="1099.html">groepaz: "[cc65] NT: www.cc65.org down ?"</a>
+<li><strong>Reply:</strong> <a href="1118.html">Ullrich von Bassewitz: "Re: [cc65] Character set translation"</a>
+<li><strong>Reply:</strong> <a href="1121.html">Mike McCarty: "Re: [cc65] Character set translation"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+Thursday, February 14, 2002, 10:42:29 PM, you wrote:
+
+
+UvB&gt; On Thu, Feb 14, 2002 at 10:06:00PM +0100, groepaz wrote:
+&gt;&gt; ok... just hacked some kind character test crap proggy.... while you
+&gt;&gt; are at it, add these .... :o)
+
+UvB&gt; These two are ok and I will add them:
+
+&gt;&gt; _      0x5f    0xaf
+&gt;&gt; |      0x7c    0x7d
+
+UvB&gt; But I'm not sure about the others. Is it really a good idea to map the
+UvB&gt; backslash to the forward slash,
+
+i thought atleast mapping the backslash to _something_ more readable
+than it is now would make sence..... the way its now kinda sux ;/
+
+i also thought that mapping a character to another one which is
+already used may introduce other problems, thats why i suggested the
+back-arrow for the backslash as alternative....
+
+UvB&gt; and some other characters to line drawing
+UvB&gt; characters?
+
+it'd work much better in uppercase-petscii actually (you have a
+backslash there and also characters that kindof represent the tilde
+and curly braces...... no lowercase letters then ofcoz ;D)
+
+UvB&gt; Please note that I'm not saying that it is a bad idea (I'm not
+UvB&gt; sure about it), I'm just trying not to be hasty.
+
+i guess we should simply evaluate what kinda problems it could
+trigger.... if there are potentially none, there shouldnt be a reason
+not to do it :o) (and ofcoz, if it'd just introduce other nasty
+problems at another point, please do NOT do it ;=P)
+
+whatever, couldnt you just introduce a #pragma or sth for the compiler
+so anyone can handle that crap like he wants themselves?
+
+#pragma charmap 0x20 0x60      /* replace spaces by shift-spaces */
+
+sth like that?
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Character%20set%20translation">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Character%20set%20translation">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1116.html">Matt Ackeret: "Re: [cc65] dummy questions..."</a>
+<li><strong>In reply to:</strong> <a href="1115.html">Ullrich von Bassewitz: "[cc65] Character set translation"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1118.html">Ullrich von Bassewitz: "Re: [cc65] Character set translation"</a>
+<li><strong>Next in thread:</strong> <a href="1099.html">groepaz: "[cc65] NT: www.cc65.org down ?"</a>
+<li><strong>Reply:</strong> <a href="1118.html">Ullrich von Bassewitz: "Re: [cc65] Character set translation"</a>
+<li><strong>Reply:</strong> <a href="1121.html">Mike McCarty: "Re: [cc65] Character set translation"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-02-15 11:13:31 CET</em>
+</em>
+</small>
+</body>
+</html>

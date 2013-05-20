@@ -1,0 +1,52 @@
+# HG changeset patch
+# User Daniel Serpell <daniel.serpell@gmail.com>
+# Date 1260021287 10800
+# Branch trunk
+# Node ID 65fa1916cb7e9d37253e9c849e8c1ee79818cfb6
+# Parent  2a51326fd5b76ba55ba87ff32a42f51ae34d4464
+Merge uppercasing with copy filename to stack.
+
+diff --git a/libsrc/atari/ucase_fn.s b/libsrc/atari/ucase_fn.s
+--- a/libsrc/atari/ucase_fn.s
++++ b/libsrc/atari/ucase_fn.s
+@@ -66,12 +66,18 @@
+ 	sty	tmp3		; save size
+ 	jsr	subysp		; make room on the stack
+ 
+-	; copy filename to the temp. place on the stack
++	; copy filename to the temp. place on the stack, also uppercasing it
+ 	lda	#0		; end-of-string
+ 	sta	(sp),y		; Y still contains length + 1
+ 	dey
+ loop2:	lda	(ptr4),y
+ 	sta	(sp),y
++	bmi	L1		; Not lowercase (also, invalid, should reject)
++	cmp	#'a'
++	bcc	L1		; Not lowercase
++	and	#$DF		; make upper case char, assume ASCII chars
++	sta	(sp),y		; store back
++L1:
+ 	dey
+ 	bpl	loop2		; bpl: this way we only support a max. length of 127
+ 
+@@ -96,20 +102,7 @@
+ 	sta	(sp),y		; insert device name (normally 'D' or 'H')
+ hasdev2:
+ .endif
+-	; uppercase the temp. filename
+-	ldy	#0
+ 
+-ucloop:	lda	(sp),y	; get character
+-	beq	uc_end		; jump if done
+-	bmi	L1		; Not lowercase (also, invalid, should reject)
+-	cmp	#'a'
+-	bcc	L1		; Not lowercase
+-	and	#$DF		; make upper case char, assume ASCII chars
+-	sta	(sp),y		; store back
+-L1:	iny	    		; next char
+-	bne	ucloop
+-
+-uc_end:
+ 	; leave A and X pointing to the modified filename
+ 	lda	sp
+ 	ldx	sp+1

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Best method for building p</title>
+<meta name="Author" content="Kevin Schuetz (scrapdog1runbox.com)" />
+<meta name="Subject" content="Re: [cc65] Best method for building projects" />
+<meta name="Date" content="2010-04-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Best method for building projects</h1>
+<!-- received="Sat Apr 10 06:37:10 2010" -->
+<!-- isoreceived="20100410043710" -->
+<!-- sent="Fri, 09 Apr 2010 23:36:50 -0500" -->
+<!-- isosent="20100410043650" -->
+<!-- name="Kevin Schuetz" -->
+<!-- email="scrapdog1runbox.com" -->
+<!-- subject="Re: [cc65] Best method for building projects" -->
+<!-- id="4BC00062.2010104@runbox.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="n2h1adf4c761004092057s61f30c72mc939130a858fb317&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8039.html" title="Oliver Schmidt: &quot;Re: [cc65] Best method for building projects&quot;">Next message</a> ]
+[ <a href="8037.html" title="Payton Byrd: &quot;[cc65] Best method for building projects&quot;">Previous message</a> ]
+[ <a href="8037.html" title="Payton Byrd: &quot;[cc65] Best method for building projects&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8040.html" title="Oliver Schmidt: &quot;Re: [cc65] Best method for building projects&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Kevin Schuetz &lt;<a href="mailto:scrapdog1runbox.com?Subject=Re:%20[cc65]%20Best%20method%20for%20building%20projects">scrapdog1runbox.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-04-10 06:36:50</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 4/9/2010 10:57 PM, Payton Byrd wrote:
+&gt; I'm looking to get back into things a bit and wanted to set up a 
+&gt; development environment under windows 7.  I've installed GNU Make into 
+&gt; my cc65 bin directory so everything is there.
+
+If you are on Windows, MinGW + MSYS will help you a lot.  In fact, I'd 
+recommend against putting GNU Make into the CC65 bin directory, as MSYS 
+includes make.
+
+<a href="http://www.mingw.org/wiki/MSYS">http://www.mingw.org/wiki/MSYS</a>
+
+Just install MSYS and add the relevant bin directories to your path 
+variable (for example, mine includes &quot;... 
+;e:\programs\mingw-64\bin;e:\programs\mingw\bin;e:\programs\msys\1.0\bin; ...&quot;)
+
+This will make it much easier to make more portable makefiles, since it 
+provides a lot of the tools available in Unix and bash.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Apr 10 06:37:10 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8039.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Best method for building projects"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8037.html" title="Previous message in the list">Payton Byrd: "[cc65] Best method for building projects"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8037.html" title="Message to which this message replies">Payton Byrd: "[cc65] Best method for building projects"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8040.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Best method for building projects"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8040.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Best method for building projects"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8038" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8038" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8038" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-04-10 06:37:12 CEST
+</em></small></p>
+</body>
+</html>

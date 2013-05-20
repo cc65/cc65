@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Cursory analyses of CBM readdir bug (</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)" />
+<meta name="Date" content="2012-09-22" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)</h1>
+<!-- received="Sat Sep 22 20:15:57 2012" -->
+<!-- isoreceived="20120922181557" -->
+<!-- sent="Sat, 22 Sep 2012 20:15:15 +0200" -->
+<!-- isosent="20120922181515" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)" -->
+<!-- id="20120922181515.GX12722@trikaliotis.net" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="20120914143959.GE12722&#64;trikaliotis.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10898.html" title="Shawn Jefferson: &quot;RE: [cc65] Re: readdir bug&quot;">Next message</a> ]
+[ <a href="10896.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] tgi_outtext bug&quot;">Previous message</a> ]
+[ <a href="10850.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Re: readdir bug&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10901.html" title="Oliver Schmidt: &quot;Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20Cursory%20analyses%20of%20CBM%20readdir%20bug%20(was:%20[cc65]%20Re:%20readdir%20bug)">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-09-22 20:15:15</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello,
+
+just a short follow-up for the reasons of this behaviour:
+
+* On Fri, Sep 14, 2012 at 04:39:59PM +0200 I wrote:
+ 
+&gt; The dir file is not real file. Instead, it is implemented somehow
+&gt; &quot;hacky&quot; in the 1541. As normally, it is LOADed into RAM, this bug does
+&gt; not happen as LOAD reads the dir byte after byte, without any
+&gt; intervening actions. BUT: The test programs (Oliver's as well as mine)
+&gt; do other operations, which trigger the bug.
+
+The directory read routine uses the same &quot;directory file matcher&quot; that
+is also used when using other commands, or opening a file.
+
+Thus, when an LOAD &quot;$&quot;,8 is issued (or the equivalent), the 1541
+rewrites it to LOAD &quot;$:*&quot;,8 (cf. an older post by me).
+
+Now, the 1541 analyses the command line, reads in the &quot;*&quot; and configures
+the &quot;directory&quot; matcher to find all files that look like &quot;*&quot; - that is,
+all files.
+
+The directory read routine now matches one file after the other against
+this matcher. If it matches (here, all do), then that file is output to
+the directory channel.
+
+
+If you read another file in between (for example, LOAD &quot;file1&quot;,8), then
+the matcher is reconfigured to find &quot;file1&quot;. After the file has been
+found, the matcher of the directory routine has switched to &quot;file1&quot;.
+
+Thus, subsequent calls do not find any more directory entries. Even
+worse, the routine is so much confused because other variables have been
+rewritten that it even outputs the directory header again. (I did not
+check all the details, I only had a cursory look)
+
+
+Now, you may ask, why do we still read 8 entries? I expect it to be
+because the directory routine does not output one byte after the other;
+instead, it fills a buffer and then lets the normal file processing take
+place. This buffer has room for exactly 8 entries. Thus, after 8 entries
+have been read, the next buffer to be filled gets confused and thus
+outputs wrong bytes.
+
+Again, this is a very cursory view, but it makes sense now.
+
+Regards,
+Spiro.
+
+-- 
+Spiro R. Trikaliotis
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Sep 22 20:15:57 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10898.html" title="Next message in the list">Shawn Jefferson: "RE: [cc65] Re: readdir bug"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10896.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] tgi_outtext bug"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10850.html" title="Message to which this message replies">Spiro Trikaliotis: "Re: [cc65] Re: readdir bug"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10901.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10901.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10897" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10897" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10897" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-09-22 20:16:01 CEST
+</em></small></p>
+</body>
+</html>

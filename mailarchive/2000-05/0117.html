@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] repeating code blocks</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] repeating code blocks">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] repeating code blocks</h1>
+<!-- received="Tue May 23 00:02:05 2000" -->
+<!-- isoreceived="20000522220205" -->
+<!-- sent="Tue, 23 May 2000 00:01:43 +0200" -->
+<!-- isosent="20000522220143" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] repeating code blocks" -->
+<!-- id="20000523000143.A3148@trixie.musoftware.de" -->
+<!-- inreplyto="3929A2D9.EF394CCA@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20repeating%20code%20blocks"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2000-05-23 00:01:43
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0118.html">Groepaz: "Re: [cc65] repeating code blocks"</a>
+<li><strong>Previous message:</strong> <a href="0116.html">Groepaz: "Re: [cc65] repeating code blocks"</a>
+<li><strong>In reply to:</strong> <a href="0116.html">Groepaz: "Re: [cc65] repeating code blocks"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0118.html">Groepaz: "Re: [cc65] repeating code blocks"</a>
+<li><strong>Reply:</strong> <a href="0118.html">Groepaz: "Re: [cc65] repeating code blocks"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Mon, May 22, 2000 at 11:12:57PM +0200, Groepaz wrote:
+&gt; well, the reason *why* i expected the linker to act like it does when &quot;fill=yes&quot;
+&gt; is, that you can assign a memory adress to a segment. if the linker wont use
+&gt; this value anyway, what should it be good for? like, if it will end up in one
+&gt; clumsy binary anyway, why bother about having segments at all?
+
+I have explained it in some older mail, but here is it again: 
+
+There is a difference between relocation and placement. The linker does both,
+but it is not the same. You may relocate a piece of code to run at address
+$1000 but place it at address $2000. The address given in the memory area
+statement is the relocation address. Code put into this area is relocated to
+run at the given address. The placement of the code is a result of several
+other statements and the load address of the resulting binary file.
+
+Most other 6502 development tools don't make a difference between relocation
+and placement (in fact, many available tools do not even support relocatable
+intermediate files). This may be the reason, why the concept looks strange on
+the first glance.
+
+&gt; &quot;fill=no&quot; WOULD make sence incase you would write out the different segments
+&gt; to seperated files and then link them together to a runable c64 exe with some
+&gt; other tool. then again, why using a linker and write out tons of files that
+&gt; you have to link together afterwards to run them...
+
+fill=yes would mean that you will *always* get a file with the size of the
+memory area. This means that any assembler program that uses something like
+the standard memory configuration will be 54K in size, even a simple &quot;hello
+world&quot; with 40 bytes of code+data. I don't think that people will like this
+default, and that it will cause a lot of questions.
+
+Regards
+
+
+	Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20repeating%20code%20blocks">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20repeating%20code%20blocks">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0118.html">Groepaz: "Re: [cc65] repeating code blocks"</a>
+<li><strong>Previous message:</strong> <a href="0116.html">Groepaz: "Re: [cc65] repeating code blocks"</a>
+<li><strong>In reply to:</strong> <a href="0116.html">Groepaz: "Re: [cc65] repeating code blocks"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0118.html">Groepaz: "Re: [cc65] repeating code blocks"</a>
+<li><strong>Reply:</strong> <a href="0118.html">Groepaz: "Re: [cc65] repeating code blocks"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:36 CET</em>
+</em>
+</small>
+</body>
+</html>

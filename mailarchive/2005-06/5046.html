@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Re: signals</title>
+<meta name="Author" content="dominic beesley (dominic1brahms.demon.co.uk)" />
+<meta name="Subject" content="Re: [cc65] Re: signals" />
+<meta name="Date" content="2005-06-02" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Re: signals</h1>
+<!-- received="Thu Jun  2 17:08:53 2005" -->
+<!-- isoreceived="20050602150853" -->
+<!-- sent="Thu, 02 Jun 2005 15:54:40 +0100" -->
+<!-- isosent="20050602145440" -->
+<!-- name="dominic beesley" -->
+<!-- email="dominic1brahms.demon.co.uk" -->
+<!-- subject="Re: [cc65] Re: signals" -->
+<!-- id="429F1DB0.90208@brahms.demon.co.uk" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="050602135504&#64;arcade.demon.co.uk" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5047.html" title="Andy Dannelley: &quot;Re: [cc65] Changes between 2.10.1 and current 2.10.5?&quot;">Next message</a> ]
+[ <a href="5045.html" title="Andy Dannelley: &quot;Re: [cc65] Changes between 2.10.1 and current 2.10.5?&quot;">Previous message</a> ]
+[ <a href="5043.html" title="Jonathan Graham Harston: &quot;[cc65] Re: signals&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: dominic beesley &lt;<a href="mailto:dominic1brahms.demon.co.uk?Subject=Re:%20[cc65]%20Re:%20signals">dominic1brahms.demon.co.uk</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-06-02 16:54:40</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Jonathan Graham Harston wrote:
+
+&gt;&gt;Message-ID: &lt;429C4ADE.6080801&#64;brahms&#46;<!--nospam-->demon.co.uk&gt;
+&gt;&gt;    
+&gt;&gt;
+&gt; 
+&gt;dominic beesley &lt;dominic&#64;brahms&#46;<!--nospam-->demon.co.uk&gt; wrote:
+&gt;  
+&gt;
+&gt;&gt;What if the user presses break, what if I _dont_ set up an
+&gt;&gt;Escape handler and the user presses Escape. What if a program is
+&gt;&gt;in a long loop (doing file stuff) and the user presses Escape
+&gt;&gt;and nothing happens? they'll press Break and make just as much
+&gt;&gt;of a mess.
+&gt;&gt;    
+&gt;&gt;
+&gt; 
+&gt;There are many instances where pressing Escape &quot;does nothing&quot;,
+&gt;because the computer is in the middle of something and hasn't got
+&gt;to the end and checked the escape flag yet.
+&gt; 
+&gt;  *SAVE name 0+1000000
+&gt; 
+&gt;isn't going to respond to the Escape flag being set until it has
+&gt;finished.  PLOT 96 (draw a circle) isn't going to check the Escape
+&gt;flag until it has stopped drawing. A really impatient user could
+&gt;get bored at any time and press Break. If the user presses Break
+&gt;they deserve whatever they get. 
+&gt; 
+&gt;  
+&gt;
+I don't mean things like that I mean if, for instance a C program is 
+stuck in a
+long processing loop. Or a program has been ported from linux (unlikely I
+know ;)) that expects to get a SIG_INT when you're sick of it...
+
+&gt;&gt;Also on many you've got to be careful about what you expect to
+&gt;&gt;be safe; structures may be half updated, variables not correctly
+&gt;&gt;set (although this is probably worse in 6502 as even a simple
+&gt;&gt;increment on a 16bit no. will take a number of instructions).
+&gt;&gt;    
+&gt;&gt;
+&gt; 
+&gt;If you abort on the background Escape event in the middle of:
+&gt; 
+&gt;  strcpy(src,dst);
+&gt; 
+&gt;then the destination memory will be left in an inconsistant state.
+&gt; 
+&gt;  
+&gt;
+During the signal handler yes. This as far as I understand is true in many
+circumstances on other platforms and signal handlers should take this into
+account.
+
+&gt; 
+&gt; 
+&gt;  
+&gt;
+&gt;&gt;It looks as if there are two camps on this, those that dont want any form of
+&gt;&gt;out-of-band signals sue to escape and those that do. I think I may put
+&gt;&gt;all this
+&gt;&gt;stuff in the BBC library but have it compile-time switchable some how
+&gt;&gt;(either
+&gt;&gt;when compiling the end program or when compiling the library).
+&gt;&gt;    
+&gt;&gt;
+&gt; 
+&gt;That's the solution I was working towards with Small-C. Let the
+&gt;programmer chose whether to use os_checkescape() themselves, or
+&gt;allow the Escape event to abort the program instead of setting the
+&gt;Escape flag.
+&gt; 
+&gt;I'm now thinkinking of adding another os_* escape function, that
+&gt;does something like:
+&gt; 
+&gt;os_something()
+&gt;{
+&gt;if !os_checkescape() return(void);
+&gt;os_byte(126, 0);
+&gt;os_error(17, &quot;Escape&quot;);
+&gt;}
+&gt; 
+&gt;so mainline code can just call os_something() and have the error
+&gt;generation done for it if an escape state is set.
+&gt;  
+&gt;
+That will be available (when I've finished the os_... veneers in cc65) too
+hopefully. I was thinking of doing something along the lines of !OSLib
+with xos_... returning a pointer to a err, errstr, 0 block or os_ form
+aborting to os
+
+Before I go off and do that I think it would be worth us synchronising
+our os_... APIs. I've done a first crack but mostly in assembler at
+moment for use by the C library. I'm happy to re-do (or use yours if
+they're suitable for cc56)
+
+&gt; 
+&gt;Now I've got my BBC hard drive interface working, I really should
+&gt;copy the C compiler over to is and do some more work on it.
+&gt; 
+&gt;  
+&gt;
+I know this is off topic but how well do these work? I'm definitely 
+interested
+in having one here! (Please reply by private email to this one or we'll 
+be miles
+off topic!)
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Jun  2 17:08:53 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5047.html" title="Next message in the list">Andy Dannelley: "Re: [cc65] Changes between 2.10.1 and current 2.10.5?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5045.html" title="Previous message in the list">Andy Dannelley: "Re: [cc65] Changes between 2.10.1 and current 2.10.5?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5043.html" title="Message to which this message replies">Jonathan Graham Harston: "[cc65] Re: signals"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5046" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5046" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5046" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-06-02 17:08:56 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Serial port API</title>
+<meta name="Author" content="MagerValp (MagerValp_at_cling.gu.se)">
+<meta name="Subject" content="Re: [cc65] Serial port API">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Serial port API</h1>
+<!-- received="Mon Nov  5 18:30:38 2001" -->
+<!-- isoreceived="20011105173038" -->
+<!-- sent="Mon, 5 Nov 2001 18:28:30 +0100" -->
+<!-- isosent="20011105172830" -->
+<!-- name="MagerValp" -->
+<!-- email="MagerValp_at_cling.gu.se" -->
+<!-- subject="Re: [cc65] Serial port API" -->
+<!-- id="15334.52286.139142.811488@panini.cling.gu.se" -->
+<!-- inreplyto="5021992206.20011105165710@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> MagerValp (<a href="mailto:MagerValp_at_cling.gu.se?Subject=Re:%20[cc65]%20Serial%20port%20API"><em>MagerValp_at_cling.gu.se</em></a>)<br>
+<strong>Date:</strong> 2001-11-05 18:28:30
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0919.html">groepaz: "Re[2]: [cc65] Serial port API"</a>
+<li><strong>Previous message:</strong> <a href="0917.html">MagerValp: "Re: [cc65] Serial port API"</a>
+<li><strong>In reply to:</strong> <a href="0913.html">groepaz: "Re: [cc65] Serial port API"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0919.html">groepaz: "Re[2]: [cc65] Serial port API"</a>
+<li><strong>Reply:</strong> <a href="0919.html">groepaz: "Re[2]: [cc65] Serial port API"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+&gt;&gt;&gt;&gt;&gt; &quot;gpz&quot; == groepaz  &lt;<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Serial%20port%20API">groepaz_at_gmx.net</a>&gt; writes:
+
+gpz&gt; a) baudrate is obviously an unsigned long
+
+gpz&gt; b) wordlength/parity/stopbit parameters are fixed at 8n1 ...
+gpz&gt; programming that kinda stuff for ~10 years i have never ever seen
+gpz&gt; anything else used.... if you'd ever need 5o2 or sth i am sure
+gpz&gt; you can implement it yourself ;=P
+
+8N2 is often overlooked -- sometimes it makes it possible to use a
+higher baudrate. 115200 8N2 might be stable where 115200 8N1 isn't,
+and it's 80% faster than 57600 8N1.
+
+MV&gt; Can you control the timeout value?
+
+gpz&gt; no :o) again, i have done that kinda stuff for long and this way
+gpz&gt; it always worked perfectly fine for me (infact thats not even a
+gpz&gt; real timeout but &quot;check data $ffff times max.&quot; ,=))
+
+Well, that works nicely, we're not multitasking or anything :)
+
+MV&gt; [serslave specs]
+
+gpz&gt; reading this, i'd really think we should work together a bit ;=P
+
+I'll release this under the GPL. I'd send it to you straight away, but
+I haven't implemented SAVE yet so I can't transfer the TASS source :)
+
+gpz&gt; actually a fileserver is among the features planned for the
+gpz&gt; debugger i am working on (actually one of the few things NOT
+gpz&gt; implemented by now), and a .d64 reciever is planned for the
+gpz&gt; retro-replay software (my debugger would be serving data on the
+gpz&gt; pc side for that)....
+
+Feel free to use whatever you want. I'm writing the server in Perl,
+but the protocol is simple and could easily be implemented in the
+language of your choice. Right now it's limited to a single command.
+C64 sends &lt;NAME\r\n and the PC answers with ? if it for some reason
+can't send NAME, otherwise it sends a ! followed by the length of the
+file. Then it just sends the raw PRG binary. If the C64 tries to load
+$ the server lists the current dir and makes a basic listing out of
+it, just like a real drive. If NAME is a directory the server CDs
+there and sends a listing (just like $). Saving will be implemented
+with &gt;NAME\r\n (duh :) followed by the length, wait for ? or !, then
+raw data. Oh, it supports @0: too.
+  This is good enough for load and save, but open and more advanced
+drive emulation needs some sort of packet protocol and a much larger
+driver. I probably won't bother.
+
+gpz&gt; also, i have designed the debugger code in a way so that it can
+gpz&gt; easily support whatever target is connected, so i'd happily
+gpz&gt; support your c64 end aswell. (only thing beeing kinda hard at
+gpz&gt; this point, i wouldnt have a swithlink for testing ;=P)
+
+I don't mind testing for you. You'd only have to change a few low
+level routines:
+
+; set the SwiftLink register addresses
+
+A_rxd	= $DE00		; ACIA receive data port
+A_txd	= $DE00		; ACIA transmit data port
+A_sts	= $DE01		; ACIA status port
+A_res	= $DE01		; ACIA reset port
+A_cmd	= $DE02		; ACIA command port
+A_ctl	= $DE03		; ACIA control port
+A_t232	= $DE07		; T232 control
+
+; initialise
+
+	STA A_res	; soft reset (value not important)
+
+	LDA #$0B	; set specific modes and functions
+			; no parity, no echo, no Tx interrupt
+	STA A_cmd	; no Rx interrupt, enable Tx/Rx
+
+for swiftlink:
+	LDA #$1F	; 8-N-1, 38400 baud
+	STA A_ctl
+
+for turbo232:
+	LDA #$10	; 8-N-1, T232 mode
+	STA A_ctl
+;	LDA #$00	; 230400
+	LDA #$01	; 115200
+;	LDA #$02	;  57600
+	STA A_t232
+
+; To send a character all we need do is wait for the Tx buffer to
+; empty then write the byte.
+
+; wait for ACIA and Tx byte
+
+	PHA			; save A
+WAIT_Tx
+	LDA	A_sts		; get status byte
+	AND	#$10		; mask transmit buffer status flag
+	BEQ	WAIT_Tx		; loop if tx buffer full
+
+	PLA			; restore A
+	STA	A_txd		; save byte to ACIA data port
+
+; To receive a character we need to wait for the Rx buffer to fill
+; then read the byte.
+
+; wait for ACIA and Rx byte
+
+WAIT_Rx
+	LDA	A_sts		; get ACIA status
+	AND	#$08		; mask rx buffer status flag
+	BEQ	WAIT_Rx		; loop if rx buffer empty
+
+	LDA	A_rxd		; get byte from ACIA data port
+
+-- 
+    ___          .     .  .         .       . +  .         .      o   
+  _|___|_   +   .  +     .     +         .   .  Per Olofsson, konstnär
+    o-o    .      .     .   o         +          <a href="mailto:MagerValp_at_cling.gu.se?Subject=Re:%20[cc65]%20Serial%20port%20API">MagerValp_at_cling.gu.se</a>
+     -       +            +    .     <a href="http://www.cling.gu.se/~cl3polof/">http://www.cling.gu.se/~cl3polof/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Serial%20port%20API">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0919.html">groepaz: "Re[2]: [cc65] Serial port API"</a>
+<li><strong>Previous message:</strong> <a href="0917.html">MagerValp: "Re: [cc65] Serial port API"</a>
+<li><strong>In reply to:</strong> <a href="0913.html">groepaz: "Re: [cc65] Serial port API"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0919.html">groepaz: "Re[2]: [cc65] Serial port API"</a>
+<li><strong>Reply:</strong> <a href="0919.html">groepaz: "Re[2]: [cc65] Serial port API"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:43 CET</em>
+</em>
+</small>
+</body>
+</html>

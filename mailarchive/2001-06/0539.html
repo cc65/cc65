@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] optimizer?</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] optimizer?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] optimizer?</h1>
+<!-- received="Sun Jun 24 21:33:16 2001" -->
+<!-- isoreceived="20010624193316" -->
+<!-- sent="Sun, 24 Jun 2001 21:32:30 +0200" -->
+<!-- isosent="20010624193230" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] optimizer?" -->
+<!-- id="9625462635.20010624213230@gmx.net" -->
+<!-- inreplyto="20010624210806.B32601@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20optimizer?"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2001-06-24 21:32:30
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0540.html">Ullrich von Bassewitz: "Re: [cc65] optimizer?"</a>
+<li><strong>Previous message:</strong> <a href="0538.html">Ullrich von Bassewitz: "Re: [cc65] optimizer?"</a>
+<li><strong>In reply to:</strong> <a href="0538.html">Ullrich von Bassewitz: "Re: [cc65] optimizer?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0540.html">Ullrich von Bassewitz: "Re: [cc65] optimizer?"</a>
+<li><strong>Reply:</strong> <a href="0540.html">Ullrich von Bassewitz: "Re: [cc65] optimizer?"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+UvB&gt; I found the idea behind this peephole optimizer interesting and I've done some
+UvB&gt; tests with Daniels sources. However, any of my source files went through this
+UvB&gt; program unchanged.
+
+like i said... this optimization stage is usually not needed for
+hand-written code.... i just use that to make sure that i dont recycle
+totally stupid old code of mine that should better be rewritten from
+scratch ;=))
+
+UvB&gt; This sounds nice, but improvements are probably limited. I haven't tried
+UvB&gt; illegal opcodes for now, but my experiences with 65C02 code are somewhat
+UvB&gt; disapointing. Improvements (both speed and size) are somewhere in the range of
+UvB&gt; one percent or lower and portability is a problem. I would assume that the
+UvB&gt; advantages of using illegal opcodes (which are often not very useful) are even
+UvB&gt; lower.
+
+yes, like i said, using illegals only makes sence in some rare
+cases... the most common one i think is
+
+replace sth like
+
+       lda something
+       tax
+
+by
+
+       lax something
+
+i have rarely seen any other illegals used except LAX.... well, except
+for copy-protection (making code hard to read in disassemblers)...
+
+UvB&gt; [...]
+
+UvB&gt; It would be nice to see how these proposed changes affect existing code. As
+UvB&gt; said above, I've tried Daniels code and it had no effect on my sources
+UvB&gt; whatsoever.
+
+UvB&gt; Some of your proposed additions are also dangerous, since they may
+UvB&gt; defeat knowledge, the programmer has put into the code (maybe in this special
+UvB&gt; section of code, VALUE is zero more often than not zero?), so they should be
+UvB&gt; switcheable.
+
+well, ofcoz optimization should be somehow control-able on sourcecode
+level..... so the programmer can exclude certain routines of which he
+knows they are already optimal.... other than that, all those
+optimization would never break the code (result in non-working code)
+but instead _maybe_ make it perform worse than before.... that can
+easily be determined through profiling (aka testing ;D) though, so i
+guess one can live with that.
+
+UvB&gt; If you really get something like this running I would be interested in some
+UvB&gt; results. There is one file in the cc65 C library (the free() function in
+UvB&gt; free.s) where I know that a few instructions can be removed by clever
+UvB&gt; rewriting/rearranging. I've avoided to do that, because the module is quite
+UvB&gt; complex and the changes would obfuscate the code even more. If your optimizer
+UvB&gt; manages to actually fix these locations, I would assume it's pretty good.
+
+well... uhm.... _I_ would need the optimizer for use on large unrolled
+loops only (which are in itself relativly trivial) so i'd use
+different properties than needed for optimizing relativly small, but
+rather complex routines...... good to know theres a potential routine
+for testing though ;=)
+
+UvB&gt; Another idea would be to let such an optimizer work on binary code. There are
+UvB&gt; some additional problems (optimizations of hardware accesses are dangerous,
+UvB&gt; and code addresses loaded as 8 bit values into registers must be detected and
+UvB&gt; handled), but other problems (like handling complex expressions) would vanish
+UvB&gt; completely.
+
+uhm well... would there be a real difference in optimizing binary vs
+assembler code ? (except with assembler code you get much more
+information about the code structure, dont have to guess code adresses
+that are loaded as 8bit lo/hi pairs etc)
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20optimizer?">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20optimizer?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0540.html">Ullrich von Bassewitz: "Re: [cc65] optimizer?"</a>
+<li><strong>Previous message:</strong> <a href="0538.html">Ullrich von Bassewitz: "Re: [cc65] optimizer?"</a>
+<li><strong>In reply to:</strong> <a href="0538.html">Ullrich von Bassewitz: "Re: [cc65] optimizer?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0540.html">Ullrich von Bassewitz: "Re: [cc65] optimizer?"</a>
+<li><strong>Reply:</strong> <a href="0540.html">Ullrich von Bassewitz: "Re: [cc65] optimizer?"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:40 CET</em>
+</em>
+</small>
+</body>
+</html>

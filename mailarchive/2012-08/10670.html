@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Filenames for POSIX functi</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Filenames for POSIX functins on CBM targets" />
+<meta name="Date" content="2012-08-12" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Filenames for POSIX functins on CBM targets</h1>
+<!-- received="Sun Aug 12 17:18:38 2012" -->
+<!-- isoreceived="20120812151838" -->
+<!-- sent="Sun, 12 Aug 2012 17:18:22 +0200" -->
+<!-- isosent="20120812151822" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Filenames for POSIX functins on CBM targets" -->
+<!-- id="2392423644902637018@unknownmsgid" -->
+<!-- charset="windows-1252" -->
+<!-- inreplyto="20120812122206.GN1982&#64;trikaliotis.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10671.html" title="A.Fachat: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">Next message</a> ]
+[ <a href="10669.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">Previous message</a> ]
+[ <a href="10669.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10678.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Filenames%20for%20POSIX%20functins%20on%20CBM%20targets">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-08-12 17:18:22</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt; Why shouldn't they? I expect if I set _curunit to 1, then the program
+&gt; written for the floppy should also work for the tape (if it does not do
+&gt; any fancy disk specific stuff).
+&gt;
+&gt; So, they should be cross-target, yes.
+
+1. The program won't build on other taegets as there's no _curunit.
+
+2. The other targets likely don't have tape drives to be accessed via open().
+
+&gt; If this is not the case, it will not be possible to open some files
+&gt; written some 20 years ago.
+
+Something I personally could live well with.
+
+&gt; Given that even on one platform only (CBM), it is not possible to find
+&gt; &quot;disallowed&quot; characters to use a separators, I can only imagine how hard
+&gt; it is to integrate the other platforms, too.
+
+Again - Im _NOT_ looking for a single path syntax for all targets! I'm
+only looking for _SOME_ path syntax on every target. But the CBMs have
+none at all. Therefore there's no need at all to find such a char.
+
+&gt; BTW: You are aware that even Unix/Windows have some differences? While
+&gt; open(&quot;2:hallo&quot;) will happily work on Unix, it will not work on Windows -
+&gt; that is, it will work on Windows with NTFS, but the result will be
+&gt; different from what most people would expect. With FAT, it will not
+&gt; work. With ReFS
+&gt; (<a href="https://blogs.msdn.com/b/b8/archive/2012/01/16/building-the-next-generation-file-system-for-windows-refs.aspx?Redirected=true">https://blogs.msdn.com/b/b8/archive/2012/01/16/building-the-next-generation-file-system-for-windows-refs.aspx?Redirected=true</a>),
+&gt; I am not sure, as it will not support alternate data streams.
+
+I hope that it is a joke to ask me if I'm aware that there are path
+syntax differences between OSes…
+
+&gt; You, on the other hand, seem to expect the cc65 RTL to be an OS in
+&gt; itself, which neglects the nifty details of each platform (which file
+&gt; names are allowed, which are not?). Am I right?
+
+No, you are wrong. There's still this misunderstanding. I explicitky
+want to stay clear from any type of emulation layer.
+
+Classic MacOS and *IX and DOS and Windows and Apple II ProDOS and &lt;you
+name it&gt; all have rheir own path syntax - and that's fine.
+
+The only thing I want to say is that you need _some_ path syntax to
+write meaningful POSIX programs. So if a target has none one needs to
+be invented.
+
+I.e. the same would be true for Apple DOS 3.3 ...
+
+&gt; Having said this: fopen() is a different beast to me. [...]
+
+
+I'm pretty this is no viable option.
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Aug 12 17:18:38 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10671.html" title="Next message in the list">A.Fachat: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10669.html" title="Previous message in the list">Spiro Trikaliotis: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10669.html" title="Message to which this message replies">Spiro Trikaliotis: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10678.html" title="Next message in this discussion thread">Spiro Trikaliotis: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10678.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10681.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10670" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10670" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10670" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-08-12 17:18:42 CEST
+</em></small></p>
+</body>
+</html>

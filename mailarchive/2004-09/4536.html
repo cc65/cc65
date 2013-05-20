@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-15" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re[2]: [cc65] cfg-files and the linke</title>
+<meta name="Author" content="Mats Andrén (matan3251student.liu.se)" />
+<meta name="Subject" content="Re[2]: [cc65] cfg-files and the linker and so on.." />
+<meta name="Date" content="2004-09-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re[2]: [cc65] cfg-files and the linker and so on..</h1>
+<!-- received="Sat Sep 25 20:59:54 2004" -->
+<!-- isoreceived="20040925185954" -->
+<!-- sent="Sat, 25 Sep 2004 21:01:15 +0200" -->
+<!-- isosent="20040925190115" -->
+<!-- name="Mats Andrén" -->
+<!-- email="matan3251student.liu.se" -->
+<!-- subject="Re[2]: [cc65] cfg-files and the linker and so on.." -->
+<!-- id="65559672.20040925210115@student.liu.se" -->
+<!-- charset="ISO-8859-15" -->
+<!-- inreplyto="200409251709.48767.groepaz&#64;gmx.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4537.html" title="Groepaz: &quot;Re: Re[2]: [cc65] cfg-files and the linker and so on..&quot;">Next message</a> ]
+[ <a href="4535.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] SuSE fake package&quot;">Previous message</a> ]
+[ <a href="4529.html" title="Groepaz: &quot;Re: [cc65] cfg-files and the linker and so on..&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4537.html" title="Groepaz: &quot;Re: Re[2]: [cc65] cfg-files and the linker and so on..&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Mats Andrén &lt;<a href="mailto:matan3251student.liu.se?Subject=Re[2]:%20[cc65]%20cfg-files%20and%20the%20linker%20and%20so%20on..">matan3251student.liu.se</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-09-25 21:01:15</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt;&gt; Any suggestion for a better cfg-file for me?
+
+&gt; you are thinking to complicated :) you dont need a special config at all...
+&gt; write your player like this:
+
+&gt; [...]
+
+&gt; assemble that, and link it to your c-program...the linker will take
+&gt; care of relocating it and placing it memory so it fits.
+
+&gt; then if you later want to create a &quot;standalone&quot; version of your player
+&gt; (and music data) -traditionally starting at $1000-, then use a simple
+&gt; config file that places stuff at $1000 (and dont link the startup code
+&gt; ofcourse).
+
+&gt; mmmh...hope that helps :)
+
+Yeah, hmm.. I get your point. However, the reason for wanting me to
+have things this way was that I want to be able to save the player
+together with the tune when people are finished with their tune. Then
+it would be convenient just to have it lying around at $1000 so it
+could just be dumped to disk, straight away. Also, I would not have to
+&quot;translate&quot; pointers to music data and that stuff, when saving all the
+stuff to disk. But, then again, I'm new to this kind of hifi coding
+and maybe I should rethink this whole program structure issue a bit..
+;) 
+
+Thanks for your answer!
+
+/Mats
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Sep 25 20:59:54 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4537.html" title="Next message in the list">Groepaz: "Re: Re[2]: [cc65] cfg-files and the linker and so on.."</a></li>
+<li><dfn>Previous message</dfn>: <a href="4535.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] SuSE fake package"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4529.html" title="Message to which this message replies">Groepaz: "Re: [cc65] cfg-files and the linker and so on.."</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4537.html" title="Next message in this discussion thread">Groepaz: "Re: Re[2]: [cc65] cfg-files and the linker and so on.."</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4537.html" title="Message sent in reply to this message">Groepaz: "Re: Re[2]: [cc65] cfg-files and the linker and so on.."</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4536" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4536" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4536" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-09-25 21:00:03 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] bug or feature: unnamed la</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] bug or feature: unnamed labels across scopes" />
+<meta name="Date" content="2012-07-30" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] bug or feature: unnamed labels across scopes</h1>
+<!-- received="Mon Jul 30 12:05:03 2012" -->
+<!-- isoreceived="20120730100503" -->
+<!-- sent="Mon, 30 Jul 2012 12:04:49 +0200" -->
+<!-- isosent="20120730100449" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] bug or feature: unnamed labels across scopes" -->
+<!-- id="20120730100449.GB5802@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="trinity-f75e5b57-9251-41d2-8293-3f6fb30a27fc-1343574909381&#64;3capp-webde-bs30" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10532.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] [ca65] Include dir behaviour change between 2.13.3 and 2.13.9&quot;">Next message</a> ]
+[ <a href="10530.html" title="Oliver Schmidt: &quot;Re: [cc65] C64 POSIX dirent stuff actually working?&quot;">Previous message</a> ]
+[ <a href="10529.html" title="Andre Fachat: &quot;[cc65] bug or feature: unnamed labels across scopes&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10533.html" title="A. Fachat: &quot;Re: [cc65] bug or feature: unnamed labels across scopes&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20bug%20or%20feature:%20unnamed%20labels%20across%20scopes">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-07-30 12:04:49</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Sun, Jul 29, 2012 at 05:15:09PM +0200, Andre Fachat wrote:
+&gt; while investigating unnamed labels, I found that they are not bound by scope blocks.
+
+Yes, that is correct.
+
+&gt; Is this intentional, or a bug?
+
+It is intentional. Scopes organizes symbols, but unnamed labels are by
+definition not symbols. And, unnamed labels are a mess when used with larger
+pieces of code, but scopes are used mostly with larger sections of code. And
+last, unnamed labels don't play very well with scopes. You can say foo::bar to
+access a symbol bar in the scope foo, but how would you do that with scopes?
+
+If you can come up with a good reason, why unnamed labels should adhere
+scoping rules, then I will think about changing the semantics. I for my part
+cannot think of any such reason.
+
+However, it might be a good idea to mention it in the docs, just for
+completeness sake.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Jul 30 12:05:03 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10532.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] [ca65] Include dir behaviour change between 2.13.3 and 2.13.9"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10530.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] C64 POSIX dirent stuff actually working?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10529.html" title="Message to which this message replies">Andre Fachat: "[cc65] bug or feature: unnamed labels across scopes"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10533.html" title="Next message in this discussion thread">A. Fachat: "Re: [cc65] bug or feature: unnamed labels across scopes"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10533.html" title="Message sent in reply to this message">A. Fachat: "Re: [cc65] bug or feature: unnamed labels across scopes"</a></li>
+<li><dfn>Reply</dfn>:  <a href="../2012-08/10537.html" title="Message sent in reply to this message">A. Fachat: "Re: [cc65] bug or feature: unnamed labels across scopes"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10531" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10531" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10531" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-07-30 12:05:08 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] wrong colors in conio</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] wrong colors in conio">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] wrong colors in conio</h1>
+<!-- received="Mon Dec  9 00:14:17 2002" -->
+<!-- isoreceived="20021208231417" -->
+<!-- sent="Mon, 9 Dec 2002 01:39:14 +0100" -->
+<!-- isosent="20021209003914" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] wrong colors in conio" -->
+<!-- id="200212090139.14615.groepaz@gmx.net" -->
+<!-- inreplyto="87fzt97fak.fsf@gibbon.cnet.aladdin.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20wrong%20colors%20in%20conio"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2002-12-09 01:39:14
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1912.html">Groepaz: "Re: [cc65] Weird problems with LoadKoala"</a>
+<li><strong>In reply to:</strong> <a href="1904.html">Christian Groessler: "Re: [cc65] wrong colors in conio"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1915.html">MagerValp: "Re: [cc65] wrong colors in conio"</a>
+<li><strong>Next in thread:</strong> <a href="1881.html">MagerValp: "Re: [cc65] Think I found a cc65 bug"</a>
+<li><strong>Reply:</strong> <a href="1915.html">MagerValp: "Re: [cc65] wrong colors in conio"</a>
+<li><strong>Reply:</strong> <a href="1918.html">Ullrich von Bassewitz: "Re: [cc65] wrong colors in conio"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Saturday 07 December 2002 21:19, Christian Groessler wrote:
+&gt; Hi,
+&gt;
+&gt; On 12/07/2002 11:22:54 AM CET Groepaz wrote:
+&gt; &gt;On Friday 06 December 2002 23:44, Christian Groessler wrote:
+&gt; &gt;&gt; Use bgcolor() to set the color. textcolor() only selects the luminance
+&gt; &gt;&gt; of the text.
+&gt; &gt;
+&gt; &gt;that shouldnt be the case though
+&gt;
+&gt; But it is. (See description of 40x24 Atari text mode.)
+
+haha lol, well what i mean is, that if the atari doesnt have any colors in 
+textmode, the textcolor() function should have NO effect at all, instead of 
+doing something undefined. if you'd like a function for setting brightness 
+(or luminance or tint or whatever) you should define a function that does 
+just that instead of abusing an api that was defined to be portable.
+
+&gt; &gt;&gt; The c64-compatible COLOR_xxx defines don't make much
+&gt; &gt;&gt; sense in this context.
+&gt; &gt;
+&gt; &gt;ehrm... in what sence is something like &quot;COLOR_RED&quot; c64 specific? (or are
+&gt; &gt; you saying someone just cut'n'pasted the values? :=P)
+&gt;
+&gt; They are in that way c64 specific in that they duplicate the 16 possible
+&gt; colors of the c64. (Maybe not that accurate, I'm color
+&gt; blinded). 
+
+at that point please notice that &quot;c64 colors&quot; is somewhat equal to &quot;primary 
+colors, secondary colors and some shades of grey&quot; which is pretty much the 
+most basic selection of colors available (also very simelar to the 4bit 
+windoze colortable if i remember right)... IMHO it does even make sence to 
+define these instead of others, since every color-capable videocircuit 
+(unless taken from the ibm-pc stoneage ;=P haha) can produce simelar colors. 
+(accuracy doesnt really matter here does it?)
+
+&gt; Should I invent 128 new COLOR_xxx values for all
+&gt; possible Atari colors?
+
+didnt you say the atari doesnt have colours in textmode? :o)
+
+/me scratches head...makes note to UZ: &quot;tgi has own colordefinitions?&quot;
+
+however if you are really concerned about a colorful border...yeah define them 
+:o) hehe (i _think_ the original borland api defined sth like &quot;max 16 colors&quot; 
+for exactly that reason - it doesnt make sence to define more than the most 
+basic colors.....generally, if you cant name the colour with one word, do not 
+define it :o))
+
+&gt; &gt;&gt; The brightness is specified by bits 1 to 3 of
+&gt; &gt;&gt; the colorvalue, use textcolor (0xe) for max. bightness, or
+&gt; &gt;&gt; textcolor(0) for max. darkness of the text.
+&gt; &gt;
+&gt; &gt;looks to me as if someone was a bit lazy with the implementation here :o)
+&gt;
+&gt; Don't think so. What more do you suggest to implement?
+
+nothing, just if the atari doesnt have colors for text, it shouldnt implement 
+something unrelated through a well defined api :)
+
+imagine someone like me writes a tetris clone using the conio-api, and he uses 
+colors. i cant test on atari (since i dont have one, nor found or even 
+searched for an emu yet ;=)), so i test on a c64 and the various cbm-machines 
+emulated by VICE. now if my program works alright with any of these 
+(including the plus4 which has different colors than c64 aswell, and the pet 
+which has no colors at all) i should be well able to rely on the fact the 
+conio-api was designed for portability, and that it WILL work (unless the 
+implementation is faulty - which it seems to be.)
+
+however, i see two ways to fix this here...
+
+a) fix your headerfiles in a way that colors are estimated, and non-available 
+colors are substituted by &quot;white&quot; (for historical reasons, since the terminal 
+background is supposed to be black). this may allow you to use your &quot;faulty&quot; 
+conio implementation in a portable way, and still get the &quot;undefined&quot; 
+behavior. however if some program you try to port uses absolute values for 
+colors instead of the defines you are in trouble. (needless to say not using 
+the defines make the program non-portable...but anyway :o)) this also creates 
+new problems on your side, for example if you can use all the colors in 
+bgcolor but not textcolor. (it will however still NOT break portability, just 
+limit use of colors more than it had to)
+
+b) fix your implementation in a way that it complies a &quot;no color&quot; 
+implementation, that is remove the color-defines alltogether and let the 
+textcolor function have no effect. this ofcoz means that you can no longer 
+use textcolor() for setting brightness, but i dont think creating another 
+function/macro for that would be a problem ;)
+
+oh..and there might be 
+
+c) request an api-change/adaption that invents a macro like
+
+#define COLOR_INTENSITY(x)	(x&lt;&lt;4)
+
+which returns a value that must be ORed into the textcolor, ie
+
+textcolor(COLOR_INTENSITY(7)|COLOR_RED);
+
+(this is almost how it works in the borland api btw :o))
+
+however, c) is probably quite tricky to solve and it generates new problems... 
+i say go for b) :o) (i did the same for the vic20 at the weekend actually, 
+which made the tetris thing work nicely without any changes at its code... 
+and thats what all the fuzz is about :o))
+
+-- 
+          ___ ___ .___________________ .___________ _______.
+    c=64 /   |   \|   \__    ___/     \ \_   _____/ \      \ [groepaz]
+     gb /    '    \   | |    | /  \ /  \ |    __)_  /   |   \ gp32
+    cgb \    .    /   | |    |/    '    \|        \/    |    \ psx
+     gba \___|_  /|___| |____|\____|__  /_______  /\____|__  / dc
+          -----\/-----'---------------\/--------\/---------\/
+       <a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    Hitmen WWW Headquarters
+       <a href="http://fly.to/hitmen-groepaz">http://fly.to/hitmen-groepaz</a>     my personal playground
+       <a href="http://rr.c64.org/silversurfer">http://rr.c64.org/silversurfer</a>   home of the RR debugger
+       ftp.musoftware.de/pub/groepaz    cc65 dump site
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20wrong%20colors%20in%20conio">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1912.html">Groepaz: "Re: [cc65] Weird problems with LoadKoala"</a>
+<li><strong>In reply to:</strong> <a href="1904.html">Christian Groessler: "Re: [cc65] wrong colors in conio"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1915.html">MagerValp: "Re: [cc65] wrong colors in conio"</a>
+<li><strong>Next in thread:</strong> <a href="1881.html">MagerValp: "Re: [cc65] Think I found a cc65 bug"</a>
+<li><strong>Reply:</strong> <a href="1915.html">MagerValp: "Re: [cc65] wrong colors in conio"</a>
+<li><strong>Reply:</strong> <a href="1918.html">Ullrich von Bassewitz: "Re: [cc65] wrong colors in conio"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-12-09 00:15:16 CET</em>
+</em>
+</small>
+</body>
+</html>

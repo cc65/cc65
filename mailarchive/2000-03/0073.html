@@ -1,0 +1,182 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: RE: [cc65] Atari port of cc65</title>
+<meta name="Author" content="cpg_at_aladdin.de (cpg_at_aladdin.de)">
+<meta name="Subject" content="RE: [cc65] Atari port of cc65">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>RE: [cc65] Atari port of cc65</h1>
+<!-- received="Fri Mar 10 01:40:12 2000" -->
+<!-- isoreceived="20000310004012" -->
+<!-- sent="Fri, 10 Mar 2000 01:41:55 +0100" -->
+<!-- isosent="20000310004155" -->
+<!-- name="cpg_at_aladdin.de" -->
+<!-- email="cpg_at_aladdin.de" -->
+<!-- subject="RE: [cc65] Atari port of cc65" -->
+<!-- id="4125689E.000494F2.00@saturn.aladdin.de" -->
+<!-- inreplyto="[cc65] Atari port of cc65" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> <a href="mailto:cpg_at_aladdin.de?Subject=RE:%20[cc65]%20Atari%20port%20of%20cc65"><em>cpg_at_aladdin.de</em></a><br>
+<strong>Date:</strong> 2000-03-10 01:41:55
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0074.html">Ullrich von Bassewitz: "Re: [cc65] Atari port of cc65"</a>
+<li><strong>Previous message:</strong> <a href="0072.html">Ullrich von Bassewitz: "Re: [cc65] faulty random generator"</a>
+<li><strong>Maybe in reply to:</strong> <a href="0069.html">Ullrich von Bassewitz: "[cc65] Atari port of cc65"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0074.html">Ullrich von Bassewitz: "Re: [cc65] Atari port of cc65"</a>
+<li><strong>Reply:</strong> <a href="0074.html">Ullrich von Bassewitz: "Re: [cc65] Atari port of cc65"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi Mark,
+
+On 03/09/2000 04:38:18 PM GMT Mark Keates wrote:
+&gt;
+&gt;It's early days, we have got the basic framework there and
+&gt;support for cputc and now I'm looking at the file i/o support.
+
+It's similar here, most is working but no file io. All still needs
+some final cleanup.
+
+&gt;&gt; I've attached a diff for the cc65 snapshot as of Mar-05 which
+&gt;&gt; incorporates my Atari changes.
+&gt;&gt;
+&gt;It appears that you've kept a lot of the original sources from
+&gt;John Dunning's Atari CC65. Ullrich's port has (nicely) moved
+&gt;many of the functions in a common area, hence we have stripped
+&gt;these away from the our version. I did like what you have done
+&gt;with the Header/Tail wrapping for DOS loading.
+
+First:  I've put the original diff which got stuck in the mailing list
+on <a href="ftp://ftp.aladdin.de/pub/people/chris/cc65">ftp://ftp.aladdin.de/pub/people/chris/cc65</a> . I've also made 2
+zips, similar to your's and put them there. So everyone who is
+interested: get it from this place!
+(The diff is for cc65 version as of Mar-05-2000. You should be
+able to obtain this from the cc65 CVS repository. Use the -D option
+for checkout.)
+
+I don't think I've used overly much of the original Dunning
+code. The patch I've sent to you moves those files into an
+&quot;old&quot; directory, therefore they appear very prominently in
+the patch file...
+
+&gt;Can you summarise the areas you have updated?
+
+Hmm, I simply started looking at the apple2 lib,
+which files were there. Then I  tried to implement those
+files for Atari. Yes, if there was a similar file in the
+old (John Dunning) directory, I used this
+
+I've looked now at more of your code, and there are reallly
+many files very similar (e.g.gotoxy.s), some are different.
+Some are missing in my version, but I think they are
+simply copied from JRD and non working yet (e.g. rename.c)?
+
+One of the  biggest differences I found is in cputc.s. You use the CIO
+for this, my version writes directly to screen. I also had a CIO
+version before, but I changed it, because I think the conio stuff
+(and so cputc, compared to putc) is optimized for speed!?
+What do you (and others) think?
+
+With the crt0.s, both our versions have their benefits and deficiencies,
+IMO. They should be merged :-)
+
+Btw, to use the zips from above mentioned ftp site,
+one has to make the same changes to lib/Makefile like
+with your zip, and the following change to binutils/ld65/target.c:
+
+---------------
+static const char CfgAtari [] =
+    &quot;MEMORY {&quot;
+        &quot;HEADER: start = $0000, size = $6, file = %O;&quot;
+        &quot;RAM: start = $3000, size = $c000, file = %O;&quot;
+    &quot;}&quot;
+    &quot;SEGMENTS {&quot;
+        &quot;EXEHDR: load = HEADER, type = wprot;&quot;
+        &quot;CODE: load = RAM, type = wprot, define = yes;&quot;
+        &quot;RODATA: load = RAM, type = wprot;&quot;
+        &quot;DATA: load = RAM, type = rw;&quot;
+        &quot;BSS: load = RAM, type = bss, define = yes;&quot;
+        &quot;AUTOSTRT: load = RAM, type = wprot;&quot;
+    &quot;}&quot;;
+---------------
+
+I here define a EXEHDR segment, which contains
+the data for the Atari DOS EXE header, and an additional
+segment  AUTOSTRT, which provides autostart when
+loaded from plain DOS. (see crt0.s on how both are
+set up).
+
+The RAM start ($3000) is currently an ad-hoc value,
+I would prefer a possibility to define an address at
+link time  (this works with %S), and fall back to some
+default value (specified here in target.c) if no &quot;-S&quot;
+switch is given at link time. I don't know whether
+this is possible with current ld scripts?  (Uz?)
+Similarly I would like to specify the size of  RAM
+to something like &quot;$c000-start&quot;. Is this possible?
+
+Finally, Mark, I think we should go thru our files in
+lib/atari and decide file by file which version to use,
+and merge files if both have unique stuff. What do you
+think?
+
+regards.
+chris
+
+
+PS: we're still using/adapting much JRD stuff. Does anybody
+know about his current whereabouts?
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=RE:%20[cc65]%20Atari%20port%20of%20cc65">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0074.html">Ullrich von Bassewitz: "Re: [cc65] Atari port of cc65"</a>
+<li><strong>Previous message:</strong> <a href="0072.html">Ullrich von Bassewitz: "Re: [cc65] faulty random generator"</a>
+<li><strong>Maybe in reply to:</strong> <a href="0069.html">Ullrich von Bassewitz: "[cc65] Atari port of cc65"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0074.html">Ullrich von Bassewitz: "Re: [cc65] Atari port of cc65"</a>
+<li><strong>Reply:</strong> <a href="0074.html">Ullrich von Bassewitz: "Re: [cc65] Atari port of cc65"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:35 CET</em>
+</em>
+</small>
+</body>
+</html>

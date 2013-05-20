@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] The Contiki Desktop OS fo</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] The Contiki Desktop OS for cc65">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] The Contiki Desktop OS for cc65</h1>
+<!-- received="Fri Mar 14 19:05:10 2003" -->
+<!-- isoreceived="20030314180510" -->
+<!-- sent="Fri, 14 Mar 2003 19:05:06 +0100" -->
+<!-- isosent="20030314180506" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] The Contiki Desktop OS for cc65" -->
+<!-- id="20030314180505.GA20317@trixie.musoftware.de" -->
+<!-- inreplyto="se71a08b.064@gwmail.sd62.bc.ca" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20The%20Contiki%20Desktop%20OS%20for%20cc65"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-03-14 19:05:06
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2769.html">Shawn Jefferson: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>In reply to:</strong> <a href="2769.html">Shawn Jefferson: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2771.html">Shawn Jefferson: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Next in thread:</strong> <a href="2720.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Maybe reply:</strong> <a href="2720.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Maybe reply:</strong> <a href="2721.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Maybe reply:</strong> <a href="2742.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Fri, Mar 14, 2003 at 09:27:25AM -0800, Shawn Jefferson wrote:
+&gt; I think banking is going to be the best way to do it on the Atari... if that would work!
+
+Here's another suggestion, nothing spectacular, but it can improve the
+situation a bit: Playing with the sources I found out that adding a
+__fastcall__ to the declaration of show_statustext() in www.c will save almost
+50 bytes. Of course, the savings depend on how many times the function is
+called, but with just one call, it comes out even. So I would suggest adding a
+__fastcall__ to at least all of the CTK functions. This can be wrapped in a
+macro, so it's compatible with other compilers:
+
+        #if defined(__CC65__)
+        #  define ctk_decl      __fastcall__
+        #else
+        #  define ctk_decl
+        #endif
+
+I would say that between 500 and 1000 bytes could be saved by making
+&quot;fastcall&quot; the standard calling convention - not really much, but also nothing
+to sniff at.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20The%20Contiki%20Desktop%20OS%20for%20cc65">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20The%20Contiki%20Desktop%20OS%20for%20cc65">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2769.html">Shawn Jefferson: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>In reply to:</strong> <a href="2769.html">Shawn Jefferson: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2771.html">Shawn Jefferson: "Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Next in thread:</strong> <a href="2720.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Maybe reply:</strong> <a href="2720.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Maybe reply:</strong> <a href="2721.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<li><strong>Maybe reply:</strong> <a href="2742.html">josef.soucek_at_ct.cz: "RE: Re: [cc65] The Contiki Desktop OS for cc65"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-03-14 19:05:23 CET</em>
+</em>
+</small>
+</body>
+</html>

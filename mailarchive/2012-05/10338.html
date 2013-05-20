@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] o65 generation bug?</title>
+<meta name="Author" content="Agent Friday (64subnet1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] o65 generation bug?" />
+<meta name="Date" content="2012-05-31" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] o65 generation bug?</h1>
+<!-- received="Thu May 31 13:23:02 2012" -->
+<!-- isoreceived="20120531112302" -->
+<!-- sent="Thu, 31 May 2012 04:22:48 -0700" -->
+<!-- isosent="20120531112248" -->
+<!-- name="Agent Friday" -->
+<!-- email="64subnet1gmail.com" -->
+<!-- subject="Re: [cc65] o65 generation bug?" -->
+<!-- id="CACb6e7-VvHf5zZQ19_rD_MrzCs2Z0H+yQF0p0-0H1KRw4k6HwQ@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20120526103541.GB18232&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10339.html" title="Agent Friday: &quot;Re: [cc65] o65 generation bug?&quot;">Next message</a> ]
+[ <a href="10337.html" title="Oliver Schmidt: &quot;Re: [cc65] Need to pass drive number in addition to device number to cbm_opendir&quot;">Previous message</a> ]
+[ <a href="10315.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] o65 generation bug?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10339.html" title="Agent Friday: &quot;Re: [cc65] o65 generation bug?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Agent Friday &lt;<a href="mailto:64subnet1gmail.com?Subject=Re:%20[cc65]%20o65%20generation%20bug?">64subnet1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-05-31 13:22:48</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Uz,
+
+As requested, this follow-up is going directly to you and not the
+mailing list.  I couldn't get gmail to attach the source files, so
+I pasted them into the message.  Hope it's not a problem to paste
+the text into files.
+
+Thanks for your attention to this!
+ // Agent Friday
+
+
+On Sat, May 26, 2012, &lt;uz&#64;musoftware&#46;<!--nospam-->de&gt; wrote:
+&gt; &gt;    &gt; &gt; 2.  Are the __segment_LOAD__ symbols supposed to still work?
+&gt; &gt;    OK, looks like there's a problem then.  ...
+&gt;
+&gt; Greg is right here, the linker will always use $0000 as start address for
+&gt; the relocations, but the symbols are defined using the start address in
+&gt; the config file. Since the format is relocatable anyway, what is the
+&gt; reason not to use a start address of $0000?
+
+Originally I was of the mindset that all relocatable segments would
+naturally have a starting location of 0, and there would therefore
+be no need to specify the start address in the executable file...
+But as I started reading up on the .o65 format and looked at
+examples of how things are actually done, there was ALWAYS a non-
+zero start address specified.  Since the .o65 format specifies it,
+I made my relocator to support nonzero start, and in hopes of
+easily switching between .prg and .o65 output formats I've always
+kept a start address in the .cfg.
+
+But now I'm thinking that if .o65 files are to be written out in
+&quot;simple&quot; format that the ideal of every segment beginning at zero
+is simply not an option.
+
+&gt; &gt;    I did an ld65 --dump-config lunix... all I could think to do.  Are
+&gt; &gt;    there perhaps better starting points?
+&gt;
+&gt; The config used for modules is also available and it is simpler. The
+&gt; module target is used for drivers (tgi, mouse and serial). They use
+&gt; a jump table at the start of the code for the entry points into the
+&gt; driver.
+
+Thanks, I'll take a look at those, but for now I think there's
+adequate support for a bug report around the linker-defined segment
+variables (__xxxx_LOAD__).  See below.
+
+&gt; ... Is there any reason not to use exactly one memory area
+&gt; with $0000 as a start address in the config file? While the linker cannot
+&gt; always generate output in &quot;simple&quot; format (alignment options may prevent
+&gt; that), having the segments in adjacent order starting at zero should
+&gt; always be possible. Or is this wrong?
+
+The issue at hand is that regardless of where the first segment is
+made to start, the segment start variables (__xxxx_LOAD__,
+__xxxx_RUN__) are always set to 0 if .o65 output is chosen.  The
+normal and recommended model of arranging  CODE, DATA, and BSS
+segments contiguously in that order GUARANTEES that DATA and BSS
+will have non-zero starts, but they are still defined by the
+symbols to be $0000.  This is just plain wrong.  If these symbols
+cannot be output with the correct value, then they are essentially
+unusable and should not be generated.  The linker clearly knows
+where these segments are going because it puts the correct values
+in the .o65 tbase, dbase, and bbase fields.  It needs to export the
+correct segment definition symbols as well.
+
+Even the simplest .cfg will demonstate this:
+
+
+==== command-line ====
+&gt;&gt;  cl65 -t c64 -C bug.cfg bug.asm
+
+==== bug.cfg ====
+MEMORY {  RAM: start=$8000, size=$2000,type=rw;}
+SEGMENTS {  CODE: load=RAM, type=ro,  define= yes;
+            DATA: load=RAM, type=rw,  define= yes;
+            BSS:  load=RAM, type=bss, define= yes; }
+FILES { %O:  format=o65; }
+
+==== bug.asm ====
+.IMPORT __CODE_LOAD__,__CODE_RUN__
+.IMPORT __DATA_LOAD__, __DATA_RUN__, __BSS_LOAD__
+
+.CODE
+        LDA     #&lt;__DATA_RUN__
+        LDX     #&gt;__DATA_RUN__
+        RTS
+
+.DATA
+BEGIN_DATA:
+        .BYTE   &quot;------&gt;&quot;   ; --- marker, makes data easier to find ---
+        .WORD   __CODE_LOAD__,__CODE_RUN__,__DATA_LOAD__,__BSS_LOAD__
+        .BYTE   &quot;&lt;--------&quot; ; --- marker, makes data easier to find ---
+        .WORD   BEGIN_BSS
+
+.BSS
+BEGIN_BSS:
+JIFFIES_PASSED: .BYTE 0
+ANI_FLAGS:      .BYTE 0
+
+
+======= OUTPUT FILE =======
+
+$0000 01 00 6F 36 35 00 00 08  ..o65...
+$0008 00 80                      $8000  text start, as set in .cfg
+            05 00                  $05  text size
+                  05 80          $8005  data start
+                        1A 00      $1A  data size
+$0010 1F 80                      $801F  bss start
+            02 00                  $02  bss size
+                  00 00 00 00           zp start and size
+$0018 00 00                             stack required
+            &lt;snip!&gt;
+$0040 30 31 32 00 00
+                     A9 00              LDA #0 &lt;-- __DATA_RUN__=$0000 ??
+                           A2 00        LDX #0
+$0048    60                             RTS
+            2D 2D 2D 2D 2D 2D 3E  -------&gt; (marker)
+$0050    00 00                   $0000! .WORD __CODE_LOAD__
+               00 00             $0000! .WORD __CODE_RUN__
+                     00 00       $0000! .WORD __DATA_LOAD__
+                           00 00 $0000! .WORD __BSS_LOAD__
+$0058    2D 2D 2D 2D 2D 2D 2D     &lt;------- (marker)
+$0060 2D 2D
+            1F 80                $801F  .WORD BEGIN_BSS
+                  00 00                   (no imports)
+                        02 23           fix-up for &quot;&lt;__DATA_RUN__&quot;
+$0068 02 43 00                          fix-up for &quot;&lt;__DATA_RUN__&quot;
+               00                         (end of code reloc info)
+                  08 82                 fix-up for &quot;__CODE_LOAD__&quot;
+                        02 82           fix-up for &quot;__CODE_RUN__&quot;
+$0070 02 83                             fix-up for &quot;__DATA_LOAD__&quot;
+            02 84                       fix-up for &quot;__BSS_LOAD__&quot;
+                  0B 84                 fix-up for &quot;BEGIN_BSS&quot;
+                        00                (end of data reloc info)
+                           00 00          (no exports)
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu May 31 13:23:02 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10339.html" title="Next message in the list">Agent Friday: "Re: [cc65] o65 generation bug?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10337.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Need to pass drive number in addition to device number to cbm_opendir"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10315.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] o65 generation bug?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10339.html" title="Next message in this discussion thread">Agent Friday: "Re: [cc65] o65 generation bug?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10339.html" title="Message sent in reply to this message">Agent Friday: "Re: [cc65] o65 generation bug?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10340.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] o65 generation bug?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10338" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10338" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10338" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-05-31 13:23:06 CEST
+</em></small></p>
+</body>
+</html>

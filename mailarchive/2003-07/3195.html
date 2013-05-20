@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] win32 one file install</title>
+<meta name="Author" content="Raf (rafalszyja_at_poczta.onet.pl)">
+<meta name="Subject" content="Re[2]: [cc65] win32 one file installer">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] win32 one file installer</h1>
+<!-- received="Thu Jul 17 14:47:14 2003" -->
+<!-- isoreceived="20030717124714" -->
+<!-- sent="Thu, 17 Jul 2003 14:47:12 +0200" -->
+<!-- isosent="20030717124712" -->
+<!-- name="Raf" -->
+<!-- email="rafalszyja_at_poczta.onet.pl" -->
+<!-- subject="Re[2]: [cc65] win32 one file installer" -->
+<!-- id="351031763.20030717144712@poczta.onet.pl" -->
+<!-- inreplyto="20030717105220.GD1255@trikaliotis.hn.org" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Raf (<a href="mailto:rafalszyja_at_poczta.onet.pl?Subject=Re[2]:%20[cc65]%20win32%20one%20file%20installer"><em>rafalszyja_at_poczta.onet.pl</em></a>)<br>
+<strong>Date:</strong> 2003-07-17 14:47:12
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3194.html">Spiro Trikaliotis: "Re: [cc65] win32 one file installer"</a>
+<li><strong>In reply to:</strong> <a href="3194.html">Spiro Trikaliotis: "Re: [cc65] win32 one file installer"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3191.html">EMILIANO PERUCH: "RE: [cc65] win32 one file installer"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Spiro,
+
+Thursday, July 17, 2003, 12:52:20 PM, you wrote:
+
+ST&gt; Hello again Rafal,
+
+ST&gt;  On Thu, Jul 17, 2003 at 12:09:55PM +0200, Rafal wrote:
+
+&gt;&gt; &gt; 1. Why do CC65_9X.BAT and CC65_NT.BAT only use relative
+&gt;&gt; &gt;    paths for CC65_LIB, CC65_INC, PATH?
+&gt;&gt; 
+&gt;&gt; READ SETTING_UP.txt
+&gt;&gt; 
+&gt;&gt; will be fixed later by additional (somewhat external) small setupping
+&gt;&gt; program :)
+
+ST&gt; Ok, this was what I wanted. Anyway, can't the installer change this itself?
+
+INNO SETUP:
+probably not , alhough there is pascal scripting language
+but probably it doesn't allow to do such operations as
+modyfing external files (it contains functions to modify INI files
+however)
+
+&gt;&gt; &gt; 2. NT.BAT is wrong:
+&gt;&gt; &gt;    a. use CMD.EXE instead of command.com
+&gt;&gt; &gt;    b. nt.bat calls NT.BAT; I think it should be
+&gt;&gt; &gt;         CMD.EXE /K CC65_NT.BAT
+&gt;&gt; &gt;       shouldn't it?
+&gt;&gt; 
+&gt;&gt; isn't CMD here? typo :)
+
+ST&gt; Yes, it isn't here, and you called NT.BAT, not CC65_NT.BAT. This made a
+ST&gt; &quot;fine&quot; recursive call.
+
+blah...
+I don't have access to NT currently...
+
+&gt;&gt; IT WORK for 9x as I said in the dox , 9x was succesfully tested ,
+&gt;&gt; I installed the package few times in different
+&gt;&gt; places and all was good
+
+ST&gt; Ok, good. Just wanted to make sure.
+
+so you are :)
+
+&gt;&gt; &gt; 5. If I added files into the CC65 tree, they are not removed on
+&gt;&gt; &gt;    uninstalling. You could at least ask for it.
+&gt;&gt; &gt;    Furthermore, the uninstaller even does not tell me that it did
+&gt;&gt; &gt;    not remove the directories in this case. I know, this is common
+&gt;&gt; &gt;    behaviour on Win machines, but despite this, it is not good practice.
+&gt;&gt; 
+&gt;&gt; I check if installer support this option
+
+ST&gt; At least a hint that the directory was not removed due to not being empty
+ST&gt; would be enough, IMHO.
+
+thanks for tip!
+
+&gt;&gt; &gt; 7. After installing, you want to start \cc65\index.url to go to the
+&gt;&gt; &gt;    CC65 homepage. At least as guest, this does not work, I get:
+&gt;&gt; &gt;    &quot;Unable to execute file: c:\cc65\index.url
+&gt;&gt; &gt;    CreateProcess failed; code 193.
+&gt;&gt; &gt;    This is due to installing it as guest on my machine. Nevertheless,
+&gt;&gt; &gt; since
+&gt;&gt; &gt;    double-clicking on the URL works, the automatic start should work, too.
+&gt;&gt; &gt;
+&gt;&gt; 
+&gt;&gt; in my system it worked
+
+ST&gt; Yes, because you have the right to do so. Anyway, as &quot;guest&quot;, you don't have
+ST&gt; much rights. Everything (except that step) works fine, this is something
+ST&gt; that is not normal on NT based machines. It would be nice if it would work
+ST&gt; this way.
+
+blah :)
+I must install winnt I see...
+or maybe someone with NT will help me?
+
+
+-- 
+Best regards,
+ Raf                            mailto:<a href="mailto:rafalszyja_at_poczta.onet.pl?Subject=Re[2]:%20[cc65]%20win32%20one%20file%20installer">rafalszyja_at_poczta.onet.pl</a>
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20win32%20one%20file%20installer">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3194.html">Spiro Trikaliotis: "Re: [cc65] win32 one file installer"</a>
+<li><strong>In reply to:</strong> <a href="3194.html">Spiro Trikaliotis: "Re: [cc65] win32 one file installer"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3191.html">EMILIANO PERUCH: "RE: [cc65] win32 one file installer"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-07-17 14:47:32 CEST</em>
+</em>
+</small>
+</body>
+</html>

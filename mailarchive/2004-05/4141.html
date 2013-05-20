@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] None target behaviour changed?</title>
+<meta name="Author" content="Shawn Jefferson (jefferson_shawn_a8bit1yahoo.com)" />
+<meta name="Subject" content="[cc65] None target behaviour changed?" />
+<meta name="Date" content="2004-05-26" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] None target behaviour changed?</h1>
+<!-- received="Wed May 26 16:50:37 2004" -->
+<!-- isoreceived="20040526145037" -->
+<!-- sent="Wed, 26 May 2004 07:50:32 -0700 (PDT)" -->
+<!-- isosent="20040526145032" -->
+<!-- name="Shawn Jefferson" -->
+<!-- email="jefferson_shawn_a8bit1yahoo.com" -->
+<!-- subject="[cc65] None target behaviour changed?" -->
+<!-- id="20040526145032.44041.qmail@web60008.mail.yahoo.com" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4142.html" title="Shawn Jefferson: &quot;Re: [cc65] None target behaviour changed?&quot;">Next message</a> ]
+[ <a href="4140.html" title="Oliver Schmidt: &quot;Re: [cc65] Upcoming snapshot problems&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4142.html" title="Shawn Jefferson: &quot;Re: [cc65] None target behaviour changed?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Shawn Jefferson &lt;<a href="mailto:jefferson_shawn_a8bit1yahoo.com?Subject=Re:%20[cc65]%20None%20target%20behaviour%20changed?">jefferson_shawn_a8bit1yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-05-26 16:50:32</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I was working on a project about 8-9 months ago (or
+longer) and I was compiling my modules using:
+
+ca65 -t none --cpu 65C02 -I c:\cc65\asminc (my *.s
+files)
+ar65 a mylib.lib (all my .o modules)
+
+then
+
+cl65 -t none --cpu 65C02 -Osir crt0.o mylib.lib test.c
+-o test.com
+
+When I run the cl65 command I get a lot of unresolved
+external references to popa, popax, zeropage variables
+tmp1, tmp2, tmp3, etc... 
+
+Has something changed about the behaviour of cc65 when
+using the none target, or am I just doing something
+wrong?  I can't quite remember how I was compiling
+this stuff before.
+
+Thanks,
+Shawn
+
+
+
+	
+		
+__________________________________
+Do you Yahoo!?
+Friends.  Fun.  Try the all-new Yahoo! Messenger.
+<a href="http://messenger.yahoo.com/">http://messenger.yahoo.com/</a> 
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed May 26 16:50:37 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4142.html" title="Next message in the list">Shawn Jefferson: "Re: [cc65] None target behaviour changed?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4140.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Upcoming snapshot problems"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4142.html" title="Next message in this discussion thread">Shawn Jefferson: "Re: [cc65] None target behaviour changed?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4142.html" title="Message sent in reply to this message">Shawn Jefferson: "Re: [cc65] None target behaviour changed?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="4143.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] None target behaviour changed?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4141" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4141" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4141" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-05-26 16:50:45 CEST
+</em></small></p>
+</body>
+</html>

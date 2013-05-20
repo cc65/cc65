@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Building with custom CC an</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Building with custom CC and CFLAGS" />
+<meta name="Date" content="2009-09-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Building with custom CC and CFLAGS</h1>
+<!-- received="Thu Sep 10 23:21:13 2009" -->
+<!-- isoreceived="20090910212113" -->
+<!-- sent="Thu, 10 Sep 2009 23:18:03 +0200" -->
+<!-- isosent="20090910211803" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Building with custom CC and CFLAGS" -->
+<!-- id="20090910211803.GA18236@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="1b8385e00909101332q36135a18wc8a8535fdffbd920&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6901.html" title="Christian Grössler: &quot;Re: [cc65] Building with custom CC and CFLAGS&quot;">Next message</a> ]
+[ <a href="6899.html" title="Oliver Schmidt: &quot;[cc65] Optimizer bug found&quot;">Previous message</a> ]
+[ <a href="6897.html" title="Per Olofsson: &quot;Re: [cc65] Building with custom CC and CFLAGS&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6901.html" title="Christian Grössler: &quot;Re: [cc65] Building with custom CC and CFLAGS&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Building%20with%20custom%20CC%20and%20CFLAGS">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-09-10 23:18:03</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Thu, Sep 10, 2009 at 10:32:05PM +0200, Per Olofsson wrote:
+&gt; Currently the gcc.mak files contain this:
+&gt;
+&gt; CFLAGS = -O4 -Wall -W -std=c89 -I$(COMMON)
+[...]
+
+It's -O2 but I see your point.
+
+&gt; This can be replaced by:
+&gt;
+&gt; CFLAGS = -O4 -Wall -W -std=c89
+&gt;
+&gt; in the top level makefile, and:
+&gt;
+&gt; CFLAGS += -I$(COMMON)
+[...]
+&gt; in the &quot;child&quot; makefiles.
+
+Maybe I'm not understanding this completely, but as already described in
+another mail, I'm not using the top level makefile when working on one of the
+tools (actually, the top level makefile is mostly used by the nightly build
+script). If the &quot;normal&quot; makefiles just contain &quot;CFLAGS += -I$(COMMON)&quot; how do
+they get &quot;-O4 -Wall -W -std=c89&quot; when called directly (which is their main
+use)?
+
+&gt; CC does not need to be set at all, as the
+&gt; system default is probably what you want. If you want to use an
+&gt; alternate compiler, set CC yourself.
+
+Maybe, but I don't like the idea. If I would just compile the stuff for
+myself, this is acceptable. But you can think of my box as something like a
+production environment. And I don't like the idea that nightly builds or even
+stable versions depend on the settings someone &quot;installs&quot; on my system by
+means of an RPM of whatever. I'm developing software for a living (among other
+things) and I've learned that it is absolutely critical that I can tell
+exactly how a software was built. I have written commercial software that - on
+request - not only outputs the SVN version number, but also the compiler
+version that was used to compile it, and the SVN release of the compiler
+sources! Using &quot;whatever compiler is installed on my system today&quot; makes my
+toenails roll up.
+
+Is it possible to do something like &quot;if it's defined on the command line, then
+use it, else use what the makefile says&quot; for a variable? If this is possible,
+then I can change the makefiles accordingly. You would then have to define
+your own variables on the command line when calling make.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Sep 10 23:21:13 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6901.html" title="Next message in the list">Christian Grössler: "Re: [cc65] Building with custom CC and CFLAGS"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6899.html" title="Previous message in the list">Oliver Schmidt: "[cc65] Optimizer bug found"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6897.html" title="Message to which this message replies">Per Olofsson: "Re: [cc65] Building with custom CC and CFLAGS"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6901.html" title="Next message in this discussion thread">Christian Grössler: "Re: [cc65] Building with custom CC and CFLAGS"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6901.html" title="Message sent in reply to this message">Christian Grössler: "Re: [cc65] Building with custom CC and CFLAGS"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6903.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] Building with custom CC and CFLAGS"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6904.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Building with custom CC and CFLAGS"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6909.html" title="Message sent in reply to this message">Per Olofsson: "Re: [cc65] Building with custom CC and CFLAGS"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6900" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6900" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6900" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-09-10 23:21:15 CEST
+</em></small></p>
+</body>
+</html>

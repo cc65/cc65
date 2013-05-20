@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] TGI palettes (was: TGI col</title>
+<meta name="Author" content="Daniel Serpell (daniel.serpell1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] TGI palettes (was: TGI colors revisited)" />
+<meta name="Date" content="2011-05-11" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] TGI palettes (was: TGI colors revisited)</h1>
+<!-- received="Wed May 11 21:17:29 2011" -->
+<!-- isoreceived="20110511191729" -->
+<!-- sent="Wed, 11 May 2011 15:17:16 -0400" -->
+<!-- isosent="20110511191716" -->
+<!-- name="Daniel Serpell" -->
+<!-- email="daniel.serpell1gmail.com" -->
+<!-- subject="Re: [cc65] TGI palettes (was: TGI colors revisited)" -->
+<!-- id="BANLkTim=5ZLZC_KEqdmWtZ3E8SLEfr+KYg@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="BANLkTinoYq+7nK6-NBp_Urm1FfKksiZ1pw&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9419.html" title="Oliver Schmidt: &quot;Re: [cc65] TGI palettes (was: TGI colors revisited)&quot;">Next message</a> ]
+[ <a href="9417.html" title="Oliver Schmidt: &quot;Re: [cc65] TGI palettes (was: TGI colors revisited)&quot;">Previous message</a> ]
+[ <a href="9417.html" title="Oliver Schmidt: &quot;Re: [cc65] TGI palettes (was: TGI colors revisited)&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9419.html" title="Oliver Schmidt: &quot;Re: [cc65] TGI palettes (was: TGI colors revisited)&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Daniel Serpell &lt;<a href="mailto:daniel.serpell1gmail.com?Subject=Re:%20[cc65]%20TGI%20palettes%20(was:%20TGI%20colors%20revisited)">daniel.serpell1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-05-11 21:17:16</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Oliver!
+
+On Wed, May 11, 2011 at 12:52 PM, Oliver Schmidt &lt;ol.sc&#64;web&#46;<!--nospam-->de&gt; wrote:
+&gt;
+&gt;&gt; Remember that in Atari, you have a driver with few simultaneous
+&gt;&gt; colors (ie, 1 or 2) from a palette with many (128) and at the same
+&gt;&gt; time drivers with several colors (16) with no palette. And you can
+&gt;&gt; select the driver at run-time.
+&gt;
+&gt; All my statements so far claim to justify such a scenario. Especially
+&gt; the pseudo codeline
+&gt;
+&gt; &quot;Is the TGI_COLOR_RED macro value smaller than tgi_getcolorcount() ?&quot;
+&gt;
+&gt; tries to find out if the TGI_COLOR_RED macro is usable as &quot;direct&quot;
+&gt; color in the currently at run-time selected driver. Such a macro would
+&gt; be expected to have a values &gt; 1 but &lt; 16 so that the pseudocode would
+&gt; do the right thing for both types of drivers - on the same target and
+&gt; therefore with the same value for TGI_COLOR_RED. Or am I wrong at some
+&gt; point?
+
+I think it could work, but in atari you have at least:
+
+mode 8: 2 colors paletted, default is index 0=blue, index  1=white.
+mode 9: 16 colors, no palette, 0=black, 1 to 15 are 15 different
+        colors of the same brightness.
+mode 10: 9 colors paletted.
+mode 11: 16 brightness, no palette. 0=dark, 15=light, all of
+         the same color.
+mode 15: 4 colors, paletted, default is 0=black, 1=red, 2=green, 3=blue.
+
+&gt;
+&gt;&gt; There is another option, the one used by earlier X windows functions. In those,
+&gt;&gt; you can &quot;allocate&quot; a new color, and the driver returns the best approximation
+&gt;&gt; of that color.
+&gt;&gt; [...]
+&gt;
+&gt; While I agree that this approach is conceptually the
+&gt; correct/right/best I personally feel that it is (way) too complicated
+&gt; both for the driver and program implementator. Just my two cents...
+
+I think that is not that difficult, either for the driver or the program.
+For example, this code would work:
+
+ // get colors
+ char black, red;
+ black = tgi_alloccolor(TGI_COLOR_BLACK);
+ red   = tgi_alloccolor(TGI_COLOR_RED);
+ // draw
+ tgi_clear();
+ tgi_setcolor(red);
+ tgi_bar(10,10,40,30);
+ tgi_setcolor(black);
+ tgi_circle(25,20,5);
+
+In the driver, this would be implemented as:
+
+ // Fixed mode, with no palette:
+ static char color_map[]; // array with index for each color value
+ char tgi_alloccolor(int color)
+ {
+  return color_map[color];
+ }
+ void tgi_freecolor(char index)
+ {
+  // NOP
+ }
+
+ // Palleted mode
+ static char num_index; // Number of indexes
+ static char used_index[max_index]; // flags
+ char tgi_alloccolor(int color)
+ {
+  char i;
+  for(i=0;i&lt;max_index;i++)
+   if( !used_index[i] )
+    break;
+  if( i == max_index )
+   return max_index -1; // Returns last index if no more colors.
+  set_palette(i,color);
+  used_index[i] = 1;
+  return i;
+ }
+ void tgi_freecolor(char index)
+ {
+  used_index[i] = 0;
+ }
+
+&gt;
+&gt;&gt; The only missing functionality is palette changing effects.
+&gt;
+&gt; Hm, it seems that we're still looking at the topic from quite
+&gt; different perspectives: Many TGI drivers don't support palettes.
+&gt; Therefore a portable TGI program can't even think about palette-based
+&gt; effects. For me this falls exactly into the same category sprites fall
+&gt; into. Great stuff but just not portable enough.
+&gt;
+&gt; What I wanted to point out in response to Uz' idea of dropping
+&gt; palettes altogether was this:
+&gt;
+&gt; TGI palettes aren't for useres/programs who WANT palettes to create
+&gt; something beyond the ordinary. TGI palettes are rather for
+&gt; users/programs who NEED palettes to reach the ordinary on as many
+&gt; targets/drivers as possible.
+&gt;
+
+I agree, but with only one simple functions (tgi_darkencolor) you can
+implement palette effects in atari and c64, making the fade-out
+effects portable.
+
+Regards,
+    Daniel.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed May 11 21:17:29 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9419.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] TGI palettes (was: TGI colors revisited)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9417.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] TGI palettes (was: TGI colors revisited)"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9417.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] TGI palettes (was: TGI colors revisited)"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9419.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] TGI palettes (was: TGI colors revisited)"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9419.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] TGI palettes (was: TGI colors revisited)"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9418" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9418" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9418" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-05-11 21:17:31 CEST
+</em></small></p>
+</body>
+</html>

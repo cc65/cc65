@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] cc65 data optimization</title>
+<meta name="Author" content="Dan (opendtv1yahoo.com)" />
+<meta name="Subject" content="[cc65] cc65 data optimization" />
+<meta name="Date" content="2007-07-03" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] cc65 data optimization</h1>
+<!-- received="Tue Jul  3 04:58:03 2007" -->
+<!-- isoreceived="20070703025803" -->
+<!-- sent="Mon, 2 Jul 2007 19:57:57 -0700 (PDT)" -->
+<!-- isosent="20070703025757" -->
+<!-- name="Dan" -->
+<!-- email="opendtv1yahoo.com" -->
+<!-- subject="[cc65] cc65 data optimization" -->
+<!-- id="589090.5395.qm@web56214.mail.re3.yahoo.com" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="E1I5JKF-0000Db-00&#64;smtp06.web.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5785.html" title="Dan: &quot;[cc65] Externs within function&quot;">Next message</a> ]
+[ <a href="5783.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Global zero page pointers&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5788.html" title="Johan Kotlinski: &quot;Re: [cc65] cc65 data optimization&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Dan &lt;<a href="mailto:opendtv1yahoo.com?Subject=Re:%20[cc65]%20cc65%20data%20optimization">opendtv1yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-07-03 04:57:57</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>--- Stefan A. Haubenthal  &lt;stefan.haubenthal&#64;web&#46;<!--nospam-->de&gt;
+wrote:
+
+&gt; Time ago I was talking with Uz about implementing
+&gt; some kind of string merge. Store every same
+&gt; read-only data (e.g. a string) only once, you may
+&gt; even reuse substrings:
+&gt; &quot;hello word&quot; -&gt; $1000
+&gt; &quot;world&quot; -&gt; $1006
+&gt; This may break some programs, so we should introduce
+&gt; an option &quot;-Om&quot;, ok?
+
+(This was a private email but I think a list reply is
+appropriate).
+
+I took another look and this time succeeded in
+implementing it. Do you think it needs another option,
+given that --writable-strings already exists?
+
+Dan
+
+
+
+       
+____________________________________________________________________________________
+Boardwalk for $500? In 2007? Ha! Play Monopoly Here and Now (it's updated for today's economy) at Yahoo! Games.
+<a href="http://get.games.yahoo.com/proddesc?gamekey=monopolyherenow">http://get.games.yahoo.com/proddesc?gamekey=monopolyherenow</a>  
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Jul  3 04:58:03 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5785.html" title="Next message in the list">Dan: "[cc65] Externs within function"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5783.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Global zero page pointers"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5788.html" title="Next message in this discussion thread">Johan Kotlinski: "Re: [cc65] cc65 data optimization"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5788.html" title="Message sent in reply to this message">Johan Kotlinski: "Re: [cc65] cc65 data optimization"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5784" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5784" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5784" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-07-03 04:58:06 CEST
+</em></small></p>
+</body>
+</html>

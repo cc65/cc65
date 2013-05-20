@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] command line args</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] command line args" />
+<meta name="Date" content="2004-04-27" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] command line args</h1>
+<!-- received="Tue Apr 27 12:03:43 2004" -->
+<!-- isoreceived="20040427100343" -->
+<!-- sent="Tue, 27 Apr 2004 12:03:40 +0200" -->
+<!-- isosent="20040427100340" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] command line args" -->
+<!-- id="20040427100340.GB2419@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="004501c42c27$221b7cf0$28f7fea9&#64;acer5j0jdwij8z" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4092.html" title="Mats Byggmastar: &quot;[cc65] Support for the EMMA II system?&quot;">Next message</a> ]
+[ <a href="4090.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] C64 command line (again)&quot;">Previous message</a> ]
+[ <a href="4089.html" title="carlos: &quot;[cc65] command line args&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20command%20line%20args">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-04-27 12:03:40</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Tue, Apr 27, 2004 at 09:13:21AM +0200, carlos wrote:
+&gt; my opinion is, that the first comma and the rem is ugly. if you want to
+&gt; test
+&gt; your program with different parameters and start it very often, the rem
+&gt; and
+&gt; the first comma, which you alway forget, slows down the code and test
+&gt; cycle
+&gt; very much.
+
+I don't like the leading comma, too. This is the reason, why I'm currently
+recoding the routine. The REM is not nice, but I can live with it. Using a
+double quote instead of the REM may seem as more convenient on the first
+glance (and in fact it was one of the ideas Stefan tested in his first
+version). But if you try it, you will notice that the line editor switches
+into quote mode when doing so, which means that backspace and other control
+keys won't work as before. This behaviour is annoying, so I do prefer the REM.
+
+Reading from the screen is an interesting idea, and it's good to have people
+who think different, even if I don't see real advantages in this case. The
+only real advantage is that the REM is no longer needed. But have a look at
+the list of problems:
+
+    * Any amount of white space make the input hard to parse.
+
+    * run may be written rU, so we have to check this, too.
+
+    * We need the cursor position, and must make assumptions on the relation
+      between the cursor position and the position of the RUN command.
+
+    * Because parsing is more complex, the code will get larger.
+
+My opinion is that having all these disadvantages, just to avoid the REM in
+front of command line arguments is not worth it. The ability to have a 1000
+char command line (instead of 80 chars) is of no real use, because one would
+need 1K of argument vector space just to index this command line.
+
+I agree that the first comma is ugly, and this is why I have taken a look at
+the code to remove this necessity. I'm still glad, Stefan and Greg created the
+first versions of the command line parser, so it was possible to evaluate
+solutions and come to a final one. Once we agree on the final format of the
+command line, I will try to port/convert the code for the other CBMs, so in
+the next release, all CBMs should be able to take commands on the command
+line.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Apr 27 12:03:43 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4092.html" title="Next message in the list">Mats Byggmastar: "[cc65] Support for the EMMA II system?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4090.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] C64 command line (again)"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4089.html" title="Message to which this message replies">carlos: "[cc65] command line args"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4091" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4091" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4091" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-04-27 12:03:49 CEST
+</em></small></p>
+</body>
+</html>

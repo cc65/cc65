@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] o65 generation bug?</title>
+<meta name="Author" content="Agent Friday (64subnet1gmail.com)" />
+<meta name="Subject" content="[cc65] o65 generation bug?" />
+<meta name="Date" content="2012-05-14" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] o65 generation bug?</h1>
+<!-- received="Mon May 14 08:37:41 2012" -->
+<!-- isoreceived="20120514063741" -->
+<!-- sent="Sun, 13 May 2012 23:37:32 -0700" -->
+<!-- isosent="20120514063732" -->
+<!-- name="Agent Friday" -->
+<!-- email="64subnet1gmail.com" -->
+<!-- subject="[cc65] o65 generation bug?" -->
+<!-- id="CACb6e798nxqY+uopuzdfFbVYG+Fg2uAYDyf4-xpkrVTOKYhOZQ@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10281.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] compiling tgidemo for lynx&quot;">Next message</a> ]
+[ <a href="10279.html" title="hans stallmann: &quot;[cc65] compiling tgidemo for lynx&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10282.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] o65 generation bug?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Agent Friday &lt;<a href="mailto:64subnet1gmail.com?Subject=Re:%20[cc65]%20o65%20generation%20bug?">64subnet1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-05-14 08:37:32</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I'm beginning to use .o65 format for a set of runtime APIs for the C64.  Up
+until now I've done relocation by bundling a relocation routine with my
+code and the relocation data from the .o65 file, and have ignored things
+that did not make sense.  I guess it's time to hunt those down now...
+
+Here are the relevant portions of my source...
+
+&gt;&gt; Command-line &lt;&lt;
+&gt; cl65 -t c64 -C tools.cfg animator.asm
+
+&gt;&gt; TOOLS.CFG &lt;&lt;
+MEMORY
+{
+   HEADER: start = $0000, size = $02,   type = ro, define = no,
+file=&quot;tools.o65&quot;;
+   HIRAM:  start = $CC00, size = $0400, type = rw, file=&quot;tools.o65&quot;;
+}
+
+SEGMENTS
+{
+   LDADDR:   load = HEADER, type = ro,  define = no;
+   CODE:     load = HIRAM,  type = ro,  define = yes;
+   DATA:     load = HIRAM, type = rw;
+   BSS:      load = HIRAM, type = bss, define = yes;
+}
+
+
+FILES
+{
+   &quot;tools.o65&quot;:  format=o65;
+}
+
+&gt;&gt; ANIMATOR.ASM &lt;&lt;
+
+.IMPORT __CODE_LOAD__
+
+.SEGMENT &quot;LDADDR&quot;
+.WORD __CODE_LOAD__
+
+.CODE
+JMP INIT_ANI
+JMP LAUNCH_ANI
+JMP KILL_ANI
+JMP SERVICE_ALARMS
+JMP SERVICE_ANI
+
+&lt;snip&gt;
+
+Here is a hexdump of the beginning of the .o65 generated, with issues
+highlighted:
+
+0000 01 00 6F 36 35 00 00 08
+0008 00 00 25 03 23 CF 06 00
+0010 29 CF 1B 00 00 00 00 00
+0018 00 00 0F 02 6C 64 36 35
+0020 20 56 32 2E 31 33 2E 32
+0028 00 1B 04 53 75 6E 20 4D
+0030 61 79 20 31 33 20 32 31
+0038 3A 33 37 3A 33 37 20 32
+0040 30 31 32 00 00 00 00 4C
+0048 0F CC 4C 3B CC 4C 20 CD
+0050 4C C5 CC 4C 2A CD A9 00
+0058 A0 7F 99 80 CF 88 10 FA
+
+Referring to file offsets:
+
+  08..09 : 00 00 -- This is the text base.  I guess 0 makes as much
+sense as anything if the code is relocatable, but then....
+  0C..0D : 23 CF -- .... why do the dbase and bbase values appear
+to based on the HIRAM location in my .cfg?
+
+  0A..0D : 25 03 23 CF -- If the above is just a glitch, and the
+code is really compiled to $CC00, then these bytes seem amiss.  If
+the code size is really 0325, then the data should start at
+CC00 + 0325 = CF25.  Why is dbase CF23 instead?
+
+I guess in the simplified format, anything beyond tbase are of
+little consequence, but...
+
+  45..46 : 00 00 -- These are presumably generated by my LDADDR
+segment, which was there for generating ready-to-run targets.  Does
+ld65 not strip out extraneous segments?  In any case, the zeroes
+seem to imply that __CODE_LOAD__ really WAS 0000... ?
+
+  47..56 : 4C 0F CC 4C 3B CC 4C 20 CD 4C C5 CC 4C 2A CD ...
+My jump table has 5 entries, occupying 15 bytes.  The JMP targets
+clearly seem to be generated as if the code were in fact assembled
+to $CC00.  (The first target is CC0F, directly after the jump table.)
+
+I'll try commenting out the LDADDR segment entry.
+
+
+
+-- 
+// Agent Friday
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon May 14 08:37:41 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10281.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] compiling tgidemo for lynx"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10279.html" title="Previous message in the list">hans stallmann: "[cc65] compiling tgidemo for lynx"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10282.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] o65 generation bug?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10282.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] o65 generation bug?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10280" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10280" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10280" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-05-14 08:37:45 CEST
+</em></small></p>
+</body>
+</html>

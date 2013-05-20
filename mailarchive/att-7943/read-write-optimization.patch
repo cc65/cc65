@@ -1,0 +1,245 @@
+#
+# Some optimization for read/write on cbm.
+#
+# <soci@c64.rulez.org> Kajtar Zsolt 14.03.2010
+#
+diff -urN cc65-snapshot-2.13.9.20100309/libsrc/cbm/read.s cc65-snapshot-2.13.9.20100309.new/libsrc/cbm/read.s
+--- cc65-snapshot-2.13.9.20100309/libsrc/cbm/read.s	2005-02-26 10:28:46.000000000 +0100
++++ cc65-snapshot-2.13.9.20100309.new/libsrc/cbm/read.s	2010-03-14 12:56:31.472074020 +0100
+@@ -8,7 +8,7 @@
+         .constructor    initstdin
+ 
+         .import         SETLFS, OPEN, CHKIN, BASIN, CLRCH, READST
+-        .import         rwcommon
++        .import         rwcommon, rwcommonend, rwsetflags
+         .import         popax
+         .import         __oserror
+         .importzp       ptr1, ptr2, ptr3, tmp1, tmp2, tmp3
+@@ -46,73 +46,55 @@
+         jsr     rwcommon        ; Pop params, check handle
+         bcs     errout          ; Invalid handle, errno already set
+ 
+-; Check if the LFN is valid and the file is open for writing
++; Check if the LFN is valid and the file is open for reading
+ 
+-        adc     #LFN_OFFS       ; Carry is already clear
+-        tax
+-        lda     fdtab-LFN_OFFS,x; Get flags for this handle
+-        and     #LFN_READ       ; File open for writing?
+-        beq     notopen
++        lsr                     ; File open for reading?
++        bcc     notopen
+ 
+ ; Check the EOF flag. If it is set, don't read anything
+ 
+-        lda     fdtab-LFN_OFFS,x; Get flags for this handle
++        asl
+         bmi     eof
+ 
+ ; Valid lfn. Make it the input file
+ 
+-        jsr     CHKIN
++nblk:   jsr     CHKIN
+         bcs     error
+ 
+-; Go looping...
++; Decrement the count
+ 
+-        bcc     @L3             ; Branch always
++@L3:    inc     ptr1
++        bne     @L0
++        inc     ptr1+1
++        beq     done            ; Branch always
+ 
+ ; Read the next byte
+ 
+ @L0:    jsr     BASIN
+         sta     tmp1            ; Save the input byte
+ 
+         jsr     READST          ; Read the IEEE status
+-        sta     tmp3            ; Save it
++        cmp     #1              ; Save it
+         and     #%10111111      ; Check anything but the EOI bit
+         bne     error5          ; Assume device not present
+ 
+ ; Store the byte just read
+ 
+-        ldy     #0
++        tay
+         lda     tmp1
+         sta     (ptr2),y
+         inc     ptr2
+         bne     @L1
+         inc     ptr2+1          ; *buf++ = A;
+ 
+-; Increment the byte count
+-
+-@L1:    inc     ptr3
+-        bne     @L2
+-        inc     ptr3+1
+-
+ ; Get the status again and check the EOI bit
+ 
+-@L2:    lda     tmp3
+-        and     #%01000000      ; Check for EOI
+-        bne     @L4             ; Jump if end of file reached
+-
+-; Decrement the count
+-
+-@L3:    inc     ptr1
+-        bne     @L0
+-        inc     ptr1+1
+-        bne     @L0
+-        beq     done            ; Branch always
++@L1:    bcc     @L3             ; Loop if no end of file
+ 
+ ; Set the EOI flag and bail out
+ 
+-@L4:    ldx     tmp2            ; Get the handle
+         lda     #LFN_EOF
+-        ora     fdtab,x
+-        sta     fdtab,x
++        jsr     rwsetflags
+ 
+ ; Read done, close the input channel
+ 
+@@ -120,9 +102,7 @@
+ 
+ ; Return the number of chars read
+ 
+-eof:    lda     ptr3
+-        ldx     ptr3+1
+-        rts
++eof:    jmp     rwcommonend
+ 
+ ; Error entry, file is not open
+ 
+@@ -132,7 +112,8 @@
+ 
+ ; Error entry, status not ok
+ 
+-error5: lda     #5              ; Device not present
++error5: jsr     CLRCH
++	lda     #5              ; Device not present
+ error:  sta     __oserror
+ errout: lda     #$FF
+         tax                     ; Return -1
+diff -urN cc65-snapshot-2.13.9.20100309/libsrc/cbm/rwcommon.s cc65-snapshot-2.13.9.20100309.new/libsrc/cbm/rwcommon.s
+--- cc65-snapshot-2.13.9.20100309/libsrc/cbm/rwcommon.s	2002-12-03 23:31:06.000000000 +0100
++++ cc65-snapshot-2.13.9.20100309.new/libsrc/cbm/rwcommon.s	2010-03-14 12:56:45.815074513 +0100
+@@ -4,8 +4,9 @@
+ ; Common stuff for the read/write routines
+ ;
+ 
+-        .export         rwcommon
++        .export         rwcommon, rwcommonend, rwsetflags
+ 
++        .import         CLRCH
+         .import         popax
+         .importzp       ptr1, ptr2, ptr3, tmp2
+ 
+@@ -31,16 +32,18 @@
+         sta     ptr2
+         stx     ptr2+1
+ 
+-        lda     #$00
+         sta     ptr3
+-        sta     ptr3+1          ; Clear ptr3
++        stx     ptr3+1          ; for length
+ 
+         jsr     popax           ; Get the handle
+         cpx     #$01
+         bcs     invhandle
+         cmp     #MAX_FDS
+         bcs     invhandle
++        adc     #LFN_OFFS       ; Carry is already clear
+         sta     tmp2
++        tax
++        lda     fdtab-LFN_OFFS,x; Get flags for this handle
+         rts                     ; Return with carry clear
+ 
+ invhandle:
+@@ -52,4 +55,24 @@
+ 
+ .endproc
+ 
++.proc   rwsetflags
++        ldx     tmp2
++        ora     fdtab-LFN_OFFS,x; Get flags for this handle
++        sta     fdtab-LFN_OFFS,x; Get flags for this handle
++        rts
++.endproc
++
++.proc   rwcommonend
++        lda     ptr2
++        sec
++        sbc     ptr3
++        pha
++        lda     ptr2+1
++        sbc     ptr3+1
++        tax
++        pla
++        rts
++
++.endproc
++
+ 
+diff -urN cc65-snapshot-2.13.9.20100309/libsrc/cbm/write.s cc65-snapshot-2.13.9.20100309.new/libsrc/cbm/write.s
+--- cc65-snapshot-2.13.9.20100309/libsrc/cbm/write.s	2005-02-26 10:28:46.000000000 +0100
++++ cc65-snapshot-2.13.9.20100309.new/libsrc/cbm/write.s	2010-03-14 12:56:39.491824195 +0100
+@@ -7,10 +7,10 @@
+         .export         _write
+         .constructor    initstdout
+ 
+-        .import         SETLFS, OPEN, CKOUT, BSOUT, CLRCH
+-        .import         rwcommon
++        .import         SETLFS, OPEN, CKOUT, BSOUT, CLRCH, IDE64BLKWR
++        .import         rwcommon, rwcommonend, rwsetflags, rwide64prepare, rwide64finish
+         .import         __oserror
+-        .importzp       sp, ptr1, ptr2, ptr3
++        .importzp       sp, ptr1, ptr2
+ 
+         .include        "fcntl.inc"
+         .include        "cbm.inc"
+@@ -52,15 +52,12 @@
+ 
+ ; Check if the LFN is valid and the file is open for writing
+ 
+-        adc     #LFN_OFFS       ; Carry is already clear
+-        tax
+-        lda     fdtab-LFN_OFFS,x; Get flags for this handle
+         and     #LFN_WRITE      ; File open for writing?
+         beq     notopen
+ 
+ ; Valid lfn. Make it the output file
+ 
+-        jsr     CKOUT
++nblk:   jsr     CKOUT
+         bcs     error
+         bcc     @L2
+ 
+@@ -74,12 +71,6 @@
+ @L1:    jsr     BSOUT
+         bcs     error           ; Bail out on errors
+ 
+-; Count characters written
+-
+-        inc     ptr3
+-        bne     @L2
+-        inc     ptr3+1
+-
+ ; Decrement count
+ 
+ @L2:    inc     ptr1
+@@ -93,9 +84,7 @@
+ 
+ ; Return the number of chars written
+ 
+-        lda     ptr3
+-        ldx     ptr3+1
+-        rts
++        jmp     rwcommonend
+ 
+ ; Error entry, file is not open
+ 
+

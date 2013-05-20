@@ -1,0 +1,201 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] snapshot #1</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] snapshot #1">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] snapshot #1</h1>
+<!-- received="Wed Sep 26 15:45:23 2001" -->
+<!-- isoreceived="20010926134523" -->
+<!-- sent="Wed, 26 Sep 2001 15:47:08 +0200" -->
+<!-- isosent="20010926134708" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] snapshot #1" -->
+<!-- id="1218137286.20010926154708@gmx.net" -->
+<!-- inreplyto="20010926145843.A30037@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20snapshot%20#1"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2001-09-26 15:47:08
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0756.html">MagerValp: "Re: Re[2]: [cc65] snapshot #1"</a>
+<li><strong>Previous message:</strong> <a href="0754.html">Ullrich von Bassewitz: "Re: [cc65] snapshot #1"</a>
+<li><strong>In reply to:</strong> <a href="0754.html">Ullrich von Bassewitz: "Re: [cc65] snapshot #1"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0756.html">MagerValp: "Re: Re[2]: [cc65] snapshot #1"</a>
+<li><strong>Reply:</strong> <a href="0756.html">MagerValp: "Re: Re[2]: [cc65] snapshot #1"</a>
+<li><strong>Reply:</strong> <a href="0758.html">Ullrich von Bassewitz: "Re: [cc65] snapshot #1"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+UvB&gt; Sorry for the late answer. I didn't find the time to have a closer look at all
+UvB&gt; the sources, but...
+
+hehe ;=P i was actually already wondering why it became that quiet on
+the list since i posted my stuff ;=) before everyone seems to be in
+urgent need for that file-stuff hehe ,=) (maybe my code is just to bad
+to serve them well? mmh....but damn i'd like to know THAT aswell ;=P)
+
+UvB&gt; I've recently added support for the Commodore 510 (aka P500) to the compiler
+UvB&gt; package. It is on par with CBM610 support, plus mouse and joystick routines.
+UvB&gt; When doing tests, I noticed that is is quite easy to port programs from the
+UvB&gt; C64 (or C128) to the P500, because it does also have a VIC and a SID and even
+UvB&gt; somewhat more free memory than the C64. As a result, the mousedemo and nachtm
+UvB&gt; samples do also run on the P500.
+
+mmmh.... may it be even possible to port bigger c64 programs then?
+what about the kernal/basic rom in the p500 (never heard of a C510
+;=)) .... maybe an interisting target for a WiLD! Demo ;=P
+
+UvB&gt; When searching for more sample programs, I found the plasma.c code in your
+UvB&gt; package. It was rather slow with the official compiler release (2 frames per
+UvB&gt; second), and contained too much C64 specific code for my taste. So I did some
+UvB&gt; code cleanup (which improved the speed by almost 50%) and added a few macros
+UvB&gt; to make it compile for both, the C64 and CBM510.
+
+would you sent that main.c to me in private mail? i'd love to checkout
+what you actually changed in the code to make it faster :=)
+
+UvB&gt; The nice thing when writing your own compiler is that you can add
+UvB&gt; optimizations that will make your benchmark programs look good:-) (all chip
+UvB&gt; makers do this to get higher SPEC ratings). Adding such optimizations improved
+UvB&gt; the fps of the plasma.c sample by about 400% - it does now run with ~12 frames
+UvB&gt; per second (pure C!), and looks really great.
+
+hehe NICE improvement really.... i actually was a bit disappointed
+when i have seen it run at 2fps only since its VERY easy to get this
+routine running in one frame (less than 60% of a frame actually) if
+you code it in asm (that wouldnt even be the most optimized and
+unrolled as hell version then)...
+
+12 fps is VERY acceptable now i think, considering how hard the job
+for the compiler is in this case :=) so would there be chance that one
+will be able to write c-code that will compile the innerloop into
+something like
+
+          ...
+          lda xbuff,x
+          clc              ; drop this in handcoded routine....noone
+                           ; on earth will notice the error ;=P
+          adc ybuff,y
+          ldy #$00
+          sta (screen),y
+          ...
+
+instead of accessing those 2 little buffers via indirect adressing
+aswell ? (my first thought was, add some optimization to the compiler
+so arrays &lt;256 elements can be accessed via x/y indexed adressing)
+
+btw, just for curiousity.... the same plasma compiled for WIN32 (using
+mingw32 - YEAH i managed to set it up properly ;D) runs kind of DEAD
+SLOW ,=P ~20fps in a 80x50 resolution (on p450) ... i am no more
+wondering now why windoze apps are slowish hehehehe .=)
+
+UvB&gt; Because sample code is a great way to show people what is possible with the
+UvB&gt; compiler, and to get them started using the tool chain, I would like to ask if
+UvB&gt; you would allow me to distribute this code as part of the cc65 samples?
+
+pretty much definetly YES ;=P if anything, i am writing those little
+samples to show ppl what can be done and how ;=)
+
+UvB&gt; And, if anyone else is willing to contribute code that is written in C and
+UvB&gt; suitable as a sample program, please contact me. Things like graphics and
+UvB&gt; sound are great, because they are appealing for many end users.
+
+i am probably going to knock up some more of those little things i
+guess.... those kinda routines (plasma, radial mapping,
+mandelbrot-zoomer, zoom-rotator etc) belong to my personal &quot;test
+suite&quot; which i use to check how well certain techniques work on a new
+platform.... and yeah, they make a pretty good benchmark aswell :o)
+
+UvB&gt; I will definitely try to get a new release out of the door, but unfortunately
+UvB&gt; there are several areas where more work is needed because essential features
+UvB&gt; are missing (there are programs that won't compile). I don't know, if I will
+UvB&gt; be able to have a closer look at your libraries until then.
+
+well...no hurry.... those libraries are by far _NOT_ in a shape one
+could add them to whatever serious 'official' release.... they do
+somewhat work for the purpose i have used them for, but thats all....
+take them as a sneak-peek into what i am playing around with, i just
+thought i could share them even at this point since they could be
+useful for some people.
+
+however.... we have also talked about this before, i have almost
+finished a library that can deal with floating-point numbers ;=) for
+now its just a stub that wraps some functions from the basic-rom into
+c-functions, but it implements all arithmetic/logical/mathematical
+functions that you could think of (no derivated functions ofcoz),
+including the cbm-basic specialty which is calculating n-grade
+polynoms (very useful for calculating/approximating whatever
+trig./math functions that could come across your way).
+
+anyway, it works fine so far, just one question: how can i make SURE
+that this library-module will be linked in say straight after the
+startup-code (so it will never appear in the memory which is banked
+under the basic-rom) ? theres not a high chance that this is going to
+be a problem anyway i guess (not in my test programs however hehee)
+but i'd ofcoz want to make it 100% right.
+
+maybe there's a snapshot#2 soonish then ,=P (and after that... i need
+hires-gfx lib so i'll implement it aswell hehe ,=))
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20snapshot%20#1">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20snapshot%20#1">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0756.html">MagerValp: "Re: Re[2]: [cc65] snapshot #1"</a>
+<li><strong>Previous message:</strong> <a href="0754.html">Ullrich von Bassewitz: "Re: [cc65] snapshot #1"</a>
+<li><strong>In reply to:</strong> <a href="0754.html">Ullrich von Bassewitz: "Re: [cc65] snapshot #1"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0756.html">MagerValp: "Re: Re[2]: [cc65] snapshot #1"</a>
+<li><strong>Reply:</strong> <a href="0756.html">MagerValp: "Re: Re[2]: [cc65] snapshot #1"</a>
+<li><strong>Reply:</strong> <a href="0758.html">Ullrich von Bassewitz: "Re: [cc65] snapshot #1"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:42 CET</em>
+</em>
+</small>
+</body>
+</html>

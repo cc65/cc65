@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Memory impact of Atari lib</title>
+<meta name="Author" content="Daniel Serpell (daniel.serpell1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] Memory impact of Atari library compile time defines" />
+<meta name="Date" content="2009-11-27" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Memory impact of Atari library compile time defines</h1>
+<!-- received="Fri Nov 27 01:08:08 2009" -->
+<!-- isoreceived="20091127000808" -->
+<!-- sent="Thu, 26 Nov 2009 21:07:58 -0300" -->
+<!-- isosent="20091127000758" -->
+<!-- name="Daniel Serpell" -->
+<!-- email="daniel.serpell1gmail.com" -->
+<!-- subject="Re: [cc65] Memory impact of Atari library compile time defines" -->
+<!-- id="f0796bb70911261607g7c626dfdk461b2c1323ef9210@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20091126161609.GA25351&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7646.html" title="Daniel Serpell: &quot;Re: [cc65] Memory impact of Atari library compile time defines&quot;">Next message</a> ]
+[ <a href="7644.html" title="Oliver Schmidt: &quot;Re: [cc65] Memory impact of Atari library compile time defines&quot;">Previous message</a> ]
+[ <a href="7641.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Memory impact of Atari library compile time defines&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7646.html" title="Daniel Serpell: &quot;Re: [cc65] Memory impact of Atari library compile time defines&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Daniel Serpell &lt;<a href="mailto:daniel.serpell1gmail.com?Subject=Re:%20[cc65]%20Memory%20impact%20of%20Atari%20library%20compile%20time%20defines">daniel.serpell1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-11-27 01:07:58</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+On Thu, Nov 26, 2009 at 1:16 PM, Ullrich von Bassewitz &lt;uz&#64;musoftware&#46;<!--nospam-->de&gt; wrote:
+&gt;
+[...]
+&gt;
+&gt; I see the portability argument (thanks for pointing this out), so contrary
+&gt; what I wrote before, I do now opt to leave the uppercasing in place. I'm still
+&gt; concerned about the size of the routine, but maybe we can get this under
+&gt; control by other measures.
+&gt;
+
+But currently, the size of ucase_fn is not that big, after my las patch that
+allocates a fixed 128 byte buffer for the uppercased filename in BSS, this
+is the sizes of the bigger modules loaded in my &quot;fileio.c&quot; test:
+
+  45  atari.lib(rwcommon.o):   CODE
+  48  atari.lib(dosdetect.o):  INIT
+  56  fileio.o:                CODE
+  66  atari.lib(getfd.o):      CODE
+  70  atari.lib(ucase_fn.o):   CODE
+  80  atari.lib(getdefdev.o):  CODE
+ 106  atari.lib(fputs.o):      CODE
+ 118  atari.lib(crt0.o):       STARTUP
+ 123  atari.lib(_fopen.o):     CODE
+ 173  atari.lib(open.o):       CODE
+ 256  atari.lib(ctype.o):      RODATA
+ 408  atari.lib(fdtable.o):    CODE
+-------------------------
+2133  TOTAL
+
+As you see, the two bigger are &quot;fdtable.o&quot; and &quot;ctype.o&quot;. The last one is
+used by the uppercasing, causing the program to get 256 bytes bigger when
+including the uppercasing routines. But ctype is also a very common module,
+I don't think is worth removing, but perhaps a simple code to substract 64 to
+all chars from 97-125 is better.
+
+&gt; Another idea (just for discussion) is to supply two modules: A do-nothing one,
+&gt; which is enabled by default, and a second one, that may be linked in using -u
+&gt; on the linker command line. Linking in the second module will enable
+&gt; uppercasing of filenames. This is similar to the current solution, but the
+&gt; programmer may choose without having to use a modified runtime library. This
+&gt; would need a highlighted warning in the Atari docs: &quot;If you want to support
+&gt; SpartaDOS 2.5 (or whatever it was), you MUST link with -u foobar&quot;.
+
+In fact, the prepending of the drive letter is necessary on all DOSs,
+so the only
+way the &quot;simple&quot; code could work is using &quot;D:&quot; in front of every filename,
+including the  tgi drivers, etc. And if we need prepending something to the
+filename string, uppercasing it is not a big deal, I think.
+
+    Daniel.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Nov 27 01:08:08 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7646.html" title="Next message in the list">Daniel Serpell: "Re: [cc65] Memory impact of Atari library compile time defines"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7644.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Memory impact of Atari library compile time defines"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7641.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Memory impact of Atari library compile time defines"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7646.html" title="Next message in this discussion thread">Daniel Serpell: "Re: [cc65] Memory impact of Atari library compile time defines"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7646.html" title="Message sent in reply to this message">Daniel Serpell: "Re: [cc65] Memory impact of Atari library compile time defines"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7645" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7645" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7645" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-11-27 01:08:10 CET
+</em></small></p>
+</body>
+</html>

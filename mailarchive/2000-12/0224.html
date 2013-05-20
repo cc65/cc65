@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Windows-1252">
+<title>cc65 mailing list archive: Re: [cc65] First steps</title>
+<meta name="Author" content="Spiro Trikaliotis (Trik-news_at_gmx.de)">
+<meta name="Subject" content="Re: [cc65] First steps">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] First steps</h1>
+<!-- received="Fri Dec 29 10:25:26 2000" -->
+<!-- isoreceived="20001229092526" -->
+<!-- sent="Fri, 29 Dec 2000 10:28:35 +0100" -->
+<!-- isosent="20001229092835" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="Trik-news_at_gmx.de" -->
+<!-- subject="Re: [cc65] First steps" -->
+<!-- id="001901c07179$b8885da0$0471a8c0@cs.unimagdeburg.de" -->
+<!-- charset="Windows-1252" -->
+<!-- inreplyto="20001228.234729.9958.2.tbsilvey@juno.com" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Spiro Trikaliotis (<a href="mailto:Trik-news_at_gmx.de?Subject=Re:%20[cc65]%20First%20steps"><em>Trik-news_at_gmx.de</em></a>)<br>
+<strong>Date:</strong> 2000-12-29 10:28:35
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0225.html">Ullrich von Bassewitz: "Re: [cc65] First steps"</a>
+<li><strong>Previous message:</strong> <a href="0223.html">Spiro Trikaliotis: "Re: [cc65] Version 2.6.0 released"</a>
+<li><strong>In reply to:</strong> <a href="0222.html">troy silvey: "[cc65] First steps"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0227.html">troy silvey: "Re: [cc65] First steps"</a>
+<li><strong>Reply:</strong> <a href="0227.html">troy silvey: "Re: [cc65] First steps"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Troy,
+
+I assume you use the WIN version of VICE.
+
+&gt; At long last I have time to work on some C code for
+&gt; the C64 using cc65. I have some simple questions.
+&gt; I have cc65 running well. I have written some basic
+&gt; test code in C, used cc65 to produce the asm source,
+&gt; and then used ca65 to produce the binary executable.
+
+Well, I only use cl65, but that doesn't make a difference (I hope).
+
+&gt; I am using vice for a C64 emulator. I have star
+&gt; commander for making disk images.
+
+You don't need the Star Commander, because:
+
+&gt; What is the easiest way to get my new binary files
+&gt; into vice and run the executable. I have been working
+&gt; on this for a couple of hours today and it is giving
+&gt; me difficulty. I can't seem to get a proper disk
+&gt; image and my files loaded to the emulator to run them.
+
+You don't need a disk image. Just go to the Menu &quot;Settings&quot;/&quot;Device
+settings&quot;, now select the register &quot;Drive 8&quot;, choose &quot;Directory&quot; and Browse
+to the directory your compiled file is stored. (Note: Don't type in the
+directory, really use the &quot;Browse&quot; button, because the type-in does not
+work, at least on my machine).
+
+Now, if you load the directory from drive 8, you see all the files in that
+directory. (Note: You must turn-off &quot;True drive emulation&quot; in the &quot;options&quot;
+menu for that to work!). Now, you can directly load your compiled file and
+run it.
+
+If you have generated a symbol file, just enter the VICE monitor and type
+the ll-command to load the symbols before executing the RUN, and you can
+debug your stuff.
+
+HTH,
+   Spiro.
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20First%20steps">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0225.html">Ullrich von Bassewitz: "Re: [cc65] First steps"</a>
+<li><strong>Previous message:</strong> <a href="0223.html">Spiro Trikaliotis: "Re: [cc65] Version 2.6.0 released"</a>
+<li><strong>In reply to:</strong> <a href="0222.html">troy silvey: "[cc65] First steps"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0227.html">troy silvey: "Re: [cc65] First steps"</a>
+<li><strong>Reply:</strong> <a href="0227.html">troy silvey: "Re: [cc65] First steps"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:37 CET</em>
+</em>
+</small>
+</body>
+</html>

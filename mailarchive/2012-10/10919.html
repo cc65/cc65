@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Literal cast to pointer genera</title>
+<meta name="Author" content="Brad Smith (rainwarrior1gmail.com)" />
+<meta name="Subject" content="[cc65] Literal cast to pointer generating unnecessary code with []." />
+<meta name="Date" content="2012-10-17" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Literal cast to pointer generating unnecessary code with [].</h1>
+<!-- received="Wed Oct 17 01:53:19 2012" -->
+<!-- isoreceived="20121016235319" -->
+<!-- sent="Tue, 16 Oct 2012 19:53:02 -0400" -->
+<!-- isosent="20121016235302" -->
+<!-- name="Brad Smith" -->
+<!-- email="rainwarrior1gmail.com" -->
+<!-- subject="[cc65] Literal cast to pointer generating unnecessary code with []." -->
+<!-- id="CAOTi9L8zE84=tC4XE0T-tSFw5wf_Biq=A28dbpQbdfmjF2ynkw@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10920.html" title="Christian Grössler: &quot;Re: [cc65] dio_query_sectcount() on Atari ?&quot;">Next message</a> ]
+[ <a href="10918.html" title="Oliver Schmidt: &quot;Re: [cc65] dio_query_sectcount() on Atari ?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10923.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Literal cast to pointer generating unnecessary code with [].&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Brad Smith &lt;<a href="mailto:rainwarrior1gmail.com?Subject=Re:%20[cc65]%20Literal%20cast%20to%20pointer%20generating%20unnecessary%20code%20with%20[].">rainwarrior1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-10-17 01:53:02</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I ran into an interesting case today. This is code produced by the
+latest snapshot (2.13.9.20121016). This is with -O, but the same basic
+problem appears without it.
+
+;
+; ((unsigned char*)0)[0x1234] = 5;
+;
+	jsr     decsp3
+	jsr     push0
+	lda     #$05
+	ldy     #$01
+	clc
+	pha
+	lda     #$12
+	adc     (sp),y
+	sta     (sp),y
+	pla
+	ldy     #$34
+	jsr     staspidx
+;
+; *(unsigned char*)(0 + 0x1234) = 5;
+;
+	lda     #$05
+	sta     $1234
+
+Specifically, in the former case it ends up doing all the work
+necessary to use indirect indexed addressing for the STA, instead of
+just using an absolute address. I presume the compiler thinks of
+((unsigned char*)0) as a variable pointer, rather than a fixed address
+that should be known at compile or link time? Using a global array
+seems to generate the compact absolute address STA that is expected.
+Similarly I could cast it to a struct * and access that struct's
+members and it still generates an absolute address. The problem only
+seems to be when I use [] with the cast pointer.
+
+-- Brad Smith
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Oct 17 01:53:19 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10920.html" title="Next message in the list">Christian Grössler: "Re: [cc65] dio_query_sectcount() on Atari ?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10918.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] dio_query_sectcount() on Atari ?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10923.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Literal cast to pointer generating unnecessary code with []."</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10923.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Literal cast to pointer generating unnecessary code with []."</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10919" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10919" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10919" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-10-17 01:53:23 CEST
+</em></small></p>
+</body>
+</html>

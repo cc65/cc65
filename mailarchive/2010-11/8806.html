@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] ca65 for stand-alone asm p</title>
+<meta name="Author" content="Agent Friday (64subnet1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] ca65 for stand-alone asm projects" />
+<meta name="Date" content="2010-11-08" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] ca65 for stand-alone asm projects</h1>
+<!-- received="Mon Nov  8 07:37:59 2010" -->
+<!-- isoreceived="20101108063759" -->
+<!-- sent="Sun, 7 Nov 2010 22:37:53 -0800" -->
+<!-- isosent="20101108063753" -->
+<!-- name="Agent Friday" -->
+<!-- email="64subnet1gmail.com" -->
+<!-- subject="Re: [cc65] ca65 for stand-alone asm projects" -->
+<!-- id="AANLkTi=7a5i4SefJtap5h09=MvqLGStsQinPm-37bgAP@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20101107111401.GA28860&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8807.html" title="Mario Fetka (geos_one): &quot;[cc65] Request to rename the make.sgml to cc65make.sgml&quot;">Next message</a> ]
+[ <a href="8805.html" title="Agent Friday: &quot;Re: [cc65] uIP and cc65&quot;">Previous message</a> ]
+[ <a href="8795.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8824.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Agent Friday &lt;<a href="mailto:64subnet1gmail.com?Subject=Re:%20[cc65]%20ca65%20for%20stand-alone%20asm%20projects">64subnet1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-11-08 07:37:53</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>UZ &lt;uz&#64;musoftware&#46;<!--nospam-->de&gt; wrote:
+&gt; On Sat, Nov 06, 2010 at 07:10:26PM -0300, Daniel Serpell wrote:
+&gt; &gt; &gt; If I'm getting this right then we could import the symbol _main from
+&gt; &gt; &gt; the &quot;usual&quot; (aka non-standalone-asm-program) linker configs :-)
+&gt; &gt;
+&gt; &gt; Currently, cc65 emits a &quot;.forceimport __STARTUP__&quot; directive in
+&gt; &gt; its assembly output if there is a main function defined in the .c file,
+&gt; &gt; to force the inclusion of the C startup at link time.
+&gt; &gt;
+&gt; &gt; This could be replaced by an import of __STARTUP__ from the
+&gt; &gt; linker config, and the special case for main removed from cc65.
+&gt;
+&gt; A useful suggestion from AgentFriday is probably, to place the headers in
+&gt; their own memory area, just to make clear that they're not part of what is
+&gt; loaded to RAM.
+
+I think that's a good complement to providing alternate targets for
+simple asm projects (like c64-asm)
+there's one suggestion that might round out the solution.
+
+The MEMORY section of the config file is a bit of a misnomer.  While
+the entries themselves are tailored for describing the addresses of
+RAM areas, the overall function of the section is to specify what
+goes into the &quot;binary&quot; file format.  I've never used the o65 format,
+but perhaps the same is not true there.
+
+Using a name like LAYOUT or FORMAT, rather than MEMORY, would better
+represent its broader purpose.  LAYOUT is probably best, since it
+can apply equally well to memory as well as files.
+
+Also confusing about entries meant only for the benefit of binary
+file creation is having to supply a START attribute.  It's really
+superfluous to those sections, and it would be nice to leave it
+out.  My suggestion would be to provide another TYPE attribute value
+of &quot;file&quot; or &quot;meta&quot; to signify the non-load sections.  (These
+entries are implicitly read-only, so to speak, and the TYPE doesn't
+provide any useful information either.)  Another option might be to
+specify something like &quot;START=none&quot;, but this is less clear.
+
+Since the non-loading file sections have no place in the o65 format,
+it seems you would need some such method to identify them.
+Otherwise, would the o65 generation code know to leave them out?
+It would be nice if you could choose between the binary and o65 file
+formats without having to make multiple changes in the config file--
+maybe even w/ a command-line override param.  (In case you are
+wondering, I do actually have a project in mind where I would want
+to produce either format at will.)
+
+
+// Agent Friday
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Nov  8 07:37:59 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8807.html" title="Next message in the list">Mario Fetka (geos_one): "[cc65] Request to rename the make.sgml to cc65make.sgml"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8805.html" title="Previous message in the list">Agent Friday: "Re: [cc65] uIP and cc65"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8795.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8824.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8824.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8806" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8806" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8806" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-11-08 07:38:02 CET
+</em></small></p>
+</body>
+</html>

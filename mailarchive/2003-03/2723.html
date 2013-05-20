@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Renaming imported zeropag</title>
+<meta name="Author" content="Marc 'BlackJack' Rintsch (marc_at_rintsch.de)">
+<meta name="Subject" content="Re: [cc65] Renaming imported zeropage variables in ca65">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Renaming imported zeropage variables in ca65</h1>
+<!-- received="Wed Mar 12 22:37:20 2003" -->
+<!-- isoreceived="20030312213720" -->
+<!-- sent="Wed, 12 Mar 2003 22:33:51 +0100" -->
+<!-- isosent="20030312213351" -->
+<!-- name="Marc 'BlackJack' Rintsch" -->
+<!-- email="marc_at_rintsch.de" -->
+<!-- subject="Re: [cc65] Renaming imported zeropage variables in ca65" -->
+<!-- id="200303122233.51975.marc@rintsch.de" -->
+<!-- inreplyto="20030312105743.GA5976@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Marc 'BlackJack' Rintsch (<a href="mailto:marc_at_rintsch.de?Subject=Re:%20[cc65]%20Renaming%20imported%20zeropage%20variables%20in%20ca65"><em>marc_at_rintsch.de</em></a>)<br>
+<strong>Date:</strong> 2003-03-12 22:33:51
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2722.html">Ullrich von Bassewitz: "Re: [cc65] NES / PCE libs"</a>
+<li><strong>In reply to:</strong> <a href="2718.html">Ullrich von Bassewitz: "Re: [cc65] Renaming imported zeropage variables in ca65"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2724.html">Ullrich von Bassewitz: "Re: [cc65] Renaming imported zeropage variables in ca65"</a>
+<li><strong>Reply:</strong> <a href="2724.html">Ullrich von Bassewitz: "Re: [cc65] Renaming imported zeropage variables in ca65"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Wednesday 12 March 2003 11:57, Ullrich von Bassewitz wrote:
+
+&gt; &gt; Is there any way to declare a label explicitly as zeropage address?
+&gt; &gt;
+&gt; &gt; I want to rename some imported zeropage labels within the scope of
+&gt; &gt; a .proc but the assembler creates absolute adressing.
+&gt;
+&gt; Which assembler version are you using? Your program works here as it
+&gt; should:
+
+I'm using 2.9.0 and I'm feeling a bit silly because it wasn't a problem 
+with renaming *within* the .proc but when I assign the variables 
+*outside* of a .proc block. Shouldn't try to debug my messy code late 
+at night. x-)
+
+Let's try again:
+
+;-----
+        .importzp zp1
+        foo = zp1
+        
+.proc
+	bar = zp1
+.code
+        sta foo
+	sta bar
+.endproc
+;-----
+
+assembles to:
+
+;-----
+ca65 V2.9.0 - (C) Copyright 1998-2000 Ullrich von Bassewitz
+Main file   : test.s
+Current file: test.s
+
+000000r 1                       .importzp zp1
+000000r 1                       foo = zp1
+000000r 1                       
+000000r 1               .proc
+000000r 1                       bar = zp1
+000000r 1               .code
+000000r 1  8D rr rr             sta foo
+000003r 1  85 rr                sta bar
+000005r 1               .endproc
+000005r 1               
+;-----
+
+Shouldn't both STAs use zp adressing? If I use indirect adressing like 
+'STA (foo),y' the assembler emits the expected code.
+
+Ciao,
+	Marc 'BlackJack' Rintsch
+-- 
+&quot;It's too bad she won't live! But then again, who does?&quot;
+  -- Gaff in &quot;Blade Runner&quot;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Renaming%20imported%20zeropage%20variables%20in%20ca65">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2722.html">Ullrich von Bassewitz: "Re: [cc65] NES / PCE libs"</a>
+<li><strong>In reply to:</strong> <a href="2718.html">Ullrich von Bassewitz: "Re: [cc65] Renaming imported zeropage variables in ca65"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2724.html">Ullrich von Bassewitz: "Re: [cc65] Renaming imported zeropage variables in ca65"</a>
+<li><strong>Reply:</strong> <a href="2724.html">Ullrich von Bassewitz: "Re: [cc65] Renaming imported zeropage variables in ca65"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-03-12 22:37:25 CET</em>
+</em>
+</small>
+</body>
+</html>

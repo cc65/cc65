@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] Solution for Variable-argumen</title>
+<meta name="Author" content="Greg King (gngking_at_erols.com)">
+<meta name="Subject" content="[cc65] Solution for Variable-argument-list Problem">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] Solution for Variable-argument-list Problem</h1>
+<!-- received="Wed Nov 29 23:32:26 2000" -->
+<!-- isoreceived="20001129223226" -->
+<!-- sent="Wed, 29 Nov 2000 17:32:12 -0500" -->
+<!-- isosent="20001129223212" -->
+<!-- name="Greg King" -->
+<!-- email="gngking_at_erols.com" -->
+<!-- subject="[cc65] Solution for Variable-argument-list Problem" -->
+<!-- id="007e01c05a54$3ab58060$9fd93ad0@palace" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Greg King (<a href="mailto:gngking_at_erols.com?Subject=Re:%20[cc65]%20Solution%20for%20Variable-argument-list%20Problem"><em>gngking_at_erols.com</em></a>)<br>
+<strong>Date:</strong> 2000-11-29 23:32:12
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0187.html">Ullrich von Bassewitz: "Re: [cc65] Solution for Variable-argument-list Problem"</a>
+<li><strong>Previous message:</strong> <a href="0185.html">Nikkinen: "Re: [cc65] Need help.."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0187.html">Ullrich von Bassewitz: "Re: [cc65] Solution for Variable-argument-list Problem"</a>
+<li><strong>Reply:</strong> <a href="0187.html">Ullrich von Bassewitz: "Re: [cc65] Solution for Variable-argument-list Problem"</a>
+<li><strong>Maybe reply:</strong> <a href="../2000-12/0196.html">Greg King: "Re: [cc65] Solution for Variable-argument-list Problem"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Here is a way to fix cc65's variable-argument-list problem:
+
+When cc65 compiles a &quot;varargs&quot; function, it knows about the named (fixxed)
+parameters; it does not know about the unnamed (variable) parameters.  When
+you use a named parameter inside that function, cc65 points to where it
+thinks that argument sits on the data-stack.  That location is different
+from the true location by the length of all of the variable arguments.  The
+compiler needs to add that length to the &quot;fixxed-offset,&quot; in order to
+&quot;touch&quot; the proper argument.
+
+The library's &quot;enter&quot; subroutine can compute that length.  It gets the size
+of the entire argument-list from the caller.  Cc65 can give, to &quot;enter,&quot;
+the size of the fixxed part of that list.  The subroutine can subtract one
+size from the other, and put the difference on the stack.  After that, the
+compiler can include code to add it to offsets whenever cc65 wants a named
+argument.
+
+Until the compiler is fixxed, you can use this &quot;standard argument header&quot;
+file, to do the same thing.  Wrap my va_par() macro around the names of
+fixxed parameters.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+/* stdarg.h -- 2000-11-26 G.King
+**
+** Ullrich von Bassewitz, 31.05.1998
+*/
+#ifndef _STDARG_H
+#define _STDARG_H
+
+/* Declare these automatic local variables, in the function:
+** va_list ap;
+** unsigned char _va_;
+*/
+
+/* Standard C macroes */
+
+typedef unsigned char* va_list;
+
+#define va_start(ap, last) (ap) = (va_list)&amp;(last) + \
+   (_va_ = *((va_list)&amp;(last)-1) - (unsigned char)__fixargs__)
+#define va_arg(ap, type) ((type)*((ap) -= ((sizeof (type) + 1) &amp; ~1)))
+#define va_end(ap)
+
+#define va_copy(dest, src) ((dest)=(src))
+
+/* cc65 macroes */
+
+#define va_par(name, type) (*(type*)((va_list)&amp;(name) + _va_))
+
+/* va_fix() makes smaller code than va_par(); but, it is less &quot;portable,&quot;
+** can't work after va_arg() is used, and assumes that all arguments
+** are two bytes long.
+*/
+#define va_fix(ap, num)  (*((ap)+(__fixargs__-(num)*2)))
+
+#endif /* End of stdarg.h */
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Solution%20for%20Variable-argument-list%20Problem">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0187.html">Ullrich von Bassewitz: "Re: [cc65] Solution for Variable-argument-list Problem"</a>
+<li><strong>Previous message:</strong> <a href="0185.html">Nikkinen: "Re: [cc65] Need help.."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0187.html">Ullrich von Bassewitz: "Re: [cc65] Solution for Variable-argument-list Problem"</a>
+<li><strong>Reply:</strong> <a href="0187.html">Ullrich von Bassewitz: "Re: [cc65] Solution for Variable-argument-list Problem"</a>
+<li><strong>Maybe reply:</strong> <a href="../2000-12/0196.html">Greg King: "Re: [cc65] Solution for Variable-argument-list Problem"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:37 CET</em>
+</em>
+</small>
+</body>
+</html>

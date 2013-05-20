@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Character encoding - configura</title>
+<meta name="Author" content="Andreas Koch (email1kochandreas.com)" />
+<meta name="Subject" content="[cc65] Character encoding - configurable?" />
+<meta name="Date" content="2007-03-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Character encoding - configurable?</h1>
+<!-- received="Sun Mar 25 13:16:22 2007" -->
+<!-- isoreceived="20070325111622" -->
+<!-- sent="Sun, 25 Mar 2007 13:17:13 +0200" -->
+<!-- isosent="20070325111713" -->
+<!-- name="Andreas Koch" -->
+<!-- email="email1kochandreas.com" -->
+<!-- subject="[cc65] Character encoding - configurable?" -->
+<!-- id="46065A39.9060404@kochandreas.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5660.html" title="Marc 'BlackJack' Rintsch: &quot;Re: [cc65] Character encoding - configurable?&quot;">Next message</a> ]
+[ <a href="5658.html" title="Shawn Jefferson: &quot;[cc65] Atari Library dosdetect.s&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5660.html" title="Marc 'BlackJack' Rintsch: &quot;Re: [cc65] Character encoding - configurable?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Andreas Koch &lt;<a href="mailto:email1kochandreas.com?Subject=Re:%20[cc65]%20Character%20encoding%20-%20configurable?">email1kochandreas.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-03-25 13:17:13</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi all,
+
+i'm working on a little game with modified charset.
+I noticed CC65 is translating uppercase letters to
+inverted uppercase chars (0xC0+) and lowercase
+letters to (uninverted) uppercase chars (0x40+).
+
+Would it be possible to make CC65 translate string
+constants so that lowercase chars actually become
+lowercase chars (0x00+)?
+
+I'd like
+
+unsigned char * data=&quot;Test&quot;;
+
+int main()
+{
+   int x,y;
+   for (x=0;x&lt;16;x++)
+     for (y=0;y&lt;16;y++)
+       (*(unsigned char*)(0x0400+x+(y+1)*40))=x+y*16;	
+   (*(unsigned char*)(0x0400))=data[0];
+   (*(unsigned char*)(0x0401))=data[1];
+   (*(unsigned char*)(0x0402))=data[2];
+   (*(unsigned char*)(0x0403))=data[3];
+   while(1);
+}
+
+to print &quot;Test&quot; instead of &quot;[T]EST&quot;
+
+thanks,
+   Andreas
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Mar 25 13:16:22 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5660.html" title="Next message in the list">Marc 'BlackJack' Rintsch: "Re: [cc65] Character encoding - configurable?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5658.html" title="Previous message in the list">Shawn Jefferson: "[cc65] Atari Library dosdetect.s"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5660.html" title="Next message in this discussion thread">Marc 'BlackJack' Rintsch: "Re: [cc65] Character encoding - configurable?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5660.html" title="Message sent in reply to this message">Marc 'BlackJack' Rintsch: "Re: [cc65] Character encoding - configurable?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="5661.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Character encoding - configurable?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5659" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5659" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5659" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-03-25 13:16:25 CEST
+</em></small></p>
+</body>
+</html>

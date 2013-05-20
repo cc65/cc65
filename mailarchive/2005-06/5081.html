@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Building latest snapshot faile</title>
+<meta name="Author" content="Johan Andersson (johanandersson1mac.com)" />
+<meta name="Subject" content="[cc65] Building latest snapshot failed" />
+<meta name="Date" content="2005-06-19" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Building latest snapshot failed</h1>
+<!-- received="Sun Jun 19 21:16:35 2005" -->
+<!-- isoreceived="20050619191635" -->
+<!-- sent="Sun, 19 Jun 2005 21:16:22 +0200" -->
+<!-- isosent="20050619191622" -->
+<!-- name="Johan Andersson" -->
+<!-- email="johanandersson1mac.com" -->
+<!-- subject="[cc65] Building latest snapshot failed" -->
+<!-- id="4DA76E9D-12B3-465A-8920-0B05E088E221@mac.com" -->
+<!-- charset="US-ASCII" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5082.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Building latest snapshot failed&quot;">Next message</a> ]
+[ <a href="5080.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] CVS and snapshots&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5082.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Building latest snapshot failed&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Johan Andersson &lt;<a href="mailto:johanandersson1mac.com?Subject=Re:%20[cc65]%20Building%20latest%20snapshot%20failed">johanandersson1mac.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-06-19 21:16:22</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+I just tried to build the latest snapshot of CC65 (20050609) using  
+GCC 4.0 on my Mac running OS X 10.4 (Tiger) and it failed. Are there  
+any special requirements for building CC65 on OS X? Browsing through  
+the mailing list archive it appear to have been done earlier.
+
+Regards,
+
+Johan Andersson
+
+The output from the compiler when the build failed:
+
+Creating dependency information
+gcc -I../common -MM dump.c error.c fileio.c global.c main.c &gt; .depend
+gcc -O2 -g -Wall -W -I../common   -c -o dump.o dump.c
+gcc -O2 -g -Wall -W -I../common   -c -o error.o error.c
+gcc -O2 -g -Wall -W -I../common   -c -o fileio.o fileio.c
+gcc -O2 -g -Wall -W -I../common   -c -o global.o global.c
+gcc -O2 -g -Wall -W -I../common   -c -o main.o main.c
+gcc  -o od65 -O2 -g -Wall -W -I../common dump.o error.o fileio.o  
+global.o main.o ../common/common.a
+for tgt in apple2 apple2enh atari atmos c16 c128 c64 cbm510 cbm610  
+geos lynx nes pet plus4 supervision vic20; do            \
+     make clean &quot;$tgt&quot;lib || exit 1;     \
+done
+for i in apple2 common runtime conio dbg em joystick tgi zlib; do \
+             make SYS=apple2 -C $i || exit 1; \
+     ../src/ar65/ar65 a apple2.lib $i/*.o;\
+done
+make -C ../runtime/ zeropage.o
+rm apple2-280-192-6.o apple2-stdjoy.o apple2-40-40-16.o apple2-lc.o
+ar65: Warning: Library `apple2.lib' not found - will be created
+_aligned_malloc.c(68): Error: Identifier expected
+_aligned_malloc.c(68): Warning: Implicit `int' is an obsolete feature
+_aligned_malloc.c(68): Error: `;' expected
+_aligned_malloc.c(68): Error: Identifier expected
+_aligned_malloc.c(68): Warning: Implicit `int' is an obsolete feature
+_aligned_malloc.c(68): Error: `;' expected
+_aligned_malloc.c(68): Error: Identifier expected
+_aligned_malloc.c(68): Warning: Implicit `int' is an obsolete feature
+_aligned_malloc.c(68): Error: `;' expected
+_aligned_malloc.c(68): Error: Identifier expected
+_aligned_malloc.c(68): Warning: Implicit `int' is an obsolete feature
+_aligned_malloc.c(68): Error: `;' expected
+_aligned_malloc.c(68): Error: Identifier expected
+_aligned_malloc.c(68): Warning: Implicit `int' is an obsolete feature
+_aligned_malloc.c(68): Error: `;' expected
+_aligned_malloc.c(68): Error: Identifier expected
+_aligned_malloc.c(68): Fatal: Too many errors
+make[3]: *** [_aligned_malloc.o] Error 1
+make[2]: *** [apple2lib] Error 1
+make[1]: *** [all] Error 1
+make: *** [libs] Error 2
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Jun 19 21:16:35 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5082.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Building latest snapshot failed"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5080.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] CVS and snapshots"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5082.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Building latest snapshot failed"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5082.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Building latest snapshot failed"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5081" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5081" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5081" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-06-19 21:16:38 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] hex encoded string bug?</title>
+<meta name="Author" content="Maspethrose71aol.com (Maspethrose71aol.com)" />
+<meta name="Subject" content="Re: [cc65] hex encoded string bug?" />
+<meta name="Date" content="2010-11-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] hex encoded string bug?</h1>
+<!-- received="Thu Nov 25 13:04:55 2010" -->
+<!-- isoreceived="20101125120455" -->
+<!-- sent="Thu, 25 Nov 2010 07:04:38 -0500 (EST)" -->
+<!-- isosent="20101125120438" -->
+<!-- name="Maspethrose71aol.com" -->
+<!-- email="Maspethrose71aol.com" -->
+<!-- subject="Re: [cc65] hex encoded string bug?" -->
+<!-- id="55e75.5b660793.3a1faad6@aol.com" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="[cc65] hex encoded string bug?" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8938.html" title="Groepaz: &quot;Re: [cc65] hex encoded string bug?&quot;">Next message</a> ]
+[ <a href="8936.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] hex encoded string bug?&quot;">Previous message</a> ]
+[ <a href="8934.html" title="Stefan Wessels: &quot;[cc65] hex encoded string bug?&quot;">Maybe in reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8938.html" title="Groepaz: &quot;Re: [cc65] hex encoded string bug?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:Maspethrose71aol.com?Subject=Re:%20[cc65]%20hex%20encoded%20string%20bug?">Maspethrose71aol.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-11-25 13:04:38</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Why not just define a hex escape sequence in a string literal as if it were 
+ a byte constant?
+
+
+-------------------
+Joseph Rose, a.k.a. Harry  Potter
+Working magic in the computer community...or at least striving to!  :(
+ 
+In a message dated 11/25/2010 5:53:26 A.M. Eastern Standard Time,  
+thefox&#64;aspekt&#46;<!--nospam-->fi writes:
+On Thu, Nov 25, 2010 at 12:32 PM, Stefan Wessels  &lt;swessels&#64;email&#46;<!--nospam-->com&gt; 
+wrote:
+&gt; I think there may be a bug in the way  cc65 deals with hex encoded 
+strings.  The following program has output as  shown when run on the C64 and OS X. 
+ I can't see any reason for the first  character coming out as 0x48 and the 
+5th as 0xc0.
+
+Not a bug. It applies a  character map to string literals based on
+system, in this case it maps from  ASCII 'h' (0x68) to PETSCII 'h'
+(0x48).
+
+Not really sure why you're  using string literals anyway, you could use
+something like this  instead:
+
+const unsigned char level_data[] = {
+0x68, 0x03, ...  etc
+};
+
+unsigned char *levelBuffer[1] =
+{
+level_data
+};
+
+-thefox
+----------------------------------------------------------------------
+To  unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the  string &quot;unsubscribe cc65&quot; in the body(!) of the  mail.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Nov 25 13:04:55 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8938.html" title="Next message in the list">Groepaz: "Re: [cc65] hex encoded string bug?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8936.html" title="Previous message in the list">silverdr1wfmh.org.pl: "Re: [cc65] hex encoded string bug?"</a></li>
+<li><dfn>Maybe in reply to</dfn>: <a href="8934.html" title="Message to which this message replies">Stefan Wessels: "[cc65] hex encoded string bug?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8938.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] hex encoded string bug?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8938.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] hex encoded string bug?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8937" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8937" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8937" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-11-25 13:04:59 CET
+</em></small></p>
+</body>
+</html>

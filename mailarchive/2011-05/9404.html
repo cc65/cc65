@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] ca65: .sizeof() doesn't re</title>
+<meta name="Author" content="Marc 'BlackJack' Rintsch (marc1rintsch.de)" />
+<meta name="Subject" content="Re: [cc65] ca65: .sizeof() doesn't return correct values?" />
+<meta name="Date" content="2011-05-09" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] ca65: .sizeof() doesn't return correct values?</h1>
+<!-- received="Mon May  9 09:47:27 2011" -->
+<!-- isoreceived="20110509074727" -->
+<!-- sent="Mon, 9 May 2011 09:30:29 +0200" -->
+<!-- isosent="20110509073029" -->
+<!-- name="Marc 'BlackJack' Rintsch" -->
+<!-- email="marc1rintsch.de" -->
+<!-- subject="Re: [cc65] ca65: .sizeof() doesn't return correct values?" -->
+<!-- id="201105090930.34835.marc@rintsch.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="4DC6E7DB.40301&#64;jade.plala.or.jp" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9405.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Re: TGI colors revisited&quot;">Next message</a> ]
+[ <a href="9403.html" title="Yutaka Amanai: &quot;Re: [cc65] ca65: .sizeof() doesn't return correct values?&quot;">Previous message</a> ]
+[ <a href="9403.html" title="Yutaka Amanai: &quot;Re: [cc65] ca65: .sizeof() doesn't return correct values?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9406.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65: .sizeof() doesn't return correct values?&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Marc 'BlackJack' Rintsch &lt;<a href="mailto:marc1rintsch.de?Subject=Re:%20[cc65]%20ca65:%20.sizeof()%20doesn't%20return%20correct%20values?">marc1rintsch.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-05-09 09:30:29</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Yutaka,
+
+&gt; But still there is a strange behavior. I wrote a test code:
+&gt; 
+&gt;    STR:    .byte   &quot;str&quot;
+&gt;    .proc   myproc
+&gt;            lda     STR,x
+&gt;            lda     #.sizeof(STR)
+&gt;    .endproc
+&gt; 
+&gt; Giving ca65 this code, it causes error: &quot;Size of `STR' is unknown&quot;.
+&gt; If you comment out the line &quot;lda STR,x&quot;, ca65 doesn't cause any
+&gt; error and .sizeof() returns 3. And, it seems that there are some
+&gt; ways to suppress this error:
+&gt;    * removing the lines &quot;.proc&quot; and &quot;.endproc&quot;
+&gt;    * explicitly specify STR as &quot;::STR&quot; (global label)
+&gt; Is it related to scope?
+
+I'd say yes.  There are two different labels called `STR`.  One global 
+and one local to `myproc`.  Just look at the produced listing::
+
+ 000000r 1  73 74 72        STR:    .byte   &quot;str&quot;
+ 000003r 1                  .proc   myproc
+ 000003r 1  BD rr rr                lda     STR,x
+ 000006r 1  A9 03                   lda     #.sizeof(::STR)
+ 000008r 1                  .endproc
+ 000008r 1               
+
+As you see the value of `myproc.STR` is not known.  The two bytes read 
+``rr``, meaning the linker has to plug in the correct value at link 
+time.
+
+Ciao,
+	Marc 'BlackJack' Rintsch
+-- 
+“I will not sell my kidney on eBay
+ I will not sell my kidney on eBay
+ I will not sell my kidney on eBay …”   -- Bart Simpson
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<div>
+<ul>
+<li>application/pgp-signature attachment: <a href="../att-9404/signature.asc_">This is a digitally signed message part.</a></li>
+</ul>
+<!-- attachment="signature.asc_" -->
+</div>
+<span id="received"><dfn>Received on</dfn> Mon May  9 09:47:27 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9405.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Re: TGI colors revisited"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9403.html" title="Previous message in the list">Yutaka Amanai: "Re: [cc65] ca65: .sizeof() doesn't return correct values?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9403.html" title="Message to which this message replies">Yutaka Amanai: "Re: [cc65] ca65: .sizeof() doesn't return correct values?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9406.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] ca65: .sizeof() doesn't return correct values?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9404" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9404" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9404" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-05-09 09:47:31 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] C64 drive direct access questi</title>
+<meta name="Author" content="Raj Wurttemberg (rajw1c64.us)" />
+<meta name="Subject" content="[cc65] C64 drive direct access question" />
+<meta name="Date" content="2005-10-22" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] C64 drive direct access question</h1>
+<!-- received="Sat Oct 22 20:44:49 2005" -->
+<!-- isoreceived="20051022184449" -->
+<!-- sent="Sat, 22 Oct 2005 14:42:44 -0400" -->
+<!-- isosent="20051022184244" -->
+<!-- name="Raj Wurttemberg" -->
+<!-- email="rajw1c64.us" -->
+<!-- subject="[cc65] C64 drive direct access question" -->
+<!-- id="20051022184439.22A96BAF1@mail.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5246.html" title="Spiro Trikaliotis: &quot;Re: [cc65] C64 drive direct access question&quot;">Next message</a> ]
+[ <a href="5244.html" title="MagerValp: &quot;[cc65] Makefiles again&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5246.html" title="Spiro Trikaliotis: &quot;Re: [cc65] C64 drive direct access question&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Raj Wurttemberg &lt;<a href="mailto:rajw1c64.us?Subject=Re:%20[cc65]%20C64%20drive%20direct%20access%20question">rajw1c64.us</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-10-22 20:42:44</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I'm working on my 1541 disk drive testing helper program when I have time
+and I have been using the book &quot;Inside Commodore DOS&quot;. I was trying to get
+the 1541 to move the head to a specified track and was not having any luck.
+
+The cc65 code was correct but I could not get the drive head to move.
+Well... It was a type-o in the documentation in the book. On page 105 the
+last line is:
+
+390 print#15,&quot;m-w&quot;chr$(0)chr$(0)chr$(1)chr$(job)
+
+The line should read:
+
+390 print#15,&quot;m-w&quot;chr$(0)chr$(0)chr$(2)chr$(job)
+
+For my program in C it looks like this:
+
+unsigned char cmW2r[] = { 'm', '-', 'w', 0, 0, 2, 0xb0 };
+
+Hope this helps anyone (like me) learning to use 1541 direct access
+commands.
+
+/*Raj*/
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Oct 22 20:44:49 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5246.html" title="Next message in the list">Spiro Trikaliotis: "Re: [cc65] C64 drive direct access question"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5244.html" title="Previous message in the list">MagerValp: "[cc65] Makefiles again"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5246.html" title="Next message in this discussion thread">Spiro Trikaliotis: "Re: [cc65] C64 drive direct access question"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5246.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Re: [cc65] C64 drive direct access question"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="../2005-11/5251.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] C64 drive direct access question"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5245" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5245" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5245" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-10-22 20:44:52 CEST
+</em></small></p>
+</body>
+</html>

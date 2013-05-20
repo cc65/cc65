@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] TGI bitmap fnts revisited</title>
+<meta name="Author" content="Greg King (greg.king41verizon.net)" />
+<meta name="Subject" content="Re: [cc65] TGI bitmap fnts revisited" />
+<meta name="Date" content="2011-07-18" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] TGI bitmap fnts revisited</h1>
+<!-- received="Mon Jul 18 13:36:02 2011" -->
+<!-- isoreceived="20110718113602" -->
+<!-- sent="Mon, 18 Jul 2011 06:24:12 -0400" -->
+<!-- isosent="20110718102412" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king41verizon.net" -->
+<!-- subject="Re: [cc65] TGI bitmap fnts revisited" -->
+<!-- id="004901cc4536$786d95e0$443efea9@monarch" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="20110717132217.GA27523&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9602.html" title="Per Olofsson: &quot;Re: [cc65] Entertainment: EventOs&quot;">Next message</a> ]
+[ <a href="9600.html" title="Greg King: &quot;Re: [cc65] sizof zp registers&quot;">Previous message</a> ]
+[ <a href="9594.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] TGI bitmap fnts revisited&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+[ <a href="9572.html" title="Greg King: &quot;Re: [cc65] TGI bitmap fnts revisited&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king41verizon.net?Subject=Re:%20[cc65]%20TGI%20bitmap%20fnts%20revisited">greg.king41verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-07-18 12:24:12</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: &quot;Ullrich von Bassewitz&quot;; on Sun, July 17, 2011; at 09:22 AM -0400
+&gt;  
+&gt; On Sun, Jul 17, 2011 at 02:05:54PM +0200, Oliver Schmidt wrote:
+&gt; &gt; However, calling it a &quot;C string&quot; seems misleading, too, to me
+&gt; &gt; because that implies that the chars. are to be used until the
+&gt; &gt; zero-termination is reached. But, if the TGI Kernel needs to
+&gt; &gt; truncate the string at the end because of clipping, then the string
+&gt; &gt; is _NOT_ to be used until the zero is reached -- is it?
+&gt;  
+&gt; Well, it's a C string in the sense that there is a zero-byte
+&gt; somewhere. But, you're right: The driver must use just the length
+&gt; byte.
+
+So, the arguments can be described as:
+1) (ptr3) a pointer to the beginning of an array of char,
+2) (6502 register) the length of that array,
+3) (ptr1,ptr2) the co-ordinates where that beginning must be plotted.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Jul 18 13:36:02 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9602.html" title="Next message in the list">Per Olofsson: "Re: [cc65] Entertainment: EventOs"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9600.html" title="Previous message in the list">Greg King: "Re: [cc65] sizof zp registers"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9594.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] TGI bitmap fnts revisited"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9572.html" title="Next message in this discussion thread">Greg King: "Re: [cc65] TGI bitmap fnts revisited"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9601" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9601" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9601" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-07-18 13:36:05 CEST
+</em></small></p>
+</body>
+</html>

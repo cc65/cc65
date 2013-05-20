@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] two little bugs</title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="Re: [cc65] two little bugs" />
+<meta name="Date" content="2009-08-24" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] two little bugs</h1>
+<!-- received="Mon Aug 24 23:36:05 2009" -->
+<!-- isoreceived="20090824213605" -->
+<!-- sent="Mon, 24 Aug 2009 23:37:10 +0200" -->
+<!-- isosent="20090824213710" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="Re: [cc65] two little bugs" -->
+<!-- id="200908242337.11991.groepaz@gmx.net" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="20090824211734.GA29645&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6730.html" title="Egan Ford: &quot;[cc65] nq.c(46): Error: Integer expression expected&quot;">Next message</a> ]
+[ <a href="6728.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] two little bugs&quot;">Previous message</a> ]
+[ <a href="6728.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] two little bugs&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6733.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] two little bugs&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20two%20little%20bugs">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-08-24 23:37:10</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Montag 24 August 2009, Ullrich von Bassewitz wrote:
+&gt; On Mon, Aug 24, 2009 at 12:00:13PM -0400, Greg King wrote:
+&gt; &gt; A hardware-reset stops all of the timers in the CIA chip.  After that,
+&gt; &gt; the Time-Of-Day clock will not run until you have written a time into it.
+&gt; &gt;  The firmware does not write into those registers.  [Even though BASIC's
+&gt; &gt; rnd(0) reads some of  those registers in CIA1 -- see the entry for
+&gt; &gt; location 57495 in the &quot;MAPPING THE Commodore 64&quot; book.]
+&gt;
+&gt; I cannot find anything about that in the data sheet. Yes, the timer control
+&gt; registers are set to zero on reset, which means that both timers are halted
+&gt; - but there is no start/stop bit for the TOD clock.
+&gt;
+&gt; Has anybody tried the test program with another VICE version? I'm still
+&gt; wondering if it's a cc65 related problem or not. A more current version of
+&gt; vice is unavailable for Centos, so I would need to create one myself. After
+&gt; installing 54 development packages, an opencbm rpm was not found, so I
+&gt; would have to create this one beforehand, and that was the point where I
+&gt; stopped :-)
+
+this works just fine for me: (yeah its ugly, and i am using CIA2, but it 
+shouldnt make a difference)
+
+void _init_systime (void)
+{
+
+	*(uint8_t*)0xdd0e=0x80;
+	*(uint8_t*)0xdd0f=0;
+	
+	*(uint8_t*)0xdd0b=0; // hours
+	*(uint8_t*)0xdd0a=0; // minutes
+	*(uint8_t*)0xdd09=0; // seconds
+	*(uint8_t*)0xdd08=0; // 1/10 seconds
+
+}
+	
+time_t _systime (void)
+{
+	time_t t=0;
+	uint8_t n;
+
+	n=*(uint8_t*)0xdd0b; // hours
+	t+=(n&amp;0xf);
+	t+=((n&gt;&gt;4)&amp;0x1)*10;
+	t*=60;
+	n=*(uint8_t*)0xdd0a; // minutes
+	t+=(n&amp;0xf);
+	t+=((n&gt;&gt;4)&amp;0xf)*10;
+	t*=60;
+	n=*(uint8_t*)0xdd09; // seconds
+	t+=(n&amp;0xf);
+	t+=((n&gt;&gt;4)&amp;0xf)*10;
+	n=*(uint8_t*)0xdd08; // 1/10 seconds
+	return t;
+}
+
+-- 
+
+<a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    <a href="http://magicdisk.untergrund.net">http://magicdisk.untergrund.net</a>
+<a href="http://www.pokefinder.org">http://www.pokefinder.org</a>        <a href="http://ftp.pokefinder.org">http://ftp.pokefinder.org</a>
+
+Ich bin nicht faul.... ich hab nur keine Lust.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Aug 24 23:36:05 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6730.html" title="Next message in the list">Egan Ford: "[cc65] nq.c(46): Error: Integer expression expected"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6728.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] two little bugs"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6728.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] two little bugs"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6733.html" title="Next message in this discussion thread">silverdr1wfmh.org.pl: "Re: [cc65] two little bugs"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6729" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6729" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6729" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-08-24 23:36:06 CEST
+</em></small></p>
+</body>
+</html>

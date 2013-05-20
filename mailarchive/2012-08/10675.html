@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Atari Extended Memory Driv</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Atari Extended Memory Driver Anybody?" />
+<meta name="Date" content="2012-08-12" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Atari Extended Memory Driver Anybody?</h1>
+<!-- received="Sun Aug 12 20:58:11 2012" -->
+<!-- isoreceived="20120812185811" -->
+<!-- sent="Sun, 12 Aug 2012 20:57:42 +0200" -->
+<!-- isosent="20120812185742" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Atari Extended Memory Driver Anybody?" -->
+<!-- id="CACT=u72TAhbKnTeN_NORPdEX1GPEeDHV=bPE4mAD2VgvMSoodQ@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="D93A699714E243B7B915E987B99529ED&#64;ORANGE2" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10676.html" title="Oliver Schmidt: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">Next message</a> ]
+[ <a href="10674.html" title="Groepaz: &quot;Re: [cc65] C64 POSIX dirent stuff actually working?&quot;">Previous message</a> ]
+[ <a href="10672.html" title="Shawn Jefferson: &quot;RE: [cc65] Atari Extended Memory Driver Anybody?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Atari%20Extended%20Memory%20Driver%20Anybody?">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-08-12 20:57:42</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt; I thought of that, but the only way to test this is write some unique value
+&gt; into each bank and then read it back. This has the unfortunate consequence
+&gt; of trashing main memory at $4000 if the extended memory is not there.
+
+Same game on the Apple II: One needs to save the value in main memory
+and restore it after testing.
+
+The bigger issue is that you have to do this testing again from a
+&quot;safe place&quot; like the CPU stack - while trying to keep the test code
+small (ideally not larger than the copy routine discussed before).
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Aug 12 20:58:11 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10676.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10674.html" title="Previous message in the list">Groepaz: "Re: [cc65] C64 POSIX dirent stuff actually working?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10672.html" title="Message to which this message replies">Shawn Jefferson: "RE: [cc65] Atari Extended Memory Driver Anybody?"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10675" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10675" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10675" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-08-12 20:58:14 CEST
+</em></small></p>
+</body>
+</html>

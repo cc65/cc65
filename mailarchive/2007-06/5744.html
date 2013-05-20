@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] building under cygwin</title>
+<meta name="Author" content="Greg King (gngking1erols.com)" />
+<meta name="Subject" content="Re: [cc65] building under cygwin" />
+<meta name="Date" content="2007-06-20" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] building under cygwin</h1>
+<!-- received="Wed Jun 20 07:29:42 2007" -->
+<!-- isoreceived="20070620052942" -->
+<!-- sent="Wed, 20 Jun 2007 01:28:25 -0400" -->
+<!-- isosent="20070620052825" -->
+<!-- name="Greg King" -->
+<!-- email="gngking1erols.com" -->
+<!-- subject="Re: [cc65] building under cygwin" -->
+<!-- id="000001c7b2fc$1c754a60$f5662c42@palace" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="[cc65] building under cygwin" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5745.html" title="MagerValp: &quot;Re: [cc65] building under cygwin&quot;">Next message</a> ]
+[ <a href="5743.html" title="MagerValp: &quot;Re: [cc65] unnamed labels and selfmod&quot;">Previous message</a> ]
+[ <a href="5717.html" title="MagerValp: &quot;[cc65] building under cygwin&quot;">Maybe in reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5745.html" title="MagerValp: &quot;Re: [cc65] building under cygwin&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:gngking1erols.com?Subject=Re:%20[cc65]%20building%20under%20cygwin">gngking1erols.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-06-20 07:28:25</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: MagerValp; on Friday, June 15, 2007; at 08:49 AM -0400
+&gt;
+&gt; True, but I'm not aware of any current Unix variants that don't support
+&gt; it.  I even checked a few flavours that traditionally are late adopters
+&gt; (IRIX, HP-UX, etc.), and they all support &quot;-p&quot;.  I think it's safe to
+&gt; default to &quot;-p&quot;.
+
+Some of us happen to use old versions of OSes on old computers.  :-)
+So, I made a safe choice:  each path is tested and created separately by
+shell expressions.
+
+&gt;
+&gt; Again, I think it's safe to default to using install, with install-sh
+&gt; as a commented-out fallback for users stuck on systems without it (and,
+&gt; out of curiosity, are there any?).
+
+Yes, I'm install-less on an old QNX box (it's the reason why I built that
+script).
+
+It's rather difficult for &quot;make&quot; to learn (while decoding the makefile) if
+a program is available, but it's easy for the shell to do it.  So now, the
+makefile always starts the script; install-sh will switch to install if
+that program exists.  Direct, simple, obvious -- so, naturally, it took me
+a long, long time to think of it! ;-D
+
+From: silverdr; on Saturday, June 16, 2007; at 04:23 PM -0400
+&gt;
+&gt; Manual cleaning (and, being sure that nothing gets
+omitted/overwritten/deleted)
+&gt; is an additional, unnecessary, and error-prone work.
+
+_Manual_ cleaning?!  MagerValp said the same thing.  Is there something
+that I forgot to put into the uninstall rule?  Why would you need to clean
+out a wrong installation _manually_?
+
+&gt;
+&gt; 1. default &quot;prefix&quot; to be /usr/local
+&gt; 2. taking care of the LIB and INC paths at the Makefile/build level
+
+1. I like your argument, so I changed it to &quot;/usr/local&quot;.
+2. That is another one of those things that I did back in February, but
+forgot to send to Uz. :-)  (It works in GNU's brand of make -- probably not
+in other brands.)
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Jun 20 07:29:42 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5745.html" title="Next message in the list">MagerValp: "Re: [cc65] building under cygwin"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5743.html" title="Previous message in the list">MagerValp: "Re: [cc65] unnamed labels and selfmod"</a></li>
+<li><dfn>Maybe in reply to</dfn>: <a href="5717.html" title="Message to which this message replies">MagerValp: "[cc65] building under cygwin"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5745.html" title="Next message in this discussion thread">MagerValp: "Re: [cc65] building under cygwin"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5745.html" title="Message sent in reply to this message">MagerValp: "Re: [cc65] building under cygwin"</a></li>
+<li><dfn>Reply</dfn>:  <a href="5747.html" title="Message sent in reply to this message">silverdr1inet.com.pl: "Re: [cc65] building under cygwin"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5744" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5744" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5744" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-06-20 07:29:45 CEST
+</em></small></p>
+</body>
+</html>

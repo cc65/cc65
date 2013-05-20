@@ -1,0 +1,32 @@
+# HG changeset patch
+# User Daniel Serpell <daniel.serpell@gmail.com>
+# Date 1260030949 10800
+# Branch trunk
+# Node ID ba4b2f07b0ed0c85516954f206fef16bc4030a3e
+# Parent  215f805d6a90e9edca88e91c2db3293b99db9693
+No need to init DEFAULT_DEVICE.
+
+diff --git a/libsrc/atari/getdefdev.s b/libsrc/atari/getdefdev.s
+--- a/libsrc/atari/getdefdev.s
++++ b/libsrc/atari/getdefdev.s
+@@ -26,10 +26,6 @@
+ 
+ __getdefdev:
+ 
+-.ifdef	DEFAULT_DEVICE
+-	lda	#'0'+DEFAULT_DEVICE
+-	sta	__defdev+1
+-.endif
+ 	lda	__dos_type	; which DOS?
+ 	cmp	#ATARIDOS
+ 	beq	finish
+@@ -86,5 +82,9 @@
+ ; Default device
+ 
+ __defdev:
++.ifdef	DEFAULT_DEVICE
++	.byte	'D', '0'+DEFAULT_DEVICE, ':', 0
++.else
+ 	.byte	"D1:", 0
++.endif
+ 

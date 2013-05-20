@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] ca65 syntax problems</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] ca65 syntax problems">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] ca65 syntax problems</h1>
+<!-- received="Mon Nov  5 20:52:48 2001" -->
+<!-- isoreceived="20011105195248" -->
+<!-- sent="Mon, 5 Nov 2001 20:51:09 +0100" -->
+<!-- isosent="20011105195109" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] ca65 syntax problems" -->
+<!-- id="936272487.20011105205109@gmx.net" -->
+<!-- inreplyto="20011105174216.A21599@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20ca65%20syntax%20problems"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2001-11-05 20:51:09
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0921.html">MagerValp: "Re: [cc65] Serial port API"</a>
+<li><strong>Previous message:</strong> <a href="0919.html">groepaz: "Re[2]: [cc65] Serial port API"</a>
+<li><strong>In reply to:</strong> <a href="0916.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0924.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<li><strong>Reply:</strong> <a href="0924.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+UvB&gt; Using &quot;-t none&quot; for the linker, one may specify the start address by using &quot;-S
+UvB&gt; addr&quot; which means that no linker config is needed.
+
+oh didnt know that...but...no....i am just slowly adapting my
+code-libs to 'real' libraries so i better forget this again ASAP ;=P
+
+UvB&gt; You are right in some way. I've had to learn that many Commodore people seem
+UvB&gt; to be rather old fashioned, maybe this is why they are still using the old
+UvB&gt; machines.
+
+YES! ;=P (atleast i am not useing edit.com at work hehehehe ,=))
+
+&gt;&gt; 115200bps actually work pretty fine even using polling operation only
+&gt;&gt; (didnt bother writing an irq-based driver yet)
+
+UvB&gt; Polling is not a good idea because you may loose characters when doing things
+UvB&gt; like outputing a &quot;\n&quot; which makes the screen scroll. The current driver (which
+UvB&gt; is based on sources written by Craig Bruce) uses interrupts for receiving and
+UvB&gt; polls for sending. And even this means that when sending, the driver may not
+UvB&gt; reach the full baud rate, so it's one of the &quot;change as soon as possible&quot;
+UvB&gt; things.
+
+err?! why does polling incorporate bad handshake? ;=) 16bytes FIFO
+should give more than enough time to raise RTS in time (maybe its a
+problem with the AICA having no fifo, but its definetly not with the 16c550)
+
+not achiving the max. possible baudrate is another issue though... its
+just that my implmentation,beeing a debug-stub, shouldnt use more
+memory than necessary so disallowing a recieve-buffer... also it can
+work without irq or nmi which is definetly a nice thing in this
+situation ,=) i get about 8k/sec though, which i think aint that bad
+anyway.
+
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20ca65%20syntax%20problems">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20ca65%20syntax%20problems">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0921.html">MagerValp: "Re: [cc65] Serial port API"</a>
+<li><strong>Previous message:</strong> <a href="0919.html">groepaz: "Re[2]: [cc65] Serial port API"</a>
+<li><strong>In reply to:</strong> <a href="0916.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0924.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<li><strong>Reply:</strong> <a href="0924.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:43 CET</em>
+</em>
+</small>
+</body>
+</html>

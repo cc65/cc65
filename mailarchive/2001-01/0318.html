@@ -1,0 +1,137 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65]zero page</title>
+<meta name="Author" content="troy silvey (tbsilvey_at_juno.com)">
+<meta name="Subject" content="Re: [cc65]zero page">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65]zero page</h1>
+<!-- received="Sat Jan  6 19:23:30 2001" -->
+<!-- isoreceived="20010106182330" -->
+<!-- sent="Sat, 6 Jan 2001 13:30:37 -0500" -->
+<!-- isosent="20010106183037" -->
+<!-- name="troy silvey" -->
+<!-- email="tbsilvey_at_juno.com" -->
+<!-- subject="Re: [cc65]zero page" -->
+<!-- id="20010106.133409.16678.5.tbsilvey@juno.com" -->
+<!-- inreplyto="14935.15605.674433.27064@panini.cling.gu.se" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> troy silvey (<a href="mailto:tbsilvey_at_juno.com?Subject=Re:%20[cc65]zero%20page"><em>tbsilvey_at_juno.com</em></a>)<br>
+<strong>Date:</strong> 2001-01-06 19:30:37
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0319.html">Groepaz: "Re: [cc65] disassembly"</a>
+<li><strong>Previous message:</strong> <a href="0317.html">troy silvey: "Re: [cc65]zero page"</a>
+<li><strong>In reply to:</strong> <a href="0315.html">MagerValp: "Re: [cc65]zero page"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0320.html">Groepaz: "Re: [cc65]zero page"</a>
+<li><strong>Reply:</strong> <a href="0320.html">Groepaz: "Re: [cc65]zero page"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+&gt;So, which ones are free for us that want to mix asm with C?
+
+I need to check the libs closely to see which are used by 
+the c64.lib, but some of the main ones that are open
+by default are...
+2,251-254
+
+Others are only used by basic and the tape drive and can
+probably be used for your C program with out problems.
+You might check with the guys at VICE. They would have
+better information on what can and can't be used. I used
+many of these years ago in asm and it worked well.
+There are dozens, but some of the more obvious ones you
+can probably use are..
+50-53, 146, 155-156, 158-159, 163-166, 176-179, 189-191,
+and 247-250.
+
+There are several more used for rs-232 I/O operations that
+could probably be used once all disk drive operatoins are done
+and you aren't going to be using disk, tape or rs-232 while your
+program executes. You would have to be more carefull with those.
+The largest consecutive areas I can find are...
+163-171 (8bytes) 247-254 (8bytes) and 176-196 (20bytes)
+I would recommend caution, experimentation and input from
+the VICE crew on how well these might work. I plan to test them
+closely myself.
+(No warrant expressed or implied :)
+if you don't have one already, you might try and find one of these
+books.... Programming the C64, Mapping the C64 or the 
+C64 programmers reference guide. You can find them on the net
+or ebay. I have a link some where that has most of the information
+in these books in txt, html or pdf format. If I can find it I will post
+it.
+They all have detailed information on the mem locations in the 64.
+
+
+troy
+
+
+
+
+
+&gt;-- 
+&gt;    ___          .     .  .         .       . +  .         .      o   
+&gt;  _|___|_   +   .  +     .     +         .   .  Per Olofsson, konstnär
+&gt;    o-o    .      .     .   o         +          <a href="mailto:MagerValp_at_cling.gu.se?Subject=Re:%20[cc65]zero%20page">MagerValp_at_cling.gu.se</a>
+&gt;     -       +            +    .     <a href="http://www.cling.gu.se/~cl3polof/">http://www.cling.gu.se/~cl3polof/</a>
+&gt;----------------------------------------------------------------------
+&gt;To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]zero%20page">majordomo_at_musoftware.de</a> with
+&gt;the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+
+________________________________________________________________
+GET INTERNET ACCESS FROM JUNO!
+Juno offers FREE or PREMIUM Internet access for less!
+Join Juno today!  For your FREE software, visit:
+<a href="http://dl.www.juno.com/get/tagj">http://dl.www.juno.com/get/tagj</a>.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]zero%20page">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0319.html">Groepaz: "Re: [cc65] disassembly"</a>
+<li><strong>Previous message:</strong> <a href="0317.html">troy silvey: "Re: [cc65]zero page"</a>
+<li><strong>In reply to:</strong> <a href="0315.html">MagerValp: "Re: [cc65]zero page"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0320.html">Groepaz: "Re: [cc65]zero page"</a>
+<li><strong>Reply:</strong> <a href="0320.html">Groepaz: "Re: [cc65]zero page"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:38 CET</em>
+</em>
+</small>
+</body>
+</html>

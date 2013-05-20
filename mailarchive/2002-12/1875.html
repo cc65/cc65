@@ -1,0 +1,213 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Debug Information in Obje</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] Debug Information in Objectfiles">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Debug Information in Objectfiles</h1>
+<!-- received="Wed Dec  4 10:29:42 2002" -->
+<!-- isoreceived="20021204092942" -->
+<!-- sent="Wed, 4 Dec 2002 11:54:26 +0100" -->
+<!-- isosent="20021204105426" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] Debug Information in Objectfiles" -->
+<!-- id="200212041154.26568.groepaz@gmx.net" -->
+<!-- inreplyto="20021203110821.GB20854@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Debug%20Information%20in%20Objectfiles"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2002-12-04 11:54:26
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1874.html">Groepaz: "Re: [cc65] Off topic: Amiga stuff"</a>
+<li><strong>In reply to:</strong> <a href="1856.html">Ullrich von Bassewitz: "Re: [cc65] Debug Information in Objectfiles"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1878.html">Spiro Trikaliotis: "Re: [cc65] Debug Information in Objectfiles"</a>
+<li><strong>Next in thread:</strong> <a href="1855.html">MagerValp: "Re: [cc65] Koala picture viewer"</a>
+<li><strong>Reply:</strong> <a href="1878.html">Spiro Trikaliotis: "Re: [cc65] Debug Information in Objectfiles"</a>
+<li><strong>Reply:</strong> <a href="1884.html">Ullrich von Bassewitz: "Re: [cc65] Debug Information in Objectfiles"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Tuesday 03 December 2002 12:08, Ullrich von Bassewitz wrote:
+
+&gt; There is no documentation available for the object file format used. I do
+&gt; not even manage to keep up with the standard compiler docs:-) 
+
+:=P figures :=) (everytime i tell someone to use ca65 instead of tass6502 or 
+some other whacked up program the outdated-docs-thing comes back to me 
+....ohwell :=P one day i'll update them myself or sth hehehehe :o))
+
+btw speaking of the docs...IMHO there should be a special section &quot;for former 
+tasm (and simelar) users&quot; that describes how to use ca65 in the most 
+&quot;tasm-ish&quot; way. (ie, many ppl i have been telling to use ca65 were switching 
+assemblers not because they were missing features, but because their old 
+assembler had obscure bugs - and is no more developed for that matter). This 
+kinda instructions should be most useful for anyone who can't live with 
+certain limitations that arise because of the assembler+linker approach. 
+(which can be solved by using one big sourcefile, no external linkage etc)
+
+however, if you would like to add sth like that to the docs, i'd volunteer to 
+write it ... i can probably cut'n'paste it from my emails anyway :o)
+
+&gt; However, it
+&gt; should not be necessary to access the object files, since all information
+&gt; that is available in the object files should be collected by the linker and
+&gt; output in a special debug file. The debug file is currently somewhat
+&gt; incomplete. For one, it does not include labels that are in the label file.
+
+no problem, since i can handle the label-files fine :) actually, since you are 
+using &quot;external&quot; files for debuginfo anyway, i'd just put some reference to 
+the labelfile(s) into the debugfile :)
+
+&gt; This will get fixed. Another problem is that the debug file does not
+&gt; contain information about local symbols. This information is not available
+&gt; in the object file, since for one, the assembler is not able to handle this
+&gt; information, second, the compiler does not generate it, and third, it is
+&gt; rather difficult to keep this information current over the optimizer
+&gt; passes, because the generated code does not use a base pointer, so the
+&gt; stack offset of locals may change with every instruction. Because all this
+&gt; is unfinished and not really well tested, the option for the linker to
+&gt; generate this debug file is undocumented.
+
+well debugging local symbols (ie put watch-/breakpoints on them etc) is even 
+troublesome in &quot;real&quot; debuggers, atleast if you are using some kind of 
+optimization during compile... not a big loss to me, i am used to step 
+through the c-code and watch how registers change at the same time :o)
+
+&gt;         --dbgfile name
+&gt;
+&gt; is what it needs to get such a debug file.
+&gt;
+&gt; Being able to step through the C source and watching the values of global
+&gt; symbols would be tremendously useful, and implementing this is possible
+&gt; using the currently available information. 
+
+yeah, looks good... i'll start with making my mind up about how to implement 
+this at ALL hehehe :o) unfortunatly to make this useful i also need either a 
+working 6510-core (for simulator, cant use marat's core here coz its terms of 
+use are to restrictive for my taste - and i am way to lazy to dig out my own 
+and debug that ;=P) or working debug stub (for the real thing, i am working 
+on that one ;=)) aswell..... (i hate writing loads of code that cannot be 
+testet immediatly for that matter)
+
+&gt; I would suggest that you
+&gt; generate such a debug file and have a look at it. It's straight ASCII, and
+&gt; currently it contains just two types of information:
+&gt;
+&gt;         file    &quot;crt0.s&quot;, 2532, 1038165106
+&gt;
+&gt; This means that crt0.s is a source file which had 2532 bytes when
+&gt; translated, and a time stamp of 1038165106 (unix mtime). The additional
+&gt; information can be used to display a warning in the debugger when the
+&gt; source code available to the debugger differs from what was available when
+&gt; the object file was generated.
+&gt;
+&gt;         line    &quot;em_load.c&quot;, 58, 00140B-00142F
+&gt;
+&gt; This means that the code range starting at 140B (hex) up to and including
+&gt; 142F (hex) was generated by line 58 of em_load.c. Note that there may be
+&gt; more than one entry for the same line of source code. An example would be
+&gt; for loops, for which the compiler generates code on loop entry and exit.
+&gt;
+
+very nice.... doing some kind of &quot;addr2line&quot; functionality (which is all i 
+need for a start) shouldnt be a problem with that. (mmmh maybe if cc65 came 
+with such a tool that could aid other emulator/simulator/debugger/whatnot 
+writers...allowing them to implement sourcelevel debugging very easy.....)
+
+&gt; There will be some more line types when more information is added, but the
+&gt; style will always be the same: The first token on a line is a keyword that
+&gt; specifies the type of information that follows.
+
+after a quick peek... i wouldnt mind ALL filenames written by their absolute 
+pathes. :) (else the debugger for example needs to know about the location of 
+the library sources). i know this would mean you could no more debug code not 
+compiled on your machine, but then again thats a rare case anyway. (if you 
+want to debug library...hell, recompiling it first is recommended anyway 
+:=)). alternativly you could write the path(es) to search for files into the 
+debug-file or sth... i like the former idea better though :)
+
+also, i think the file should tell the total memory used by the program (maybe 
+splitted into bss/code/data etc) so the debugger can use that, and the the 
+addr2line info for calculating areas for which is no debug-information 
+available, but which are still code. (is that even a possible scenario incase 
+of cc65? mmmh)
+
+oh and apropos label files.... is there a way to get ALL labels written there, 
+not just the exported ones? and what about local labels...there should be a 
+way to handle these aswell, although that might be kinda hard compared to the 
+rest :)
+
+ok 'nuff for now.... will prolly take a while until i got something worth 
+showing (UI coding sux ;=P hehe).
+
+regards
+
+gpz
+
+
+-- 
+          ___ ___ .___________________ .___________ _______.
+    c=64 /   |   \|   \__    ___/     \ \_   _____/ \      \ [groepaz]
+     gb /    '    \   | |    | /  \ /  \ |    __)_  /   |   \ gp32
+    cgb \    .    /   | |    |/    '    \|        \/    |    \ psx
+     gba \___|_  /|___| |____|\____|__  /_______  /\____|__  / dc
+          -----\/-----'---------------\/--------\/---------\/
+       <a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    Hitmen WWW Headquarters
+       <a href="http://fly.to/hitmen-groepaz">http://fly.to/hitmen-groepaz</a>     my personal playground
+       <a href="http://rr.c64.org/silversurfer">http://rr.c64.org/silversurfer</a>   home of the RR debugger
+       ftp.musoftware.de/pub/groepaz    cc65 dump site
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Debug%20Information%20in%20Objectfiles">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1874.html">Groepaz: "Re: [cc65] Off topic: Amiga stuff"</a>
+<li><strong>In reply to:</strong> <a href="1856.html">Ullrich von Bassewitz: "Re: [cc65] Debug Information in Objectfiles"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1878.html">Spiro Trikaliotis: "Re: [cc65] Debug Information in Objectfiles"</a>
+<li><strong>Next in thread:</strong> <a href="1855.html">MagerValp: "Re: [cc65] Koala picture viewer"</a>
+<li><strong>Reply:</strong> <a href="1878.html">Spiro Trikaliotis: "Re: [cc65] Debug Information in Objectfiles"</a>
+<li><strong>Reply:</strong> <a href="1884.html">Ullrich von Bassewitz: "Re: [cc65] Debug Information in Objectfiles"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-12-04 10:30:21 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Fwd: Bug in cl65 (?)</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Fwd: Bug in cl65 (?)" />
+<meta name="Date" content="2010-04-22" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Fwd: Bug in cl65 (?)</h1>
+<!-- received="Thu Apr 22 21:04:49 2010" -->
+<!-- isoreceived="20100422190449" -->
+<!-- sent="Thu, 22 Apr 2010 21:04:39 +0200" -->
+<!-- isosent="20100422190439" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Fwd: Bug in cl65 (?)" -->
+<!-- id="20100422190439.GB11927@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="s2j1002edb71004220523ob2aecc9eu61f896dde4b5271f&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8101.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Please be patient... More questions&quot;">Next message</a> ]
+[ <a href="8099.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Bug in cl65 (?)&quot;">Previous message</a> ]
+[ <a href="8096.html" title="Oliver Schmidt: &quot;[cc65] Fwd: Bug in cl65 (?)&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8104.html" title="Oliver Schmidt: &quot;Re: [cc65] Fwd: Bug in cl65 (?)&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Fwd:%20Bug%20in%20cl65%20(?)">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-04-22 21:04:39</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Thu, Apr 22, 2010 at 02:23:51PM +0200, Oliver Schmidt wrote:
+&gt; AFAIK it would be best, if
+&gt;
+&gt;   cl65 -c src/aaa.c -o obj/bbb.o
+
+Ok, this is the reason for the &quot;bug&quot; (in your last mail). cl65 (as all other
+tools) parse the command line from left to right. As soon as a file name is
+reached, the corresponding subcommand is executed. So in your case, -o and its
+argument are actually ignored.
+
+The reasoning behind this is that you can apply different switches to
+different source files on the command line:
+
+  cl65 -S -o foo/test.s -Oirs test.c -T -g -o bar/test1.s -O test1.c
+
+This generates foo/test.s without debug info but with full optimization and
+bar/test1.s with less optimization but with debug info and source lines.
+                   
+So just remember to place your source files at the end of the line and things
+will be fine.
+
+&gt; would translate to
+&gt;
+&gt;   cc65 src/aaa.c -o obj/bbb.s
+&gt;   ca65 obj/bbb.s -o obj/bbb.o
+&gt;
+&gt; for two reasons:
+&gt;
+&gt; 1. There would be no write access to the source directory (probably
+&gt; even readonly).
+&gt; 2. The potentially generated .u file would appear as obj/bbb.u
+&gt; (matching best the user's expectation).
+
+It's difficult for a tool to try to read the masters mind, and therefore I'm
+not sure if not someone else would argue different.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Apr 22 21:04:49 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8101.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Please be patient... More questions"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8099.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Bug in cl65 (?)"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8096.html" title="Message to which this message replies">Oliver Schmidt: "[cc65] Fwd: Bug in cl65 (?)"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8104.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Fwd: Bug in cl65 (?)"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8104.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Fwd: Bug in cl65 (?)"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8100" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8100" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8100" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-04-22 21:04:52 CEST
+</em></small></p>
+</body>
+</html>

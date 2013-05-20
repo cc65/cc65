@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Moving the stack to a diff</title>
+<meta name="Author" content="Greg King (greg.king41verizon.net)" />
+<meta name="Subject" content="Re: [cc65] Moving the stack to a different segment?" />
+<meta name="Date" content="2012-03-12" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Moving the stack to a different segment?</h1>
+<!-- received="Mon Mar 12 20:14:36 2012" -->
+<!-- isoreceived="20120312191436" -->
+<!-- sent="Mon, 12 Mar 2012 15:13:52 -0400" -->
+<!-- isosent="20120312191352" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king41verizon.net" -->
+<!-- subject="Re: [cc65] Moving the stack to a different segment?" -->
+<!-- id="000d01cd0084$4d2eacc0$443efea9@monarch" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="1331043885.10287.YahooMailNeo&#64;web120601.mail.ne1.yahoo.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10104.html" title="Payton Byrd: &quot;[cc65] Debugging with VICE&quot;">Next message</a> ]
+[ <a href="10102.html" title="Joseph Rose: &quot;Re: [cc65] C64 Cartridge clarifications&quot;">Previous message</a> ]
+[ <a href="10089.html" title="Joseph Rose: &quot;[cc65] Moving the stack to a different segment?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king41verizon.net?Subject=Re:%20[cc65]%20Moving%20the%20stack%20to%20a%20different%20segment?">greg.king41verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-03-12 20:13:52</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: &quot;Joseph Rose&quot;; on Tuesday, March 06, 2012; at 10:24 AM -0500
+
+&gt; I want to create new start-up configurations for a library for CC65;
+&gt; and, I want to move the stack to a different segment. I know that I
+&gt; simply could change the value written to the &quot;sp&quot; pointer in the
+&gt; zero-page; but, I'm sure that it is not enough. How do I prevent the
+&gt; stack from corrupting the data stored in the new segment?
+
+The stack isn't put in a segment; it's put into a separate memory area.
+That area isn't named; it's implied by two expressions.  The first one
+is in the ld65 configuration file.  For example, &quot;c64.cfg&quot; has
+&quot;size = $C7F3 - __STACKSIZE__&quot;.  The second one is in the start-up code.
+For example, &quot;c64/crt0.s&quot; has
+&quot;(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)&quot;.
+
+If it were named explicitly (it _should_ be!),
+then they would look like this:
+
+HEADER: file=%O, define=yes, start=$0801, size=$000C;
+STACK: file=&quot;&quot;, define=yes, start=$d000-__STACKSIZE__, size=__STACKSIZE__;
+RAM: file=%O, define=yes, start=__HEADER_LAST__, size=__STACK_START__-__RAM_START__;
+
+And, sp would be set to &quot;(__STACK_START__ + __STACK_SIZE__)&quot;.
+
+If you do want to put your stack into a segment, then you simply
+assemble a big buffer, put a label at the end of it, and store that
+label in sp.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Mar 12 20:14:36 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10104.html" title="Next message in the list">Payton Byrd: "[cc65] Debugging with VICE"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10102.html" title="Previous message in the list">Joseph Rose: "Re: [cc65] C64 Cartridge clarifications"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10089.html" title="Message to which this message replies">Joseph Rose: "[cc65] Moving the stack to a different segment?"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10103" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10103" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10103" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-03-12 20:14:40 CET
+</em></small></p>
+</body>
+</html>

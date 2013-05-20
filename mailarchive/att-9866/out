@@ -1,0 +1,228 @@
+linuxdoc -B txt -f  apple2.sgml
+Processing file apple2.sgml
+linuxdoc -B txt -f  apple2enh.sgml
+Processing file apple2enh.sgml
+linuxdoc -B txt -f  ar65.sgml
+Processing file ar65.sgml
+linuxdoc -B txt -f  atari.sgml
+Processing file atari.sgml
+linuxdoc -B txt -f  atmos.sgml
+Processing file atmos.sgml
+linuxdoc -B txt -f  c128.sgml
+Processing file c128.sgml
+linuxdoc -B txt -f  c16.sgml
+Processing file c16.sgml
+linuxdoc -B txt -f  c64.sgml
+Processing file c64.sgml
+linuxdoc -B txt -f  ca65.sgml
+Processing file ca65.sgml
+<standard input>:1101: `\&' is not allowed in a name
+<standard input>:1103: `\&' is not allowed in a name
+<standard input>:1105: `\&' is not allowed in a name
+<standard input>:1107: `\&' is not allowed in a name
+<standard input>:1113: `\&' is not allowed in a name
+<standard input>:1115: `\&' is not allowed in a name
+<standard input>:1117: `\&' is not allowed in a name
+<standard input>:1119: `\&' is not allowed in a name
+<standard input>:1124: `\&' is not allowed in a name
+<standard input>:1134: `\&' is not allowed in a name
+<standard input>:1138: `\&' is not allowed in a name
+<standard input>:1141: `\&' is not allowed in a name
+linuxdoc -B txt -f  ca65html.sgml
+Processing file ca65html.sgml
+linuxdoc -B txt -f  cbm510.sgml
+Processing file cbm510.sgml
+linuxdoc -B txt -f  cbm610.sgml
+Processing file cbm610.sgml
+linuxdoc -B txt -f  cc65.sgml
+Processing file cc65.sgml
+linuxdoc -B txt -f  cl65.sgml
+Processing file cl65.sgml
+linuxdoc -B txt -f  co65.sgml
+Processing file co65.sgml
+linuxdoc -B txt -f  coding.sgml
+Processing file coding.sgml
+linuxdoc -B txt -f  customizing.sgml
+Processing file customizing.sgml
+linuxdoc -B txt -f  da65.sgml
+Processing file da65.sgml
+linuxdoc -B txt -f  debugging.sgml
+Processing file debugging.sgml
+linuxdoc -B txt -f  dio.sgml
+Processing file dio.sgml
+linuxdoc -B txt -f  funcref.sgml
+Processing file funcref.sgml
+linuxdoc -B txt -f  geos.sgml
+Processing file geos.sgml
+linuxdoc -B txt -f  grc65.sgml
+Processing file grc65.sgml
+linuxdoc -B txt -f  index.sgml
+Processing file index.sgml
+linuxdoc -B txt -f  intro.sgml
+Processing file intro.sgml
+linuxdoc -B txt -f  ld65.sgml
+Processing file ld65.sgml
+linuxdoc -B txt -f  library.sgml
+Processing file library.sgml
+linuxdoc -B txt -f  lynx.sgml
+Processing file lynx.sgml
+linuxdoc -B txt -f  using-make.sgml
+Processing file using-make.sgml
+linuxdoc -B txt -f  nes.sgml
+Processing file nes.sgml
+linuxdoc -B txt -f  od65.sgml
+Processing file od65.sgml
+linuxdoc -B txt -f  pet.sgml
+Processing file pet.sgml
+linuxdoc -B txt -f  plus4.sgml
+Processing file plus4.sgml
+linuxdoc -B txt -f  supervision.sgml
+Processing file supervision.sgml
+linuxdoc -B txt -f  vic20.sgml
+Processing file vic20.sgml
+linuxdoc -B html --split=1  apple2.sgml
+Processing file apple2.sgml
+linuxdoc -B html --split=1  apple2enh.sgml
+Processing file apple2enh.sgml
+linuxdoc -B html --split=1  ar65.sgml
+Processing file ar65.sgml
+linuxdoc -B html --split=1  atari.sgml
+Processing file atari.sgml
+linuxdoc -B html --split=1  atmos.sgml
+Processing file atmos.sgml
+linuxdoc -B html --split=1  c128.sgml
+Processing file c128.sgml
+linuxdoc -B html --split=1  c16.sgml
+Processing file c16.sgml
+linuxdoc -B html --split=1  c64.sgml
+Processing file c64.sgml
+linuxdoc -B html --split=1  ca65.sgml
+Processing file ca65.sgml
+linuxdoc -B html --split=1  ca65html.sgml
+Processing file ca65html.sgml
+linuxdoc -B html --split=1  cbm510.sgml
+Processing file cbm510.sgml
+linuxdoc -B html --split=1  cbm610.sgml
+Processing file cbm610.sgml
+linuxdoc -B html --split=1  cc65.sgml
+Processing file cc65.sgml
+linuxdoc -B html --split=1  cl65.sgml
+Processing file cl65.sgml
+linuxdoc -B html --split=1  co65.sgml
+Processing file co65.sgml
+sgml2html --split=0 coding.sgml
+Processing file coding.sgml
+linuxdoc -B html --split=1  customizing.sgml
+Processing file customizing.sgml
+linuxdoc -B html --split=1  da65.sgml
+Processing file da65.sgml
+linuxdoc -B html --split=1  debugging.sgml
+Processing file debugging.sgml
+linuxdoc -B html --split=1  dio.sgml
+Processing file dio.sgml
+sgml2html --split=2  funcref.sgml
+Processing file funcref.sgml
+linuxdoc -B html --split=1  geos.sgml
+Processing file geos.sgml
+linuxdoc -B html --split=1  grc65.sgml
+Processing file grc65.sgml
+sgml2html --split=0 index.sgml
+Processing file index.sgml
+linuxdoc -B html --split=1  intro.sgml
+Processing file intro.sgml
+linuxdoc -B html --split=1  ld65.sgml
+Processing file ld65.sgml
+linuxdoc -B html --split=1  library.sgml
+Processing file library.sgml
+linuxdoc -B html --split=1  lynx.sgml
+Processing file lynx.sgml
+linuxdoc -B html --split=1  using-make.sgml
+Processing file using-make.sgml
+linuxdoc -B html --split=1  nes.sgml
+Processing file nes.sgml
+linuxdoc -B html --split=1  od65.sgml
+Processing file od65.sgml
+linuxdoc -B html --split=1  pet.sgml
+Processing file pet.sgml
+linuxdoc -B html --split=1  plus4.sgml
+Processing file plus4.sgml
+linuxdoc -B html --split=1  supervision.sgml
+Processing file supervision.sgml
+linuxdoc -B html --split=1  vic20.sgml
+Processing file vic20.sgml
+linuxdoc -B info apple2.sgml
+Processing file apple2.sgml
+linuxdoc -B info apple2enh.sgml
+Processing file apple2enh.sgml
+linuxdoc -B info ar65.sgml
+Processing file ar65.sgml
+linuxdoc -B info atari.sgml
+Processing file atari.sgml
+linuxdoc -B info atmos.sgml
+Processing file atmos.sgml
+linuxdoc -B info c128.sgml
+Processing file c128.sgml
+linuxdoc -B info c16.sgml
+Processing file c16.sgml
+linuxdoc -B info c64.sgml
+Processing file c64.sgml
+linuxdoc -B info ca65.sgml
+Processing file ca65.sgml
+/tmp/linuxdoc-tools.7QPPaPVbU3/sgmltmp.ca65.2.texi:1571: warning: @strong{Note...} produces a spurious cross-reference in Info; reword to avoid that.
+/tmp/linuxdoc-tools.7QPPaPVbU3/sgmltmp.ca65.2.texi:4524: warning: @strong{Note...} produces a spurious cross-reference in Info; reword to avoid that.
+linuxdoc -B info ca65html.sgml
+Processing file ca65html.sgml
+linuxdoc -B info cbm510.sgml
+Processing file cbm510.sgml
+/tmp/linuxdoc-tools.pSAmdLnfAa/sgmltmp.cbm510.2.texi:242: warning: @strong{Note...} produces a spurious cross-reference in Info; reword to avoid that.
+linuxdoc -B info cbm610.sgml
+Processing file cbm610.sgml
+/tmp/linuxdoc-tools.RFIY9DHb1M/sgmltmp.cbm610.2.texi:243: warning: @strong{Note...} produces a spurious cross-reference in Info; reword to avoid that.
+linuxdoc -B info cc65.sgml
+Processing file cc65.sgml
+linuxdoc -B info cl65.sgml
+Processing file cl65.sgml
+linuxdoc -B info co65.sgml
+Processing file co65.sgml
+linuxdoc -B info coding.sgml
+Processing file coding.sgml
+linuxdoc -B info customizing.sgml
+Processing file customizing.sgml
+linuxdoc -B info da65.sgml
+Processing file da65.sgml
+linuxdoc -B info debugging.sgml
+Processing file debugging.sgml
+linuxdoc -B info dio.sgml
+Processing file dio.sgml
+linuxdoc -B info funcref.sgml
+Processing file funcref.sgml
+/tmp/linuxdoc-tools.tcNogf8GVh/sgmltmp.funcref.2.texi:36: warning: @strong{Note...} produces a spurious cross-reference in Info; reword to avoid that.
+/tmp/linuxdoc-tools.tcNogf8GVh/sgmltmp.funcref.2.texi:5801: warning: @strong{Note...} produces a spurious cross-reference in Info; reword to avoid that.
+/tmp/linuxdoc-tools.tcNogf8GVh/sgmltmp.funcref.2.texi:5882: warning: @strong{Note...} produces a spurious cross-reference in Info; reword to avoid that.
+/tmp/linuxdoc-tools.tcNogf8GVh/sgmltmp.funcref.2.texi:5963: warning: @strong{Note...} produces a spurious cross-reference in Info; reword to avoid that.
+/tmp/linuxdoc-tools.tcNogf8GVh/sgmltmp.funcref.2.texi:6045: warning: @strong{Note...} produces a spurious cross-reference in Info; reword to avoid that.
+/tmp/linuxdoc-tools.tcNogf8GVh/sgmltmp.funcref.2.texi:6127: warning: @strong{Note...} produces a spurious cross-reference in Info; reword to avoid that.
+/tmp/linuxdoc-tools.tcNogf8GVh/sgmltmp.funcref.2.texi:6208: warning: @strong{Note...} produces a spurious cross-reference in Info; reword to avoid that.
+/tmp/linuxdoc-tools.tcNogf8GVh/sgmltmp.funcref.2.texi:6291: warning: @strong{Note...} produces a spurious cross-reference in Info; reword to avoid that.
+/tmp/linuxdoc-tools.tcNogf8GVh/sgmltmp.funcref.2.texi:6373: warning: @strong{Note...} produces a spurious cross-reference in Info; reword to avoid that.
+/tmp/linuxdoc-tools.tcNogf8GVh/sgmltmp.funcref.2.texi:6455: warning: @strong{Note...} produces a spurious cross-reference in Info; reword to avoid that.
+/tmp/linuxdoc-tools.tcNogf8GVh/sgmltmp.funcref.2.texi:6538: warning: @strong{Note...} produces a spurious cross-reference in Info; reword to avoid that.
+/tmp/linuxdoc-tools.tcNogf8GVh/sgmltmp.funcref.2.texi:6622: warning: @strong{Note...} produces a spurious cross-reference in Info; reword to avoid that.
+/tmp/linuxdoc-tools.tcNogf8GVh/sgmltmp.funcref.2.texi:6704: warning: @strong{Note...} produces a spurious cross-reference in Info; reword to avoid that.
+/tmp/linuxdoc-tools.tcNogf8GVh/sgmltmp.funcref.2.texi:6786: warning: @strong{Note...} produces a spurious cross-reference in Info; reword to avoid that.
+linuxdoc -B info geos.sgml
+Processing file geos.sgml
+linuxdoc -B info grc65.sgml
+Processing file grc65.sgml
+/tmp/linuxdoc-tools.GKfz1ZNSm0/sgmltmp.grc65.2.texi:450: Node `Building the GEOS application using cl65' previously defined at line 314.
+/tmp/linuxdoc-tools.GKfz1ZNSm0/sgmltmp.grc65.2.texi:474: Node `Building the GEOS application without cl65' previously defined at line 333.
+/tmp/linuxdoc-tools.GKfz1ZNSm0/sgmltmp.grc65.2.texi:490: Node `First step -- compiling the resources' previously defined at line 349.
+/tmp/linuxdoc-tools.GKfz1ZNSm0/sgmltmp.grc65.2.texi:503: Node `Second step -- assembling the application header' previously defined at line 367.
+/tmp/linuxdoc-tools.GKfz1ZNSm0/sgmltmp.grc65.2.texi:516: Node `Third step -- compiling the code' previously defined at line 381.
+/tmp/linuxdoc-tools.GKfz1ZNSm0/sgmltmp.grc65.2.texi:530: Node `Fourth and last step -- linking it together' previously defined at line 397.
+/tmp/linuxdoc-tools.GKfz1ZNSm0/sgmltmp.grc65.2.texi:349: Prev field of node `First step -- compiling the resources' not pointed to.
+/tmp/linuxdoc-tools.GKfz1ZNSm0/sgmltmp.grc65.2.texi:397: This node (Fourth and last step -- linking it together) has the bad Next.
+makeinfo: Removing output file `grc65.info' due to errors; use --force to preserve.
+fmt_info::postASP: Failed to run makeinfo. Aborting ...
+make: *** [grc65.info] Error 25
+

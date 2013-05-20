@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Support for the EMMA II sy</title>
+<meta name="Author" content="Mats Byggmastar (mats.byggmastar1multi.fi)" />
+<meta name="Subject" content="Re: [cc65] Support for the EMMA II system?" />
+<meta name="Date" content="2004-04-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Support for the EMMA II system?</h1>
+<!-- received="Thu Apr 29 07:37:48 2004" -->
+<!-- isoreceived="20040429053748" -->
+<!-- sent="Thu, 29 Apr 2004 08:33:32 +0300" -->
+<!-- isosent="20040429053332" -->
+<!-- name="Mats Byggmastar" -->
+<!-- email="mats.byggmastar1multi.fi" -->
+<!-- subject="Re: [cc65] Support for the EMMA II system?" -->
+<!-- id="002001c42dab$82877730$0100a8c0@inet" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="20040428193902.GA30268&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4099.html" title="carlos: &quot;[cc65] start adress&quot;">Next message</a> ]
+[ <a href="4097.html" title="Groepaz: &quot;Re: [cc65] macro arguments&quot;">Previous message</a> ]
+[ <a href="4095.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Support for the EMMA II system?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4100.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Support for the EMMA II system?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Mats Byggmastar &lt;<a href="mailto:mats.byggmastar1multi.fi?Subject=Re:%20[cc65]%20Support%20for%20the%20EMMA%20II%20system?">mats.byggmastar1multi.fi</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-04-29 07:33:32</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt; You will have to come up with a memory layout, and generate a linker config
+&gt; for it. With a linker config and a working crt0 file, you can start writing C
+&gt; programs. But keep in mind that 1.5K of RAM is not much, there are C functions
+&gt; with almost that size (the printf family of functions for example).
+
+Yes, I thought so. 
+To make things even worse, the 1.5 KB is not continous, 
+it's 512 byte at $0200 and 1024 byte at $0C00.
+I've put CODE into the 1024 byte block and the other 
+segments into the 512 byte block.
+
+ 
+&gt; As for the crt0 file, the best approach would be to have a look at one of the
+&gt; existing ones, for example that of the c16 (it's a good example because it is
+&gt; rather small).
+
+OK, I'll do that. Thanks.
+
+ 
+Mats
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Apr 29 07:37:48 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4099.html" title="Next message in the list">carlos: "[cc65] start adress"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4097.html" title="Previous message in the list">Groepaz: "Re: [cc65] macro arguments"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4095.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Support for the EMMA II system?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4100.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Support for the EMMA II system?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4100.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Support for the EMMA II system?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4098" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4098" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4098" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-04-29 07:37:54 CEST
+</em></small></p>
+</body>
+</html>

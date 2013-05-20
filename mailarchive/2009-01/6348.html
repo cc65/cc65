@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Unresolved external in V2.</title>
+<meta name="Author" content="Marc 'BlackJack Rintsch (marc1rintsch.de)" />
+<meta name="Subject" content="Re: [cc65] Unresolved external in V2.12.0" />
+<meta name="Date" content="2009-01-07" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Unresolved external in V2.12.0</h1>
+<!-- received="Wed Jan  7 10:26:25 2009" -->
+<!-- isoreceived="20090107092625" -->
+<!-- sent="Wed, 7 Jan 2009 10:26:42 +0100" -->
+<!-- isosent="20090107092642" -->
+<!-- name="Marc 'BlackJack Rintsch" -->
+<!-- email="marc1rintsch.de" -->
+<!-- subject="Re: [cc65] Unresolved external in V2.12.0" -->
+<!-- id="200901071026.46690.marc@rintsch.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="f7acaadf0901061931v53c473f8mc8fe45215cf83544&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6349.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Unresolved external in V2.12.0&quot;">Next message</a> ]
+[ <a href="6347.html" title="Tachdaun: &quot;Re: [cc65] ld65 configuration files&quot;">Previous message</a> ]
+[ <a href="6346.html" title="Halldor Karl Hognason: &quot;[cc65] Unresolved external in V2.12.0&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6349.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Unresolved external in V2.12.0&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Marc 'BlackJack Rintsch &lt;<a href="mailto:marc1rintsch.de?Subject=Re:%20[cc65]%20Unresolved%20external%20in%20V2.12.0">marc1rintsch.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-01-07 10:26:42</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Wednesday 07 January 2009, Halldor Karl Hognason wrote:
+
+&gt; The program is the following (just a simple test):
+&gt;
+&gt; #include &lt;stdlib.h&gt;
+&gt; #define poke(addr,val)     (*(unsigned char*) (addr) = (val))
+&gt; int main (void)
+&gt; {
+&gt;     int i = 0;
+&gt;
+&gt;     for(i=0; i&lt;4; i++)
+&gt;     {
+&gt;         poke(0x8000, 8);
+&gt;     }
+&gt;     return EXIT_SUCCESS;
+&gt; }
+&gt;
+&gt; We call this test.c and now run the following,
+&gt;
+&gt; cc65 -Oi -t c64 test.c  (success)
+&gt; ca65 -t c64 test.s  (success)
+&gt; ld65 -t c64 test.o (un-successful, see below)
+&gt;
+&gt;
+&gt; This results in the following error reported by the linker,
+&gt;
+&gt; ld65.exe: Warning: [builtin config](6): Segment `STARTUP' does not
+&gt; exist Unresolved external `incsp2' referenced in:
+&gt;   test.s(44)
+&gt; Unresolved external `ldaxysp' referenced in:
+&gt;   test.s(36)
+&gt; Unresolved external `pushax' referenced in:
+&gt;   test.s(26)
+&gt; Unresolved external `staxysp' referenced in:
+&gt;   test.s(28)
+&gt; Unresolved external `toslta0' referenced in:
+&gt;   test.s(31)
+&gt; ld65.exe: Error: 5 unresolved external(s) found - cannot create
+&gt; output file
+&gt;
+&gt; […]
+&gt;
+&gt; Now, back to the one with a for-loop.
+&gt; When I look into the ASM source, test.s, I see that there in between
+&gt; are the ' jsr     pushax','jsr     staxysp','jsr     pushax',' jsr
+&gt; toslta0','jsr     ldaxysp',  what are they for ?
+&gt; Are they macros for swapping between or pushing on stack  A,X,Y ?
+
+Subroutines for dealing with the software stack that is used for 
+arguments and local variables, `i` in this case.
+
+&gt; .segment        &quot;CODE&quot;
+&gt; .proc   _main: near
+&gt; .segment        &quot;CODE&quot;
+&gt;         ldx     #$00
+&gt;         txa
+&gt;         jsr     pushax
+
+Here is `i` initialized to 0 for example.
+
+&gt; I would really appreciate if somebody could have a look at this, I
+&gt; suspect this has something todo with the macros, most probably
+&gt; nothing todo with the ca65, more probably me beeing a newbie here
+&gt; using the cc65 and not seeing something.
+
+If you insist on calling the tools yourself you have to give the startup 
+object file and the standard library for the target to ``ld65``::
+
+  ld65 -t c64 c64.o test.o c64.lib
+
+But all this is simplified by ``cl65``::
+
+  cl65 -o test.prg test.c
+
+That's all you need to compile, assemble, and link the program for the 
+C64 as target machine.
+
+Ciao,
+	Marc 'BlackJack' Rintsch
+-- 
+“Programmers should be paid by the amount of code
+ that they avoid writing.”  -- Michael P. Soulier
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<div>
+<ul>
+<li>application/pgp-signature attachment: <a href="../att-6348/signature.asc_">This is a digitally signed message part.</a></li>
+</ul>
+<!-- attachment="signature.asc_" -->
+</div>
+<span id="received"><dfn>Received on</dfn> Wed Jan  7 10:26:25 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6349.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Unresolved external in V2.12.0"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6347.html" title="Previous message in the list">Tachdaun: "Re: [cc65] ld65 configuration files"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6346.html" title="Message to which this message replies">Halldor Karl Hognason: "[cc65] Unresolved external in V2.12.0"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6349.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Unresolved external in V2.12.0"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6348" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6348" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6348" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-01-07 10:26:26 CET
+</em></small></p>
+</body>
+</html>

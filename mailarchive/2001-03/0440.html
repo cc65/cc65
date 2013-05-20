@@ -1,0 +1,173 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] c64 question</title>
+<meta name="Author" content="Arvid Norberg (c99ang_at_cs.umu.se)">
+<meta name="Subject" content="Re: [cc65] c64 question">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] c64 question</h1>
+<!-- received="Sat Mar 10 10:53:33 2001" -->
+<!-- isoreceived="20010310095333" -->
+<!-- sent="Sat, 10 Mar 2001 10:53:33 +0100 (MET)" -->
+<!-- isosent="20010310095333" -->
+<!-- name="Arvid Norberg" -->
+<!-- email="c99ang_at_cs.umu.se" -->
+<!-- subject="Re: [cc65] c64 question" -->
+<!-- id="Pine.GSO.3.95.1010310103933.353A-100000@peppar.cs.umu.se" -->
+<!-- inreplyto="20010307232817.A29599@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Arvid Norberg (<a href="mailto:c99ang_at_cs.umu.se?Subject=Re:%20[cc65]%20c64%20question"><em>c99ang_at_cs.umu.se</em></a>)<br>
+<strong>Date:</strong> 2001-03-10 10:53:33
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0441.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<li><strong>Previous message:</strong> <a href="0439.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<li><strong>In reply to:</strong> <a href="0439.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0441.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<li><strong>Reply:</strong> <a href="0441.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Wed, 7 Mar 2001, Ullrich von Bassewitz wrote:
+
+&gt; Saving registers is not done by the 6502 itself but must be done by the
+&gt; interrupt routine. The 6502 saves the condition codes (flags) and the return
+&gt; address.
+&gt; 
+&gt; &gt; I don't see what pushing ints onto the stack has to do with this.
+&gt; [...]
+&gt; &gt; This means that I don't understand why the stack get messed up.
+&gt; 
+&gt; Have a look at the following routine. It has the purpose to increment the
+&gt; stack. I've made it samewhat simpler than the last example (which was the
+&gt; actual routine minus 65C02 code and was optimized for speed):
+&gt; 
+&gt; incsp:	inc	sp		; Increment low byte
+&gt; 	    			; &lt;-- Assume interrupt here
+&gt; 	bne	@L1		; Jump if no overflow
+&gt; 	inc	sp+1		; Overflow, increment high byte
+&gt; @L1:	rts
+&gt; 
+&gt; Now assume that the value of the stackpointer is $CBFF. This means that the
+&gt; low byte will overflow and the high byte has to be incremented, too. The final
+&gt; value (after calling the function) should be $CC00.
+&gt; 
+&gt; If an interrupt occurs after incrementing the low byte (marked with an arrow),
+&gt; the value of the stack pointer at this point is $DB00 - which is not only
+&gt; wrong, but may also be outside the stack area.
+&gt; 
+&gt; Now, if you call a C function, this C function will use the stack, and this
+&gt; means that it will use an invalid stack pointer. 
+&gt; 
+&gt; The problem here is, that the increment of the stack pointer is not atomic, so
+&gt; it may have an invalid value if the routine is interrupted.
+&gt; 
+
+I see what you mean. But isn't the stack pointer increamented
+automatically by pha?
+
+if so, wouldn't it be possible to write an interrupt handler like this:
+
+handler:
+	pha
+	txa
+	pha
+	tya
+	pha
+
+	[..]	; push all the zero-page registers
+
+	[..]	; free for a C-function to do watever it wants
+
+	[..]	; pull back the zero-page registers
+
+	pla
+	tay
+	pla
+	tax
+	pla
+	rti
+
+?
+	
+
+
+&gt; The zero page locations are the working variables of the C compiler
+&gt; (comparable to real registers on other CPUs). Not saving these locations would
+&gt; be equal to not saving registers in an interrupt routine.
+
+ok.
+
+&gt; &gt;[..]
+&gt; 
+&gt; The compiler is correct here. Characters are unsigned, so variable a can never
+&gt; be less than zero. If you want signed characters, you have to declare them
+&gt; explicitly as such:
+&gt; 
+&gt; 	signed char a = -1;
+&gt; 	if (a &lt; 0 || a &gt; 2) cputs(&quot;a &lt; 0 or a &gt; 2\n&quot;);
+&gt; 
+&gt; This code will not longer produce the warning. Please note however, that
+&gt; operations on signed data types are usually slower compared to the same
+&gt; operations on the equivalent unsigned data type, because the 6502 does not
+&gt; support signed data very good, so the compiler must generate additional code.
+&gt; For best performance avoid signed data types if you can.
+
+ah, I thought it meant the entire expression. Now I see.
+
+thanks,
+
+---
+Arvid Norberg
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20c64%20question">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0441.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<li><strong>Previous message:</strong> <a href="0439.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<li><strong>In reply to:</strong> <a href="0439.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0441.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<li><strong>Reply:</strong> <a href="0441.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:39 CET</em>
+</em>
+</small>
+</body>
+</html>

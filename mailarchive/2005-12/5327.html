@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] ca65 Z80 support</title>
+<meta name="Author" content="Gábor Lénárt (lgb1lgb.hu)" />
+<meta name="Subject" content="Re: [cc65] ca65 Z80 support" />
+<meta name="Date" content="2005-12-05" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] ca65 Z80 support</h1>
+<!-- received="Mon Dec  5 09:44:32 2005" -->
+<!-- isoreceived="20051205084432" -->
+<!-- sent="Mon, 5 Dec 2005 09:44:21 +0100" -->
+<!-- isosent="20051205084421" -->
+<!-- name="Gábor Lénárt" -->
+<!-- email="lgb1lgb.hu" -->
+<!-- subject="Re: [cc65] ca65 Z80 support" -->
+<!-- id="20051205084421.GA27089@lgb.hu" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="20051204212340.GA28934&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5328.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65 Z80 support&quot;">Next message</a> ]
+[ <a href="5326.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65 Z80 support&quot;">Previous message</a> ]
+[ <a href="5326.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65 Z80 support&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5328.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65 Z80 support&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Gábor Lénárt &lt;<a href="mailto:lgb1lgb.hu?Subject=Re:%20[cc65]%20ca65%20Z80%20support">lgb1lgb.hu</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-12-05 09:44:21</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+On Sun, Dec 04, 2005 at 10:23:41PM +0100, Ullrich von Bassewitz wrote:
+&gt; &gt; Ones with 'Z' are conditioned opcodes (Z is the condition here, other one
+&gt; &gt; can stay here as well). At the level of CPU opcodes there are simply another
+&gt; &gt; opcodes. Now how can I parse the source?
+&gt; 
+&gt; Determining the addressing mode is done in one of the ea... modules. You would
+&gt; have to write such a module for the Z80. Making the condition code specifiers
+&gt; reserved words in the scanner is possible, and probably the best idea.
+
+I've simply created an instruction table for Z80, and used different handler
+functions in InsDesc struct, totally ignores the addressing mode field (I
+don't use it). I've started to code an EvalZ80() function which would parse
+the rest of the line to get with the number of arguments (separated by
+comma), and the type of them. Each handler would call this EvalZ80() first,
+check number of params and types and then decide if it's valid and generate
+code if so. I guess this is not it whould be done ;-) It works well for
+instructions don't need any parameters (TokIsSep() can be used to detect
+if have bogus params). However problem occures to write the real part of my
+EvalZ80(). I would like to classify assembly source line (after opcode name
+itself) in this way:
+
+[label:]  opcode  [param1 [,param2]]
+		  ^
+		  we are here
+
+where paramX can be for example:
+
+(HL)		-&gt;   MODE_HLINDEXED
+(IX+const)	-&gt;   MODE_IXPLUSCONSTINDEXED (and value of const stored somewhere
+                                              well at least the expression which
+			                      is enough to genrate signed byte
+                                              offset needed here)
+BC		-&gt;   MODE_REG_BC
+(BC)		-&gt;   MODE_BCINDEXED
+(const)		-&gt;   MODE_MEMORYLOC          (and value of expression for WORD
+					      const stored)
+
+and such ...
+Then handlers can use these MODE_ constants to check if addressing mode
+is valid and if it is what code should be generated (probably in the form
+of having an array contain every valid combination of these constants,
+type byte(s) should emit and the optional variable stuff value and type
+(signed byte, word)).
+
+Sorry for this mess, but because of my bad English I can't explain myself
+easily ...
+
+
+&gt; &gt; But I don't want to mess up the whole
+&gt; &gt; source without asking first the &quot;best&quot; solution for the problem of support
+&gt; &gt; of a totally different CPU from the already-well-supported 65xx ones int
+&gt; &gt; ca65. Since Z80 differs from these CPUs a lot, I guess I've got quite big
+&gt; &gt; change in tokenizer and such, and I don't want it, if you won't accept my
+&gt; &gt; code because of its uglyness.
+&gt; 
+&gt; There are also 65xx CPUs that need other reserved identifiers, the 65CE02 for
+&gt; example has a Z register. If this is of any help, I can add the necessary
+&gt; hooks in the scanner for CPU dependent reserved identifiers.
+
+My problem that I haven't had got an overview on the full ca65 yet. So I
+stucked at my EvalZ80(). If you can explain (or even do) to add Z80 (and
+possibly other if it's a general solution) specific stuffs into the scanner
+then please do. Also I will check out the source a bit deeper, since I've
+spent about quarter a hour to check the source no wonder that I don't
+understand all of the source at once in the begining :) However as most
+people I'm lazy, and I want everything fast :)
+
+Thanks for your help in advance,
+
+-- 
+- Gábor
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Dec  5 09:44:32 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5328.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] ca65 Z80 support"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5326.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] ca65 Z80 support"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5326.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] ca65 Z80 support"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5328.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] ca65 Z80 support"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5328.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] ca65 Z80 support"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5327" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5327" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5327" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-12-05 09:44:35 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Does 4529 TGI library compile?</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="[cc65] Does 4529 TGI library compile?" />
+<meta name="Date" content="2009-12-16" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Does 4529 TGI library compile?</h1>
+<!-- received="Wed Dec 16 20:51:34 2009" -->
+<!-- isoreceived="20091216195134" -->
+<!-- sent="Wed, 16 Dec 2009 20:51:11 +0100" -->
+<!-- isosent="20091216195111" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="[cc65] Does 4529 TGI library compile?" -->
+<!-- id="20091216195111.GK13938@trikaliotis.net" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7703.html" title="Christian Grössler: &quot;Re: [cc65] How smart is the linker?&quot;">Next message</a> ]
+[ <a href="7701.html" title="Rick Cortese: &quot;RE: [cc65] How smart is the linker?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7706.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Does 4529 TGI library compile?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20[cc65]%20Does%204529%20TGI%20library%20compile?">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-12-16 20:51:11</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello,
+
+does SVN version 4529 on trunk actually compile?
+
+I am trying to build DEB packages for i386 and AMD64 (Thanks Daniel
+Serpell for the fixes for the Debian files!), but I stumbled upon a
+compilation error when libsrc/tgi is compiled:
+
+_circle.s(19): Error: Symbol `_tgi_ellipse' is undefined
+make: *** [tgi_circle.o] Error 1
+
+I applied the following patch:
+
+diff -urNad cc65-2.13.0svn4529~/libsrc/tgi/tgi_circle.s cc65-2.13.0svn4529/libsrc/tgi/tgi_circle.s
+--- cc65-2.13.0svn4529~/libsrc/tgi/tgi_circle.s	2009-12-16 13:39:26.000000000 +0100
++++ cc65-2.13.0svn4529/libsrc/tgi/tgi_circle.s	2009-12-16 20:43:15.000000000 +0100
+&#64;&#64; -7,6 +7,7 &#64;&#64;
+         .include        &quot;tgi-kernel.inc&quot;
+ 
+         .import         pusha
++        .import         _tgi_ellipse
+ 
+ 
+ ;----------------------------------------------------------------------------
+
+
+and this file compiles, but then, I got other errors:
+
+tgi_clippedline.s(416): Error: Symbol `tgi_clip_y2' is undefined
+tgi_clippedline.s(406): Error: Symbol `tgi_clip_x2' is undefined
+tgi_clippedline.s(353): Error: Symbol `_tgi_ymax' is undefined
+tgi_clippedline.s(326): Error: Symbol `tgi_clip_y1' is undefined
+tgi_clippedline.s(311): Error: Symbol `_tgi_xmax' is undefined
+tgi_clippedline.s(267): Error: Symbol `tgi_clip_x1' is undefined
+tgi_clippedline.s(101): Error: Symbol `tgi_clip_y1' is undefined
+tgi_clippedline.s(99): Error: Symbol `tgi_clip_y2' is undefined
+tgi_clippedline.s(89): Error: Symbol `tgi_clip_x1' is undefined
+tgi_clippedline.s(87): Error: Symbol `tgi_clip_x2' is undefined
+tgi_clippedline.s(51): Error: Symbol `tgi_outcode' is undefined
+tgi_clippedline.s(50): Error: Symbol `tgi_clip_y1' is undefined
+tgi_clippedline.s(50): Error: Symbol `tgi_clip_y2' is undefined
+tgi_clippedline.s(41): Error: Symbol `tgi_outcode' is undefined
+
+I could go through these files, too. However, I ask myself if this is
+intended, or if I have a local problem?
+
+The problem occurred on two different machines, both running Debian Etch
+(4.0)
+
+Regards,
+Spiro.
+
+-- 
+Spiro R. Trikaliotis                              <a href="http://opencbm.sf.net/">http://opencbm.sf.net/</a>
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>                     <a href="http://www.viceteam.org/">http://www.viceteam.org/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Dec 16 20:51:34 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7703.html" title="Next message in the list">Christian Grössler: "Re: [cc65] How smart is the linker?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7701.html" title="Previous message in the list">Rick Cortese: "RE: [cc65] How smart is the linker?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7706.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Does 4529 TGI library compile?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7706.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Does 4529 TGI library compile?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="7707.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Re: [cc65] Does 4529 TGI library compile?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7702" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7702" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7702" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-12-16 20:51:37 CET
+</em></small></p>
+</body>
+</html>

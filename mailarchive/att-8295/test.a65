@@ -1,0 +1,7 @@
+.define _CMT() ;
+
+_CMT() "Hallo!"
+
+test:
+	rts
+

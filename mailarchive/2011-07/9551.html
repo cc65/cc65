@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] TGI bitmap fnts revisited</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] TGI bitmap fnts revisited" />
+<meta name="Date" content="2011-07-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] TGI bitmap fnts revisited</h1>
+<!-- received="Sun Jul 10 10:24:09 2011" -->
+<!-- isoreceived="20110710082409" -->
+<!-- sent="Sun, 10 Jul 2011 10:23:54 +0200" -->
+<!-- isosent="20110710082354" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] TGI bitmap fnts revisited" -->
+<!-- id="CACT=u72bnhSsRfmUwyA260XNrUNpW7bARQKQfAjF3q-r+FFR3w@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9552.html" title="Karri Kaksonen: &quot;Re: [cc65] TGI bitmap fnts revisited&quot;">Next message</a> ]
+[ <a href="9550.html" title="Greg King: &quot;Re: [cc65] Interrupt &lt;-&gt;  C runtime environment&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9552.html" title="Karri Kaksonen: &quot;Re: [cc65] TGI bitmap fnts revisited&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20TGI%20bitmap%20fnts%20revisited">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-07-10 10:23:54</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+Quite some months ago we were discussing here some aspects of TGI
+bitmap font handling. However other aspects were not covered.
+Therefore I revisited the topic.
+
+First let me briefly summarize our results:
+
+
+1. The coordinate used for text output becomes the bottom left corner
+of the first character.
+
+
+2. The bottom left corner refers to the bounding box of the
+characters, _not_ the baseline of the characters. So all drawing
+happens above and to the right of the coordinate used.
+
+
+3. Vertical direction means the text runs upwards. The coordinate used
+still refers to the same point relative to the first character. So all
+drawing happens above and to the _left_ of the coordinate used.
+
+
+4. The TGI cursor is advanced by the TGI kernel beyond the last
+character in a way that a subsequent text output would result in
+continuous text drawn.
+
+&#64;Uz: The current implementation of that cursor movement seems to take
+vertical direction into account but seems to _not_ take text scaling
+into account.
+
+
+The aspects not being covered that I'm aware of are:
+
+
+1. Do we want to make any statements what the user can expect from
+setting the first two parameters of tgi_textstyle (&lt;1&gt;, &lt;2&gt;, &lt;3&gt;,
+TGI_FONT_BITMAP) to anything different from 0x100? Range? Granularity?
+Minimal value? Maximal value?
+
+To be honest this doesn't affect me personally directly as my new
+Apple II implementation of bitmap font text output will ignore the
+first two parameters anyway - meaning it won't support scaling at all.
+The primary reason is the overhead necessary by means of code size -
+that is always present in the driver even if unused.
+
+Now that vector fonts are (close to be) there we might even consider
+not supporting bitmap font scaling in general - leaving those
+&quot;advanced&quot; stuff to vector font text output. Two arguments (beside
+code size):
+- Enlarged bitmap fonts are ugly
+- The screen resolution of our target devices are even in &quot;hires&quot; mode
+so low that there's not much use for enlarged text output
+
+
+2. Our last TGI discussions lead to the result that the TGI kernel
+takes care of clipping for about all drawing primitives. However
+there's currently no clipping for bitmap font text output implemented
+in the TGI kernel. But for consistency reasons I believe it should be
+done there. I see very well that this is somewhat difficult for the
+TGI kernel, but I see two viable options:
+- Text output not fitting the screen is omitted completely - the TGI
+kernel just doesn't call into the driver for text output
+- Characters not fitting the screen are omitted completely
+  a) The TGI kernel creates a copy of the substring fitting the screen
+(and adjusts potentially the coordinate)
+  b) The TGI kernel creates a single character string for every
+character fitting the screen and calls into the driver in a loop
+(leveraging the cursor movement feature)
+
+
+3. What happens to the pixels not being part of the character glyph
+but being part of the character bounding box? Are they to be left
+as-is? Or are they to be set to some value - if yes to which?
+
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Jul 10 10:24:09 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9552.html" title="Next message in the list">Karri Kaksonen: "Re: [cc65] TGI bitmap fnts revisited"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9550.html" title="Previous message in the list">Greg King: "Re: [cc65] Interrupt &lt;-&gt;  C runtime environment"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9552.html" title="Next message in this discussion thread">Karri Kaksonen: "Re: [cc65] TGI bitmap fnts revisited"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9552.html" title="Message sent in reply to this message">Karri Kaksonen: "Re: [cc65] TGI bitmap fnts revisited"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9553.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] TGI bitmap fnts revisited"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9551" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9551" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9551" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-07-10 10:24:12 CEST
+</em></small></p>
+</body>
+</html>

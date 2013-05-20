@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] Graphics library</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="[cc65] Graphics library">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] Graphics library</h1>
+<!-- received="Sun Jul  7 13:47:46 2002" -->
+<!-- isoreceived="20020707114746" -->
+<!-- sent="Sun, 7 Jul 2002 13:47:49 +0200" -->
+<!-- isosent="20020707114749" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="[cc65] Graphics library" -->
+<!-- id="20020707114749.GA18022@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Graphics%20library"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-07-07 13:47:49
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="../2002-06/1457.html">Ullrich von Bassewitz: "Re: [cc65] Remote display for the C64 using VNC"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1459.html">groepaz: "Re: [cc65] Graphics library"</a>
+<li><strong>Reply:</strong> <a href="1459.html">groepaz: "Re: [cc65] Graphics library"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+If anyone is interested: I've added a first alpha version of the graphics
+library to the repository today. There will probably be some more changes, but
+the overall design should not change.
+
+I would be glad if people could test the driver/interface and send me some
+feedback. The current code works only for the C64, because the o65 loader for
+the graphics driver uses CBM kernal calls for file I/O. I'm not happy about
+this, and this will for sure change before the next release, but it's not as
+bad as it seems in the current situation, because the only graphics driver
+available is also for the C64 (in 320*200*2 mode). Besides that, the CBM
+specific code is only in one module, so it's easy to replace by standard C
+code (using C file stream functions).
+
+Maybe anyone is interested in writing drivers for other graphics modes or for
+other machines? The C64 160*200*4 mode should be doable without too much work,
+because the existing 320*200*2 driver can be used as a base. The existing
+driver is fairly well documented and the only interfacing is to the graphics
+kernal, so any knowledgeable assembler programmer should be able to write such
+a driver for other hardware without much need to know about C and cc65.
+
+Here is a short description of the architecture:
+
+The graphics interface is modeled after the old BGI interface of the borland
+DOS compilers. Which is no wonder, because I've written and sold BGI drivers
+for all sorts of devices a long time ago:-) (they may be downloaded from my
+web page together with the sources). In fact, the cc65 graphics interface is
+as similar to BGI as it can get if you keep the hardware limitations in mind,
+so I've named it &quot;tgi&quot; for &quot;Tiny Graphics Interface&quot;.
+
+It consists of a platform independent layer with C callable functions, plus
+graphics drivers that are loaded from disk at runtime. Colors are supported
+through palettes. That is, the color used is actually an index into a
+(platform specific) color table that may be altered by the application (if
+this feature is provided by the hardware).
+
+The advantages of this approach are:
+
+  1. The drivers don't use memory while not loaded, so one can write a program
+     with a text mode interface and just switch into graphics mode to display
+     a diagram or something like that.
+
+  2. Drivers may be switched at runtime to support different solutions/colors
+     on the users request.
+
+  3. Common code (like clipping for primitives where this is possible) may be
+     moved into the device independent kernel and must not be replicated by
+     each of the drivers.
+
+  4. The device independent kernel may contain emulation code. This code can
+     implement more complex operations by using simpler ones provided by the
+     driver. One example would be lines: If the driver has no line support
+     itself, lines may be plotted by the kernel using the PutPixel function of
+     the driver (this is of course a lot slower). I'm not sure however, if
+     this feature will be left in, because the emulation code is not needed
+     with a complete driver, but always linked in (using precious memory).
+
+  5. Writing a new driver is easy, because you don't have to cope with
+     existing code, interfacing to other library routines, or making your
+     routines C callable. The driver is written in pure assembly, the
+     interface consists of a parameter and a jump table.
+
+  6. The graphics kernel itself is completely platform independent. All the
+     platform dependencies go into the loadable driver.
+
+... and maybe some more :-)
+
+For the C64 320x200x2 mode I'm using a modified version of Stephen Judds grlib
+graphics library. This is the reference driver I'm using to develop the kernel
+and the interface. Most things are already in good shape and working. The next
+step will be to write some sort of documentation, so other people can start
+writing drivers for other hardware (it should even be possible to write a
+driver for the Commodore 1520 plotter - I've done similar things for the BGI
+interface a long time ago).
+
+This graphics interface is not perfect. It is simply not possible to write a
+graphics interface that suits all people and all purposes, needs almost no
+memory, is fast as lightning and - last but not least - is C callable and
+compatible with the cc65 memory setup. But I think I've created a good mixture
+that should make many applications possible.
+
+One goodie: The existing C64 driver for mode 320*200*2 uses NO ADDITIONAL
+MEMORY! It does this by placing the hires screen below the kernal ROM and the
+color map below the I/O area. This means that there is only one video screen
+available, and some operations are a bit slower than needed (because of the
+banking). However, I've rated the advantages of this approach higher than the
+disadvantages:
+
+  * No special linker config is needed. The driver will use the memory that
+    is not assigned to the C program by the linker.
+
+  * Apart from the graphics routines itself, no additional memory is used.
+
+As usual, any feedback is highly appreciated!
+
+Regards
+
+
+	Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Graphics%20library">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Graphics%20library">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="../2002-06/1457.html">Ullrich von Bassewitz: "Re: [cc65] Remote display for the C64 using VNC"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1459.html">groepaz: "Re: [cc65] Graphics library"</a>
+<li><strong>Reply:</strong> <a href="1459.html">groepaz: "Re: [cc65] Graphics library"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-07-07 13:48:59 CEST</em>
+</em>
+</small>
+</body>
+</html>

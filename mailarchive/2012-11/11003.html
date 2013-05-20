@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] calloc() not failing</title>
+<meta name="Author" content="Marc 'BlackJack' Rintsch (marc1rintsch.de)" />
+<meta name="Subject" content="[cc65] calloc() not failing" />
+<meta name="Date" content="2012-11-12" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] calloc() not failing</h1>
+<!-- received="Mon Nov 12 10:19:30 2012" -->
+<!-- isoreceived="20121112091930" -->
+<!-- sent="Mon, 12 Nov 2012 10:19:02 +0100" -->
+<!-- isosent="20121112091902" -->
+<!-- name="Marc 'BlackJack' Rintsch" -->
+<!-- email="marc1rintsch.de" -->
+<!-- subject="[cc65] calloc() not failing" -->
+<!-- id="201211121019.04568.marc@rintsch.de" -->
+<!-- charset="utf-8" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11004.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] calloc() not failing&quot;">Next message</a> ]
+[ <a href="11002.html" title="Oliver Schmidt: &quot;[cc65] Improved Static Driver Support&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="11004.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] calloc() not failing&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Marc 'BlackJack' Rintsch &lt;<a href="mailto:marc1rintsch.de?Subject=Re:%20[cc65]%20calloc()%20not%20failing">marc1rintsch.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-11-12 10:19:02</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi *,
+
+Is it me or the library?  I have a problem with `calloc()` either not 
+failing with a NULL return value or even crashing the system with 
+writing zeroes in places it shouldn't.
+
+I reduced the real program to the following::
+
+ #include &lt;stdio.h&gt;
+ #include &lt;stdlib.h&gt;
+
+ int main(void)
+ {
+     if (!calloc(250, 104)) {
+         puts(&quot;Error&quot;);
+     }
+     return 0;
+ }
+
+First time I run this, the program returns to the BASIC interpreter 
+without printing the &quot;Error&quot; I expect.  On the next run the system hangs 
+after half of the video memory is filled with &#64; signs, so it looks like 
+`calloc()` fills memory it clearly shouldn't.  This pattern of the two 
+runs is reproducible regardless of the compiler options for 
+optimizations.  A glance at the `calloc()` source reveals there is no 
+check for overflow of the multiplication of the arguments.  IMHO it 
+should‽
+
+Background of the code snippet: Of course both values are not hard coded 
+in the real program.  The count is user input and the size belongs to a 
+struct.  I let the user input a count and want to tell him the count is 
+too high if `calloc()` fails.  As there is no function in the C standard 
+to ask beforehand how much free memory there is, I thought that is the 
+way to go.
+
+Ciao,
+	Marc 'BlackJack' Rintsch
+
+-- 
+“Money is a new form of slavery, and distinguishable from
+ the old simply by the fact that it is impersonal --
+ that there is no human relation between master and slave.”
+                     -- Leo Tolstoy, What shall We Do Then?
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Nov 12 10:19:30 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11004.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] calloc() not failing"</a></li>
+<li><dfn>Previous message</dfn>: <a href="11002.html" title="Previous message in the list">Oliver Schmidt: "[cc65] Improved Static Driver Support"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="11004.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] calloc() not failing"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="11004.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] calloc() not failing"</a></li>
+<li><dfn>Reply</dfn>:  <a href="11005.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] calloc() not failing"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#11003" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#11003" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#11003" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-11-12 10:19:36 CET
+</em></small></p>
+</body>
+</html>

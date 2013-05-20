@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] another bug?</title>
+<meta name="Author" content="Karri Kaksonen (karri1sipo.fi)" />
+<meta name="Subject" content="Re: [cc65] another bug?" />
+<meta name="Date" content="2009-10-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] another bug?</h1>
+<!-- received="Fri Oct 23 12:15:22 2009" -->
+<!-- isoreceived="20091023101522" -->
+<!-- sent="Fri, 23 Oct 2009 13:15:05 +0300" -->
+<!-- isosent="20091023101505" -->
+<!-- name="Karri Kaksonen" -->
+<!-- email="karri1sipo.fi" -->
+<!-- subject="Re: [cc65] another bug?" -->
+<!-- id="4AE18229.20806@sipo.fi" -->
+<!-- charset="UTF-8" -->
+<!-- inreplyto="20091023093524.GB8519&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7253.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Optimization possible?&quot;">Next message</a> ]
+[ <a href="7251.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] another bug?&quot;">Previous message</a> ]
+[ <a href="7251.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] another bug?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Karri Kaksonen &lt;<a href="mailto:karri1sipo.fi?Subject=Re:%20[cc65]%20another%20bug?">karri1sipo.fi</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-10-23 12:15:05</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Ullrich von Bassewitz wrote:
+&gt; Hi!
+&gt;
+&gt; On Fri, Oct 23, 2009 at 11:03:40AM +0300, Karri Kaksonen wrote:
+&gt;   
+&gt;&gt; Anyway all my code is written this way. I obviously need to add
+&gt;&gt; --signed-chars to all my Makefiles.
+&gt;&gt;     
+&gt;
+&gt; I would suggest to check the code instead. Any compiler is free to choose
+&gt; either, so code that makes assumptions about the signedness of chars is highly
+&gt; non-portable.
+&gt;
+&gt; cc65 uses unsigned chars, because operations with signed data generates much
+&gt; more code and is slower. For chars, the problems is what the standard calls
+&gt; &quot;integer promotion&quot;. In short, this means that all arithmetic operations
+&gt; operate on ints, even if all operands are chars. So the compiler needs to do
+&gt; sign extension on operands. Which - in case of unsigned chars - means just
+&gt; loading 0 for the high byte. But for signed chars, the sign of the char has to
+&gt; be tested and either 0x00 or 0xFF needs to be loaded for the high byte.
+&gt;
+&gt; Regards
+&gt;
+&gt;
+&gt;         Uz
+&gt;   
+
+Ok. My next project is an Elite-inspired space shooter that has heavy 
+use of 16 bit matrix operations (rotate, scale). The plan is to use the 
+math hardware in Suzy so that I can use the CPU for other things 
+simultaneously. The Suzy has some combined hw functions like  24 bit 
+accumulator with 16 bit operands &quot;a += b * c&quot; in a single operation. 
+Many intermediate results are 24 bit so I may end up in needing signed 
+chars here and there. But this time I declare every &quot;signed char&quot; properly.
+
+--
+Regards,
+
+Karri
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Oct 23 12:15:22 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7253.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Optimization possible?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7251.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] another bug?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7251.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] another bug?"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7252" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7252" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7252" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-10-23 12:15:23 CEST
+</em></small></p>
+</body>
+</html>

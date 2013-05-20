@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] ca65 ascii translation</title>
+<meta name="Author" content="Chris Cureau (cmcureau1gmail.com)" />
+<meta name="Subject" content="[cc65] ca65 ascii translation" />
+<meta name="Date" content="2011-12-16" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] ca65 ascii translation</h1>
+<!-- received="Fri Dec 16 19:44:52 2011" -->
+<!-- isoreceived="20111216184452" -->
+<!-- sent="Fri, 16 Dec 2011 12:44:40 -0600" -->
+<!-- isosent="20111216184440" -->
+<!-- name="Chris Cureau" -->
+<!-- email="cmcureau1gmail.com" -->
+<!-- subject="[cc65] ca65 ascii translation" -->
+<!-- id="CAL0fNgV7LP9CdDzhUukayNEdasF0CLhZHR9TOXmvMtyJac+Bew@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9824.html" title="Chris Cureau: &quot;[cc65] Re: ca65 ascii translation&quot;">Next message</a> ]
+[ <a href="9822.html" title="Gábor Lénárt: &quot;Re: [cc65] C64 fast-loader suggestion?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9824.html" title="Chris Cureau: &quot;[cc65] Re: ca65 ascii translation&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Chris Cureau &lt;<a href="mailto:cmcureau1gmail.com?Subject=Re:%20[cc65]%20ca65%20ascii%20translation">cmcureau1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-12-16 19:44:40</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Everyone,
+
+I'm running a bit of code here which should work, from all I can see...but
+it isn't.  I'm wondering if ca65 is translating it incorrectly?
+
+Not shown is readerr, which simply reads and prints the error channel.
+ When I run the code, it reports a 73 (as I would expect from a reset
+drive), then a 62, FILE NOT FOUND.  The drive should open &quot;#&quot; as a
+buffer...am I doing something wrong?
+
+Thanks in advance,
+Chris Cureau
+
+code:
+
+;        set up command channel
+        lda #15                 ;logical file number 15
+        ldx #8                  ;device 8
+        ldy #15                 ;secondary address 15
+        jsr SETLFS              ;set LA, FA, SA
+        lda #0                  ;zero length file name
+        jsr SETNAM
+        jsr OPEN                ;open command channel
+        jsr readerr
+
+;        set up for random access
+        lda #2           ;logical file number 5
+        ldx #8           ;device 8
+        ldy #2           ;secondary address 5
+        jsr SETLFS       ;set LA, FA, SA
+        lda #1
+        ldx #&gt;buffer
+        ldy #&lt;buffer     ;set file name
+        jsr SETNAM
+        jsr OPEN         ;open command channel
+        jsr readerr
+...
+; data
+buffer:
+        .byte &quot;#&quot;
+drvcmd:
+        .byte &quot;U1 2 0 18 1&quot;
+endcmd:
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Dec 16 19:44:52 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9824.html" title="Next message in the list">Chris Cureau: "[cc65] Re: ca65 ascii translation"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9822.html" title="Previous message in the list">Gábor Lénárt: "Re: [cc65] C64 fast-loader suggestion?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9824.html" title="Next message in this discussion thread">Chris Cureau: "[cc65] Re: ca65 ascii translation"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9824.html" title="Message sent in reply to this message">Chris Cureau: "[cc65] Re: ca65 ascii translation"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9831.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] ca65 ascii translation"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9823" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9823" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9823" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-12-16 19:44:55 CET
+</em></small></p>
+</body>
+</html>

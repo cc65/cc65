@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Filenames for POSIX functi</title>
+<meta name="Author" content="silverdr1wfmh.org.pl (silverdr1wfmh.org.pl)" />
+<meta name="Subject" content="Re: [cc65] Filenames for POSIX functins on CBM targets" />
+<meta name="Date" content="2012-08-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Filenames for POSIX functins on CBM targets</h1>
+<!-- received="Fri Aug 10 14:30:08 2012" -->
+<!-- isoreceived="20120810123008" -->
+<!-- sent="Fri, 10 Aug 2012 14:29:56 +0200" -->
+<!-- isosent="20120810122956" -->
+<!-- name="silverdr1wfmh.org.pl" -->
+<!-- email="silverdr1wfmh.org.pl" -->
+<!-- subject="Re: [cc65] Filenames for POSIX functins on CBM targets" -->
+<!-- id="F0BF05B1-524E-481D-B130-24B240284389@wfmh.org.pl" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="CACT=u735=S-LcihHk+c6DyyCtP-_+ancJ_P2_uFhUToy1UAhVw&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10593.html" title="Gábor Lénárt: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">Next message</a> ]
+[ <a href="10591.html" title="A.Fachat: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">Previous message</a> ]
+[ <a href="10588.html" title="Oliver Schmidt: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10640.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:silverdr1wfmh.org.pl?Subject=Re:%20[cc65]%20Filenames%20for%20POSIX%20functins%20on%20CBM%20targets">silverdr1wfmh.org.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-08-10 14:29:56</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 2012-08-10, at 13:43, Oliver Schmidt wrote:
+
+&gt;&gt;  * Everybody has his pet syntax for this purpose.
+&gt; 
+&gt; A missing standard is from my perspective no excuse to not support it at all.
+
+Good point.
+
+&gt; Hm, I personally can't judge on that. But I remember well that I got
+&gt; quite a lot negative feedback on Contiki in several forums for not
+&gt; supporting other unit numbers than #8. That negative feedback was the
+&gt; reason why we changed _curunit from being initialized to #8 to being
+&gt; initialized from ZP location $BA (?). So I have at least an indication
+&gt; that there's a real world need for other unit numbers.
+
+Definitely there is. And I find it not really true that if one uses something else than #8 then it is already a device like IDE64. True - IDE64 or SD2IEC, etc. have their place in the more sophisticated setups but two regular drives are still not so rare. The problem is as Uz noted that those who don't have would have to pay the price in memory usage..
+
+&gt;&gt;  * CBM people are used to specify the device number separately.
+&gt; 
+&gt; Surely. But they are as well used to C64 specific programs written in
+&gt; asm. Here we're about C programs - that at least I like to be
+&gt; cross-target. And from that cross-target perspective it is obligatory
+&gt; that a single string can represent all potential file locations.
+
+Reiterating my thinking aloud - how about making it this syntax cross-target and always numbering the devices/drives starting from 0. On various targets that would always mean first available storage device. This way nobody would have to think (or ifdef) whether this is to be run on CBM or Apple or..
+
+&gt; If we want to go cross-target we sometimes need to move away from what
+&gt; people are used to.
+
+Another good point.
+
+&gt; An example: On the Apple II drives are specified
+&gt; by a slot (1-7) and a drive (0-1). But the cc65 dio API identifies a
+&gt; drive by a single number. So I &quot;invented&quot; a mapping and documented it:
+&gt; <a href="http://www.cc65.org/snapshot-doc/apple2-9.html#ss9.3">http://www.cc65.org/snapshot-doc/apple2-9.html#ss9.3</a>
+
+And if we used the scheme I suggested (not that I insist ;-) one could use the same code on various targets. I mean there is always first storage device. Whether it is #8 or slot1 or A: does not really matter as target specific implementation would have to take care of it. The same applies for additional devices. The only thing I don't like is the potential memory price to be paid
+
+&gt;&gt; A special,
+&gt;&gt;    cc65 only syntax will confuse most users more than it helps.
+
+I don't think so. We talk about programmers here, not the end users, right? They should be able to read how to pass arguments properly when writing code. And if we make it somehow unified across targets - the best result.
+
+-- 
+SD!
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Aug 10 14:30:08 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10593.html" title="Next message in the list">Gábor Lénárt: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10591.html" title="Previous message in the list">A.Fachat: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10588.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10640.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10640.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10592" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10592" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10592" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-08-10 14:30:11 CEST
+</em></small></p>
+</body>
+</html>

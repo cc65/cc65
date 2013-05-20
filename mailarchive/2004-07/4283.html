@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] opt65</title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="Re: [cc65] opt65" />
+<meta name="Date" content="2004-07-21" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] opt65</h1>
+<!-- received="Wed Jul 21 20:22:18 2004" -->
+<!-- isoreceived="20040721182218" -->
+<!-- sent="Wed, 21 Jul 2004 20:30:37 +0200" -->
+<!-- isosent="20040721183037" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="Re: [cc65] opt65" -->
+<!-- id="200407212030.37445.groepaz@gmx.net" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="20040721173635.31044.qmail&#64;web52208.mail.yahoo.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4284.html" title="Shawn Jefferson: &quot;Re: [cc65] opt65&quot;">Next message</a> ]
+[ <a href="4282.html" title="Shawn Jefferson: &quot;Re: [cc65] opt65&quot;">Previous message</a> ]
+[ <a href="4282.html" title="Shawn Jefferson: &quot;Re: [cc65] opt65&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4284.html" title="Shawn Jefferson: &quot;Re: [cc65] opt65&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20opt65">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-07-21 20:30:37</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Wednesday 21 July 2004 19:36, Shawn Jefferson wrote:
+
+&gt; I just ran it over my current project, and ecounter a
+&gt; couple of errors:
+&gt;
+&gt; ;;line           optimized             original
+&gt; ;;   0 ldx _image_table_cyl+1 | lda _image_table_cyl
+&gt; dep: mod: feeds: passes: fl: 0 [0/0]
+&gt; ;;   1 lda            #511 | ldx _image_table_cyl+1
+&gt; dep: mod: feeds: passes: fl: 0 [1/1]
+&gt; ;;   2                     | ora            #$FF dep:
+&gt; mod: feeds: passes: fl: 0 [2], val=255
+&gt; ;; 1 instructions saved.
+&gt;
+&gt; This gives me a range error when I try to use ca65 to
+&gt; assemble it.
+
+cool it tries to load 511 into A ? now thats odd :=)
+
+&gt; ---------------------------------------------------------------
+&gt; ; unsigned char __near__ text_input (unsigned char,
+&gt; unsigned char, unsigned char*, unsigned char, u
+&gt; nsigned char, unsigned char)
+&gt; ;
+&gt; ---------------------------------------------------------------
+&gt;
+&gt; For some reason here it truncated a long comment, or
+&gt; maybe it was something the OS did.. I ran opt65 crap.s
+&gt;
+&gt; &gt; ocrap.s
+
+wow amazing.... i've been using it for a while now and didnt
+see any errors like this....
+
+would you send me the offending asm file in private mail? :)
+
+gpz
+
+ps: what OS are you using?
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Jul 21 20:22:18 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4284.html" title="Next message in the list">Shawn Jefferson: "Re: [cc65] opt65"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4282.html" title="Previous message in the list">Shawn Jefferson: "Re: [cc65] opt65"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4282.html" title="Message to which this message replies">Shawn Jefferson: "Re: [cc65] opt65"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4284.html" title="Next message in this discussion thread">Shawn Jefferson: "Re: [cc65] opt65"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4284.html" title="Message sent in reply to this message">Shawn Jefferson: "Re: [cc65] opt65"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4283" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4283" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4283" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-07-21 20:22:27 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,30 @@
+# HG changeset patch
+# User Daniel Serpell <daniel.serpell@gmail.com>
+# Date 1260023028 10800
+# Branch trunk
+# Node ID 2d307ef348f4f009f495c416be2585284401bbbd
+# Parent  65fa1916cb7e9d37253e9c849e8c1ee79818cfb6
+Copy default device name with a loop.
+
+diff --git a/libsrc/atari/ucase_fn.s b/libsrc/atari/ucase_fn.s
+--- a/libsrc/atari/ucase_fn.s
++++ b/libsrc/atari/ucase_fn.s
+@@ -91,15 +91,11 @@
+ 	inc	tmp3
+ 	ldy	#3
+ 	jsr	subysp		; adjust stack pointer
+-	ldy	#2
+-	lda	#':'
+-	sta	(sp),y		; insert ':'
+ 	dey
+-	lda	__defdev+1
+-	sta	(sp),y		; insert device number
++cpdev:	lda	__defdev,y
++	sta	(sp),y		; insert device name, number and ':'
+ 	dey
+-	lda	__defdev
+-	sta	(sp),y		; insert device name (normally 'D' or 'H')
++	bpl	cpdev
+ hasdev2:
+ .endif
+ 

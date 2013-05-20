@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] New problem with Mac OS X and </title>
+<meta name="Author" content="Andy Dannelley (andyda1earthlink.net)" />
+<meta name="Subject" content="[cc65] New problem with Mac OS X and Snapshot 2.10.5" />
+<meta name="Date" content="2005-05-18" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] New problem with Mac OS X and Snapshot 2.10.5</h1>
+<!-- received="Wed May 18 16:58:59 2005" -->
+<!-- isoreceived="20050518145859" -->
+<!-- sent="Wed, 18 May 2005 07:58:48 -0700" -->
+<!-- isosent="20050518145848" -->
+<!-- name="Andy Dannelley" -->
+<!-- email="andyda1earthlink.net" -->
+<!-- subject="[cc65] New problem with Mac OS X and Snapshot 2.10.5" -->
+<!-- id="56B45AB0-C7AD-11D9-8139-000D936E90CA@earthlink.net" -->
+<!-- charset="US-ASCII" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5009.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Mailing list archive&quot;">Next message</a> ]
+[ <a href="5007.html" title="42Bastian Schick: &quot;Re: [cc65] Mailing list archive&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5010.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] New problem with Mac OS X and Snapshot 2.10.5&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Andy Dannelley &lt;<a href="mailto:andyda1earthlink.net?Subject=Re:%20[cc65]%20New%20problem%20with%20Mac%20OS%20X%20and%20Snapshot%202.10.5">andyda1earthlink.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-05-18 16:58:48</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Sorry to bother now, seems nothing is happening except the problem with 
+the list, such a shame :(
+
+Anyway, I have a new problem.  First the success:  I got 2.10.1 to 
+compile, install and run (seems just fine) under OS X.
+
+What I did to get 2.10.1 to compile and install was to use Fink.  Seems 
+that there is a Fink script to install cc65, so I just modified it to 
+always use the local source directory (/sw/src) to find the 
+source.tar.bz2 instead of downloading (as Fink normally tries to do). 
+This works just fine for 2.10.1.  When I compile and install 2.10.1 I 
+just compile the main source, and do not even use the additional target 
+specific packages.  When I do this, cc65 compiles on OS X and installs, 
+and I can compile and link  using cc65 and CL65 for any specific target 
+and I get no errors.
+
+When I try to compile the snapshot alone, it compiles and installs just 
+fine. Then when I use cc65, it compiles a program just fine, however 
+when I use cl65 for any target (using the -t option), or unspecified or 
+specify none  it complains that it cannot find xx.o (c16 or c64 or 
+whatever).  I then remove all traces of 2.10.5 and recompile with 
+2.10.1 and it works just fine again.  I remove all traces of 2.10.1 and 
+then use the FInk script to install the target specific files and then 
+compile cc65-2.10.5 and then try to use it and cc65 works OK, but cl65 
+still complains about not finding xx.o where xx.o is c16.o or c64.o or 
+whatever I'm trying. I looked around and found the c16.o, c64.o and all 
+the others in a directory /sw/lib/cc65/lib somehow cl65 can't find 
+these files.
+
+What can I do to point cl65 to the directory so it will find the files?
+
+BTW:  I got most of my tasks done to use cc65 and my Mac with my AIM 
+65.  The only thing remaining is to get 2.10.5 working so I can start 
+on the AIM 65 specific stuff.  And a LAST task.  I managed to get my 
+Mac talking to my AIM 65 using a USB to RS-232 converter and connecting 
+it to my AIM.  Works great.
+
+Now, I need to find a way to convert the object files output by cl65 to 
+a format my AIM can recognize.  I tested using the paper tape format as 
+a text file and I CAN transfer files using this format between my AIM 
+and Mac.  I believe that doing the conversion from cl65 format to the 
+the text file format may be beyond my capabilities.
+
+Anyway, thanks for any insights on my current problem with 2.10.5.
+
+AndyD
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed May 18 16:58:59 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5009.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Mailing list archive"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5007.html" title="Previous message in the list">42Bastian Schick: "Re: [cc65] Mailing list archive"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5010.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] New problem with Mac OS X and Snapshot 2.10.5"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5010.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] New problem with Mac OS X and Snapshot 2.10.5"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5008" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5008" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5008" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-05-18 16:59:02 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] local .res ?</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] local .res ?" />
+<meta name="Date" content="2007-11-24" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] local .res ?</h1>
+<!-- received="Sat Nov 24 21:40:17 2007" -->
+<!-- isoreceived="20071124204017" -->
+<!-- sent="Sat, 24 Nov 2007 21:39:55 +0100" -->
+<!-- isosent="20071124203955" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] local .res ?" -->
+<!-- id="20071124203955.GA10545@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="56223.213.114.179.176.1195822279.squirrel&#64;webmail.sys.kth.se" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="../2007-12/5922.html" title="Oliver Schmidt: &quot;[cc65] Contiki 2.1 released&quot;">Next message</a> ]
+[ <a href="5920.html" title="Anders Åstrand: &quot;[cc65] local .res ?&quot;">Previous message</a> ]
+[ <a href="5920.html" title="Anders Åstrand: &quot;[cc65] local .res ?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20local%20.res%20?">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-11-24 21:39:55</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Fri, Nov 23, 2007 at 01:51:19PM +0100, Anders Ã…strand wrote:
+&gt; Now, it would be nice to not having to do the increments manually and let
+&gt; the linker find out what size the temp-mem needs to be (by checking how
+&gt; much whatever proc that uses most temp-mem uses). Is this at all possible?
+&gt; If not, which way do you recommend for handling this?
+
+I haven't done this myself, so all I have are two ideas that may help a bit,
+but don't make the process fully automatic.
+
+The first idea is to create a new segment for each temporary and let the
+linker overlay all these segments in one memory area. So actually, each module
+has it's own zeropage segment, and you will place all these zeropage segments
+at the same address using the linker config. The disadvantage is that you will
+have to write a rather detailed config file and that the size calculation is
+still not automatic. However, since each segment is listed in the map file
+together with it's size, it is easy to find the largest one, if you use a
+common naming scheme for these temporary segments.
+
+Another idea is to use structs for allocation. This will handle the offsets
+automatically. You can output the size of the storage used and determine the
+largest one by some script magic.
+
+.struct         tmpseg
+        var1    .word
+        var2    .byte
+.endstruct
+
+.out .sprintf (&quot;Size of temp storage is %d&quot;, .sizeof (tmpseg))
+
+Since structs do just generate a set of constants for the &quot;fields&quot;, you will
+have to use &quot;addr+offset&quot; notation when accessing the storage, which is not
+really comfortable.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Nov 24 21:40:17 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="../2007-12/5922.html" title="Next message in the list">Oliver Schmidt: "[cc65] Contiki 2.1 released"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5920.html" title="Previous message in the list">Anders Åstrand: "[cc65] local .res ?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5920.html" title="Message to which this message replies">Anders Åstrand: "[cc65] local .res ?"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5921" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5921" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5921" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-11-24 21:40:21 CET
+</em></small></p>
+</body>
+</html>

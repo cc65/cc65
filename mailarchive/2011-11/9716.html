@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] .IFDEF, .DEFINED for checking </title>
+<meta name="Author" content="Gábor Lénárt (lgb1lgb.hu)" />
+<meta name="Subject" content="[cc65] .IFDEF, .DEFINED for checking existance of macros?" />
+<meta name="Date" content="2011-11-28" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] .IFDEF, .DEFINED for checking existance of macros?</h1>
+<!-- received="Mon Nov 28 15:50:59 2011" -->
+<!-- isoreceived="20111128145059" -->
+<!-- sent="Mon, 28 Nov 2011 15:50:50 +0100" -->
+<!-- isosent="20111128145050" -->
+<!-- name="Gábor Lénárt" -->
+<!-- email="lgb1lgb.hu" -->
+<!-- subject="[cc65] .IFDEF, .DEFINED for checking existance of macros?" -->
+<!-- id="20111128145050.GB20708@vega.lgb.hu" -->
+<!-- charset="iso-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9717.html" title="Joseph Rose: &quot;[cc65] Hidden64: malloc() Global variables?&quot;">Next message</a> ]
+[ <a href="9715.html" title="Gábor Lénárt: &quot;Re: [cc65] using screen codes instead of PETSCII&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9719.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] .IFDEF, .DEFINED for checking existance of macros?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Gábor Lénárt &lt;<a href="mailto:lgb1lgb.hu?Subject=Re:%20[cc65]%20.IFDEF,%20.DEFINED%20for%20checking%20existance%20of%20macros?">lgb1lgb.hu</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-11-28 15:50:50</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+Is there a way to do conditional assembly based on the fact that a macro is
+defined? It seems .IFDEF or .DEFINED does not work with macros, at least
+I got errors. I would need something like this (sorry if the syntax is not
+correct, I have not the source at this moment, so it's only by heart - but
+I remember that theory does not worked even with the correct syntax - as I
+could extract from the documentation at least):
+
+
+.DEFINE file_name &quot;filename.dat&quot;  ; comment this out to use the disk-loader
+
+.BSS
+.IFNDEF (file_name)
+my_data: RES 8192	; if file_name is not defined, I just reserve space,
+			; I will load the data from disk on run-time
+.ENDIF
+
+.CODE
+.IFDEF (file_name)
+my_data: .INCBIN file_name  ; include the &quot;built-in&quot; version
+.ENDIF
+
+.IFNDEF(file_name)
+; routines to load from disk: only needed to compile if we don't use the included version
+.ENDIF
+
+id_marker = my_data + $10
+version_byte = my_data + $11
+
+main:
+... some code ...
+.IFNDEF(file_name)
+JSR disk_loader
+.ENDIF
+... some code ...
+
+
+My goal is to have a single source to have a music player which can play an
+song included (with .INCBIN, I meant) as a quick demo, but also it can be
+compiled with a minor modification (commenting out the .DEFINE) to be able
+to load song from disk: and only then the routines needed for this is
+compiled. Also, I have constants (my_data + ...) which should be correct for
+both cases.
+
+Is it possible somehow? Sorry form my chaotic example, but hopefully my idea
+is understandable at least.
+
+As far as I remember (the source is at home now) I always get errors even if
+I try syntax directly copy&amp;pasted from the documentation. Are these .DEFINED
+etc built-in functions can only be used within macros (for macro parameters
+maybe ...), or some special cases, so it's not suitable for the purpose I want to use?
+
+thanks!
+
+- Gábor
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Nov 28 15:50:59 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9717.html" title="Next message in the list">Joseph Rose: "[cc65] Hidden64: malloc() Global variables?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9715.html" title="Previous message in the list">Gábor Lénárt: "Re: [cc65] using screen codes instead of PETSCII"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9719.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] .IFDEF, .DEFINED for checking existance of macros?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9719.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] .IFDEF, .DEFINED for checking existance of macros?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9716" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9716" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9716" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-11-28 15:51:02 CET
+</em></small></p>
+</body>
+</html>

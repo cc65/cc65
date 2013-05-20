@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Apple2 Libraries - Current</title>
+<meta name="Author" content="jim (jsymolon011comcast.net)" />
+<meta name="Subject" content="Re: [cc65] Apple2 Libraries - Current status of file io ?" />
+<meta name="Date" content="2004-07-27" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Apple2 Libraries - Current status of file io ?</h1>
+<!-- received="Tue Jul 27 15:37:12 2004" -->
+<!-- isoreceived="20040727133712" -->
+<!-- sent="Tue, 27 Jul 2004 09:37:01 -0400" -->
+<!-- isosent="20040727133701" -->
+<!-- name="jim" -->
+<!-- email="jsymolon011comcast.net" -->
+<!-- subject="Re: [cc65] Apple2 Libraries - Current status of file io ?" -->
+<!-- id="41065A7D.7080504@comcast.net" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20040727051157.GA18634&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4302.html" title="Oliver Schmidt: &quot;Re: [cc65] Apple2 Libraries - Current status of file io ?&quot;">Next message</a> ]
+[ <a href="4300.html" title="Groepaz: &quot;Re: [cc65] Newbie-Question&quot;">Previous message</a> ]
+[ <a href="4297.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Apple2 Libraries - Current status of file io ?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4302.html" title="Oliver Schmidt: &quot;Re: [cc65] Apple2 Libraries - Current status of file io ?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: jim &lt;<a href="mailto:jsymolon011comcast.net?Subject=Re:%20[cc65]%20Apple2%20Libraries%20-%20Current%20status%20of%20file%20io%20?">jsymolon011comcast.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-07-27 15:37:01</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Ullrich von Bassewitz wrote:
+
+&gt;On Mon, Jul 26, 2004 at 06:10:50PM -0400, jim wrote:
+&gt;  
+&gt;
+&gt;&gt;Would it be best to map the ProDOS values into the stat structure ?
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;I havent't looked at the other platforms and at the POSIX specs for stat().
+&gt;It would be necessary to come up with something that works across all
+&gt;supported platforms.
+&gt;
+&gt;  
+&gt;
+What I was thinking was to have a POSIX call, in which the function maps 
+as much as it can into the stat structure and an Apple only call which 
+returns all the information.  The example would resemble the DIO calls 
+in the Atari namespace.
+
+For example:
+  int fstat(int fd, struct stat *buf);  /* standard POSIX call */
+  int dio_get_file_info(int fd, struct a2_stat *buf);  /* apple namespace */
+
+&gt;&gt;Is anyone else working on the same routines ?
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;Oliver Schmidt is working on the Apple library.
+&gt;
+&gt;  
+&gt;
+
+I am looking for a status of what's been done and if we're even 
+compatible.  Oliver might be working on ProDOS 16 implementation where 
+I'm working in ProDOS 8.
+
+&gt;&gt;What is the procedure to add the changes into the code base ?
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;The usual procedure is to sent patches to me for inclusion (but see
+&gt;<a href="http://www.cc65.org/#PatchPolicy">http://www.cc65.org/#PatchPolicy</a>). It is often a good idea, to check back with
+&gt;me early when doing larger changes. For one, someone else might be working on
+&gt;it. And second, I (or the platform maintainer) do sometimes have my own ideas
+&gt;on how things should be done, which may lead to problems.
+&gt;
+&gt;Regards
+&gt;
+&gt;
+&gt;        Uz
+&gt;  
+&gt;
+
+&quot;... my own ideas ob how things should be done...&quot;
+
+I'm not too sure what you mean by this.  Functionally ? Internal 
+structure ? Syntax ?
+
+For example: I've coded the Apple libraries to correspond with the POSIX 
+calls
+ int chdir(const char* path);
+ int __fastcall__ close(int fd);
+ int creat(const char *name, mode_t mode);
+ int flush (int fd);
+  ... and so on ...
+
+The hacks in the write and read functions have been worked with so that 
+using the STDIO consts work.  Example:
+    fwrite(&amp;msg0[0],1,11,stdout);   /* writes to screen - stderr will 
+write to screen also */
+    f1 = fopen(&amp;filename[0],&quot;w&quot;);
+    fwrite(&amp;msg1[0],1,6,f1);            /* writes to open file */
+
+Thanks
+Jim
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Jul 27 15:37:12 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4302.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4300.html" title="Previous message in the list">Groepaz: "Re: [cc65] Newbie-Question"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4297.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4302.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4302.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="4304.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4301" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4301" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4301" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-07-27 15:37:20 CEST
+</em></small></p>
+</body>
+</html>

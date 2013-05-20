@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Optimized tgi line functions f</title>
+<meta name="Author" content="Andreas Rückert (a_rueckert1gmx.net)" />
+<meta name="Subject" content="[cc65] Optimized tgi line functions for horizontal and vertical lines" />
+<meta name="Date" content="2011-11-07" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Optimized tgi line functions for horizontal and vertical lines</h1>
+<!-- received="Mon Nov  7 14:17:14 2011" -->
+<!-- isoreceived="20111107131714" -->
+<!-- sent="Mon, 07 Nov 2011 14:16:59 +0100" -->
+<!-- isosent="20111107131659" -->
+<!-- name="Andreas Rückert" -->
+<!-- email="a_rueckert1gmx.net" -->
+<!-- subject="[cc65] Optimized tgi line functions for horizontal and vertical lines" -->
+<!-- id="20111107131659.145500@gmx.net" -->
+<!-- charset="utf-8" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9670.html" title="Oliver Schmidt: &quot;Re: [cc65] Optimized tgi line functions for horizontal and vertical lines&quot;">Next message</a> ]
+[ <a href="9668.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Conflict in headers&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9670.html" title="Oliver Schmidt: &quot;Re: [cc65] Optimized tgi line functions for horizontal and vertical lines&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Andreas Rückert &lt;<a href="mailto:a_rueckert1gmx.net?Subject=Re:%20[cc65]%20Optimized%20tgi%20line%20functions%20for%20horizontal%20and%20vertical%20lines">a_rueckert1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-11-07 14:16:59</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+First of all, thanks for the great cc65 compiler and the libs.
+
+We're trying to do test some simple float ops with cc65 and are drawing
+a 3d plot for this purpose. Some source see here:
+
+<a href="http://www.forum64.de/wbb3/board25-coder-unter-sich/board308-programmieren/board29-cross-development/45525-real-zahlen-und-funktionen-im-cc65-nutzen-zur-umsetzung/index3.html#post561059">http://www.forum64.de/wbb3/board25-coder-unter-sich/board308-programmieren/board29-cross-development/45525-real-zahlen-und-funktionen-im-cc65-nutzen-zur-umsetzung/index3.html#post561059</a>
+
+I did not do some actual benchmarks of the graphic ops, but drawing the
+vertical lines seems to be somewhat slow? Maybe it would help to add
+separate functions for vertical and horizontal lines, since these could
+be tuned quite good on most systems?
+
+Is there a quicker way to set the background color before drawing?
+
+Thanks in advance,
+Andreas
+
+-- 
+NEU: FreePhone - 0ct/min Handyspartarif mit Geld-zurÃ¼ck-Garantie!		
+Jetzt informieren: <a href="http://www.gmx.net/de/go/freephone">http://www.gmx.net/de/go/freephone</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Nov  7 14:17:14 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9670.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Optimized tgi line functions for horizontal and vertical lines"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9668.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Conflict in headers"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9670.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Optimized tgi line functions for horizontal and vertical lines"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9670.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Optimized tgi line functions for horizontal and vertical lines"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9671.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Optimized tgi line functions for horizontal and vertical lines"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9669" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9669" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9669" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-11-07 14:17:18 CET
+</em></small></p>
+</body>
+</html>

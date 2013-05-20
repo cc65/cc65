@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] 3dmaze portability</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] 3dmaze portability" />
+<meta name="Date" content="2009-10-16" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] 3dmaze portability</h1>
+<!-- received="Fri Oct 16 23:38:44 2009" -->
+<!-- isoreceived="20091016213844" -->
+<!-- sent="Fri, 16 Oct 2009 23:38:37 +0200" -->
+<!-- isosent="20091016213837" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] 3dmaze portability" -->
+<!-- id="f97798c20910161438t41a910b4qabd4afbd293d9745@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7146.html" title="Maspethrose71aol.com: &quot;[cc65] Help w/ initlib asm procedure&quot;">Next message</a> ]
+[ <a href="7144.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Strange cc65 generation?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7163.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] 3dmaze portability&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%203dmaze%20portability">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-10-16 23:38:37</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+The description of the user contribution program '3dmaze' contains:
+
+&quot;The current code has problems on other platforms, probably related to
+the aspect ratio. It is possible to compile it for the C128 or any
+other platform that has a TGI driver, but the output looks strange.&quot;
+
+Today I analyzed this and found the actual reason: The program draws
+lines starting or ending outside the screen presuming the lines get
+clipped at the screen edge. This presumption is true for the C64 'std'
+driver. However the the C128 vdc seems to not draw those lines at
+all... and the Apple2 'std' driver shows undefined behaviour.
+
+I didn't find definitive information on if a tgi driver is supposed to
+clip lines. If yes then the C128 (?) and Apple2 drivers don't work
+correctly. A change for the Apple2 driver would be difficult as it
+currently uses a ROM function that just doesn't support clipping.
+
+Regarding the 3dmaze program the problem can be worked around easily
+by reducing the screen output area to a square with the size of the
+screen y resolution. This is accomplished by replacing
+
+    unsigned Size = (g.CenterX) / 2;
+
+with
+
+    unsigned Size = (g.CenterY - 1) / 2;
+
+If anybody is interested I can send the modified source. Beside the
+change above I leveraged the new &quot;standard driver&quot; feature and added a
+small Apple2 workaround (necessary because of the missing clock()
+function).
+
+Best, Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Oct 16 23:38:44 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7146.html" title="Next message in the list">Maspethrose71aol.com: "[cc65] Help w/ initlib asm procedure"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7144.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Strange cc65 generation?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7163.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] 3dmaze portability"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7163.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] 3dmaze portability"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7145" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7145" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7145" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-10-16 23:38:48 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] optimizer?</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] optimizer?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] optimizer?</h1>
+<!-- received="Sun Jun 24 22:45:28 2001" -->
+<!-- isoreceived="20010624204528" -->
+<!-- sent="Sun, 24 Jun 2001 22:44:29 +0200" -->
+<!-- isosent="20010624204429" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] optimizer?" -->
+<!-- id="9529781409.20010624224429@gmx.net" -->
+<!-- inreplyto="20010624220455.A608@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20optimizer?"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2001-06-24 22:44:29
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0542.html">Ullrich von Bassewitz: "Re: [cc65] optimizer?"</a>
+<li><strong>Previous message:</strong> <a href="0540.html">Ullrich von Bassewitz: "Re: [cc65] optimizer?"</a>
+<li><strong>In reply to:</strong> <a href="0540.html">Ullrich von Bassewitz: "Re: [cc65] optimizer?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0542.html">Ullrich von Bassewitz: "Re: [cc65] optimizer?"</a>
+<li><strong>Reply:</strong> <a href="0542.html">Ullrich von Bassewitz: "Re: [cc65] optimizer?"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+UvB&gt; What about something like
+
+UvB&gt;         acia    = $DC00
+UvB&gt;         data    = $00
+
+UvB&gt;         lda     acia+data               ; dummy read
+UvB&gt;         lda     #$00
+UvB&gt;         ...
+
+UvB&gt; The first load is a dummy read, but it is needed in some way to initialize
+UvB&gt; hardware, acknowledge an interrupt or whatever. An optimizer would have a
+UvB&gt; really hard time to figure this out.
+
+yeah, sure.... and it _HAS_ a hard time to figure it out, even in all
+c-compilers i have seen ;=) i would expect the programmer to write:
+
+             acia    = $DC00
+             data    = $00
+          .opt off
+             lda     acia+data               ; dummy read
+          .opt on
+             lda     #$00
+             ...
+
+or sth simelar ... same as using the 'volatile' keyword in C (i think
+i have actually seen some c-compilers which implemented the volatile
+keyword like this)
+
+&gt;&gt; uhm well... would there be a real difference in optimizing binary vs
+&gt;&gt; assembler code ? (except with assembler code you get much more
+&gt;&gt; information about the code structure, dont have to guess code adresses
+&gt;&gt; that are loaded as 8bit lo/hi pairs etc)
+
+UvB&gt; You don't have to mess with expressions when using binary code. It is easy to
+UvB&gt; detect that things like
+
+UvB&gt;         foo     = $02
+UvB&gt;         bar     = $02
+UvB&gt;         lda     foo
+UvB&gt;         ...
+UvB&gt;         lda     bar
+
+UvB&gt; are accessing the same location. Or what about
+
+UvB&gt;         foo     = $02
+UvB&gt;         bar     = $01
+UvB&gt;         lda     foo
+UvB&gt;         ...
+UvB&gt;         lda     bar*2
+
+UvB&gt; Having an optimizer working on source code, you need to mimic the complete
+UvB&gt; symbol handling of the assembler, including local symbols and so on. Or
+UvB&gt; something like
+
+UvB&gt;         .import foo, bar
+
+UvB&gt;         jmp     foo
+UvB&gt;         ...
+UvB&gt;         jmp     bar
+
+UvB&gt; foo and bar may in fact resolve to the same address which would allow some
+UvB&gt; speed and/or size optimizations, but an optimizer working on source code would
+UvB&gt; not have the necessary knowledge, while this would be easy to detect when
+UvB&gt; working with binary code.
+
+yeah you are right ofcoz, and to be honest... i havent even thought to
+handle things like this (i wouldnt need them personally) .... BUT i
+guess it would be the best idea to work on &quot;precompiled&quot; object
+files.... like a binary plus additional symbol-infos and alike (you
+really need that to handle those very common 8bit lo/hibyte adress
+loads and also certain other stuff). working on plain binaries without
+additional infos would require too much stages to gather all the
+sequence-points etc pp i think..... we had to 'guess' a lot of
+information that the sourcecode could provide. ... what about that
+.a64 (right extension?) relocatable stuff your linker can spit out?
+maybe thats a good starting point aswell? (but i guess that would
+already leave out all info about internal references/symbols etc?!) i
+really love the idea about not having to mess with expressions (would
+make the optimizer hell easier to write and debug) but it would
+definetly require more than a plain binary as input to do anything
+useful in the optimizer ,=)
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20optimizer?">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20optimizer?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0542.html">Ullrich von Bassewitz: "Re: [cc65] optimizer?"</a>
+<li><strong>Previous message:</strong> <a href="0540.html">Ullrich von Bassewitz: "Re: [cc65] optimizer?"</a>
+<li><strong>In reply to:</strong> <a href="0540.html">Ullrich von Bassewitz: "Re: [cc65] optimizer?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0542.html">Ullrich von Bassewitz: "Re: [cc65] optimizer?"</a>
+<li><strong>Reply:</strong> <a href="0542.html">Ullrich von Bassewitz: "Re: [cc65] optimizer?"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:40 CET</em>
+</em>
+</small>
+</body>
+</html>

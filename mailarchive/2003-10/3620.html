@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] DA65 GEOS Disassembly?</title>
+<meta name="Author" content="Todd Elliott (eyeth_at_videocam.net.au)">
+<meta name="Subject" content="Re: [cc65] DA65 GEOS Disassembly?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] DA65 GEOS Disassembly?</h1>
+<!-- received="Fri Oct 10 20:43:52 2003" -->
+<!-- isoreceived="20031010184352" -->
+<!-- sent="Sat, 11 Oct 2003 04:11:40 +0930 (CST)" -->
+<!-- isosent="20031010184140" -->
+<!-- name="Todd Elliott" -->
+<!-- email="eyeth_at_videocam.net.au" -->
+<!-- subject="Re: [cc65] DA65 GEOS Disassembly?" -->
+<!-- id="Pine.LNX.4.58.0310110355450.11291@vcsweb.com" -->
+<!-- inreplyto="20031010152518.GA17504@spektr.localdomain" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Todd Elliott (<a href="mailto:eyeth_at_videocam.net.au?Subject=Re:%20[cc65]%20DA65%20GEOS%20Disassembly?"><em>eyeth_at_videocam.net.au</em></a>)<br>
+<strong>Date:</strong> 2003-10-10 20:41:40
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3619.html">Groepaz: "Re: [cc65] Overflows in signed comparisions"</a>
+<li><strong>In reply to:</strong> <a href="3616.html">Maciej Witkowiak: "Re: [cc65] DA65 GEOS Disassembly?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3626.html">Ullrich von Bassewitz: "Re: [cc65] DA65 GEOS Disassembly?"</a>
+<li><strong>Next in thread:</strong> <a href="3624.html">Ullrich von Bassewitz: "Re: [cc65] DA65 GEOS Disassembly?"</a>
+<li><strong>Reply:</strong> <a href="3626.html">Ullrich von Bassewitz: "Re: [cc65] DA65 GEOS Disassembly?"</a>
+<li><strong>Reply:</strong> <a href="3659.html">Todd Elliott: "Re: [cc65] DA65 GEOS Disassembly?"</a>
+<li><strong>Reply:</strong> <a href="3679.html">Todd Elliott: "Re: [cc65] DA65 GEOS Disassembly?"</a>
+<li><strong>Reply:</strong> <a href="../2004-03/3989.html">Todd Elliott: "[cc65] Spring Commodore EXPO 2004 News"</a></li>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Fri, 10 Oct 2003, Maciej Witkowiak wrote:
+&gt; Currently grc can concatenate binary files into one .cvt in VLIR format.
+&gt; I don't know what is better when thinking about all supported targets - should
+&gt; da65 understand .cvt format or should grc/[new tool] be able to split files
+&gt; into something that da65 understands now - CBM DOS PRG-like files.
+&gt;
+Hello, Maciej-
+
+That sounds workable. Something like an 'ungrc' utility or a GEOS splitter
+utility that can chop up .CVT's into their respective parts. Then, these
+parts can be run through DA65 or some other utility. This way, DA65 need
+not to support a GEOS target, much less a Nintendo target, Atari target,
+etc.
+
+Still, it would be nice if DA65 could somehow support GEOS disassembly.
+Sure, I could use separate utility to split up the GEOS .CVT file, but it
+does mean an additional step in the process. Then I would have to
+construct a .CFG file for CA65/GRC to compile it again.
+
+I am keenly aware that the cc65 programming suite is a hobbyist project
+for many developers here. Any progress towards GEOS development will be
+gratefully accepted and be used on my end. Hopefully GEOS disassembly can
+be realistically done under the cc65 suite of tools soon.
+
+&gt; They could be provided with da65 or GEOS package in some additional file so
+&gt; a user doesn't have to prepare it himself. Is it ok?
+&gt;
+A quick glance into the help section of the DA65 disassembler shows that
+it does not support symbol tables. This doesn't have to be GEOS specific;
+A user could specify via the commandline argument to DA65, to load in a
+symbol table used to place labels/symbols throughout the disassembly. This
+symbol table could be a regular text file, as used in the regular CC65
+programming suite.
+
+This way, the user can supply his symbol/label file specific to his/her
+platform, be it a C64, Atari, Vic-20, etc. After all, the programmer will
+use the same symbol table file for compiling the disassembled program.
+This addition will make it easier for the programmer to better understand
+the disassembled program, make changes, and more.
+
+Enjoy.
+-- 
+Todd Elliott
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20DA65%20GEOS%20Disassembly?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3619.html">Groepaz: "Re: [cc65] Overflows in signed comparisions"</a>
+<li><strong>In reply to:</strong> <a href="3616.html">Maciej Witkowiak: "Re: [cc65] DA65 GEOS Disassembly?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3626.html">Ullrich von Bassewitz: "Re: [cc65] DA65 GEOS Disassembly?"</a>
+<li><strong>Next in thread:</strong> <a href="3624.html">Ullrich von Bassewitz: "Re: [cc65] DA65 GEOS Disassembly?"</a>
+<li><strong>Reply:</strong> <a href="3626.html">Ullrich von Bassewitz: "Re: [cc65] DA65 GEOS Disassembly?"</a>
+<li><strong>Reply:</strong> <a href="3659.html">Todd Elliott: "Re: [cc65] DA65 GEOS Disassembly?"</a>
+<li><strong>Reply:</strong> <a href="3679.html">Todd Elliott: "Re: [cc65] DA65 GEOS Disassembly?"</a>
+<li><strong>Reply:</strong> <a href="../2004-03/3989.html">Todd Elliott: "[cc65] Spring Commodore EXPO 2004 News"</a></li>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-10-10 20:44:10 CEST</em>
+</em>
+</small>
+</body>
+</html>

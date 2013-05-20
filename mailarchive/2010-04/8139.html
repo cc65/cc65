@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] OT: Where to get some help?</title>
+<meta name="Author" content="Payton Byrd (plbyrd1gmail.com)" />
+<meta name="Subject" content="[cc65] OT: Where to get some help?" />
+<meta name="Date" content="2010-04-24" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] OT: Where to get some help?</h1>
+<!-- received="Sat Apr 24 02:41:19 2010" -->
+<!-- isoreceived="20100424004119" -->
+<!-- sent="Fri, 23 Apr 2010 19:40:52 -0500" -->
+<!-- isosent="20100424004052" -->
+<!-- name="Payton Byrd" -->
+<!-- email="plbyrd1gmail.com" -->
+<!-- subject="[cc65] OT: Where to get some help?" -->
+<!-- id="h2z1adf4c761004231740n6a50fb2g2a65bb79b3b7794e@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8140.html" title="Steve Davison: &quot;Re: [cc65] declaring variables after code&quot;">Next message</a> ]
+[ <a href="8138.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] --create-dep for ca65?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8159.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] OT: Where to get some help?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Payton Byrd &lt;<a href="mailto:plbyrd1gmail.com?Subject=Re:%20[cc65]%20OT:%20Where%20to%20get%20some%20help?">plbyrd1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-04-24 02:40:52</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I am moving right along on my project, but I've run into a common problem
+that windowing libraries have solved time and again and I'm looking for
+advice on how to implement a solution in C.
+
+The problem is that when I draw a drop down menu (or a pop-up window) I want
+to preserve the text under the menu and restore it when the menu goes away.
+ I can see three approaches, but I'm not sure if there are C functions to
+aid either or if I'm going to have to roll-my-own code.
+
+Approach 1: Copy the entire screen to another page in memory and move the
+start memory for the current screen to the copy, then draw the menu.  When
+I'm done with the menu, set the screen pointer back to the original screen
+and keep going.  What concerns me is the amount of time it would take to
+copy the screen using C, so I'm thinking this might be a job for some inline
+assembler, unless there's already a function out there to do this.
+
+Approach 2: Copy the contents of the screen where the menu is to be
+displayed into an array where the size of the array is height * width, then
+write the contents of the array back to the screen one line at a time.  I
+see two problems with this approach: first, the array might get quite big
+and I don't know the maximum size of an array in CC65; second, how do I
+obtain the contents of the screen?  Should I use the screen codes from
+memory and write the screen codes back to memory?  If I'm going to be
+writing screens directly to memory then what's the point of using CONIO?
+
+Approach 3: Simply invalidate the screen and force a full refresh.  This may
+be the simplest, but it could be expensive as the screen may be very
+complex.  Plus, if there's some text that was generated organically and
+can't be repeated then such text would be lost.  I'm not fond of this
+approach, but if all else fails....
+
+Maybe I'm going about this all wrong!  Does anyone know of a publicly
+available windowing library for text mode on CBM machines?  A port of curses
+for CC65 would rule the world, if there's enough resources on our machines
+to handle such a library.
+-- 
+Payton Byrd
+&lt;<a href="http://www.paytonbyrd.com">http://www.paytonbyrd.com</a>&gt;
+&lt;<a href="http://it.toolbox.com/blogs/paytonbyrd">http://it.toolbox.com/blogs/paytonbyrd</a>&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Apr 24 02:41:19 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8140.html" title="Next message in the list">Steve Davison: "Re: [cc65] declaring variables after code"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8138.html" title="Previous message in the list">silverdr1wfmh.org.pl: "Re: [cc65] --create-dep for ca65?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8159.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] OT: Where to get some help?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8159.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] OT: Where to get some help?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8139" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8139" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8139" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-04-24 02:41:21 CEST
+</em></small></p>
+</body>
+</html>

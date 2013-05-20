@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Filenames for POSIX functi</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="Re: [cc65] Filenames for POSIX functins on CBM targets" />
+<meta name="Date" content="2012-08-12" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Filenames for POSIX functins on CBM targets</h1>
+<!-- received="Sun Aug 12 21:35:58 2012" -->
+<!-- isoreceived="20120812193558" -->
+<!-- sent="Sun, 12 Aug 2012 21:35:31 +0200" -->
+<!-- isosent="20120812193531" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="Re: [cc65] Filenames for POSIX functins on CBM targets" -->
+<!-- id="20120812193531.GO1982@trikaliotis.net" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="2392423644902637018&#64;unknownmsgid" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10679.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">Next message</a> ]
+[ <a href="10677.html" title="Groepaz: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">Previous message</a> ]
+[ <a href="10670.html" title="Oliver Schmidt: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10680.html" title="Oliver Schmidt: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20[cc65]%20Filenames%20for%20POSIX%20functins%20on%20CBM%20targets">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-08-12 21:35:31</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello,
+
+* On Sun, Aug 12, 2012 at 05:18:22PM +0200 Oliver Schmidt wrote:
+ 
+&gt; &gt; Why shouldn't they? I expect if I set _curunit to 1, then the program
+&gt; &gt; written for the floppy should also work for the tape (if it does not do
+&gt; &gt; any fancy disk specific stuff).
+&gt; &gt;
+&gt; &gt; So, they should be cross-target, yes.
+&gt; 
+&gt; 1. The program won't build on other taegets as there's no _curunit.
+
+So, just because we have to put one simple statement in an ifdef
+completely removes any cross-target attribute from the code?
+
+I see. Thinking this way, it gets obvious that cross-target programs on
+Unixoids are extremely rare.
+
+Come on.
+
+&gt; 2. The other targets likely don't have tape drives to be accessed via open().
+
+The point is: I can have the same code to access floppy drives on all
+(?) platforms CC65 supports, on all devices that it supports. The small
+setup that is platform-specific does not count for me here.
+
+BTW, the setup could be hidden in a chdir() function, making it
+cross-platform again.
+
+&gt; &gt; If this is not the case, it will not be possible to open some files
+&gt; &gt; written some 20 years ago.
+&gt; 
+&gt; Something I personally could live well with.
+
+I tend to disagree. A user that will not be able to open a file because
+it has some weird characters in it will not be appy.
+
+&gt; &gt; Given that even on one platform only (CBM), it is not possible to find
+&gt; &gt; &quot;disallowed&quot; characters to use a separators, I can only imagine how hard
+&gt; &gt; it is to integrate the other platforms, too.
+&gt; 
+&gt; Again - Im _NOT_ looking for a single path syntax for all targets! I'm
+&gt; only looking for _SOME_ path syntax on every target. But the CBMs have
+&gt; none at all. Therefore there's no need at all to find such a char.
+
+No? I thought you proposed the colon?
+
+ 
+&gt; I hope that it is a joke to ask me if I'm aware that there are path
+&gt; syntax differences between OSes…
+
+Well... Do I have to google for your name in order to find out about
+your background?
+
+Well, better not: <a href="http://oliver-schmidt-hairdesign.de/">http://oliver-schmidt-hairdesign.de/</a>, ;)
+<a href="http://www.bild.de/sport/fussball/oliver-schmidt/zdf-kommentator-hat-nichts-gegen-pyrotechnik-20423458.bild.html">http://www.bild.de/sport/fussball/oliver-schmidt/zdf-kommentator-hat-nichts-gegen-pyrotechnik-20423458.bild.html</a>,
+<a href="http://www.dr-oliver-schmidt.de/">http://www.dr-oliver-schmidt.de/</a>
+
+Your name without additional information is not enough.
+
+
+Enough jokes: No, this was not a joke, but I do not know you enough to
+judge what you know and what not.
+
+ 
+&gt; No, you are wrong. There's still this misunderstanding. I explicitky
+&gt; want to stay clear from any type of emulation layer.
+
+Ok, in this case, I misunderstood your argumantations.
+
+
+Regards,
+Spiro.
+
+-- 
+Spiro R. Trikaliotis
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Aug 12 21:35:58 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10679.html" title="Next message in the list">Spiro Trikaliotis: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10677.html" title="Previous message in the list">Groepaz: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10670.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10680.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10680.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10678" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10678" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10678" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-08-12 21:36:02 CEST
+</em></small></p>
+</body>
+</html>

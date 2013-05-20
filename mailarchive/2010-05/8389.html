@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Need some help with a memo</title>
+<meta name="Author" content="Per Olofsson (magervalp1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] Need some help with a memory leak" />
+<meta name="Date" content="2010-05-14" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Need some help with a memory leak</h1>
+<!-- received="Fri May 14 15:08:14 2010" -->
+<!-- isoreceived="20100514130814" -->
+<!-- sent="Fri, 14 May 2010 15:08:09 +0200" -->
+<!-- isosent="20100514130809" -->
+<!-- name="Per Olofsson" -->
+<!-- email="magervalp1gmail.com" -->
+<!-- subject="Re: [cc65] Need some help with a memory leak" -->
+<!-- id="AANLkTika-f0AlnNqngKb02l3Y4BQ54TdF0739TuzQJEI@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="k2o1adf4c761005041039v8b791e6g702ea83fefc2aaac&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8390.html" title="Per Olofsson: &quot;Re: [cc65] His Dark Majesty&quot;">Next message</a> ]
+[ <a href="8388.html" title="Groepaz: &quot;Re: [cc65] Re: floating point support redux&quot;">Previous message</a> ]
+[ <a href="8333.html" title="Payton Byrd: &quot;[cc65] Need some help with a memory leak&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8391.html" title="Payton Byrd: &quot;Re: [cc65] Need some help with a memory leak&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Per Olofsson &lt;<a href="mailto:magervalp1gmail.com?Subject=Re:%20[cc65]%20Need%20some%20help%20with%20a%20memory%20leak">magervalp1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-05-14 15:08:09</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Tue, May 4, 2010 at 7:39 PM, Payton Byrd &lt;plbyrd&#64;gmail&#46;<!--nospam-->com&gt; wrote:
+&gt; I'm stumped trying to track down a memory leak and I'm hoping someone here
+&gt; can spend a little time to help me out.  The only place in my app where I'm
+&gt; dynamically allocating memory is creating the linked list that holds the
+&gt; directory information for a drive, so I know it's gotta be in there
+&gt; somewhere.
+
+An interesting(?) bit of trivia: when I wrote the directory handling
+code for C-Vote, whose SimpleMenu library you looked at when started
+this project, I ran into a similar problem. I solved it with
+debugmalloc:
+
+<a href="http://www.paradroid.net/debugmalloc/">http://www.paradroid.net/debugmalloc/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri May 14 15:08:14 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8390.html" title="Next message in the list">Per Olofsson: "Re: [cc65] His Dark Majesty"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8388.html" title="Previous message in the list">Groepaz: "Re: [cc65] Re: floating point support redux"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8333.html" title="Message to which this message replies">Payton Byrd: "[cc65] Need some help with a memory leak"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8391.html" title="Next message in this discussion thread">Payton Byrd: "Re: [cc65] Need some help with a memory leak"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8391.html" title="Message sent in reply to this message">Payton Byrd: "Re: [cc65] Need some help with a memory leak"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8389" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8389" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8389" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-05-14 15:08:17 CEST
+</em></small></p>
+</body>
+</html>

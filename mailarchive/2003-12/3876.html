@@ -1,0 +1,339 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] Announcement: cc65 v2.10.0 &q</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="[cc65] Announcement: cc65 v2.10.0 &quot;christmas edition&quot;">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] Announcement: cc65 v2.10.0 &quot;christmas edition&quot;</h1>
+<!-- received="Tue Dec 23 21:51:01 2003" -->
+<!-- isoreceived="20031223205101" -->
+<!-- sent="Tue, 23 Dec 2003 21:50:55 +0100" -->
+<!-- isosent="20031223205055" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="[cc65] Announcement: cc65 v2.10.0 &quot;christmas edition&quot;" -->
+<!-- id="20031223205055.GA31757@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Announcement:%20cc65%20v2.10.0%20&quot;christmas%20edition&quot;"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-12-23 21:50:55
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3875.html">Johan Kotlinski: "Re: [cc65] CBM disk write problems"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3877.html">Marc 'BlackJack' Rintsch: "Re: [cc65] Announcement: cc65 v2.10.0 &quot;christmas edition&quot;"</a>
+<li><strong>Reply:</strong> <a href="3877.html">Marc 'BlackJack' Rintsch: "Re: [cc65] Announcement: cc65 v2.10.0 &quot;christmas edition&quot;"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+I'm proud to announce cc65 version 2.10.0 (&quot;christmas edition&quot;). cc65 is a
+complete cross development package for 65(C)02 systems, including a powerful
+macro assembler, a C compiler, linker, librarian and several other tools.
+
+cc65 has C and runtime library support for many of the old 6502 machines,
+including
+
+  - The Commodore VIC20 (contributed by Steve Schmidtke
+    &lt;<a href="mailto:steve_schmidtke_at_hotmail.com?Subject=Re:%20[cc65]%20Announcement:%20cc65%20v2.10.0%20&quot;christmas%20edition&quot;">steve_schmidtke_at_hotmail.com</a>&gt;).
+
+  - The Commodore C64 and C128.
+
+  - The Commodore C16, C116 and Plus/4.
+
+  - The CBM 510 (aka P500), a quite rare Commodore machine (programs
+    run in bank 0).
+
+  - The CBM 600/700 family (programs run in bank 1).
+
+  - Newer PET machines (not 2001)
+
+  - The Apple ][ (library support by Kevin Ruland &lt;<a href="mailto:kevin_at_rodin.wustl.edu?Subject=Re:%20[cc65]%20Announcement:%20cc65%20v2.10.0%20&quot;christmas%20edition&quot;">kevin_at_rodin.wustl.edu</a>&gt;)
+
+  - The Atari 8 bit machines (thanks to the Atari team: Christian Groessler
+    &lt;<a href="mailto:cpg_at_aladdin.de?Subject=Re:%20[cc65]%20Announcement:%20cc65%20v2.10.0%20&quot;christmas%20edition&quot;">cpg_at_aladdin.de</a>&gt;, Mark Keates &lt;<a href="mailto:markk_at_dendrite.co.uk?Subject=Re:%20[cc65]%20Announcement:%20cc65%20v2.10.0%20&quot;christmas%20edition&quot;">markk_at_dendrite.co.uk</a>&gt;, Freddy Offenga
+    &lt;<a href="mailto:taf_offenga_at_yahoo.com?Subject=Re:%20[cc65]%20Announcement:%20cc65%20v2.10.0%20&quot;christmas%20edition&quot;">taf_offenga_at_yahoo.com</a>&gt; and David Lloyd, &lt;<a href="mailto:dmlloyd_at_atari-central.com?Subject=Re:%20[cc65]%20Announcement:%20cc65%20v2.10.0%20&quot;christmas%20edition&quot;">dmlloyd_at_atari-central.com</a>&gt;).
+
+  - GEOS for the C64 and C128 (by Maciej Witkowiak &lt;<a href="mailto:ytm_at_elysium.pl?Subject=Re:%20[cc65]%20Announcement:%20cc65%20v2.10.0%20&quot;christmas%20edition&quot;">ytm_at_elysium.pl</a>&gt;)
+
+  - The Nintendo Entertainment System (NES) (contributed by Groepaz,
+    &lt;<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Announcement:%20cc65%20v2.10.0%20&quot;christmas%20edition&quot;">groepaz_at_gmx.net</a>&gt;.
+
+  - The Supervision console (contributed by Peter Trauner,
+    &lt;<a href="mailto:peter.trauner_at_utanet.at?Subject=Re:%20[cc65]%20Announcement:%20cc65%20v2.10.0%20&quot;christmas%20edition&quot;">peter.trauner_at_utanet.at</a>&gt;) (startup code and linker config only).
+
+  - The Oric Atmos (this one is BETA!).
+
+The libraries are fairly portable, so creating a version for other 6502s
+shouldn't be too much work.
+
+
+Changes to the last version:
+
+This is a major release with many new features and (of course) bug fixes. Lots
+of things have changed since the last major release. The compiler itself got
+only a few user visible changes, but there are many visible additions to the
+libraries.  Hardware support has been much improved thanks to the help of many
+contributors. Serial drivers are now loadable at runtime, which means that
+applications can support a much broader palette of serial devices (and can
+even support hardware that wasn't known when the application was built).
+Serial support is now available for more machines than before, so the Contiki
+team has something to do over christmas:-) Lots of new extended memory and
+grahpics drivers are available. To sum it up: Library support for more
+platforms and better library support for existing platforms. The assembler has
+gotten some nice enhancements: Better 65816 support, improved scoping, and the
+addition of structs/unions and other high level constructs. And last but not
+least: The documentation has been extended, the function reference is much
+more complete, and there are now docs that outline the special features for
+each platform.
+
+See the (almost) full list of changes below for more information.
+
+
+Available packages:
+
+As usual I will provide the complete sources and several binary packages,
+including RPMs for RedHat Linux. Linux is the primary development
+platform, so the sources do compile out of the box on Linux machines.
+
+Please note that there are separate RPMs for the compiler proper and the
+target specific libraries. To develop for one of the predefined target
+systems you need the compiler RPM package *and* one of the target machine
+packages.
+
+Starting with this version, the docs are also in a separate package, so
+if you want docs (recommended), be sure to download the cc65-doc archive.
+
+Binaries for DOS and and Windows will follow or may already be available
+at the time you read this. OS/2 packages will again be available, but
+since there are almost no downloads for OS/2, so the host platform may
+get dropped in the near future (again). As with the RPM packages, you
+need the package for the development system (Windows, etc.) *and* one or
+more of the target machine packages, plus optionally the doc package.
+
+
+Download:
+
+For more information and a download link, please visit the cc65 web page at
+
+     	<a href="http://www.cc65.org/">http://www.cc65.org/</a>
+
+
+Mailing list:
+
+There is a mailing list for discussing cc65 related issues (programming,
+suggestions, bugs, ...). See
+
+        <a href="http://www.cc65.org/#List">http://www.cc65.org/#List</a>
+
+for information on how to subscribe to this list.
+
+-----------
+
+Thanks to all who sent feedback and suggestions, and of course to anyone who
+helped developing cc65.
+
+I wish you a merry christmas and lots of fun with this new cc65 release!
+
+Regards
+
+
+	Uz
+
+
+
+------------------------------------------------------------------------------
+
+List of changes for 2.10.0:
+
+
+  * Assembler:
+
+    - New .FORCEIMPORT command.
+
+    - New address size override symbols (z:, ...)
+
+    - New macro package &quot;cpu&quot;.
+
+    - New assignment operator :=
+
+    - INCOMPATIBLE CHANGE of the .CPU pseudo variable
+
+    - New pseudo functions .SIZEOF, .HIBYTE, .HIWORD, .LOBYTE, .LOWORD,
+      .BANKBYTE
+
+    - Structures, unions and enums: .STRUCT, .UNION, .ENUM and .TAG.
+
+    - New, improved scoping rules.
+
+    - First support for far and near segments/procedures.
+
+
+  * Compiler:
+
+    - Flexible array struct members.
+
+    - Provisions for handling arguments to main()
+
+    - Rewrite of the type conversion.
+
+    - New keywords (some of them only in non ANSI mode): far, near, __far__,
+      __near__
+
+    - Slightly improved code in a few situations.
+
+
+  * Linker
+
+    - New directory search options.
+
+    - Generation of debug info is now &quot;official&quot; (but the format of the file
+      may still change). NOTE: The VICE label file will go in the next
+      release, so if you are using it for some other purpose than feeding it
+      into VICE, please think about using the debug info file instead.
+
+
+  * cl65 utility:
+
+    - Small additions to track changes in the tools called.
+
+
+  * ca65html
+
+    - New --linenumbers and --linelabels options
+
+    - Ability to convert tabs to spaces in the output
+
+    - Colorization
+
+    - Can generate links to the C source files (must be generated by c2html)
+
+
+  * Library
+
+    - New directory functions for the CBMs contributed by Josef Soucek.
+
+    - Joystick drivers are now loadable modules. The old statically linked
+      code has been converted to loadable drivers and is no longer available.
+
+    - Library support for the NES by groepaz &lt;<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Announcement:%20cc65%20v2.10.0%20&quot;christmas%20edition&quot;">groepaz_at_gmx.net</a>&gt;
+
+    - system() function.
+
+    - isblank() is &quot;official&quot; in C99.
+
+    - Arguments passed to main for several platforms (includes GEOS!)
+
+    - The open function for the CBMs will no longer add a file type, so
+      files of any type can be opened without changing _filetype.
+
+    - Joystick driver for the Apple 2 contributed by Stefan Haubenthal.
+
+    - Two joystick drivers for the C64 contributed by groepaz, one of them
+      converted to c128 by me.
+
+    - Minimal Supervision support (linker config and startup file) contributed
+      by Peter Trauner.
+
+    - Several graphics drivers for the C128 and GEOS written and contributed
+      by Maciej Witkowiak.
+
+    - New ramcart extended memory driver for the C128 written by Maciej
+      Witkowiak.
+
+    - Two new Apple ][ TGI drivers contributed by Stefan Haubenthal.
+
+    - One new extended memory driver for the Apple ][ contributed by Stefan
+      Haubenthal.
+
+    - New serial (RS232) driver architecture. RS232 drivers are now loadable.
+      Drivers are available for C64/SwiftLink, C128/SwiftLink and Plus/4
+      (builtin ACIA). The latter is not tested because of the lack of an RS232
+      interface on my side, but since it is to more than 90% identical to the
+      (tested) C64 version, there's a good chance it will work. The old static
+      drivers are still available but deprecated. They will get removed in one
+      of the next releases.
+
+    - INCOMPATIBLE CHANGE for GEOS applications: Exiting main() now ends the
+      program. Before, exit() had to be called explicitly. Please read the
+      docs!
+
+    - Full file I/O support and other improvements for the Commodore 610.
+
+    - RAM extended memory driver for the CBM610 does now work.
+
+    - New loadable serial driver for the builtin ACIA of the Commodore 610.
+
+    - More small changes/additions.
+
+
+  * Documentation
+
+    - Platform specific docs for the Atari, C128, C16, C64, Plus/4 and CBM610.
+
+    - Much extended function reference.
+
+    - Documentation for ca65html (an assembler source to HTML converter)
+      added.
+
+    - Lots of other additions.
+
+
+  * Other
+
+    - New co65 utility that allows to convert an o65 file into an assembler
+      module, so it can be linked statically.
+
+    - Changed object file format.
+
+    - Disassembler ready, documentation added.
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Announcement:%20cc65%20v2.10.0%20&quot;christmas%20edition&quot;">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Announcement:%20cc65%20v2.10.0%20&quot;christmas%20edition&quot;">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3875.html">Johan Kotlinski: "Re: [cc65] CBM disk write problems"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3877.html">Marc 'BlackJack' Rintsch: "Re: [cc65] Announcement: cc65 v2.10.0 &quot;christmas edition&quot;"</a>
+<li><strong>Reply:</strong> <a href="3877.html">Marc 'BlackJack' Rintsch: "Re: [cc65] Announcement: cc65 v2.10.0 &quot;christmas edition&quot;"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-12-23 21:52:01 CET</em>
+</em>
+</small>
+</body>
+</html>

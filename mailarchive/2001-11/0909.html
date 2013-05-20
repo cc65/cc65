@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] ca65 syntax problems</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] ca65 syntax problems">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] ca65 syntax problems</h1>
+<!-- received="Mon Nov  5 14:02:19 2001" -->
+<!-- isoreceived="20011105130219" -->
+<!-- sent="Mon, 5 Nov 2001 14:02:21 +0100" -->
+<!-- isosent="20011105130221" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] ca65 syntax problems" -->
+<!-- id="20011105140221.A20204@trixie.musoftware.de" -->
+<!-- inreplyto="1028568214.20011104121333@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20ca65%20syntax%20problems"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2001-11-05 14:02:21
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0910.html">groepaz: "Re[2]: [cc65] ca65 syntax problems"</a>
+<li><strong>Previous message:</strong> <a href="0908.html">groepaz: "Re[2]: [cc65] ca65 syntax problems"</a>
+<li><strong>In reply to:</strong> <a href="0908.html">groepaz: "Re[2]: [cc65] ca65 syntax problems"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0910.html">groepaz: "Re[2]: [cc65] ca65 syntax problems"</a>
+<li><strong>Reply:</strong> <a href="0910.html">groepaz: "Re[2]: [cc65] ca65 syntax problems"</a>
+<li><strong>Reply:</strong> <a href="0926.html">Mike McCarty: "Re: [cc65] ca65 syntax problems"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Sun, Nov 04, 2001 at 12:13:33PM +0100, groepaz wrote:
+&gt; and seriously, i still want a traditional .org directive (thats one
+&gt; thing really missing in ca65 IMHO) ... its kinda annyoing to eg write
+&gt; drivecode embedded in your sources this way ;/
+
+There is no way to have a traditional .org directive if you have relocatable
+code. And, seriously, I think that having relocatable code is far more useful
+than an old style .ORG directive.
+
+&gt; actually, the lack of certain features (traditional .org and
+&gt; prog-count assignment in particular) is what scares a lot of people i
+&gt; have talked to ....
+
+Both are non issues. If you use one file (and one or more include files as is
+common use with other assemblers) .ORG works fine for most things. And program
+counter assignment is possible using one or more of the .feature commands.
+Using
+
+        .feature pc_assignment, dollar_is_pc
+
+things like
+
+        $ = $200
+
+are completely legal.
+
+The code for the 1541 that comes with cbm4linux was originally written for
+xa65, and it translates without changes using ca65 with the following feature
+set enabled on the command line:
+
+        --feature labels_without_colons
+   	--feature pc_assignment
+   	--feature loose_char_term
+
+You are right, having some more emulation features would be nice, but on the
+other side, ca65 will probably work with more different styled input files
+than any other assembler out there.
+
+&gt; mmmh i have started one when i have translated some of my old sources
+&gt; to ca65..... its very incomplete/inaccurate by now i guess, but i can
+&gt; mail it over if you like.
+
+That would be nice, even if it is incomplete.
+
+&gt; BTW... different thing... is there already some header file that
+&gt; defines an api for serial-port access?
+
+Yes, there is such a file, it is called rs232.h. There is also the
+corresponding library for some machines including the C64, it was used by the
+uIP TCP/IP stack and web server.
+
+Having support for the silver surfer would be nice, because the 16550 chip it
+uses is far more advanced than the usual 6551. With the silver surfer, using
+115200 bps on the slip line should be easily possible with even more cycles to
+spare than with the Swiftlink at 38400. But I've myself written more than one
+driver for the 16550 chip on different platforms, so if it is too much work to
+adapt your code, I don't think it would be a problem for me to write a support
+module for the silver surfer - provided that I will get the hardware.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20ca65%20syntax%20problems">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20ca65%20syntax%20problems">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0910.html">groepaz: "Re[2]: [cc65] ca65 syntax problems"</a>
+<li><strong>Previous message:</strong> <a href="0908.html">groepaz: "Re[2]: [cc65] ca65 syntax problems"</a>
+<li><strong>In reply to:</strong> <a href="0908.html">groepaz: "Re[2]: [cc65] ca65 syntax problems"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0910.html">groepaz: "Re[2]: [cc65] ca65 syntax problems"</a>
+<li><strong>Reply:</strong> <a href="0910.html">groepaz: "Re[2]: [cc65] ca65 syntax problems"</a>
+<li><strong>Reply:</strong> <a href="0926.html">Mike McCarty: "Re: [cc65] ca65 syntax problems"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:43 CET</em>
+</em>
+</small>
+</body>
+</html>

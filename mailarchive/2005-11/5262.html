@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Need help getting started </title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Need help getting started with cc65 NES" />
+<meta name="Date" content="2005-11-16" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Need help getting started with cc65 NES</h1>
+<!-- received="Wed Nov 16 22:54:04 2005" -->
+<!-- isoreceived="20051116215404" -->
+<!-- sent="Wed, 16 Nov 2005 22:53:51 +0100" -->
+<!-- isosent="20051116215351" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Need help getting started with cc65 NES" -->
+<!-- id="20051116215351.GA13641@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="437BA835.3090207&#64;alpinecom.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5263.html" title="Groepaz: &quot;Re: [cc65] Need help getting started with cc65 NES&quot;">Next message</a> ]
+[ <a href="5261.html" title="PH: &quot;Re: [cc65] Need help getting started with cc65 NES&quot;">Previous message</a> ]
+[ <a href="5261.html" title="PH: &quot;Re: [cc65] Need help getting started with cc65 NES&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5263.html" title="Groepaz: &quot;Re: [cc65] Need help getting started with cc65 NES&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Need%20help%20getting%20started%20with%20cc65%20NES">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-11-16 22:53:51</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Wed, Nov 16, 2005 at 03:44:21PM -0600, PH wrote:
+&gt; I am looking at the crt0.s file like you said.  That is the code that is
+&gt; being run first, like you say.  The problem seems to be when it gets to
+&gt; the initlib code in the condes.s file.  It runs to the &quot;jmp condes&quot;
+&gt; line, and then jumps to location $6003, and from there I am not sure
+&gt; what it is doing, but it eventually gets stuck at $600c.  Then, it just
+&gt; sits there.  Does that tell you anything?
+
+As you can see from the linker config, it expects $6000-$7FFF to contain RAM.
+The condes routine is self modifying code for performance reasons, so it must
+be located in the data segment, which is in RAM. The condes routine calls
+several subroutines that are placed in a table by the linker. What should
+happen is that the subroutine call at the jmpvec: label is executed several
+times, and after that the routine returns.
+
+My suggestion is to first check if condes routine is actually in place. This
+could fail if either the copy routine has a problem, or if there is no RAM at
+the given location. If the condes routine is in place, check if the subroutine
+calls are ok. You can locate the target addresses in the map file to find out
+the corresponding names.
+
+As an alternative approach, if you choose a simpler program, there may not be
+called any constructors at all, so initlib will do nothing.
+
+Maybe groepaz has an idea what else to try, because the NES port is his
+child:-)
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Nov 16 22:54:04 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5263.html" title="Next message in the list">Groepaz: "Re: [cc65] Need help getting started with cc65 NES"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5261.html" title="Previous message in the list">PH: "Re: [cc65] Need help getting started with cc65 NES"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5261.html" title="Message to which this message replies">PH: "Re: [cc65] Need help getting started with cc65 NES"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5263.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] Need help getting started with cc65 NES"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5263.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] Need help getting started with cc65 NES"</a></li>
+<li><dfn>Reply</dfn>:  <a href="5264.html" title="Message sent in reply to this message">PH: "Re: [cc65] Need help getting started with cc65 NES"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5262" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5262" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5262" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-11-16 22:54:07 CET
+</em></small></p>
+</body>
+</html>

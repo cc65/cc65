@@ -1,0 +1,34 @@
+#
+# Don't forget to restore the device number before exit, otherwise it's
+# destroyed by the close all files routine elsewhere.
+#
+# <soci@c64.rulez.org> Kajtar Zsolt 14.03.2010
+#
+diff -urN cc65-snapshot-2.13.9.20100309/libsrc/cbm/filevars.s cc65-snapshot-2.13.9.20100309.new/libsrc/cbm/filevars.s
+--- cc65-snapshot-2.13.9.20100309/libsrc/cbm/filevars.s	2010-02-15 00:12:54.000000000 +0100
++++ cc65-snapshot-2.13.9.20100309.new/libsrc/cbm/filevars.s	2010-03-14 13:08:58.754075136 +0100
+@@ -7,6 +7,7 @@
+         .export         __filetype
+         .export         __curunit
+         .constructor    initcurunit, 30
++        .destructor     restorecurunit, 14
+         .importzp       devnum
+ 
+ 
+@@ -24,6 +25,14 @@
+ 
+ .segment "INIT"
+ 
++.proc   restorecurunit
++
++        lda     __curunit
++        sta     devnum
++        rts
++
++.endproc
++
+ .proc   initcurunit
+ 
+         lda     devnum
+
+

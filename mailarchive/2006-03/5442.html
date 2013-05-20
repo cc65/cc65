@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Re: Mouse API</title>
+<meta name="Author" content="Jonathan Graham Harston (jgh1arcade.demon.co.uk)" />
+<meta name="Subject" content="[cc65] Re: Mouse API" />
+<meta name="Date" content="2006-03-22" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Re: Mouse API</h1>
+<!-- received="Wed Mar 22 13:00:26 2006" -->
+<!-- isoreceived="20060322120026" -->
+<!-- sent="22 Mar 2006 10:48:13 +0000" -->
+<!-- isosent="20060322104813" -->
+<!-- name="Jonathan Graham Harston" -->
+<!-- email="jgh1arcade.demon.co.uk" -->
+<!-- subject="[cc65] Re: Mouse API" -->
+<!-- id="060322115504@arcade.demon.co.uk" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5443.html" title="Greg King: &quot;Re: [cc65] Re: Mouse API&quot;">Next message</a> ]
+[ <a href="5441.html" title="cdoty1rastersoft.net: &quot;[cc65] CC65, lcc &amp; 65816?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5443.html" title="Greg King: &quot;Re: [cc65] Re: Mouse API&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Jonathan Graham Harston &lt;<a href="mailto:jgh1arcade.demon.co.uk?Subject=Re:%20[cc65]%20Re:%20Mouse%20API">jgh1arcade.demon.co.uk</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2006-03-22 11:48:13</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt;Message-ID: &lt;20060311113955.GB21214&#64;trixie&#46;<!--nospam-->musoftware.de&gt;
+ 
+Ullrich von Bassewitz &lt;uz&#64;musoftware&#46;<!--nospam-->de&gt; wrote:
+&gt; &gt; Here is the code I thought would work for this .
+&gt; &gt; unsigned int cursx = info.pos.x / 8;
+&gt; &gt; unsigned int cursy = info.pos.y / 8;
+&gt; 
+&gt; Yes, that should work for the C64.
+ 
+Do mouse coordinates start from the top-left like text
+coordinates? I thought they started from the bottom-left, like
+graphics coordinates. They do on all systems I've ever used. That
+would mean you need something like:
+ 
+cursy = maximum_text_y_coord - info.pos.y/8;
+ 
+-- 
+J.G.Harston - jgh&#64;arcade&#46;<!--nospam-->demon.co.uk - mdfs.net/User/JGH
+Sheffield Boundary Review at <a href="http://mdfs.net/User/JGH/Docs/Politics/ParlReview">http://mdfs.net/User/JGH/Docs/Politics/ParlReview</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Mar 22 13:00:26 2006</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5443.html" title="Next message in the list">Greg King: "Re: [cc65] Re: Mouse API"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5441.html" title="Previous message in the list">cdoty1rastersoft.net: "[cc65] CC65, lcc &amp; 65816?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5443.html" title="Next message in this discussion thread">Greg King: "Re: [cc65] Re: Mouse API"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Maybe reply</dfn>:  <a href="5443.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] Re: Mouse API"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5442" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5442" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5442" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2006-03-22 13:00:29 CET
+</em></small></p>
+</body>
+</html>

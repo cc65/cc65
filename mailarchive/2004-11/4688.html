@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Assembler expressions abov</title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="Re: [cc65] Assembler expressions above $ffff" />
+<meta name="Date" content="2004-11-09" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Assembler expressions above $ffff</h1>
+<!-- received="Tue Nov  9 20:45:44 2004" -->
+<!-- isoreceived="20041109194544" -->
+<!-- sent="Tue, 9 Nov 2004 20:32:43 +0100" -->
+<!-- isosent="20041109193243" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="Re: [cc65] Assembler expressions above $ffff" -->
+<!-- id="200411092032.43809.groepaz@gmx.net" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="Pine.LNX.4.58.0411092135200.12936&#64;kosh.sipo.fi" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4689.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Assembler expressions above $ffff&quot;">Next message</a> ]
+[ <a href="4687.html" title="Karri Kaksonen: &quot;Re: [cc65] Assembler expressions above $ffff&quot;">Previous message</a> ]
+[ <a href="4687.html" title="Karri Kaksonen: &quot;Re: [cc65] Assembler expressions above $ffff&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4689.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Assembler expressions above $ffff&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20Assembler%20expressions%20above%20$ffff">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-11-09 20:32:43</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Tuesday 09 November 2004 20:39, Karri Kaksonen wrote:
+&gt; On Tue, 9 Nov 2004, Groepaz wrote:
+&gt; &gt; umhz just use unsigned long? *shrug*? or are you talking about the linker
+&gt; &gt; config? *confused*
+&gt; 
+&gt; I am talking about the linked result file. I have two ways to produce an
+&gt; executable for the Lynx. The easy one is just something you can download
+&gt; and run in RAM.
+&gt; 
+&gt; The hard one is a ROM cart that contains a filesystem, graphics and
+&gt; executables. When I try to build the ROM I got this strange idea to
+&gt; convince the linker to create the filesystem, graphics and executables in
+&gt; one go! It works like a dream up to 64k and like a nightmare above it.
+&gt; 
+&gt; So I wonder if it is possible to define labels in the cc65 code that
+&gt; contain large numbers?
+
+mmmmh....now i understand....
+
+well since the assembler and linker support the 65816, which can address
+up to 16mb, atleast 24bit should work...not sure how to handle it though
+or if you might need to explicitly enable it or whatnot.....UZ should
+enlighten us :=P
+
+gpz
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Nov  9 20:45:44 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4689.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Assembler expressions above $ffff"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4687.html" title="Previous message in the list">Karri Kaksonen: "Re: [cc65] Assembler expressions above $ffff"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4687.html" title="Message to which this message replies">Karri Kaksonen: "Re: [cc65] Assembler expressions above $ffff"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4689.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Assembler expressions above $ffff"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4688" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4688" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4688" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-11-09 20:45:53 CET
+</em></small></p>
+</body>
+</html>

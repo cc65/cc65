@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] dummy questions...</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] dummy questions...">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] dummy questions...</h1>
+<!-- received="Thu Feb 14 19:50:26 2002" -->
+<!-- isoreceived="20020214185026" -->
+<!-- sent="Thu, 14 Feb 2002 19:23:30 +0100" -->
+<!-- isosent="20020214182330" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] dummy questions..." -->
+<!-- id="01176813.20020214192330@gmx.net" -->
+<!-- inreplyto="20020214180326.B7637@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20dummy%20questions..."><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2002-02-14 19:23:30
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1097.html">Ullrich von Bassewitz: "Re: [cc65] dummy questions..."</a>
+<li><strong>In reply to:</strong> <a href="1097.html">Ullrich von Bassewitz: "Re: [cc65] dummy questions..."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1106.html">Ullrich von Bassewitz: "Re: [cc65] dummy questions..."</a>
+<li><strong>Next in thread:</strong> <a href="1099.html">groepaz: "[cc65] NT: www.cc65.org down ?"</a>
+<li><strong>Next in thread:</strong> <a href="1085.html">Matt Ackeret: "Re: [cc65] library header bug correction - and some compiler hazzle"</a>
+<li><strong>Reply:</strong> <a href="1106.html">Ullrich von Bassewitz: "Re: [cc65] dummy questions..."</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+Thursday, February 14, 2002, 6:03:26 PM, you wrote:
+
+
+UvB&gt; On Thu, Feb 14, 2002 at 04:54:45PM +0100, groepaz wrote:
+&gt;&gt; mmmmmh bummer ;( never had a problem with that one (actually using it
+&gt;&gt; in some of my programs aswell.... args) what'd be the most convinient
+&gt;&gt; way to add it back to get those tests compile aswell?
+
+UvB&gt; Just take it from the source distribution, and compile and link it with your
+UvB&gt; executable.
+
+ok well... i'll add an &quot;util&quot; directory to the testsuite then that may
+keep such target-dependent stuff.
+
+&gt;&gt; UvB&gt; If you use the &quot;-t platform&quot; option, the compiler will do character set
+&gt;&gt; UvB&gt; translation.
+&gt;&gt;
+&gt;&gt; oh i am doing that! however, would it also translate those weird chars
+&gt;&gt; (underscore etc) aswell?
+
+UvB&gt; So what are you actually doing? Oh, wait... The translation tables assume
+UvB&gt; ISO-8859-1 (or -15 since the additional symbols aren't used). This should work
+UvB&gt; for Windows but not for DOS. Maybe this is the problem?
+
+nope... i am using the windoze-compiled binaries .... win98(first ed.)
+
+going to write a testproggy tonite so we can check this :=P
+
+but still, IS printf(&quot;_&quot;); expected to output an underscore on the c64
+and not a left-arrow ? (left-arrow indicates no charset-translation
+basically ;o))
+
+&gt;&gt; printf(&quot;blabla: &lt;some whitespace/spaces here&gt; %d\n&quot;,bla);
+&gt;&gt;
+&gt;&gt; and the compiler seems to ignore the whitespace! (as in, it doesnt
+&gt;&gt; print spaces where it should!)
+
+UvB&gt; Are you sure your &quot;whitespace&quot; were spaces and not tabs? If you get a tab in
+UvB&gt; there, the result may look unexpected, especially since the alignment
+UvB&gt; regarding tab columns is different in the source than in the output.
+
+oh yes that was my first thought aswell.... not 100%sure if there
+arent tabs, BUT... there was NO whitespace in the output at ALL (i
+could interpret errors caused by different tab-alignment i guess) ...
+going to re-check that one aswell tonite :o)
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20dummy%20questions...">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20dummy%20questions...">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1097.html">Ullrich von Bassewitz: "Re: [cc65] dummy questions..."</a>
+<li><strong>In reply to:</strong> <a href="1097.html">Ullrich von Bassewitz: "Re: [cc65] dummy questions..."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1106.html">Ullrich von Bassewitz: "Re: [cc65] dummy questions..."</a>
+<li><strong>Next in thread:</strong> <a href="1099.html">groepaz: "[cc65] NT: www.cc65.org down ?"</a>
+<li><strong>Next in thread:</strong> <a href="1085.html">Matt Ackeret: "Re: [cc65] library header bug correction - and some compiler hazzle"</a>
+<li><strong>Reply:</strong> <a href="1106.html">Ullrich von Bassewitz: "Re: [cc65] dummy questions..."</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-02-14 19:50:43 CET</em>
+</em>
+</small>
+</body>
+</html>

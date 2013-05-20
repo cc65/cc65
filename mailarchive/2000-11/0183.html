@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] CygWin / MingW / DJGPP ...</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="[cc65] CygWin / MingW / DJGPP ...">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] CygWin / MingW / DJGPP ...</h1>
+<!-- received="Sun Nov 19 18:32:23 2000" -->
+<!-- isoreceived="20001119173223" -->
+<!-- sent="Sun, 19 Nov 2000 18:32:27 +0100" -->
+<!-- isosent="20001119173227" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="[cc65] CygWin / MingW / DJGPP ..." -->
+<!-- id="20001119183227.A26116@trixie.musoftware.de" -->
+<!-- inreplyto="3A17FA40.3CE51B3D@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20CygWin%20/%20MingW%20/%20DJGPP%20..."><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2000-11-19 18:32:27
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0184.html">Groepaz: "Re: [cc65] CygWin / MingW / DJGPP ..."</a>
+<li><strong>Previous message:</strong> <a href="0182.html">Groepaz: "Re: [cc65] Need help.."</a>
+<li><strong>In reply to:</strong> <a href="0182.html">Groepaz: "Re: [cc65] Need help.."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0184.html">Groepaz: "Re: [cc65] CygWin / MingW / DJGPP ..."</a>
+<li><strong>Reply:</strong> <a href="0184.html">Groepaz: "Re: [cc65] CygWin / MingW / DJGPP ..."</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Sun, Nov 19, 2000 at 05:05:20PM +0100, Groepaz wrote:
+&gt; 1) DON'T use the MingW port of GCC. While its produces &quot;better&quot; binaries and
+&gt; its also somewhat easier to handle on the first glance, it really SUX for
+&gt; porting linux stuff to windoze. With cygwin you get an environment that
+&gt; is quite close to a linux shell, so most linux based stuff compiles out of
+&gt; the box (including nifty configure-scripts etc pp)
+	   
+Nothing in cc65 is &quot;linux stuff&quot;. All of the tools were multi-platform from
+day one, and even the first cc65 version produced by me was available for DOS,
+Windows, OS/2 and Linux. So while your arguments may be true for some hardcore
+Unix software, they are definitely NOT true for cc65.
+
+In fact, I've tried to translate cc65 with the MingW compiler this afternoon
+because of another problem (see below), and apart from about 5 really minor
+problems (include paths and similar things) the sources compiled and worked
+without problems.
+
+So for a windows programmer I would repeat my suggestion: Use MingW instead of
+CygWin. It is really easy to setup, much more Windows like, creates
+executables that run without a 3MB monster DLL, and last but not least: It
+compiles cc65 without major problems.
+
+To port hardcore Unix programs, CygWin is probably a better solution, but for
+cc65 the additional features are not needed and the more complex handling is
+annoying. This is of course just my own humble opinion based on usage of both
+packages:-)
+
+Another question regarding a partially related problem: Has anyone managed to
+compile the snapshot using the DJGPP compiler under DOS? Keith Gerdes sent me
+some really weird linker error message, and I have absolutely no idea what
+goes wrong here. It seems that an enum with external linkage is missing when
+translating the ca65 assembler. All other externals from this module seem to
+be ok. I would say it's a compiler bug, but it would be nice to have the
+problem verified by someone else.
+
+Regards
+
+
+	Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20CygWin%20/%20MingW%20/%20DJGPP%20...">uz_at_musoftware.de</a>
+
+
+</pre>
+<hr noshade>
+<ul>
+<li>application/pgp-signature attachment: <a href="../att-0183/01-part">stored</a>
+</ul>
+<!-- attachment="01-part" -->
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20CygWin%20/%20MingW%20/%20DJGPP%20...">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0184.html">Groepaz: "Re: [cc65] CygWin / MingW / DJGPP ..."</a>
+<li><strong>Previous message:</strong> <a href="0182.html">Groepaz: "Re: [cc65] Need help.."</a>
+<li><strong>In reply to:</strong> <a href="0182.html">Groepaz: "Re: [cc65] Need help.."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0184.html">Groepaz: "Re: [cc65] CygWin / MingW / DJGPP ..."</a>
+<li><strong>Reply:</strong> <a href="0184.html">Groepaz: "Re: [cc65] CygWin / MingW / DJGPP ..."</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:37 CET</em>
+</em>
+</small>
+</body>
+</html>

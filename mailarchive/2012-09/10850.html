@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Re: readdir bug</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="Re: [cc65] Re: readdir bug" />
+<meta name="Date" content="2012-09-14" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Re: readdir bug</h1>
+<!-- received="Fri Sep 14 16:40:34 2012" -->
+<!-- isoreceived="20120914144034" -->
+<!-- sent="Fri, 14 Sep 2012 16:39:59 +0200" -->
+<!-- isosent="20120914143959" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="Re: [cc65] Re: readdir bug" -->
+<!-- id="20120914143959.GE12722@trikaliotis.net" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="20120914110118.GA17121&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10851.html" title="Spiro Trikaliotis: &quot;Re: readdir bug (was: [cc65] Atari Extended Memory Driver Anybody?)&quot;">Next message</a> ]
+[ <a href="10849.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] [ld65] Overwriting fillval for one segment only?&quot;">Previous message</a> ]
+[ <a href="10848.html" title="Ullrich von Bassewitz: &quot;[cc65] Re: readdir bug&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10852.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Re: readdir bug&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20[cc65]%20Re:%20readdir%20bug">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-09-14 16:39:59</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello,
+
+* On Fri, Sep 14, 2012 at 01:01:18PM +0200 Ullrich von Bassewitz wrote:
+ 
+&gt; Olivers test program does not only read the directory, but does also open and
+&gt; close each file.
+
+ARGH! THIS RINGS A BELL!
+
+In fact, I did not notice that Oliver's program opens the file. Thus, I
+did not understand why setting the file type could change the behaviour
+so dramatically. Thus, I thought the write went wrong, and something
+else were overwritten. My thoughts were wrong.
+
+&gt; This triggers the error somehow as can be seen by taking
+&gt; Olivers program and commenting out the lines that open/close the file. What is
+&gt; also interesting is that it fails with true drive emulation in VICE but works
+&gt; otherwise. At least here with my version of VICE.
+
+This is a known error (at least, know to me, as I had fallen into the
+trap before) of the 1541 ROM (and, most probably, also of 157x):
+
+Look at this program:
+
+100 open 1,8,0,&quot;$0&quot;
+110 n$=chr$(0)
+120 rem load address
+130 get#1,a$,b$
+140 nl=4
+200 rem new line
+210 get#1,a$,b$
+220 ifa$+b$=&quot;&quot;thenend
+230 rem line number
+240 get#1,a$,b$
+250 print asc(a$+n$)+asc(b$+n$)*256;&quot; &quot;;
+260 get#1,a$:ifa$&lt;&gt;&quot;&quot;thenprinta$;:goto260
+270 print
+280 li=li+1:if li&lt;nl goto 200
+290 li=0
+
+300 open2,8,2,&quot;test,p,r&quot;
+310 close2
+320 goto200
+
+If you set nl in line 140 big enough (more than there are lines in the
+dir), the directory is read and output correctly.
+
+As it is, though, (assuming the program &quot;test&quot; exists on the disk), the
+behaviour is exactly what you see in the test program: After opening and
+closing the file, the dir channel returns erroneous values. I believe
+that the 1541 overwrites some pointers which confuse it completely, but
+I have not tested it yet.
+
+Note that you will see parts of the header line repeated again. This is
+*exactly* the behaviour I have seen in my cc65 tests with my test
+program (output of &quot;buffer&quot;).
+
+If you change 300 to
+
+300 open2,8,15
+
+it seems to look even worse. (I see that your _close implementation also
+tries to read the error channel, that's why I am mentioning it).
+
+The dir file is not real file. Instead, it is implemented somehow
+&quot;hacky&quot; in the 1541. As normally, it is LOADed into RAM, this bug does
+not happen as LOAD reads the dir byte after byte, without any
+intervening actions. BUT: The test programs (Oliver's as well as mine)
+do other operations, which trigger the bug.
+
+ 
+&gt; &gt; In fact, currently, I'd think it is a compiler bug that triggers it.
+&gt; 
+&gt; I doubt this is the case, see below.
+
+I totally agreed in the minute you told me that Oliver's program
+actually opens the file.
+
+&gt; &gt; You see, I instrumented with some outputs, and I modified the case 2 by
+&gt; &gt; making it as simple as possible.
+&gt; 
+&gt; Please note that instrumenting the output with printf is dangerous, because
+&gt; printf does file I/O and therefore interferes heavily with the calls that read
+&gt; from the directory. Each time you call printf, the KERNAL is called to switch
+&gt; files. This is why I didn't use this method in the give case. I had used it in
+&gt; an earlier case and run into trouble.
+
+I know that this is dangerous. However, it was the best I could come up
+with.
+
+Perhaps, we should convince the VICE developers to add a &quot;debugging
+chip&quot; which only outputs data to the host. That is, something like
+
+  base+0, base+1: output string, start address
+  base+2, base+3: length of string
+  base+4:       bit flags to actually start the transfer
+
+That is, the following code
+
+  LDA #&lt;TEXT
+  LDX #&gt;TEXT
+  STA base+0
+  STX base+1
+  LDA #&lt;TEXTLENGTH
+  LDX #&gt;TEXTLENGTH
+  STA base+2
+  STX base+3
+  LDA #$FF
+  STA base+4
+
+should then output the bytes as label TEXT:, for example, into the log
+file. This way, debugging would be much easier.
+
+Groepaz, would you consider adding such a patch?
+
+
+ 
+&gt; I've tried adding the #if 0 to the code and compared the assembly results.
+
+With the &quot;#if 1&quot;, the entry type is set to &quot;program&quot;, so that the test
+program actually opens the file. With the &quot;#if 0&quot;, it skipps it instead.
+
+ 
+&gt; Unfortunately this is complicated by not having a decent debugger available.
+&gt; My current version of VICE is not even able to load the label file any more.
+
+Did you change the format of the label files?
+
+&gt; It reads it, but cannot find most of the symbols later. So I have to lookup
+&gt; the symbols manually in the map or debug files. Unfortuntely their values
+&gt; change with every change in the source ...
+
+I know. That's exactly my problem, too.
+
+Also, that's why I put readdir() into my code, so I can see it better in
+the assembly listing. It makes reading the map file easier, IMHO.
+
+
+Now, what about a fix? I am not sure how to proceed. The directory would
+have to be read in one chunk (or, by using the offset and seekdir()? But
+that would slow down the process of reading the dir extremely.)
+
+Regards,
+Spiro.
+
+-- 
+Spiro R. Trikaliotis
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Sep 14 16:40:34 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10851.html" title="Next message in the list">Spiro Trikaliotis: "Re: readdir bug (was: [cc65] Atari Extended Memory Driver Anybody?)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10849.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] [ld65] Overwriting fillval for one segment only?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10848.html" title="Message to which this message replies">Ullrich von Bassewitz: "[cc65] Re: readdir bug"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10852.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Re: readdir bug"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10852.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Re: readdir bug"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10854.html" title="Message sent in reply to this message">Kajtár Zsolt: "Re: [cc65] Re: readdir bug"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10897.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10850" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10850" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10850" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-09-14 16:40:37 CEST
+</em></small></p>
+</body>
+</html>

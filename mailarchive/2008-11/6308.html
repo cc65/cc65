@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] lines of code, memory, etc</title>
+<meta name="Author" content="Tachdaun (tachdaun1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] lines of code, memory, etc" />
+<meta name="Date" content="2008-11-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] lines of code, memory, etc</h1>
+<!-- received="Mon Dec 29 00:26:21 2008" -->
+<!-- isoreceived="20081228232621" -->
+<!-- sent="Fri, 28 Nov 2008 21:22:44 -0300" -->
+<!-- isosent="20081129002244" -->
+<!-- name="Tachdaun" -->
+<!-- email="tachdaun1gmail.com" -->
+<!-- subject="Re: [cc65] lines of code, memory, etc" -->
+<!-- id="49308B54.4040604@gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="200812282203.35573.marc&#64;rintsch.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="../2008-12/6309.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] lines of code, memory, etc&quot;">Next message</a> ]
+[ <a href="6307.html" title="Tachdaun: &quot;Re: [cc65] lines of code, memory, etc&quot;">Previous message</a> ]
+[ <a href="../2008-12/6305.html" title="Marc 'BlackJack Rintsch: &quot;Re: [cc65] lines of code, memory, etc&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="../2008-12/6313.html" title="Marc 'BlackJack Rintsch: &quot;Re: [cc65] lines of code, memory, etc&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Tachdaun &lt;<a href="mailto:tachdaun1gmail.com?Subject=Re:%20[cc65]%20lines%20of%20code,%20memory,%20etc">tachdaun1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-11-29 01:22:44</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a></pre>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<head>
+  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
+  <title></title>
+</head>
+<body bgcolor="#ffffff" text="#000000">
+Oh that's a good one! maybe I mail you all my code so you optimize it
+for me :D<br>
+Thanks<br>
+<br>
+PS: I'm aware of PEEK, in fact it inspired addr(x), but I use it in
+place of POKE, for example:<br>
+addr( 0x4016 ) = 1; instead of POKE( 0x4016, 1 );<br>
+It just looks better for me.<br>
+<br>
+Marc 'BlackJack Rintsch wrote:
+<blockquote cite="mid:200812282203.35573.marc@rintsch.de" type="cite">
+  <pre wrap="">On Friday 28 November 2008, Tachdaun wrote:
+
+  </pre>
+  <blockquote type="cite">
+    <pre wrap="">A question of choice: what would be better, taking into account code
+size, execution time and memoy consumption( declaring additional
+variables ) ?
+
+// addr( x )  means:    (*(unsigned char*) ( x ))      it's the value
+of the given address
+    </pre>
+  </blockquote>
+  <pre wrap=""><!---->
+This is available as `PEEK()` macro in `peekpoke.h`.
+
+  </pre>
+  <blockquote type="cite">
+    <pre wrap="">code 1:
+    joy_state |= ( addr(joypad) &amp; 1 );            // Push A
+    button state bit to joy_state's bit 0
+    joy_state |= ( addr(joypad) &amp; 1 ) &lt;&lt; 1;    // Push B
+button state bit to joy_state's bit 1
+    joy_state |= ( addr(joypad) &amp; 1 ) &lt;&lt; 2;    // Push Select   
+button state bit to joy_state's bit 2
+    joy_state |= ( addr(joypad) &amp; 1 ) &lt;&lt; 3;    // Push Start
+button state bit to joy_state's bit 3
+    joy_state |= ( addr(joypad) &amp; 1 ) &lt;&lt; 4;    // Push Up
+button state bit to joy_state's bit 4
+    joy_state |= ( addr(joypad) &amp; 1 ) &lt;&lt; 5;    // Push Down
+button state bit to joy_state's bit 5
+    joy_state |= ( addr(joypad) &amp; 1 ) &lt;&lt; 6;    // Push Left
+button state bit to joy_state's bit 6
+    joy_state |= ( addr(joypad) &amp; 1 ) &lt;&lt; 7;    // Push Right
+button state bit to joy_state's bit 7
+
+or code 2:
+    unsigned char iter;
+    for( iter = 0; iter &lt;= 7; ++iter )
+        joy_state |= ( addr(joypad) &amp; 1 ) &lt;&lt; iter;
+
+of course, code 2 declares one variable that code 1 doesn't, and it
+has the overhead of checking the loop conditions.
+But code 2 has fewer lines of code than code 1. I know that in asm
+it's more than 2 lines, but I guess it's fewer than code 1
+Which would you choose?
+    </pre>
+  </blockquote>
+  <pre wrap=""><!---->
+Any chance you can reverse the meaning of the bits in `joy_state`?  Then 
+you can use::
+
+    joy_state = (joy_state &lt;&lt; 1) | (PEEK(joypad) &amp; 1);
+    joy_state = (joy_state &lt;&lt; 1) | (PEEK(joypad) &amp; 1);
+    joy_state = (joy_state &lt;&lt; 1) | (PEEK(joypad) &amp; 1);
+    joy_state = (joy_state &lt;&lt; 1) | (PEEK(joypad) &amp; 1);
+    joy_state = (joy_state &lt;&lt; 1) | (PEEK(joypad) &amp; 1);
+    joy_state = (joy_state &lt;&lt; 1) | (PEEK(joypad) &amp; 1);
+    joy_state = (joy_state &lt;&lt; 1) | (PEEK(joypad) &amp; 1);
+    joy_state = (joy_state &lt;&lt; 1) | (PEEK(joypad) &amp; 1);
+
+or::
+
+    for (i = 0; i &lt; 8; ++i) {
+        joy_state = (joy_state &lt;&lt; 1) | (PEEK(joypad) &amp; 1);
+    }
+
+To compare the generated assembler code you can tell the compiler to 
+write it into a file.
+
+Ciao,
+	Marc 'BlackJack' Rintsch
+  </pre>
+</blockquote>
+</body>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo@musoftware.de with
+the string "unsubscribe cc65" in the body(!) of the mail.
+<span id="received"><dfn>Received on</dfn> Mon Dec 29 00:26:21 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="../2008-12/6309.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] lines of code, memory, etc"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6307.html" title="Previous message in the list">Tachdaun: "Re: [cc65] lines of code, memory, etc"</a></li>
+<li><dfn>In reply to</dfn>: <a href="../2008-12/6305.html" title="Message to which this message replies">Marc 'BlackJack Rintsch: "Re: [cc65] lines of code, memory, etc"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="../2008-12/6313.html" title="Next message in this discussion thread">Marc 'BlackJack Rintsch: "Re: [cc65] lines of code, memory, etc"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="../2008-12/6313.html" title="Message sent in reply to this message">Marc 'BlackJack Rintsch: "Re: [cc65] lines of code, memory, etc"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6308" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6308" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6308" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-12-29 00:26:23 CET
+</em></small></p>
+</body>
+</html>

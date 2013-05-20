@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] how about commercial prgs?</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] how about commercial prgs?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] how about commercial prgs?</h1>
+<!-- received="Tue Apr  2 22:18:31 2002" -->
+<!-- isoreceived="20020402201831" -->
+<!-- sent="Tue, 2 Apr 2002 22:18:37 +0200" -->
+<!-- isosent="20020402201837" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] how about commercial prgs?" -->
+<!-- id="20020402221837.B16600@trixie.musoftware.de" -->
+<!-- inreplyto="200204021725.TAA00824@color.sics.se" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20how%20about%20commercial%20prgs?"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-04-02 22:18:37
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1236.html">Adam Dunkels: "Re: [cc65] how about commercial prgs?"</a>
+<li><strong>In reply to:</strong> <a href="1232.html">Adam Dunkels: "Re: [cc65] how about commercial prgs?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="../2002-03/1191.html">MagerValp: "Re: [cc65] how about commercial prgs?"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Tue, Apr 02, 2002 at 07:25:19PM +0200, Adam Dunkels wrote:
+&gt; There seems to be a lot to misinterpret :-) The GPL says that &quot;[...] the
+&gt; distribution of the whole must be ON THE TERMS of this License [...]&quot;, not
+&gt; &quot;be licensed under the terms of the License&quot; (emphasis mine). Being
+&gt; distributed &quot;on the terms of the License&quot; means that the distribution of the
+&gt; whole package must include an offer to receive the source code. This is what
+&gt; is being demanded by the GPL. It does not mean that the whole package must be
+&gt; relicensed under the GPL (or any other license for that matter).
+
+This sounds very reasonable and would be an explanation why the FSF considers
+the zlib license compatible with the GPL. So it seems indeed that I've
+misinterpreted the cited paragraph. Which in turn makes me rather happy,
+because I've already started to think about measures to make the existing
+license GPL compatible - but since all authors would have to agree, this would
+have been rather difficult.
+
+So no problems at all, not even with Adams package (if anyone is really
+willing to use it). Thanks a lot!
+
+There is more good news: I will prepare a new release in about two weeks. Here
+is a list of the new features:
+
+  1. Support for Lunix/o65.
+
+  2. conio support for GEOS (by Maciej Witkowiak, &lt;<a href="mailto:ytm_at_friko.onet.pl?Subject=Re:%20[cc65]%20how%20about%20commercial%20prgs?">ytm_at_friko.onet.pl</a>&gt;). This
+     means that any program using the conio API will run under GEOS with a
+     simple recompile!
+
+  3. RS232 support for the Atari machines (added by Christian Groessler,
+     &lt;<a href="mailto:cpg_at_aladdin.de?Subject=Re:%20[cc65]%20how%20about%20commercial%20prgs?">cpg_at_aladdin.de</a>&gt;). The uip TCP stack including the web server is usable
+     with this addition, so you can have your own Atari web server with the
+     new version.
+
+  4. RS232 support for the C128. This will make uip available for use with the
+     C128 (this makes two new platforms that can run uip - the Commodore B
+     series will probably follow soon).
+
+  5. Several changes regarding code generation and optimizations:
+
+        a. Compares do now generate better code thanks to a hint from Piotr
+           Fusik.
+
+        b. 65C02 code generation is back.
+
+        c. &quot;Optimize for size&quot; will work again.
+
+  6. More flexible character code translation.
+
+  7. sscanf is now available. The basic layer would also make fscanf and
+     friends possible, but the missing ungetc() function prevents this. Scanf
+     for files streams will probably be available in the next version.
+
+  8. Bugfixes and minor improvements as usual.
+
+I would like to invite anyone to test the current snapshot. There are known
+problems with 2. (Maciej is working on it), but apart from this, the snapshot
+should be usable. If I forgot something in the list above, please drop me a
+mail.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20how%20about%20commercial%20prgs?">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20how%20about%20commercial%20prgs?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1236.html">Adam Dunkels: "Re: [cc65] how about commercial prgs?"</a>
+<li><strong>In reply to:</strong> <a href="1232.html">Adam Dunkels: "Re: [cc65] how about commercial prgs?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="../2002-03/1191.html">MagerValp: "Re: [cc65] how about commercial prgs?"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-04-02 22:18:43 CEST</em>
+</em>
+</small>
+</body>
+</html>

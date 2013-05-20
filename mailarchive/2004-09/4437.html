@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] __IRQFUNC_*__</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] __IRQFUNC_*__" />
+<meta name="Date" content="2004-09-15" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] __IRQFUNC_*__</h1>
+<!-- received="Wed Sep 15 11:19:40 2004" -->
+<!-- isoreceived="20040915091940" -->
+<!-- sent="Wed, 15 Sep 2004 11:19:37 +0200" -->
+<!-- isosent="20040915091937" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] __IRQFUNC_*__" -->
+<!-- id="20040915091937.GE8064@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="1095237486.341.19.camel&#64;strumpa.sics.se" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4438.html" title="Karri Kaksonen: &quot;Re: [cc65] New cc65 target: atari lynx&quot;">Next message</a> ]
+[ <a href="4436.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] __IRQFUNC_*__&quot;">Previous message</a> ]
+[ <a href="4433.html" title="Adam Dunkels: &quot;Re: [cc65] __IRQFUNC_*__&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4439.html" title="Adam Dunkels: &quot;Re: [cc65] __IRQFUNC_*__&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20__IRQFUNC_*__">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-09-15 11:19:37</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Wed, Sep 15, 2004 at 10:38:06AM +0200, Adam Dunkels wrote:
+&gt; But I don't really know what they do :-)
+
+That is simple: The __IRQFUNC_TABLE__ is a table of function vectors built by
+the linker that is called from the interrupt. So a module that wants to add an
+interrupt handler does no longer have to chain the IRQ vector, but just
+declare the handler function as
+
+        .condes         irq_handler, &lt;priority&gt;
+
+and it will be called as a subroutine in the interrupt. No need to save any
+registers, and no need for an RTI.
+
+The feature was added for two reasons:
+
+  * Less overhead, because the code to chain and restore the interrupt is not
+    needed any longer. Plus the interrupt handler doesn't need to save and
+    restore any registers.
+
+  * Avoid problems with the order of interrupt handlers. When chaining the
+    interrupt, the handlers must be removed in the reverse order as they were
+    installed. Since loadable modules contain interrupt handlers, these
+    handlers - and therefore the modules - must be deinstalled when the module
+    is unloaded. But the compiler resp. the runtime cannot guarantee that the
+    modules are unloaded in the correct order, and in fact it would be stupid
+    to enforce such an unloading order.
+
+Not all platforms support this feature until now, but I expect most platforms
+to adopt it sooner or later. If you want to know if your platform supports it,
+just check linker config file.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Sep 15 11:19:40 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4438.html" title="Next message in the list">Karri Kaksonen: "Re: [cc65] New cc65 target: atari lynx"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4436.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] __IRQFUNC_*__"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4433.html" title="Message to which this message replies">Adam Dunkels: "Re: [cc65] __IRQFUNC_*__"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4439.html" title="Next message in this discussion thread">Adam Dunkels: "Re: [cc65] __IRQFUNC_*__"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4439.html" title="Message sent in reply to this message">Adam Dunkels: "Re: [cc65] __IRQFUNC_*__"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4437" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4437" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4437" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-09-15 11:19:49 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] How can I cause the &quot;FIL</title>
+<meta name="Author" content="Michael McIntosh (cc65_at_lifepod.com)">
+<meta name="Subject" content="[cc65] How can I cause the &quot;FILE NOT FOUND&quot; msg to print to screen using existing kernal or basic routines for the C64?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] How can I cause the &quot;FILE NOT FOUND&quot; msg to print to screen using existing kernal or basic routines for the C64?</h1>
+<!-- received="Tue Feb 11 21:00:50 2003" -->
+<!-- isoreceived="20030211200050" -->
+<!-- sent="Tue, 11 Feb 2003 15:00:46 -0500 (EST)" -->
+<!-- isosent="20030211200046" -->
+<!-- name="Michael McIntosh" -->
+<!-- email="cc65_at_lifepod.com" -->
+<!-- subject="[cc65] How can I cause the &quot;FILE NOT FOUND&quot; msg to print to screen using existing kernal or basic routines for the C64?" -->
+<!-- id="Pine.BSF.4.44.0302111424310.6047-100000@wredhor.pair.com" -->
+<!-- inreplyto="BA6B7D85.800%carlosofcascade@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Michael McIntosh (<a href="mailto:cc65_at_lifepod.com?Subject=Re:%20[cc65]%20How%20can%20I%20cause%20the%20&quot;FILE%20NOT%20FOUND&quot;%20msg%20to%20print%20to%20screen%20using%20existing%20kernal%20or%20basic%20routines%20for%20the%20C64?"><em>cc65_at_lifepod.com</em></a>)<br>
+<strong>Date:</strong> 2003-02-11 21:00:46
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2426.html">Ullrich von Bassewitz: "Re: [cc65] parameter and assembly precedures"</a>
+<li><strong>In reply to:</strong> <a href="2424.html">stefan: "Re: [cc65] parameter and assembly precedures"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2429.html">Ullrich von Bassewitz: "Re: [cc65] How can I cause the &quot;FILE NOT FOUND&quot; msg to print to screen using existing kernal or basic routines for the C64?"</a>
+<li><strong>Reply:</strong> <a href="2429.html">Ullrich von Bassewitz: "Re: [cc65] How can I cause the &quot;FILE NOT FOUND&quot; msg to print to screen using existing kernal or basic routines for the C64?"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+I am writing a program that runs automatically upon loading by overwriting
+the basic warm start vector while loading and causing it to execute code
+at $02A7 when it finishes loading. That code, in turn, loads another
+program and executes it.
+
+I am using the C64 kernal LOAD routine ($FFD5) to load a file in assembly
+language. If the file is not found, I wish to print out a &quot;FILE NOT FOUND&quot;
+message and cause the code to return to the basic prompt without clearing
+the screen.
+
+I have to write this code in assembly because I only have 89 bytes to work
+with ($02A7-$02FF). I could embed an ascii string in my program, but I
+don't have room for it and the code required to print it. Does anyone know
+how I could trigger either an existing kernal or basic routine that would
+print out the standard &quot;FILE NOT FOUND&quot; message?
+
+I wouldn't go through all this hassle normally, but I plan on contributing
+my code for others to use. If they mess up while trying to use the code,
+I'd like to give them a clue if they used an invalid filename.
+
+Here is the relevant part of my code:
+
+	lda	#$01		; device file #
+	ldx	#$08		; device unit #
+	ldy	#$ff		; no command
+	jsr	setlfs		; set logical file (kernal call)
+	lda	#(.strlen(PROGRAM_NAME))	; get length of filename
+	ldx	#&lt;(_filename)	; set lower address of filename
+	ldy	#&gt;(_filename)	; set upper address of filename
+	jsr	setnam		; set file name	(kernal call)
+	lda	#$00		; set flag for load operation
+	ldx	#$ff		; alternative start address
+	ldy	#$ff		; alternative start address
+	jsr	load		; load program file (kernal call)
+	bcc	EXEC		; branch to execution if no load error
+
+	???     Print error message and return to basic prompt
+
+EXEC:	jmp     PROGRAM_ADDR	; jump to program entry point
+
+Thank you all for your time. :)
+
+Michael McIntosh
+
++++ Codito, Ergo Sum +++
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20How%20can%20I%20cause%20the%20&quot;FILE%20NOT%20FOUND&quot;%20msg%20to%20print%20to%20screen%20using%20existing%20kernal%20or%20basic%20routines%20for%20the%20C64?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2426.html">Ullrich von Bassewitz: "Re: [cc65] parameter and assembly precedures"</a>
+<li><strong>In reply to:</strong> <a href="2424.html">stefan: "Re: [cc65] parameter and assembly precedures"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2429.html">Ullrich von Bassewitz: "Re: [cc65] How can I cause the &quot;FILE NOT FOUND&quot; msg to print to screen using existing kernal or basic routines for the C64?"</a>
+<li><strong>Reply:</strong> <a href="2429.html">Ullrich von Bassewitz: "Re: [cc65] How can I cause the &quot;FILE NOT FOUND&quot; msg to print to screen using existing kernal or basic routines for the C64?"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-02-11 21:03:19 CET</em>
+</em>
+</small>
+</body>
+</html>

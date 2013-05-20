@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] wrong colors in conio</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] wrong colors in conio">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] wrong colors in conio</h1>
+<!-- received="Mon Dec  9 12:20:25 2002" -->
+<!-- isoreceived="20021209112025" -->
+<!-- sent="Mon, 9 Dec 2002 12:20:24 +0100" -->
+<!-- isosent="20021209112024" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] wrong colors in conio" -->
+<!-- id="20021209112024.GB13336@trixie.musoftware.de" -->
+<!-- inreplyto="200212090139.14615.groepaz@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20wrong%20colors%20in%20conio"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-12-09 12:20:24
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1917.html">Ullrich von Bassewitz: "[cc65] VIC20 conio"</a>
+<li><strong>In reply to:</strong> <a href="1913.html">Groepaz: "Re: [cc65] wrong colors in conio"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1919.html">MagerValp: "Re: [cc65] wrong colors in conio"</a>
+<li><strong>Next in thread:</strong> <a href="1881.html">MagerValp: "Re: [cc65] Think I found a cc65 bug"</a>
+<li><strong>Reply:</strong> <a href="1919.html">MagerValp: "Re: [cc65] wrong colors in conio"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Mon, Dec 09, 2002 at 01:39:14AM +0100, Groepaz wrote:
+&gt; /me scratches head...makes note to UZ: &quot;tgi has own colordefinitions?&quot;
+
+No. TGI has palettes and supports multiple machines, which makes color
+definitions difficult. I would like to wait how it evolves before eventually
+adding colors.
+
+&gt; nothing, just if the atari doesnt have colors for text, it shouldnt implement
+&gt; something unrelated through a well defined api :)
+
+As I understand it, it's not really unrelated. Having a black background,
+textcolor() will allow to set different shades of gray (up to white). This
+would definitely make sense, provided that the function does only change the
+color of new (and not extisting) text.
+
+&gt; imagine someone like me writes a tetris clone using the conio-api, and he uses
+&gt; colors. i cant test on atari (since i dont have one, nor found or even
+&gt; searched for an emu yet ;=)), so i test on a c64 and the various cbm-machines
+&gt; emulated by VICE. now if my program works alright with any of these
+&gt; (including the plus4 which has different colors than c64 aswell, and the pet
+&gt; which has no colors at all) i should be well able to rely on the fact the
+&gt; conio-api was designed for portability, and that it WILL work (unless the
+&gt; implementation is faulty - which it seems to be.)
+
+If I understand that correctly, the Atari does not have real colors in text
+mode, but allows different shades of the background color for each character
+on the screen. This is different from the C64, and different from what the
+monochrome CBMs have. Since there is no way to hide peculiarities of the
+hardware, your program has to cope with it. Having textcolor() depend on the
+last call to bgcolor is different from the CBM implementations, but this does
+not mean it is necessarily bad. We cannot add an API that completely hides the
+underlying hardware because of space and performance reasons, so we have to
+live with differences like this. Any program can choose to handle the Atari as
+a monochrome machine like the PETs, so there is no reason to get overexcited.
+
+I admit that the color definitions in atari.h are confusing, because they look
+like the atari would support colors (the conio.h header file is including
+atari.h to get the color definitions), but this is not a serious problem.
+
+If I'm wrong here, and the textcolor() function changes the color for all text
+on the screen, then groepaz would be right and textcolor() should not do
+anything.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20wrong%20colors%20in%20conio">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20wrong%20colors%20in%20conio">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1917.html">Ullrich von Bassewitz: "[cc65] VIC20 conio"</a>
+<li><strong>In reply to:</strong> <a href="1913.html">Groepaz: "Re: [cc65] wrong colors in conio"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1919.html">MagerValp: "Re: [cc65] wrong colors in conio"</a>
+<li><strong>Next in thread:</strong> <a href="1881.html">MagerValp: "Re: [cc65] Think I found a cc65 bug"</a>
+<li><strong>Reply:</strong> <a href="1919.html">MagerValp: "Re: [cc65] wrong colors in conio"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-12-09 12:21:30 CET</em>
+</em>
+</small>
+</body>
+</html>

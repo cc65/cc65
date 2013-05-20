@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Randomizer problem with librar</title>
+<meta name="Author" content="Joseph Rose (rose.joseph121yahoo.com)" />
+<meta name="Subject" content="[cc65] Randomizer problem with library" />
+<meta name="Date" content="2012-05-15" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Randomizer problem with library</h1>
+<!-- received="Tue May 15 17:46:26 2012" -->
+<!-- isoreceived="20120515154626" -->
+<!-- sent="Tue, 15 May 2012 08:46:12 -0700 (PDT)" -->
+<!-- isosent="20120515154612" -->
+<!-- name="Joseph Rose" -->
+<!-- email="rose.joseph121yahoo.com" -->
+<!-- subject="[cc65] Randomizer problem with library" -->
+<!-- id="1337096772.73150.YahooMailNeo@web120603.mail.ne1.yahoo.com" -->
+<!-- charset="iso-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10287.html" title="Ullrich von Bassewitz: &quot;***SPAM*** Re: [cc65] o65 generation bug?&quot;">Next message</a> ]
+[ <a href="10285.html" title="Agent Friday: &quot;Re: [cc65] o65 generation bug?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10292.html" title="Joseph Rose: &quot;Re: [cc65] Randomizer problem with library&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Joseph Rose &lt;<a href="mailto:rose.joseph121yahoo.com?Subject=Re:%20[cc65]%20Randomizer%20problem%20with%20library">rose.joseph121yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-05-15 17:46:12</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi.  I am working on a memory extension for the C128 under cc65 and am having a problem with random numbers.  Every time I use the _randomize() function, the seed seems to start off at the same number.  I can tell this because the output of a function is the same after it calls the _randomize() function.  When I remove the call, the calling routine seems to work fine.  But I need random numbers.  I did alot of debugging and narrowed the problem to the particular function.  The _randomize() function is intended to be called from Bank 0 and access Bank 15 before returning to Bank 0.  Can anybody help me out?  The code for the function follows:
+----------------------
+.segment &quot;LOWCODE&quot;
+__randomize:
+ lda #$00
+ sta $FF00
+        ldx     VIC_HLINE       ; Use VIC rasterline as high byte
+        lda     TIME            ; Use 60HZ clock as low byte
+ sta $FF01
+        jmp     _srand          ; Initialize generator
+------------------------
+Joseph Rose, a.k.a. Harry Potter
+Working magic in the computer community
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue May 15 17:46:26 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10287.html" title="Next message in the list">Ullrich von Bassewitz: "***SPAM*** Re: [cc65] o65 generation bug?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10285.html" title="Previous message in the list">Agent Friday: "Re: [cc65] o65 generation bug?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10292.html" title="Next message in this discussion thread">Joseph Rose: "Re: [cc65] Randomizer problem with library"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10292.html" title="Message sent in reply to this message">Joseph Rose: "Re: [cc65] Randomizer problem with library"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10286" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10286" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10286" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-05-15 17:46:30 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] rebuilding libraries - ge</title>
+<meta name="Author" content="jimsymolon (jsymolon01_at_attbi.com)">
+<meta name="Subject" content="Re: [cc65] rebuilding libraries - generated program crashes">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] rebuilding libraries - generated program crashes</h1>
+<!-- received="Sun Jun  8 02:22:50 2003" -->
+<!-- isoreceived="20030608002250" -->
+<!-- sent="Sat, 07 Jun 2003 20:10:19 -0400" -->
+<!-- isosent="20030608001019" -->
+<!-- name="jimsymolon" -->
+<!-- email="jsymolon01_at_attbi.com" -->
+<!-- subject="Re: [cc65] rebuilding libraries - generated program crashes" -->
+<!-- id="3EE27EEB.9020405@attbi.com" -->
+<!-- inreplyto="20030607200043.GA16263@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> jimsymolon (<a href="mailto:jsymolon01_at_attbi.com?Subject=Re:%20[cc65]%20rebuilding%20libraries%20-%20generated%20program%20crashes"><em>jsymolon01_at_attbi.com</em></a>)<br>
+<strong>Date:</strong> 2003-06-08 02:10:19
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3086.html">Ullrich von Bassewitz: "Re: [cc65] rebuilding libraries - generated program crashes"</a>
+<li><strong>In reply to:</strong> <a href="3086.html">Ullrich von Bassewitz: "Re: [cc65] rebuilding libraries - generated program crashes"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Ullrich von Bassewitz wrote:
+
+&gt;Hi!
+&gt;
+&gt;Thanks for the detailed description. I'm sorry that I didn't note this
+&gt;earlier, but the linker acts exactly as it should. Have a look at the
+&gt;linker configuration for the Apple (this file is part of the source
+&gt;package and comes in the doc/ directory of the apple2 binary package):
+&gt;
+&gt;    MEMORY {
+&gt;        ZP: start = $00, size = $1A, type = rw, define = yes;
+&gt;        HEADER: start = $0000, size = $4, file = %O;
+&gt;        RAM: start = $800, size = $8E00, file = %O;
+&gt;    }
+&gt;    SEGMENTS {
+&gt;        EXEHDR: load = HEADER, type = ro;
+&gt;        STARTUP: load = RAM, type = ro, define = yes;
+&gt;        LOWCODE: load = RAM, type = ro, optional = yes;
+&gt;        CODE: load = RAM, type = ro;
+&gt;        RODATA: load = RAM, type = ro;
+&gt;        DATA: load = RAM, type = rw;
+&gt;        BSS: load = RAM, type = bss, define = yes;
+&gt;        ZEROPAGE: load = ZP, type = zp;
+&gt;    }
+&gt;
+&gt;What you can see is that the AppleDOS 3.3 header which comes in the EXEHDR
+&gt;segment is written into the HEADER memory area, which goes to the output
+&gt;file (&quot;%O&quot; is the output file named on the command line).
+&gt;
+&gt;The STARTUP segment, which contains the code from crt0.s is the first
+&gt;segment that is written to the RAM memory area, which is relocated to $800
+&gt;and which goes into the same file as the header.
+&gt;
+&gt;This means that the output file contains 4 bytes of header, followed by
+&gt;code that must be loaded to $800. So either the loader has to strip the
+&gt;first 4 bytes and load the remainder to $800, or you have to load the
+&gt;whole file to $7FC so that the STARTUP segment begins at $800.
+&gt;
+&gt;As you can see, there is no error, anything works as it should. I'm not
+&gt;sure why you insist on loading the whole file to $800. If this is based on
+&gt;some information in the docs, the docs are wrong. In this case please tell
+&gt;me where you found the information so I can fix it.
+&gt;
+&gt;Older versions of cc65 produced apple2 binaries without the header. It has
+&gt;been added later by request of the AppleWin author (Oliver Schmidt). His
+&gt;statement was that both, AppleDOS 3.3 and ProDOS are both able to use this
+&gt;header.
+&gt;
+&gt;If you don't want the header, just modify line 3 of the linker config so
+&gt;that it reads:
+&gt;
+&gt;        HEADER: start = $0000, size = $4, file = &quot;&quot;;
+&gt;
+&gt;This will dump the header by assigning an empty output file. Then apply
+&gt;the changed linker config by using
+&gt;
+&gt;        ld65 -C apple2.cfg ...
+&gt;
+&gt;instead of
+&gt;
+&gt;        ld65 -t apple2 ...
+&gt;
+&gt;The latter command uses the builtin version of the apple2 linker
+&gt;configuration as shown above.
+&gt;
+&gt;Regards
+&gt;
+&gt;
+&gt;        Uz
+&gt;
+&gt;
+&gt;  
+&gt;
+I've a copy of  &quot;Beneath Apple DOS&quot;, in which it describes the binary 
+file as having the 4 byte header information, and I at a loss to figure 
+out how I originally got it to work.  It might be the a2tools options 
+are wrong.  I'll look into that.
+
+CC65 is a great product and I hope to add to your work with the DOS drivers.
+
+Thank you for your help
+Jim
+
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20rebuilding%20libraries%20-%20generated%20program%20crashes">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3086.html">Ullrich von Bassewitz: "Re: [cc65] rebuilding libraries - generated program crashes"</a>
+<li><strong>In reply to:</strong> <a href="3086.html">Ullrich von Bassewitz: "Re: [cc65] rebuilding libraries - generated program crashes"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-06-08 02:23:36 CEST</em>
+</em>
+</small>
+</body>
+</html>

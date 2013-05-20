@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="iso-8859-15"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] CBM C-Library Features and</title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="Re: [cc65] CBM C-Library Features and Usecases" />
+<meta name="Date" content="2013-02-22" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] CBM C-Library Features and Usecases</h1>
+<!-- received="Fri Feb 22 17:38:15 2013" -->
+<!-- isoreceived="20130222163815" -->
+<!-- sent="Fri, 22 Feb 2013 17:38:12 +0100" -->
+<!-- isosent="20130222163812" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="Re: [cc65] CBM C-Library Features and Usecases" -->
+<!-- id="201302221738.13160.groepaz@gmx.net" -->
+<!-- charset="iso-8859-15" -->
+<!-- inreplyto="CACT=u70YiB_w20ehQTDRVs7WVZ-Cni104zB1uJYW2dMZj0pqmw&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11219.html" title="Oliver Schmidt: &quot;Re: [cc65] CBM C-Library Features and Usecases&quot;">Next message</a> ]
+[ <a href="11217.html" title="Oliver Schmidt: &quot;Re: [cc65] CBM C-Library Features and Usecases&quot;">Previous message</a> ]
+[ <a href="11217.html" title="Oliver Schmidt: &quot;Re: [cc65] CBM C-Library Features and Usecases&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="11219.html" title="Oliver Schmidt: &quot;Re: [cc65] CBM C-Library Features and Usecases&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20CBM%20C-Library%20Features%20and%20Usecases">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2013-02-22 17:38:12</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Friday 22 February 2013, you wrote:
+&gt; &gt; 1. DIO [...]
+&gt; 
+&gt; arent there cbm_ functions for this? probably thats why noone misses dio ?
+&gt; 
+&gt; 
+&gt; Hm, I'm missing them badly, so your statement is per definition wrong ;-))
+
+&gt; 1. If there are cbm_ functions for sector-level access then it should be
+&gt; pretty easy to implement DIO based on them allowing for uniform
+&gt; cross-target programming.
+
+well no, its not that trivial.... you have to use cbm_open/write/read/close 
+for sending the respective dos commands and recieving the data.
+
+&gt; 2. If there are cbm_ functions for sector-level access I presume they have
+&gt; track and sector as parameter. Given that the number for sectors per track
+&gt; is variable on CBM drives/DOS/&lt;whatever is the right term here&gt; it's not
+&gt; trivial to convert that from/to the linear sector stream in .D64 files.
+&gt; That's exactly the type of &quot;business logic&quot; I'd like to see encapsulated in
+&gt; the C library instead of having to deal with it as an application
+&gt; programmer.
+
+thing is, in a typical c64 copy program for example you want to know what 
+physical track/sector you are going to read/write ... if only for 
+visualisation or error messages. an abstract linear layer would not only not 
+be useful, but even be counterproductive at this point. not even thinking 
+about how different drives have different physical layouts and how you'd have 
+to support a good portion of them. that seems to be the biggest problem in the 
+current approach.... there should be a way to provide a mapping for the 
+application. else it must not only support detecting the drive type, but also 
+deal with like 10 disc formats (counting all CBM targets and all related 
+drives).
+
+-- 
+
+<a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    <a href="http://magicdisk.untergrund.net">http://magicdisk.untergrund.net</a>
+<a href="http://www.pokefinder.org">http://www.pokefinder.org</a>        <a href="http://ftp.pokefinder.org">http://ftp.pokefinder.org</a>
+
+A 'hacker' is any person who derives joy from discovering ways to circumvent 
+limitations. 
+&lt;Robert Bickford&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Feb 22 17:38:15 2013</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11219.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] CBM C-Library Features and Usecases"</a></li>
+<li><dfn>Previous message</dfn>: <a href="11217.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] CBM C-Library Features and Usecases"</a></li>
+<li><dfn>In reply to</dfn>: <a href="11217.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] CBM C-Library Features and Usecases"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="11219.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] CBM C-Library Features and Usecases"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="11219.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] CBM C-Library Features and Usecases"</a></li>
+<li><dfn>Reply</dfn>:  <a href="11221.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] CBM C-Library Features and Usecases"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#11218" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#11218" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#11218" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2013-02-22 17:38:18 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Overlaying segments?</title>
+<meta name="Author" content="Fatih Aygün (cyco1301yahoo.com)" />
+<meta name="Subject" content="Re: [cc65] Overlaying segments?" />
+<meta name="Date" content="2009-11-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Overlaying segments?</h1>
+<!-- received="Tue Nov 10 17:29:30 2009" -->
+<!-- isoreceived="20091110162930" -->
+<!-- sent="Tue, 10 Nov 2009 08:29:23 -0800 (PST)" -->
+<!-- isosent="20091110162923" -->
+<!-- name="Fatih Aygün" -->
+<!-- email="cyco1301yahoo.com" -->
+<!-- subject="Re: [cc65] Overlaying segments?" -->
+<!-- id="414638.63872.qm@web56508.mail.re3.yahoo.com" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="20091110152028.GA8101&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7534.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] bank switching/retro replay?&quot;">Next message</a> ]
+[ <a href="7532.html" title="Oliver Schmidt: &quot;Re: [cc65] Overlaying segments?&quot;">Previous message</a> ]
+[ <a href="7531.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Overlaying segments?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7535.html" title="Oliver Schmidt: &quot;Re: [cc65] Overlaying segments?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Fatih Aygün &lt;<a href="mailto:cyco1301yahoo.com?Subject=Re:%20[cc65]%20Overlaying%20segments?">cyco1301yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-11-10 17:29:23</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+
+
+Ullrich von Bassewitz wrote:
+
+&gt; Just add &quot;define = yes&quot; to the BSS segment in the linker config, and the
+&gt; linker will export the symbols __BSS_RUN__, __BSS_LOAD__ and __BSS_SIZE__.
+
+I'm aware of that. But how could I tell the linker to start the INIT_CODE segment from
+__BSS_LOAD__ (or __BSS_RUN__, they're the same for my case)?
+
+This obviously doesn't work:
+
+MEMORY {
+    ZP:   start = $0080, size = $0040, type = rw;
+    RAM:  start = $0700, size = $B900, file = %O;
+    RAM2: start = __BSS_LOAD__, size = $C000 - __BSS_LOAD__, file = +O;
+}
+SEGMENTS {
+    CODE:        load = RAM, type = ro;
+    RODATA:      load = RAM, type = ro;
+    DATA:        load = RAM, type = rw;
+    BSS:         load = RAM, type = bss, define = yes;
+    INIT_CODE:   load = RAM2, type = ro;
+    INIT_RODATA: load = RAM2, type = ro;
+    INIT_DATA:   load = RAM2, type = rw;
+    INIT_BSS:    load = RAM2, type = bss;
+}
+
+Oliver Schmidt wrote:
+&gt; Maybe you want to check out the Apple2 startup code:
+&gt; 
+&gt; When loaded from disk the INIT segment is located where the BSS
+&gt; segment &quot;should be&quot; - simply because there's one contiguous file that
+&gt; is loaded. The startup code first moves INIT above BSS (making sure
+&gt; that an overlap between original and final INIT region is okay). Then
+&gt; the stuff in INIT is called (incl. clearing the BSS). Later on the
+&gt; INIT segment gets (potentially) overwritten by the stack and/or heap.
+
+I don't need any stack or heap. I want the INIT_* segments overlaid with BSS, not only
+in the file but in the memory too. I clear BSS later, in the CODE segment.
+
+But thanks anyway, when reading your posts, it occured to me that I can pull this trick by 
+calling ld65 once with a bogus RAM2 address and make it generate a map file. Now that 
+I know where BSS is supposed to be, I can call it a second time, this time with a known 
+RAM2 offset, using some perl magic. The only remaining problem is the fact that I stink
+at perl. Good opportunity to start fixing that :)
+
+Thanks,
+Fatih.
+
+
+      
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Nov 10 17:29:30 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7534.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] bank switching/retro replay?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7532.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Overlaying segments?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7531.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Overlaying segments?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7535.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Overlaying segments?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7535.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Overlaying segments?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7533" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7533" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7533" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-11-10 17:29:32 CET
+</em></small></p>
+</body>
+</html>

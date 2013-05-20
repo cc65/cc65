@@ -1,0 +1,211 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+<title>cc65 mailing list archive: [cc65] Cracknut...</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="[cc65] Cracknut...">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] Cracknut...</h1>
+<!-- received="Sun May 18 01:29:37 2003" -->
+<!-- isoreceived="20030517232937" -->
+<!-- sent="Sun, 18 May 2003 01:25:33 +0200" -->
+<!-- isosent="20030517232533" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="[cc65] Cracknut..." -->
+<!-- id="200305180125.33980.groepaz@gmx.net" -->
+<!-- charset="iso-8859-15" -->
+<!-- inreplyto="EMEGJNIONNDMKFEMNKLOIEIOCDAA.chris@CosmicWolf.com" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Cracknut..."><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2003-05-18 01:25:33
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3026.html">CHRIS: "RE: [cc65] Apple 2 ASCII with MSB on"</a>
+<li><strong>In reply to:</strong> <a href="3026.html">CHRIS: "RE: [cc65] Apple 2 ASCII with MSB on"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3028.html">Ullrich von Bassewitz: "Re: [cc65] Cracknut..."</a>
+<li><strong>Reply:</strong> <a href="3028.html">Ullrich von Bassewitz: "Re: [cc65] Cracknut..."</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+this one kindof results from a little discussion we had on the go64 
+mailinglist.... may be interisting to hear some comments :)
+
+ok..the keywords are &quot;efficiency of generated code&quot; and &quot;peephole optimizing&quot; 
+(we were discussing compilers in general)
+
+i came up with a simple codesnippet that kindof drastically demonstrates how 
+bloated compiled code can get...atleast when the compiler is small-c based 
+:=P
+
+first in handcoded asm:
+
+buf:	.res $100
+
+main:
+	ldx #0
+	txa
+lp:
+	sta buf,x
+	inx
+	bne lp
+	rts
+
+i think what it does is obvious...
+
+now there is a snippet of C-code doing the same thing:
+
+char x;
+char buf[0x100];
+
+ void main(void)
+ {
+ 	x=0;
+ 	do
+ 	{
+ 		buf[x++]=0;
+ 	} while(x);
+ }
+
+cc65 generates the following code (-Osir).... please notice the comments about 
+remaining peepholes (more to that later...)
+
+_x:   .res    1,$00
+_buf:   .res    256,$00
+
+_main:
+        lda     #$00
+        sta     _x
+L0006:  
+	;-peephole start
+	; lda     _x
+        ; pha
+        ; clc
+        ; adc     #$01
+        ; sta     _x
+        ; pla
+	;-peephole end
+	inc _x
+	lda _x
+	;-peephole optimization end
+	;-peephole start
+        ; clc
+        ; adc     #&lt;(_buf)
+        ; tay
+        ; lda     #$00
+        ; adc     #&gt;(_buf)
+        ; tax
+        ; tya
+	;-peephole end
+	clc
+	ldx  #&gt;(_buf)
+        adc     #&lt;(_buf)
+	bcc @s
+	inx
+@s:	
+	;-peephole optimization end
+        sta     sreg
+        stx     sreg+1
+        lda     #$00
+        tay
+        sta     (sreg),y
+        lda     _x
+        bne     L0006
+        rts
+
+after removing those 2 peepholes we get:
+
+_main:
+        lda     #$00
+        sta     _x
+L0006:  
+	inc _x
+	lda _x
+	clc
+	ldx  #&gt;(_buf)
+        adc     #&lt;(_buf)
+	bcc @s
+	inx
+@s:	
+        sta     sreg
+        stx     sreg+1
+        lda     #$00
+        tay
+        sta     (sreg),y
+        lda     _x
+        bne     L0006
+        rts
+
+now the question is what that actually proves.... a) cc65 doesnt have a 
+peephole optimizer or b) the peephole rules are not sufficient. and whatever 
+it is, i am very tempted to help with improving it :=) (btw could you tell in 
+a few words what type of optimizations cc65 actually does?... and if there is 
+peephole optimization, could you point me to the file with the rules in it? 
+:))
+
+the second question goes one (or more :=)) step further... is there a way to 
+make the compiler access arrays &lt;=256 elements via indexed addressing mode 
+rather than indirect? that could probably reduce the above loop even further, 
+probably to something quite close to the first mentioned handwritten code. (i 
+know it'll prolly involve major changes to the 
+compiler/codegenerator/whatever but i'd like to hear your comments anyway... 
+maybe there's a small chance or sth :=P)
+
+however...the first thing sounds actually very doable to me (peephole 
+optimizing is nothing more than pattern matching anyway) while the second 
+appears to be the real cracknut here :o) Nevertheless improving the peephole 
+stuff looks very promising to me (i've spotted rts following immediatly on 
+jsr a couple of times in compiled code aswell...) ... tjam whatever :)
+
+gpz
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Cracknut...">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3026.html">CHRIS: "RE: [cc65] Apple 2 ASCII with MSB on"</a>
+<li><strong>In reply to:</strong> <a href="3026.html">CHRIS: "RE: [cc65] Apple 2 ASCII with MSB on"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3028.html">Ullrich von Bassewitz: "Re: [cc65] Cracknut..."</a>
+<li><strong>Reply:</strong> <a href="3028.html">Ullrich von Bassewitz: "Re: [cc65] Cracknut..."</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-05-18 01:30:00 CEST</em>
+</em>
+</small>
+</body>
+</html>

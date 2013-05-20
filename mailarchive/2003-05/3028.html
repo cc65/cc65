@@ -1,0 +1,246 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Cracknut...</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Cracknut...">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Cracknut...</h1>
+<!-- received="Sun May 18 04:44:02 2003" -->
+<!-- isoreceived="20030518024402" -->
+<!-- sent="Sun, 18 May 2003 04:44:00 +0200" -->
+<!-- isosent="20030518024400" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Cracknut..." -->
+<!-- id="20030518024400.GA23044@trixie.musoftware.de" -->
+<!-- inreplyto="200305180125.33980.groepaz@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Cracknut..."><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-05-18 04:44:00
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3027.html">Groepaz: "[cc65] Cracknut..."</a>
+<li><strong>In reply to:</strong> <a href="3027.html">Groepaz: "[cc65] Cracknut..."</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Sun, May 18, 2003 at 01:25:33AM +0200, Groepaz wrote:
+&gt; now the question is what that actually proves.... a) cc65 doesnt have a
+&gt; peephole optimizer or b) the peephole rules are not sufficient.
+
+It proves that
+
+  c) you haven't read the docs:-)
+
+The coding rules state explicitly that you shouldn't use post increment (and I
+do also remember telling you that several times when talking about your
+programs). When writing the code the proper way
+
+        x = 0;
+        do {
+            ++x;
+            buf[x] = 0;
+        } while (x);
+
+you will get the following assembler code:
+
+                lda     #$00
+                sta     _x
+        L000A:	inc     _x
+                lda     #&lt;(_buf)
+                ldx     #&gt;(_buf)
+                clc
+                adc     _x
+                bcc     L000F
+                inx
+        L000F:  sta     sreg
+                stx     sreg+1
+                lda     #$00
+                tay
+                sta     (sreg),y
+                lda     _x
+                bne     L000A
+                rts
+
+This is almost identical to what you propose the compiler should generate.
+
+&gt; and whatever
+&gt; it is, i am very tempted to help with improving it :=)
+
+I would say that you overestimate the potentialities of a peephole optimizer.
+The problems with a peephole optimizer are:
+
+    1. It can only handle patterns it knows.
+
+    2. A small change in code generation may break lots of patterns.
+
+    3. There are lots of order dependencies. Some patterns do only work after
+       others have been replaced, some more patterns must be replaced before
+       others.
+
+    4. Checking for patterns, especially larger ones (like in your example)
+       gets a mess rather quickly, because small variances in several places
+       add up to dozens of different resulting patterns. It is easy for a
+       human to see the common base in all these patterns, but not for a
+       computer.
+
+Problem #1 means that you can *always* come up with a sequence that runs
+through a peephole optimizer without major changes - just use a pattern it
+doesn't know. This is also the answer to the following question:
+
+&gt; the second question goes one (or more :=)) step further... is there a way to
+&gt; make the compiler access arrays &lt;=256 elements via indexed addressing mode
+&gt; rather than indirect?
+
+The replacement you're mentioning here is indeed done for loads (your plasma
+demo shows this [or should - seems my current development version of the
+compiler breaks it]). So yes, it is possible. But because of problems 1-4,
+adding more patterns doesn't always make sense, I'm doing this usually for
+heavily used patterns.
+
+The cc65 optimizer has about 60 different rules. Not all, but most of them are
+what you would call &quot;peephole optimizing&quot;, and many do handle more than just
+one pattern. If you define an environment variable named &quot;CC65_OPTSTATS&quot; with
+the name of a file, the compiler will generate a text file with this name that
+contains single and cumulated statistics about the steps applied, and those
+that were successful. The file is then updated with every compiler run.
+
+&gt; (btw could you tell in
+&gt; a few words what type of optimizations cc65 actually does?... and if there is
+&gt; peephole optimization, could you point me to the file with the rules in it?
+&gt; :))
+
+The cc65 optimizer is much more complex, so there are no static rules. Code
+optimization is done on the 6502 level only (this is the reason why sometimes
+the generated code is really clever, especially for simple code, and sometimes
+absolutely ugly). The following files are concerned with optimization:
+
+        codeinfo.c codeopt.c coptadd.c coptcmp.c coptneg.c coptsize.c
+        coptstore.c copttest.c coptc02.c coptind.c coptpush.c coptstop.c
+        coptsub.c
+
+You will also want to have a look at the following modules, they contain data
+structures and functions for the abstract representation of the 6502 code, the
+labels and so on:
+
+        codeent.c codelab.c codeseg.c opcodes.c reginfo.c
+
+&gt; however...the first thing sounds actually very doable to me (peephole
+&gt; optimizing is nothing more than pattern matching anyway) while the second
+&gt; appears to be the real cracknut here :o)
+
+See my comments above. Maybe I'm wrong, but it would say that you're
+underestimating the problems. Look at the generated code above, then assume we
+have some simple changes:
+
+    1. The programmer may write
+
+            buf[++x] = 0;
+
+       or
+
+            buf[x++] = 0;
+
+       instead of
+
+            ++x;
+            buf[x] = 0;
+
+    2. We may have a pointer that points to the buffer. Something like
+
+        char x;
+        char* buf;
+
+        void main (void)
+        {
+            x = 0;
+            do {
+                ++x;
+                buf[x] = 0;
+            } while (x);
+        }
+
+    3. Either the buffer or the index may be an auto variable on the stack.
+
+    4. The index may have some arithmetics applied like in
+
+            buf[x+1] = 0;
+
+    5. The compiler/code generator may use some other zero page register
+       instead of sreg.
+
+Just take these (rather simple) variations and calculate how many resulting
+patterns you get. If you don't find a better solution instead of &quot;nothing more
+than pattern matching&quot;, you will end up with a dozens of patterns just for
+this case. And all of these patterns may have errors and may need changes when
+one single line in the code generator gets changed.
+
+&gt; Nevertheless improving the peephole
+&gt; stuff looks very promising to me
+
+For me it seems to be pretty maxed out. Just have a look at the list of files
+concerned with this sort of stuff...
+
+&gt; (i've spotted rts following immediatly on
+&gt; jsr a couple of times in compiled code aswell...) ... tjam whatever :)
+
+&quot;jsr xxx/rts&quot; should always get replaced by &quot;jmp xxx&quot;. If you do *really* find
+it in optimized code, you can send me a bug report.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Cracknut...">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Cracknut...">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3027.html">Groepaz: "[cc65] Cracknut..."</a>
+<li><strong>In reply to:</strong> <a href="3027.html">Groepaz: "[cc65] Cracknut..."</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-05-18 04:44:21 CEST</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] statics in zero page</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] statics in zero page">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] statics in zero page</h1>
+<!-- received="Tue May 21 18:19:57 2002" -->
+<!-- isoreceived="20020521161957" -->
+<!-- sent="Tue, 21 May 2002 18:21:25 +0200" -->
+<!-- isosent="20020521162125" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] statics in zero page" -->
+<!-- id="13224165599.20020521182125@gmx.net" -->
+<!-- inreplyto="20020521163400.A18125@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20statics%20in%20zero%20page"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2002-05-21 18:21:25
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1361.html">Ullrich von Bassewitz: "Re: [cc65] statics in zero page"</a>
+<li><strong>In reply to:</strong> <a href="1359.html">Ullrich von Bassewitz: "Re: [cc65] statics in zero page"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1355.html">Keates, Mark: "RE: Re[2]: [cc65] statics in zero page"</a>
+<li><strong>Maybe reply:</strong> <a href="1355.html">Keates, Mark: "RE: Re[2]: [cc65] statics in zero page"</a>
+<li><strong>Reply:</strong> <a href="1363.html">Ullrich von Bassewitz: "Re: [cc65] statics in zero page"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+UvB&gt; Hooking asm handlers is rather easy, because not much has to be done. Hooking
+UvB&gt; interrupt handlers in C need more work, because the zero page has to be saved
+UvB&gt; and the stack has to be switched. The break handler used for the debugger
+UvB&gt; interface does most of this, so it would be a good starting point.
+
+yeah ofcoz.... i found it nice to have a simple interface for hooking
+up different asm-routines though....my handler does all the work of
+decoding what the source of the interupt was that is,so you can hook
+irqs like
+
+irq_install(&amp;vblank_handler,IRQ_RASTER,0xf8); or
+irq_install(&amp;timer_routine,IRQ_TIMERA,0x2000); or whatever :O)
+
+&gt;&gt; btw whats the deal to get floats supported in cc65? 
+
+UvB&gt; The old parser is quite ugly, and adding floats would certainly not help with
+UvB&gt; this:-) It is certainly doable, but will double the code for several of the
+UvB&gt; operators and make the code generator larger. C defines quite some automatic
+UvB&gt; conversions, so there has to be code for that also. Maybe you can send me the
+UvB&gt; interface (not the actual code) for your floating point routines, so I can
+UvB&gt; check if all required routines are there. There wouldn't be instant support
+UvB&gt; for floats, but evaluating the library would be a first step.
+
+uhmz... dont have the actual file handy atm (not at home) but its got
+everything that is available in the kernal:
+
+convert floats from/to integers
+convert floats from/to strings
+basic math operations (+-*/ etc)
+trig.functions (sin,cos,tan etc)
+
+all routines are in the form
+
+_fmul(float *out,float *in1,float *in2);
+
+where &quot;float&quot; currently is a struct that keeps exponent/mantissa in
+the form the kernal expects. (different from the one used in
+basic...one byte more but faster).
+
+the only thing actually missing are the two polynom-routines since i
+didnt really bother figuring out their exact parameter-format (and
+didnt really have a use for them either ,=P)....apart from that,
+everything you can do with a float in basic should be doable with that
+code. (minus some routines i found rather useless, eg the &quot;free()&quot;
+command)
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20statics%20in%20zero%20page">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20statics%20in%20zero%20page">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1361.html">Ullrich von Bassewitz: "Re: [cc65] statics in zero page"</a>
+<li><strong>In reply to:</strong> <a href="1359.html">Ullrich von Bassewitz: "Re: [cc65] statics in zero page"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1355.html">Keates, Mark: "RE: Re[2]: [cc65] statics in zero page"</a>
+<li><strong>Maybe reply:</strong> <a href="1355.html">Keates, Mark: "RE: Re[2]: [cc65] statics in zero page"</a>
+<li><strong>Reply:</strong> <a href="1363.html">Ullrich von Bassewitz: "Re: [cc65] statics in zero page"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-05-21 18:20:13 CEST</em>
+</em>
+</small>
+</body>
+</html>

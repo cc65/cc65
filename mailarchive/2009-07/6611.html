@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Segment EXEHDR does not ex</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Segment EXEHDR does not exist - while using ld65 directly" />
+<meta name="Date" content="2009-07-20" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Segment EXEHDR does not exist - while using ld65 directly</h1>
+<!-- received="Mon Jul 20 22:41:58 2009" -->
+<!-- isoreceived="20090720204158" -->
+<!-- sent="Mon, 20 Jul 2009 22:39:05 +0200" -->
+<!-- isosent="20090720203905" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Segment EXEHDR does not exist - while using ld65 directly" -->
+<!-- id="20090720203905.GA7178@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="000901ca04aa$17bb9040$443efea9&#64;monarch" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6612.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Segment EXEHDR does not exist - while using ld65 directly&quot;">Next message</a> ]
+[ <a href="6610.html" title="Greg King: &quot;Re: [cc65] Segment EXEHDR does not exist - while using ld65 directly&quot;">Previous message</a> ]
+[ <a href="6610.html" title="Greg King: &quot;Re: [cc65] Segment EXEHDR does not exist - while using ld65 directly&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6612.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Segment EXEHDR does not exist - while using ld65 directly&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Segment%20EXEHDR%20does%20not%20exist%20-%20while%20using%20ld65%20directly">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-07-20 22:39:05</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Tue, Jul 14, 2009 at 01:39:25PM -0400, Greg King wrote:
+&gt; That reminds me of an idea:
+&gt; When the C compiler sees the definition of main(), it inserts a
+&gt; &quot;.forceimport&quot; line into its assembly-code output if that main() has
+&gt; parameters.  I think that it will be useful for the compiler to generate
+&gt; another &quot;.forceimport&quot; line when it sees main() { }:
+&gt;
+&gt;     .forceimport    _exit
+
+The idea is good, but I don't think the compiler should reference _exit but
+the STARTUP segment instead. While exit() is usually part of crt0.s, it is not
+a necessity. When referencing STARTUP, we can easily define that the startup
+code must contain a STARTUP segment.
+
+&gt; If you accept that idea, then it must be put on your &quot;to-do&quot; list because
+&gt; it needs STARTUP segment support (to guarantee where the code is put).
+&gt; Some of the targets do not have that segment -- yet.
+
+Maybe it's time to drop some of the very old supported systems like osa65?
+It's tedious to maintain it without being able to test it and without any
+known users.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Jul 20 22:41:58 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6612.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Segment EXEHDR does not exist - while using ld65 directly"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6610.html" title="Previous message in the list">Greg King: "Re: [cc65] Segment EXEHDR does not exist - while using ld65 directly"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6610.html" title="Message to which this message replies">Greg King: "Re: [cc65] Segment EXEHDR does not exist - while using ld65 directly"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6612.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Segment EXEHDR does not exist - while using ld65 directly"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6612.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Segment EXEHDR does not exist - while using ld65 directly"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6611" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6611" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6611" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-07-20 22:42:00 CEST
+</em></small></p>
+</body>
+</html>

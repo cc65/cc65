@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Possible bug?</title>
+<meta name="Author" content="Shawn Jefferson (jefferson_shawn_a8bit1yahoo.com)" />
+<meta name="Subject" content="[cc65] Possible bug?" />
+<meta name="Date" content="2004-06-09" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Possible bug?</h1>
+<!-- received="Wed Jun  9 23:05:10 2004" -->
+<!-- isoreceived="20040609210510" -->
+<!-- sent="Wed, 9 Jun 2004 12:48:21 -0700 (PDT)" -->
+<!-- isosent="20040609194821" -->
+<!-- name="Shawn Jefferson" -->
+<!-- email="jefferson_shawn_a8bit1yahoo.com" -->
+<!-- subject="[cc65] Possible bug?" -->
+<!-- id="20040609194821.37724.qmail@web52207.mail.yahoo.com" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4176.html" title="Adam Dunkels: &quot;Re: [cc65] Possible bug?&quot;">Next message</a> ]
+[ <a href="4174.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] HEADS UP Atari users!&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4176.html" title="Adam Dunkels: &quot;Re: [cc65] Possible bug?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Shawn Jefferson &lt;<a href="mailto:jefferson_shawn_a8bit1yahoo.com?Subject=Re:%20[cc65]%20Possible%20bug?">jefferson_shawn_a8bit1yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-06-09 21:48:21</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I don't know if this would be a bug or not, but if I
+have the following code:
+
+#define disable_irq(n)        \
+  asm(&quot;lda #$80&quot;);            \
+  asm(&quot;trb $fd01+&quot;#n&quot;*4&quot;) 
+
+and in my C code I do:
+
+if (JOYSTICK == BUTTON_INNER)
+  disable_irq(0);
+
+I get the following listing (with -OSir):
+
+;
+00019Br 1               ; if (JOYSTICK ==
+BUTTON_INNER)
+00019Br 1               ;
+00019Br 1  AD B0 FC     L0047:	lda     $FCB0
+00019Er 1  C9 02        	cmp     #$02
+0001A0r 1  D0 02        	bne     L0061
+0001A2r 1               ;
+0001A2r 1               ; disable_irq(0);
+0001A2r 1               ;
+0001A2r 1  A9 80        	lda     #$80
+0001A4r 1  1C 01 FD     L0061:	trb     $fd01+0*4
+
+It works if I put the disable_irq(0) in { } brackets. 
+I guess the compiler doesn't know the inline assembly
+is going to be more than one line's worth?
+
+--
+Shawn Jefferson
+
+
+
+	
+		
+__________________________________
+Do you Yahoo!?
+Friends.  Fun.  Try the all-new Yahoo! Messenger.
+<a href="http://messenger.yahoo.com/">http://messenger.yahoo.com/</a> 
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Jun  9 23:05:10 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4176.html" title="Next message in the list">Adam Dunkels: "Re: [cc65] Possible bug?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4174.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] HEADS UP Atari users!"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4176.html" title="Next message in this discussion thread">Adam Dunkels: "Re: [cc65] Possible bug?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4176.html" title="Message sent in reply to this message">Adam Dunkels: "Re: [cc65] Possible bug?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="4177.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Possible bug?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4175" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4175" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4175" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-06-09 23:05:19 CEST
+</em></small></p>
+</body>
+</html>

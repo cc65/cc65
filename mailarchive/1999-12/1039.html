@@ -1,0 +1,146 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] cc65 Millenium Edition</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="[cc65] cc65 Millenium Edition">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] cc65 Millenium Edition</h1>
+<!-- received="Sun Dec 19 11:25:51 1999" -->
+<!-- isoreceived="19991219102551" -->
+<!-- sent="Sun, 19 Dec 1999 11:25:30 +0100 (CET)" -->
+<!-- isosent="19991219102530" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="[cc65] cc65 Millenium Edition" -->
+<!-- id="199912191025.LAA02741@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%20Millenium%20Edition"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 1999-12-19 11:25:30
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="1040.html">Ullrich von Bassewitz: "[cc65] New version frozen"</a>
+<li><strong>Previous message:</strong> <a href="../1980-01/1038.html">Eivind Schjerven: "Re: [cc65] sid-player."</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+I'm planning to start into the new millenium with a brand new cc65 release
+
+			  cc65 Millenium Edition :-)
+
+The new version is going to be released late this year or early next year. New
+features include:
+
+  * Fixed several bugs (see <a href="http://www.von-bassewitz.de/uz/cc65/bugs.html">http://www.von-bassewitz.de/uz/cc65/bugs.html</a>)
+
+  * Some support for register variables.
+
+  * Better code in some places.
+
+And finally:
+
+  * A port to the Apple 2.
+
+The Apple ][ port was done by Kevin Ruland (<a href="mailto:kevin_at_rodin.wustl.edu?Subject=Re:%20[cc65]%20cc65%20Millenium%20Edition">kevin_at_rodin.wustl.edu</a>). He ported
+not only the basic runtime stuff, but also the complete conio library and the
+debugger module, which places the port on par with the CBM ports. He is
+planning to add disk support soon, so this is going to get even more exciting!
+With file support, it would be the first port that does not lack any important
+standard C features.
+
+Issues that are currently open:
+
+  * Last line in debugger screen gets lost here and then. This is a minor
+    issue and easily fixed.
+
+  * I have heard about a problem with code generation introduced by an
+    optimization in the compiler (expressions with labels are handled as
+    constants in many more cases). I know that there may be a problem, but
+    I don't have any code showing it, so I'm currently not able to fix it.
+
+I have changed the script that produces the daily snapshots so that the
+correct CVS branch of the compiler will be put onto the FTP server. So, if you
+have a Unix box, get the snapshot and give it a try. I would be happy to get
+as much feedback as possible before officially releasing the new version.
+
+You may also access the source repository directly using readonly CVS:
+
+    	protocol:	pserver
+    	login:	   	guest
+    	password:  	guest
+    	host:	   	trixie.musoftware.de
+    	repository:	/disk2/cvspub
+    	branch:	   	OLDBRANCH
+
+So you would do a
+
+    cvs -d :pserver:<a href="mailto:guest_at_trixie.musoftware.de?Subject=Re:%20[cc65]%20cc65%20Millenium%20Edition">guest_at_trixie.musoftware.de</a>:/disk2/cvspub login
+
+and then
+
+    cvs -d :pserver:<a href="mailto:guest_at_trixie.musoftware.de?Subject=Re:%20[cc65]%20cc65%20Millenium%20Edition">guest_at_trixie.musoftware.de</a>:/disk2/cvspub checkout -r OLDBRANCH cc65
+
+Adding &quot;-z 9&quot; for compression may also be a good idea.
+
+NOTE: This is not very well tested, so if you have problems, please contact me
+by mail.
+
+
+A merry christmas and a happy new year to you all!
+
+Regards
+
+
+	Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%20Millenium%20Edition">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%20Millenium%20Edition">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="1040.html">Ullrich von Bassewitz: "[cc65] New version frozen"</a>
+<li><strong>Previous message:</strong> <a href="../1980-01/1038.html">Eivind Schjerven: "Re: [cc65] sid-player."</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:45 CET</em>
+</em>
+</small>
+</body>
+</html>

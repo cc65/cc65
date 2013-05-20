@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] ca65html bug report: &quot;Use</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="[cc65] ca65html bug report: &quot;Use of uninitialized value in sprintf at /usr/bin/ca65html line 579&quot;" />
+<meta name="Date" content="2007-05-20" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] ca65html bug report: &quot;Use of uninitialized value in sprintf at /usr/bin/ca65html line 579&quot;</h1>
+<!-- received="Sun May 20 10:36:43 2007" -->
+<!-- isoreceived="20070520083643" -->
+<!-- sent="Sun, 20 May 2007 10:36:28 +0200" -->
+<!-- isosent="20070520083628" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="[cc65] ca65html bug report: &quot;Use of uninitialized value in sprintf at /usr/bin/ca65html line 579&quot;" -->
+<!-- id="20070520083628.GA12001@trikaliotis.net" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5695.html" title="Greg King: &quot;Re: [cc65] C64 Cartridge Program&quot;">Next message</a> ]
+[ <a href="5693.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] C64 Cartridge Program&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5696.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65html bug report: &quot;Use of uninitialized value in sprintf at /usr/bin/ca65html line 579&quot;&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20[cc65]%20ca65html%20bug%20report:%20&amp;quot;Use%20of%20uninitialized%20value%20in%20sprintf%20at%20/usr/bin/ca65html%20line%20579&amp;quot;">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-05-20 10:36:28</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello,
+
+I am using ca65html and I keep getting some error message, regardless of
+which file I try to handle:
+
+$ ca65html --colorize --htmldir /tmp/www/cbmrom.html/c64/ --linelabels --linenumbers -cvttabs source/c64/c64.a65
+[...]
+Use of uninitialized value in sprintf at /usr/bin/ca65html line 579, &lt;INPUT&gt; line XXXX.
+[...]
+
+The line numbers XXXX vary, of course.
+
+I also tried with a &quot;minimalistic&quot; command line (&quot;ca65html
+source/c64/c64.a65&quot;), the problem remains.
+
+I don't know much about perl. Nevertheless, I tried to add the output of
+the different variables to find out which one is the culprit. I did the
+following before the offending line:
+
+$ diff -u cc65-snapshot-2.11.9.20070329/src/ca65html/ca65html /tmp/www/cbmrom/ca65html
+--- cc65-snapshot-2.11.9.20070329/src/ca65html/ca65html	2007-02-10 19:22:43.000000000 +0100
++++ /tmp/www/cbmrom/ca65html	2007-05-20 10:23:21.000000000 +0200
+&#64;&#64; -576,6 +576,11 &#64;&#64;
+ 	    $Label = $Labels{$OutName}{$Id};
+ 
+ 	    # Print the label with a tag
++printf STDERR &quot;label = %s\n&quot;, $Label;
++printf STDERR &quot;1 = %s\n&quot;, $1;
++printf STDERR &quot;2 = %s\n&quot;, $2;
++printf STDERR &quot;3 = %s\n&quot;, $3;
++printf STDERR &quot;4 = %s\n&quot;, $4;
+        	    $OutLine .= sprintf (&quot;&lt;a name=\&quot;%s\&quot;&gt;%s%s&lt;/a&gt;%s%s&quot;, $Label, $1, $2, $3, $4);
+ 	}
+
+With the help of this, I found out that $4 is not defined, as the error
+message from above duplicates in the line where $4 is output.
+
+I don't know how to debug this further, as I do not know enough about
+perl.
+
+BTW: I am almost sure it worked before, this is what baffles me. I call
+ca65html from an automated script whenever the sources change.
+Unfortunately, they did not change for quite some time, so, I cannot
+tell for sure when it broke.
+
+Regards,
+   Spiro.
+
+-- 
+Spiro R. Trikaliotis                              <a href="http://opencbm.sf.net/">http://opencbm.sf.net/</a>
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>                     <a href="http://www.viceteam.org/">http://www.viceteam.org/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun May 20 10:36:43 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5695.html" title="Next message in the list">Greg King: "Re: [cc65] C64 Cartridge Program"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5693.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] C64 Cartridge Program"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5696.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] ca65html bug report: &quot;Use of uninitialized value in sprintf at /usr/bin/ca65html line 579&quot;"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5696.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] ca65html bug report: &quot;Use of uninitialized value in sprintf at /usr/bin/ca65html line 579&quot;"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5694" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5694" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5694" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-05-20 10:36:46 CEST
+</em></small></p>
+</body>
+</html>

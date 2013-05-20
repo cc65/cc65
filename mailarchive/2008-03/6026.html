@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] C64, Interrupt and in need</title>
+<meta name="Author" content="MagerValp (MagerValp1cling.gu.se)" />
+<meta name="Subject" content="Re: [cc65] C64, Interrupt and in need of an example" />
+<meta name="Date" content="2008-03-03" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] C64, Interrupt and in need of an example</h1>
+<!-- received="Mon Mar  3 09:14:52 2008" -->
+<!-- isoreceived="20080303081452" -->
+<!-- sent="Mon, 3 Mar 2008 09:14:32 +0100" -->
+<!-- isosent="20080303081432" -->
+<!-- name="MagerValp" -->
+<!-- email="MagerValp1cling.gu.se" -->
+<!-- subject="Re: [cc65] C64, Interrupt and in need of an example" -->
+<!-- id="18379.45928.360905.480389@hal.cling.gu.se" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="1204159191.31864.25.camel&#64;katzenlinux" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6027.html" title="stefan: &quot;Re: [cc65] C64, Interrupt and in need of an example&quot;">Next message</a> ]
+[ <a href="6025.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Questions for CBM guys&quot;">Previous message</a> ]
+[ <a href="../2008-02/5988.html" title="Markus Stehr: &quot;[cc65] C64, Interrupt and in need of an example&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6027.html" title="stefan: &quot;Re: [cc65] C64, Interrupt and in need of an example&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: MagerValp &lt;<a href="mailto:MagerValp1cling.gu.se?Subject=Re:%20[cc65]%20C64,%20Interrupt%20and%20in%20need%20of%20an%20example">MagerValp1cling.gu.se</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-03-03 09:14:32</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt;&gt;&gt;&gt;&gt; &quot;MS&quot; == Markus Stehr &lt;bastetfurry&#64;ircnet&#46;<!--nospam-->de&gt; writes:
+
+MS&gt; Could someone please provide me with an usable example for an
+MS&gt; interrupt for the C64? I have been reading the manual and asked
+MS&gt; Google for 2 hours now and i am as clueless as i was 2 hours ago.
+
+In (almost) pure C:
+
+
+#include &lt;c64.h&gt;
+#include &lt;peekpoke.h&gt;
+
+
+void music_init(void) {
+}
+
+
+void music_play(void) {
+}
+
+
+void my_irq(void) {
+  ++VIC.bgcolor0;
+  music_play();
+  --VIC.bgcolor0;
+
+  /* ack raster IRQ */
+  VIC.irr = 1;
+  __asm__(&quot; jmp $ea31&quot;);
+}
+
+
+void __fastcall__ irq_setup(void (*irqh)(void)) {
+  /* disable IRQ sources, SEI not needed */
+  CIA1.icr = 0x7f;
+  VIC.imr = 0;
+
+  /* irq on line 100 */
+  VIC.rasterline = 100;
+  VIC.ctrl1 = 0x1b;
+
+  /* set kernal IRQ vector */
+  POKEW(0x0314, (int)irqh);
+
+  /* enable raster IRQs */
+  VIC.imr = 1;
+}
+
+
+void main(void) {
+  music_init();
+
+  irq_setup(&amp;my_irq);
+
+  while (PEEK(0xc6) == 0) {
+    ;
+  }
+}
+
+-- 
+    ___          .     .  .         .       . +  .         .      o   
+  _|___|_   +   .  +     .     +         .  Per Olofsson, arkadspelare
+    o-o    .      .     .   o         +          MagerValp&#64;cling&#46;<!--nospam-->gu.se
+     -       +            +    .     <a href="http://www.cling.gu.se/~cl3polof/">http://www.cling.gu.se/~cl3polof/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Mar  3 09:14:52 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6027.html" title="Next message in the list">stefan: "Re: [cc65] C64, Interrupt and in need of an example"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6025.html" title="Previous message in the list">Spiro Trikaliotis: "Re: [cc65] Questions for CBM guys"</a></li>
+<li><dfn>In reply to</dfn>: <a href="../2008-02/5988.html" title="Message to which this message replies">Markus Stehr: "[cc65] C64, Interrupt and in need of an example"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6027.html" title="Next message in this discussion thread">stefan: "Re: [cc65] C64, Interrupt and in need of an example"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6027.html" title="Message sent in reply to this message">stefan: "Re: [cc65] C64, Interrupt and in need of an example"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6026" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6026" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6026" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-03-03 09:14:55 CET
+</em></small></p>
+</body>
+</html>

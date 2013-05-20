@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Problems with ORG directive an</title>
+<meta name="Author" content="Sidney Cadot (sidney1jigsaw.nl)" />
+<meta name="Subject" content="[cc65] Problems with ORG directive and linker" />
+<meta name="Date" content="2011-03-30" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Problems with ORG directive and linker</h1>
+<!-- received="Wed Mar 30 14:28:25 2011" -->
+<!-- isoreceived="20110330122825" -->
+<!-- sent="Wed, 30 Mar 2011 14:28:11 +0200" -->
+<!-- isosent="20110330122811" -->
+<!-- name="Sidney Cadot" -->
+<!-- email="sidney1jigsaw.nl" -->
+<!-- subject="[cc65] Problems with ORG directive and linker" -->
+<!-- id="AANLkTikw7O_kYt-qoPzLvZMq_mHPu4oPY=suPn7uTLUb@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9302.html" title="Groepaz: &quot;Re: [cc65] Problems with ORG directive and linker&quot;">Next message</a> ]
+[ <a href="9300.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Is there a way to build CONDES style tables of all assembled segments?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9302.html" title="Groepaz: &quot;Re: [cc65] Problems with ORG directive and linker&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Sidney Cadot &lt;<a href="mailto:sidney1jigsaw.nl?Subject=Re:%20[cc65]%20Problems%20with%20ORG%20directive%20and%20linker">sidney1jigsaw.nl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-03-30 14:28:11</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi guys,
+
+I have a very silly linker problem. I am assembling a (slightly
+modified version) of very old code with ca65. The code has a lot of
+&quot;.org&quot; directives. What I am trying to do is generate a 64K memory map
+of the software after compilation, but I can't get the linker to do
+what I want.
+
+Allow me to give a simple example demonstrating the problem I have.
+Suppose I have the file &quot;foobar.s&quot; that looks like this:
+
+$ cat foobar.s
+; ========== start of foobar.s
+
+        .org $e000
+
+foo:    jmp bar
+
+bar:    rts
+
+; ========== end of foobar.s
+
+Assembling works fine:
+
+
+$ ca65 -l foobar.s
+$ cat foobar.lst
+ca65 V2.13.2 - (C) Copyright 1998-2005 Ullrich von Bassewitz
+Main file   : foobar.s
+Current file: foobar.s
+
+000000r 1               ; ========== start of foobar.s
+000000r 1
+000000r 1                       .org $e000
+00E000  1
+00E000  1  4C 03 E0     foo:    jmp bar
+00E003  1
+00E003  1  60           bar:    rts
+00E004  1
+00E004  1               ; ========== end of foobar.s
+00E004  1
+
+
+On to linking. Suppose I have this very simple linker configuration:
+
+$ cat simple.cfg
+########## start of simple.cfg
+
+memory {
+    EntireMemorySpace : start = $0000, size =$10000, fill = yes;
+}
+
+segments {
+    CODE : load = EntireMemorySpace;
+}
+
+########## end of simple.cfg
+
+However, when I use it for linking the previously generated &quot;foobar.o&quot;
+to &quot;a.out&quot;, the code ends up at the start of the &quot;a.out&quot; file rather
+than at offset 0xE000:
+
+$ ld65 -C simple.cfg foobar.o
+$ od -Ax4 -tx1 -w1 a.out
+000000 4c
+000001 03
+000002 e0
+000003 60
+000004 00
+*
+010000
+
+
+
+So, I am probably doing something stupid here. Who can help out?
+
+Best regards, Sidney
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Mar 30 14:28:25 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9302.html" title="Next message in the list">Groepaz: "Re: [cc65] Problems with ORG directive and linker"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9300.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Is there a way to build CONDES style tables of all assembled segments?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9302.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] Problems with ORG directive and linker"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9302.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] Problems with ORG directive and linker"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9301" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9301" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9301" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-03-30 14:28:29 CEST
+</em></small></p>
+</body>
+</html>

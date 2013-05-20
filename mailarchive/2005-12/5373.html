@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Reading Directory on Atari</title>
+<meta name="Author" content="Shawn Jefferson (jefferson_shawn_a8bit1yahoo.com)" />
+<meta name="Subject" content="Re: [cc65] Reading Directory on Atari" />
+<meta name="Date" content="2005-12-27" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Reading Directory on Atari</h1>
+<!-- received="Tue Dec 27 23:18:06 2005" -->
+<!-- isoreceived="20051227221806" -->
+<!-- sent="Tue, 27 Dec 2005 14:17:53 -0800 (PST)" -->
+<!-- isosent="20051227221753" -->
+<!-- name="Shawn Jefferson" -->
+<!-- email="jefferson_shawn_a8bit1yahoo.com" -->
+<!-- subject="Re: [cc65] Reading Directory on Atari" -->
+<!-- id="20051227221753.41237.qmail@web54605.mail.yahoo.com" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="Pine.LNX.4.30.0512261816400.8712-100000&#64;ds9.groessler.org" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5374.html" title="silverdr1inet.com.pl: &quot;[cc65] macro arguments&quot;">Next message</a> ]
+[ <a href="5372.html" title="Oliver Schmidt: &quot;Re: [cc65] Reading Directory on Atari&quot;">Previous message</a> ]
+[ <a href="5370.html" title="Christian Groessler: &quot;Re: [cc65] Reading Directory on Atari&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="../2006-01/5386.html" title="Christian Groessler: &quot;Re: [cc65] Reading Directory on Atari&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Shawn Jefferson &lt;<a href="mailto:jefferson_shawn_a8bit1yahoo.com?Subject=Re:%20[cc65]%20Reading%20Directory%20on%20Atari">jefferson_shawn_a8bit1yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-12-27 23:17:53</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>--- Christian Groessler &lt;chris&#64;groessler&#46;<!--nospam-->org&gt; wrote:
+
+&gt; Thanks for the hint. There is still some parsing
+&gt; needed for the different
+&gt; DOS versions, but this sounds more doable. I will
+&gt; try to implement it for
+&gt; the Atari.
+
+Hi Chris,
+
+All three major DOSes (DOS 2.5, SpartaDOS 3.3a, and
+MyDOS 4.53) that I tested give the same output for the
+normal read directory CIOV call.
+
+Thanks to your help, I got the following code working
+to read and parse the directory entry (it's still
+pretty rough, lots of things need to be fixed still):
+
+
+		.include    &quot;atari.inc&quot;
+		.export     _open_dir, _read_dir_entry, _close_dir
+		.export     _diriocb
+		.import     findfreeiocb, clriocb
+		.import     __oserror, __do_oserror
+		.import     return0, return1
+		.importzp   tmp1, tmp2, ptr1
+
+
+
+_open_dir:      sta tmp1
+		stx tmp2
+		jsr findfreeiocb
+		beq iocbok
+		jmp return0
+
+iocbok:         stx diriocb
+		jsr clriocb
+		ldx diriocb
+		lda tmp1
+		sta ICBAL,x
+		lda tmp2
+		sta ICBAH,x
+		lda #OPEN
+		sta ICCOM,x
+		lda #OPEN|DIRECT
+		sta ICAX1,x
+		;lda #6
+		;sta ICAX2,x
+		jsr CIOV
+		bmi cioerr
+		lda #0
+		sta __oserror
+		jmp return1
+
+cioerr:         jmp __do_oserror
+
+_close_dir:     lda #CLOSE
+		ldx diriocb
+		sta ICCOM,x
+		jsr CIOV
+		rts
+
+_read_dir_entry:
+		sta ptr1
+		stx ptr1+1
+		lda diriocb
+		tax
+		lda #GETREC
+		;lda #GETCHR
+		sta ICCOM,x
+		lda ptr1
+		sta ICBAL,x
+		lda ptr1+1
+		sta ICBAH,x
+		lda #$80
+		sta ICBLL,x
+		lda #0
+		sta ICBLH,x
+		jsr CIOV
+		bmi cioerr
+		lda #0
+		sta __oserror
+		jmp return1
+
+
+	    .bss
+
+_diriocb:
+diriocb:    .res    1
+
+
+#include &lt;atari.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;conio.h&gt;
+#include &lt;ctype.h&gt;
+
+
+unsigned char __fastcall__ open_dir(char *drive);
+void close_dir(void);
+unsigned char __fastcall__ read_dir_entry(char
+*entry);
+extern unsigned char diriocb;
+
+
+unsigned char main(void)
+{
+  unsigned char ret, i, j;
+  char entry[128], filename[13];
+
+  ret = open_dir(&quot;D1:*.*&quot;);
+  if (!ret) return(0);
+
+  while(1) {
+    ret = read_dir_entry(&amp;entry);
+    if (ret == 255) break;
+    if (isdigit(entry[0])) break;
+    printf(&quot;entry:%s &quot;, entry);
+
+    // parse the directory entry
+    j = 0;
+    for(i=2; i&lt;10; ++i) {
+      if (isspace(entry[i]))
+	break;
+      filename[j] = entry[i];
+      ++j;
+    }
+    filename[j] = '.';
+    ++j;
+
+    for(i=10; i&lt;13; ++i) {
+      if (isspace(entry[i]))
+	break; 
+      filename[j] = entry[i];
+      ++j;
+    }
+    filename[j] = '\0';
+
+    printf(&quot;filename:%s\n&quot;, filename);
+    cgetc();
+  }
+
+  close_dir();
+  return(1);
+}
+
+
+
+
+
+
+
+	
+		
+__________________________________ 
+Yahoo! for Good - Make a difference this year. 
+<a href="http://brand.yahoo.com/cybergivingweek2005/">http://brand.yahoo.com/cybergivingweek2005/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Dec 27 23:18:06 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5374.html" title="Next message in the list">silverdr1inet.com.pl: "[cc65] macro arguments"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5372.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Reading Directory on Atari"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5370.html" title="Message to which this message replies">Christian Groessler: "Re: [cc65] Reading Directory on Atari"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="../2006-01/5386.html" title="Next message in this discussion thread">Christian Groessler: "Re: [cc65] Reading Directory on Atari"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="../2006-01/5386.html" title="Message sent in reply to this message">Christian Groessler: "Re: [cc65] Reading Directory on Atari"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5373" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5373" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5373" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-12-27 23:18:10 CET
+</em></small></p>
+</body>
+</html>

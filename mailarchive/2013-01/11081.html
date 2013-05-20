@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: Cursory analyses of CBM readdir b</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)" />
+<meta name="Date" content="2013-01-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)</h1>
+<!-- received="Thu Jan 10 21:43:03 2013" -->
+<!-- isoreceived="20130110204303" -->
+<!-- sent="Thu, 10 Jan 2013 21:42:32 +0100" -->
+<!-- isosent="20130110204232" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)" -->
+<!-- id="20130110204231.GG21108@trikaliotis.net" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="C47D6FC1-AD43-4645-853A-7EFBAA0BA2C9&#64;wfmh.org.pl" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11082.html" title="Daniel Serpell: &quot;Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)&quot;">Next message</a> ]
+[ <a href="11080.html" title="Oliver Schmidt: &quot;Re: [cc65] News for 2013&quot;">Previous message</a> ]
+[ <a href="11079.html" title="silverdr1wfmh.org.pl: &quot;Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="11082.html" title="Daniel Serpell: &quot;Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20Cursory%20analyses%20of%20CBM%20readdir%20bug%20(was:%20[cc65]%20Re:%20readdir%20bug)">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2013-01-10 21:42:32</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello,
+
+btw: I do not consider this OT, as it is something people should be
+aware when programming with cc65.
+
+* On Thu, Jan 10, 2013 at 11:59:18AM +0100 silverdr&#64;wfmh&#46;<!--nospam-->org.pl wrote:
+ 
+&gt; This is the use case I am referring to and I get white, no matter
+&gt; whether the file opened correctly or not. It is honest question - I'd
+&gt; be glad not to use status channel in this case but I know no other way
+&gt; to confirm that the file opened correctly (or not).
+
+Yes, you are right.
+
+The &quot;problem&quot; is how the C64 opens the file:
+
+$FFC0: KERNAL OPEN: JMP indirectly to $F34A
+$F34A: generic OPEN routine
+$F37F JSR §F3D5 if the file to be opened is on the IEC bus.
+$F3DD clear the status (READST)
+Then:
+$F3E3 LISTEN, no check for error code
+$F3EA send secondary address after listen
+$F3ED-$F3F5: If the listen + secondary address failed, return &quot;DEVICE
+             NOT PRESENT&quot;
+$F3F6-$F404: Output the name bytes onto the IEC Bus; NO ERROR CHECKING
+             IS PERFORMED!
+$F406 JMP $F654
+
+And here the best things occur:
+$F654 JSR $EDFE send UNLISTEN
+$F657 CLC 
+$F658 RTS
+
+Back to
+$F382 BCC $F3D3
+$F3D3 CLC 
+$F3D4 RTS
+
+Thus, if the LISTEN was successfull, we will ALWAYS get a success (CLC)
+on return from this routine, regardless if wheather the actual name
+transfer is successfull or not.
+
+Note that this does not even take into account if he file could be
+opened. In fact, the drive will only start to search for the file after
+the UNLISTEN, that is, immediately before the return of the OPEN
+routine.
+
+Also, as long as there were no severe transmission errors, READST will
+also return 0.
+
+Thus, the only way to find out if the OPEN was successfull is to read
+the error channel, or (much easier): read the first byte. If the OPEN
+was not successfull, READST will return 0x42 (0x40 = EOF, 0x02 = time
+out).
+
+For a real EOF, READST will read 0x40 instead. If you ignore it and read
+past the EOF, then you will get a 0x42 on subsequent reads.
+
+Regards,
+Spiro.
+
+-- 
+Spiro R. Trikaliotis
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Jan 10 21:43:03 2013</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11082.html" title="Next message in the list">Daniel Serpell: "Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="11080.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] News for 2013"</a></li>
+<li><dfn>In reply to</dfn>: <a href="11079.html" title="Message to which this message replies">silverdr1wfmh.org.pl: "Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="11082.html" title="Next message in this discussion thread">Daniel Serpell: "Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="11082.html" title="Message sent in reply to this message">Daniel Serpell: "Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)"</a></li>
+<li><dfn>Reply</dfn>:  <a href="11085.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#11081" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#11081" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#11081" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2013-01-10 21:43:07 CET
+</em></small></p>
+</body>
+</html>

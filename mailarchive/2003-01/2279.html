@@ -1,0 +1,179 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] Newbie question: memcpy</title>
+<meta name="Author" content="Tim Schürmann (tischuer_at_web.de)">
+<meta name="Subject" content="[cc65] Newbie question: memcpy">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] Newbie question: memcpy</h1>
+<!-- received="Mon Jan 13 12:40:44 2003" -->
+<!-- isoreceived="20030113114044" -->
+<!-- sent="Mon, 13 Jan 2003 12:41:51 +0100" -->
+<!-- isosent="20030113114151" -->
+<!-- name="Tim Schürmann" -->
+<!-- email="tischuer_at_web.de" -->
+<!-- subject="[cc65] Newbie question: memcpy" -->
+<!-- id="3E22A5FF.C5A8E113@web.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Tim Schürmann (<a href="mailto:tischuer_at_web.de?Subject=Re:%20[cc65]%20Newbie%20question:%20memcpy"><em>tischuer_at_web.de</em></a>)<br>
+<strong>Date:</strong> 2003-01-13 12:41:51
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2278.html">Marc 'BlackJack' Rintsch: "Re: [cc65] __fastcall__ &amp; func(void)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2280.html">MagerValp: "Re: [cc65] Newbie question: memcpy"</a>
+<li><strong>Reply:</strong> <a href="2280.html">MagerValp: "Re: [cc65] Newbie question: memcpy"</a>
+<li><strong>Reply:</strong> <a href="2286.html">Tim Schürmann: "Re: [cc65] Newbie question: memcpy"</a>
+<li><strong>Reply:</strong> <a href="2287.html">Tim Schürmann: "Re: [cc65] Newbie question: memcpy"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hallo!
+
+I try to backup a hires graphic in memory by using malloc/memcpy. Why
+does the following code won't work?
+As you can see, i'm using loadkoala to exclude any other errors.
+
+------------------------ snip -------------------------------------
+
+
+... header-files ...
+
+unsigned char loadtoram(unsigned char lfn, unsigned char *dest, unsigned
+int length) {...}
+
+#define POKE(A,X) (*(unsigned char *)A) = (X)
+#define PEEK(A) (*(unsigned char *)A)
+
+unsigned char *filename = &quot;cyberwing.koa&quot;;
+
+int main (void)
+{
+
+    unsigned char dev;
+    unsigned char addr[2];
+    unsigned char* bitmap_buffer; /* graphic buffer */
+    unsigned char* screen_buffer;
+    unsigned char* color_buffer;
+
+    /* Allocating mem for backup */
+    bitmap_buffer=(unsigned char*)malloc(8000);
+    if(bitmap_buffer==NULL) exit(1);
+    screen_buffer=(unsigned char*)malloc(1000);
+    if(screen_buffer==NULL) exit(1);
+    color_buffer=(unsigned char*)malloc(1000);
+    if(color_buffer==NULL) exit(1);
+
+    /* Clear the screen, set white on black */
+    bordercolor (COLOR_BLACK);
+    bgcolor (COLOR_BLACK);
+    textcolor (COLOR_GRAY3);
+    cursor (0);
+    clrscr ();
+
+/* load routines */
+
+    dev = PEEK(0x00ba); /* get current device number */
+
+    /* open the file */
+    if (cbm_open(1, dev, 2, filename)) {...}
+
+    /* read file load address */
+    if (cbm_read(1, &amp;addr, 2) != 2) {...}
+
+    /* make sure load address is $4400 or $6000 */
+    if (addr[0] != 0 || (addr[1] != 0x44 &amp;&amp; addr[1] != 0x60)) {...}
+
+    /* load bitmap data */
+    if (loadtoram(1, (unsigned char *)bitmap_buffer, 8000)) {...}
+    memcpy ((void*)0x2000, bitmap_buffer, 8000);
+
+    /* load screen data */
+    if (loadtoram(1, (unsigned char *)screen_buffer, 1000)) {...}
+    memcpy ((void*)0x0400, screen_buffer, 1000);
+
+    /* load colour ram */
+    if (loadtoram(1, (unsigned char*)color_buffer, 1000)) {...}
+    memcpy ((void*)0xd800, color_buffer, 1000);
+
+    /* load background colour into $d021 */
+    if (loadtoram(1, (unsigned char *)0xd021, 1)) {...}
+
+    /* done */
+    cbm_close(1);
+
+    POKE(0xd011, 0x3b); /* enable bitmap mode */
+    POKE(0xd016, 0x18); /* enable multicolour */
+    POKE(0xd018, 0x1f); /* screen at $0400 bitmap at $2000 */
+    POKE(0xd020, 0x00); /* black border */
+
+
+/* Here follows: wait for a key, and &quot;cleanup&quot; code */
+
+...
+
+}
+
+------------------------ snap -------------------------------------
+
+After starting this little routine, the screen messed up.
+
+Could anyone help?
+
+Thanks,
+
+Tim Schürmann
+<a href="mailto:tischuer_at_web.de?Subject=Re:%20[cc65]%20Newbie%20question:%20memcpy">tischuer_at_web.de</a>
+
+P.S.: Please excuse my really bad english :)
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Newbie%20question:%20memcpy">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2278.html">Marc 'BlackJack' Rintsch: "Re: [cc65] __fastcall__ &amp; func(void)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2280.html">MagerValp: "Re: [cc65] Newbie question: memcpy"</a>
+<li><strong>Reply:</strong> <a href="2280.html">MagerValp: "Re: [cc65] Newbie question: memcpy"</a>
+<li><strong>Reply:</strong> <a href="2286.html">Tim Schürmann: "Re: [cc65] Newbie question: memcpy"</a>
+<li><strong>Reply:</strong> <a href="2287.html">Tim Schürmann: "Re: [cc65] Newbie question: memcpy"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-01-13 12:41:08 CET</em>
+</em>
+</small>
+</body>
+</html>

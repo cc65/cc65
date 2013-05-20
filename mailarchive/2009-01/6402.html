@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-15" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Any interest in GameCartVi</title>
+<meta name="Author" content="Jonathan MASUR (jmasur1microclub.ch)" />
+<meta name="Subject" content="Re: [cc65] Any interest in GameCartVic?" />
+<meta name="Date" content="2009-01-20" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Any interest in GameCartVic?</h1>
+<!-- received="Tue Jan 20 18:44:53 2009" -->
+<!-- isoreceived="20090120174453" -->
+<!-- sent="Tue, 20 Jan 2009 18:49:15 +0100" -->
+<!-- isosent="20090120174915" -->
+<!-- name="Jonathan MASUR" -->
+<!-- email="jmasur1microclub.ch" -->
+<!-- subject="Re: [cc65] Any interest in GameCartVic?" -->
+<!-- id="49760E9B.8000100@microclub.ch" -->
+<!-- charset="ISO-8859-15" -->
+<!-- inreplyto="200901201552.22673.groepaz&#64;gmx.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6403.html" title="Andre Majorel: &quot;Re: [cc65] Any interest in GameCartVic?&quot;">Next message</a> ]
+[ <a href="6401.html" title="Groepaz: &quot;Re: [cc65] Any interest in GameCartVic?&quot;">Previous message</a> ]
+[ <a href="6401.html" title="Groepaz: &quot;Re: [cc65] Any interest in GameCartVic?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6403.html" title="Andre Majorel: &quot;Re: [cc65] Any interest in GameCartVic?&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Jonathan MASUR &lt;<a href="mailto:jmasur1microclub.ch?Subject=Re:%20[cc65]%20Any%20interest%20in%20GameCartVic?">jmasur1microclub.ch</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-01-20 18:49:15</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Groepaz a écrit :
+&gt; no, they were never ment to be used to write games :) the nes library only has 
+&gt; some basic screen output for text, and joystick input. for a game, you will 
+&gt; surely need your own gfx stuff.
+&gt; 
+&gt; if you want to write games, you pretty much have to roll your own libraries 
+&gt; for screen i/o etc yourself anyway. (and anything &quot;cool&quot; would almost 
+&gt; certainly require huge parts of it beeing in asm) the runtime of cc65 is 
+&gt; pretty much as good as it can get, and i doubt you can gain much by changing 
+&gt; fundamentally how it works (except you'll surely get tons of interisting bugs 
+&gt; =P)
+Creating interesting bugs is not really what I'd like to do, I would 
+have enough bugs in the code being compiled so it would feel terrible if 
+the compiler itself is bugged :(
+
+Of couse any kind of I/O should be written in assembly, but it would be 
+nice if something decent was available as a starter kit so that newbies 
+that don't know much could start NES-deving with C without having to 
+worry about instruction fetches and clock cycles in a first place. I'm 
+pretty sure there is a lot of people involved in GBA-dev and Nintendo 
+DS-dev because they can write small games/demo easily in C, altough I 
+have to check that out. Of course the respective CPUs are more modern, 
+faster and all so this helps.
+&gt; 
+&gt; 
+&gt; but like you said, its pretty much the way to do it. the 6502 just isnt a cpu 
+&gt; that can run compiled code very efficiently, for example due to the limited 
+&gt; stack. (and no, it doesnt really work without a software stack, except for 
+&gt; very trivial programs maybe)
+&gt; 
+Of course using the $100-$1ff stack would just be terribly inefficent. I 
+guess I would have to re-write some decent NES libraries, and try to do 
+stuff with the I/O done in assembly and the engine done in C and see how 
+well it would work, also newbie could come straight away and code stuff 
+in C without worrying much about what is exactly happening in the first 
+time.
+
+I know assembly so it is not a problem to write games, altough the 
+variable conflicts thing is really annoying to track. The real problem 
+is to port them to another platform where you have to re-write the whole 
+programm just because it's a different CPU, as it would be the case when 
+porting from NES to GB (there is also a compiler available). Or even if 
+it's the same CPU because I/O capabilities are completely different, as 
+when porting from C64 to NES.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Jan 20 18:44:53 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6403.html" title="Next message in the list">Andre Majorel: "Re: [cc65] Any interest in GameCartVic?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6401.html" title="Previous message in the list">Groepaz: "Re: [cc65] Any interest in GameCartVic?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6401.html" title="Message to which this message replies">Groepaz: "Re: [cc65] Any interest in GameCartVic?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6403.html" title="Next message in this discussion thread">Andre Majorel: "Re: [cc65] Any interest in GameCartVic?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6402" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6402" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6402" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-01-20 18:44:55 CET
+</em></small></p>
+</body>
+</html>

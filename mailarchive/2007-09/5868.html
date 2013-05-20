@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] cl65 -t apple2 works, but </title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't" />
+<meta name="Date" content="2007-09-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't</h1>
+<!-- received="Mon Sep 10 18:35:06 2007" -->
+<!-- isoreceived="20070910163506" -->
+<!-- sent="Mon, 10 Sep 2007 18:34:48 +0200" -->
+<!-- isosent="20070910163448" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't" -->
+<!-- id="20070910163448.GA10358@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="46E46634.5090403&#64;alfter.us" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5869.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't&quot;">Next message</a> ]
+[ <a href="5867.html" title="Scott Alfter: &quot;Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't&quot;">Previous message</a> ]
+[ <a href="5861.html" title="Scott Alfter: &quot;Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5870.html" title="Scott Alfter: &quot;SOLVED: Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20cl65%20-t%20apple2%20works,%20but%20cl65%20-C%20apple2.cfg%20doesn't">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-09-10 18:34:48</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Sun, Sep 09, 2007 at 02:31:32PM -0700, Scott Alfter wrote:
+&gt; &gt; Are you sure you aren't mixing different versions of the files?
+&gt;
+&gt; This particular machine I think has had only 2.11.0 on it.
+                                                             
+This is what happens on my machine with a fresh 2.11.0 install:
+
+-----------------------------------------------------------------------------
+uz&#64;trixie:~/samples$ cl65 -C apple2-tgi&#46;<!--nospam-->cfg tgidemo.c
+ld65: Warning: apple2-tgi.cfg(7): Segment `EXEHDR' does not exist
+uz&#64;trixie:~/samples$ l tgidemo*
+-rw-rw-r-- 1 uz uz  7699 Sep 10 18:23 tgidemo
+-rw-r--r-- 1 uz uz  5701 Sep 10 18:16 tgidemo.c
+-rw-rw-r-- 1 uz uz 13583 Sep 10 18:23 tgidemo.o
+uz&#64;trixie:~/samples$ ld65 --version
+ld65 V2.11.0 - (C) Copyright 1998-2005 Ullrich von Bassewitz
+ld65: Error: No object files to link
+uz&#64;trixie:~/samples$ cc65 --version
+cc65 V2.11.0
+cc65: No input files
+uz&#64;trixie:~/samples$ ca65 --version
+ca65 V2.11.0 - (C) Copyright 1998-2005 Ullrich von Bassewitz
+ca65: No input files
+-----------------------------------------------------------------------------
+
+As you can see, compilation works without any problems, so please recheck the
+files on your machine. I've also looked at the sources, and there is no import
+of __RAM_SIZE__ in line 13 of crt0.s (as your error message says). In fact,
+the apple startup file has never used __RAM_SIZE__ at all.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Sep 10 18:35:06 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5869.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5867.html" title="Previous message in the list">Scott Alfter: "Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5861.html" title="Message to which this message replies">Scott Alfter: "Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5870.html" title="Next message in this discussion thread">Scott Alfter: "SOLVED: Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5870.html" title="Message sent in reply to this message">Scott Alfter: "SOLVED: Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't"</a></li>
+<li><dfn>Reply</dfn>:  <a href="5871.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5868" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5868" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5868" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-09-10 18:35:10 CEST
+</em></small></p>
+</body>
+</html>

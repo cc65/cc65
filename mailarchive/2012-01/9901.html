@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Macros in inline assembler</title>
+<meta name="Author" content="Andreas Rückert (a_rueckert1gmx.net)" />
+<meta name="Subject" content="Re: [cc65] Macros in inline assembler" />
+<meta name="Date" content="2012-01-19" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Macros in inline assembler</h1>
+<!-- received="Thu Jan 19 16:35:35 2012" -->
+<!-- isoreceived="20120119153535" -->
+<!-- sent="Thu, 19 Jan 2012 16:35:26 +0100" -->
+<!-- isosent="20120119153526" -->
+<!-- name="Andreas Rückert" -->
+<!-- email="a_rueckert1gmx.net" -->
+<!-- subject="Re: [cc65] Macros in inline assembler" -->
+<!-- id="20120119153526.132150@gmx.net" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="20120119143856.GA20038&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9902.html" title="Oliver Schmidt: &quot;Re: [cc65] Macros in inline assembler&quot;">Next message</a> ]
+[ <a href="9900.html" title="Oliver Schmidt: &quot;Re: [cc65] Macros in inline assembler&quot;">Previous message</a> ]
+[ <a href="9898.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Macros in inline assembler&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9902.html" title="Oliver Schmidt: &quot;Re: [cc65] Macros in inline assembler&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Andreas Rückert &lt;<a href="mailto:a_rueckert1gmx.net?Subject=Re:%20[cc65]%20Macros%20in%20inline%20assembler">a_rueckert1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-01-19 16:35:26</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+-------- Original-Nachricht --------
+&gt; Datum: Thu, 19 Jan 2012 15:38:57 +0100
+&gt; Von: Ullrich von Bassewitz &lt;uz&#64;musoftware&#46;<!--nospam-->de&gt;
+&gt; An: cc65&#64;musoftware&#46;<!--nospam-->de
+&gt; Betreff: Re: [cc65] Macros in inline assembler
+
+--&lt;snip&gt;--
+ 
+&gt; Just as a side note, because this is not your actual question: You should
+&gt; never generate the names of variables yourself by prepending an
+&gt; underscore.
+&gt; Please read this:
+&gt; 
+&gt;         <a href="http://www.cc65.org/snapshot-doc/cc65-9.html">http://www.cc65.org/snapshot-doc/cc65-9.html</a>
+
+I know. The problem was, that I couldn't find any examples with 
+multiple arguments. That's why I tried the _data etc. Vars in
+the code.
+
+&gt; Reading that chapter may also give some clues how your problem can be
+&gt; solved
+&gt; easily: Just use %w for the offset.
+
+I did something else and just unrolled the loop by hand
+========
+        uint8 *datap = data;
+
+        __asm__( &quot;lda %v+3&quot;, datap);
+        __asm__( &quot;sta %v&quot;, W);
+        __asm__( &quot;lda %v+2&quot;, datap);
+        __asm__( &quot;sta %v+1&quot;, W);
+        __asm__( &quot;lda %v+1&quot;, datap);
+        __asm__( &quot;sta %v+2&quot;, W);
+        __asm__( &quot;lda %v&quot;, datap);
+        __asm__( &quot;sta %v+3&quot;, W);
+
+        __asm__( &quot;lda %v+19&quot;, datap);
+        __asm__( &quot;sta %v+4&quot;, W);
+...
+========
+, which is also wrong as I see it, since the compiler might
+rearrange the asm statements. So far ist does not, so the code 
+works with all optimization on. It's just not very readable to
+have so many asm-lines in the code, that's why I wanted the 
+macros.
+
+&gt; Apart from that, above lines have several other errors: There's something
+&gt; named &quot;q&quot; in the second line which leads to an error.
+
+Sorry, you're right. It came while inserting the code into the mail...
+
+&gt; And, using the token
+&gt; pasting operator (##) is wrong, because pasting two strings together gives
+&gt; an
+&gt; invalid token. Strings do not need an operator to have them concatenated.
+
+That's what I thought. But when I had the macro argument in the
+string, I always got complaints, that asm expectected a ')'.
+
+&gt; &gt; , but this doesn't work so far, because the macro parameter is
+&gt; &gt; not expanded and the linker complains about unresolved externals
+&gt; &gt; _data and _W .
+&gt; 
+&gt; I would first fix the problems then try again. There are some problems
+&gt; with
+&gt; cc65 macros, but as far as I can say, your code doesn't trigger any of
+&gt; them.
+
+So far I just accepted, that they don't work in asm Statements.
+
+--&lt;snip&gt;--
+ 
+&gt; &gt; Or is there a way to expand macro parameters within a string, so
+&gt; &gt; I get something like sta _W+(3*4+3), which could be used as an
+&gt; &gt; absolute address? (_W is a local var, but static as I understand it).
+&gt; 
+&gt; There's an old saying among us engineers: If nothing else helps, read the
+&gt; documentation:-) Hint: It does also describe how to access a static local
+&gt; variable from inline assembly.
+
+I know. It just couldn't find an example in the docs...
+
+Ciao,
+Andreas
+
+-- 
+Empfehlen Sie GMX DSL Ihren Freunden und Bekannten und wir
+belohnen Sie mit bis zu 50,- Euro! <a href="https://freundschaftswerbung.gmx.de">https://freundschaftswerbung.gmx.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Jan 19 16:35:35 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9902.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Macros in inline assembler"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9900.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Macros in inline assembler"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9898.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Macros in inline assembler"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9902.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Macros in inline assembler"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9902.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Macros in inline assembler"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9906.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Macros in inline assembler"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9901" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9901" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9901" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-01-19 16:35:38 CET
+</em></small></p>
+</body>
+</html>

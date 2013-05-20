@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Optimization ideas</title>
+<meta name="Author" content="Dan (opendtv1yahoo.com)" />
+<meta name="Subject" content="[cc65] Optimization ideas" />
+<meta name="Date" content="2007-06-21" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Optimization ideas</h1>
+<!-- received="Thu Jun 21 09:17:05 2007" -->
+<!-- isoreceived="20070621071705" -->
+<!-- sent="Thu, 21 Jun 2007 00:16:54 -0700 (PDT)" -->
+<!-- isosent="20070621071654" -->
+<!-- name="Dan" -->
+<!-- email="opendtv1yahoo.com" -->
+<!-- subject="[cc65] Optimization ideas" -->
+<!-- id="885217.80066.qm@web56211.mail.re3.yahoo.com" -->
+<!-- charset="iso-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5749.html" title="Greg King: &quot;Re: [cc65] building under cygwin&quot;">Next message</a> ]
+[ <a href="5747.html" title="silverdr1inet.com.pl: &quot;Re: [cc65] building under cygwin&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5751.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Optimization ideas&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Dan &lt;<a href="mailto:opendtv1yahoo.com?Subject=Re:%20[cc65]%20Optimization%20ideas">opendtv1yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-06-21 09:16:54</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Here are some ideas for optimizations that could be
+implemented relatively easily:
+
+1. Save/restore &quot;register&quot; (zero page) variables with
+a JSR to a subroutine, such as:
+
+[...more...]
+save3:
+    dey
+    lda regbank+2
+    sta (sp),y
+save2:
+    dey
+    lda regbank+1
+    sta (sp),y
+save1:
+    dey
+    lda regbank
+    sta (sp),y
+    rts
+[...more...]
+restore3:
+    lda (sp),y
+    sta regbank+2
+    dey
+restore2:
+    lda (sp),y
+    sta regbank+1
+    dey
+restore1:
+    lda (sp),y
+    sta regbank
+    rts
+
+I wonder if there's any way to trick the linker into
+automatically selecting a routine of exactly the right
+size?
+
+2. Implement a second &quot;register&quot; area in zero page
+that would only be used by leaf functions (i.e.
+functions that don't call other functions). These
+would not need to be saved/restored.
+
+3. Automatically assign local pointer/char/int
+&quot;register&quot; status, and increase the default maximum
+(only 6 bytes?)
+
+Comments?
+
+Dan
+
+
+
+       
+____________________________________________________________________________________
+Looking for a deal? Find great prices on flights and hotels with Yahoo! FareChase.
+<a href="http://farechase.yahoo.com/">http://farechase.yahoo.com/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Jun 21 09:17:05 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5749.html" title="Next message in the list">Greg King: "Re: [cc65] building under cygwin"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5747.html" title="Previous message in the list">silverdr1inet.com.pl: "Re: [cc65] building under cygwin"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5751.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Optimization ideas"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5751.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Optimization ideas"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5748" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5748" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5748" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-06-21 09:17:08 CEST
+</em></small></p>
+</body>
+</html>

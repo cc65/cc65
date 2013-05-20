@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Debug info question</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Debug info question">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Debug info question</h1>
+<!-- received="Wed May 23 16:09:38 2001" -->
+<!-- isoreceived="20010523140938" -->
+<!-- sent="Wed, 23 May 2001 16:09:38 +0200" -->
+<!-- isosent="20010523140938" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Debug info question" -->
+<!-- id="20010523160938.A11716@trixie.musoftware.de" -->
+<!-- inreplyto="02cd01c0e375$e20aa0c0$a2192c8d@cs.unimagdeburg.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Debug%20info%20question"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2001-05-23 16:09:38
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0499.html">groepaz: "Re[2]: [cc65] Debug info question"</a>
+<li><strong>Previous message:</strong> <a href="0497.html">shubel, paul: "RE: [cc65] Debug info question"</a>
+<li><strong>In reply to:</strong> <a href="0496.html">Spiro Trikaliotis: "Re: [cc65] Debug info question"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0499.html">groepaz: "Re[2]: [cc65] Debug info question"</a>
+<li><strong>Reply:</strong> <a href="0499.html">groepaz: "Re[2]: [cc65] Debug info question"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+	 
+On Wed, May 23, 2001 at 12:48:20PM +0200, Spiro Trikaliotis wrote:
+&gt; No, VICE does not support debug infos yet. Although, I would like it to do
+&gt; so. I've startet an mail exachange with Uz on 20.1.2000 where I wanted to
+&gt; negotiate exactly if CC65 supports (or will support in the future) these
+&gt; infos, and Uz said that it does not and most probably will not.
+
+At that time I wrote that having source level debugging information is rather
+difficult with the current compiler, since it does not have an abstract
+intermediate code, so the optimizer would mess up the debug infos. I've used
+the last two weeks to rewrite the compiler backend, so this argument is no
+longer valid.
+
+Regarding the debug info format: I've searched the web for more information on
+the AD2500 and WD formats and found some interesting links. One is NoICE, a
+shareware remote debugger that supports lots of different compilers:
+
+        <a href="http://www.noicedebugger.com/">http://www.noicedebugger.com/</a>
+
+It is interesting to note that almost *any* compiler for embedded systems out
+there supports it's own debug information format. See
+
+        <a href="http://www.noicedebugger.com/tools.html">http://www.noicedebugger.com/tools.html</a>
+
+This is what they say about COFF: &quot;Unfortunately, there is not real standard
+for COFF: every compiler and assembler seems to produce a slightly different
+format.&quot;
+
+There seems to be a file format named IEEE-695 which is very well supported by
+NoICE and &quot;IEEE&quot; sounds very standard:-) So I will have a closer look at it.
+There are several IEEE-695 resources listed on
+
+        <a href="http://www.eskimo.com/~dalus/ieee-695.html">http://www.eskimo.com/~dalus/ieee-695.html</a>
+
+Among other things, they mention that the GNU binutils come with a library to
+read and parse this format - this should be helpful for VICE since VICE is
+also GPL licensed and may therefore use other GPL code without problems.
+
+Regards
+
+
+        Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Debug%20info%20question">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Debug%20info%20question">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0499.html">groepaz: "Re[2]: [cc65] Debug info question"</a>
+<li><strong>Previous message:</strong> <a href="0497.html">shubel, paul: "RE: [cc65] Debug info question"</a>
+<li><strong>In reply to:</strong> <a href="0496.html">Spiro Trikaliotis: "Re: [cc65] Debug info question"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0499.html">groepaz: "Re[2]: [cc65] Debug info question"</a>
+<li><strong>Reply:</strong> <a href="0499.html">groepaz: "Re[2]: [cc65] Debug info question"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:40 CET</em>
+</em>
+</small>
+</body>
+</html>

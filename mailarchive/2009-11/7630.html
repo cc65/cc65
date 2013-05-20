@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Memory impact of Atari lib</title>
+<meta name="Author" content="Christian Grössler (chris1groessler.org)" />
+<meta name="Subject" content="Re: [cc65] Memory impact of Atari library compile time defines" />
+<meta name="Date" content="2009-11-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Memory impact of Atari library compile time defines</h1>
+<!-- received="Mon Nov 23 23:31:46 2009" -->
+<!-- isoreceived="20091123223146" -->
+<!-- sent="Mon, 23 Nov 2009 23:31:29 +0100" -->
+<!-- isosent="20091123223129" -->
+<!-- name="Christian Grössler" -->
+<!-- email="chris1groessler.org" -->
+<!-- subject="Re: [cc65] Memory impact of Atari library compile time defines" -->
+<!-- id="4B0B0D41.4040300@groessler.org" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="f0796bb70911221901s61fbd308gc621d24ce62d93fa&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7631.html" title="Daniel Serpell: &quot;Re: [cc65] Memory impact of Atari library compile time defines&quot;">Next message</a> ]
+[ <a href="7629.html" title="Daniel Serpell: &quot;Re: [cc65] Memory impact of Atari library compile time defines&quot;">Previous message</a> ]
+[ <a href="7629.html" title="Daniel Serpell: &quot;Re: [cc65] Memory impact of Atari library compile time defines&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7631.html" title="Daniel Serpell: &quot;Re: [cc65] Memory impact of Atari library compile time defines&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Christian Grössler &lt;<a href="mailto:chris1groessler.org?Subject=Re:%20[cc65]%20Memory%20impact%20of%20Atari%20library%20compile%20time%20defines">chris1groessler.org</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-11-23 23:31:29</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+Daniel Serpell wrote:
+&gt; 
+&gt; Here are 3 patches to further reduce the size of the executables,
+&gt; the patches are in git format (from a mercurial clone of the SVN
+&gt; repositry).
+&gt; 
+&gt; Patch 4062: The proposed patch by Ullrich, remove one byte from crt0.s
+&gt; Patch 4063: Reves 3 bytes from open, based on cbm code.
+&gt; Patch 4064: Move fdtoiocb out from fdtable.s, so that code that don't
+&gt; use file IO does not need the whole fdtable file (this is huge).
+
+Thanks!
+
+
+&gt; With the attached 3 programs, the size went from:
+&gt; -rw-r--r-- 1 daniel daniel 291 2009-11-22 23:06 empty-atari
+&gt; -rw-r--r-- 1 daniel daniel 2254 2009-11-22 23:06 fileio-atari
+&gt; -rw-r--r-- 1 daniel daniel 3150 2009-11-22 23:06 printf-atari
+&gt; -rw-r--r-- 1 daniel daniel 1243 2009-11-22 23:06 put-atari
+&gt; 
+&gt; To:
+&gt; -rw-r--r-- 1 daniel daniel 290 2009-11-22 23:46 empty-atari
+&gt; -rw-r--r-- 1 daniel daniel 2253 2009-11-22 23:46 fileio-atari
+&gt; -rw-r--r-- 1 daniel daniel 2744 2009-11-22 23:46 printf-atari
+&gt; -rw-r--r-- 1 daniel daniel 837 2009-11-22 23:46 put-atari
+&gt; 
+&gt; The same files for C64 are:
+&gt; -rw-r--r-- 1 daniel daniel 335 2009-11-22 23:46 empty-c64
+&gt; -rw-r--r-- 1 daniel daniel 1981 2009-11-22 23:46 fileio-c64
+&gt; -rw-r--r-- 1 daniel daniel 2688 2009-11-22 23:46 printf-c64
+&gt; -rw-r--r-- 1 daniel daniel 749 2009-11-22 23:46 put-c64
+
+Really nice
+
+
+&gt; The patch 4063 includes copying from fdtable.s to fdtoiocb.s and then
+&gt; removing the rest of the code, so to apply, you need first to
+&gt; &quot;svn cp fdtable.s fdtoiocb.s&quot;.
+
+Ok, I overlooked this part when I first read the mail, so I
+manually made the change to put the fdtoiocb function into
+its own file (since the patch didn't apply). Please take
+a look. I did some sanity checks but nothing more yet.
+
+I also removed the &quot;initsp&quot; constructor in crt0.s. I don't
+remember why I turned the sp initialization into a
+constructor, maybe some kind of mental derangement...
+
+
+regards,
+chris
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Nov 23 23:31:46 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7631.html" title="Next message in the list">Daniel Serpell: "Re: [cc65] Memory impact of Atari library compile time defines"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7629.html" title="Previous message in the list">Daniel Serpell: "Re: [cc65] Memory impact of Atari library compile time defines"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7629.html" title="Message to which this message replies">Daniel Serpell: "Re: [cc65] Memory impact of Atari library compile time defines"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7631.html" title="Next message in this discussion thread">Daniel Serpell: "Re: [cc65] Memory impact of Atari library compile time defines"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7631.html" title="Message sent in reply to this message">Daniel Serpell: "Re: [cc65] Memory impact of Atari library compile time defines"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7630" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7630" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7630" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-11-23 23:31:49 CET
+</em></small></p>
+</body>
+</html>

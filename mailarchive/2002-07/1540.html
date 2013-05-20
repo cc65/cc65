@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] preprocessor hazzle...</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] preprocessor hazzle...">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] preprocessor hazzle...</h1>
+<!-- received="Fri Jul 26 23:56:59 2002" -->
+<!-- isoreceived="20020726215659" -->
+<!-- sent="Fri, 26 Jul 2002 23:56:51 +0200" -->
+<!-- isosent="20020726215651" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] preprocessor hazzle..." -->
+<!-- id="18229094414.20020726235651@gmx.net" -->
+<!-- inreplyto="20020726192330.GA14307@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20preprocessor%20hazzle..."><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2002-07-26 23:56:51
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1539.html">Christian Groessler: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>In reply to:</strong> <a href="1538.html">Ullrich von Bassewitz: "Re: [cc65] preprocessor hazzle..."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1544.html">Ullrich von Bassewitz: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Next in thread:</strong> <a href="1542.html">MagerValp: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Next in thread:</strong> <a href="1539.html">Christian Groessler: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Reply:</strong> <a href="1544.html">Ullrich von Bassewitz: "Re: [cc65] preprocessor hazzle..."</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+Friday, July 26, 2002, 9:23:30 PM, you wrote:
+
+UvB&gt; However, it seems that unknown pragmas are not skipped correctly, so -
+UvB&gt; depending on the actual pragma - you may get a related error. I will have a
+UvB&gt; look into the problem on the weekend.
+
+ok, thought so :) i needed less #ifdef crap to work around that that i
+thought though, no hurry :=P
+
+UvB&gt; It is an unrelated bug:-) Undefined identifiers are not replaced by a numeric
+UvB&gt; zero in an expression following #if. There is a patch for this on the ftp
+UvB&gt; server together with a patch for the compare issue you've posted a few days
+UvB&gt; ago. The &quot;known bugs&quot; has the actual links-
+
+coolio :o) btw, i guess i can safely assume that the snapshots you
+generate each nite (i guess? looks like it atleast ;=P) always have
+all those patches applied? (i have bad experiences with weirdo errors
+caused by cygwin screwing up things when applying patches so i kinda
+prefer getting the whole bunch and recompiling from that ;))
+
+UvB&gt; Thanks a lot for the reports!
+
+hehe i gotta thank you even more for fixing them :) less compiler bugs
+make life easier (tm) :=P
+
+however.... in the &quot;small&quot; source i stumbled about another possible
+problem.....
+
+void foo(void) {
+     extern int bla;
+}
+
+looks like the compiler doesnt like variables declared extern like
+this :) (seems it doesnt ALWAYS result in an error though, have to
+admit i didnt try this in a simple testprog yet either). the assembler
+output kinda shows that its emitting the .import stuff at wrong places
+and/or two times in the same file.
+
+and another, maybe related thing... somewhere in &quot;small&quot; is a variable
+declared like
+
+extern int bla[];
+
+and then &quot;bla&quot; is somewhere reused in an expression where the size of
+&quot;bla&quot; must be known..... resulting in an &quot;size of &quot;bla&quot; unknown&quot;
+error. i am not sure here, but afaik &quot;bla[]&quot; equals &quot;*bla&quot; in an
+expression and thus its size (the size of the pointer) _is_ known and
+such an error shouldnt occur. (ok i could come up with a testprog
+aswell here but maybe you know where to look already :o))
+
+&gt;&gt; btw as a sidenote.... i noticed the cc65.org frontpage doesnt mention
+&gt;&gt; &quot;cygwin&quot; in the list of working hosts.... so you can add that it works
+&gt;&gt; like a charm in win9x-hosted (prolly nt/2000/xp aswell then) cygwin,
+&gt;&gt; with really minor changes in the gcc-makefiles (some pathes if i
+&gt;&gt; remember right, eg to let it find perl). compiles without a single
+&gt;&gt; warning (-O2 -Wall) btw, good job :O)
+
+UvB&gt; Added, thanks!
+
+btw! i tried compiling with an oldish mingw32 install aswell (cygwin
+compiled binaries are kinda sloooooooow ;=P) and noticed that
+somewhere the code relies on fork() and friends and maybe some other
+things used to spawn a sub-process in *nix.... is there a way to
+compile the source for a target that has simple &quot;spawn...&quot; functions
+but no fork() already? (i also thought on giving turbo-c a try coz
+that usually gives me very small and fast binaries, but it has none of
+all that funky posix stuff :=P)
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20preprocessor%20hazzle...">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20preprocessor%20hazzle...">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1539.html">Christian Groessler: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>In reply to:</strong> <a href="1538.html">Ullrich von Bassewitz: "Re: [cc65] preprocessor hazzle..."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1544.html">Ullrich von Bassewitz: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Next in thread:</strong> <a href="1542.html">MagerValp: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Next in thread:</strong> <a href="1539.html">Christian Groessler: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Reply:</strong> <a href="1544.html">Ullrich von Bassewitz: "Re: [cc65] preprocessor hazzle..."</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-07-26 23:59:04 CEST</em>
+</em>
+</small>
+</body>
+</html>

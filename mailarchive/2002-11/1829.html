@@ -1,0 +1,170 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Inserting Assembly Routin</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Inserting Assembly Routines">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Inserting Assembly Routines</h1>
+<!-- received="Thu Nov 28 12:43:34 2002" -->
+<!-- isoreceived="20021128114334" -->
+<!-- sent="Thu, 28 Nov 2002 12:43:32 +0100" -->
+<!-- isosent="20021128114332" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Inserting Assembly Routines" -->
+<!-- id="20021128114332.GA31323@trixie.musoftware.de" -->
+<!-- inreplyto="sde4d2f5.094@gwmail.sd62.bc.ca" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Inserting%20Assembly%20Routines"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-11-28 12:43:32
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1828.html">Groepaz: "[cc65] Fwd: RR-Devel:ca65 in 21 days"</a>
+<li><strong>In reply to:</strong> <a href="1825.html">Shawn Jefferson: "Re: [cc65] Inserting Assembly Routines"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1832.html">MagerValp: "[cc65] Non-linear memory"</a>
+<li><strong>Reply:</strong> <a href="1832.html">MagerValp: "[cc65] Non-linear memory"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Wed, Nov 27, 2002 at 02:12:35PM -0800, Shawn Jefferson wrote:
+&gt; In the Atari, this is complicated by the fact that a huge window is banked
+&gt; out (16 kB).  Using the banked memory as storage is easy if you do your own
+&gt; linker config and assign code segments manually.  Using it for code would be
+&gt; more of the same, I guess (as you have explained to me.)
+
+Using it for code would need small wrappers in common memory (this is an
+example where the new LOWCODE segment is useful). The reason for the wrapper
+is that it banks in the memory where the actual routine resides, and it allows
+code in one bank to call code from another bank.
+
+&gt; In the internal.txt there is mention of using the extended ram and ram under
+&gt; the OS as a far heap. What does this mean?
+
+It means that this memory is not usable by normal means. One possible use
+would be the memory extension API we talked about, which needs copying in this
+case.
+
+&gt; I have thought of writing routines that would allow you to malloc memory in
+&gt; this extended memory banks, and when you want to access it, it would bank in
+&gt; the right memory bank and then malloc a block in regular ram, copy the data
+&gt; there, bank in the regular 16kB bank again, and return a pointer to the
+&gt; regular ram where it was copied.  This may be just too much overhead/work
+&gt; though....
+
+Too much overhead compared to what? When talking about extended memory, it
+does not make sense to compare it with real linear memory. Instead, compare it
+with disk access, which would otherwise be needed.
+
+&gt; Problems:
+&gt; - this code must not be in the bank window
+
+This is not a problem. Just place the critical pieces into the LOWCODE
+segment. LOWCODE will be placed in low memory, directly above the startup
+code.
+
+&gt; - the bank window cannot contain interrupt routines, or you must disable
+&gt; interrupts while the extended memory access is happening (might this be too
+&gt; long?)
+
+The critical parts of an interrupt handler (entry code at least) should also
+go into LOWCODE, so interrupts should not be a problem. The new Plus/4 code
+does also banking (you may have read the discussion a week ago). The Plus/4
+hardware is able to bank in ROM in the upper 32KB or RAM. Several stubs in low
+memory (including an interrupt handler stub) allow RAM code to call ROM
+routines regardless of the address where the RAM code itself is located, even
+if the RAM is in the high range that is banked out when ROM is enabled.
+
+&gt; - lots of overhead/speed issues maybe too.
+
+I wouldn't think too much about speed. When having to decide between access to
+extended memory, and no access to extended memory, people will almost sure
+choose the former, even if this is slower than access to linear memory. For
+someone with a lot of time, there's always the possibility to write
+handcrafted routines for a special purpose.
+
+&gt; Another topic: Are/is the module loading routines going to be supported on
+&gt; the Atari?
+
+The question is not, if these routines are supported on the Atari, but if
+these routines will be supported on other platforms than the Atari:-)
+
+Seriously: o65 modules are platform independent (a 6502 CPU is necessary), but
+the data must come from somewhere, and the most common data storage is a
+floppy drive. Since the Atari was the first platform to have working disk I/O
+(besides the old ACE target which is no longer supported), it was never a
+question if the module loader would work on the Atari. However, it *was* a
+question if loadable modules would be useful on other platforms, since for
+example the CBMs had no standard disk I/O until two weeks ago.
+
+If you want to know more about the o65 format, please have a look at Andre
+Fachats o65 spec at
+
+        <a href="http://www.6502.org/users/andre/o65/fileformat.html">http://www.6502.org/users/andre/o65/fileformat.html</a>
+
+cc65 has an &quot;official&quot; o65 id, like OSA/65 and Lunix, and I have suggested a
+small addition to Andre, which was accepted by him. Both things are currently
+not reflected in the docs, but apart from that, the page is current.
+
+If you really want to write a memory extension library, please consider taking
+part in the discussion regarding an API for such a library. Having a common
+API across all platforms would certainly help all developers.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Inserting%20Assembly%20Routines">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Inserting%20Assembly%20Routines">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1828.html">Groepaz: "[cc65] Fwd: RR-Devel:ca65 in 21 days"</a>
+<li><strong>In reply to:</strong> <a href="1825.html">Shawn Jefferson: "Re: [cc65] Inserting Assembly Routines"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1832.html">MagerValp: "[cc65] Non-linear memory"</a>
+<li><strong>Reply:</strong> <a href="1832.html">MagerValp: "[cc65] Non-linear memory"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-11-28 12:44:20 CET</em>
+</em>
+</small>
+</body>
+</html>

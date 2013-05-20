@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: Re: [cc65] HEAP from here to ther</title>
+<meta name="Author" content="Thomas Giesel (skoe1directbox.com)" />
+<meta name="Subject" content="Re: Re: [cc65] HEAP from here to there" />
+<meta name="Date" content="2009-06-05" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: Re: [cc65] HEAP from here to there</h1>
+<!-- received="Fri Jun  5 07:32:19 2009" -->
+<!-- isoreceived="20090605053219" -->
+<!-- sent="Fri, 05 Jun 2009 07:32:10" -->
+<!-- isosent="20090605053210" -->
+<!-- name="Thomas Giesel" -->
+<!-- email="skoe1directbox.com" -->
+<!-- subject="Re: Re: [cc65] HEAP from here to there" -->
+<!-- id="083C07D9060505200A21C@directbox.com" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="Re: [cc65] HEAP from here to there" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6586.html" title="Oliver Schmidt: &quot;Re: [cc65] HEAP from here to there&quot;">Next message</a> ]
+[ <a href="6584.html" title="Greg King: &quot;Re: [cc65] HEAP from here to there&quot;">Previous message</a> ]
+[ <a href="6584.html" title="Greg King: &quot;Re: [cc65] HEAP from here to there&quot;">Maybe in reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Thomas Giesel &lt;<a href="mailto:skoe1directbox.com?Subject=Re:%20Re:%20[cc65]%20HEAP%20from%20here%20to%20there">skoe1directbox.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-06-05 07:32:10</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Thanks for your responses.
+
+&gt; Since segments have fixed sizes,
+&gt; your suggestion is not satisfactory.  A fixed-size heap segment is either
+&gt; too small or too large for &gt; 99% of all programs. :-) 
+
+I didn't realize the fixed size. So currently one could use __HEAP_START__ but still there has to be a dependency from __RAM_END__ to get the maximal possible heap size. This dependency is created based on SP at the moment (because after running the program SP is near __RAM_END__). Correct me if I'm wrong.
+
+(The symbol names may be wrong because I'm in a hurry and can't look them up now)
+
+It's also totally intelligible that both, heap and stack are in HEAP.
+
+A way to have both, the maximal size of the HEAP segment and the freedom to put it into another memory area could be this: There could be a new attribute for a linker segment &quot;maximize = yes&quot;. This shall mean that the segment goes up to the end of the current area (and must be the last one in this area). With this feature one could put the HEAP segment in any area and both, heap and stack can be calculated from HEAP_START and HEAP_END,
+
+Possibly I still didn't understand the cross-platform issues and that's why my writing may be nonsense. I'm sorry in this case.
+
+&gt; Uz is not as old as he thinks that he is. :-)
+Oh, I also have some half-finished changes in my code I forgot why I've started them. And I feel young nevertheless ;-)
+
+Regards,
+
+Thomas
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Jun  5 07:32:19 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6586.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] HEAP from here to there"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6584.html" title="Previous message in the list">Greg King: "Re: [cc65] HEAP from here to there"</a></li>
+<li><dfn>Maybe in reply to</dfn>: <a href="6584.html" title="Message to which this message replies">Greg King: "Re: [cc65] HEAP from here to there"</a></li>
+<!-- lnextthread="start" -->
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6589.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] HEAP from here to there"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6585" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6585" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6585" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-06-05 07:32:22 CEST
+</em></small></p>
+</body>
+</html>

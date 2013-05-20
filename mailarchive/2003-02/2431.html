@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Lynx target</title>
+<meta name="Author" content="Shawn Jefferson (sjefferson_at_sd62.bc.ca)">
+<meta name="Subject" content="Re: [cc65] Lynx target">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Lynx target</h1>
+<!-- received="Wed Feb 12 00:03:21 2003" -->
+<!-- isoreceived="20030211230321" -->
+<!-- sent="Tue, 11 Feb 2003 15:02:16 -0800" -->
+<!-- isosent="20030211230216" -->
+<!-- name="Shawn Jefferson" -->
+<!-- email="sjefferson_at_sd62.bc.ca" -->
+<!-- subject="Re: [cc65] Lynx target" -->
+<!-- id="se491092.026@gwmail.sd62.bc.ca" -->
+<!-- inreplyto="[cc65] Lynx target" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Shawn Jefferson (<a href="mailto:sjefferson_at_sd62.bc.ca?Subject=Re:%20[cc65]%20Lynx%20target"><em>sjefferson_at_sd62.bc.ca</em></a>)<br>
+<strong>Date:</strong> 2003-02-12 00:02:16
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2430.html">Ullrich von Bassewitz: "Re: [cc65] Lynx target"</a>
+<li><strong>Maybe in reply to:</strong> <a href="2428.html">Shawn Jefferson: "[cc65] Lynx target"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2432.html">Ullrich von Bassewitz: "Re: [cc65] Lynx target"</a>
+<li><strong>Reply:</strong> <a href="2432.html">Ullrich von Bassewitz: "Re: [cc65] Lynx target"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+&gt;
+&gt;On Tue, Feb 11, 2003 at 01:06:14PM -0800, Shawn Jefferson wrote:
+&gt;&gt; How hard would it be to add the Lynx as a target for cc65 (again?) ?
+&gt;
+&gt;This version of cc65 never had a lynx target. There was another version based
+&gt;on the old Atari cc65, developed independently by Bastian Schick, which
+&gt;generated code for the lynx exclusively. It hasn't been updated for years,
+&gt;however. Problem with that version is that most library routines are rather
+&gt;non standard and lynx specific.
+
+Yes, most would have to be lynx specific and most of the c libraries are not really needed.  It wouldn't make much sense to port conio.h to the lynx (although you could do it I guess.)  I've been looking at the cc65 lynx port and was thinking that it would be nice to benefit from your work the cc65 compiler and I also don't like the K&amp;R syntax that is used.
+
+&gt;&gt; What would the issues be, if any?
+&gt;
+&gt;If you're planing to contribute support for the lynx, please don't use any
+&gt;code from the existing lynx compiler (license problems).
+
+Hmmm, what about the lynx libraries?  I wonder what the licensing issues are with that?  Would code from the compiler itself be needed?
+
+Writing it all from scratch would be a significant job.  *sigh*  I may have to just use it as it is.
+
+ Try to support
+&gt;existing APIs and don't invent anything new if this is not absolutely
+&gt;necessary. The minimum needed is a linker configuration and a startup file.
+&gt;With these two it is possible to compile programs, but since there's no I/O
+&gt;they are of not much use (the Atmos target is currently in this state). While
+&gt;writing the linker config and startup is quite easy (a few minutes if you know
+&gt;the machine), I would prefer to have a more complete port. I had added such a
+&gt;minimal configuration several times but never got anything else, so I removed
+&gt;the stuff later on.
+
+Programming for the lynx would not really require standard i/o stuff.  I was thinking mainly of porting over the existing lynx library to your version of cc65 (reasons stated above.)  Have no idea if that is permissable or possible.
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Lynx%20target">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2430.html">Ullrich von Bassewitz: "Re: [cc65] Lynx target"</a>
+<li><strong>Maybe in reply to:</strong> <a href="2428.html">Shawn Jefferson: "[cc65] Lynx target"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2432.html">Ullrich von Bassewitz: "Re: [cc65] Lynx target"</a>
+<li><strong>Reply:</strong> <a href="2432.html">Ullrich von Bassewitz: "Re: [cc65] Lynx target"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-02-12 00:03:31 CET</em>
+</em>
+</small>
+</body>
+</html>

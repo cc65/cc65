@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] cc65 not producing .s outp</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] cc65 not producing .s output file" />
+<meta name="Date" content="2004-05-02" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] cc65 not producing .s output file</h1>
+<!-- received="Sun May  2 03:12:54 2004" -->
+<!-- isoreceived="20040502011254" -->
+<!-- sent="Sun, 2 May 2004 03:12:48 +0200" -->
+<!-- isosent="20040502011248" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] cc65 not producing .s output file" -->
+<!-- id="20040502011248.GA6609@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="00e101c42fb0$9cd52360$6601a8c0&#64;mypc" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4114.html" title="Ullrich von Bassewitz: &quot;[cc65] Announcement: cc65 2.10.1 released&quot;">Next message</a> ]
+[ <a href="4112.html" title="Apple2Stuff: &quot;Re: [cc65] cc65 not producing .s output file&quot;">Previous message</a> ]
+[ <a href="4112.html" title="Apple2Stuff: &quot;Re: [cc65] cc65 not producing .s output file&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+[ <a href="../2004-04/4104.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] cc65 macros&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20cc65%20not%20producing%20.s%20output%20file">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-05-02 03:12:48</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Sat, May 01, 2004 at 03:15:05PM -0400, Apple2Stuff wrote:
+&gt; Found the problem.
+&gt;
+&gt; Open ended comment.
+
+It's not really the comment, it's the number of stars that were interpreted as
+&quot;pointer to pointer to pointer to ...&quot;. The parser doesn't check for a buffer
+overrun in this place - shame on me.
+
+What I do not understand is that you didn't get a message like
+
+	make: *** [test.o] Segmentation fault (core dumped)
+
+If you get something like this, it does always mean, that there is a problem
+with the compiler.
+
+Regards
+
+
+	Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun May  2 03:12:54 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4114.html" title="Next message in the list">Ullrich von Bassewitz: "[cc65] Announcement: cc65 2.10.1 released"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4112.html" title="Previous message in the list">Apple2Stuff: "Re: [cc65] cc65 not producing .s output file"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4112.html" title="Message to which this message replies">Apple2Stuff: "Re: [cc65] cc65 not producing .s output file"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="../2004-04/4104.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] cc65 macros"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4113" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4113" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4113" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-05-02 03:13:00 CEST
+</em></small></p>
+</body>
+</html>

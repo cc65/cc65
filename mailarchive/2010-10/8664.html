@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Re: Porting to CC65</title>
+<meta name="Author" content="doynax (doynax1gmail.com)" />
+<meta name="Subject" content="[cc65] Re: Porting to CC65" />
+<meta name="Date" content="2010-10-09" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Re: Porting to CC65</h1>
+<!-- received="Sat Oct  9 22:51:30 2010" -->
+<!-- isoreceived="20101009205130" -->
+<!-- sent="Sat, 9 Oct 2010 22:51:22 +0200" -->
+<!-- isosent="20101009205122" -->
+<!-- name="doynax" -->
+<!-- email="doynax1gmail.com" -->
+<!-- subject="[cc65] Re: Porting to CC65" -->
+<!-- id="AANLkTimKpusP_Y3-eFwwS9Pbf_a7NP-uScE8c8W8Pa9y@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="AANLkTin+Eo4isYJcE=r6NcYg8B98W-uxPqh3SSwT2+kE&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8665.html" title="Oliver Schmidt: &quot;Re: [cc65] Re: Porting to CC65&quot;">Next message</a> ]
+[ <a href="8663.html" title="Daniel Pralle: &quot;[cc65] RedHat Specfile&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8665.html" title="Oliver Schmidt: &quot;Re: [cc65] Re: Porting to CC65&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: doynax &lt;<a href="mailto:doynax1gmail.com?Subject=Re:%20[cc65]%20Re:%20Porting%20to%20CC65">doynax1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-10-09 22:51:22</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello,
+
+I'm looking into transferring a C64 game project from ACME to CA65
+with a view to prototyping tedious game logic in C and to make dealing
+with overlay code easier. Anyway, after spending an afternoon reading
+through the manuals and doing a little testing I've now got a couple
+of questions:
+
+1. Am I likely to get into trouble compiling the odd C function into
+an existing project? Is there a big fixed space overhead, or are the
+standard library and runtime functions compiled-in as needed? Also,
+what is the convention for preserving the compiler's zeropage
+variables?
+
+2. My old code makes frequent use of a certain &quot;single_page N&quot; macro
+which insures that the following N-byte array stays within a single
+page. Is there any way I can handle this efficiently in CA65? As far
+as I can see just aligning would waste up to 4*(N-1) bytes.
+
+3. Should I be using the preprocessor to implement non-trivial loops?
+I can't see how to redefine labels imperatively so I tried using macro
+recursion but ran into if-nesting limits.
+
+4. Am I abusing named scopes by trying to use them like C++
+namespaces? I seem to end up wanting to open scopes twice, both in the
+code itself and in the .inc &quot;header.&quot;
+
+I apologize ahead of time if any of this has already been covered by
+the manual or previous discussions in the mailing list.
+
+/doynax
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Oct  9 22:51:30 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8665.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Re: Porting to CC65"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8663.html" title="Previous message in the list">Daniel Pralle: "[cc65] RedHat Specfile"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8665.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Re: Porting to CC65"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8665.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Re: Porting to CC65"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8666.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Re: Porting to CC65"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8664" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8664" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8664" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-10-09 22:51:34 CEST
+</em></small></p>
+</body>
+</html>

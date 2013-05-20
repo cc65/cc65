@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Banking improvements</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="[cc65] Banking improvements" />
+<meta name="Date" content="2012-01-05" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Banking improvements</h1>
+<!-- received="Thu Jan  5 10:35:05 2012" -->
+<!-- isoreceived="20120105093505" -->
+<!-- sent="Thu, 5 Jan 2012 10:34:57 +0100" -->
+<!-- isosent="20120105093457" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="[cc65] Banking improvements" -->
+<!-- id="20120105093457.GA8772@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9866.html" title="Spiro Trikaliotis: &quot;[cc65] Build error for doc/ (Debian Stable)&quot;">Next message</a> ]
+[ <a href="9864.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] How to find highest address of my C code?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Banking%20improvements">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-01-05 10:34:57</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Good morning!
+
+I've introduced two improvements for banking lately.
+
+The first one was suggested by David Lloyd. There's now a new symbol for
+memory areas called __NAME_FILEOFFS__, which contains the offset of the memory
+section in the output file. It is defined when using &quot;define = yes&quot; for the
+memory area, and only if the memory area is output to a binary file.
+
+The second was suggested by Groepaz here:
+
+  <a href="http://www.cc65.org/mailarchive/2009-11/7529.html">http://www.cc65.org/mailarchive/2009-11/7529.html</a>
+
+Thread start:
+
+  <a href="http://www.cc65.org/mailarchive/2009-11/7511.html">http://www.cc65.org/mailarchive/2009-11/7511.html</a>
+
+The memory area attribute is named &quot;bank&quot; (not &quot;banked&quot; as in groepaz
+suggestion), and consequently, the assembler pseudo function is .BANK. The
+argument may be any expression that has exactly one segment reference. So
+
+        foo:
+                .word   .bank (foo)
+
+will work, while things like
+
+        foo:
+        bar:
+                .word   .bank (foo - bar)
+
+will not. See also the comments in the assembler docs:
+
+  <a href="http://www.cc65.org/snapshot-doc/ca65-10.html#ss10.1">http://www.cc65.org/snapshot-doc/ca65-10.html#ss10.1</a>
+
+As usual, I'm glad about any feedback.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Jan  5 10:35:05 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9866.html" title="Next message in the list">Spiro Trikaliotis: "[cc65] Build error for doc/ (Debian Stable)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9864.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] How to find highest address of my C code?"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9865" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9865" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9865" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-01-05 10:35:10 CET
+</em></small></p>
+</body>
+</html>

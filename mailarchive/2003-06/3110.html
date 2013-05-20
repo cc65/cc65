@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Directory/Drive functions</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Directory/Drive functions">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Directory/Drive functions</h1>
+<!-- received="Fri Jun 13 15:15:51 2003" -->
+<!-- isoreceived="20030613131551" -->
+<!-- sent="Fri, 13 Jun 2003 15:15:48 +0200" -->
+<!-- isosent="20030613131548" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Directory/Drive functions" -->
+<!-- id="20030613131548.GA19784@trixie.musoftware.de" -->
+<!-- inreplyto="000001c33151$194b8ec0$ee672c42@palace" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Directory/Drive%20functions"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-06-13 15:15:48
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3109.html">Groepaz: "Re: [cc65] Directory/Drive functions"</a>
+<li><strong>In reply to:</strong> <a href="3108.html">Greg King: "Re: [cc65] Directory/Drive functions"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3111.html">Groepaz: "[cc65] 24bit addresses"</a>
+<li><strong>Next in thread:</strong> <a href="../2003-05/3033.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="3111.html">Groepaz: "[cc65] 24bit addresses"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Thu, Jun 12, 2003 at 09:19:23PM -0400, Greg King wrote:
+&gt; I go further than that.  I changed my copy of the libraries so that they
+&gt; save-and-restore some useful things that might be trashed.  I mentioned it
+&gt; to Uz because I thought that other people might appreciate that convenience
+&gt; as much as I do [if I am wrong, my ego will survive -- just barely ;-)].
+
+This is ok with me. I admit that it can make sense for a program to save and
+restore more than the standard stuff. I just don't think that this should be
+the default, because most people won't sacrifice the memory needed to do these
+things if it is not really necessary.
+
+BTW: You do probably know, but most others dont't; there's an easy way to
+save and restore whatever you like without messing with the library sources.
+Use an assembler module like this one:
+
+-----------------------------------------------------------------------------
+
+        .export         _usemystuff
+        .constructor    initmystuff, 32
+        .destructor     donemystuff, 1
+
+.proc   _usemystuff
+        rts
+.endproc
+
+.proc   initmystuff             ; Save whatever you want here
+        ...
+        rts
+.endproc
+
+.proc   donemystuff             ; Restore things
+        ...
+        rts
+.endproc
+
+-----------------------------------------------------------------------------
+
+Declare the usemystuff function as external function:
+
+        void usemystuff (void);
+
+and call it somewhere from your program. The exact location doesn't matter,
+since the call doesn't do anything but force the module to be linked (maybe
+it's not even necessary if the module is not in a library - I will have to
+check that). After doing so, initmystuff and donemystuff are called
+automagically from the cc65 startup and exit code. Because of the priorities,
+the functions are called before resp. after anything else. Warning: Just save
+and restore variables here. Since the C stuff is not initialized, you cannot
+rely on anything provided by the C runtime library.
+
+Using such a module is an easy way to provide any special intializations your
+program needs before main() is called.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Directory/Drive%20functions">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Directory/Drive%20functions">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3109.html">Groepaz: "Re: [cc65] Directory/Drive functions"</a>
+<li><strong>In reply to:</strong> <a href="3108.html">Greg King: "Re: [cc65] Directory/Drive functions"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3111.html">Groepaz: "[cc65] 24bit addresses"</a>
+<li><strong>Next in thread:</strong> <a href="../2003-05/3033.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="3111.html">Groepaz: "[cc65] 24bit addresses"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-06-13 15:15:57 CEST</em>
+</em>
+</small>
+</body>
+</html>

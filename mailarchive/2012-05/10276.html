@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] non-contiguous code</title>
+<meta name="Author" content="Egan Ford (egan1sense.net)" />
+<meta name="Subject" content="[cc65] non-contiguous code" />
+<meta name="Date" content="2012-05-12" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] non-contiguous code</h1>
+<!-- received="Sat May 12 17:47:24 2012" -->
+<!-- isoreceived="20120512154724" -->
+<!-- sent="Sat, 12 May 2012 09:46:27 -0600" -->
+<!-- isosent="20120512154627" -->
+<!-- name="Egan Ford" -->
+<!-- email="egan1sense.net" -->
+<!-- subject="[cc65] non-contiguous code" -->
+<!-- id="CAFGhWqs7fhsw3BrZ0Hf=QAP=w35jTzGyMvFL0-NkK_DdtM6Q-Q@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10277.html" title="Egan Ford: &quot;[cc65] Re: non-contiguous code&quot;">Next message</a> ]
+[ <a href="../2012-04/10275.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] .proc and labels&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10277.html" title="Egan Ford: &quot;[cc65] Re: non-contiguous code&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Egan Ford &lt;<a href="mailto:egan1sense.net?Subject=Re:%20[cc65]%20non-contiguous%20code">egan1sense.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-05-12 17:46:27</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello all,
+
+I am trying to recompile code that I originally wrote for a 12k or 20k
+Apple-1.  Apple-1s were most commonly 8k with the first 4k assigned to
+$0 and the second assigned to $E000.  The later was used to load BASIC
+from tape.  As RAM prices dropped it was possible to replace the lower
+RAM with 8k or 16k.  Most emulators and replicas support more than 4k
+at $0.  However I would still like to get my code to run on the 4+4
+configuration.
+
+My code segment is 4k + ~600 bytes.  Here is my config file:
+
+MEMORY {
+ZP:     start = $0020, size = $00C0, define = yes;
+HEADER: start = $0000, size = $0004, file = %O;
+RAM1:    start = $0280, size = $0D80, file = %O;
+RAM2:    start = $E000, size = $1000, file = %O;
+}
+SEGMENTS {
+EXEHDR:   load = HEADER, type = ro;
+STARTUP:  load = RAM1,    type = ro, define = yes;
+LOWCODE:  load = RAM1,    type = ro,               optional = yes;
+INIT:     load = RAM1,    type = ro, define = yes, optional = yes;
+CODE:     load = RAM2,    type = ro;
+RODATA:   load = RAM1,    type = ro;
+DATA:     load = RAM1,    type = rw;
+BSS:      load = RAM1,    type = bss, define = yes;
+HEAP:     load = RAM1,    type = bss, optional = yes;
+ZEROPAGE: load = ZP,     type = zp;
+}
+FEATURES {
+CONDES: segment = INIT,
+type = constructor,
+label = __CONSTRUCTOR_TABLE__,
+count = __CONSTRUCTOR_COUNT__;
+CONDES: segment = RODATA,
+type = destructor,
+label = __DESTRUCTOR_TABLE__,
+count = __DESTRUCTOR_COUNT__;
+CONDES: type = interruptor,
+segment = RODATA,
+label = __INTERRUPTOR_TABLE__,
+count = __INTERRUPTOR_COUNT__;
+}
+SYMBOLS {
+__STACKSIZE__ = $800;
+}
+
+Clearly my code is not going to fit into RAM2.
+
+Suggestions?
+
+Thanks.
+
+BTW, I am still using 2.13.2, I have not had time to check the Apple1
+patches with the latest release.  Thanks again.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat May 12 17:47:24 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10277.html" title="Next message in the list">Egan Ford: "[cc65] Re: non-contiguous code"</a></li>
+<li><dfn>Previous message</dfn>: <a href="../2012-04/10275.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] .proc and labels"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10277.html" title="Next message in this discussion thread">Egan Ford: "[cc65] Re: non-contiguous code"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10277.html" title="Message sent in reply to this message">Egan Ford: "[cc65] Re: non-contiguous code"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10276" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10276" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10276" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-05-12 17:47:28 CEST
+</em></small></p>
+</body>
+</html>

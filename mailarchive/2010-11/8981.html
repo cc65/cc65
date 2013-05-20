@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] String Literal Segment in </title>
+<meta name="Author" content="Maspethrose71aol.com (Maspethrose71aol.com)" />
+<meta name="Subject" content="Re: [cc65] String Literal Segment in C code" />
+<meta name="Date" content="2010-11-28" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] String Literal Segment in C code</h1>
+<!-- received="Sun Nov 28 23:15:13 2010" -->
+<!-- isoreceived="20101128221513" -->
+<!-- sent="Sun, 28 Nov 2010 17:14:53 -0500 (EST)" -->
+<!-- isosent="20101128221453" -->
+<!-- name="Maspethrose71aol.com" -->
+<!-- email="Maspethrose71aol.com" -->
+<!-- subject="Re: [cc65] String Literal Segment in C code" -->
+<!-- id="52438.652fd87b.3a242e5d@aol.com" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="[cc65] String Literal Segment in C code" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8982.html" title="Stefan: &quot;[cc65] cbm_readdir&quot;">Next message</a> ]
+[ <a href="8980.html" title="Shawn Jefferson: &quot;RE: [cc65] String Literal Segment in C code&quot;">Previous message</a> ]
+[ <a href="8971.html" title="Maspethrose71aol.com: &quot;[cc65] String Literal Segment in C code&quot;">Maybe in reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9009.html" title="Agent Friday: &quot;Re: [cc65] String Literal Segment in C code&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:Maspethrose71aol.com?Subject=Re:%20[cc65]%20String%20Literal%20Segment%20in%20C%20code">Maspethrose71aol.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-11-28 23:14:53</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a> 
+ 
+In a message dated 11/28/2010 4:09:52 P.M. Eastern Standard Time,  
+64subnet&#64;gmail&#46;<!--nospam-->com writes:
+
+Uhhh...  shall we start with your example?  Could you post the  interesting
+parts of the code you ran?  I don't have a ready example  of my own...
+
+
+
+The config. file:
+---------------------------------------------------------
+MEMORY {
+ZP:  start = $0002, size = $001A, type  = rw, define = yes;
+RAM: start = $07FF, size = $3801, file  = %O, define = yes;
+RAM2:start = $4FFE, size = $1000, file  = &quot;data.seq&quot;, define = yes;
+}
+SEGMENTS {
+STARTUP:  load = RAM, type = ro;
+LOWCODE:  load  = RAM, type =  ro,                optional = yes;
+INIT:     load = RAM,  type = ro, define = yes, optional = yes;
+CODE:     load = RAM, type = ro;
+RODATA:   load = RAM, type = ro;
+DATA:     load = RAM, type = rw;
+ZPSAVE:   load = RAM, type = bss;
+BSS:      load = RAM, type = bss, define =  yes;
+HEAP:     load = RAM, type = bss,  optional = yes; # must sit just below 
+stack
+HIDECONST:load  = RAM2,type = ro, optional = yes;
+HIDEDATA: load =  RAM2,type = rw, optional = yes;
+HIDEBSS:  load =  RAM2,type = bss, optional = yes;
+ZEROPAGE: load =  ZP,  type = zp;
+}
+FEATURES {
+CONDES: segment =  INIT,
+type =  constructor,
+label =  __CONSTRUCTOR_TABLE__,
+count =  __CONSTRUCTOR_COUNT__;
+CONDES: segment =  RODATA,
+type =  destructor,
+label =  __DESTRUCTOR_TABLE__,
+count =  __DESTRUCTOR_COUNT__;
+CONDES: segment =  RODATA,
+type =  interruptor,
+label =  __INTERRUPTOR_TABLE__,
+count =  __INTERRUPTOR_COUNT__;
+}
+SYMBOLS {
+__STACKSIZE__:  value = $0800, weak = yes; # 2k stack
+}
+ 
+---------------------------------------------------------
+The code:
+ 
+---------------------------------------------------------  
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include  &lt;string.h&gt;
+#include &lt;ctype.h&gt;
+#include &lt;conio.h&gt;
+ 
+#include &lt;c64.h&gt;
+ 
+#pragma rodataseg (&quot;HIDECONST&quot;)
+#pragma dataseg (&quot;HIDEDATA&quot;)
+const  unsigned a=0x5000;
+char* strovr=&quot;Hello, world!&quot;;
+#pragma rodataseg  (&quot;RODATA&quot;)
+#pragma dataseg (&quot;DATA&quot;)
+void main ()
+{
+cbm_load  (&quot;data,prg&quot;,8,0);
+puts  (strovr);
+}
+---------------------------------------------------------
+
+
+
+ 
+-------------------
+Joseph Rose, a.k.a. Harry Potter
+Working  magic in the computer community...or at least striving to!  :(
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Nov 28 23:15:13 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8982.html" title="Next message in the list">Stefan: "[cc65] cbm_readdir"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8980.html" title="Previous message in the list">Shawn Jefferson: "RE: [cc65] String Literal Segment in C code"</a></li>
+<li><dfn>Maybe in reply to</dfn>: <a href="8971.html" title="Message to which this message replies">Maspethrose71aol.com: "[cc65] String Literal Segment in C code"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9009.html" title="Next message in this discussion thread">Agent Friday: "Re: [cc65] String Literal Segment in C code"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9009.html" title="Message sent in reply to this message">Agent Friday: "Re: [cc65] String Literal Segment in C code"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8981" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8981" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8981" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-11-28 23:15:16 CET
+</em></small></p>
+</body>
+</html>

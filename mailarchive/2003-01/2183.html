@@ -1,0 +1,167 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] ATARI Multijoy Joystickdr</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] ATARI Multijoy Joystickdriver">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] ATARI Multijoy Joystickdriver</h1>
+<!-- received="Wed Jan  1 15:12:48 2003" -->
+<!-- isoreceived="20030101141248" -->
+<!-- sent="Wed, 1 Jan 2003 15:12:47 +0100" -->
+<!-- isosent="20030101141247" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] ATARI Multijoy Joystickdriver" -->
+<!-- id="20030101141247.GA28879@trixie.musoftware.de" -->
+<!-- inreplyto="200212300156.15811.cas@strotmann.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20ATARI%20Multijoy%20Joystickdriver"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-01-01 15:12:47
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="../2002-12/2182.html">Carsten Strotmann: "[cc65] ATARI Multijoy Joystickdriver"</a>
+<li><strong>In reply to:</strong> <a href="../2002-12/2182.html">Carsten Strotmann: "[cc65] ATARI Multijoy Joystickdriver"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2184.html">Ullrich von Bassewitz: "Re: [cc65] ATARI Multijoy Joystickdriver"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+Sorry for the late answer. I will move at the end of january and currently
+refurbishing the new flat, so I don't have much time.
+
+On Mon, Dec 30, 2002 at 01:56:15AM +0100, Carsten Strotmann wrote:
+&gt; My problem now is, if I try to run the joy-test binary on the ATARI Emulator,
+&gt; the machine crashes when loading the driver (black screen).
+&gt;
+&gt; I need now more information on the cc65 driver architecture, how it works,
+&gt; especially on which memory location the drivers are loaded.
+
+cc65 modules are o65 relocatable files as specified in Andre Fachats o65 specs
+that are available at
+
+  <a href="http://www.6502.org/users/andre/o65/fileformat.html">http://www.6502.org/users/andre/o65/fileformat.html</a>
+
+Two changes currently not in this document are:
+
+  * There is a new registered ID for cc65 modules
+
+  * There is a new bit in the header (mode.11), which when set means that
+    the header has a special &quot;simple&quot; structure, so a few other checks can
+    be omitted to keep the loader small.
+
+These changes are &quot;official&quot;, which means that they have been acknowledged by
+Andre. It's just the document that is not up to date.
+
+The o65 module loader/relocator which is the base of all higher level loadable
+module APIs is described in modload.h (the o65 specs are in o65.h). The module
+loader loads the data into space allocated on the heap, does relocation as
+needed and clears the BSS segment of the module. This means that the location
+of the module can vary.
+
+While the o65 module loader just knows how to load and relocate o65 modules
+that have common features like having the cc65 id and the &quot;simple&quot; header bit
+set, the higher level code expects a special structure that is described in
+the &quot;module.cfg&quot; linker configuration. Each module starts with a header that
+is packed into a segment called &quot;JUMPTABLE&quot;. The first four bytes are always a
+driver signature (an id and a version number). More data and a jump table for
+the functions contained in the driver will follow.
+
+What the higher level API does is this:
+
+  1. Load the o65 module into memory using the o65 module loader. The loader
+     will return a pointer to the module.
+
+  2. Check the signature of the driver.
+
+  3. Do some additional checks and/or copy additional data.
+
+  4. Copy the jump table building a cascade of &quot;jmp xxx&quot; instructions which
+     jump to the routines in the driver. These jumps are then the actual entry
+     points to the driver, which means that the only speed overhead of a
+     function contained in a loadable module is one jump instruction.
+
+  5. Call the INSTALL vector of the driver and check the error code.
+
+  6. In some cases: Copy more data that may have changed when calling INSTALL.
+
+In case of the joystick driver, step 3 consists of copying the button masks,
+and step 6 does not exist.
+
+The o65 module loader doesn't know about files, the higher level code must
+pass a &quot;read&quot; function down. So step 1. consists of opening the file using
+open(), calling mod_load(), and closing the file after that. After each step,
+the code checks for errors.
+
+Since there were no modules for the Atari before, it may be that there are
+problems with the Atari code, or the existing code may not work for the Atari
+for unknown reasons. At least in theory, all the platform specific code is in
+the open(), read() and close() calls so there is no real reason why the module
+loader should not work on the Atari.
+
+The first thing you can try for testing is take the code from
+libsrc/joystick/joy_load.c, embedd it into your test program and check the
+driver code after it was loaded in memory (before the call to joy_install()).
+
+Next step would be to trace the call to joy_install, maybe changing the
+background color in the INSTALL routine of the driver so see if the code is
+reached.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20ATARI%20Multijoy%20Joystickdriver">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20ATARI%20Multijoy%20Joystickdriver">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="../2002-12/2182.html">Carsten Strotmann: "[cc65] ATARI Multijoy Joystickdriver"</a>
+<li><strong>In reply to:</strong> <a href="../2002-12/2182.html">Carsten Strotmann: "[cc65] ATARI Multijoy Joystickdriver"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2184.html">Ullrich von Bassewitz: "Re: [cc65] ATARI Multijoy Joystickdriver"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-01-01 15:13:37 CET</em>
+</em>
+</small>
+</body>
+</html>

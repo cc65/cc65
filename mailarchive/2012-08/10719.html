@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Uniform mass storage devic</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Uniform mass storage device discovery and file locations" />
+<meta name="Date" content="2012-08-17" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Uniform mass storage device discovery and file locations</h1>
+<!-- received="Fri Aug 17 17:17:41 2012" -->
+<!-- isoreceived="20120817151741" -->
+<!-- sent="Fri, 17 Aug 2012 17:16:43 +0200" -->
+<!-- isosent="20120817151643" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Uniform mass storage device discovery and file locations" -->
+<!-- id="CACT=u7048X=kT7bzMVDpn=Fda7z3WsVdN+Fm6UQK=Na3EZ_d-A@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="d16d9a12-d5b6-42eb-a59a-93dd4e4812ea&#64;email.android.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10720.html" title="Oliver Schmidt: &quot;Re: [cc65] Uniform mass storage device discovery and file locations&quot;">Next message</a> ]
+[ <a href="10718.html" title="Oliver Schmidt: &quot;Re: [cc65] Uniform mass storage device discovery and file locations&quot;">Previous message</a> ]
+[ <a href="10717.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Uniform mass storage device discovery and file locations&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Uniform%20mass%20storage%20device%20discovery%20and%20file%20locations">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-08-17 17:16:43</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt;&gt;&gt; just check with a simple LISTEN/SECLISTN/UNLISTEN or
+&gt;&gt;&gt; similar that a device is there
+
+Okay, I#ve been trying to do my homework and came up with this:
+
+
+lda &lt;device&gt;
+jsr $ffb1 ; listen
+lda #$00
+sta $90   ; necessary ?
+lda #$ff  ; or rather #$6f ?
+jsr $ff93 ; lstnsa
+ldy $90
+jsr $ffae ; unlstn
+tya
+bpl &lt;present&gt;
+&lt;not present&gt;
+
+However I have several questions:
+- Is it really necessary to initialize $90
+- What is the right high nibble for &quot;opening&quot; the cmd channel here $F or $6 ?
+- Is it correct to assume that unlstn doesn't trash Y ?
+- Is it correct that $90 must be saved before calling unlstn ?
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Aug 17 17:17:41 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10720.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Uniform mass storage device discovery and file locations"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10718.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Uniform mass storage device discovery and file locations"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10717.html" title="Message to which this message replies">silverdr1wfmh.org.pl: "Re: [cc65] Uniform mass storage device discovery and file locations"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10719" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10719" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10719" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-08-17 17:17:45 CEST
+</em></small></p>
+</body>
+</html>

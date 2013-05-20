@@ -1,0 +1,24 @@
+
+On Fri, Oct 22, 2004 at 08:05:55AM -0500, ccureau@i-55.com wrote:
+> Basically, I'm trying to create a hash table from a structure of c reserved
+> words.  It works fine with gcc, but seems to choke somewhere around the final
+> link in cc65.  I noticed a possible problem when the executable size was
+> smaller than the two object files created.  I then added the printf to test
+> with and ran it on a commodore 64.  The output for each keyword is missing the
+> actual keyword and the newline.
+
+Runs fine here. Which compiler version did you use?
+
+Regards
+
+
+	Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz@musoftware.de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo@musoftware.de with
+the string "unsubscribe cc65" in the body(!) of the mail.
+
+

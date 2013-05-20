@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Re: Problem with generatin</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Re: Problem with generating o65 files" />
+<meta name="Date" content="2005-01-21" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Re: Problem with generating o65 files</h1>
+<!-- received="Fri Jan 21 14:21:51 2005" -->
+<!-- isoreceived="20050121132151" -->
+<!-- sent="Fri, 21 Jan 2005 14:21:47 +0100" -->
+<!-- isosent="20050121132147" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Re: Problem with generating o65 files" -->
+<!-- id="20050121132147.GA18200@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="20050121124928.GC942&#64;mail.trikaliotis.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4782.html" title="Spiro Trikaliotis: &quot;[cc65] Re: Problem with generating o65 files&quot;">Next message</a> ]
+[ <a href="4780.html" title="Spiro Trikaliotis: &quot;[cc65] Re: Problem with generating o65 files&quot;">Previous message</a> ]
+[ <a href="4780.html" title="Spiro Trikaliotis: &quot;[cc65] Re: Problem with generating o65 files&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4782.html" title="Spiro Trikaliotis: &quot;[cc65] Re: Problem with generating o65 files&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Re:%20Problem%20with%20generating%20o65%20files">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-01-21 14:21:47</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Fri, Jan 21, 2005 at 01:49:28PM +0100, Spiro Trikaliotis wrote:
+&gt; According to ca65-3.html#ss3.3, ca65 does not expect a plus sign for a
+&gt; decimal number, so I believe this would be a bug in co65, not in ca65.
+
+No, it's a bug in ca65. A unary plus should of course be allowed. The unary
+plus operator is listed in the &quot;Available operators&quot; section of the ca65
+manual, but it doesn't work. Here is the necessary patch (apply to
+src/ca65/expr.c):
+
+-----------------------------------------------------------------------------
+*** expr.c~     2004-07-18 00:13:35.000000000 +0200
+--- expr.c      2005-01-21 13:56:44.000000000 +0100
+***************
+*** 810,815 ****
+--- 810,820 ----
+            NextTok ();
+            break;
+
++         case TOK_PLUS:
++             NextTok ();
++             N = Factor ();
++             break;
++
+        case TOK_MINUS:
+              NextTok ();
+              L = Factor ();
+-----------------------------------------------------------------------------
+
+&gt; Ok. As you already know, I am not interested in Lunix, but in the
+&gt; 1541/1571/1581 drives with (x)o65 files. Do you recommend another better
+&gt; option?
+
+I don't know of a better option.
+
+&gt; ld65-5.html#ss5.8 does not mention if other OS versions than
+&gt; Lunix are supported. <a href="http://www.6502.org/users/andre/o65/fileformat.html">http://www.6502.org/users/andre/o65/fileformat.html</a>
+&gt; mentions the OSA/65 header supplement, and you told me that there is a
+&gt; version for cc65 use.
+
+Version of what?
+
+&gt; BTW: To compile the cc65 package on my cygwin box [1], I had to make
+&gt; sure that src/common/inttypes.h includes stdint.h instead of defining
+&gt; the own types, or I get an error.
+&gt;
+&gt; Trying to check for __STDC_VERSION__ with a simple test source [2], I
+&gt; get &quot;No __STDC_VERSION__&quot;, so I do not know how this can be
+&gt; distinguished.
+
+This means that the compiler is not conforming to the ISO C99 standard, which
+states that __STDC_VERSION__ must be a predefined macro. The problem why the
+code doesn't work is probably that the compiler doesn't define
+__STDC_VERSION__, but seems to include stdint.h (which is a header file new in
+C99) somewhere, so there are name collisions. Unfortunately, there's not much
+I can do about it. I would say it's a cygwin problem. The compiler should
+either say that it's C99 conformant, or not use any identifiers new in C99.
+BTW: cc65 doesn't define __STDC_VERSION__ either, but the case is somewhat
+different ...
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Jan 21 14:21:51 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4782.html" title="Next message in the list">Spiro Trikaliotis: "[cc65] Re: Problem with generating o65 files"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4780.html" title="Previous message in the list">Spiro Trikaliotis: "[cc65] Re: Problem with generating o65 files"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4780.html" title="Message to which this message replies">Spiro Trikaliotis: "[cc65] Re: Problem with generating o65 files"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4782.html" title="Next message in this discussion thread">Spiro Trikaliotis: "[cc65] Re: Problem with generating o65 files"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4782.html" title="Message sent in reply to this message">Spiro Trikaliotis: "[cc65] Re: Problem with generating o65 files"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4781" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4781" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4781" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-01-21 14:22:02 CET
+</em></small></p>
+</body>
+</html>

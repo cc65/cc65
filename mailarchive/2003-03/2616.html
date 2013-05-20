@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] C++ compiler for the 6502</title>
+<meta name="Author" content="David Holz (davidh_at_otterspace.com)">
+<meta name="Subject" content="Re: [cc65] C++ compiler for the 6502/6510 (CC66)?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] C++ compiler for the 6502/6510 (CC66)?</h1>
+<!-- received="Thu Mar  6 17:17:39 2003" -->
+<!-- isoreceived="20030306161739" -->
+<!-- sent="Thu, 6 Mar 2003 08:22:01 -0800" -->
+<!-- isosent="20030306162201" -->
+<!-- name="David Holz" -->
+<!-- email="davidh_at_otterspace.com" -->
+<!-- subject="Re: [cc65] C++ compiler for the 6502/6510 (CC66)?" -->
+<!-- id="107e01c2e3fc$84cb3990$6902a8c0@magnesium" -->
+<!-- inreplyto="DCE2904C62EF104F9B2C76252D63EDB12404FF@paceserver1.pace.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> David Holz (<a href="mailto:davidh_at_otterspace.com?Subject=Re:%20[cc65]%20C%2B%2B%20compiler%20for%20the%206502/6510%20(CC66)?"><em>davidh_at_otterspace.com</em></a>)<br>
+<strong>Date:</strong> 2003-03-06 17:22:01
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2615.html">Bryan Pope: "Re: [cc65] C++ compiler for the 6502/6510 (CC66)?"</a>
+<li><strong>In reply to:</strong> <a href="2614.html">Christian Krüger: "Re: [cc65] C++ compiler for the 6502/6510 (CC66)?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2622.html">Ullrich von Bassewitz: "Re: [cc65] C++ compiler for the 6502/6510 (CC66)?"</a>
+<li><strong>Next in thread:</strong> <a href="2617.html">Greg Long: "RE: [cc65] C++ compiler for the 6502/6510 (CC66)?"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Nothing was added to C++ that would make it slower than its counterpart in
+C.  This design goal was strictly adhered to in the design of C++.
+
+From: &quot;Christian Krüger&quot; &lt;<a href="mailto:christian.krueger_at_pace.de?Subject=Re:%20[cc65]%20C%2B%2B%20compiler%20for%20the%206502/6510%20(CC66)?">christian.krueger_at_pace.de</a>&gt;
+&gt; all member-functions will get slower (ok,ok static members not.. ;-) ).
+&gt; The compiler have allways to supply the 'this'-pointer and every access
+&gt; to class functions &amp; members is indirect. (Bigger &amp; slower... as I said.)
+
+All functions that act on structures in C require passing the &quot;this&quot; pointer
+manually:  void bounceBall(struct Ball* ball, float someParam).  Having the
+compiler knowledgable of the &quot;this&quot; pointer makes it much faster than a
+normal stack-passed pointer.  For instance, there can be zero-page pointers
+set up for specific &quot;this&quot; pointers for various classes.
+
+&gt; I'm not talking about the virtual function table here - this would
+&gt; increase the program-size additionally...
+
+Enabling virtual functions would add 1 pointer to each class that uses them.
+Compiled virtual function calls are just a call through a function pointer
+in a table and are a whole lot faster than doing &quot;if&quot; trees or switch/case,
+and a lot easier and safer than managing your own function pointer tables in
+C.
+
+&gt; It would also be 'funny' to return class-objects - Remember: cc65 doesn't
+&gt; support even 'struct' returns. (And as we all like fast programs, this is
+&gt; not a limitation to be worry about... ;-) )
+
+This would be no different than returning a struct, except the option of
+overriding how the copy is done with your own routine.  If you don't take
+the option, the compiled code is exactly the same as C's struct returning
+code.
+
+&gt; &gt;Actually, I think I'd be happy with doubles for now :)
+&gt;
+&gt; It would be of course interessting how much memory is left when IEEE is
+&gt; fully supported... (with &lt;math.h&gt;)
+
+Doesn't the linker only pull in those functions which are actually
+referenced?  If so, it shouldn't have to pull in everything, and something
+like Woz's floating point routines are only a couple of hundred bytes of 650
+2.
+
+However, all of this is pretty [OT].  I'm also all for a 6502 C++ compiler,
+but that'd be a different project altogether, and I fully agree with
+Christian Krueger's notions of &quot;better code through a smarter compiler&quot;.
+
+--
+White Flame (aka David Holz)
+<a href="http://www.white-flame.com/">http://www.white-flame.com/</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20C%2B%2B%20compiler%20for%20the%206502/6510%20(CC66)?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2615.html">Bryan Pope: "Re: [cc65] C++ compiler for the 6502/6510 (CC66)?"</a>
+<li><strong>In reply to:</strong> <a href="2614.html">Christian Krüger: "Re: [cc65] C++ compiler for the 6502/6510 (CC66)?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2622.html">Ullrich von Bassewitz: "Re: [cc65] C++ compiler for the 6502/6510 (CC66)?"</a>
+<li><strong>Next in thread:</strong> <a href="2617.html">Greg Long: "RE: [cc65] C++ compiler for the 6502/6510 (CC66)?"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-03-06 17:17:51 CET</em>
+</em>
+</small>
+</body>
+</html>

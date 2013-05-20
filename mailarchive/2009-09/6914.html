@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Optimizer bug found</title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="Re: [cc65] Optimizer bug found" />
+<meta name="Date" content="2009-09-11" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Optimizer bug found</h1>
+<!-- received="Fri Sep 11 19:35:33 2009" -->
+<!-- isoreceived="20090911173533" -->
+<!-- sent="Fri, 11 Sep 2009 19:35:22 +0200" -->
+<!-- isosent="20090911173522" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="Re: [cc65] Optimizer bug found" -->
+<!-- id="200909111935.23990.groepaz@gmx.net" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="20090911163809.GA18208&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6915.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Optimizer bug found&quot;">Next message</a> ]
+[ <a href="6913.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] More low hanging fruits for target independence&quot;">Previous message</a> ]
+[ <a href="6911.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Optimizer bug found&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6915.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Optimizer bug found&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20Optimizer%20bug%20found">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-09-11 19:35:22</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Freitag 11 September 2009, Ullrich von Bassewitz wrote:
+&gt; Hi!
+&gt;
+&gt; On Thu, Sep 10, 2009 at 11:19:34PM +0200, Oliver Schmidt wrote:
+&gt; &gt; After spending a &quot;little&quot; time I finally succeeded in isolating an
+&gt; &gt; (maybe THE) optimizer bug causing Contiki to fail.
+&gt;
+&gt; Thanks a lot! I've fixed the problem, but had to change the guts of one of
+&gt; the optimizer routines, so this may have an impact on other stuff. Please
+&gt; check again.
+
+i ran the testsuite again on 4150 with all combinations of optimizer settings:
+
+- olivers testcase works in all cases now
+- nothing else broke
+- yacc.c works when optimizations are disabled. its still broken in all other 
+cases :/ and most annoyingly: when i enable debug output in yacc.c, it still 
+works in all cases, so tracking down the bug is kinda tedious =P
+
+hrm. =P
+
+-- 
+
+<a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    <a href="http://magicdisk.untergrund.net">http://magicdisk.untergrund.net</a>
+<a href="http://www.pokefinder.org">http://www.pokefinder.org</a>        <a href="http://ftp.pokefinder.org">http://ftp.pokefinder.org</a>
+
+When you take stuff from one writer, it's plagiarism; but when you take it 
+from many writers, it's research. 
+&lt;Wilson Mizner&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Sep 11 19:35:33 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6915.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Optimizer bug found"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6913.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] More low hanging fruits for target independence"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6911.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Optimizer bug found"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6915.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Optimizer bug found"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6915.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Optimizer bug found"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6934.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Optimizer bug found"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6937.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Optimizer bug found"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6938.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Optimizer bug found"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6914" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6914" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6914" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-09-11 19:35:35 CEST
+</em></small></p>
+</body>
+</html>

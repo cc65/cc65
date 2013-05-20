@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] how to write a driver</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] how to write a driver" />
+<meta name="Date" content="2006-08-03" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] how to write a driver</h1>
+<!-- received="Thu Aug  3 09:56:48 2006" -->
+<!-- isoreceived="20060803075648" -->
+<!-- sent="Thu, 3 Aug 2006 09:56:38 +0200" -->
+<!-- isosent="20060803075638" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] how to write a driver" -->
+<!-- id="20060803075638.GA24146@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="44CFF9FC.7050403&#64;freenet.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5549.html" title="Johannes Braun: &quot;Re: [cc65] how to write a driver&quot;">Next message</a> ]
+[ <a href="5547.html" title="Johannes Braun: &quot;[cc65] how to write a driver&quot;">Previous message</a> ]
+[ <a href="5547.html" title="Johannes Braun: &quot;[cc65] how to write a driver&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5549.html" title="Johannes Braun: &quot;Re: [cc65] how to write a driver&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20how%20to%20write%20a%20driver">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2006-08-03 09:56:38</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Good morning.
+
+On Wed, Aug 02, 2006 at 03:03:56AM +0200, Johannes Braun wrote:
+&gt; i would like to provide an extended memory driver for 32k of the retro
+&gt; replay ram. now i have written the source code (i used the c64-reu.emd
+&gt; source as &quot;template&quot;) and it should work fine but how do i actually make
+&gt; a loadable driver out of it. Does it _have_ to be an o65 format file?!
+
+Yes, drivers must be in o65 format, because this format is relocatable (= can
+be loaded at any address).
+
+&gt; if yes, how do i produce such a file??
+
+The easiest way is to use the existing source tree. Place your driver in the
+platform directory (libsrc/c64 in your case), add it to the EMDS stanza of the
+makefile and then run &quot;make c64lib&quot; in the libsrc directory. Your driver will
+then be built as any other driver.
+
+The harder way is to assemble and link the driver manually. In this case you
+do need the zeropage.s module from the source tree:
+
+        ca65 -t c64 zeropage.s
+        ca65 -t c64 -I /path/to/asminc/dir mydriver.s
+        ld65 -t module -o mydriver.emd mydriver.o zeropage.o
+
+&gt; i found nothing in the docs concerning this.
+
+This is true, because the information can be easily retrieved from the
+existing Makefiles.
+
+&gt; the driver code offers routines for INSTALL, UNINSTALL, USE, MAP,
+&gt; COMMIT, COPYFROM and COPYTO complying to the prototypes in em.h
+
+There's a test program for emd drivers: testcode/lib/em-test.c It runs a few
+minutes (depending on the size and speed of the external memory), and finds
+quite a few errors. At least it did in the drivers I wrote:-)
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Aug  3 09:56:48 2006</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5549.html" title="Next message in the list">Johannes Braun: "Re: [cc65] how to write a driver"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5547.html" title="Previous message in the list">Johannes Braun: "[cc65] how to write a driver"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5547.html" title="Message to which this message replies">Johannes Braun: "[cc65] how to write a driver"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5549.html" title="Next message in this discussion thread">Johannes Braun: "Re: [cc65] how to write a driver"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5549.html" title="Message sent in reply to this message">Johannes Braun: "Re: [cc65] how to write a driver"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5548" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5548" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5548" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2006-08-03 09:56:51 CEST
+</em></small></p>
+</body>
+</html>

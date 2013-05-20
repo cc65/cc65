@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Addressing resident code quest</title>
+<meta name="Author" content="Karri Kaksonen (karri1sipo.fi)" />
+<meta name="Subject" content="[cc65] Addressing resident code question" />
+<meta name="Date" content="2004-09-06" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Addressing resident code question</h1>
+<!-- received="Mon Sep  6 10:56:05 2004" -->
+<!-- isoreceived="20040906085605" -->
+<!-- sent="Mon, 6 Sep 2004 12:03:28 +0300 (EEST)" -->
+<!-- isosent="20040906090328" -->
+<!-- name="Karri Kaksonen" -->
+<!-- email="karri1sipo.fi" -->
+<!-- subject="[cc65] Addressing resident code question" -->
+<!-- id="Pine.LNX.4.58.0409061142350.6295@kosh.sipo.fi" -->
+<!-- charset="US-ASCII" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4392.html" title="Karri Kaksonen: &quot;[cc65] Including binary-stuff question&quot;">Next message</a> ]
+[ <a href="4390.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] cc65 calling conventions&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4395.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Addressing resident code question&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Karri Kaksonen &lt;<a href="mailto:karri1sipo.fi?Subject=Re:%20[cc65]%20Addressing%20resident%20code%20question">karri1sipo.fi</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-09-06 11:03:28</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+I am a bit new to the cc65 and currently I play around with the Atari
+Lynx.
+
+One thing that looks nice is the ability to specify several named segments
+for the code.
+
+What I would like to do is to create a small set of resident functions in
+a segment and be able to access these routines from my code in another
+segment that gets switched in and out during the play.
+
+Like:
+
+resident_code segment:
+  - vertical_blanking_interrupt
+  - play_tune
+  - read_file_from_cart
+
+swapped_code segment:
+level_one (starts just behind resident_code):
+  - game
+
+level_two (overwrites level one)
+  - game
+
+How do I tell the compiler what the starting address of level_one will be?
+Do I have to do it manually in the lynx.cfg file or is there a way to find
+out this from the compilation of the resident_code part.
+
+How do I find the entry addresses of my resident routines (play_tune,
+read_file_from_cart) when I link my game at level_one or level_two?
+Or do I have to write a jump table at the start of the module to all
+routines I want to access in another code segment?
+
+By the way. I like this new cc65 version a lot already. The old Lynx
+compiler (newcc65) has a lot more embedded runtime overhead. The assembly
+language files (*.s) are much easier to understand in this compiler.
+
+--
+Cheers,
+
+Karri
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Sep  6 10:56:05 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4392.html" title="Next message in the list">Karri Kaksonen: "[cc65] Including binary-stuff question"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4390.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] cc65 calling conventions"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4395.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Addressing resident code question"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4395.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Addressing resident code question"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4391" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4391" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4391" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-09-06 10:56:14 CEST
+</em></small></p>
+</body>
+</html>

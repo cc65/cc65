@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Running C program in a cart</title>
+<meta name="Author" content="Payton Byrd (plbyrd1gmail.com)" />
+<meta name="Subject" content="[cc65] Running C program in a cart" />
+<meta name="Date" content="2012-05-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Running C program in a cart</h1>
+<!-- received="Fri May 25 22:30:12 2012" -->
+<!-- isoreceived="20120525203012" -->
+<!-- sent="Fri, 25 May 2012 15:28:38 -0500" -->
+<!-- isosent="20120525202838" -->
+<!-- name="Payton Byrd" -->
+<!-- email="plbyrd1gmail.com" -->
+<!-- subject="[cc65] Running C program in a cart" -->
+<!-- id="CAJm6qqfF0SjGin3GZUM-Ea8hmE+FCWdBjiMvAfprL=MDRYSn6w@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10303.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Running C program in a cart&quot;">Next message</a> ]
+[ <a href="10301.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65: Why doesn't this zero-apge override work?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10303.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Running C program in a cart&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Payton Byrd &lt;<a href="mailto:plbyrd1gmail.com?Subject=Re:%20[cc65]%20Running%20C%20program%20in%20a%20cart">plbyrd1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-05-25 22:28:38</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello,
+
+I've got the following code that I'm trying to compile to an
+8k cartridridge and run.
+
+#include &lt;peekpoke.h&gt;
+
+
+void main(void)
+{
+	POKE(53280, 2);
+	POKE(53281, 2);
+
+	while(1);
+}
+
+The configuration file is as such:
+
+
+SYMBOLS {
+    __STACKSIZE__:   type = weak,   value = $0800; # 2k stack
+    __OVERLAYSIZE__: type = weak,   value = $0000;
+	__ROMLOADADDRESS__: type = import;
+}
+MEMORY {
+    ZP:       file = &quot;&quot;, define = yes, start = $0002, size = $001A;
+    RAM:      file = &quot;&quot;, define = yes, start = $080D, size = $8000 -
+$080D, fill = no;
+    ROM1LA:		file = &quot;easycli.bin&quot;, start = $8000, size = $0011;
+	ROM1:		file = &quot;easycli.bin&quot;, define = yes, start = $8011, size =
+$1FEF, fill = yes;
+	RAM2:		file = &quot;&quot;, define = yes, start = $C000, size = $1000, fill = yes;
+}
+SEGMENTS {
+	ROMLA:	  load = ROM1LA,	type = ro, define = yes, optional = no;
+    STARTUP:  load = ROM1,      type = ro;
+    LOWCODE:  load = ROM1,      type = ro,                optional = yes;
+    INIT:     load = ROM1,      type = ro,  define = yes, optional = yes;
+    CODE:     load = ROM1,      type = ro, define = yes;
+    RODATA:   load = ROM1,      type = ro;
+    DATA:     load = RAM,		type = rw, define = yes;
+    ZPSAVE:   load = RAM,		type = bss;
+    BSS:      load = RAM,		type = bss, define = yes;
+    ZEROPAGE: load = ZP,		type = zp;
+}
+FEATURES {
+    CONDES: segment = INIT,
+	    type    = constructor,
+	    label   = __CONSTRUCTOR_TABLE__,
+	    count   = __CONSTRUCTOR_COUNT__;
+    CONDES: segment = RODATA,
+	    type    = destructor,
+	    label   = __DESTRUCTOR_TABLE__,
+	    count   = __DESTRUCTOR_COUNT__;
+    CONDES: segment = RODATA,
+	    type    = interruptor,
+	    label   = __INTERRUPTOR_TABLE__,
+	    count   = __INTERRUPTOR_COUNT__;
+}
+
+
+Finally, my cart header looks like this:
+
+
+;
+; Ullrich von Bassewitz, 2010-11-13
+;
+; This module supplies the load address that is expected by Commodore
+; machines in the first two bytes of an excutable disk file.
+;
+
+
+        ; The following symbol is used by linker config to force the module
+        ; to get included into the output file
+        .export         __ROMLOADADDRESS__: absolute = 1
+
+.segment        &quot;ROMLA&quot;
+
+		.word	$8009
+		.word	$febc
+		.byte   'c' + $80
+		.byte   'b' + $80
+		.byte   'm' + $80
+		.byte   $38, $30
+
+		lda #$01
+		sta $d020
+		sta $d021
+
+
+Now, the cart compiles and loads into VICE, and when it's loaded as a Cart
+the screen and border turn white which is as expected based on the code in
+the header.  The compiled binary then drops straight into the CC65
+initialization code that is normally at 2061 as you would expect.  The
+problem is that somewhere during initialization the system goes into an
+infinite loop of displaying garbage on the screen.
+
+Is there something special I need to do to make this work?
+-- 
+Payton Byrd
+&lt;<a href="http://www.paytonbyrd.com">http://www.paytonbyrd.com</a>&gt;
+&lt;<a href="http://it.toolbox.com/blogs/paytonbyrd">http://it.toolbox.com/blogs/paytonbyrd</a>&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri May 25 22:30:12 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10303.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Running C program in a cart"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10301.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] ca65: Why doesn't this zero-apge override work?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10303.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Running C program in a cart"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10303.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Running C program in a cart"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10313.html" title="Message sent in reply to this message">Thomas Giesel: "Re: [cc65] Running C program in a cart"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10302" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10302" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10302" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-05-25 22:30:15 CEST
+</em></small></p>
+</body>
+</html>

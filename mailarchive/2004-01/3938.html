@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] CIA Timers, SID gate, Structs</title>
+<meta name="Author" content="Veli-Pekka Tätilä (vtatila_at_mail.student.oulu.fi)">
+<meta name="Subject" content="[cc65] CIA Timers, SID gate, Structs Vs Poking, NES?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] CIA Timers, SID gate, Structs Vs Poking, NES?</h1>
+<!-- received="Fri Jan  9 13:28:58 2004" -->
+<!-- isoreceived="20040109122858" -->
+<!-- sent="Fri, 9 Jan 2004 14:26:06 +0200" -->
+<!-- isosent="20040109122606" -->
+<!-- name="Veli-Pekka Tätilä" -->
+<!-- email="vtatila_at_mail.student.oulu.fi" -->
+<!-- subject="[cc65] CIA Timers, SID gate, Structs Vs Poking, NES?" -->
+<!-- id="005301c3d6ab$c4338bd0$8c01a8c0@vpt" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Veli-Pekka Tätilä (<a href="mailto:vtatila_at_mail.student.oulu.fi?Subject=Re:%20[cc65]%20CIA%20Timers,%20SID%20gate,%20Structs%20Vs%20Poking,%20NES?"><em>vtatila_at_mail.student.oulu.fi</em></a>)<br>
+<strong>Date:</strong> 2004-01-09 13:26:06
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3937.html">Rafal: "Re: [cc65] cc65 2.10.0 and windows"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3939.html">David Holz: "Re: [cc65] CIA Timers, SID gate, Structs Vs Poking, NES?"</a>
+<li><strong>Reply:</strong> <a href="3939.html">David Holz: "Re: [cc65] CIA Timers, SID gate, Structs Vs Poking, NES?"</a>
+<li><strong>Reply:</strong> <a href="3940.html">Groepaz: "Re: [cc65] CIA Timers, SID gate, Structs Vs Poking, NES?"</a>
+<li><strong>Reply:</strong> <a href="3941.html">Ullrich von Bassewitz: "Re: [cc65] CIA Timers, SID gate, Structs Vs Poking, NES?"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi list,
+This is my first post in here, I hope this is the right list. I'm more like
+a musician than a programmer so sorry if some of these questions seem
+newbish. I've programmed a bit with C already but am not familiar with the
+C64 in particular apart from the SID chip. That is to say, I've got the
+HardSId card which has the SID chip on a PCI card in hardware and am
+thinking of creating a simple text-mode step sequencer for generating
+x0x-like percussive noise drum loops. I could then use the program to run
+the real SID chip inside an emulator and capture the output in wavefiles for
+example to be used in Sonar later on.
+
+1) I don't really understand the CIA even after reading the section on it in
+the C64 programmers guide and looking at the memory map. Could some kind
+soul explain me how the timer chip basically works? I'd need to do a
+function that will generate an interrupt after a given number of
+milliseconds has passed. I'll be using this as the basis for my sequencers
+timing. Handling interrupts is also all new to me so could you please give a
+simple example in C related to the timer question above? I know the concept
+of an intterupt and used to fight with IRQ conflicts in the good(?) old DOS
+days but that's about it, really.
+
+2) I've already gotten some noise out of the SID chip but began wondering
+how the gate works exactly. Can I retrigger the envelope while it's at the
+sustain phase by simply reopening the gate or do I always need to close it
+before a reopen? Also any ideas on how musical pitch would be represented
+nicely, is a lookup table preferd to finding out the values algorithmically?
+
+3) Just out of curiousity, is poking the memory directly with the macro
+introduced in the FAQ faster than assigning to a field of one of those
+structs? I personally find the struct version much easier to work with.
+
+4) Is it possible to write programs for the NES using this same compiler? I
+think it uses the same processor as the C64 but haven't seen any NES
+specific structs in the headers.
+
+Any help greatly appreciated.
+
+With kind regards Veli-Pekka Tätilä (<a href="mailto:vtatila_at_mail.student.oulu.fi?Subject=Re:%20[cc65]%20CIA%20Timers,%20SID%20gate,%20Structs%20Vs%20Poking,%20NES?">vtatila_at_mail.student.oulu.fi</a>)
+Accessibility, VG music, synthesizers and programming:
+<a href="http://www.student.oulu.fi/~vtatila">http://www.student.oulu.fi/~vtatila</a>
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20CIA%20Timers,%20SID%20gate,%20Structs%20Vs%20Poking,%20NES?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3937.html">Rafal: "Re: [cc65] cc65 2.10.0 and windows"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3939.html">David Holz: "Re: [cc65] CIA Timers, SID gate, Structs Vs Poking, NES?"</a>
+<li><strong>Reply:</strong> <a href="3939.html">David Holz: "Re: [cc65] CIA Timers, SID gate, Structs Vs Poking, NES?"</a>
+<li><strong>Reply:</strong> <a href="3940.html">Groepaz: "Re: [cc65] CIA Timers, SID gate, Structs Vs Poking, NES?"</a>
+<li><strong>Reply:</strong> <a href="3941.html">Ullrich von Bassewitz: "Re: [cc65] CIA Timers, SID gate, Structs Vs Poking, NES?"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2004-01-09 13:30:56 CET</em>
+</em>
+</small>
+</body>
+</html>

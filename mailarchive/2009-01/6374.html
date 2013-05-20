@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Patch for linuxdoc documentati</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="[cc65] Patch for linuxdoc documentation" />
+<meta name="Date" content="2009-01-18" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Patch for linuxdoc documentation</h1>
+<!-- received="Sun Jan 18 15:27:12 2009" -->
+<!-- isoreceived="20090118142712" -->
+<!-- sent="Sun, 18 Jan 2009 15:26:51 +0100" -->
+<!-- isosent="20090118142651" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="[cc65] Patch for linuxdoc documentation" -->
+<!-- id="20090118142650.GG9136@trikaliotis.net" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6375.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] an aftereffect or a bug?&quot;">Next message</a> ]
+[ <a href="6373.html" title="ogd: &quot;[cc65] an aftereffect or a bug?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6395.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Patch for linuxdoc documentation&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20[cc65]%20Patch%20for%20linuxdoc%20documentation">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-01-18 15:26:51</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello,
+
+as I just wanted to generate a new Debian package from SVN, I found out
+that the documentation does not completely compile. I stripped down the
+relevant parts of the errors, see file cc65-svn3907.err.gz.
+
+I worked through it and created a patch which fixes all of this, cf.
+cc65-svn3907-fixdoc-compilation.diff.gz.
+
+Note: I am no LinuxDoc expert; however, now it compiles.
+
+(BTW: does anyone know how I can debug such issues? The linuxdoc tools
+present some arbitrary line number which does not reflect the actual
+line numbers in the file. Thus, it is always a blind guessing)
+
+What did I fix?
+
+1. lynx.sgml: Some 'R' and the like have been changed to `R'.
+
+2. co65.sgml: LinuxDoc does not like the title &quot;Examples: ...&quot; - it
+   seems it does not like the colon. I replaced it with &quot;Examples -
+   ...&quot;.
+
+3. cbm510.sgml, cbm610.sgml: There are two &lt;sect1&gt; with the name
+   &quot;Interrupts&quot;. Although they appear in different &lt;sect&gt;, it seems
+   LinuxDoc does not like this. I renamed one of the &lt;sect1&gt; in order to
+   fix this.
+
+4. ca65.sgml:
+   * like cbm510.sgml with &lt;sect1&gt; of &quot;Overview&quot;.
+   * I replaced some '...' with `...' (at first, I thought this was the
+     problem but I was wrong here)
+   * the weird errors are fixed by adding some (empty) comments at the
+     end of some files. To make them easier recognisable, I added &quot;SRT&quot;
+     (&lt;!--SRT --&gt;). Please, don't ask my *why* this fixes these issues,
+     but it fixes them, anyway.
+
+5. apple2.sgml, apple2enh.sgml: Same as in 1.
+
+Uz, if you like the patches, feel free to apply these to your SVN.
+
+Regards,
+Spiro.
+
+-- 
+Spiro R. Trikaliotis                              <a href="http://opencbm.sf.net/">http://opencbm.sf.net/</a>
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>                     <a href="http://www.viceteam.org/">http://www.viceteam.org/</a>
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<div>
+<ul>
+<li>application/octet-stream attachment: <a href="../att-6374/cc65-svn3907.err.gz">cc65-svn3907.err.gz</a></li>
+</ul>
+<!-- attachment="cc65-svn3907.err.gz" -->
+<ul>
+<li>application/octet-stream attachment: <a href="../att-6374/cc65-svn3907-fixdoc-compilation.diff.gz">cc65-svn3907-fixdoc-compilation.diff.gz</a></li>
+</ul>
+<!-- attachment="cc65-svn3907-fixdoc-compilation.diff.gz" -->
+</div>
+<span id="received"><dfn>Received on</dfn> Sun Jan 18 15:27:12 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6375.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] an aftereffect or a bug?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6373.html" title="Previous message in the list">ogd: "[cc65] an aftereffect or a bug?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6395.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Patch for linuxdoc documentation"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6395.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Patch for linuxdoc documentation"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6419.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] Patch for linuxdoc documentation"</a></li>
+<li><dfn>Reply</dfn>:  <a href="../2009-02/6502.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Patch for linuxdoc documentation"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6374" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6374" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6374" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-01-18 15:27:14 CET
+</em></small></p>
+</body>
+</html>

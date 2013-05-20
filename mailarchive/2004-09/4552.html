@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-15" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re[2]: [cc65] quickly getting the adr</title>
+<meta name="Author" content="Mats Andrén (matan3251student.liu.se)" />
+<meta name="Subject" content="Re[2]: [cc65] quickly getting the adress from somewhere in the code" />
+<meta name="Date" content="2004-09-27" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re[2]: [cc65] quickly getting the adress from somewhere in the code</h1>
+<!-- received="Mon Sep 27 16:52:48 2004" -->
+<!-- isoreceived="20040927145248" -->
+<!-- sent="Mon, 27 Sep 2004 16:54:07 +0200" -->
+<!-- isosent="20040927145407" -->
+<!-- name="Mats Andrén" -->
+<!-- email="matan3251student.liu.se" -->
+<!-- subject="Re[2]: [cc65] quickly getting the adress from somewhere in the code" -->
+<!-- id="409896180.20040927165407@student.liu.se" -->
+<!-- charset="ISO-8859-15" -->
+<!-- inreplyto="16727.56855.952769.780082&#64;panini.cling.gu.se" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4553.html" title="Karri Kaksonen: &quot;Re: [cc65] Floating point support?&quot;">Next message</a> ]
+[ <a href="4551.html" title="MagerValp: &quot;Re: [cc65] quickly getting the adress from somewhere in the code&quot;">Previous message</a> ]
+[ <a href="4551.html" title="MagerValp: &quot;Re: [cc65] quickly getting the adress from somewhere in the code&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4558.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] quickly getting the adress from somewhere in the code&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Mats Andrén &lt;<a href="mailto:matan3251student.liu.se?Subject=Re[2]:%20[cc65]%20quickly%20getting%20the%20adress%20from%20somewhere%20in%20the%20code">matan3251student.liu.se</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-09-27 16:54:07</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Monday, September 27, 2004, 11:32:07 AM, you wrote:
+&gt;&gt;&gt;&gt;&gt;&gt; &quot;UvB&quot; == Ullrich von Bassewitz &lt;uz&#64;musoftware&#46;<!--nospam-->de&gt; writes:
+
+UvB&gt;&gt; I cannot imagine a situation where this would be more useful than
+UvB&gt;&gt; using any of the other information sources given by the linker
+UvB&gt;&gt; (for example the debug info file). Can you give an example for a
+UvB&gt;&gt; common situation where this command could be helpful, that cannot
+UvB&gt;&gt; be handled by other means?
+
+&gt; FWIW I've missed this too. I use it like Mats, to get addresses
+&gt; printed out during assembly that I can check in the monitor when the
+&gt; program is running - without having to export a variable and find it
+&gt; via the map/lab file. Or to print out how many bytes are free in a
+&gt; chunk of code or a table. It's just a convenience features though
+
+Exactly. It is &quot;just&quot; (!) for convenience as a general quick and easy
+way to get in touch with properties of the generated binary or
+contents in c64 memory when working with a cartridge with a monitor.
+Letting you know what expressions evaluate to and so on. Even though I
+understand that it is possible to get most kinds of information out of
+ld65 somehow I think it's obvious what's most usable:
+
+ - Seeing an address:
+   .ldprint *
+   .ldprint somelabel
+
+ - Seeing what an expression evaluates to:
+   .ldprint (table1end-table1start)*NUMBEROFTABLES
+
+ - Seeing what an expression evaluates to, with an additional string
+   description:
+   .ldprint &quot;generated data size: &quot;,(table1end-table1start)*NUMBEROFTABLES
+
+..and then just read what it says on the screen when
+assembling/linking (and just waiting for the binary to transfer to the
+c64 anyway, in my specific case), compared to:
+
+ - Seeing an address:
+   flepp: .export flepp
+   ...and then turning on &quot;-vm&quot; in the linker and loading and browsing
+   the mapfile (which is then also filled with lots of other
+   information that is not straight to the current point) or checking
+   the labelfile by reloading that file into the texteditor or by using
+   an additional grep command on the labelfile or something.
+
+ - Seeing what an expression evaluates to:
+   ...is this even possible now? As far as I understand, you can only
+   check weather an expressíon evaluates to something specific or not
+   with the &quot;.assert&quot; command? Not what it evaluates to.
+
+In fact, I didn't even understand how to easily check what constants
+evaluate to, even though they are determined already in the assembler
+phase? I may have missed that part though. As far as I could see you
+can only output the name of a constant (with &quot;.out .string(CONSTANT)&quot;
+which is quite pointless for the purposes I describe here and
+obviously not what these commands are meant for) and not the value
+associated with it. Can be useful when a constant is calculated from a
+complicated formula depending on lots of stuff.
+
+Even though it is &quot;just for convenience&quot;, it's a feature that I use
+again and again while coding, and having to do it in unnesescarily
+complicated ways just makes me a bit irritated. I see this as a more
+basic feature than most of the other commands in ca65 since it has do
+with ease of interaction during the daily coding process, where &quot;trial
+and error&quot; makes you want to know &quot;what really happened&quot; in many
+different ways depending on what kind of project you're working on.
+It could be used to a lot more than just checking where a label ends
+up. Even though I'm happy that a linker takes care of stuff for me,
+I'm unhappy when it's not really easy to find out _what_ it does for
+me.
+
+Still, I may have missed something, since I'm quite new to the whole
+package and not fully aware of the workings of all available commands
+and so on. Except for this specific aspect, I find ca65+ld65 to be
+really great.
+
+Have a nice day!
+
+/Mats
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Sep 27 16:52:48 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4553.html" title="Next message in the list">Karri Kaksonen: "Re: [cc65] Floating point support?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4551.html" title="Previous message in the list">MagerValp: "Re: [cc65] quickly getting the adress from somewhere in the code"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4551.html" title="Message to which this message replies">MagerValp: "Re: [cc65] quickly getting the adress from somewhere in the code"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4558.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] quickly getting the adress from somewhere in the code"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4558.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] quickly getting the adress from somewhere in the code"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4552" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4552" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4552" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-09-27 16:52:57 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Uniform mass storage devic</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Uniform mass storage device discovery and file locations" />
+<meta name="Date" content="2012-08-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Uniform mass storage device discovery and file locations</h1>
+<!-- received="Thu Aug 23 15:25:23 2012" -->
+<!-- isoreceived="20120823132523" -->
+<!-- sent="Thu, 23 Aug 2012 15:25:06 +0200" -->
+<!-- isosent="20120823132506" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Uniform mass storage device discovery and file locations" -->
+<!-- id="CACT=u72tBC9CVq1i9=N9ZZ7fKLKSG=wGKUm1FEw5qsfDGXUH_Q@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20120822185722.GE2826&#64;trikaliotis.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10762.html" title="Oliver Schmidt: &quot;Re: [cc65] [PATCH 2/3] Fix documentation for DiskChangeDevice.&quot;">Next message</a> ]
+[ <a href="10760.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Uniform mass storage device discovery and file locations&quot;">Previous message</a> ]
+[ <a href="10760.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Uniform mass storage device discovery and file locations&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10763.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Uniform mass storage device discovery and file locations&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Uniform%20mass%20storage%20device%20discovery%20and%20file%20locations">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-08-23 15:25:06</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt;&gt; lda #$ff  ; or rather #$6f ?
+&gt;
+&gt; Yep, $6F.
+
+Okay, I see. Like in
+<a href="http://www.lb.shuttle.de/puffin/cbm4linux/manual/cbm4linux-3.html">http://www.lb.shuttle.de/puffin/cbm4linux/manual/cbm4linux-3.html</a>
+where I saw the $60 ;-)
+
+&gt;&gt; However I have several questions:
+&gt;&gt; - Is it really necessary to initialize $90
+&gt;
+&gt; Yep.
+&gt;
+&gt; [...]
+&gt;
+&gt; Thus, as you are using direct (&quot;low-level&quot;) IEC routines, nothing will
+&gt; reset $90 for you, so you have to do it yourself.
+
+I see.
+
+&gt;&gt; - Is it correct to assume that unlstn doesn't trash Y ?
+&gt;
+&gt; Yep, neither X nor Y is affected, only A (by contract):
+
+Okay.
+
+&gt;&gt; - Is it correct that $90 must be saved before calling unlstn ?
+&gt;
+&gt; No, not really
+&gt;
+&gt; [...]
+
+I was afraid that unlstn would set $90 to zero because &quot;there wasn't a
+communication channel opened successfully in the first place so
+closing it is a nop and therefore by definition successful&quot;. But if
+this isn't the case i'll just LDA $90 after all operations. Dit I
+understand you right that this is reasonable?
+
+Many thanks,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Aug 23 15:25:23 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10762.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] [PATCH 2/3] Fix documentation for DiskChangeDevice."</a></li>
+<li><dfn>Previous message</dfn>: <a href="10760.html" title="Previous message in the list">Spiro Trikaliotis: "Re: [cc65] Uniform mass storage device discovery and file locations"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10760.html" title="Message to which this message replies">Spiro Trikaliotis: "Re: [cc65] Uniform mass storage device discovery and file locations"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10763.html" title="Next message in this discussion thread">Spiro Trikaliotis: "Re: [cc65] Uniform mass storage device discovery and file locations"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10763.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Re: [cc65] Uniform mass storage device discovery and file locations"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10761" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10761" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10761" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-08-23 15:25:28 CEST
+</em></small></p>
+</body>
+</html>

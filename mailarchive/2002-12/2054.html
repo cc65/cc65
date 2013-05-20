@@ -1,0 +1,270 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] Version 2.9.0 is out!</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="[cc65] Version 2.9.0 is out!">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] Version 2.9.0 is out!</h1>
+<!-- received="Sat Dec 14 18:37:58 2002" -->
+<!-- isoreceived="20021214173758" -->
+<!-- sent="Sat, 14 Dec 2002 18:37:56 +0100" -->
+<!-- isosent="20021214173756" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="[cc65] Version 2.9.0 is out!" -->
+<!-- id="20021214173756.GA20395@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Version%202.9.0%20is%20out!"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-12-14 18:37:56
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2053.html">Groepaz: "Re: [cc65] Escape keys"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2055.html">Todd Elliott: "Re: [cc65] Version 2.9.0 is out!"</a>
+<li><strong>Reply:</strong> <a href="2055.html">Todd Elliott: "Re: [cc65] Version 2.9.0 is out!"</a>
+<li><strong>Reply:</strong> <a href="2152.html">Greg King: "Re: [cc65] Version 2.9.0 is out!"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+I've just moved the archives for version 2.9.0 to the ftp server. The
+announcement is appended below. Happy downloading!
+
+Regards
+
+
+        Uz
+
+
+-----------------------------------------------------------------------------
+
+I'm proud to announce version 2.9.0 of CC65, a C crosscompiler /
+crossassembler combo for 6502 systems.
+
+CC65 has C and runtime library support for many of the old 6502 machines,
+including
+
+  - The Commodore VIC20 (contributed by Steve Schmidtke
+    &lt;<a href="mailto:steve_schmidtke_at_hotmail.com?Subject=Re:%20[cc65]%20Version%202.9.0%20is%20out!">steve_schmidtke_at_hotmail.com</a>&gt;).
+
+  - The Commodore C64 and C128.
+
+  - The Commodore C16, C116, Plus/4.
+
+  - The CBM 510 (aka P500), a quite rare Commodore machine (programs
+    run in bank 0).
+
+  - The CBM 600/700 family (programs run in bank 1).
+
+  - Newer PET machines (not 2001)
+
+  - The Apple ][ (library support by Kevin Ruland &lt;<a href="mailto:kevin_at_rodin.wustl.edu?Subject=Re:%20[cc65]%20Version%202.9.0%20is%20out!">kevin_at_rodin.wustl.edu</a>&gt;)
+
+  - The Atari 8 bit machines (thanks to the Atari team: Christian Groessler
+    &lt;<a href="mailto:cpg_at_aladdin.de?Subject=Re:%20[cc65]%20Version%202.9.0%20is%20out!">cpg_at_aladdin.de</a>&gt;, Mark Keates &lt;<a href="mailto:markk_at_dendrite.co.uk?Subject=Re:%20[cc65]%20Version%202.9.0%20is%20out!">markk_at_dendrite.co.uk</a>&gt;, Freddy Offenga
+    &lt;<a href="mailto:taf_offenga_at_yahoo.com?Subject=Re:%20[cc65]%20Version%202.9.0%20is%20out!">taf_offenga_at_yahoo.com</a>&gt; and David Lloyd, &lt;<a href="mailto:dmlloyd_at_atari-central.com?Subject=Re:%20[cc65]%20Version%202.9.0%20is%20out!">dmlloyd_at_atari-central.com</a>&gt;).
+
+  - GEOS for the C64 and C128 (GEOSLib by Maciej Witkowiak &lt;<a href="mailto:ytm_at_elysium.pl?Subject=Re:%20[cc65]%20Version%202.9.0%20is%20out!">ytm_at_elysium.pl</a>&gt;)
+
+There is also rudimentary support for the Oric Atmos (startup file and linker
+config, but no library support) contributed by Debrune Jérôme &lt;<a href="mailto:jede_at_oric.org?Subject=Re:%20[cc65]%20Version%202.9.0%20is%20out!">jede_at_oric.org</a>&gt;.
+
+The libraries are fairly portable, so creating a version for other 6502s
+shouldn't be too much work.
+
+
+New features in this release are:
+
+  * Assembler:
+
+    - In the .local directive, transfer the local char to the created
+      symbols, so &quot;.local @L1&quot; will create cheap local symbols in macros.
+
+    - New commands .PUSHSEG and .POPSEG to save and restore the current
+      segment.
+
+  * Compiler:
+
+    - Optimization for memset (call bzero if fill value is zero).
+
+    - Better handling of unknown pragmas, support for _Pragma().
+
+    - Local variables of compound type may now be initialized.
+
+    - Register variables are back again and they work better than ever before!
+      The plasma demo has a speed increase of 30% using register variables,
+      the fire demo more than 60%. Note that these are special cases (small
+      loops with a high loop count), so these numbers may not be typical.
+
+    - More optimizations, especially register variable related ones.
+
+  * Linker:
+
+    - Support for more o65 attributes and &quot;simple&quot; o65 files
+
+    - The linker is able to generate cc65 specific o65 modules.
+
+  * cl65 utility:
+
+    - Output the command line for the subprocesses when -d is given
+
+  * Library:
+
+    - A module loader allows to load o65 extension modules at runtime. These
+      fully relocatable modules can be used as drivers, overlays or whatever.
+
+    - Completely new graphics library (currently supported: C64) using
+      loadable graphics drivers.
+
+    - RS232 module for the Atari (written by Christian Groessler)
+
+    - New _randomize() function for all platforms
+
+    - Complete set of functions from time.h. All that has to be supplied
+      is a machine speficic _systime function.
+
+    - Most CBM file functions are now written in assembly.
+
+    - C file I/O support for the following platforms: C64, C128, C16, C116,
+      Plus/4, VIC20, PET. This is probably one of the most requested
+      additions!
+
+    - New API to access extended memory with loadable drivers for:
+      C64 with GeoRAM cartridge, C64 with REU, C64 using RAM behind kernal
+      and I/O area. C128 with GeoRAM cartridge, C128 with REU and C128 using
+      the RAM in bank #1.
+
+  * Platforms:
+
+    - Some small improvements for the Apple ][:
+
+      o revers() should now work correctly (do nothing)
+
+      o Binaries have an AppleDOS 3.3 header
+
+    - Support for VLIR files under GEOS
+
+    - Minimal support for the Oric Atmos (just the startup file - contributed
+      by Debrune Jérôme)
+
+    - Support for the VIC20 (Steve Schmidtke). The standard linker config is
+      made for the standard memory setup (3.5K) which is too small for most
+      serious things. You have to use an external memory config when linking
+      for a VIC20 with memory extension.
+
+    - The C16/116 and Plus/4 are now separate platforms. The new Plus/4 target
+      does banking and supports up to 59K of memory, while the C16/116 works
+      without banking (and the overhead) and supports up to 28K. Both are
+      still compatible, so C16 programs will run on the Plus/4, and Plus/4
+      programs will run on an expanded C16 or 116.
+
+  * Documentation:
+
+    - New function reference (incomplete)
+
+  * Bugfixes and minor improvements as usual.
+
+
+There is still no support for the following features:
+
+  * Floats and bit fields.
+
+  * stdio file routines on some systems.
+
+  * The 80 column mode on the C128 is not supported by the conio library.
+
+
+Available packages:
+
+As usual I will provide the complete sources and several binary packages,
+including RPMs for RedHat Linux. Linux is the primary development
+platform, so the sources do compile out of the box on Linux machines.
+
+Please note that there are separate RPMs for the compiler proper and the
+target specific libraries. To develop for one of the predefined target
+systems you need the compiler RPM package *and* one of the target machine
+packages.
+
+Binaries for DOS and and Windows will follow or may already be available
+at the time you read this. OS/2 packages will again be available, but
+since there are almost no downloads for OS/2, so the host platform may
+get dropped in the near future (again). As with the RPM packages, you
+need the package for the development system (Windows, etc.) *and* one or
+more of the target machine packages.
+
+
+Download:
+
+For more information and a download link, please visit the cc65 web page at
+
+     	<a href="http://www.cc65.org/">http://www.cc65.org/</a>
+
+
+Mailing list:
+
+There is a mailing list for discussing cc65 related issues (programming,
+suggestions, bugs, ...). See
+
+        <a href="http://www.cc65.org/#List">http://www.cc65.org/#List</a>
+
+for information on how to subscribe to this list.
+
+-----------
+
+Thanks to all who sent feedback and suggestions, and of course to anyone who
+helped developing cc65!
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Version%202.9.0%20is%20out!">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Version%202.9.0%20is%20out!">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2053.html">Groepaz: "Re: [cc65] Escape keys"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2055.html">Todd Elliott: "Re: [cc65] Version 2.9.0 is out!"</a>
+<li><strong>Reply:</strong> <a href="2055.html">Todd Elliott: "Re: [cc65] Version 2.9.0 is out!"</a>
+<li><strong>Reply:</strong> <a href="2152.html">Greg King: "Re: [cc65] Version 2.9.0 is out!"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-12-14 18:38:13 CET</em>
+</em>
+</small>
+</body>
+</html>

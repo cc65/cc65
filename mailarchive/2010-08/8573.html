@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Contiki 2.4 binary release for</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] Contiki 2.4 binary release for Retrocomputing" />
+<meta name="Date" content="2010-08-21" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Contiki 2.4 binary release for Retrocomputing</h1>
+<!-- received="Sat Aug 21 15:21:44 2010" -->
+<!-- isoreceived="20100821132144" -->
+<!-- sent="Sat, 21 Aug 2010 15:21:38 +0200" -->
+<!-- isosent="20100821132138" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] Contiki 2.4 binary release for Retrocomputing" -->
+<!-- id="AANLkTikeSH+sXC3m0jsAt4VOroprNfBE=SFfoUhde0RK@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8574.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Contiki 2.4 binary release for Retrocomputing&quot;">Next message</a> ]
+[ <a href="8572.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] C64 game coded using CC65&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8574.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Contiki 2.4 binary release for Retrocomputing&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Contiki%202.4%20binary%20release%20for%20Retrocomputing">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-08-21 15:21:38</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+I just released the 'Contiki 2.4 binary release for Retrocomputing'.
+It is available at
+
+  <a href="http://cbm8bit.com/contiki/">http://cbm8bit.com/contiki/</a>
+
+and at
+
+  <a href="http://a2retrosystems.com/contiki.html">http://a2retrosystems.com/contiki.html</a>
+
+This release was built using cc65 2.13.2 from (modified) Contiki 2.4
+sources. The orginal sources are available at
+
+  <a href="http://sourceforge.net/projects/contiki/files/Contiki/Contiki%202.4/contiki-2.4.zip/download">http://sourceforge.net/projects/contiki/files/Contiki/Contiki%202.4/contiki-2.4.zip/download</a>
+
+and the modifications at
+
+  <a href="http://cbm8bit.com/contiki/contiki-2.4-addon.zip">http://cbm8bit.com/contiki/contiki-2.4-addon.zip</a>
+
+Contiki 1.x integrated all programs into a common GUI as windows. Very
+cool but very complex to to write programs for. In fact there was
+never a Contiki 1.x GUI program which was not developed by the Contiki
+core team - and as the Contiki core team doesn't develop GUI programs
+anymore Contiki 1.x was sort of a deadend street.
+
+So in order to ease development of 3rd-party Contiki program I
+modified Contiki 2.x to focus on individual standalone programs with a
+fullscreen GUI. This simplification significantly reduced the memory
+consumption thus allowing to replace custom &quot;hacks&quot; with generic cc65
+components:
+- C-library startup code
+- Linker config file
+- CONIO library
+- Mouse driver
+
+As a result Contiki 2.x contains only very little assembler coding and
+even less target-specific assembler coding. This allowed for easy
+porting to targets beside the C64 namely the C128 and Apple II.
+Porting to other cc65 targets wasn't done due to missing Ethernet
+hardware.
+
+Contiki 2.4 is the first 2.x release to contain the following programs:
+- dhcp client
+- web server
+- web browser
+- wget
+- smtp client
+- irc client
+- Twitter client
+
+The Twitter client called BREADBOX64 proves that the Contiki 2.x
+approach was actual successful as it was independently developed by
+the 3rd-party developer Johan Van den Brande.
+
+Another contribution to this release worthwhile mentioning is the CBM
+filesystem implemented by soci which is both very compact and includes
+fast IDE64 I/O support on the C64.
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Aug 21 15:21:44 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8574.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Contiki 2.4 binary release for Retrocomputing"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8572.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] C64 game coded using CC65"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8574.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Contiki 2.4 binary release for Retrocomputing"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8574.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Contiki 2.4 binary release for Retrocomputing"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8573" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8573" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8573" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-08-21 15:21:48 CEST
+</em></small></p>
+</body>
+</html>

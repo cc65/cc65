@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] ca65 bug? &quot;Range Erro</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] ca65 bug? &quot;Range Error&quot; and scopes problem" />
+<meta name="Date" content="2013-01-05" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] ca65 bug? &quot;Range Error&quot; and scopes problem</h1>
+<!-- received="Sat Jan  5 18:20:18 2013" -->
+<!-- isoreceived="20130105172018" -->
+<!-- sent="Sat, 5 Jan 2013 18:20:05 +0100" -->
+<!-- isosent="20130105172005" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] ca65 bug? &quot;Range Error&quot; and scopes problem" -->
+<!-- id="20130105172005.GA26205@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="CAPsggwtW9TDnK01d4O9VXV-ed7FUim6ymt+=iXegXQ1WdO+iwg&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11048.html" title="Christian Krüger: &quot;Re: [cc65] Strange calculation error...&quot;">Next message</a> ]
+[ <a href="11046.html" title="Jeremy Turner: &quot;[cc65] ca65 bug? &quot;Range Error&quot; and scopes problem&quot;">Previous message</a> ]
+[ <a href="11046.html" title="Jeremy Turner: &quot;[cc65] ca65 bug? &quot;Range Error&quot; and scopes problem&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20ca65%20bug?%20&amp;quot;Range%20Error&amp;quot;%20and%20scopes%20problem">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2013-01-05 18:20:05</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Sat, Jan 05, 2013 at 11:14:15AM -0500, Jeremy Turner wrote:
+&gt;    .autoimport + 
+&gt;    .proc foo
+&gt;        bcc label            ; any branch instruction
+&gt;    .endproc
+&gt;    .proc bar
+&gt;        .export label
+&gt;        label:
+&gt;    .endproc
+&gt;    Replacing the branch instruction with a jmp results in the problem going
+&gt;    away. Is the linker able to figure out addresses but not branches? (This
+&gt;    seems to be failing at assembly.) Is there a correct way to do this?
+
+The problem lies in &quot;.autoimport +&quot;, whose use is not recommended. If you
+remove it, the assembler will tell you that &quot;label&quot; is actually undefined.
+Which is true, since the symbol with this name is in scope &quot;bar&quot;.
+
+So what happens is that &quot;label&quot; is undefined, but because of &quot;.autoimport&quot;,
+the assembler will make it an import. An import has absolute addressing by
+default, so the assembler assumes that the symbol is not reachable by a short
+branch.
+
+&gt;    Thanks for any insight.(I'm using the most recent snapshot.)
+
+No solution (depends on your code), but I hope this clarifies things.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Jan  5 18:20:18 2013</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11048.html" title="Next message in the list">Christian Krüger: "Re: [cc65] Strange calculation error..."</a></li>
+<li><dfn>Previous message</dfn>: <a href="11046.html" title="Previous message in the list">Jeremy Turner: "[cc65] ca65 bug? &quot;Range Error&quot; and scopes problem"</a></li>
+<li><dfn>In reply to</dfn>: <a href="11046.html" title="Message to which this message replies">Jeremy Turner: "[cc65] ca65 bug? &quot;Range Error&quot; and scopes problem"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#11047" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#11047" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#11047" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2013-01-05 18:20:21 CET
+</em></small></p>
+</body>
+</html>

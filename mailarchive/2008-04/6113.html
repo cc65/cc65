@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] cc65 2.12.0 released</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="[cc65] cc65 2.12.0 released" />
+<meta name="Date" content="2008-04-22" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] cc65 2.12.0 released</h1>
+<!-- received="Tue Apr 22 18:37:47 2008" -->
+<!-- isoreceived="20080422163747" -->
+<!-- sent="Tue, 22 Apr 2008 18:37:38 +0200" -->
+<!-- isosent="20080422163738" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="[cc65] cc65 2.12.0 released" -->
+<!-- id="20080422163737.GA2262@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6114.html" title="Spiro Trikaliotis: &quot;[cc65] Debian packages of 2.12.0 available (was: cc65 2.12.0 released)&quot;">Next message</a> ]
+[ <a href="6112.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Windows installer&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6114.html" title="Spiro Trikaliotis: &quot;[cc65] Debian packages of 2.12.0 available (was: cc65 2.12.0 released)&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20cc65%202.12.0%20released">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-04-22 18:37:38</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>It's done. See below for the announcement.
+
+Regards
+
+
+        Uz
+
+
+-----------------------------------------------------------------------------
+
+I'm proud to announce version 2.12.0 of cc65. cc65 is a complete cross
+development package for 65(C)02 systems, including a powerful macro assembler,
+a C compiler, linker, librarian and several other tools.
+
+cc65 has C and runtime library support for many of the old 6502 machines,
+including
+
+  - The Commodore VIC20, C16/C116, C64, C128, C116, Plus/4, 510 (aka P500),
+    the 600/700 family and newer PET machines (not 2001).
+
+  - The Apple ][ and successors.
+
+  - The Atari 8 bit machines.
+
+  - GEOS for the C64 and C128.
+
+  - The Nintendo Entertainment System (NES).
+
+  - The Supervision console.
+
+  - The Oric Atmos.
+
+  - The Lynx Console.
+
+The libraries are fairly portable, so creating a version for other 6502s
+shouldn't be too much work.
+
+This is mostly a bugfix release, with larger changes in just a few places. The
+latter is especially true for the Apple ][ libraries, which have undergone
+major changes done by Oliver Schmidt.
+
+
+As usual I will provide the complete sources and several binary packages,
+including RPMs for RedHat Enterprise Linux 5. Please note that there are
+separate RPMs for the compiler proper, the docs, and the target specific
+libraries. To develop for one of the predefined target systems you need the
+compiler RPM package *and* one of the target machine packages. Be sure to
+download the documentation package if you're new to cc65.
+
+Precompiled binaries for DOS, OS/2 and Windows are available in ZIP archives.
+As with the RPM packages, you need the package for the development system
+(Windows or whatever.) *and* one or more of the target machine packages, plus
+optionally the doc package.
+
+There's also a windows installer package. The target specific libraries and
+header files are selectable as components from within the installer dialogue.
+
+All packages are available from the MU software FTP server:
+
+        <a href="ftp://ftp.musoftware.de/pub/uz/cc65/">ftp://ftp.musoftware.de/pub/uz/cc65/</a>
+
+More information on cc65 can be found on the cc65 web page at
+
+     	<a href="http://www.cc65.org/">http://www.cc65.org/</a>
+
+There is also a mailing list for discussing cc65 related issues (programming,
+suggestions, bugs, ...). See
+
+        <a href="http://www.cc65.org/#List">http://www.cc65.org/#List</a>
+
+for information on how to subscribe to this list.
+
+
+
+While I'm the main developer of cc65, it is actually a joint effort. I would
+like to thank the target library developers, all the people on the cc65
+mailing list, all those sending suggestions and feedback, and even those
+bugging me for a new stable release:-) The CREDITS file is probably
+incomplete, but you know who you are.
+
+Thank you!
+
+
+       	Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Apr 22 18:37:47 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6114.html" title="Next message in the list">Spiro Trikaliotis: "[cc65] Debian packages of 2.12.0 available (was: cc65 2.12.0 released)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6112.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Windows installer"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6114.html" title="Next message in this discussion thread">Spiro Trikaliotis: "[cc65] Debian packages of 2.12.0 available (was: cc65 2.12.0 released)"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6114.html" title="Message sent in reply to this message">Spiro Trikaliotis: "[cc65] Debian packages of 2.12.0 available (was: cc65 2.12.0 released)"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6113" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6113" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6113" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-04-22 18:37:49 CEST
+</em></small></p>
+</body>
+</html>

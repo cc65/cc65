@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] ca65 syntax problems</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] ca65 syntax problems">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] ca65 syntax problems</h1>
+<!-- received="Tue Nov  6 18:43:41 2001" -->
+<!-- isoreceived="20011106174341" -->
+<!-- sent="Tue, 6 Nov 2001 18:43:46 +0100" -->
+<!-- isosent="20011106174346" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] ca65 syntax problems" -->
+<!-- id="20011106184346.C29776@trixie.musoftware.de" -->
+<!-- inreplyto="1381181377.20011106121006@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20ca65%20syntax%20problems"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2001-11-06 18:43:46
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0930.html">groepaz: "Re[2]: [cc65] ca65 syntax problems"</a>
+<li><strong>Previous message:</strong> <a href="0928.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<li><strong>In reply to:</strong> <a href="0925.html">groepaz: "Re[2]: [cc65] ca65 syntax problems"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0930.html">groepaz: "Re[2]: [cc65] ca65 syntax problems"</a>
+<li><strong>Reply:</strong> <a href="0930.html">groepaz: "Re[2]: [cc65] ca65 syntax problems"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Tue, Nov 06, 2001 at 12:10:06PM +0100, groepaz wrote:
+&gt; no ;o) the current &quot;driver&quot; keeps RTS _always_ on, unless you want to
+&gt; get a byte from the serial line, for that matter it drops the RTS line
+&gt; to low for a few cycles (enough for a character to arrive) and then
+&gt; reads the character.
+
+This does not sound very good either, since it places a high interrupt load on
+the other side of the link. Real operating systems have an interrupt triggered
+on a state change of CTS (which is connected to the RTS by the null modem
+cable), so you effectively double the number of interrupts generated on the
+remote side. And you will disable the transfer while your application is not
+polling the UART so your effective transfer rate may be a lot slower than
+necessary, even if the CPU would on average be able to keep up with the
+incoming characters.
+
+&gt; yes, true.... well... like i said before, i have never ever used a
+&gt; different method in plenty of years doing that kinda datatransfer crap
+&gt; so i'd say, unless you are writing sth like a &quot;real&quot; high-performance
+&gt; driver for an operating system or so, you can get of with polling
+&gt; pretty well ;o) (and yes, for sth like a terminal-program its probably
+&gt; not the worst thing to use interupts either ;=))
+
+I've written interrupt driven code for this chip on several platforms, so I do
+of course believe that it's the only real way to do it:-)
+
+The 16550 is quite friendly to the programmer and it is not very difficult to
+use interrupts for sending and receiving, so - apart from the additional space
+for the send and receive buffers - I see no real reason for polling.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20ca65%20syntax%20problems">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20ca65%20syntax%20problems">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0930.html">groepaz: "Re[2]: [cc65] ca65 syntax problems"</a>
+<li><strong>Previous message:</strong> <a href="0928.html">Ullrich von Bassewitz: "Re: [cc65] ca65 syntax problems"</a>
+<li><strong>In reply to:</strong> <a href="0925.html">groepaz: "Re[2]: [cc65] ca65 syntax problems"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0930.html">groepaz: "Re[2]: [cc65] ca65 syntax problems"</a>
+<li><strong>Reply:</strong> <a href="0930.html">groepaz: "Re[2]: [cc65] ca65 syntax problems"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:44 CET</em>
+</em>
+</small>
+</body>
+</html>

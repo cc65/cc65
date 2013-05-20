@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] linker cfg files</title>
+<meta name="Author" content="3843416 (carlosofcascade_at_gmx.net)">
+<meta name="Subject" content="[cc65] linker cfg files">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] linker cfg files</h1>
+<!-- received="Sun Apr 20 18:13:03 2003" -->
+<!-- isoreceived="20030420161303" -->
+<!-- sent="Sun, 20 Apr 2003 17:11:25 +0200" -->
+<!-- isosent="20030420151125" -->
+<!-- name="3843416" -->
+<!-- email="carlosofcascade_at_gmx.net" -->
+<!-- subject="[cc65] linker cfg files" -->
+<!-- id="3EA2B89D.BFE7BB33@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> 3843416 (<a href="mailto:carlosofcascade_at_gmx.net?Subject=Re:%20[cc65]%20linker%20cfg%20files"><em>carlosofcascade_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2003-04-20 17:11:25
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2866.html">Brian Bagnall: "Re: [cc65] Westwood BBS will live again"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2868.html">Marc 'BlackJack' Rintsch: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="2868.html">Marc 'BlackJack' Rintsch: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="2870.html">Groepaz: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="2873.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="2876.html">Shawn Jefferson: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="2879.html">Shawn Jefferson: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="2883.html">Greg King: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="2885.html">Greg King: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="2889.html">Shawn Jefferson: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="2890.html">Shawn Jefferson: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="2899.html">Greg King: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="../2003-05/2930.html">Shawn Jefferson: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="../2003-05/3031.html">Greg King: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="../2003-08/3232.html">Greg King: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="../2003-08/3233.html">Greg King: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="../2003-08/3238.html">Greg King: "Re: [cc65] linker cfg files"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+i have a problem with a specific linker config.
+i want to display grafic on the screen, so i want to reserve memory for
+the bitmap.
+i want to reserve this 8000 bytes at the adress $2000. so i wrote
+following linker cfg:
+
+MEMORY {
+ ZP: start = $02, size = $1A, type = rw;
+ RAMLO: start = $07ff, size = $1800, define = yes, file = %O;
+  BMP: start = $2000, size = $1f40, define = yes, file = %O;
+  RAM: start = $3f3e, size = $4000, define = yes, file = %O;
+}
+SEGMENTS {
+  BITMAP: load = BMP, type = bss;
+  STARTUP: load = RAMLO, type = wprot;
+  CODE: load = RAMLO, type = wprot;
+  RODATA: load = RAMLO, type = wprot;
+ DATA: load = RAM, type = rw;
+ BSS: load = RAM, type = bss, define = yes;
+ ZEROPAGE: load = ZP, type = zp;
+}
+FEATURES {
+ CONDES: segment = RODATA,
+  type = constructor,
+  label = __CONSTRUCTOR_TABLE__,
+  count = __CONSTRUCTOR_COUNT__;
+ CONDES: segment = RODATA,
+  type = destructor,
+  label = __DESTRUCTOR_TABLE__,
+  count = __DESTRUCTOR_COUNT__;
+}
+SYMBOLS {
+ __STACKSIZE__ = $800; # 2K stack
+}
+
+then i used following assembly prg to reserve storage in the
+BITMAP segment:
+
+.segment &quot;BITMAP&quot;
+.res 8000,0
+
+the rest was done in c. i expect malloc to reserve storage in this
+segment, so that the program crashes. yes, that is what it does.
+without using this memory configuration the program ran already.
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20linker%20cfg%20files">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2866.html">Brian Bagnall: "Re: [cc65] Westwood BBS will live again"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2868.html">Marc 'BlackJack' Rintsch: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="2868.html">Marc 'BlackJack' Rintsch: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="2870.html">Groepaz: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="2873.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="2876.html">Shawn Jefferson: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="2879.html">Shawn Jefferson: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="2883.html">Greg King: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="2885.html">Greg King: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="2889.html">Shawn Jefferson: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="2890.html">Shawn Jefferson: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="2899.html">Greg King: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="../2003-05/2930.html">Shawn Jefferson: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="../2003-05/3031.html">Greg King: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="../2003-08/3232.html">Greg King: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="../2003-08/3233.html">Greg King: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="../2003-08/3238.html">Greg King: "Re: [cc65] linker cfg files"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-04-20 18:13:50 CEST</em>
+</em>
+</small>
+</body>
+</html>

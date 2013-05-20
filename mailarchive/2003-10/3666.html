@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Platform specific docs</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Platform specific docs">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Platform specific docs</h1>
+<!-- received="Tue Oct 28 10:39:31 2003" -->
+<!-- isoreceived="20031028093931" -->
+<!-- sent="Tue, 28 Oct 2003 10:39:28 +0100" -->
+<!-- isosent="20031028093928" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Platform specific docs" -->
+<!-- id="20031028093928.GD18214@trixie.musoftware.de" -->
+<!-- inreplyto="fg3rpvgu4dh3f5jm3573vc3cqmrl4e0lh6@4ax.com" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Platform%20specific%20docs"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-10-28 10:39:28
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3665.html">Ullrich von Bassewitz: "Re: [cc65] Platform specific docs"</a>
+<li><strong>In reply to:</strong> <a href="3663.html">Shawn Jefferson: "Re: [cc65] Platform specific docs"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3668.html">Shawn Jefferson: "Re: [cc65] Platform specific docs"</a>
+<li><strong>Next in thread:</strong> <a href="../2003-09/3446.html">Groepaz: "Re: [cc65] Platform specific docs"</a>
+<li><strong>Reply:</strong> <a href="3668.html">Shawn Jefferson: "Re: [cc65] Platform specific docs"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Mon, Oct 27, 2003 at 01:35:20PM -0800, Shawn Jefferson wrote:
+&gt; This might be slightly off topic, but I noticed that in _heap.s we are
+&gt; subtracting the size of the stack.  Since the stack is by default on
+&gt; the Atari platform put at MEMTOP, if I move my BSS segment, is not
+&gt; _heap.s wasting some memory that otherwise could be used?  The heap
+&gt; grows downward toward the program, right?
+
+On the Atari, the stack is initialized to MEMTOP. Later, module constructors
+may decrease this value if additional space is needed for other purposes.
+Last, the heap module subtracts the proposed size of the heap (as specified in
+the linker config) from the stack pointer and uses this value as the upper
+limit for the heap (the stack pointer itself is not changed by the heap
+routines). So, as far as I can tell, nothing is wasted if you move your BSS
+segment.
+
+For special setups, with larger changes to the segment setup, you can add
+memory blocks to the heap using
+
+        _heapadd (pointer_to_block, size_of_block);
+
+If for example, your program needs to be loaded at $4000 to make room for some
+sort of graphics buffer, but this setup wastes the range $800-$1FFF, you can
+use it as dynamic memory by adding
+
+        _heapadd ((void*)0x800, 0x1800);
+
+somewhere in your program. It is not as good as using it for code/data
+directly, but at an easy way to make at least some use of it. 
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Platform%20specific%20docs">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Platform%20specific%20docs">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3665.html">Ullrich von Bassewitz: "Re: [cc65] Platform specific docs"</a>
+<li><strong>In reply to:</strong> <a href="3663.html">Shawn Jefferson: "Re: [cc65] Platform specific docs"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3668.html">Shawn Jefferson: "Re: [cc65] Platform specific docs"</a>
+<li><strong>Next in thread:</strong> <a href="../2003-09/3446.html">Groepaz: "Re: [cc65] Platform specific docs"</a>
+<li><strong>Reply:</strong> <a href="3668.html">Shawn Jefferson: "Re: [cc65] Platform specific docs"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-10-28 10:40:41 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Setting aside Character S</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Setting aside Character Set ram">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Setting aside Character Set ram</h1>
+<!-- received="Tue Oct 22 11:33:51 2002" -->
+<!-- isoreceived="20021022093351" -->
+<!-- sent="Tue, 22 Oct 2002 11:33:53 +0200" -->
+<!-- isosent="20021022093353" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Setting aside Character Set ram" -->
+<!-- id="20021022093353.GA22914@trixie.musoftware.de" -->
+<!-- inreplyto="002c01c27970$aa7de2b0$8000a8c0@briandvwzriudd" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Setting%20aside%20Character%20Set%20ram"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-10-22 11:33:53
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1619.html">Brian Bagnall: "Re: [cc65] Setting aside Character Set ram"</a>
+<li><strong>In reply to:</strong> <a href="1619.html">Brian Bagnall: "Re: [cc65] Setting aside Character Set ram"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1621.html">Brian Bagnall: "Re: [cc65] Setting aside Character Set ram"</a>
+<li><strong>Reply:</strong> <a href="1621.html">Brian Bagnall: "Re: [cc65] Setting aside Character Set ram"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Mon, Oct 21, 2002 at 09:13:51PM -0500, Brian Bagnall wrote:
+&gt; It really turns into a pain if I try to address memory higher than the first
+&gt; 16kb. Would there be any problems if I changed the START variable in the
+&gt; config to $FFF, leaving 2048 kb for a custom character set near the start of
+&gt; RAM? From what you described about the basic header, it seems this would not
+&gt; conflict with that area.
+
+There won't be any problems. You will have to use a customized startup file
+and you won't be able to load your program as a BASIC program and start it
+with RUN (you will have to load it as an absolute program and use SYS instead
+of RUN). You can also use a BASIC loader that moves the main part of your
+program to $1000. All these and even more things are possible with a custom
+linker config and startup file.
+
+&gt; Also, you mentioned a graphics package would be included in the next
+&gt; release. Would this handle custom character sets, and when do you expect the
+&gt; next version to be released?
+
+The graphics package will not be special for the C64, so it will not support
+custom character sets. The current driver for the C64 will support one high
+res page in 320*200*2 mode with an adjustable palette.
+
+The release date for the next version is currently unknown. I have to solve
+two problems before thinking about a release schedule:
+
+  1. I have to solve the compare problem, which is quite some work, since
+     problematic code is distributed widely over all sources and the library.
+
+  2. The interface to the graphics driver must be extended so that it survives
+     at least one or two more releases without changes, otherwise there will
+     be a version chaos.
+
+There are a few other, minor things, but the two mentioned are the most
+important ones.
+
+&gt; ----- Original Message -----
+&gt; From: &quot;Ullrich von Bassewitz&quot; &lt;<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Setting%20aside%20Character%20Set%20ram">uz_at_musoftware.de</a>&gt;
+&gt; To: &lt;<a href="mailto:cc65_at_musoftware.de?Subject=Re:%20[cc65]%20Setting%20aside%20Character%20Set%20ram">cc65_at_musoftware.de</a>&gt;
+&gt; Sent: Saturday, October 19, 2002 12:37 PM
+&gt; Subject: Re: [cc65] Setting aside Character Set ram
+&gt;
+&gt;
+&gt; &gt;
+&gt; &gt; Hi!
+
+Please remove the copy of the old message from your mail, if there is no real
+reason for keeping it. Remember: Your message is sent to about 100 people, so
+each additional KB in your mail causes 100KB of additional traffic for my mail
+server. I don't have a problem paying for this and other cc65 related traffic,
+but on the other side, there's not really a need to stress my budget.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Setting%20aside%20Character%20Set%20ram">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Setting%20aside%20Character%20Set%20ram">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1619.html">Brian Bagnall: "Re: [cc65] Setting aside Character Set ram"</a>
+<li><strong>In reply to:</strong> <a href="1619.html">Brian Bagnall: "Re: [cc65] Setting aside Character Set ram"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1621.html">Brian Bagnall: "Re: [cc65] Setting aside Character Set ram"</a>
+<li><strong>Reply:</strong> <a href="1621.html">Brian Bagnall: "Re: [cc65] Setting aside Character Set ram"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-10-22 11:35:08 CEST</em>
+</em>
+</small>
+</body>
+</html>

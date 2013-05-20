@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] tgi_sprite and friends</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] tgi_sprite and friends" />
+<meta name="Date" content="2012-11-07" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] tgi_sprite and friends</h1>
+<!-- received="Wed, 7 Nov 2012 11:42:58 +0100" -->
+<!-- isoreceived="20121107104258" -->
+<!-- sent="Wed, 7 Nov 2012 11:42:58 +0100" -->
+<!-- isosent="20121107104258" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] tgi_sprite and friends" -->
+<!-- id="CACT=u718g=H7nzYTrUL-K2WjVWLZHgPX8FZPUbewR+2_FSnLLw@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="509A2BFD.5080308&#64;sipo.fi" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10988.html" title="Karri Kaksonen: &quot;Re: [cc65] tgi_sprite and friends&quot;">Next message</a> ]
+[ <a href="10986.html" title="Karri Kaksonen: &quot;Re: [cc65] tgi_sprite and friends&quot;">Previous message</a> ]
+[ <a href="10986.html" title="Karri Kaksonen: &quot;Re: [cc65] tgi_sprite and friends&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10988.html" title="Karri Kaksonen: &quot;Re: [cc65] tgi_sprite and friends&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20tgi_sprite%20and%20friends">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-11-07 11:42:58</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt; Unfortunately I have nothing new to add to this discussion thread.
+
+By no means I wanted to stop a discussion on this topic - rather the
+opposite ;-)
+
+
+1. In some areas things have changed in the meanwhile too...
+
+- The question to have a tool that runs on the cc65 host platform and
+that creates target (and graphics mode) specific binary data is
+already answered: Uz introduced sp65.
+
+- The question if that tool is able to create that binary data for
+several targets from a single source (as I advocated for) is already
+answered: Uz clearly stated to me that he does _not_ see
+resizing/dithering/&lt;you name it&gt; as part of sp65. This means that one
+likely has to preprocess a source PNG using gimp or whatever before
+feeding the result into sp65. While I personally still dislike this
+from the cross-target perspective the good news is that this is
+answered.
+
+- The question if that tool is creates a common header for that binary
+data allowing i.e. to dynamically load a suitable TGI driver in order
+to render it (as I advocated for) is already answered: Uz added some
+metadata support when generating C code but clearly stated that he
+does _not_ see that - at least in a generic cross-target fashion - for
+generating binary data. Same as above: I personally dislike this but
+the good news is that it is answered.
+
+
+2. Most of us don't see TGI as the tool for high performance highly
+interactive programs.
+
+So at least for me it's totally fine that those scenarios require
+other sprite/bitmap tools - just in the same way that those scenarios
+require other drawing primitives in general.
+
+
+3. So the primary question is about sprites vs. bitmaps - isn't it?
+
+From the sp65 perspective that's no issue: It generates binary data
+and it's up to the user to decide what to do with it and/or how to
+interpret it. So somewhat more precisely it's:
+
+a) Does it make sense to define a cross-target TGI function that takes
+some target-specific sp65 output and places it on the screen?
+
+b) Does it make sense to have that function make use of
+hardware-sprites where they are available?
+
+Hopefully this makes sense to far...
+
+Now for my opinion:
+
+For a)
+I think that it makes certainly sense. For me the big question was it
+the (somehow limited) benefit of such a function justifies the need
+for a whole new host platform tool. But now with sp65 that tool is
+already there so I see no reason to not use it that way.
+
+For b)
+Given that sprites tend to have severe size limitations and that their
+&quot;behaviour&quot; is very different from bitmaps I'd rather say that the
+function as I envision it doesn't make use of hardware sprites - or
+that it falls back to bitmaps if the data to be displayed is to large.
+I would imagine that a TGI user should be allowed to use the function
+to display &quot;something&quot; covering the full screen - the function
+shouldn't be optimized that that scenario but it should be a scenario
+not precluded.
+
+So if a target has hardware-sprites there's nothing to say against a
+target-specific ioctl-based extension. And of course sp65 may generate
+binary data consumed by that extension. But it seems to me that the
+cross-target function that I'd like to see should most likely rather
+stay clear of hardware-sprites.
+
+Just my two - as always length - cents,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed, 7 Nov 2012 11:42:58 +0100</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10988.html" title="Next message in the list">Karri Kaksonen: "Re: [cc65] tgi_sprite and friends"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10986.html" title="Previous message in the list">Karri Kaksonen: "Re: [cc65] tgi_sprite and friends"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10986.html" title="Message to which this message replies">Karri Kaksonen: "Re: [cc65] tgi_sprite and friends"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10988.html" title="Next message in this discussion thread">Karri Kaksonen: "Re: [cc65] tgi_sprite and friends"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10988.html" title="Message sent in reply to this message">Karri Kaksonen: "Re: [cc65] tgi_sprite and friends"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10987" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10987" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10987" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-11-07 11:43:24 CET
+</em></small></p>
+</body>
+</html>

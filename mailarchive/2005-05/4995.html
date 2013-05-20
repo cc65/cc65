@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] errors when compiling cc65 wit</title>
+<meta name="Author" content="Andy Dannelley (andyda1mac.com)" />
+<meta name="Subject" content="[cc65] errors when compiling cc65 with new target" />
+<meta name="Date" content="2005-05-13" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] errors when compiling cc65 with new target</h1>
+<!-- received="Fri May 13 18:32:17 2005" -->
+<!-- isoreceived="20050513163217" -->
+<!-- sent="Fri, 13 May 2005 09:32:01 -0700" -->
+<!-- isosent="20050513163201" -->
+<!-- name="Andy Dannelley" -->
+<!-- email="andyda1mac.com" -->
+<!-- subject="[cc65] errors when compiling cc65 with new target" -->
+<!-- id="884E66EF-C3CC-11D9-9CF1-000D936E90CA@mac.com" -->
+<!-- charset="US-ASCII" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4996.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] errors when compiling cc65 with new target&quot;">Next message</a> ]
+[ <a href="4994.html" title="42Bastian Schick: &quot;Re: [cc65] if/else/endif macros&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4996.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] errors when compiling cc65 with new target&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Andy Dannelley &lt;<a href="mailto:andyda1mac.com?Subject=Re:%20[cc65]%20errors%20when%20compiling%20cc65%20with%20new%20target">andyda1mac.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-05-13 18:32:01</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I have bee trying to compile cc65 with a new target, the AIM 65.
+
+I have successfully compiled the standard version of 2.10.1 with no  
+problems so I thought I would add the AIM 65 as a target.
+
+
+Here's that I've done, each time I compile I look at everything and try  
+to find what I may have left out, and I found some, but now I can't  
+find anymore, below is a list of what I've done, I hope you can maybe  
+see what I've left out, any help is much appreciated.
+
+Thanks,
+
+AndyD
+
+ From a previous posting in response to a question on the topic,
+Uz said &quot;Absolutely necessary are the linker configuration  
+(platform.cfg) and the
+startup code (crt0.s, assembled to platform.o). Provided that you have  
+these
+two files, you can write programs that run on the platform. You may use  
+any of
+the existing platforms as example, I'm usually suggesting the c16.&quot;
+
+So I tried to do that.
+
+It seems to compile OK until I get to the library portion of the  
+compile, and here are he errors I get when compiling --
+
+cd libsrc ; make
+for tgt in apple2 aim65 atari atmos c16 c128 c64 cbm510 cbm610 geos nes  
+pet plus4 supervision vic20; do		\
+     make clean &quot;$tgt&quot;lib || exit 1;	\
+done
+
+(correct outpoput for apple2 was here)
+
+for i in aim65 common runtime conio dbg zlib; do \
+     AS=../../src/ca65/ca65 \
+     CC=../../src/cc65/cc65 \
+     LD=../../src/ld65/ld65 \
+     AFLAGS=&quot;-t aim65 -I../../asminc&quot; \
+     CFLAGS=&quot;-Osir -g -T -t aim65 --forget-inc-paths -I.  
+-I../../include&quot; \
+     make -C $i || exit 1; \
+     ../src/ar65/ar65 a aim65.lib $i/*.o;\
+done
+ca65: Invalid target name: `aim65'
+make[2]: *** [break.o] Error 1
+make[1]: *** [aim65lib] Error 1
+make: *** [all] Error 1
+### execution of cd failed, exit code 2
+Failed: compiling cc65-2.10.1a-0 failed
+
+
+
+Here's what I have included or modified in the source:
+
+include:  aim65.h escentially a dummy file with no defines yet
+
+libsrc:  aim65 directory (folder) contining: aim65.inc, break.s,  
+cclear.s, cgetc.s, clrscr.s, cputc.s
+crt0.s, cvline.s, getargs.s, kbhit.s, randomize.s, sysuname.s and the  
+modified makefile to reflect the
+actual files used and modifications to include, .include   	&quot;aim65.inc&quot;  
+where necessary.
+
+The makefile for libsrc has the following for aim65:
+
+#----------------------------------------------------------------------- 
+------
+# AIM 65
+
+aim65lib:
+	for i in aim65 common runtime conio dbg zlib; do \
+	    AS=$(AS) \
+	    CC=$(CC) \
+	    LD=$(LD) \
+	    AFLAGS=&quot;-t aim65 -I../../asminc&quot; \
+	    CFLAGS=&quot;-Osir -g -T -t aim65 --forget-inc-paths -I.  
+-I../../include&quot; \
+	    $(MAKE) -C $$i || exit 1; \
+	    $(AR) a aim65.lib $$i/*.o;\
+	done
+	mv aim65/crt0.o aim65.o
+	
+	
+in the /src/ld65 i have included and aim65.inc
+	
+In 	/src/ld65/cfg I have the aim65.cfg
+	
+In	/src/ld65 modifications to makefile.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri May 13 18:32:17 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4996.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] errors when compiling cc65 with new target"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4994.html" title="Previous message in the list">42Bastian Schick: "Re: [cc65] if/else/endif macros"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4996.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] errors when compiling cc65 with new target"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4996.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] errors when compiling cc65 with new target"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4995" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4995" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4995" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-05-13 18:32:21 CEST
+</em></small></p>
+</body>
+</html>

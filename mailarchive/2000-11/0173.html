@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] lcc port to the c64</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] lcc port to the c64">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] lcc port to the c64</h1>
+<!-- received="Thu Nov 16 20:11:03 2000" -->
+<!-- isoreceived="20001116191103" -->
+<!-- sent="Thu, 16 Nov 2000 20:10:40 +0100" -->
+<!-- isosent="20001116191040" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] lcc port to the c64" -->
+<!-- id="20001116201040.A22417@trixie.musoftware.de" -->
+<!-- inreplyto="OF55A099C4.87F68BE9-ONC1256999.00502A8A@aladdin.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20lcc%20port%20to%20the%20c64"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2000-11-16 20:10:40
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0174.html">Rene de Bie: "[cc65] Need help.."</a>
+<li><strong>Previous message:</strong> <a href="0172.html">cpg_at_aladdin.de: "Re: [cc65] lcc port to the c64"</a>
+<li><strong>In reply to:</strong> <a href="0172.html">cpg_at_aladdin.de: "Re: [cc65] lcc port to the c64"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0174.html">Rene de Bie: "[cc65] Need help.."</a>
+<li><strong>Reply:</strong> <a href="0174.html">Rene de Bie: "[cc65] Need help.."</a>
+<li><strong>Reply:</strong> <a href="0188.html">Todd Vierling: "Re: [cc65] lcc port to the c64"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Thu, Nov 16, 2000 at 03:39:46PM +0100, <a href="mailto:cpg_at_aladdin.de?Subject=Re:%20[cc65]%20lcc%20port%20to%20the%20c64">cpg_at_aladdin.de</a> wrote:
+&gt; If you follow the credits section to the lcc backend, there is also something
+&gt; noteworthy - a 6502 version of gcc. Maybe we could change it to used ca65 and
+&gt; friends?
+
+I have had a look an the sources of this gcc port a long time ago, and I don't
+think this would be worthwile:
+
+  * It emulates a 24 bit machine with 16 registers on the 6502. First, this is
+    slow, since the 6502 has enough trouble even with 16 bit values. Second,
+    this means that there are no 32 bit longs (which is the minimum size
+    according to the standard). And third, the zeropage footprint is quite
+    large.
+
+  * There is no stack, all space for locals is static. This means that you
+    cannot have functions calling themselves.
+
+  * The docs state that &quot;This port required changes to the standard GCC source
+    code, code that is normally not necessary to change for a port.&quot; I don't
+    think that the gcc folks will like that, so it may be difficult to get the
+    changes into the main gcc tree.
+
+  * The patches are from '97 - which means they're quite old. It may be quite
+    some work to apply them to a more recent version of gcc (remember that gcc
+    development is fast since egcs has taken over).
+
+All in all it seems that gcc is too big as a compiler to be targeted to an 8
+bit machine. As far as I remember there has never been a port to 16 bit intel
+CPUs for this reason.
+
+The 6502 lcc compiler is a much more interesting port. Unfortunately it has
+been vapourware for several years (Daniel Dallmans Lunix page mentions it for
+a long time now, but I've never found anything to download). Maybe this will
+change (I could not test the compiler that is downloadable from the Oric page,
+since I currently do not have any DOS capable machines running).
+
+Regards
+
+
+	Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20lcc%20port%20to%20the%20c64">uz_at_musoftware.de</a>
+
+
+</pre>
+<hr noshade>
+<ul>
+<li>application/pgp-signature attachment: <a href="../att-0173/01-part">stored</a>
+</ul>
+<!-- attachment="01-part" -->
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20lcc%20port%20to%20the%20c64">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0174.html">Rene de Bie: "[cc65] Need help.."</a>
+<li><strong>Previous message:</strong> <a href="0172.html">cpg_at_aladdin.de: "Re: [cc65] lcc port to the c64"</a>
+<li><strong>In reply to:</strong> <a href="0172.html">cpg_at_aladdin.de: "Re: [cc65] lcc port to the c64"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0174.html">Rene de Bie: "[cc65] Need help.."</a>
+<li><strong>Reply:</strong> <a href="0174.html">Rene de Bie: "[cc65] Need help.."</a>
+<li><strong>Reply:</strong> <a href="0188.html">Todd Vierling: "Re: [cc65] lcc port to the c64"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:36 CET</em>
+</em>
+</small>
+</body>
+</html>

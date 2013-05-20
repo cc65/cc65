@@ -1,0 +1,269 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Re: still need support wi</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] Re: still need support with low-level file stuff?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Re: still need support with low-level file stuff?</h1>
+<!-- received="Sat Jul 10 17:57:45 1999" -->
+<!-- isoreceived="19990710155745" -->
+<!-- sent="Sat, 10 Jul 1999 17:57:20 +0200" -->
+<!-- isosent="19990710155720" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] Re: still need support with low-level file stuff?" -->
+<!-- id="37876D60.AD20C1EF@gmx.net" -->
+<!-- inreplyto="m112rym-000brTC@wuschel.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Re:%20still%20need%20support%20with%20low-level%20file%20stuff?"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 1999-07-10 17:57:20
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="1002.html">Ullrich von Bassewitz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<li><strong>Previous message:</strong> <a href="1000.html">Ullrich von Bassewitz: "[cc65] Re: still need support with low-level file stuff?"</a>
+<li><strong>In reply to:</strong> <a href="1000.html">Ullrich von Bassewitz: "[cc65] Re: still need support with low-level file stuff?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1002.html">Ullrich von Bassewitz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<li><strong>Reply:</strong> <a href="1002.html">Ullrich von Bassewitz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+&gt; &gt; mmmh, will there be windoze binaries as well? still no linux here, bah
+&gt; 
+&gt; I've created binaries for all supported platforms as usual.
+
+ok... sorry if that question sounded somewhat ignorant =)
+
+&gt; No, there's no low level file support. But then, there's also no low level
+&gt; file support if you write your stuff in assembler, so at least you don't loose
+&gt; anything:-)
+
+true... however, i wanna make the code as portable as possible (that is,
+i want the thing to be easily portable to PC using the PLAYSID-engine)
+so
+beeing able to use open/write/close etc would be very nice.
+
+&gt; More seriously: This topic is not quite as easy as it looks on the first
+&gt; glance. It seems that there is no easy way to support files in a standard
+&gt; conform way. One reason is, that you may open a file for reading and writing
+&gt; in C, and this is not possible with the CBM disk drives, at least not with
+&gt; sequential files. The second reason is that things like fseek() must be
+&gt; implemented by closing and reopening the file, then skipping all the bytes
+&gt; &gt;from the beginning (things like SEEK_END are even more ugly). This makes the
+&gt; routine almost useless.
+&gt; 
+&gt; An alternative would be to use relative files, but these are far more complex
+&gt; to handle, and are not very well supported by many software tools available.
+&gt; In addition, relative files may not be used for some type of data: If you
+&gt; write a program in C that outputs a program file (assembler for example), this
+&gt; program file may not go into a relative file, otherwise it won't be executed
+&gt; by the kernal.
+&gt; 
+&gt; So, until I have a good idea how to handle this problem, the easiest way is
+&gt; probably to write a short specialized assembler that reads or writes your data
+&gt; files. If you write your programs in assembler you would also need such a
+&gt; routine, so just make it C callable and use it from the high level code.
+
+well.... i dont pretty much agree with you... there is actually NO
+difference 
+in using PRG, SEQ, USR, REL or whatever files, since direct raw access
+worx
+with all of these in the same way. also lseek() and stuff aint a real
+problem
+since we could use a thing simelar to what 'crackers' refer to as IFFL.
+this
+would probably work without having to seek through the whole file, since
+it'll
+work on a 254-bytes block basis, and also the last readen block could be
+buffered (in the drive). i know that would still cause some problems if
+you
+would be lseek()'ing like a mad dog, but it'll still work (however)
+the other problem (opening several files at once for reading and
+writing) may
+be a harder thing to solve, but keeping the above mentioned technique in
+mind,
+it will still be possible with a clever drive-code.
+
+SO: don't say it's impossible... there's no such thing 'impossible' in
+c64 world 8=)
+
+the ONLY drawback to this all would be, that it'll probably only work
+for
+15xx drives (and compatible oceanic etc), but however, it'll still serve
+90% or sth of all users very well
+
+&gt; Well, some people (including me) seem to have a different opinion about what
+&gt; is annoying and what isn't. 
+
+well, sure.. no doubt =) i still think C is annyoing by itself and ASM 
+rulez the world 8=) hehe, at least i thought that until i started coding
+C on PSX =)
+
+&gt; In fact, the original compiler had a #asm
+&gt; directive that worked the way you described. 
+
+yeah, i know (thats why i mentioned this actually) ... actually i have
+also
+worked on a 65xx version of some other small-c version, but i cancelled
+that
+when i saw yours 8=)
+
+&gt; The reason for replacing it were:
+&gt; 
+&gt;   1. #asm is in no way standard conform. C++ specifies an asm() keyword like
+&gt;      the one used in cc65.
+
+oh well.... rulez are made to break them =) 
+
+btw, while we are at standards.... your chars that are unsigned by
+default break
+the rulez by far more than that non-standard directive would =) whats 
+wrong with having a signed/unsigned keyword, and then just doing a
+
+#define u_char unsigned char
+
+etc pp. ?! this would make the code MUCH more portable and also would
+let
+you compile a whole lot of sources that are around. (besides the u_char
+thing is
+quite common anyway). 
+Also i noticed that you mention the INT datatype in
+quite some places of the docs, and since you seem to be one of the ppl 
+that like to &quot;follow the rulez&quot; i just wanted to point out that INT is
+by far
+not standard, and lots of literature  (ehrm orthograpy sux =)  advices
+to 
+no more use it, at least not for portable code (use short/u_short
+instead 
+for example)
+ 
+&gt;   2. asm() is more flexible, since it allows parametrized assembly instructions
+&gt;      similar to what gcc implements.
+
+well, yes and no =) i know asm() rox for small macros and stuff (i use
+it
+like hell in gcc) but it really sux for some other stuff.
+ 
+&gt;   3. #asm was implemented as a preprocessor directive (like all others
+&gt;      starting with #). Since the parser works with a two token lookahead, an
+&gt;      absolutely ugly hack was needed to implement #asm (since it is executed
+&gt;      by the preprocessor, however, it must be in sync with the parser, so that
+&gt;      the emitted code gets in the right place).
+
+mmmh, &quot;ugly&quot; hack ? na... GOTO is ugly =))
+ 
+&gt; Apart from that, #asm (and asm()) was never thought to write anything more
+&gt; than two lines of assembly. ca65 is a full featured macro assembler, so why
+&gt; not use it?
+
+well, i told you.... i like having both the asm library code AND the
+test-code
+that calls it in ONE source file and beeing able to compile (and run) it
+with
+just one command-line command... however, i have noticed there is now
+also a
+MAKE-utility for cc65, so i guess that should be no prob now doing that
+with
+more sourcefiles.
+
+&gt; Admitted, there is no &quot;dummy&quot; implementation of a C callable assembler
+&gt; function. Instead, there are lots of &quot;real&quot; assembly functions called by the C
+&gt; code with full source code. The lib/ subdirectory contains all sorts of
+&gt; functions that are used in a C program. Examples are strcat(), atol(),
+&gt; isdigit()... Just have a look at the supplied sources.
+
+ok, i will try... if i understand that, i will probably write that
+'dummy'
+thingy myself for everyone (and me ofcoz =) to use it as a template...
+
+oh, another quick question i was wondering about.... my editor needs to
+bank out ALL kernal/basic rom and also need access to ram under i/o at
+certain times... will the runtime library work with that? and, will i
+need to rewrite lots of the other libs to make them work independent
+from the roms?! or would it just compile and WORK? 8=) (that'll be very
+nice really hehe)
+
+ok dudes... 
+
+gpz/hit
+
+-- 
+........................................................
+
+		            /^\
+                            \ /  
+      ASCII RIBBON CAMPAIGN  X  AGAINST HTML MAIL
+                            / \  
+
+........................................................
+
+             .--.--.--.----..--.--.--.-----.----.
+   C=64     /  /  /  /  .  /  .  .  /  .  /  .  /\
+           /  /  /__/  /__/  /  /  /  /  /  /  / /
+   PC     /     /  /  /\_/  /  /  /  __ /  /  / /
+         /  /  /  /  / //  /  /  /  /  /  /  / /
+   PSX  /  /  /  /  / //  /  /  /  /  /  /  / /
+       /__/__/__/__/ //__/__/__/_____/__/__/ / 
+       \__\__\__\__\/ \__\__\__\_____\__\__\/  Groepaz
+
+........................................................
+.. <a href="http://fly.to/hitmen-c64">http://fly.to/hitmen-c64</a> ............................
+..... the hitmen c64 home page .........................
+.. <a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a> .......................
+..... hitmen psx section ...............................
+.. <a href="http://start.at/hitnav64">http://start.at/hitnav64</a> ............................
+..... biggest c64 link collection around ...............
+.. <a href="http://fly.to/hitmen-groepaz">http://fly.to/hitmen-groepaz</a> ........................
+..... my little personal page ..........................
+........................................................
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Re:%20still%20need%20support%20with%20low-level%20file%20stuff?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="1002.html">Ullrich von Bassewitz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<li><strong>Previous message:</strong> <a href="1000.html">Ullrich von Bassewitz: "[cc65] Re: still need support with low-level file stuff?"</a>
+<li><strong>In reply to:</strong> <a href="1000.html">Ullrich von Bassewitz: "[cc65] Re: still need support with low-level file stuff?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1002.html">Ullrich von Bassewitz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<li><strong>Reply:</strong> <a href="1002.html">Ullrich von Bassewitz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:44 CET</em>
+</em>
+</small>
+</body>
+</html>

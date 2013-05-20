@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] some patches</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] some patches" />
+<meta name="Date" content="2010-03-15" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] some patches</h1>
+<!-- received="Mon Mar 15 20:49:46 2010" -->
+<!-- isoreceived="20100315194946" -->
+<!-- sent="Mon, 15 Mar 2010 20:49:39 +0100" -->
+<!-- isosent="20100315194939" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] some patches" -->
+<!-- id="f97798c21003151249l6a6ad999habe720c24a1807a2@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="201003152019.03251.groepaz&#64;gmx.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7948.html" title="Kajtár Zsolt: &quot;Re: [cc65] some patches&quot;">Next message</a> ]
+[ <a href="7946.html" title="Groepaz: &quot;Re: [cc65] some patches&quot;">Previous message</a> ]
+[ <a href="7946.html" title="Groepaz: &quot;Re: [cc65] some patches&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7948.html" title="Kajtár Zsolt: &quot;Re: [cc65] some patches&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20some%20patches">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-03-15 20:49:39</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Groepaz,
+
+&gt;&gt; # Add blockread/write support if IDE64 is present.
+
+&gt;&gt; This last patch makes a copy of read.s, write.s and rwcommon.s to the c64
+&gt;&gt; directory. This is not nice, but I haven't found an easy way to not have
+&gt;&gt;  the IDE64 code compiled in for other cbm machines.
+
+&gt; urks. that means every c64 program would get this - normally unneeded - ide64
+&gt; stuff compiled in?
+
+As soci already wrote this is surely not the final solution.
+
+&gt; rather looks to me as if this should go in a seperate
+&gt; library.
+
+I seem to remember someone saying that he didn't have good experiences
+with cc65 libraries &quot;overriding&quot; C library functionality...
+
+Could it possibly be an 'extra' case? As far as I understand that
+would &quot;only&quot; mean always bringing in the write code even if the
+program does only read.
+
+Regards, Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Mar 15 20:49:46 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7948.html" title="Next message in the list">Kajtár Zsolt: "Re: [cc65] some patches"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7946.html" title="Previous message in the list">Groepaz: "Re: [cc65] some patches"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7946.html" title="Message to which this message replies">Groepaz: "Re: [cc65] some patches"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7948.html" title="Next message in this discussion thread">Kajtár Zsolt: "Re: [cc65] some patches"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7947" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7947" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7947" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-03-15 20:49:49 CET
+</em></small></p>
+</body>
+</html>

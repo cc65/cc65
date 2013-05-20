@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] Extended memory API</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="[cc65] Extended memory API">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] Extended memory API</h1>
+<!-- received="Thu Nov 28 22:44:31 2002" -->
+<!-- isoreceived="20021128214431" -->
+<!-- sent="Thu, 28 Nov 2002 22:44:29 +0100" -->
+<!-- isosent="20021128214429" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="[cc65] Extended memory API" -->
+<!-- id="20021128214429.GA14521@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Extended%20memory%20API"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-11-28 22:44:29
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1840.html">Ullrich von Bassewitz: "Re: [cc65] 65816"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1844.html">Ullrich von Bassewitz: "[cc65] Re: Extended memory API"</a>
+<li><strong>Reply:</strong> <a href="1844.html">Ullrich von Bassewitz: "[cc65] Re: Extended memory API"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+I have written together a draft of the new extended memory API and would like
+to hear a few comments. I've tried to keep it as minimalistic as possible to
+make it fast, easy to use and to implement. So I got away with just 6
+functions.
+
+There is no error checking once the driver is successfully loaded, and no
+memory management. If these things are a problem in the future, it should be
+easy to add an exception vector or layer a memory management module on top of
+the extended memory API.
+
+The em_map... functions do return a pointer to the page, which means that I've
+abolished the old concept with just one 256 byte window. Pages are still fixed
+size (256 bytes), but it's up to the driver if it will keep more than one page
+in memory.
+
+Since the API is really short, I will post it here for review:
+
+----------------------------------------------------------------------------
+unsigned char em_load (unsigned char driver);
+/* Load the extended memory driver and return an error code. */
+
+unsigned char em_load_driver (const char* driver);
+/* Load an extended memory driver and return an error code */
+
+unsigned char em_unload (void);
+/* Unload the currently loaded driver. */
+
+unsigned em_page_count (void);
+/* Return the total number of 256 byte pages available in extended memory. */
+
+void* em_map_page (unsigned page);
+/* Unmap the current page from memory and map a new one. The function returns
+ * a pointer to the location of the page in memory.
+ */
+
+void* em_map_page_clean (unsigned page);
+/* Unmap the current page from memory and map a new one. The function returns
+ * a pointer to the location of the page in memory. This function differs from
+ * em_map_page() in that it will discard the contents of the currently mapped
+ * page, assuming that the page has not been modified or that the modifications
+ * are no longer needed, if this leads to better performance. NOTE: This does
+ * NOT mean that the contents of currently mapped page are always discarded!
+ */
+----------------------------------------------------------------------------
+
+A full copy of the proposed header file is available on the web server:
+
+        <a href="http://www.cc65.org/em.h">http://www.cc65.org/em.h</a>
+
+Please let me know what you think about it. Do you see any problems on
+specific platforms?
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Extended%20memory%20API">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Extended%20memory%20API">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1840.html">Ullrich von Bassewitz: "Re: [cc65] 65816"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1844.html">Ullrich von Bassewitz: "[cc65] Re: Extended memory API"</a>
+<li><strong>Reply:</strong> <a href="1844.html">Ullrich von Bassewitz: "[cc65] Re: Extended memory API"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-11-28 22:44:42 CET</em>
+</em>
+</small>
+</body>
+</html>

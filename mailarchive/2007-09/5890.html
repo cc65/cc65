@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] I've ported my 1-Wire routines</title>
+<meta name="Author" content="Scott Alfter (scott1alfter.us)" />
+<meta name="Subject" content="[cc65] I've ported my 1-Wire routines (&amp; Apple II beer fridge controller) to cc65" />
+<meta name="Date" content="2007-09-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] I've ported my 1-Wire routines (&amp; Apple II beer fridge controller) to cc65</h1>
+<!-- received="Tue Sep 25 09:34:50 2007" -->
+<!-- isoreceived="20070925073450" -->
+<!-- sent="Tue, 25 Sep 2007 00:27:30 -0700" -->
+<!-- isosent="20070925072730" -->
+<!-- name="Scott Alfter" -->
+<!-- email="scott1alfter.us" -->
+<!-- subject="[cc65] I've ported my 1-Wire routines (&amp; Apple II beer fridge controller) to cc65" -->
+<!-- id="46F8B862.4000501@alfter.us" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="../2007-10/5891.html" title="Tom Watt: &quot;[cc65] Problem with swiftlink&quot;">Next message</a> ]
+[ <a href="5889.html" title="MagerValp: &quot;Re: [cc65] Memory in atari&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Scott Alfter &lt;<a href="mailto:scott1alfter.us?Subject=Re:%20[cc65]%20I've%20ported%20my%201-Wire%20routines%20(&amp;amp;%20Apple%20II%20beer%20fridge%20controller)%20to%20cc65">scott1alfter.us</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-09-25 09:27:30</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>About four years ago, I connected some 1-Wire sensors to my Apple IIe through a
+simple adapter board (plugs into the joystick port) to monitor the fermentation
+of my homebrew.  Software-wise, I never got around to publishing more than the
+assembly-language 1-Wire primitives needed to read the temperature sensor
+and real-time clock hanging off the aforementioned interface board.  The
+higher-level functionality was mostly in BASIC, with a few assembly-language
+speedups here and there.  For the most part, it's worked well for the past
+four years, but parts of the program (especially screen updates and 1-Wire
+device enumeration) were slow.
+
+I've rewritten the entire package in a mix of C and assembly now, using cc65 to
+cross-compile.  Once I had some toolchain installation problems sorted out, the
+rest of the project came together pretty nicely over the course of maybe 2-3
+weeks of evening hacking.
+
+It's here if you want to take a look:
+
+<a href="http://alfter.us/files/a2bfc-1.0.tar.gz">http://alfter.us/files/a2bfc-1.0.tar.gz</a>
+
+The 1-Wire routines should be easy to adapt to other targets; there's just one
+assembly-language source file with all of the Apple II-specific primitives in
+it.  I could definitely do a better job documenting it, but the codebase at
+this point is small enough that you can probably figure it out by looking at it.
+
+Scott Alfter
+scott&#64;alfter&#46;<!--nospam-->us
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Sep 25 09:34:50 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="../2007-10/5891.html" title="Next message in the list">Tom Watt: "[cc65] Problem with swiftlink"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5889.html" title="Previous message in the list">MagerValp: "Re: [cc65] Memory in atari"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5890" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5890" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5890" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-09-25 09:34:53 CEST
+</em></small></p>
+</body>
+</html>

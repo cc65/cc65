@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] raw disk access (was: cr/</title>
+<meta name="Author" content="Greg King (gngking_at_erols.com)">
+<meta name="Subject" content="Re: [cc65] raw disk access (was: cr/lf translation?)">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] raw disk access (was: cr/lf translation?)</h1>
+<!-- received="Thu Jul 25 21:11:19 2002" -->
+<!-- isoreceived="20020725191119" -->
+<!-- sent="Thu, 25 Jul 2002 08:00:42 -0400" -->
+<!-- isosent="20020725120042" -->
+<!-- name="Greg King" -->
+<!-- email="gngking_at_erols.com" -->
+<!-- subject="Re: [cc65] raw disk access (was: cr/lf translation?)" -->
+<!-- id="000001c2340f$1575f140$fb312c42@palace" -->
+<!-- inreplyto="[cc65] raw disk access (was: cr/lf translation?)" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Greg King (<a href="mailto:gngking_at_erols.com?Subject=Re:%20[cc65]%20raw%20disk%20access%20(was:%20cr/lf%20translation?)"><em>gngking_at_erols.com</em></a>)<br>
+<strong>Date:</strong> 2002-07-25 14:00:42
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1534.html">Ullrich von Bassewitz: "Re: [cc65] read.o missing from c64.lib"</a>
+<li><strong>Maybe in reply to:</strong> <a href="1471.html">MagerValp: "[cc65] raw disk access (was: cr/lf translation?)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1476.html">cbmnut_at_hushmail.com: "Re: Re: [cc65] raw disk access (was: cr/lf translation?)"</a>
+<li><strong>Maybe reply:</strong> <a href="1476.html">cbmnut_at_hushmail.com: "Re: Re: [cc65] raw disk access (was: cr/lf translation?)"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+-----Original Message-----
+From: MagerValp &lt;<a href="mailto:MagerValp_at_cling.gu.se?Subject=Re:%20[cc65]%20raw%20disk%20access%20(was:%20cr/lf%20translation?)">MagerValp_at_cling.gu.se</a>&gt;
+Date: Saturday, July 13, 2002 09:47 AM
+&gt;
+&gt; OK, the problem appears to be that the data written gets shifted by one byte.
+&gt; 18,00 starts with 00 21 01 41.  A &quot;B-P 2 0&quot; fixxed that problem.  I though
+&gt; that B-P wasn't necessary for U1/U2?  At least, that's what the 1541 and 1581
+&gt; user-guides claim.
+
+There are two separate operations:
+(1) data-transfer between the drive's buffer and your computer;
+(2) data-transfer between the drive's buffer and a disk.
+
+Neither operation knows much about the other one.  The first one doesn't know
+which DOS-command you plan to use for the second operation.  It always assumes
+that you are using &quot;random-files&quot; (RELative-files and User-commands were added
+to the DOS at a later time).  Therefore, the first byte (in the buffer) is a
+length-byte; the computer-transfer starts at the second position.  That is why
+you must have &quot;B-P 2 0&quot; when you are going to employ the DOS's User-commands.
+
+(Earlier, MagerValp asked a question about the closing of files.)
+
+If you use the Block-Allocate/-Free commands, then you MUST open a buffer-file
+some time before, and close it some time after, you use those &quot;Block-&quot; commands.
+Ignore what the books say; none of the authors understood those commands!  The
+commands don't have bugs -- as long as you remember to open and close that file.
+
+The wisest policy is to close what you open (even though the other block/sector
+commands don't require it).  (But, you don't need to do it, repeatedly, in the
+middle of a loop.  Open a file before the loop, and close it after the loop.)
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20raw%20disk%20access%20(was:%20cr/lf%20translation?)">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1534.html">Ullrich von Bassewitz: "Re: [cc65] read.o missing from c64.lib"</a>
+<li><strong>Maybe in reply to:</strong> <a href="1471.html">MagerValp: "[cc65] raw disk access (was: cr/lf translation?)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1476.html">cbmnut_at_hushmail.com: "Re: Re: [cc65] raw disk access (was: cr/lf translation?)"</a>
+<li><strong>Maybe reply:</strong> <a href="1476.html">cbmnut_at_hushmail.com: "Re: Re: [cc65] raw disk access (was: cr/lf translation?)"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-07-25 21:11:39 CEST</em>
+</em>
+</small>
+</body>
+</html>

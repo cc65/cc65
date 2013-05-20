@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Atari tgi update</title>
+<meta name="Author" content="Christian Grössler (chris1groessler.org)" />
+<meta name="Subject" content="Re: [cc65] Atari tgi update" />
+<meta name="Date" content="2009-11-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Atari tgi update</h1>
+<!-- received="Tue Nov 10 23:59:55 2009" -->
+<!-- isoreceived="20091110225955" -->
+<!-- sent="Tue, 10 Nov 2009 23:59:39 +0100" -->
+<!-- isosent="20091110225939" -->
+<!-- name="Christian Grössler" -->
+<!-- email="chris1groessler.org" -->
+<!-- subject="Re: [cc65] Atari tgi update" -->
+<!-- id="4AF9F05B.9080809@groessler.org" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="340628.71125.qm&#64;web56505.mail.re3.yahoo.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7540.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Atari tgi update&quot;">Next message</a> ]
+[ <a href="7538.html" title="Groepaz: &quot;Re: [cc65] bank switching/retro replay?&quot;">Previous message</a> ]
+[ <a href="7459.html" title="Fatih Aygün: &quot;[cc65] Atari tgi update&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7540.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Atari tgi update&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Christian Grössler &lt;<a href="mailto:chris1groessler.org?Subject=Re:%20[cc65]%20Atari%20tgi%20update">chris1groessler.org</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-11-10 23:59:39</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello Fatih,
+
+sorry for the late response, I was busy with vacation (:-)) and work
+(what still am).
+
+
+Fatih Aygün wrote:
+&gt; 
+&gt; Sorry for the weekend delay :) Here is the latest atari tgi drivers: <a href="http://atari.isgreat.org/atari-tgi-2009-11-02.zip">http://atari.isgreat.org/atari-tgi-2009-11-02.zip</a>
+&gt; 
+
+
+I've integrated it into svn now. I've renamed the atari&lt;modenum&gt;.s files
+to atari-&lt;modenum&gt;.s files (adding a dash).
+
+There seem to be some problems, maybe I made a mistake when
+intergrating. Please check the version from svn (or take the
+next snapshot).
+
+- in tgidemo.c the circles get painted once and cleared once
+   and after some time the x lines vanish. When I compare it
+   to the c64 version, circles should be drawn and cleared
+   until a key is pressed. Also the later stages (checkerboard
+   etc.) aren't printed, only a completely white screen is
+   visible. You can type a key 4 times and then the program exits
+   (nothing painted on the screen in the meanwhile).
+
+- some modes seem to crash after painting the circles. The
+   circles aren't cleared anymore and the program doesn't end.
+
+
+I first thought adding Atari specific error codes to tgi-error.inc
+is a bad idea. But then I got TGI_ERR_NO_MEM when I first tried
+the tgidemo sample. That's because I forgot to set __RESERVED_MEMORY__
+when linking. Getting this error saved me felt (gefühlte) 2 hours
+of debugging time where I would have needed to dig into the code
+in order to find out why the driver doesn't load. So I think this
+error code makes pretty much sense and therefore I added it together
+with the other 2 Atari specific error codes you defined. Uz, please
+comment about how you feel about it.
+
+Thanks again for you efforts, Fatih.
+
+regards,
+chris
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Nov 10 23:59:55 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7540.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Atari tgi update"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7538.html" title="Previous message in the list">Groepaz: "Re: [cc65] bank switching/retro replay?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7459.html" title="Message to which this message replies">Fatih Aygün: "[cc65] Atari tgi update"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7540.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Atari tgi update"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7540.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Atari tgi update"</a></li>
+<li><dfn>Reply</dfn>:  <a href="7541.html" title="Message sent in reply to this message">Fatih Aygün: "Re: [cc65] Atari tgi update"</a></li>
+<li><dfn>Reply</dfn>:  <a href="7543.html" title="Message sent in reply to this message">Fatih Aygün: "Re: [cc65] Atari tgi update"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7539" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7539" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7539" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-11-10 23:59:57 CET
+</em></small></p>
+</body>
+</html>

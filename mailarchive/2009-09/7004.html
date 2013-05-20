@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] two little bugs</title>
+<meta name="Author" content="Greg King (greg.king41verizon.net)" />
+<meta name="Subject" content="Re: [cc65] two little bugs" />
+<meta name="Date" content="2009-09-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] two little bugs</h1>
+<!-- received="Fri Sep 25 20:39:14 2009" -->
+<!-- isoreceived="20090925183914" -->
+<!-- sent="Fri, 25 Sep 2009 11:44:40 -0400" -->
+<!-- isosent="20090925154440" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king41verizon.net" -->
+<!-- subject="Re: [cc65] two little bugs" -->
+<!-- id="00e401ca3e0f$7ffe8a60$443efea9@monarch" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="9FFA79C1-F90C-442C-96E3-7443A007C399&#64;wfmh.org.pl" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7005.html" title="Greg King: &quot;Re: [cc65] Community projects?&quot;">Next message</a> ]
+[ <a href="7003.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Secondary linker configurations&quot;">Previous message</a> ]
+[ <a href="6942.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] two little bugs&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7006.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] two little bugs&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king41verizon.net?Subject=Re:%20[cc65]%20two%20little%20bugs">greg.king41verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-09-25 17:44:40</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: silverdr; on Monday, Sept. 14, 2009; at 05:48 PM -0400
+&gt; On 2009-09-01, at 02:40, Greg King wrote:
+&gt; &gt;&gt;
+&gt; &gt;&gt; Huh?  Since when?  The TOD happily goes on after a reset, try it.
+&gt; &gt;
+&gt; &gt; I did -- it didn't!
+&gt; &gt;
+&gt; &gt; I tested the CIAs on my breadbox NTSC 64.  Hardware-reset stopped both
+&gt; &gt; Time-Of-Day clocks.  I cannot find any thing in the firmware that
+&gt; &gt; would do
+&gt; &gt; that.  Therefore, I conclude that reset stops _everything_.
+&gt;
+&gt; Could you let us know how exactly do you test it?
+
+A simple BASIC program:
+
+0 print&quot;{home}&quot;;peek(56329);&quot;{cursor-left} &quot;;:goto0
+
+It displays the &quot;seconds&quot; register, in real-time.
+
+I ran the program; and, confirmed that the register didn't change.  I poked
+location 56328, reran the program, and confirmed that the register started
+changing.  While the register showed a non-zero number, I reset the
+machine.  I reran the program; and, saw that the &quot;seconds&quot; register showed
+zero, and did not change.
+
+I poked again; and, repeated the tests many times -- just to make sure that
+it was not a fluke.  I did it with both chips.
+
+P.S. Yes, those tests were done on _real_ hardware!
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Sep 25 20:39:14 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7005.html" title="Next message in the list">Greg King: "Re: [cc65] Community projects?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7003.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Secondary linker configurations"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6942.html" title="Message to which this message replies">silverdr1wfmh.org.pl: "Re: [cc65] two little bugs"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7006.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] two little bugs"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7006.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] two little bugs"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7004" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7004" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7004" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-09-25 20:39:16 CEST
+</em></small></p>
+</body>
+</html>

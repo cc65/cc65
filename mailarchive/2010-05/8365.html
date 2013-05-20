@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Eureka moment, or waste of tim</title>
+<meta name="Author" content="Payton Byrd (plbyrd1gmail.com)" />
+<meta name="Subject" content="[cc65] Eureka moment, or waste of time?" />
+<meta name="Date" content="2010-05-06" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Eureka moment, or waste of time?</h1>
+<!-- received="Thu May  6 23:22:25 2010" -->
+<!-- isoreceived="20100506212225" -->
+<!-- sent="Thu, 6 May 2010 16:21:57 -0500" -->
+<!-- isosent="20100506212157" -->
+<!-- name="Payton Byrd" -->
+<!-- email="plbyrd1gmail.com" -->
+<!-- subject="[cc65] Eureka moment, or waste of time?" -->
+<!-- id="o2x1adf4c761005061421y897266ecj60c5c0ab35b7a871@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8366.html" title="Gábor Lénárt: &quot;Re: [cc65] Re: floating point support redux&quot;">Next message</a> ]
+[ <a href="8364.html" title="Payton Byrd: &quot;[cc65] Request from a user leads to this question&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8370.html" title="Payton Byrd: &quot;[cc65] Re: Eureka moment, or waste of time?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Payton Byrd &lt;<a href="mailto:plbyrd1gmail.com?Subject=Re:%20[cc65]%20Eureka%20moment,%20or%20waste%20of%20time?">plbyrd1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-05-06 23:21:57</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I think I may have solved the problem of long directories.  Even with my
+current sliding window implementation there is still a linked list which
+keeps track of which files are selected.  I know this is a bit wasteful and
+I think I've come up with a solution.
+
+When loading a directory I would simply ignore directory entries not in the
+sliding window except to count them.  At the end of the directory when we
+know how many entries there are I'd initialize an array with a length of
+(directory length)/8 + 1.  Each item in the array would be a bit flag for
+eight directory entries.  If the bit for a directory entry is set then that
+directory entry is selected.  This would eliminate the need for the linked
+list and I'd have a MUCH smaller structure to maintain for the is selected
+flags.  Finally, I'd simply be able to use a 30 cell array for my sliding
+window instead of the linked list I'm using now.
+
+If anyone sees any holes in this approach then please poke them now.  I
+won't get to do this code for a few days, so some good discussion on it
+would be welcome between now and then.
+
+-- 
+Payton Byrd
+&lt;<a href="http://www.paytonbyrd.com">http://www.paytonbyrd.com</a>&gt;
+&lt;<a href="http://it.toolbox.com/blogs/paytonbyrd">http://it.toolbox.com/blogs/paytonbyrd</a>&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu May  6 23:22:25 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8366.html" title="Next message in the list">Gábor Lénárt: "Re: [cc65] Re: floating point support redux"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8364.html" title="Previous message in the list">Payton Byrd: "[cc65] Request from a user leads to this question"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8370.html" title="Next message in this discussion thread">Payton Byrd: "[cc65] Re: Eureka moment, or waste of time?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8370.html" title="Message sent in reply to this message">Payton Byrd: "[cc65] Re: Eureka moment, or waste of time?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8365" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8365" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8365" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-05-06 23:22:28 CEST
+</em></small></p>
+</body>
+</html>

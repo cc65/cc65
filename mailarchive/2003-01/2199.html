@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-2">
+<title>cc65 mailing list archive: Re: [cc65] LUnix</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] LUnix">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] LUnix</h1>
+<!-- received="Thu Jan  2 23:51:34 2003" -->
+<!-- isoreceived="20030102225134" -->
+<!-- sent="Thu, 2 Jan 2003 23:51:31 +0100" -->
+<!-- isosent="20030102225131" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] LUnix" -->
+<!-- id="200301022351.31187.groepaz@gmx.net" -->
+<!-- charset="iso-8859-2" -->
+<!-- inreplyto="20030102224017.GA18387@spektr.localdomain" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20LUnix"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2003-01-02 23:51:31
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2198.html">Debrune Jérôme: "Re: [cc65] Regbank"</a>
+<li><strong>In reply to:</strong> <a href="2197.html">Maciej Witkowiak: "Re: [cc65] LUnix"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2200.html">Groepaz: "Re: [cc65] LUnix"</a>
+<li><strong>Reply:</strong> <a href="2200.html">Groepaz: "Re: [cc65] LUnix"</a>
+<li><strong>Reply:</strong> <a href="2201.html">Maciej Witkowiak: "Re: [cc65] LUnix"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Thursday 02 January 2003 23:40, Maciej Witkowiak wrote:
+
+&gt; It works for having assembly completed but will not work on LUnix anyway.
+&gt; This is for future use, currently the first byte in CODE segment is the
+&gt; program entry point.
+
+ah ok...good to know :)
+
+&gt; &gt; yep :) lemme see if i can come up with a working hello world :o)
+&gt;
+&gt; Not with C. Some low level part is missing: stack - crt0.s has to
+&gt; allocate some memory and setup C stack there. Probably something will have
+&gt; to be changed in malloc/heap functions. Information about other segments
+&gt; (data+bss) is contained in o65 file and handled correctly.
+
+well...i will look at it :=P
+
+&gt; Download LUnix from CVS, the last release was quite some time ago and there
+&gt; were some changes, like adding a sample application for ca65 and o65 file
+&gt; format.
+
+i've done that :) cant see any ca65 sample app though?! were is it? :)
+
+&gt; If you want your Silver Surfer code be included in LUnix, please send it me
+&gt; so I can upload it to CVS.
+
+ofcoz, no problem.... just some minor changes to fifo64.s and sfifo64.s 
+actually.... still trying to find a good way to autodetect wether the fifo is 
+at de00 or de08 (silversurfer).
+
+i am also currently creating a docs directory actually (mostly for myself but 
+maybe useful for others) and i also want to put some of the old addons back 
+into the distribution (like the 1541 fasthead) .... i'll come back to you :)
+
+is there any active development on lunix anyway? anything done during the last 
+year?
+
+-- 
+          ___ ___ .___________________ .___________ _______.
+    c=64 /   |   \|   \__    ___/     \ \_   _____/ \      \ [groepaz]
+     gb /    '    \   | |    | /  \ /  \ |    __)_  /   |   \ gp32
+    cgb \    .    /   | |    |/    '    \|        \/    |    \ psx
+     gba \___|_  /|___| |____|\____|__  /_______  /\____|__  / dc
+          -----\/-----'---------------\/--------\/---------\/
+       <a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    Hitmen WWW Headquarters
+       <a href="http://fly.to/hitmen-groepaz">http://fly.to/hitmen-groepaz</a>     my personal playground
+       <a href="http://rr.c64.org/silversurfer">http://rr.c64.org/silversurfer</a>   home of the RR debugger
+       ftp.musoftware.de/pub/groepaz    cc65 dump site
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20LUnix">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2198.html">Debrune Jérôme: "Re: [cc65] Regbank"</a>
+<li><strong>In reply to:</strong> <a href="2197.html">Maciej Witkowiak: "Re: [cc65] LUnix"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2200.html">Groepaz: "Re: [cc65] LUnix"</a>
+<li><strong>Reply:</strong> <a href="2200.html">Groepaz: "Re: [cc65] LUnix"</a>
+<li><strong>Reply:</strong> <a href="2201.html">Maciej Witkowiak: "Re: [cc65] LUnix"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-01-02 23:51:39 CET</em>
+</em>
+</small>
+</body>
+</html>

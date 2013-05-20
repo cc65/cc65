@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Re: Announcement 'Contiki </title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Re: Announcement 'Contiki 2.5.rc1 binary release for Retrocomputing'" />
+<meta name="Date" content="2011-01-28" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Re: Announcement 'Contiki 2.5.rc1 binary release for Retrocomputing'</h1>
+<!-- received="Fri Jan 28 13:11:55 2011" -->
+<!-- isoreceived="20110128121155" -->
+<!-- sent="Fri, 28 Jan 2011 13:11:46 +0100" -->
+<!-- isosent="20110128121146" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Re: Announcement 'Contiki 2.5.rc1 binary release for Retrocomputing'" -->
+<!-- id="20110128121146.GA16779@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="AANLkTi=CBSPRVVLF7TmRLZt7ALB=-Vdd3PStWnwZDm-r&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9200.html" title="Oliver Schmidt: &quot;Re: [cc65] Re: Announcement 'Contiki 2.5.rc1 binary release for Retrocomputing'&quot;">Next message</a> ]
+[ <a href="9198.html" title="Oliver Schmidt: &quot;Re: [cc65] Re: Announcement 'Contiki 2.5.rc1 binary release for Retrocomputing'&quot;">Previous message</a> ]
+[ <a href="9198.html" title="Oliver Schmidt: &quot;Re: [cc65] Re: Announcement 'Contiki 2.5.rc1 binary release for Retrocomputing'&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9200.html" title="Oliver Schmidt: &quot;Re: [cc65] Re: Announcement 'Contiki 2.5.rc1 binary release for Retrocomputing'&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Re:%20Announcement%20'Contiki%202.5.rc1%20binary%20release%20for%20Retrocomputing'">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-01-28 13:11:46</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Fri, Jan 28, 2011 at 12:58:17PM +0100, Oliver Schmidt wrote:
+&gt; It was one of the last-minute-changes to replace the html files names
+&gt; from .html to .htm because the newly supported target Atari only has
+&gt; 8.3 file names. Unfortunately I forgot to change the code that sets
+&gt; the mime type accordingly :-(
+
+Glad to hear that. So it's not always me looking so stupid:-)
+
+&gt; I didn't notice this while I was testing
+&gt; because Internet Explorer ignores the wrong mime type and displays the
+&gt; html page anyway (!).
+
+Ahh, the usual microsoft drama. Since a few days, I have Firefox running even
+on my Nokia N900 :-)
+
+&gt; The bugfix is in the Contiki CVS and will be delivered as part of the
+&gt; final 2.5 release. BTW: The 24-7 online C64 web server &#64;
+&gt; <a href="http://120.146.162.194:8080/">http://120.146.162.194:8080/</a> should have the fix already applied as
+&gt; the owner successfully went through the guide and created this way the
+&gt; web server binary himself for the first time :-)
+
+Doesn't seem so:
+
+----------------------------------------------------------------------------
+uz&#64;trixie:~/src/cc65/src/ar65$ telnet 120&#46;<!--nospam-->146.162.194 8080
+Trying 120.146.162.194...
+Connected to 120.146.162.194.
+Escape character is '^]'.
+GET / HTTP/1.0
+
+HTTP/1.0 200 OK
+Server: Contiki/2.4 <a href="http://www.sics.se/contiki/">http://www.sics.se/contiki/</a>
+Connection: close
+Content-type: application/octet-stream
+[...]
+----------------------------------------------------------------------------
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Jan 28 13:11:55 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9200.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Re: Announcement 'Contiki 2.5.rc1 binary release for Retrocomputing'"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9198.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Re: Announcement 'Contiki 2.5.rc1 binary release for Retrocomputing'"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9198.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] Re: Announcement 'Contiki 2.5.rc1 binary release for Retrocomputing'"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9200.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Re: Announcement 'Contiki 2.5.rc1 binary release for Retrocomputing'"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9200.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Re: Announcement 'Contiki 2.5.rc1 binary release for Retrocomputing'"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9199" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9199" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9199" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-01-28 13:11:58 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65]</title>
+<meta name="Author" content="David Schmidt (david46021gmail.com)" />
+<meta name="Subject" content="[cc65]" />
+<meta name="Date" content="2011-12-11" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65]</h1>
+<!-- received="Sun Dec 11 19:58:57 2011" -->
+<!-- isoreceived="20111211185857" -->
+<!-- sent="Sun, 11 Dec 2011 13:58:50 -0500" -->
+<!-- isosent="20111211185850" -->
+<!-- name="David Schmidt" -->
+<!-- email="david46021gmail.com" -->
+<!-- subject="[cc65]" -->
+<!-- id="CAG=HHpVx00Q6k9dX64=TA_xefaVVdHPPEpkmWUxT3pwF=tASxw@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9788.html" title="David Schmidt: &quot;[cc65] 65816 instructions with ca65 on Windows - some versions do, some don't&quot;">Next message</a> ]
+[ <a href="9786.html" title="Groepaz: &quot;Re: [cc65] C64 fast-loader suggestion?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9789.html" title="Ullrich von Bassewitz: &quot;Re: [cc65]&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: David Schmidt &lt;<a href="mailto:david46021gmail.com?Subject=Re:%20[cc65]">david46021gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-12-11 19:58:50</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I'm having some trouble with ca65 on Windows (apparently) getting it
+to recognize the .P816 directive.  I am starting with a simple
+program:
+
+.P816
+        xce
+
+ca65 V2.13.0 will assemble this without complaint.  I have a February,
+2011 build that I have been using all year for a straight 6502
+project, and I just downloaded V2.13.9_20111208 to try also.  Both of
+the 2011 versions of ca65 seem to not understand the xce mnemonic -
+it's thinking it's a label:
+
+Error: `:' expected
+
+On Mac OSX, the February 2011 version of ca65 seems to understand and
+assemble correctly.  What might I be doing wrong on the Windows side?
+This seems like a very straightforward test.  This is on 32 bit
+Windows 7, if it makes a difference.
+
+Windows ca65 V2.13.0: succeeds
+Windows ca65 V2.13.9 (Feb 2011): fails
+Windows ca65 V2.13.9 (20111208): fails
+
+Mac OSX ca65 V2.13.0: succeeds
+Mac OSX ca65 V2.13.9 (Feb 2011): succeeds
+
+(I think my original query went into the bitbucket, so I'm trying this
+from my Google mail address... apologies if it eventually appears
+twice.)
+
+- David
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Dec 11 19:58:57 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9788.html" title="Next message in the list">David Schmidt: "[cc65] 65816 instructions with ca65 on Windows - some versions do, some don't"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9786.html" title="Previous message in the list">Groepaz: "Re: [cc65] C64 fast-loader suggestion?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9789.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65]"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9789.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65]"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9787" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9787" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9787" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-12-11 19:59:00 CET
+</em></small></p>
+</body>
+</html>

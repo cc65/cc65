@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Manic Miner game for C64 m</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="Re: [cc65] Manic Miner game for C64 more or less done" />
+<meta name="Date" content="2010-12-20" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Manic Miner game for C64 more or less done</h1>
+<!-- received="Mon Dec 20 08:32:22 2010" -->
+<!-- isoreceived="20101220073222" -->
+<!-- sent="Mon, 20 Dec 2010 08:32:09 +0100" -->
+<!-- isosent="20101220073209" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="Re: [cc65] Manic Miner game for C64 more or less done" -->
+<!-- id="20101220073209.GC4890@trikaliotis.net" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="E03D8A06-81DB-45CC-86CC-FE9764A6C865&#64;email.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9079.html" title="Stefan Wessels: &quot;Re: [cc65] Manic Miner game for C64 more or less done&quot;">Next message</a> ]
+[ <a href="9077.html" title="Stefan Wessels: &quot;Re: [cc65] Manic Miner game for C64 more or less done&quot;">Previous message</a> ]
+[ <a href="9077.html" title="Stefan Wessels: &quot;Re: [cc65] Manic Miner game for C64 more or less done&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9079.html" title="Stefan Wessels: &quot;Re: [cc65] Manic Miner game for C64 more or less done&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20[cc65]%20Manic%20Miner%20game%20for%20C64%20more%20or%20less%20done">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-12-20 08:32:09</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello Stefan,
+
+* On Sun, Dec 19, 2010 at 10:10:42AM -0800 Stefan Wessels wrote:
+ 
+&gt; &gt;&gt; 3.  The game doesn't run right on VICE.  
+&gt; 
+&gt; I just thought about it, and tested this hypotheses.  I use (CIA1.cra
+&gt; = (CIA1.cra &amp; 0xc0) | 0x12;	CIA1.crb |= 0x60;) to set up timer a and
+&gt; b so I can get a fixed frame rate.  When I take this code out, it runs
+&gt; fine under Vice, just too fast.  With that code in, this code
+&gt; (CIA1.pra = 0;keys = 255 - CIA1.prb;) doesn't return 0, as I expect it
+&gt; to, and as Power64 does. Getting the cra/crb values was a crapshoot.
+&gt; The issue may very well be there.
+
+Which version of VICE are you using? I know that the current snapshot
+has parts of the CIA reworked. It should work better now.
+
+Have you tested on a real C64?
+
+I would be interested in your game (either sources, or a binary of it -
+better: Both! ;)
+
+Regards,
+Spiro.
+
+-- 
+Spiro R. Trikaliotis                              <a href="http://opencbm.sf.net/">http://opencbm.sf.net/</a>
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>                     <a href="http://www.viceteam.org/">http://www.viceteam.org/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Dec 20 08:32:22 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9079.html" title="Next message in the list">Stefan Wessels: "Re: [cc65] Manic Miner game for C64 more or less done"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9077.html" title="Previous message in the list">Stefan Wessels: "Re: [cc65] Manic Miner game for C64 more or less done"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9077.html" title="Message to which this message replies">Stefan Wessels: "Re: [cc65] Manic Miner game for C64 more or less done"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9079.html" title="Next message in this discussion thread">Stefan Wessels: "Re: [cc65] Manic Miner game for C64 more or less done"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9079.html" title="Message sent in reply to this message">Stefan Wessels: "Re: [cc65] Manic Miner game for C64 more or less done"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9078" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9078" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9078" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-12-20 08:32:26 CET
+</em></small></p>
+</body>
+</html>

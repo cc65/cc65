@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] OT: Where to get some help</title>
+<meta name="Author" content="Payton Byrd (plbyrd1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] OT: Where to get some help?" />
+<meta name="Date" content="2010-04-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] OT: Where to get some help?</h1>
+<!-- received="Sun Apr 25 10:01:59 2010" -->
+<!-- isoreceived="20100425080159" -->
+<!-- sent="Sun, 25 Apr 2010 03:00:38 -0500" -->
+<!-- isosent="20100425080038" -->
+<!-- name="Payton Byrd" -->
+<!-- email="plbyrd1gmail.com" -->
+<!-- subject="Re: [cc65] OT: Where to get some help?" -->
+<!-- id="i2r1adf4c761004250100o5d907c47m690db189797485d8@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20100425073045.GB19737&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8163.html" title="Payton Byrd: &quot;Re: [cc65] How to prototype an assembler function?&quot;">Next message</a> ]
+[ <a href="8161.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] How to prototype an assembler function?&quot;">Previous message</a> ]
+[ <a href="8159.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] OT: Where to get some help?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8203.html" title="Per Olofsson: &quot;Re: [cc65] OT: Where to get some help?&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Payton Byrd &lt;<a href="mailto:plbyrd1gmail.com?Subject=Re:%20[cc65]%20OT:%20Where%20to%20get%20some%20help?">plbyrd1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-04-25 10:00:38</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Sun, Apr 25, 2010 at 2:30 AM, Ullrich von Bassewitz &lt;uz&#64;musoftware&#46;<!--nospam-->de&gt;wrote:
+
+&gt;
+&gt; On Fri, Apr 23, 2010 at 07:40:52PM -0500, Payton Byrd wrote:
+&gt; &gt; Approach 1: Copy the entire screen to another page in memory and move the
+&gt; &gt; start memory for the current screen to the copy, then draw the menu.
+&gt;  When
+&gt; &gt; I'm done with the menu, set the screen pointer back to the original
+&gt; screen
+&gt; &gt; and keep going.  What concerns me is the amount of time it would take to
+&gt; &gt; copy the screen using C, so I'm thinking this might be a job for some
+&gt; inline
+&gt; &gt; assembler, unless there's already a function out there to do this.
+&gt;
+&gt; memcpy is a standard C function.
+&gt;
+
+I'm really leaning toward this method after some research and soul-searching
+today.  For 80-column mode the VDC actually has a block-copy command in
+hardware that will allow me to duplicate the contents of video memory with a
+single assembler command.  For the 40-column screen I believe memcpy will do
+the trick for me.
+
+
+&gt;
+&gt; &gt; Approach 2: Copy the contents of the screen where the menu is to be
+&gt; &gt; displayed into an array where the size of the array is height * width,
+&gt; then
+&gt; &gt; write the contents of the array back to the screen one line at a time.  I
+&gt; &gt; see two problems with this approach: first, the array might get quite big
+&gt; &gt; and I don't know the maximum size of an array in CC65; second, how do I
+&gt; &gt; obtain the contents of the screen?
+&gt;
+&gt; It is usuallay a memory area at a fixed address.
+&gt;
+&gt; &gt; Should I use the screen codes from
+&gt; &gt; memory and write the screen codes back to memory?  If I'm going to be
+&gt; &gt; writing screens directly to memory then what's the point of using CONIO?
+&gt;
+&gt; These are problems no one can solve for you. It depends on the type and
+&gt; requirements of your application. There are cases where it does make sense
+&gt; to
+&gt; work around conio and others where this is not true.
+&gt;
+
+I think by doing the screen duplication I'll be able to preserve CONIO for
+my screen drawing.  I like CONIO for writing the screen since it keeps me
+from having to deal with the messiness of two display systems 90% of the
+time.
+
+
+&gt;
+&gt; &gt; Approach 3: Simply invalidate the screen and force a full refresh.  This
+&gt; may
+&gt; &gt; be the simplest, but it could be expensive as the screen may be very
+&gt; &gt; complex.  Plus, if there's some text that was generated organically and
+&gt; &gt; can't be repeated then such text would be lost.  I'm not fond of this
+&gt; &gt; approach, but if all else fails....
+&gt;
+&gt; This is often the most memory saving solution.
+&gt;
+
+And hopefully I'll be able to avoid it. :)
+
+
+&gt;
+&gt; &gt; Maybe I'm going about this all wrong!  Does anyone know of a publicly
+&gt; &gt; available windowing library for text mode on CBM machines?  A port of
+&gt; curses
+&gt; &gt; for CC65 would rule the world, if there's enough resources on our
+&gt; machines
+&gt; &gt; to handle such a library.
+&gt;
+&gt; There are a two window libraries I do currently remember: Fields by Joseph
+&gt; Rose and simplemenu by Magervalp. The first one is available from the
+&gt; contrib
+&gt; directory, the second one was available from paradroid.net, but the link
+&gt; on
+&gt; the page doesn't work, so you may have to contact Magervalp directly.
+&gt;
+&gt;
+I looked at Fields after I got your email and he stopped at exactly the same
+spot I'm at now as there's no code to preserve the screen underneath the
+dialogs and menus.  I think I'm heading in the right direction now, but I'm
+just getting bogged down in my lack of experience with both the C libraries
+and assembler as it doesn't appear that there's a good way to avoid using
+assembler when dealing with the VDC.
+
+
+&gt; Regards
+&gt;
+&gt;
+&gt;        Uz
+&gt;
+&gt;
+Thanks for your time and patience!
+
+-- 
+Payton Byrd
+&lt;<a href="http://www.paytonbyrd.com">http://www.paytonbyrd.com</a>&gt;
+&lt;<a href="http://it.toolbox.com/blogs/paytonbyrd">http://it.toolbox.com/blogs/paytonbyrd</a>&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Apr 25 10:01:59 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8163.html" title="Next message in the list">Payton Byrd: "Re: [cc65] How to prototype an assembler function?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8161.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] How to prototype an assembler function?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8159.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] OT: Where to get some help?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8203.html" title="Next message in this discussion thread">Per Olofsson: "Re: [cc65] OT: Where to get some help?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8162" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8162" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8162" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-04-25 10:02:01 CEST
+</em></small></p>
+</body>
+</html>

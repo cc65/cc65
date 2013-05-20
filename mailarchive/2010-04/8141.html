@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] --create-dep for ca65?</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] --create-dep for ca65?" />
+<meta name="Date" content="2010-04-24" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] --create-dep for ca65?</h1>
+<!-- received="Sat Apr 24 10:04:44 2010" -->
+<!-- isoreceived="20100424080444" -->
+<!-- sent="Sat, 24 Apr 2010 10:04:37 +0200" -->
+<!-- isosent="20100424080437" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] &ndash;&ndash;create&ndash;dep for ca65?" -->
+<!-- id="u2j1002edb71004240104qedd9c518ve2cd6792bbaf8cd6@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20100423184100.GA495&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8142.html" title="Oliver Schmidt: &quot;Re: [cc65] Please critique this makefile&quot;">Next message</a> ]
+[ <a href="8140.html" title="Steve Davison: &quot;Re: [cc65] declaring variables after code&quot;">Previous message</a> ]
+[ <a href="8135.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] --create-dep for ca65?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8144.html" title="Greg King: &quot;Re: [cc65] --create-dep for ca65?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20--create-dep%20for%20ca65?">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-04-24 10:04:37</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Uz,
+
+&gt; That's not true, but not a problem, since it is not much code, and the list of
+&gt; files is kept for other purposes already (they're written to the object files).
+
+Nice :-)
+
+&gt; A more serious question is how to handle --create-dep on the cl65 level? The
+&gt; simplest way would be to add something like --asm-create-dep, which is
+&gt; explicitly passed to the assembler. But what if --create-dep is specified when
+&gt; assembling files with cl65? On the other side, cl65 could try to be smart
+&gt; (in fact, I could try to teach cl65 how to be smart :-), but often, trying to
+&gt; be smart doesn't work as expected :-)
+
+I must admit that I can't follow here. Where's the issue with using
+--create-dep both for the compiler and assembler? Are we talking about
+the scenario of someone using cl65 who want's .u files for C sources
+but not for asm sources (or the other way round)? That scenario seems
+by far obscure enough to say that's a case for calling the underlying
+tools separately.
+
+However The issue I see (like silverdr) is potential overwriting of
+cc65-generated .u files with ca65-generated .u files. Either one could
+do what silverdr describes, or one could have _ONLY_ ca65 generate .u
+files. Then cc65 would embed it's dependency information in some
+format in the generated .s file. And ca65 would write it out. One
+would however have to distinguish between several scenarios...
+
+a) Individual calls to compile a C file:
+
+make calls cc65 with --create-dep, it write its &lt;file&gt;.s: &lt;file&gt;.c
+&lt;incl&gt;.h to the .u file (it embeds them as well into the .s file where
+they don't hurt).
+
+make calls ca65 without --create-dep as the cc65 generated .s files
+don't have includes anyway.
+
+b) Assemble an asm file:
+
+make calls ca65 with --create-dep, it write its &lt;file&gt;.o: &lt;file&gt;.s
+&lt;incl&gt;.inc to the .u file.
+
+c) Compile a C file through cl65:
+
+make calls cl65, which calls cc65 without --create-dep, it only embeds
+its dependencies into the .s file.
+
+make calls cl65 which calls ca65 with --create-dep, it finds the
+embedded dependencies and writes &lt;file&gt;.o: &lt;file&gt;.c &lt;incl&gt;.h to the .u
+file.
+
+I certainly understand if you consider this approach too much effort
+&quot;just for&quot; dependency management. I just wanted to point out the from
+my perspective best way - as it allows cl65 users to really &quot;forget
+about&quot; the intermediate .s files. Otherwise a .u file postprocessing
+is always necessary.
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Apr 24 10:04:44 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8142.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Please critique this makefile"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8140.html" title="Previous message in the list">Steve Davison: "Re: [cc65] declaring variables after code"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8135.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] --create-dep for ca65?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8144.html" title="Next message in this discussion thread">Greg King: "Re: [cc65] --create-dep for ca65?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8144.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] --create-dep for ca65?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8141" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8141" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8141" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-04-24 10:04:47 CEST
+</em></small></p>
+</body>
+</html>

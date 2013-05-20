@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Some unrelated patches to ca65</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="[cc65] Some unrelated patches to ca65, documentation and the build system for dicussion" />
+<meta name="Date" content="2012-08-17" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Some unrelated patches to ca65, documentation and the build system for dicussion</h1>
+<!-- received="Fri Aug 17 21:13:00 2012" -->
+<!-- isoreceived="20120817191300" -->
+<!-- sent="Fri, 17 Aug 2012 21:11:38 +0200" -->
+<!-- isosent="20120817191138" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="[cc65] Some unrelated patches to ca65, documentation and the build system for dicussion" -->
+<!-- id="1345230701-5458-1-git-send-email-ml-cc65@trikaliotis.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10724.html" title="Spiro Trikaliotis: &quot;[cc65] [PATCH 3/3] Generate libsrc/apple2enh/extra if necessary&quot;">Next message</a> ]
+[ <a href="10722.html" title="Spiro Trikaliotis: &quot;[cc65] [PATCH 1/3] Allow Bcc from one segment to another.&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+[ <a href="10721.html" title="Spiro Trikaliotis: &quot;[cc65] [PATCH 2/3] Fix documentation for DiskChangeDevice.&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20[cc65]%20Some%20unrelated%20patches%20to%20ca65,%20documentation%20and%20the%20build%20system%20for%20dicussion">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-08-17 21:11:38</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello,
+
+this is a series of unrelated patches to the current SVN version of cc65.
+
+Patch 1 allows to do inter-segment branches in ca65, as alreads discussed in
+the other mail. Note, however, that ld65 will not discover every possible
+problem, as the range will be more like -255..255 instead of -128..127.
+I am not sure how to fix this in ld65, though.
+
+Patch 2 fixes a documentation error, while patch 3 fixes a possible build
+problem, at least on my machine.
+
+[PATCH 1/3] Allow Bcc from one segment to another.
+[PATCH 2/3] Fix documentation for DiskChangeDevice.
+[PATCH 3/3] Generate libsrc/apple2enh/extra if necessary
+
+Regards
+Spiro.
+
+-- 
+Spiro R. Trikaliotis
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Aug 17 21:13:00 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10724.html" title="Next message in the list">Spiro Trikaliotis: "[cc65] [PATCH 3/3] Generate libsrc/apple2enh/extra if necessary"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10722.html" title="Previous message in the list">Spiro Trikaliotis: "[cc65] [PATCH 1/3] Allow Bcc from one segment to another."</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10721.html" title="Next message in this discussion thread">Spiro Trikaliotis: "[cc65] [PATCH 2/3] Fix documentation for DiskChangeDevice."</a></li>
+<li><a name="replies" id="replies"></a>
+<dfn>Reply</dfn>: <a href="10721.html" title="Message sent in reply to this message">Spiro Trikaliotis: "[cc65] [PATCH 2/3] Fix documentation for DiskChangeDevice."</a></li>
+<li><dfn>Reply</dfn>: <a href="10722.html" title="Message sent in reply to this message">Spiro Trikaliotis: "[cc65] [PATCH 1/3] Allow Bcc from one segment to another."</a></li>
+<li><dfn>Reply</dfn>:  <a href="10724.html" title="Message sent in reply to this message">Spiro Trikaliotis: "[cc65] [PATCH 3/3] Generate libsrc/apple2enh/extra if necessary"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10728.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Some unrelated patches to ca65, documentation and the build system for dicussion"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="10732.html" title="Message sent in reply to this message">A.Fachat: "Re: [cc65] Some unrelated patches to ca65, documentation and the build system for dicussion"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10723" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10723" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10723" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-08-17 21:13:04 CEST
+</em></small></p>
+</body>
+</html>

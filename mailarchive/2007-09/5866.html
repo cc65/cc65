@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] cl65 -t apple2 works, but </title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't" />
+<meta name="Date" content="2007-09-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't</h1>
+<!-- received="Mon Sep 10 10:52:42 2007" -->
+<!-- isoreceived="20070910085242" -->
+<!-- sent="Mon, 10 Sep 2007 10:52:30 +0200" -->
+<!-- isosent="20070910085230" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't" -->
+<!-- id="f97798c20709100152q41519589ye5d8540903614e6b@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="46E47E29.1090008&#64;alfter.us" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5867.html" title="Scott Alfter: &quot;Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't&quot;">Next message</a> ]
+[ <a href="5865.html" title="Scott Alfter: &quot;Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't&quot;">Previous message</a> ]
+[ <a href="5863.html" title="Scott Alfter: &quot;Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5867.html" title="Scott Alfter: &quot;Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20cl65%20-t%20apple2%20works,%20but%20cl65%20-C%20apple2.cfg%20doesn't">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-09-10 10:52:30</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Scott,
+
+&gt; I can edit it to change the start
+&gt; address (moving it to $2000 and resaving the binary with type SYS instead of
+&gt; $00 creates a file that can be double-clicked from the Finder to launch, though
+&gt; it crashes to the Monitor when it exits...there's probably a ProDOS MLI call or
+&gt; something that can be hacked in at the end of main() to fix that).
+
+I'd rather stay clear from trying to hack a BIN file into a SYS file...
+
+The contribution section contains a ProDOS loader that is a
+less-than-512-byte SYS file loading the BIN files created by the cc65
+toolchain.
+
+The benefit of this approach is that the final binary starting at $800
+has $1800 more RAM available. Additionally this approach is quite
+flexible:
+
+- As long as a cc65 binary doesn't use file I/O it may run as DOS 3.3
+binary, as ProDOS binary launched from BASIC.SYSTEM ans via the loader
+as ProDOS SYS file.
+
+- If it uses file I/O and therefore depends on the ProDOS MLI it still
+can be launched from the BASIC.SYSTEM and via the loader.
+
+- If it is launched via BASIC.SYSTEM it will return to BASIC on exit.
+If it is launched via the loader it will call the ProDOS selector at
+exit.
+
+- If launched via the loader it has more memory available resulting in
+a larger C heap. I.e. the DIODEMO program that copies disks allocates
+memory for track storage from the heap. In a single drive scenario it
+requires you one time less to swap the floppies if run via the loader.
+
+- The loader supports the ProDOS startup file protocol and delivers
+the content as argv[1] to main().
+
+&gt; I can also build and load tgidemo, but it runs into a problem when it tries to
+&gt; load the TGI driver.
+
+Works fine for me.
+
+&gt; ld65: Error: File `a2e.hi.tgi' has unknown type
+
+Surely, it's not an object file. It's a dynamically loadable module.
+Check out the cc65 docs.
+
+&gt; Since the documentation for the Apple II libraries says file I/O isn't working
+&gt; yet, maybe this is to be expected.
+
+You obviously are looking at quite outdated docs.
+
+&gt; Time to unpack the Apple II books so I can
+&gt; figure out what I need to do.
+
+Or just grab the latest cc65 snapshot. It has comprehensive file I/O
+support based on the ProDOS MLI. The TGIDEMO runs nicely dynamically
+loading the .tgi driver.
+
+Generally I'd stop presuming that everything is broken and/or incomplete.
+
+Best, Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Sep 10 10:52:42 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5867.html" title="Next message in the list">Scott Alfter: "Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5865.html" title="Previous message in the list">Scott Alfter: "Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5863.html" title="Message to which this message replies">Scott Alfter: "Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5867.html" title="Next message in this discussion thread">Scott Alfter: "Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5867.html" title="Message sent in reply to this message">Scott Alfter: "Re: [cc65] cl65 -t apple2 works, but cl65 -C apple2.cfg doesn't"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5866" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5866" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5866" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-09-10 10:52:45 CEST
+</em></small></p>
+</body>
+</html>

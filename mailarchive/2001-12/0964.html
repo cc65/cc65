@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Compile problem</title>
+<meta name="Author" content="Adam Dunkels (adam_at_sics.se)">
+<meta name="Subject" content="Re: [cc65] Compile problem">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Compile problem</h1>
+<!-- received="Mon Dec 10 21:48:06 2001" -->
+<!-- isoreceived="20011210204806" -->
+<!-- sent="Mon, 10 Dec 2001 21:48:25 +0100" -->
+<!-- isosent="20011210204825" -->
+<!-- name="Adam Dunkels" -->
+<!-- email="adam_at_sics.se" -->
+<!-- subject="Re: [cc65] Compile problem" -->
+<!-- id="200112102048.VAA22923@color.sics.se" -->
+<!-- inreplyto="236794992.20011210200348@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Adam Dunkels (<a href="mailto:adam_at_sics.se?Subject=Re:%20[cc65]%20Compile%20problem"><em>adam_at_sics.se</em></a>)<br>
+<strong>Date:</strong> 2001-12-10 21:48:25
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0965.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<li><strong>Previous message:</strong> <a href="0963.html">groepaz: "Re[4]: [cc65] Compile problem"</a>
+<li><strong>In reply to:</strong> <a href="0963.html">groepaz: "Re[4]: [cc65] Compile problem"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0965.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<li><strong>Reply:</strong> <a href="0965.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Monday 10 December 2001 20:03, you wrote:
+&gt; AD&gt; I think that the behavour that ca65/cc65 exhibits is the more common
+&gt; AD&gt; behaviour. I haven't come across any compilers that lets you specify
+&gt; &quot;include AD&gt; file relative to where this file lives&quot; (but then I haven't
+&gt; come across very AD&gt; many compilers).  The common behaviour is that
+&gt; #include files are searched AD&gt; relative to all -I paths and some default
+&gt; paths (., /usr/include and friends AD&gt; as well as a few others).
+&gt;
+&gt; eh? just try this... create 2 .h files in the same directory, let one
+&gt; of them include the other using its filename ONLY. now create a .c
+&gt; file somewhere else in your filesystem and include the previous .h
+&gt; file (the one that includes the other that is ;=)) using a relative
+&gt; path.
+
+But the big question is why you would want to do just that? What is there to 
+gain by using
+
+#include &quot;../a/very/long/and/troublesome/path/file.h&quot;
+
+instead of 
+
+#include &quot;file.h&quot;
+
+and specifying -I../a/very/long/and/troublesome/path to ca65 or cc65?
+
+The latter is much more practical when the long and troublesome path suddenly 
+changes; instead of having to go through every .c file and change the path, 
+only the makefile has to be changed.
+
+&gt; AD&gt; CFLAGS = -I../src/include -I../src/arch/cc65/include
+&gt; -I../src/include/ipv4
+&gt;
+&gt; AD&gt; This way, all includes are kept in diffrent directories and the paths
+&gt; are AD&gt; relative to the makefile and not to the root of the filesystem.
+&gt;
+&gt; this makes another assumption though...that is cc65 beeing installed
+&gt; at a specific location. mmmmh
+
+Huh? What does that have to do with which C compilers are installed and where 
+they are located?
+
+&gt; however, trying relative paths in the -I line might be a working
+&gt; solution for what i want to do... didnt think of that :o)
+
+The -I flag is a very good way to deal with having include files scattered 
+around. 
+
+/adam
+-- 
+Adam Dunkels &lt;<a href="mailto:adam_at_sics.se?Subject=Re:%20[cc65]%20Compile%20problem">adam_at_sics.se</a>&gt;
+<a href="http://www.sics.se/~adam">http://www.sics.se/~adam</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Compile%20problem">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0965.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<li><strong>Previous message:</strong> <a href="0963.html">groepaz: "Re[4]: [cc65] Compile problem"</a>
+<li><strong>In reply to:</strong> <a href="0963.html">groepaz: "Re[4]: [cc65] Compile problem"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0965.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<li><strong>Reply:</strong> <a href="0965.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:44 CET</em>
+</em>
+</small>
+</body>
+</html>

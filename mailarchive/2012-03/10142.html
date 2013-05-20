@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Magic Desk Cartridge Demo prob</title>
+<meta name="Author" content="Joseph Rose (rose.joseph121yahoo.com)" />
+<meta name="Subject" content="[cc65] Magic Desk Cartridge Demo problems" />
+<meta name="Date" content="2012-03-22" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Magic Desk Cartridge Demo problems</h1>
+<!-- received="Thu Mar 22 18:10:32 2012" -->
+<!-- isoreceived="20120322171032" -->
+<!-- sent="Thu, 22 Mar 2012 10:10:21 -0700 (PDT)" -->
+<!-- isosent="20120322171021" -->
+<!-- name="Joseph Rose" -->
+<!-- email="rose.joseph121yahoo.com" -->
+<!-- subject="[cc65] Magic Desk Cartridge Demo problems" -->
+<!-- id="1332436221.91827.YahooMailNeo@web120604.mail.ne1.yahoo.com" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="BOZO" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10143.html" title="Joseph Rose: &quot;[cc65] OT: SIN/LOG/EXP/SQR calculations?&quot;">Next message</a> ]
+[ <a href="10141.html" title="Joseph Rose: &quot;Re: [cc65] c64 cartridge types?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Joseph Rose &lt;<a href="mailto:rose.joseph121yahoo.com?Subject=Re:%20[cc65]%20Magic%20Desk%20Cartridge%20Demo%20problems">rose.joseph121yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-03-22 18:10:21</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I''ve been working on a cartridge library for the C64 and have been creating a demo for the Magic Desk cartridge format.  Most of it seems to work, even the banking strategy.  However, I'm having a problem: certain library functions aren't functioning properly.  cputsxy() displays garbage.  As the text starts in the proper location, it seems to me that either cputchar() or cputs() is at fault.  The _randomize() and rand() functions produce results that are too regular for my purpose.  I copy the LOWCODE, CODE, DATA, RODATA and bank access code to RAM upon startup, so unavailability of these functions shouldn't be a problem.  Some code snippets follow:
+--------------------------
+void __fastcall__ bankrun (unsigned char codeid);
+--------------------------_bankrun:
+ ;cmp #-1
+ ;bne *+5
+ ;jmp _exit
+ asl
+ asl
+ tax
+ lda _codetable,x
+ sta ptr1
+ lda _codetable+1,x
+ sta ptr1+1
+ lda _codetable+2,x
+ sta $DE00
+ lda #$00
+ sta sp
+ lda #$D0
+ sta sp+1
+ ldx #$00
+ txs
+ jmp (ptr1)
+--------------------------
+magiccart.h
+--------------------------
+//Main routine table.  Define in your code as the locations of your main
+//parts, where each entry determines a module in your program.
+//Put in RODATA segment.
+extern const struct codetable {
+ void*  calladdr; //Address of routine in cartridge bank.
+ unsigned char bank,   //Bank containing routine.
+   x;  //Padding--no meaning.
+} codetable [];
+//Transfer control to a different module in your code.
+void __fastcall__ bankrun (char p); //p is the ID of the module, as in the codetable
+     //subscript.
+--------------------------
+main.c
+--------------------------
+#define numparts 2
+#pragma codeseg  (&quot;CODE2&quot;)
+#pragma rodataseg (&quot;RODATA2&quot;)
+static const unsigned char partid[]={1,2};
+void main()
+{
+ unsigned char c;
+ bgcolor (1); bordercolor (4); //textcolor (5);
+ //clrscr();
+ puts (&quot;\f\x93\x12\x89 Screen Demo of MagicDesk cartridge fmt.\x92&quot;
+  &quot;   by \x9aJoseph Rose\x99, a.k.a. \x96\x12Harry Potter\x99\n&quot;
+  &quot;----------------------------------------\x90&quot;
+  &quot;Choose your demo:\n\n&quot;
+  &quot;1.  Ink Blot\n&quot;
+  &quot;2.  \x1C&quot;&quot;C\x81o\x9El\x1Eo\x1Fr\x90 Ink Blot\n&quot;
+  );
+ while (1) {
+  c=cgetc()-'1';
+  if (c&lt;numparts) bankrun (partid[c]);
+ }
+}
+
+#pragma rodataseg (&quot;RODATA&quot;)
+const struct codetable codetable [] =
+{
+ {&amp;main,  1},
+ {&amp;blot,  2},
+ {&amp;colorblot, 2}
+};
+#pragma rodataseg (&quot;RODATA2&quot;)
+
+--------------------------
+blot.c
+--------------------------
+#pragma codeseg  (&quot;CODE3&quot;)
+#pragma rodataseg (&quot;RODATA3&quot;)
+...
+void blot ()
+{
+ static unsigned i;
+ _randomize ();
+ bordercolor (3); bgcolor(1); textcolor (0);
+ clrscr ();
+ for (i=0; i&lt;20*40; ++i) {revers (rand()&amp;1); cputc(' ');}
+ revers(0);
+ cputcxy (0,24,&quot;Press any key to continue...&quot;);
+ while (!kbhit());
+ cgetc();
+ bankrun (0);
+}
+
+--------------------------
+I compiled the program with cl65, and the above is the problem.  When I did it the long way, (i.e. cc65/ca65/ld65) the screen flashed then displayed the C64's blue screen without the text.  If it helps, I didn't implement the IRQ stub.
+--------------------------
+Joseph Rose, a.k.a. Harry Potter
+Working magic in the computer community
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Mar 22 18:10:32 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10143.html" title="Next message in the list">Joseph Rose: "[cc65] OT: SIN/LOG/EXP/SQR calculations?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10141.html" title="Previous message in the list">Joseph Rose: "Re: [cc65] c64 cartridge types?"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10142" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10142" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10142" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-03-22 18:10:36 CET
+</em></small></p>
+</body>
+</html>

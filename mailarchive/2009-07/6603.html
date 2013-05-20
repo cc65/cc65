@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] diskcmd.s error</title>
+<meta name="Author" content="silverdr1wfmh.org.pl (silverdr1wfmh.org.pl)" />
+<meta name="Subject" content="Re: [cc65] diskcmd.s error" />
+<meta name="Date" content="2009-07-05" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] diskcmd.s error</h1>
+<!-- received="Sun Jul  5 21:26:10 2009" -->
+<!-- isoreceived="20090705192610" -->
+<!-- sent="Sun, 5 Jul 2009 21:26:01 +0200" -->
+<!-- isosent="20090705192601" -->
+<!-- name="silverdr1wfmh.org.pl" -->
+<!-- email="silverdr1wfmh.org.pl" -->
+<!-- subject="Re: [cc65] diskcmd.s error" -->
+<!-- id="D63AD9F4-7DE0-4C68-95F5-329711525EF9@wfmh.org.pl" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="20090705162043.GA29949&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6604.html" title="silverdr1wfmh.org.pl: &quot;[cc65] &quot;overlay&quot; files&quot;">Next message</a> ]
+[ <a href="6602.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] diskcmd.s error&quot;">Previous message</a> ]
+[ <a href="6602.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] diskcmd.s error&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6608.html" title="Jakub: &quot;[cc65] Segment EXEHDR does not exist - while using ld65 directly&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:silverdr1wfmh.org.pl?Subject=Re:%20[cc65]%20diskcmd.s%20error">silverdr1wfmh.org.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-07-05 21:26:01</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 2009-07-05, at 18:20, Ullrich von Bassewitz wrote:
+
+&gt;&gt; OK. Set of sources sent to the personal mailbox.
+&gt;
+&gt; Thanks, I've had a look at it. The problem is caused by tricky  
+&gt; programming
+&gt; together with ld65 being too strict.
+
+Being strict is not a bad thing in programming IMHO. It often helps  
+finding nasty bugs, which would otherwise survive much longer.
+
+&gt; Here is the relevant line again:
+&gt;
+&gt;        jsr     isdisk          ; Disk unit?
+&gt;        bcs     success
+&gt;
+&gt; ; Is this channel already open?
+&gt;
+&gt;        ldy     opentab-FIRST_DRIVE,x
+&gt;        bne     isopen
+&gt;
+&gt; First, X is checked to contain the address of a disk on the bus, so  
+&gt; X is at
+&gt; least 8 (= first disk drive). Since the table &quot;opentab&quot; contains  
+&gt; just disks,
+&gt; an offset of 8 (= FIRST_DRIVE) is subtracted, so when X contains 8,  
+&gt; the first
+&gt; element of the table is addressed. The address calculation (get  
+&gt; address of
+&gt; opentab and subtract 8) is stored in the object file.
+
+I see. I think now I know what you meant by &quot;tricky programming&quot; here.  
+At first I was wondering what was tricky in my crude test code :-) but  
+subtracting the offset from the base rather than the index (even if  
+more or less ensured to be working) is what I understand as tricky.
+
+&gt; The table &quot;opentab&quot; is in the BSS segment. In your program, there is  
+&gt; nothing
+&gt; else in the BSS segment, so the table is at the start of the  
+&gt; segment. So the
+&gt; expression resolves to &quot;get the address of the BSS segment and  
+&gt; subtract 8&quot;,
+&gt; which is an address that lies *outside* of the segment. And this is  
+&gt; what the
+&gt; linker doesn't like ...
+
+Yes, and for a reason as I understand here.
+
+&gt;
+&gt; The error will go away by itself if you start adding uninitialized  
+&gt; variables
+&gt; or use more library modules. As a quick workaround, use
+&gt;
+&gt;        static char unused[8];
+&gt;
+&gt; at the top of your C module until your program grows larger.
+
+Hm, I don't have the sources here at hand but would changing the  
+diskcmd.s starting at line 49 to read more or less like:
+
+	pha
+	txa
+	pha
+	sec
+	sbc #FIRST_DRIVE
+	tax
+	ldy opentab,x
+	pla
+	tax
+	pla
+	cpy #$00
+	bne isopen
+
+be a drop-in replacement fix, even if long, slow, etc?
+
+Of course this should possibly be optimised, depending on how  
+important preserving the registers values is (as I wrote I can't check  
+the lib sources now) or whether not to use different registers, etc.
+
+&gt;
+&gt; Thanks for the report. This was an interesting one :-)
+&gt;
+
+Thank you for checking this out. At least I feel better that:
+
+a) it wasn't me doing something utterly stupid
+b) I wasn't bothering you without a reason as it would certainly take  
+me many times longer to find this out, if at all ;-)
+
+Cordially,
+
+-- 
+SD!
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Jul  5 21:26:10 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6604.html" title="Next message in the list">silverdr1wfmh.org.pl: "[cc65] &quot;overlay&quot; files"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6602.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] diskcmd.s error"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6602.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] diskcmd.s error"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6608.html" title="Next message in this discussion thread">Jakub: "[cc65] Segment EXEHDR does not exist - while using ld65 directly"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6603" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6603" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6603" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-07-05 21:26:12 CEST
+</em></small></p>
+</body>
+</html>

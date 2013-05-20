@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Testing cc65</title>
+<meta name="Author" content="Dan (opendtv1yahoo.com)" />
+<meta name="Subject" content="[cc65] Testing cc65" />
+<meta name="Date" content="2007-07-06" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Testing cc65</h1>
+<!-- received="Fri Jul  6 16:26:37 2007" -->
+<!-- isoreceived="20070706142637" -->
+<!-- sent="Fri, 6 Jul 2007 07:26:27 -0700 (PDT)" -->
+<!-- isosent="20070706142627" -->
+<!-- name="Dan" -->
+<!-- email="opendtv1yahoo.com" -->
+<!-- subject="[cc65] Testing cc65" -->
+<!-- id="214112.80400.qm@web56209.mail.re3.yahoo.com" -->
+<!-- charset="iso-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5790.html" title="Groepaz: &quot;Re: [cc65] Testing cc65&quot;">Next message</a> ]
+[ <a href="5788.html" title="Johan Kotlinski: &quot;Re: [cc65] cc65 data optimization&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5790.html" title="Groepaz: &quot;Re: [cc65] Testing cc65&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Dan &lt;<a href="mailto:opendtv1yahoo.com?Subject=Re:%20[cc65]%20Testing%20cc65">opendtv1yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-07-06 16:26:27</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Does anyone have some ideas on how to test cc65?
+Ullrich, do you have a way of doing automated tests?
+
+If somebody is willing to try out my version of cc65,
+let me know and I'll send you the source and/or Win32
+binary. Here's a summary of enhancements:
+
+* Static parameter passing (enabled with
+--static-params): uses fixed memory locations for
+parameter passing. Only applied to functions declared
+'static' that don't have their address taken. The
+externally-visible calling convention is unchanged.
+
+* Leaf function optimization (enabled with --leaf):
+leaf functions (i.e. functions that don't call other
+functions) use a special block of zero page memory
+(leafregbank). By default it is 16 bytes, but this can
+be changed with --leaf-space. If --leaf is combined
+with --static-params, leaf function parameters are
+passed directly in zero page. All locals in leaf
+functions use zero page (space permitting); the
+&quot;register&quot; keyword has no effect.
+
+* Using the hardware stack for zero page save/restore
+(enabled by --hardware-stack): uses PHA for saving
+locals declared as &quot;register&quot;. This is much faster
+than using the C stack, and often (but not always)
+more compact. Since the default maximum is only 6
+bytes per function, there is not much risk of stack
+overflow, but it could happen.
+
+* Automatically use &quot;fastcall&quot; (enabled by
+--fastcall): automatically applies fastcall calling
+convention to static functions. This just saves having
+to type &quot;fastcall&quot; in function declarations. Despite
+its name, fastcall is not really faster, but it is
+more compact for functions called more than once.
+
+* Optimizes zero page global pointers (marked with
+#pragma zpsym): pointers in zero page are now used
+directly, instead of being treated as if they weren't
+in zero page.
+
+* String merge (enabled by --string-merge): merges
+duplicate string literals.
+
+Dan
+
+
+
+       
+____________________________________________________________________________________
+Got a little couch potato? 
+Check out fun summer activities for kids.
+<a href="http://search.yahoo.com/search?fr=oni_on_mail&amp;p=summer+activities+for+kids&amp;cs=bz">http://search.yahoo.com/search?fr=oni_on_mail&amp;p=summer+activities+for+kids&amp;cs=bz</a> 
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Jul  6 16:26:37 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5790.html" title="Next message in the list">Groepaz: "Re: [cc65] Testing cc65"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5788.html" title="Previous message in the list">Johan Kotlinski: "Re: [cc65] cc65 data optimization"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5790.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] Testing cc65"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5790.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] Testing cc65"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5789" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5789" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5789" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-07-06 16:26:41 CEST
+</em></small></p>
+</body>
+</html>

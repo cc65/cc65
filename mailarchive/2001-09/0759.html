@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] snapshot #1</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] snapshot #1">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] snapshot #1</h1>
+<!-- received="Wed Sep 26 17:31:22 2001" -->
+<!-- isoreceived="20010926153122" -->
+<!-- sent="Wed, 26 Sep 2001 17:31:27 +0200" -->
+<!-- isosent="20010926153127" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] snapshot #1" -->
+<!-- id="20010926173127.B31020@trixie.musoftware.de" -->
+<!-- inreplyto="15281.58720.231529.908784@panini.cling.gu.se" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20snapshot%20#1"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2001-09-26 17:31:27
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0760.html">groepaz: "Re[2]: [cc65] snapshot #1"</a>
+<li><strong>Previous message:</strong> <a href="0758.html">Ullrich von Bassewitz: "Re: [cc65] snapshot #1"</a>
+<li><strong>In reply to:</strong> <a href="0756.html">MagerValp: "Re: Re[2]: [cc65] snapshot #1"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0761.html">groepaz: "Re[2]: [cc65] snapshot #1"</a>
+<li><strong>Reply:</strong> <a href="0761.html">groepaz: "Re[2]: [cc65] snapshot #1"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Wed, Sep 26, 2001 at 04:25:36PM +0200, MagerValp wrote:
+&gt; So would I -- just post the changes here. I know how to optimize asm,
+&gt; but I'm fairly clueless when it comes to C.
+
+With a really good compiler, it should not be needed to write C code in a
+special way to optimize it, but unfortunately cc65 is far from being an
+optimizing compiler, so...
+
+...most of the hints to help the compiler generate good code are listed in the
+&quot;coding.sgml&quot; document in the doc directory, which is also available as an
+HTML version at <a href="http://www.cc65.org/doc/coding.html">http://www.cc65.org/doc/coding.html</a>.
+
+In the given case of the plasma demo, the most helpful change was to replace
+all post-increment operators by the pre-increment form. Since the demo uses
+nested for loops, all additional code gets executed 1000 times in each frame -
+and this really adds up.
+
+The problem with the post-increment operators is that it tells the compiler
+that the old value (before the increment) may be used later. The cc65 compiler
+is not smart enough to figure out in all cases that this never happens, so it
+generates additional code. If you write pseudo code for the pre-increment and
+post-increment operators you will end up with something like this:
+
+    unsigned postincrement (unsigned* v)
+    {
+        unsigned save = *v;
+	*v += 1;
+	return save;
+    }
+
+    unsigned preincrement (unsigned* v)
+    {
+        return *v += 1;
+    }
+
+The need for a temporary copy is what makes the difference here.
+
+C++ programmers usually have less problems using pre-increment instead of
+post-increment, because C++ lets you write these operators yourself for some
+classes. And when writing these operators, one will notice that the
+pre-increment operator is always a lot simpler than post-increment one (this
+is of course also true for pre-decrement compared to post-decrement).
+
+The new compiler will make some additional efforts to find useless temporary
+copies, but this may still fail.
+
+So my advice for any C programmer is to use the pre-increment/decrement form
+whenever possible. This is even more true for C++ programmers, because in the
+case of C++, such an operator may involve generation of a temporary copy of a
+class instance, which is even more expensive than the copy of a native data
+type.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20snapshot%20#1">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20snapshot%20#1">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0760.html">groepaz: "Re[2]: [cc65] snapshot #1"</a>
+<li><strong>Previous message:</strong> <a href="0758.html">Ullrich von Bassewitz: "Re: [cc65] snapshot #1"</a>
+<li><strong>In reply to:</strong> <a href="0756.html">MagerValp: "Re: Re[2]: [cc65] snapshot #1"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0761.html">groepaz: "Re[2]: [cc65] snapshot #1"</a>
+<li><strong>Reply:</strong> <a href="0761.html">groepaz: "Re[2]: [cc65] snapshot #1"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:42 CET</em>
+</em>
+</small>
+</body>
+</html>

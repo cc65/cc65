@@ -1,0 +1,139 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] preprocessor hazzle...</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] preprocessor hazzle...">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] preprocessor hazzle...</h1>
+<!-- received="Mon Jul 29 08:20:01 2002" -->
+<!-- isoreceived="20020729062001" -->
+<!-- sent="Mon, 29 Jul 2002 08:20:01 +0200" -->
+<!-- isosent="20020729062001" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] preprocessor hazzle..." -->
+<!-- id="20020729062001.GA12492@trixie.musoftware.de" -->
+<!-- inreplyto="18229094414.20020726235651@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20preprocessor%20hazzle..."><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-07-29 08:20:01
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1543.html">groepaz: "[cc65] glitch in &quot;assert.h&quot; ?"</a>
+<li><strong>In reply to:</strong> <a href="1540.html">groepaz: "Re[2]: [cc65] preprocessor hazzle..."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1545.html">groepaz: "Re[2]: [cc65] preprocessor hazzle..."</a>
+<li><strong>Next in thread:</strong> <a href="1542.html">MagerValp: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Reply:</strong> <a href="1545.html">groepaz: "Re[2]: [cc65] preprocessor hazzle..."</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Fri, Jul 26, 2002 at 11:56:51PM +0200, groepaz wrote:
+&gt; coolio :o) btw, i guess i can safely assume that the snapshots you
+&gt; generate each nite (i guess? looks like it atleast ;=P) always have
+&gt; all those patches applied?
+
+Unfortunately not .There are situations where the development sources are in a
+state that does not allow to apply the patch, or sometimes I choose a
+different solution for the development sources.
+
+&gt; however.... in the &quot;small&quot; source i stumbled about another possible
+&gt; problem.....
+[...]
+
+Works here. The only thing that does not work is something like this:
+
+        int bar;
+
+        void foo (void)
+        {
+            extern int bar;
+        }
+                          
+So as long as you don't have both, a declaration and an extern definition in
+your sources, they should be ok.
+
+&gt; and then &quot;bla&quot; is somewhere reused in an expression where the size of
+&gt; &quot;bla&quot; must be known..... resulting in an &quot;size of &quot;bla&quot; unknown&quot;
+&gt; error. i am not sure here, but afaik &quot;bla[]&quot; equals &quot;*bla&quot; in an
+&gt; expression and thus its size (the size of the pointer) _is_ known and
+&gt; such an error shouldnt occur. (ok i could come up with a testprog
+&gt; aswell here but maybe you know where to look already :o))
+
+If the size of bla[] is the size of a pointer, what would you expect from
+sizeof(bla[3])? I don't know about the code you're testing, but gcc does not
+accept this construct either:
+
+        t.c:6: sizeof applied to an incomplete type
+
+&gt; btw! i tried compiling with an oldish mingw32 install aswell (cygwin
+&gt; compiled binaries are kinda sloooooooow ;=P) and noticed that
+&gt; somewhere the code relies on fork() and friends and maybe some other
+&gt; things used to spawn a sub-process in *nix.... is there a way to
+&gt; compile the source for a target that has simple &quot;spawn...&quot; functions
+&gt; but no fork() already?
+
+The Windows version uses spawn() from it's own library. The unix version has
+an additional module that implements spawn().
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20preprocessor%20hazzle...">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20preprocessor%20hazzle...">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1543.html">groepaz: "[cc65] glitch in &quot;assert.h&quot; ?"</a>
+<li><strong>In reply to:</strong> <a href="1540.html">groepaz: "Re[2]: [cc65] preprocessor hazzle..."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1545.html">groepaz: "Re[2]: [cc65] preprocessor hazzle..."</a>
+<li><strong>Next in thread:</strong> <a href="1542.html">MagerValp: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Reply:</strong> <a href="1545.html">groepaz: "Re[2]: [cc65] preprocessor hazzle..."</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-07-29 08:21:22 CEST</em>
+</em>
+</small>
+</body>
+</html>

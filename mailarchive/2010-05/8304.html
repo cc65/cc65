@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Difference between __fastcall </title>
+<meta name="Author" content="Payton Byrd (plbyrd1gmail.com)" />
+<meta name="Subject" content="[cc65] Difference between __fastcall and __fastcall__ ?" />
+<meta name="Date" content="2010-05-03" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Difference between __fastcall and __fastcall__ ?</h1>
+<!-- received="Mon May  3 03:12:09 2010" -->
+<!-- isoreceived="20100503011209" -->
+<!-- sent="Sun, 2 May 2010 20:11:40 -0500" -->
+<!-- isosent="20100503011140" -->
+<!-- name="Payton Byrd" -->
+<!-- email="plbyrd1gmail.com" -->
+<!-- subject="[cc65] Difference between __fastcall and __fastcall__ ?" -->
+<!-- id="t2t1adf4c761005021811u1d641f76h44cbb7ea97beb22@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8305.html" title="Payton Byrd: &quot;[cc65] Coding style for apps: One huge header file, or a domain specific  header files?&quot;">Next message</a> ]
+[ <a href="8303.html" title="Oliver Schmidt: &quot;Re: [cc65] --create-dep for ca65?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8307.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Difference between __fastcall and __fastcall__ ?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Payton Byrd &lt;<a href="mailto:plbyrd1gmail.com?Subject=Re:%20[cc65]%20Difference%20between%20__fastcall%20and%20__fastcall__%20?">plbyrd1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-05-03 03:11:40</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I'm using Visual Studio 2010 as my IDE and for the most part it's totally
+cool with the cc65 specific source files.  The only that that trips it up is
+the __fastcall__ convention with two trailing underscores.  VS 2010 actually
+recognizes __fastcall as a keyword and colors it appropriately so long as it
+doesn't have the trailing spaces.  Is __fastcall a standard convention that
+means the same thing as __fastcall__ in cc65?
+
+The reason I ask is that Intellisense for VS 2010 does a great job with my
+sources, but not so much with the header files in the cc65/include folder.
+ The reason why is that it thinks that the __fastcall__ macro is an error
+and so each and every function defined in the include files parses as an
+error and there are literally over 100 intellisense errors reported on the
+header files.  It's nothing *important* for this to work, but it would be
+nice if it did.  If cc65 could accept __fastcall as the same thing as
+__fastcall__ then the header files could be updated to the __fastcall
+convention and intellisense would be happy which would make VS just that
+much more awesome for cc65 development (which it is already pretty awesome).
+
+-- 
+Payton Byrd
+&lt;<a href="http://www.paytonbyrd.com">http://www.paytonbyrd.com</a>&gt;
+&lt;<a href="http://it.toolbox.com/blogs/paytonbyrd">http://it.toolbox.com/blogs/paytonbyrd</a>&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon May  3 03:12:09 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8305.html" title="Next message in the list">Payton Byrd: "[cc65] Coding style for apps: One huge header file, or a domain specific  header files?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8303.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] --create-dep for ca65?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8307.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Difference between __fastcall and __fastcall__ ?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8307.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Difference between __fastcall and __fastcall__ ?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8311.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Difference between __fastcall and __fastcall__ ?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8304" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8304" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8304" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-05-03 03:12:13 CEST
+</em></small></p>
+</body>
+</html>

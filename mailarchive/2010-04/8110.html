@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Bug in CONIO on C128?</title>
+<meta name="Author" content="Payton Byrd (plbyrd1gmail.com)" />
+<meta name="Subject" content="[cc65] Bug in CONIO on C128?" />
+<meta name="Date" content="2010-04-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Bug in CONIO on C128?</h1>
+<!-- received="Fri Apr 23 04:15:25 2010" -->
+<!-- isoreceived="20100423021525" -->
+<!-- sent="Thu, 22 Apr 2010 21:14:55 -0500" -->
+<!-- isosent="20100423021455" -->
+<!-- name="Payton Byrd" -->
+<!-- email="plbyrd1gmail.com" -->
+<!-- subject="[cc65] Bug in CONIO on C128?" -->
+<!-- id="y2l1adf4c761004221914xc838e0d7q3d57735b42177b53@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8111.html" title="Kevin Schuetz: &quot;Re: [cc65] Please critique this makefile&quot;">Next message</a> ]
+[ <a href="8109.html" title="Groepaz: &quot;Re: [cc65] declaring variables after code&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8133.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Bug in CONIO on C128?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Payton Byrd &lt;<a href="mailto:plbyrd1gmail.com?Subject=Re:%20[cc65]%20Bug%20in%20CONIO%20on%20C128?">plbyrd1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-04-23 04:14:55</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I believe I have found a bug in the CONIO library implementation for the
+C128.  Attached is a C128 program that uses CONIO to write a menu on the
+screen.  In 40-column mode it displays correctly, but in 80-column mode the
+text of the menu does not display, instead it draws as unreversed spaces.
+ The same code runs in both modes, so there's no tricks here.  You do need
+to run from a warm boot (use the 40/80 key to select your mode when booting)
+to ensure you are running exactly the same code.
+
+The behavior is the same in both WinVICE and on a real flat C128.
+
+The cputsxy method is what's writing the menu text to the screen and would
+be my first place to start looking for the bug.  Uz, if you need the sources
+let me know.  They are still very ugly and I don't want to post them to the
+mailing list.
+
+-- 
+Payton Byrd
+&lt;<a href="http://www.paytonbyrd.com">http://www.paytonbyrd.com</a>&gt;
+&lt;<a href="http://it.toolbox.com/blogs/paytonbyrd">http://it.toolbox.com/blogs/paytonbyrd</a>&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<div>
+<ul>
+<li>application/octet-stream attachment: <a href="../att-8110/cbmcommand.prg">cbmcommand.prg</a></li>
+</ul>
+<!-- attachment="cbmcommand.prg" -->
+</div>
+<span id="received"><dfn>Received on</dfn> Fri Apr 23 04:15:25 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8111.html" title="Next message in the list">Kevin Schuetz: "Re: [cc65] Please critique this makefile"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8109.html" title="Previous message in the list">Groepaz: "Re: [cc65] declaring variables after code"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8133.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Bug in CONIO on C128?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8133.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Bug in CONIO on C128?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8145.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] Bug in CONIO on C128?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8110" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8110" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8110" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-04-23 04:15:29 CEST
+</em></small></p>
+</body>
+</html>

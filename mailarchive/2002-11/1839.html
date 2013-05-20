@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] 65816 (Was: Inserting Ass</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] 65816 (Was: Inserting Assembly Routines)">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] 65816 (Was: Inserting Assembly Routines)</h1>
+<!-- received="Thu Nov 28 21:16:44 2002" -->
+<!-- isoreceived="20021128201644" -->
+<!-- sent="Thu, 28 Nov 2002 21:16:42 +0100" -->
+<!-- isosent="20021128201642" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] 65816 (Was: Inserting Assembly Routines)" -->
+<!-- id="20021128201642.GA13624@trixie.musoftware.de" -->
+<!-- inreplyto="15846.13630.137778.178114@panini.cling.gu.se" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%2065816%20(Was:%20Inserting%20Assembly%20Routines)"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-11-28 21:16:42
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1838.html">MagerValp: "Re: [cc65] 65816 (Was: Inserting Assembly Routines)"</a>
+<li><strong>In reply to:</strong> <a href="1838.html">MagerValp: "Re: [cc65] 65816 (Was: Inserting Assembly Routines)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1840.html">Ullrich von Bassewitz: "Re: [cc65] 65816"</a>
+<li><strong>Next in thread:</strong> <a href="1823.html">Ullrich von Bassewitz: "Re: [cc65] Inserting Assembly Routines"</a>
+<li><strong>Reply:</strong> <a href="1840.html">Ullrich von Bassewitz: "Re: [cc65] 65816"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Thu, Nov 28, 2002 at 04:24:46PM +0100, MagerValp wrote:
+&gt; But more bytes are pushed on the stack in native mode
+
+This is not a problem, because the 3 low bytes (that may be accessed in an
+interrupt handler) are the same as in 6502 mode. The additional byte that is
+pushed by an IRQ is poped by the RTI, so it is invisible for the programmer
+and does not need special care.
+
+&gt; and the hand-
+&gt; ling of the BRK bit is different, so the kernal IRQ handler needs to
+&gt; be completely rewritten.
+
+Even this is not a problem as long as there are no BRK instructions in your
+code (which should be the usual case).
+
+&gt; Also the new IRQ vectors ($FFE5..$FFEF)
+&gt; collide with the kernal jump table.
+
+The COP vector at $FFF5/$FFF6 is unused. It needs special hardware to be of
+any use. The new BREAK vector at $FFF7/$FFF8 would be a problem, but since
+normal code does not have BRK instructions, this vector will never be used.
+The new BREAK vector will NOT collide with the kernal jump table (the last
+byte of the kernal jump table is at $FFF5). The 4 bytes at $FFF6 are unused in
+the C64 kernal, and I would assume that the CMD kernal for the SCPU has a
+valid BREAK vector in that location that is routed to the indirect kernal
+vector. I'm not sure about this, but since the space where the vector resides
+is not used anway, it would have been plain stupid not to do so.
+
+&gt; Having the DBR set to a bank
+&gt; different than 0 breaks many kernal routines.
+
+In the small memory model described in my earlier mail DBR is set to zero, so
+even this is not a problem.
+
+I've used the method described above to run Elite 128 in 65816 native mode.
+All that was needed was detection of the 816 and the additional SEP
+instruction.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%2065816%20(Was:%20Inserting%20Assembly%20Routines)">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%2065816%20(Was:%20Inserting%20Assembly%20Routines)">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1838.html">MagerValp: "Re: [cc65] 65816 (Was: Inserting Assembly Routines)"</a>
+<li><strong>In reply to:</strong> <a href="1838.html">MagerValp: "Re: [cc65] 65816 (Was: Inserting Assembly Routines)"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1840.html">Ullrich von Bassewitz: "Re: [cc65] 65816"</a>
+<li><strong>Next in thread:</strong> <a href="1823.html">Ullrich von Bassewitz: "Re: [cc65] Inserting Assembly Routines"</a>
+<li><strong>Reply:</strong> <a href="1840.html">Ullrich von Bassewitz: "Re: [cc65] 65816"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-11-28 21:17:00 CET</em>
+</em>
+</small>
+</body>
+</html>

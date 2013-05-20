@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] New subversion source code</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] New subversion source code repository" />
+<meta name="Date" content="2008-08-05" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] New subversion source code repository</h1>
+<!-- received="Tue Aug  5 20:01:21 2008" -->
+<!-- isoreceived="20080805180121" -->
+<!-- sent="Tue, 5 Aug 2008 20:01:12 +0200" -->
+<!-- isosent="20080805180112" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] New subversion source code repository" -->
+<!-- id="f97798c20808051101j1af92253lae7946784f8b67cd@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20080805093411.GA15872&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6202.html" title="silverdr1inet.com.pl: &quot;Re: [cc65] New subversion source code repository&quot;">Next message</a> ]
+[ <a href="6200.html" title="Karri Kaksonen: &quot;Re: [cc65] New subversion source code repository&quot;">Previous message</a> ]
+[ <a href="6197.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] New subversion source code repository&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6204.html" title="Spiro Trikaliotis: &quot;Re: [cc65] New subversion source code repository&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20New%20subversion%20source%20code%20repository">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-08-05 20:01:12</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt;&gt; - I personally consider this security measure neither appropriate nor useful.
+&gt;
+&gt; You may call me paranoid, but I have a permanent internet connection with
+&gt; static IPs at home for about 10 years now (I started with an analog leased
+&gt; line using two USR Dual Standard modems, the whole thing cost me about 800DM
+&gt; per month at that time). I'm also administrating other networks with static
+&gt; IPs and permanent internet connections. And I didn't have a single serious
+&gt; security incident in all the years. I don't know, how well the svnserve code
+&gt; is written, but in case there's an incident, I want at least be able to get
+&gt; behind the originator.
+
+Again thanks for your open statement. I totally understand - and agree
+with - your motivation.
+
+&gt;&gt; - Do you accept DNS records from all TLDs?
+&gt;
+&gt; The incoming host must have a valid reverse and matching forward lookup. The
+&gt; domain used doesn't matter. I think that's not too much to ask for.
+
+Maybe time for some explanation on my side...
+
+- Not useful:
+
+As Mike already pointed out I see your policy easily yield lots both
+false positives and false negatives (aka type I and type II errors).
+
+- Not appropriate:
+
+FCrDNS is about hosts, not about individuals. It's intended for
+machine to machine communication. But here we talk about individuals
+accessing a source code repository. Applying FCrDNS here is similiar
+to a bank that does credit worthiness checks by evaluating if the
+credit applicant is living in a &quot;good neighbourhood&quot;.
+
+Although questionable from an ethical point of view the bank just has
+statistical data that shows a correlation between neighourhood and
+payments morality. I however doubt that you have such data on the
+correlation between using an FCrDNS-less ISP and hacking your site.
+
+I might serve as a good example: I'm contributing to cc65 for quite
+some years by now. I envision this stealing time from my familiy.
+Therefore I'm strictly staying clear from additionally stealing money
+from my familiy. So I'll certainly stay with my el cheapo ISP. Not
+getting access to your repository for that reason seems discriminating
+to me.
+
+The internet of today is an internet of a mobile individual: Home,
+office, public hotspots, ... So from my perspective the (only) way to
+go for secure accessing a source code repository is on individuals
+with a PKI. Give certificates to people you either trust for some
+reason or you can identify in some way. If a certificate is obused
+revoke it for good.
+
+Best, Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Aug  5 20:01:21 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6202.html" title="Next message in the list">silverdr1inet.com.pl: "Re: [cc65] New subversion source code repository"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6200.html" title="Previous message in the list">Karri Kaksonen: "Re: [cc65] New subversion source code repository"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6197.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] New subversion source code repository"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6204.html" title="Next message in this discussion thread">Spiro Trikaliotis: "Re: [cc65] New subversion source code repository"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6204.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Re: [cc65] New subversion source code repository"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6205.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] New subversion source code repository"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6201" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6201" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6201" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-08-05 20:01:23 CEST
+</em></small></p>
+</body>
+</html>

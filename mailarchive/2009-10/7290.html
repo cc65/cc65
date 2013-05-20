@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] TGI API deficit / proposal</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] TGI API deficit / proposal" />
+<meta name="Date" content="2009-10-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] TGI API deficit / proposal</h1>
+<!-- received="Sun, 25 Oct 2009 13:20:13 +0200" -->
+<!-- isoreceived="20091025112013" -->
+<!-- sent="Sun, 25 Oct 2009 13:20:13 +0200" -->
+<!-- isosent="20091025112013" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] TGI API deficit / proposal" -->
+<!-- id="f97798c20910250420h1da9d449n105ffe3cd403e780@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7291.html" title="Oliver Schmidt: &quot;Re: [cc65] Atari TGI drivers, finally&quot;">Next message</a> ]
+[ <a href="7289.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Atari TGI drivers, finally&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7292.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] TGI API deficit / proposal&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20TGI%20API%20deficit%20/%20proposal">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-10-25 12:20:13</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+when looking the other day at the 3dmaze output I noticed that it is
+rather ugly that the screen is always cleared an then redrawed. Then I
+remembered that a native Apple2 program would certainly used
+offscreen-drawing and page-switching to improve the visual appearance.
+
+But when looking at the TGI API to see if that would be implementable
+with TGI I noticed that tgi_clear() always clears the current, visible
+screen :-(
+
+From my experience this turns the multi-page support in TGI rather
+useless: I see (maybe oversimplifying) three ways to handle the
+flicker-free screeen drawing in interactive programs:
+
+1. Modify a single page incrementally (doesn't need multi-page support at all).
+2. Redraw the hidden page opaquely (feasable only with bitmaps
+unfortunately not supported by TGI at all)
+3. Clear hidden page and then draw selectively (needs page-specific
+clear currently not available in TGI)
+
+With a page-specific clear the 3dmaze could by easily converted to a
+type 3.) program - and by checking tgi_getpagecount() this behaviour
+could be turned on only if the driver supports it...
+
+Best, Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun, 25 Oct 2009 13:20:13 +0200</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7291.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Atari TGI drivers, finally"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7289.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Atari TGI drivers, finally"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7292.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] TGI API deficit / proposal"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7292.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] TGI API deficit / proposal"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7290" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7290" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7290" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-10-25 12:20:28 CET
+</em></small></p>
+</body>
+</html>

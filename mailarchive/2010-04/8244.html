@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Why does this work in 128 </title>
+<meta name="Author" content="Payton Byrd (plbyrd1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] Why does this work in 128 mode but not 64 mode?" />
+<meta name="Date" content="2010-04-30" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Why does this work in 128 mode but not 64 mode?</h1>
+<!-- received="Fri Apr 30 05:53:10 2010" -->
+<!-- isoreceived="20100430035310" -->
+<!-- sent="Thu, 29 Apr 2010 22:52:46 -0500" -->
+<!-- isosent="20100430035246" -->
+<!-- name="Payton Byrd" -->
+<!-- email="plbyrd1gmail.com" -->
+<!-- subject="Re: [cc65] Why does this work in 128 mode but not 64 mode?" -->
+<!-- id="o2m1adf4c761004292052k35bdd9f3j7db3e21e42e2c9a@mail.gmail.com" -->
+<!-- charset="UTF-8" -->
+<!-- inreplyto="20100429212056.GD18765&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8245.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Why does this work in 128 mode but not 64 mode?&quot;">Next message</a> ]
+[ <a href="8243.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Why does this work in 128 mode but not 64 mode?&quot;">Previous message</a> ]
+[ <a href="8243.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Why does this work in 128 mode but not 64 mode?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8245.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Why does this work in 128 mode but not 64 mode?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Payton Byrd &lt;<a href="mailto:plbyrd1gmail.com?Subject=Re:%20[cc65]%20Why%20does%20this%20work%20in%20128%20mode%20but%20not%2064%20mode?">plbyrd1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-04-30 05:52:46</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Thu, Apr 29, 2010 at 4:20 PM, Ullrich von Bassewitz &lt;uz&#64;musoftware&#46;<!--nospam-->de&gt;wrote:
+
+&gt;
+&gt; Hi!
+&gt;
+&gt; On Thu, Apr 29, 2010 at 12:15:11PM -0500, Payton Byrd wrote:
+&gt; &gt;    I've got some simple drive code that works fine in 128 mode, but does
+&gt; not
+&gt; &gt;    work correctly in 64 mode. �What happens is that when in 64 mode, the
+&gt; &gt;    first time it enounters a drive number without a device it locks up.
+&gt; �In
+&gt; &gt;    128 mode it gracefully encounters an error and moves on to the next
+&gt; drive
+&gt; &gt;    number.
+&gt;
+&gt; My suggestion would be to check it on a real C64. If it doesn't work there
+&gt; either, then the behaviour of the C128 in C64 mode is correct (since it is
+&gt; fully compatible :-).
+&gt;
+&gt;
+After a lot of digging, it appears to be a problem in the libraries.
+ According to cbm.h, all of the disk operations (cbm_open, etc) should
+update the _oserror global variable which you can read by including
+errorno.h.  The little table in cbm.h indicates that if a drive doesn't
+exist, that _oserror should have a 5 in it, which I would assume would be
+the case when calling cbm_open on a drive number with no drive attached.
+ The following program shows this is not the case.  After calling cbm_open
+on a non-existent drive _oserror contains 0 and so the code attempts to read
+from the channel which then locks up in 64 mode.  128 mode allows the read
+but returns an empty string in the buffer which is easy enough to handle.
+ The problem for me is that there's no way to know whether or not cbm_open
+failed since _oserror doesn't get populated as expected.
+
+Code showing the problem:
+#include &lt;errno.h&gt;
+#include &lt;cbm.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+void main(void)
+{
+  int dr = 15;
+  int size;
+  unsigned char message[39];
+
+  cbm_open(15,dr,15,&quot;&quot;);
+  printf(&quot;_oserror: %d\n&quot;, _oserror);
+
+  if(_oserror == 0)
+  {
+    size = cbm_read(15, message, 39);
+    if(size &gt;= 0) message[size] = '\0';
+    else message[0] = '\0';
+
+    printf(&quot;%s\n&quot;, message);
+  }
+
+  cbm_close(15);
+}
+
+
+-- 
+Payton Byrd
+&lt;<a href="http://www.paytonbyrd.com">http://www.paytonbyrd.com</a>&gt;
+&lt;<a href="http://it.toolbox.com/blogs/paytonbyrd">http://it.toolbox.com/blogs/paytonbyrd</a>&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Apr 30 05:53:10 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8245.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Why does this work in 128 mode but not 64 mode?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8243.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Why does this work in 128 mode but not 64 mode?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8243.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Why does this work in 128 mode but not 64 mode?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8245.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Why does this work in 128 mode but not 64 mode?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8245.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Why does this work in 128 mode but not 64 mode?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8244" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8244" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8244" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-04-30 05:53:14 CEST
+</em></small></p>
+</body>
+</html>

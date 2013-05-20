@@ -1,0 +1,260 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: RE: [cc65] Label file</title>
+<meta name="Author" content="Keates, Mark (Mark.Keates_at_dendrite.com)">
+<meta name="Subject" content="RE: [cc65] Label file">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>RE: [cc65] Label file</h1>
+<!-- received="Thu Aug  2 20:06:56 2001" -->
+<!-- isoreceived="20010802180656" -->
+<!-- sent="Thu, 2 Aug 2001 14:06:02 -0400 " -->
+<!-- isosent="20010802180602" -->
+<!-- name="Keates, Mark" -->
+<!-- email="Mark.Keates_at_dendrite.com" -->
+<!-- subject="RE: [cc65] Label file" -->
+<!-- id="1D2B2C77C9CF964EB1331ABEB51562E1AB8927@ukntsvr2.uk.drte.com" -->
+<!-- inreplyto="[cc65] Label file" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Keates, Mark (<a href="mailto:Mark.Keates_at_dendrite.com?Subject=RE:%20[cc65]%20Label%20file"><em>Mark.Keates_at_dendrite.com</em></a>)<br>
+<strong>Date:</strong> 2001-08-02 20:06:02
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0572.html">groepaz: "Re[2]: [cc65] Label file"</a>
+<li><strong>Previous message:</strong> <a href="0570.html">Ullrich von Bassewitz: "Re: [cc65] Label file"</a>
+<li><strong>Maybe in reply to:</strong> <a href="0566.html">Keates, Mark: "[cc65] Label file"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0572.html">groepaz: "Re[2]: [cc65] Label file"</a>
+<li><strong>Reply:</strong> <a href="0572.html">groepaz: "Re[2]: [cc65] Label file"</a>
+<li><strong>Reply:</strong> <a href="0573.html">Mike McCarty: "RE: [cc65] Label file"</a>
+<li><strong>Reply:</strong> <a href="0574.html">Ullrich von Bassewitz: "Re: [cc65] Label file"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Dear all,
+ 
+&gt; The label file will contain all labels from modules that are 
+&gt; assembled with -g
+&gt; (debug info). So the feature you're requesting is already 
+&gt; there - just use -g
+&gt; for the compiler and assembler and you will get what you want.
+
+Thanks, exactly what I wanted.
+ 
+&gt; The only drawback is currently that the file will include all symbols
+&gt; regardless of the type, so it is not possible to distinguish 
+&gt; a zero page address from the symbol definition &quot;blank = $20&quot;. This would 
+&gt; be not too difficult to add once there are emulators capable of using 
+&gt; this information.
+
+Surely the fact the address &lt; $100 identifies this?
+I think it can be left to the emulator import process
+to work this out.
+ 
+&gt; If you are adding label information, you may also think about 
+&gt; adding source level debugging: 
+
+Whoa, how would that work? Map address ranges to filename/line pairs?
+Or even as far as statement start/end position within a line? E.g.
+
+	for (i=0; i&lt;max; i++)
+or
+	x = 0; x += y; y--;
+
+
+That should be enough info to parse into an emulator, e.g.
+
+'C' code:
+
+void script_char (zchar c)
+{
+/* This is line 50 */
+    if (c == ZC_INDENT &amp;&amp; script_width != 0)
+	c = ' ';
+
+    if (c == ZC_INDENT)
+	{ script_char (' '); script_char (' '); script_char (' '); return; }
+
+etc...
+
+'S' code:
+
+_script_char: 
+	.LINEPOS 51,8,21
+	ldx	#$00
+	lda	(sp,x)
+	cmp	#$09
+	bne	L005D
+	.LINEPOS 51,26,42
+	lda	_script_width+0
+	ora	_script_width+0+1
+	bne	L005C
+	.LINEPOS 51,4,43
+L005D:
+	lda	#$00
+	beq	L005B
+L005C:
+	lda	#$01
+L005E:
+	beq	L005B
+	.LINEPOS 52,1,7
+	lda	#$20
+	ldy	#$00
+	sta	(sp),y
+L005B:
+	.LINEPOS 54,8,21
+	ldx	#$00
+	lda	(sp,x)
+	cmp	#$09
+	.LINEPOS 54,4,22
+	bne	L0061
+	.LINEPOS 55,16,18
+	lda	#$20
+	jsr	pusha
+	.LINEPOS 55,3,19
+	jsr	_script_char
+	.LINEPOS 55,35,37
+	lda	#$20
+	jsr	pusha
+	.LINEPOS 55,22,38
+	jsr	_script_char
+	.LINEPOS 55,54,56
+	lda	#$20
+	jsr	pusha
+	.LINEPOS 55,41,57
+	jsr	_script_char
+	.LINEPOS 55,60
+	jmp	incsp1
+
+etc... (how this affects the .o file I wouldn't like to say ;-)
+
+(assuming _script_char was at $0900)
+The resulting info required by the emulator would be:
+
+$0900-$0907:51,8,21
+$0908-$090E:51,26,42
+
+etc. (if start/end positions are too hard then just line #s will do)
+
+For just an assembler file this could be:
+
+$0900-$0901:101
+$0902-$0903:102
+$0904-$0905:103
+$0906-$0907:104
+
+This begs the question &quot;What if I'm writing both C and assembler?&quot;
+I would recommend that the C file generates the above syntax, but
+for assembler programming the .LINEPOS could be allowed to have
+no arguments, e.g. use the current line number (and pos=0).
+I think you'll might also need something to end a range.
+
+_script_char: (assume this is line 100)
+	.LINEPOS
+	ldx	#$00
+	lda	(sp,x)
+	cmp	#$09
+	bne	L005D
+	lda	_script_width+0
+	ora	_script_width+0+1
+	bne	L005C
+L005D:
+	lda	#$00
+	beq	L005B
+L005C:
+	lda	#$01
+L005E:
+	beq	L005B
+	.LINEPOS
+	lda	#$20
+	ldy	#$00
+	sta	(sp),y
+L005B:
+	.LINEPOS
+	ldx	#$00
+	lda	(sp,x)
+
+$0900-$0917:101
+$0918-$091D:116
+$091E-$09xx:121
+
+Is it overkill for the assembler to generate a range for each
+line of code? This clogs up emulator memory/serach time.
+(but then again this is running on a well spec'd PC).
+E.g.
+
+_script_char:
+	ldx	#$00
+	lda	(sp,x)
+	cmp	#$09
+	bne	L005D
+
+$0900-$0901:101
+$0902-$0903:102
+$0904-$0905:103
+$0906-$0907:104
+
+Then, how do you determine whether the emulator should load the
+'C' file or the 'S' file (as 'C' compiles to 'S' assembles to 'O')
+to highlight the code being executed? This would have to be 
+specified in the assembler file's header, e.g. similar to 
+'.debuginfo&lt;tab&gt;off' use '.sourcefile&lt;tab&gt;filename.c'
+If this isn't specified then the current filename is implied.
+As with GDB you'll also need to give the emulator as search path
+for debug files!
+
+Food for thought?
+
+Mark
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=RE:%20[cc65]%20Label%20file">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0572.html">groepaz: "Re[2]: [cc65] Label file"</a>
+<li><strong>Previous message:</strong> <a href="0570.html">Ullrich von Bassewitz: "Re: [cc65] Label file"</a>
+<li><strong>Maybe in reply to:</strong> <a href="0566.html">Keates, Mark: "[cc65] Label file"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0572.html">groepaz: "Re[2]: [cc65] Label file"</a>
+<li><strong>Reply:</strong> <a href="0572.html">groepaz: "Re[2]: [cc65] Label file"</a>
+<li><strong>Reply:</strong> <a href="0573.html">Mike McCarty: "RE: [cc65] Label file"</a>
+<li><strong>Reply:</strong> <a href="0574.html">Ullrich von Bassewitz: "Re: [cc65] Label file"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:40 CET</em>
+</em>
+</small>
+</body>
+</html>

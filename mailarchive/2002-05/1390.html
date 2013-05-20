@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Floating point support</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Floating point support">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Floating point support</h1>
+<!-- received="Thu May 23 12:49:45 2002" -->
+<!-- isoreceived="20020523104945" -->
+<!-- sent="Thu, 23 May 2002 12:49:48 +0200" -->
+<!-- isosent="20020523104948" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Floating point support" -->
+<!-- id="20020523124948.A534@trixie.musoftware.de" -->
+<!-- inreplyto="4812921321.20020523003903@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Floating%20point%20support"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-05-23 12:49:48
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1389.html">groepaz: "Re[2]: [cc65] Floating point support"</a>
+<li><strong>In reply to:</strong> <a href="1389.html">groepaz: "Re[2]: [cc65] Floating point support"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1393.html">groepaz: "Re[2]: [cc65] Floating point support"</a>
+<li><strong>Next in thread:</strong> <a href="1360.html">Christian Krüger: "Re: [cc65] statics in zero page"</a>
+<li><strong>Reply:</strong> <a href="1393.html">groepaz: "Re[2]: [cc65] Floating point support"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Thu, May 23, 2002 at 12:39:03AM +0200, groepaz wrote:
+&gt; UvB&gt; The difference is that the graphics interface is not covered by a standard
+&gt; UvB&gt; while floating point arithmetic is.
+&gt;
+&gt; so thats the accuracy argument again? or what else? errno? ;=P
+
+It has nothing to do with accuracy. 32 bit IEEE floats have about the same
+precision as the floating point implementation in the CBM kernal, and I
+expected a simple implementation to about as fast. The important word is
+&quot;standard compliance&quot;.
+
+&gt; yes, and like mentioned before - if you really ever need standard
+&gt; compliance you could always drop in your own standard-compliant
+&gt; routines. i am just saying that for most reallife programs (those you
+&gt; could compile using cc65 atleast) wont really suffer from the little
+&gt; differences. its just the same as using file i/o that cannot seek or
+&gt; termio that cant handle all attributes (or substitutes them for that
+&gt; matter).
+
+There is a large difference between missing routines and routines that work
+different. The former will cause some programs to compile, but those which
+compile are still standard C programs. If you have a library that is not
+standard compliant, it makes standard C programs fail.
+
+&gt; thats why i suggested using &quot;real&quot; (IEEE) floats in the compiler
+&gt; internally, and use IEEE for internal conversion and arithmetics, but
+&gt; apart from that let the assembler know about different targets formats
+&gt; (and also IEEE for that matter) - and then simply spill calls to a
+&gt; standard fp-emulator interface....
+
+This is ok with me. But to get the interface right, I would like to have the
+first implementation to be a IEEE one. If you want to use the ROM routines
+later, and it is possible to plug them into the existing interface - ok. But
+I'm convinced that using non standard routines for a start will spoil the
+interface and prevent standard compliant routines later.
+
+&gt; - you want your compiler to act standard-compliant, and by all means
+&gt; to work as one would expect from any other &quot;big&quot; compiler
+
+I would be perfectly happy with 32 bit floats for both, float and double.
+Anything else would be complete overkill. This is quite some difference to a
+compiler for larger machines, where mostly 64 bit floats are used.
+
+&gt; so the real question is, how can the user (me) use his non-standard
+&gt; libraries with your compiler without the need of adding &quot;ugly&quot; stuff
+&gt; to the compiler that potentially breaks the standard ? 
+
+My proposal would be to add standard compliant floating point routines (if
+any). These routines need an interface, and you can then go ahead and replace
+these routines with your own.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Floating%20point%20support">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Floating%20point%20support">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1389.html">groepaz: "Re[2]: [cc65] Floating point support"</a>
+<li><strong>In reply to:</strong> <a href="1389.html">groepaz: "Re[2]: [cc65] Floating point support"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1393.html">groepaz: "Re[2]: [cc65] Floating point support"</a>
+<li><strong>Next in thread:</strong> <a href="1360.html">Christian Krüger: "Re: [cc65] statics in zero page"</a>
+<li><strong>Reply:</strong> <a href="1393.html">groepaz: "Re[2]: [cc65] Floating point support"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-05-23 12:50:25 CEST</em>
+</em>
+</small>
+</body>
+</html>

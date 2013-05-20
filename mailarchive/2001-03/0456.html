@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] c64 question</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] c64 question">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] c64 question</h1>
+<!-- received="Mon Mar 19 22:39:59 2001" -->
+<!-- isoreceived="20010319213959" -->
+<!-- sent="Mon, 19 Mar 2001 22:40:05 +0100" -->
+<!-- isosent="20010319214005" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] c64 question" -->
+<!-- id="20010319224005.A10919@trixie.musoftware.de" -->
+<!-- inreplyto="Pine.SOL.4.10.10103191439590.16438-100000@sun1307.ssd.usa.alcatel.com" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20c64%20question"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2001-03-19 22:40:05
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0457.html">Arvid Norberg: "Re: [cc65] c64 question"</a>
+<li><strong>Previous message:</strong> <a href="0455.html">Mike McCarty: "Re: [cc65] c64 question"</a>
+<li><strong>In reply to:</strong> <a href="0455.html">Mike McCarty: "Re: [cc65] c64 question"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0457.html">Arvid Norberg: "Re: [cc65] c64 question"</a>
+<li><strong>Reply:</strong> <a href="0457.html">Arvid Norberg: "Re: [cc65] c64 question"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Mon, Mar 19, 2001 at 02:45:05PM -0600, Mike McCarty wrote:
+&gt; Certainly it can. The gnu C compiler does this automatically as an
+&gt; optimization even for machines which have a reasonable (read 16 bit)
+&gt; stack pointer. If a routine is declared &quot;static&quot; then the compiler
+&gt; knows, and  can check for aliased pointers.
+
+For one, the GNU C compiler has about one hundred times the source code size
+of cc65. I would expect it to do things like this.
+
+Second, this can only be done for routines declared static, which limits the
+scope considerably.
+
+And third, if there are external functions and calls to external functions in
+this module (which is true for most C modules) the scope of such optimizations
+is even more limited, since recursive calls may happen indirectly through
+these external functions and the compiler does not know about it.
+
+So I doubt that these optimizations do really save a considerable amount of
+pushes and pops.
+
+&gt; Especially it can know if
+&gt; it is told by the programmer by...
+[...]
+&gt; using an ISO C Standard compliant #pragma.
+
+Do you really think it is realistic to expect programmers to tell the compiler
+for each function if it is called recursively? Most people are not even
+declaring local functions and variables as static. And what happens, if the
+code gets changed but not the #pragma?
+
+&gt; Ultimately: You support the compiler. You don't like that solution, so
+&gt; it won't exist.
+
+That's wrong in two places.
+
+Everyone is welcome to send me code improvements, and a lot of people have
+done so. So it's not just me who is supporting the compiler. It is your
+decision to use it as is, or help improving it.
+
+And if your solution is better than the stuff that exists now, and you can
+show that with hard facts (that is: a real implementation) and not just words,
+I would be happy to add your code to the compiler. If you send me code that
+has no unnecessary runtime overhead and does improve the optimizer so that
+lots of stack operations could be removed I would be crazy not to use it. And
+I may be stubborn, but I'm not crazy:-)
+
+Regards
+
+
+	Uz
+
+
+
+P.S.: This discussion has kept me from adding the stack checking code which I
+      was working on, so I will try to shut up until this is finished:-)
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20c64%20question">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20c64%20question">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0457.html">Arvid Norberg: "Re: [cc65] c64 question"</a>
+<li><strong>Previous message:</strong> <a href="0455.html">Mike McCarty: "Re: [cc65] c64 question"</a>
+<li><strong>In reply to:</strong> <a href="0455.html">Mike McCarty: "Re: [cc65] c64 question"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0457.html">Arvid Norberg: "Re: [cc65] c64 question"</a>
+<li><strong>Reply:</strong> <a href="0457.html">Arvid Norberg: "Re: [cc65] c64 question"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:39 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+<title>cc65 mailing list archive: Re: [cc65] Another wish: Unsized Arr</title>
+<meta name="Author" content="Spiro Trikaliotis (Trik-news_at_gmx.de)">
+<meta name="Subject" content="Re: [cc65] Another wish: Unsized Arrays in Structures">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Another wish: Unsized Arrays in Structures</h1>
+<!-- received="Thu Jan 23 08:45:00 2003" -->
+<!-- isoreceived="20030123074500" -->
+<!-- sent="Thu, 23 Jan 2003 08:44:25 +0100" -->
+<!-- isosent="20030123074425" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="Trik-news_at_gmx.de" -->
+<!-- subject="Re: [cc65] Another wish: Unsized Arrays in Structures" -->
+<!-- id="044001c2c2b3$6934d5c0$a2192c8d@cs.unimagdeburg.de" -->
+<!-- charset="iso-8859-15" -->
+<!-- inreplyto="200301230100.48108.groepaz@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Spiro Trikaliotis (<a href="mailto:Trik-news_at_gmx.de?Subject=Re:%20[cc65]%20Another%20wish:%20Unsized%20Arrays%20in%20Structures"><em>Trik-news_at_gmx.de</em></a>)<br>
+<strong>Date:</strong> 2003-01-23 08:44:25
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2333.html">David Holz: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<li><strong>In reply to:</strong> <a href="2332.html">Groepaz: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2335.html">Tim Schürmann: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<li><strong>Next in thread:</strong> <a href="2333.html">David Holz: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<li><strong>Reply:</strong> <a href="2335.html">Tim Schürmann: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello,
+
+Groepaz wrote:
+
+&gt; On Wednesday 22 January 2003 23:37, Christian Krüger wrote:
+
+&gt; &gt; today I've tried to compile something like this:
+&gt; &gt;
+&gt; &gt; --8&lt;-------------------
+&gt; &gt;
+&gt; &gt; typedef struct
+&gt; &gt; {
+&gt; &gt;   unsigned char width;
+&gt; &gt;   unsigned char height;
+&gt; &gt;   unsigned char data[];
+&gt; &gt; }
+&gt; &gt; TestStruct;
+&gt; &gt;
+&gt; &gt; --8&lt;-------------------
+
+&gt; why dont you simply use
+&gt;
+&gt;  typedef struct
+&gt;  {
+&gt;    unsigned char width;
+&gt;    unsigned char height;
+&gt;    unsigned char *data;
+&gt;  }
+&gt;  TestStruct;
+
+Because it's not the same? ;-)
+
+First: Christian, doesn't
+
+   unsigned char data[0];
+
+work as last element in CC65? If not, use it like David Holtz suggested
+with index 1.
+
+Groepaz: There is a difference. In your code, TestStruct contains
+a pointer to some area. This is not true with Christian's wanted
+solution.
+
+Look at this:
+
+TestStruct *a = malloc(sizeof(TestStruct)+sizeof(unsigned char)*100);
+
+With this, you get a TestStruct which contains 100 elements (0..99)
+[in case the 0 does not work, and David's suggestion has to be applied,
+it is 101, ie., 0..100].
+
+With your solution, you had to
+
+TestStruct *a = malloc(sizeof(TestStruct));
+a-&gt;data = malloc(sizeof(unsigned char)*100);
+
+which is less handy than the first solution.
+
+Spiro.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Another%20wish:%20Unsized%20Arrays%20in%20Structures">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2333.html">David Holz: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<li><strong>In reply to:</strong> <a href="2332.html">Groepaz: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2335.html">Tim Schürmann: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<li><strong>Next in thread:</strong> <a href="2333.html">David Holz: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<li><strong>Reply:</strong> <a href="2335.html">Tim Schürmann: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-01-23 08:45:16 CET</em>
+</em>
+</small>
+</body>
+</html>

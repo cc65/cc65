@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] glitch in &quot;assert.h&</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] glitch in &quot;assert.h&quot; ?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] glitch in &quot;assert.h&quot; ?</h1>
+<!-- received="Wed Sep 18 22:29:14 2002" -->
+<!-- isoreceived="20020918202914" -->
+<!-- sent="Wed, 18 Sep 2002 22:29:20 +0200" -->
+<!-- isosent="20020918202920" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] glitch in &quot;assert.h&quot; ?" -->
+<!-- id="20020918202920.GA9778@trixie.musoftware.de" -->
+<!-- inreplyto="12017386159.20020727232345@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20glitch%20in%20&quot;assert.h&quot;%20?"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-09-18 22:29:20
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="../2002-08/1564.html">Shawn Jefferson: "RE: [cc65] Sorting large files"</a>
+<li><strong>In reply to:</strong> <a href="../2002-07/1543.html">groepaz: "[cc65] glitch in &quot;assert.h&quot; ?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1568.html">groepaz: "Re[2]: [cc65] glitch in &quot;assert.h&quot; ?"</a>
+<li><strong>Next in thread:</strong> <a href="../2002-07/1547.html">Greg King: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Reply:</strong> <a href="1568.html">groepaz: "Re[2]: [cc65] glitch in &quot;assert.h&quot; ?"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Sat, Jul 27, 2002 at 11:23:45PM +0200, groepaz wrote:
+&gt; while brosing throug a couple of standard references (bzw can you
+&gt; suggest some decent url? ;=P too much outdated and/or unconfirmed
+&gt; stuff around it seems ;=P) i noticed the following....
+&gt;
+&gt; &quot;Note that assert must expand to a void expression, so the more
+&gt; obvious if-statement does not suffice as a definition of
+&gt; assert.&quot;
+
+Admittedly, it took some time, but it is fixed now:-)
+
+I've added another change that allows the ?: operator to take two arguments of
+type void (which was not possible before).
+
+&gt; in the &quot;small&quot; source there are a lof sanity checks in the form
+&gt;
+&gt; assert((sizeof(char)==1);
+&gt;
+&gt; that is, the expression passed to assert is actually constant, can be
+&gt; computed at compile-time, and is true - ultimativly resulting in an
+&gt; &quot;unreachable code&quot; warning for each of those assertions that doesnt
+&gt; fail. hrm, now the question is, is there a way to get rid of these
+&gt; warnings without disabling the specific warning completely? (there
+&gt; might be other places in the code were this warning is triggered not
+&gt; by assertions) ... i actually think the above macro should result into
+&gt; this behaviour...mmmh
+
+The only fix I can think of is using &quot;cc65 -DNDEBUG&quot;:-)
+
+More seriously: No. cc65 is not smart enough to distinguish between
+intentional and non intentional cases where the result of an expression is
+constant. Even gcc gets this wrong sometimes...
+
+Regards
+
+
+        Uz (glad to be able to remove a few more old mails from his mailbox)
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20glitch%20in%20&quot;assert.h&quot;%20?">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20glitch%20in%20&quot;assert.h&quot;%20?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="../2002-08/1564.html">Shawn Jefferson: "RE: [cc65] Sorting large files"</a>
+<li><strong>In reply to:</strong> <a href="../2002-07/1543.html">groepaz: "[cc65] glitch in &quot;assert.h&quot; ?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1568.html">groepaz: "Re[2]: [cc65] glitch in &quot;assert.h&quot; ?"</a>
+<li><strong>Next in thread:</strong> <a href="../2002-07/1547.html">Greg King: "Re: [cc65] preprocessor hazzle..."</a>
+<li><strong>Reply:</strong> <a href="1568.html">groepaz: "Re[2]: [cc65] glitch in &quot;assert.h&quot; ?"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-09-18 22:30:15 CEST</em>
+</em>
+</small>
+</body>
+</html>

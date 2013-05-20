@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] C64 fast-loader suggestion</title>
+<meta name="Author" content="Gábor Lénárt (lgb1lgb.hu)" />
+<meta name="Subject" content="Re: [cc65] C64 fast-loader suggestion?" />
+<meta name="Date" content="2011-12-16" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] C64 fast-loader suggestion?</h1>
+<!-- received="Fri Dec 16 18:29:49 2011" -->
+<!-- isoreceived="20111216172949" -->
+<!-- sent="Fri, 16 Dec 2011 18:29:42 +0100" -->
+<!-- isosent="20111216172942" -->
+<!-- name="Gábor Lénárt" -->
+<!-- email="lgb1lgb.hu" -->
+<!-- subject="Re: [cc65] C64 fast-loader suggestion?" -->
+<!-- id="20111216172942.GC16857@vega.lgb.hu" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="A29A6CC8-D211-4551-9BF8-EB43FCB5565F&#64;wfmh.org.pl" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9821.html" title="Groepaz: &quot;Re: [cc65] C64 fast-loader suggestion?&quot;">Next message</a> ]
+[ <a href="9819.html" title="Gábor Lénárt: &quot;Re: [cc65] C64 fast-loader suggestion?&quot;">Previous message</a> ]
+[ <a href="9817.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] C64 fast-loader suggestion?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9825.html" title="Spiro Trikaliotis: &quot;Re: [cc65] C64 fast-loader suggestion?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Gábor Lénárt &lt;<a href="mailto:lgb1lgb.hu?Subject=Re:%20[cc65]%20C64%20fast-loader%20suggestion?">lgb1lgb.hu</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-12-16 18:29:42</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Fri, Dec 16, 2011 at 05:30:54PM +0100, silverdr&#64;wfmh&#46;<!--nospam-->org.pl wrote:
+&gt; 
+&gt; On 2011-12-16, at 16:51, Gábor Lénárt wrote:
+&gt; 
+&gt; &gt; Yes, I need other files, not my ones, where I can create a format I prefer.
+&gt; 
+&gt; Do they come as PRG files? Are they large?
+
+PRG, but data files. I am unsure if one file is SEQ then it causes problem
+for LOAD or not. I can't tell you the file sizes, but from about 1K
+anything is possible which fits into the BASIC RAM (and my code is there
+too). So I guess, I can't expect to load larger files than - let's say -
+about 30K, which is large enough though that I want to be the fastest on a
+stock C64 too (without fastloaders, custom hw etc) and to use the features
+given by fast loaders and others too (that's why my &quot;love&quot; towards LOAD).
+
+&gt; &gt; not sure about that: I need OPEN the file then BASIN two bytes. Do I need to
+&gt; &gt; close the file before LOAD then?
+&gt; 
+&gt; The best way would be to simply try this, wouldn't it? I believe that LOAD calls OPEN itself, so unless you want to jump directly into KERNAL code rather than via jump table (which is what you don't want to do!) then you will get I/O error #2 aka FILE OPEN  ERROR if you don't CLOSE upfront. But I am telling that off head so checking is the best way.
+&gt; 
+&gt; &gt; Won't be LOAD bothered (ZP locations
+&gt; &gt; modified etc) that I did OPEN/BASIC/CLOSE/whatever before calling LOAD as I
+&gt; &gt; want to use the same params given by SETNAM+SETLFS? And can I use the very
+&gt; &gt; same parameters as for LOAD for OPEN too, so I don't need call SETNAM/SETLFS
+&gt; &gt; again before LOAD (as far as I know, SETNAM/SETLFS only sets some ZP
+&gt; &gt; locations btw, nothing more).
+&gt; 
+&gt; Again - I believe you can reuse the SETLFS/SETNAM but don't take my word. It's just a few lines. Check this and let us know too! ;-)
+
+I will tell, actually the code supposed to be open source (it it works at
+least).  The reason I am asking: I can test it of course.  However I am
+always unsure in this project if custom fastloaders, IDEDOS, whatever does
+not modify the situation in a way that it will cause problems, even if it
+works on a &quot;stock C64&quot;.  That's also a reason I don't want to jump into the
+kernal code directly but using the &quot;official&quot; entry points only.  btw this
+is also the reason I am so in using LOAD: there is greater chance it's
+accelerated by certain fastloaders.
+
+To be honest, I would reuse my code in my future projects, that's why I want
+to do it well, so no need to dig in things again and again later for me ;)
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Dec 16 18:29:49 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9821.html" title="Next message in the list">Groepaz: "Re: [cc65] C64 fast-loader suggestion?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9819.html" title="Previous message in the list">Gábor Lénárt: "Re: [cc65] C64 fast-loader suggestion?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9817.html" title="Message to which this message replies">silverdr1wfmh.org.pl: "Re: [cc65] C64 fast-loader suggestion?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9825.html" title="Next message in this discussion thread">Spiro Trikaliotis: "Re: [cc65] C64 fast-loader suggestion?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9825.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Re: [cc65] C64 fast-loader suggestion?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9827.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] C64 fast-loader suggestion?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9820" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9820" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9820" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-12-16 18:29:52 CET
+</em></small></p>
+</body>
+</html>

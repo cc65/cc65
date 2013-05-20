@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Using asm inline assembly </title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Using asm inline assembly as part of expression" />
+<meta name="Date" content="2013-01-13" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Using asm inline assembly as part of expression</h1>
+<!-- received="Sun Jan 13 22:21:30 2013" -->
+<!-- isoreceived="20130113212130" -->
+<!-- sent="Sun, 13 Jan 2013 22:21:23 +0100" -->
+<!-- isosent="20130113212123" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Using asm inline assembly as part of expression" -->
+<!-- id="20130113212122.GA18132@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="20130113202140.55990&#64;gmx.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11090.html" title="Oliver Schmidt: &quot;Re: [cc65] News for 2013&quot;">Next message</a> ]
+[ <a href="11088.html" title="Stefan: &quot;[cc65] Using asm inline assembly as part of expression&quot;">Previous message</a> ]
+[ <a href="11088.html" title="Stefan: &quot;[cc65] Using asm inline assembly as part of expression&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Using%20asm%20inline%20assembly%20as%20part%20of%20expression">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2013-01-13 22:21:23</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Sun, Jan 13, 2013 at 09:21:40PM +0100, Stefan wrote:
+&gt;    As far i understand from the manual, an asm statement is always of type
+&gt;    void and can be part of an expression. This is, what i don't understand:
+&gt;
+&gt;    - If the asm statement is of type void and i cannot convert it to another
+&gt;    type, how can it be part of an expression ? Is this a contradiction or am
+&gt;    i wrong?
+
+In C, &quot;void&quot; is a type. The standard says (in &quot;6.2.5 Types&quot;, if you want to
+look it up): &quot;The void type comprises an empty set of values; it is an
+incomplete type that cannot be completed.&quot;
+
+This is the reason, why you can't convert it to anything else (there is one
+exception when the compiler is in cc65 mode, but that behaviour is not
+standard compliant).
+
+An expression can yield something of type void. An example is
+
+        int a;
+        (void) a;       /* The (ignored) result is of type void */
+
+&gt;    - What is the right ways of using asm statements as an part of an
+&gt;    expression?
+
+Having a subexpression of type void doesn't prevent you from using it within
+an expression. The standard says about the comma operator (6.5.17):
+
+&quot;The left operand of a comma operator is evaluated as a void expression; there
+is a sequence point after its evaluation. Then the right operand is evaluated;
+the result has its type and value.&quot;
+
+So the comma operator evaluates the left operand as a void expression. This
+works (of course) if the left expression does already have a void type.
+
+So an example of correct __asm__ usage in expressions is:
+
+        a = (__asm__ (&quot;lda #$00&quot;),
+             __asm__ (&quot;ldx #$00&quot;),
+             __AX__);
+
+A and X are loaded, and the right operand of the comma operator tells the
+compiler that the expression result is the primary register __AX__. If you
+look through the headers, you will find that this construct is used heavily
+within them.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Jan 13 22:21:30 2013</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11090.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] News for 2013"</a></li>
+<li><dfn>Previous message</dfn>: <a href="11088.html" title="Previous message in the list">Stefan: "[cc65] Using asm inline assembly as part of expression"</a></li>
+<li><dfn>In reply to</dfn>: <a href="11088.html" title="Message to which this message replies">Stefan: "[cc65] Using asm inline assembly as part of expression"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#11089" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#11089" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#11089" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2013-01-13 22:21:33 CET
+</em></small></p>
+</body>
+</html>

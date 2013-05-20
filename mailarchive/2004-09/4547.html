@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Floating point support?</title>
+<meta name="Author" content="Sidney Cadot (sidney1jigsaw.nl)" />
+<meta name="Subject" content="Re: [cc65] Floating point support?" />
+<meta name="Date" content="2004-09-26" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Floating point support?</h1>
+<!-- received="Sun Sep 26 23:27:15 2004" -->
+<!-- isoreceived="20040926212715" -->
+<!-- sent="Sun, 26 Sep 2004 23:27:12 +0200" -->
+<!-- isosent="20040926212712" -->
+<!-- name="Sidney Cadot" -->
+<!-- email="sidney1jigsaw.nl" -->
+<!-- subject="Re: [cc65] Floating point support?" -->
+<!-- id="D45317D6-1002-11D9-BEB2-000A95914D12@jigsaw.nl" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="20040926200100.GA7116&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4548.html" title="Mats Andrén: &quot;[cc65] quickly getting the adress from somewhere in the code&quot;">Next message</a> ]
+[ <a href="4546.html" title="Raj Wurttemberg: &quot;RE: [cc65] Get user input?&quot;">Previous message</a> ]
+[ <a href="4544.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Floating point support?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4549.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Floating point support?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Sidney Cadot &lt;<a href="mailto:sidney1jigsaw.nl?Subject=Re:%20[cc65]%20Floating%20point%20support?">sidney1jigsaw.nl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-09-26 23:27:12</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 26 Sep 2004, at 22:01, Ullrich von Bassewitz wrote:
+
+&gt; On Sun, Sep 26, 2004 at 01:02:07PM +0200, Sidney Cadot wrote:
+&gt;&gt; Just out of curiosity... Have you given any thought on adding floating
+&gt;&gt; point support to cc65?
+&gt;
+&gt; Lots of course, and there's even some code in the development 
+&gt; compiler:-) Most
+&gt; of my thoughts led into the same direction as what you wrote. My plan 
+&gt; was to
+&gt; use the IEEE 32 bit format (I think this has been discussed in the 
+&gt; list some
+&gt; time ago). I learned only recently that the IEEE 32 bit format does 
+&gt; not meet
+&gt; the ISO C requirements for the data type double. Since implementing 64 
+&gt; bit
+&gt; floats on the 6502 is out of question, there are two remaining 
+&gt; approaches:
+&gt;
+&gt;   * Use another, maybe non standard format. As far as I remember, 5 
+&gt; bytes (40
+&gt;     bits) should be enough for a standard conforming double data type.
+
+ From the C99 spec, section 5.2.4.2.2, the relevant limit is DBL_DIG 
+that in essence requires at least 10 decimal digits to be representable 
+accurately. Since log(10^10)/log(2) equals 33.2193, one would need at 
+least 34 bits of mantissa to fulfill the requirement. The 
+DBL_MIN/DBL_MAX requirements essentially state that you need at least 
+an 8-bit exponent, and we still need a mantissa sign bit - the minimum 
+number of bits required would be 43 in total I think - so at least a 
+six-byte double would be needed.
+
+&gt;   * Use the 32 bit data format and accept that the compiler won't be
+&gt;     conforming in this respect.
+&gt;
+&gt; There is a lot that speaks for the latter approach:
+&gt;
+&gt;   * Since 32 bits are already used for longs, the routines to 
+&gt; load/store or
+&gt;     move data are already there. Adding the same for a new data type 
+&gt; would
+&gt;     increase code size.
+&gt;
+&gt;   * The compiler could require that the float data type of the source 
+&gt; platform
+&gt;     is the 32 bit IEEE float type (this is true for all hardware cc65 
+&gt; does
+&gt;     currently run on). This would mean that no special floating point 
+&gt; routines
+&gt;     would have to be written for the compiler itself.
+
+This is not true for the Atari, which uses a rather awkward 6-byte 
+BCD-based format,  (and also for the FPGA-based 6502 that I recently 
+implemented - on which cc65 works like a charm, by the way ;-))
+
+An OS-independent implementation of floating-point routines seems a bit 
+cleaner to me.
+
+&gt; But as you know, I'm rather serious about standards, so I'm not really 
+&gt; happy
+&gt; with it.
+
+Yes, and rightly so. Still, it would perhaps be a good idea to add 
+supports for 4-byte floats first, then based on the experience look 
+towards a 6 (or even 8) byte double.
+
+&gt; Major problems are the compiler and assembler. The expression 
+&gt; evaluation in
+&gt; the assembler does only work with integers, and does currently not 
+&gt; support any
+&gt; types. Adding floats would also mean that the expression evaluation 
+&gt; has to be
+&gt; rewritten to support types. This includes the expression trees passed 
+&gt; to the
+&gt; linker. As a consequence, the linker must know how to handle floats. 
+&gt; For a
+&gt; first solution, this can be ignored if the compiler translates 
+&gt; floating point
+&gt; data into .byte statements. But the compiler is the next problem: 
+&gt; There are
+&gt; parts of the compiler (code generation) that are strictly integer 
+&gt; based and do
+&gt; not cope easily with a new data type. So these parts have to be 
+&gt; rewritten
+&gt; before a new type can be added. But ... quite a lot of other changes 
+&gt; have
+&gt; already been started. I would really like to finish those before adding
+&gt; floats.
+&gt;
+&gt; In other words: While I'm thinking about floats, and about to slowly 
+&gt; add code
+&gt; to support them, it's definitely not top priority.
+
+Sure, anyway I'm glad you're thinking about it, and that some efforts 
+are being made for it.
+
+&gt;&gt; Now if such a roadmap (or similar) would be acceptable, I would
+&gt;&gt; volunteer to take care of steps (2) and (3).
+&gt;
+&gt; We can talk about the road map, and find a solution for the floating 
+&gt; point
+&gt; format, but step 4 (changes of the compiler, assembler and linker) will
+&gt; definitely not happen in the near future. If that is ok for you, I 
+&gt; would
+&gt; happily accept a contribution. Maybe the functions can be used from 
+&gt; assembler,
+&gt; or I can at least add the ability to store floats to the compiler, so 
+&gt; while
+&gt; floats cannot be processed, they could be moved around and passed to 
+&gt; assembler
+&gt; functions.
+
+That's fine. As a starting point, I think it would be convenient if at 
+least the basic operations were available (addition, subtraction, 
+multiplication, division, and comparison operators - am I missing any 
+out?), this would at least allow people to do basic FP stuff using 
+function calls for now, and these will suffice later on for providing 
+compilation ability.
+
+I propose to settle on IEEE-754 single-precision for now. We should be 
+able to use these as a base for a widened implementation later on. If 
+that's ok, I'll start working on this; however I have a busy job so 
+even the implementation of these basic functions will likely take a few 
+months on the calendar.
+
+&gt; Calling conventions will be as with integer stuff: First argument is 
+&gt; on the
+&gt; stack, second argument is in a register.
+
+Ok.
+
+Regards, Sidney
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Sep 26 23:27:15 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4548.html" title="Next message in the list">Mats Andrén: "[cc65] quickly getting the adress from somewhere in the code"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4546.html" title="Previous message in the list">Raj Wurttemberg: "RE: [cc65] Get user input?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4544.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Floating point support?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4549.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Floating point support?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4549.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Floating point support?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4547" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4547" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4547" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-09-26 23:27:24 CEST
+</em></small></p>
+</body>
+</html>

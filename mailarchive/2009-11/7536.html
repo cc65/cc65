@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Overlaying segments?</title>
+<meta name="Author" content="Fatih Aygün (cyco1301yahoo.com)" />
+<meta name="Subject" content="Re: [cc65] Overlaying segments?" />
+<meta name="Date" content="2009-11-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Overlaying segments?</h1>
+<!-- received="Tue Nov 10 18:48:00 2009" -->
+<!-- isoreceived="20091110174800" -->
+<!-- sent="Tue, 10 Nov 2009 09:47:54 -0800 (PST)" -->
+<!-- isosent="20091110174754" -->
+<!-- name="Fatih Aygün" -->
+<!-- email="cyco1301yahoo.com" -->
+<!-- subject="Re: [cc65] Overlaying segments?" -->
+<!-- id="701392.29166.qm@web56506.mail.re3.yahoo.com" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="f97798c20911100842x9e8de2dpe97e1b728e6a5ba0&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7537.html" title="Oliver Schmidt: &quot;Re: [cc65] Overlaying segments?&quot;">Next message</a> ]
+[ <a href="7535.html" title="Oliver Schmidt: &quot;Re: [cc65] Overlaying segments?&quot;">Previous message</a> ]
+[ <a href="7535.html" title="Oliver Schmidt: &quot;Re: [cc65] Overlaying segments?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7537.html" title="Oliver Schmidt: &quot;Re: [cc65] Overlaying segments?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Fatih Aygün &lt;<a href="mailto:cyco1301yahoo.com?Subject=Re:%20[cc65]%20Overlaying%20segments?">cyco1301yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-11-10 18:47:54</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Oliver Schmidt wrote:
+
+&gt; Now I understand your problem. Afaik there's no clean way to do this
+&gt; with ld65. Some years ago I did a hack to workaround it - not that I
+&gt; would recommend it, but...
+&gt; 
+&gt; <a href="http://contiki.cvs.sourceforge.net/viewvc/*checkout*/contiki/contiki-apple2/lib/crt0.S">http://contiki.cvs.sourceforge.net/viewvc/*checkout*/contiki/contiki-apple2/lib/crt0.S</a>
+&gt; 
+&gt; Check out the code below the meaningful comment:
+&gt; 
+&gt; ; The linker doesn't understand that the &quot;BOOT&quot; segment overlays the &quot;BSS&quot;
+&gt; ; segment so the automatic fixup of references to the &quot;BOOT&quot; segment does
+&gt; ; not work. Therefore references to this segment have to be expressed as
+&gt; ; offsets to __BSS_RUN__.
+&gt; 
+&gt; And here's the corresponding linker config:
+&gt; 
+&gt; <a href="http://contiki.cvs.sourceforge.net/viewvc/*checkout*/contiki/contiki-apple2/apple2enh.cfg">http://contiki.cvs.sourceforge.net/viewvc/*checkout*/contiki/contiki-apple2/apple2enh.cfg</a>
+&gt; 
+&gt; Best, Oliver
+
+That's very close to what I want to achieve. But I'll go with the perl option since my initialization 
+code is much bigger. It's, in fact, bigger than the main code. It would be very error prone for me
+to express everything as offsets from __BSS_RUN__. But for normal initialization tasks I think
+your trick is way more clever :)
+
+
+Thanks,
+Fatih.
+
+
+      
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Nov 10 18:48:00 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7537.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Overlaying segments?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7535.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Overlaying segments?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7535.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] Overlaying segments?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7537.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Overlaying segments?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7537.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Overlaying segments?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7536" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7536" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7536" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-11-10 18:48:03 CET
+</em></small></p>
+</body>
+</html>

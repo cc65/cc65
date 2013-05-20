@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] linking to o65</title>
+<meta name="Author" content="A. Fachat (fachat1web.de)" />
+<meta name="Subject" content="Re: [cc65] linking to o65" />
+<meta name="Date" content="2012-01-21" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] linking to o65</h1>
+<!-- received="Sat Jan 21 01:02:15 2012" -->
+<!-- isoreceived="20120121000215" -->
+<!-- sent="Sat, 21 Jan 2012 01:02:01 +0100" -->
+<!-- isosent="20120121000201" -->
+<!-- name="A. Fachat" -->
+<!-- email="fachat1web.de" -->
+<!-- subject="Re: [cc65] linking to o65" -->
+<!-- id="5555401.L9RacvtPhe@euler" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="20120119175356.GD20418&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9921.html" title="Oliver Schmidt: &quot;Re: [cc65] Interrupt handlers in C as part of the C library ?&quot;">Next message</a> ]
+[ <a href="9919.html" title="Oliver Schmidt: &quot;Re: [cc65] Preprocessor Issue (?)&quot;">Previous message</a> ]
+[ <a href="9910.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] linking to o65&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9925.html" title="Greg King: &quot;Re: [cc65] linking to o65&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: A. Fachat &lt;<a href="mailto:fachat1web.de?Subject=Re:%20[cc65]%20linking%20to%20o65">fachat1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-01-21 01:02:01</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi there,
+
+after lurking on this list for a (short) while, I thought I'd jump into the 
+discussion here... I have to admit I am new to cc65 though.
+
+On Thursday 19 January 2012 18:53:56 Ullrich von Bassewitz wrote:
+&gt; There have been people successfully generating o65 output for Lunix using
+&gt; ld65, so I do assume that it works up to some degree. If you want your own
+&gt; OS id, you ask Andre Fachat for one and add it as a number in the linker
+&gt; config file (specifying &quot;os = 5&quot; instead of &quot;os = lunix&quot;).
+
+That is no problem. Just have something working, and I'll register a new ID. 
+There aren't many anyway...
+
+&gt; &gt; Well, if lunix target works well, it will be ok, I can create a
+&gt; &gt; configuration similar to the lunix starting with the linker config file
+&gt; &gt; dumped with ld65 (ld65 --dump-config lunix) and modified for my needs. I
+&gt; &gt; guess :)
+&gt; That is probably the best idea until you have some stuff running. You can
+&gt; ask Andre for your own OS id later.
+
+Yes.
+
+&gt; &gt; &gt; There's also a reason not to rely on imports: The string table for
+&gt; &gt; &gt; the names of the symbols may get rather big. This is the reason why
+&gt; &gt; &gt; loadable drivers (which a in o65 format) use a jump table instead
+&gt; &gt; &gt; of imports by name.&gt; 
+&gt; &gt; That's an important point.
+
+Well. In fact, even though I don't have it documented explicitely on the web 
+page, the recommendation is a mixed approach. Use a jump table, and only 
+import the base address of the jump table. The file format is intelligent 
+enough to handle offsets to imported variables. So what I do in my own 
+operating system is to have two imports, &quot;OSA65&quot; and &quot;LIB6502&quot;, and all 
+references are like &quot;OSA65+3&quot; (hidden by defined constants like &quot;PUTC&quot;). The 
+loader then adds the offset to the import. This way you keep the import table 
+small, and still have the relocation ability. I don't know if cc65 supports 
+this though.
+
+&gt; &gt; Just I had the dream that there can be an OS
+&gt; &gt; which has programs compatible with any computers which can run that OS
+&gt; &gt; and use the same CPU, but the exact type of the computer is not
+&gt; &gt; important.
+&gt; That's a very ambitious goal. You might get further with a target that's
+&gt; easier to achieve.
+
+But achievable. Well I did. I think. :-) 
+But you need some experience and perseverance. I started small, and got 
+increasingly better. I suggest first start with an own OS at all, then go 
+multi-arch.
+
+&gt; Yes. o65 is what you're looking for. It has been designed by Andre with
+&gt; 6502/816 operating systems in mind. It is less qualified for more complex
+&gt; applications, this is why I didn't use it as an intermediate format for
+&gt; cc65.
+
+Absolutely. o65 wasn't designed for linker intermediate files.
+
+André
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Jan 21 01:02:15 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9921.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Interrupt handlers in C as part of the C library ?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9919.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Preprocessor Issue (?)"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9910.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] linking to o65"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9925.html" title="Next message in this discussion thread">Greg King: "Re: [cc65] linking to o65"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9925.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] linking to o65"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9920" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9920" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9920" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-01-21 01:02:18 CET
+</em></small></p>
+</body>
+</html>

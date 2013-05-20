@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Problem with swiftlink</title>
+<meta name="Author" content="Tom Watt (tom1awhost.biz)" />
+<meta name="Subject" content="[cc65] Problem with swiftlink" />
+<meta name="Date" content="2007-10-21" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Problem with swiftlink</h1>
+<!-- received="Sun Oct 21 19:58:09 2007" -->
+<!-- isoreceived="20071021175809" -->
+<!-- sent="Sun, 21 Oct 2007 11:58:16 -0600" -->
+<!-- isosent="20071021175816" -->
+<!-- name="Tom Watt" -->
+<!-- email="tom1awhost.biz" -->
+<!-- subject="[cc65] Problem with swiftlink" -->
+<!-- id="002a01c8140b$f6ead500$6b01a8c0@dlt" -->
+<!-- charset="iso-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5892.html" title="Dan Winslow: &quot;RE: [cc65] Problem with swiftlink&quot;">Next message</a> ]
+[ <a href="../2007-09/5890.html" title="Scott Alfter: &quot;[cc65] I've ported my 1-Wire routines (&amp; Apple II beer fridge controller) to cc65&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5892.html" title="Dan Winslow: &quot;RE: [cc65] Problem with swiftlink&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Tom Watt &lt;<a href="mailto:tom1awhost.biz?Subject=Re:%20[cc65]%20Problem%20with%20swiftlink">tom1awhost.biz</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-10-21 19:58:16</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello,
+
+I just downloaded the latest windows cc65, and c64 support... I made the following test program/make.bat file and get the errors below and not sure why..
+
+sltest.c:
+#include &lt;c64.h&gt;
+#include &lt;cbm.h&gt;
+#include &lt;rs232.h&gt;
+
+void main(void) {
+  rs232_init (0);
+  rs232_params(RS_BAUD_19200, RS_PAR_NONE);
+  rs232_put ('H');
+  rs232_put ('e');
+  rs232_put ('l');
+  rs232_put ('l');
+  rs232_put ('o');
+  rs232_put (' ');
+  rs232_put ('W');
+  rs232_put ('o');
+  rs232_put ('r');
+  rs232_put ('l');
+  rs232_put ('d');
+  rs232_put ('!');
+  rs232_put ('\n');
+  rs232_done ();
+}
+
+
+make.bat:
+cl65 -g -Oi sltest.c
+
+
+error/output when make.bat ran:
+C:\DOCUME~1\Tom\Desktop\c64\sltest&gt;cl65 -L &quot;C:\Progra~1\cc65\ser&quot; sltest.c
+Unresolved external `_rs232_done' referenced in:
+  sltest.s(14)
+Unresolved external `_rs232_init' referenced in:
+  sltest.s(12)
+Unresolved external `_rs232_params' referenced in:
+  sltest.s(13)
+Unresolved external `_rs232_put' referenced in:
+  sltest.s(15)
+ld65.exe: Error: 4 unresolved external(s) found - cannot create output file
+
+
+Thanks,
+
+Tom
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Oct 21 19:58:09 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5892.html" title="Next message in the list">Dan Winslow: "RE: [cc65] Problem with swiftlink"</a></li>
+<li><dfn>Previous message</dfn>: <a href="../2007-09/5890.html" title="Previous message in the list">Scott Alfter: "[cc65] I've ported my 1-Wire routines (&amp; Apple II beer fridge controller) to cc65"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5892.html" title="Next message in this discussion thread">Dan Winslow: "RE: [cc65] Problem with swiftlink"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5892.html" title="Message sent in reply to this message">Dan Winslow: "RE: [cc65] Problem with swiftlink"</a></li>
+<li><dfn>Reply</dfn>:  <a href="5894.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Problem with swiftlink"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5891" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5891" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5891" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-10-21 19:58:13 CEST
+</em></small></p>
+</body>
+</html>

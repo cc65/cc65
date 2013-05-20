@@ -1,0 +1,171 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: Sv: [cc65] Back on Track</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: Sv: [cc65] Back on Track">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: Sv: [cc65] Back on Track</h1>
+<!-- received="Sat Jan 22 14:33:41 2000" -->
+<!-- isoreceived="20000122133341" -->
+<!-- sent="Sat, 22 Jan 2000 14:33:07 +0100" -->
+<!-- isosent="20000122133307" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: Sv: [cc65] Back on Track" -->
+<!-- id="3889B193.70A6CC89@gmx.net" -->
+<!-- inreplyto="013401bf6462$ad5625e0$0171a8c0@bonn" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20Sv:%20[cc65]%20Back%20on%20Track"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2000-01-22 14:33:07
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0037.html">Spiro Trikaliotis: "Re: Sv: [cc65] Back on Track"</a>
+<li><strong>Previous message:</strong> <a href="0035.html">Spiro Trikaliotis: "Re: Sv: [cc65] Back on Track"</a>
+<li><strong>In reply to:</strong> <a href="0035.html">Spiro Trikaliotis: "Re: Sv: [cc65] Back on Track"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0037.html">Spiro Trikaliotis: "Re: Sv: [cc65] Back on Track"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+and again... 8=)
+
+&gt; Why will seeks remain slow? Every seek will require at most reading one
+&gt; sector from disc.
+
+With 'slow' seeks i was referring to the speed one could be expecting from eg 
+a pc hd. on a 1541 ofcoz, you can hardly do any faster ;=P
+
+&gt; Even the already mentioned &quot;while(1) fseek(-1)&quot; - example could be made
+&gt; fast if you would always buffer a whole (physical) sector on the host,
+&gt; so you would not need to read the sector from disc with every seek.
+
+it will read the current sector into drive-memory actually....
+
+the procedure to read byte at position N from a file would be like:
+
+sect=fpos/254;	// this is nonsence ofcoz, a table to the actual track/sector
+would be involved
+byte=fpos%254;
+
+... if(sect!=last_sector) read sector 'sect' from disc to drivemem
+... read byte number 'byte' from drivemem and send to host
+
+this way no more data than necessary has to travel the serial bus ;=) (which is
+the bottleneck in the cbm setup ;=)
+
+&gt; Another fine way would be to 'detach' the seeking and the reading:
+&gt; The seek could issue the command to the floppy to find the sector
+&gt; and return immediately; then, you only would have to wait for the
+&gt; seek being performed when you read some bytes (which could possibly be
+&gt; some time afterwards). This would also have the advantage that seeks
+&gt; w/o reading anything (like the loop above) would be really fast, because
+&gt; we would never have to wait for the floppy.
+
+well, what you are thinking of is async-operations and YES it will be ofcoz 
+possible to improve the disc-driver to use it.... however, due to the nature
+of the 'generalized' kernal and kernal-disc drivers its out of the question at
+this time.... but something to remember for the 1541-specific driver ;=)
+ 
+&gt; Another think to think about is to read the links only when they
+&gt; are needed or when they are provided anyway. I believe it's too
+&gt; much overhead at opening to get the link list for a file occupiing
+&gt; the whole disc, when there will never be any seek on it.
+
+well...for a 664 blox file it would require 664*2 bytes for buffering the
+whole link-list.... maybe its too much you are right ... mmmhhhh, i have to
+think about some mechanism that retrieves the list when needed ;=P
+
+&gt; Well, now I'm not sure, but I believe you should only close() _one_
+&gt; pre-defined file handle at a time and re-open it immediately.
+
+this will also work. it will also be 'safer' than the way i mentioned above i
+think
+since it'll also work if stdin/out/err are NOT fd=0,1,2
+ 
+&gt; The rest seems good to me.
+
+ok.
+
+l8rs
+
+gpz
+
+-- 
+........................................................
+
+		            /^\
+                            \ /  
+      ASCII RIBBON CAMPAIGN  X  AGAINST HTML MAIL
+                            / \  
+
+........................................................
+
+             .--.--.--.----..--.--.--.-----.----.
+   C=64     /  /  /  /  .  /  .  .  /  .  /  .  /\
+           /  /  /__/  /__/  /  /  /  /  /  /  / /
+   PC     /     /  /  /\_/  /  /  /  __ /  /  / /
+         /  /  /  /  / //  /  /  /  /  /  /  / /
+   PSX  /  /  /  /  / //  /  /  /  /  /  /  / /
+       /__/__/__/__/ //__/__/__/_____/__/__/ / 
+       \__\__\__\__\/ \__\__\__\_____\__\__\/  Groepaz
+
+........................................................
+.. <a href="http://fly.to/hitmen-c64">http://fly.to/hitmen-c64</a> ............................
+..... the hitmen c64 home page .........................
+.. <a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a> .......................
+..... hitmen psx section ...............................
+.. <a href="http://start.at/hitnav64">http://start.at/hitnav64</a> ............................
+..... biggest c64 link collection around ...............
+.. <a href="http://fly.to/hitmen-groepaz">http://fly.to/hitmen-groepaz</a> ........................
+..... my little personal page ..........................
+........................................................
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20Sv:%20[cc65]%20Back%20on%20Track">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0037.html">Spiro Trikaliotis: "Re: Sv: [cc65] Back on Track"</a>
+<li><strong>Previous message:</strong> <a href="0035.html">Spiro Trikaliotis: "Re: Sv: [cc65] Back on Track"</a>
+<li><strong>In reply to:</strong> <a href="0035.html">Spiro Trikaliotis: "Re: Sv: [cc65] Back on Track"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0037.html">Spiro Trikaliotis: "Re: Sv: [cc65] Back on Track"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:35 CET</em>
+</em>
+</small>
+</body>
+</html>

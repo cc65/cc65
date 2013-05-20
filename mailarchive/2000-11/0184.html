@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] CygWin / MingW / DJGPP ...</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] CygWin / MingW / DJGPP ...">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] CygWin / MingW / DJGPP ...</h1>
+<!-- received="Mon Nov 20 18:45:38 2000" -->
+<!-- isoreceived="20001120174538" -->
+<!-- sent="Mon, 20 Nov 2000 18:45:23 +0100" -->
+<!-- isosent="20001120174523" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] CygWin / MingW / DJGPP ..." -->
+<!-- id="3A196333.312D6E23@gmx.net" -->
+<!-- inreplyto="20001119183227.A26116@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20CygWin%20/%20MingW%20/%20DJGPP%20..."><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2000-11-20 18:45:23
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0185.html">Nikkinen: "Re: [cc65] Need help.."</a>
+<li><strong>Previous message:</strong> <a href="0183.html">Ullrich von Bassewitz: "[cc65] CygWin / MingW / DJGPP ..."</a>
+<li><strong>In reply to:</strong> <a href="0183.html">Ullrich von Bassewitz: "[cc65] CygWin / MingW / DJGPP ..."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0185.html">Nikkinen: "Re: [cc65] Need help.."</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Ullrich von Bassewitz wrote:
+ 
+&gt; Nothing in cc65 is &quot;linux stuff&quot;. All of the tools were multi-platform from
+&gt; day one, and even the first cc65 version produced by me was available for DOS,
+&gt; Windows, OS/2 and Linux. So while your arguments may be true for some hardcore
+&gt; Unix software, they are definitely NOT true for cc65.
+&gt; 
+&gt; In fact, I've tried to translate cc65 with the MingW compiler this afternoon
+&gt; because of another problem (see below), and apart from about 5 really minor
+&gt; problems (include paths and similar things) the sources compiled and worked
+&gt; without problems.
+&gt; 
+&gt; So for a windows programmer I would repeat my suggestion: Use MingW instead of
+&gt; CygWin. It is really easy to setup, much more Windows like, creates
+&gt; executables that run without a 3MB monster DLL, and last but not least: It
+&gt; compiles cc65 without major problems.
+&gt; 
+&gt; To port hardcore Unix programs, CygWin is probably a better solution, but for
+&gt; cc65 the additional features are not needed and the more complex handling is
+&gt; annoying. This is of course just my own humble opinion based on usage of both
+&gt; packages:-)
+
+yeah you are probably right ... i just happen to compile 'big' linux stuff 
+often and found the cygwin environment to be much less troublesome. (well,
+and it DOES work for any 'small' programms as well ;=D)
+
+&gt; Another question regarding a partially related problem: Has anyone managed to
+&gt; compile the snapshot using the DJGPP compiler under DOS? Keith Gerdes sent me
+&gt; some really weird linker error message, and I have absolutely no idea what
+&gt; goes wrong here. It seems that an enum with external linkage is missing when
+&gt; translating the ca65 assembler. All other externals from this module seem to
+&gt; be ok. I would say it's a compiler bug, but it would be nice to have the
+&gt; problem verified by someone else.
+
+mmmh, as for DJGPP i'd say &quot;it either works or you can't fix it&quot; ... djgpp has
+some odd problems with several things actually (that appear from time to time
+only, however). Also, i experienced different problems like that on different
+machine-setups (namely, 'real' DOS6.0 vs win9x versions) - so it might be worth
+a try to compile on a different machine.
+
+-- 
+----------------------------------------------------------------------
+                                 /^\
+                                 \ /
+          ASCII RIBBON CAMPAIGN   X   AGAINST HTML JUNK MAIL
+                                 / \
+----------------------------------------------------------------------
+          ___ ___ .___________________ .___________ _______.
+  c=64   /   |   \|   \__    ___/     \ \_   _____/ \      \ groepaz
+   cgb  /    '    \   | |    | /  \ /  \ |    __)_  /   |   \
+    psx \    .    /   | |    |/    '    \|        \/    |    \
+     dc  \___|_  /|___| |____|\____|__  /_______  /\____|__  /
+               \/     '               \/        \/         \/
+       <a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    Hitmen WWW Headquarters
+       <a href="http://fly.to/hitmen-groepaz">http://fly.to/hitmen-groepaz</a>     my personal playground
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20CygWin%20/%20MingW%20/%20DJGPP%20...">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0185.html">Nikkinen: "Re: [cc65] Need help.."</a>
+<li><strong>Previous message:</strong> <a href="0183.html">Ullrich von Bassewitz: "[cc65] CygWin / MingW / DJGPP ..."</a>
+<li><strong>In reply to:</strong> <a href="0183.html">Ullrich von Bassewitz: "[cc65] CygWin / MingW / DJGPP ..."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0185.html">Nikkinen: "Re: [cc65] Need help.."</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:37 CET</em>
+</em>
+</small>
+</body>
+</html>

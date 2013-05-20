@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] C64 drive direct access qu</title>
+<meta name="Author" content="MagerValp (MagerValp1cling.gu.se)" />
+<meta name="Subject" content="Re: [cc65] C64 drive direct access question" />
+<meta name="Date" content="2005-10-11" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] C64 drive direct access question</h1>
+<!-- received="Tue Oct 11 09:49:37 2005" -->
+<!-- isoreceived="20051011074937" -->
+<!-- sent="Tue, 11 Oct 2005 09:49:30 +0200" -->
+<!-- isosent="20051011074930" -->
+<!-- name="MagerValp" -->
+<!-- email="MagerValp1cling.gu.se" -->
+<!-- subject="Re: [cc65] C64 drive direct access question" -->
+<!-- id="17227.28298.673524.697507@panini.cling.gu.se" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="000301c5cdcd$5f327820$6401a8c0&#64;akira" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5244.html" title="MagerValp: &quot;[cc65] Makefiles again&quot;">Next message</a> ]
+[ <a href="5242.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] C64 drive direct access question&quot;">Previous message</a> ]
+[ <a href="5241.html" title="Raj Wurttemberg: &quot;[cc65] C64 drive direct access question&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: MagerValp &lt;<a href="mailto:MagerValp1cling.gu.se?Subject=Re:%20[cc65]%20C64%20drive%20direct%20access%20question">MagerValp1cling.gu.se</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-10-11 09:49:30</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt;&gt;&gt;&gt;&gt; &quot;RW&quot; == Raj Wurttemberg &lt;rajw&#64;c64&#46;<!--nospam-->us&gt; writes:
+
+RW&gt; How to I do the chr$(x) with cbm_write? Is this correct?
+
+RW&gt; cbm_write(15, &quot;m-w\x06\x00\x02\x18\x00&quot;, 8);
+
+Yep. I used a struct in my code:
+
+  struct mwcmd {
+    char mw[3];
+    void *addr;
+    unsigned char len;
+    char data[34];
+  };
+
+  struct mwcmd mw;
+
+  memcpy(mw.mw, &quot;M-W&quot;, 3);
+  mw.addr = (void *)0x0006;
+  mw.len = 2;
+  memcpy(mw.data, &quot;\x18\x00&quot;, 2);
+
+  cbm_write(15, &amp;mw, 8);
+
+-- 
+    ___          .     .  .         .       . +  .         .      o   
+  _|___|_   +   .  +     .     +         .  Per Olofsson, arkadspelare
+    o-o    .      .     .   o         +          MagerValp&#64;cling&#46;<!--nospam-->gu.se
+     -       +            +    .     <a href="http://www.cling.gu.se/~cl3polof/">http://www.cling.gu.se/~cl3polof/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Oct 11 09:49:37 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5244.html" title="Next message in the list">MagerValp: "[cc65] Makefiles again"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5242.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] C64 drive direct access question"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5241.html" title="Message to which this message replies">Raj Wurttemberg: "[cc65] C64 drive direct access question"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5243" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5243" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5243" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-10-11 09:49:39 CEST
+</em></small></p>
+</body>
+</html>

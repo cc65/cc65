@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] ASM to C help a n00b</title>
+<meta name="Author" content="S M (san.mes1gmail.com)" />
+<meta name="Subject" content="[cc65] ASM to C help a n00b" />
+<meta name="Date" content="2010-05-27" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] ASM to C help a n00b</h1>
+<!-- received="Thu May 27 11:56:18 2010" -->
+<!-- isoreceived="20100527095618" -->
+<!-- sent="Thu, 27 May 2010 10:56:12 +0100" -->
+<!-- isosent="20100527095612" -->
+<!-- name="S M" -->
+<!-- email="san.mes1gmail.com" -->
+<!-- subject="[cc65] ASM to C help a n00b" -->
+<!-- id="AANLkTimffNUskQYFRF3KLdrL7ZHeu7j6eRtPMzgYccvi@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8425.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] c question&quot;">Next message</a> ]
+[ <a href="8423.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] c question&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8428.html" title="Marc 'BlackJack Rintsch: &quot;Re: [cc65] ASM to C help a n00b&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: S M &lt;<a href="mailto:san.mes1gmail.com?Subject=Re:%20[cc65]%20ASM%20to%20C%20help%20a%20n00b">san.mes1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-05-27 11:56:12</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>How can I have the following but in C?:
+
+_pCharsLo: .byte &lt;char0
+_pCharsHi: .byte &gt;char0
+
+char0:
+.byte %11111111
+.byte %11101111
+.byte %11010111
+.byte %10111011
+.byte %10101011
+.byte %10111011
+.byte %11010111
+.byte %11111111
+
+_pTileBuffer:
+.word tile_buffer01
+.word tile_buffer02
+.word tile_buffer03
+.word tile_buffer04
+.word tile_buffer05
+.word tile_buffer06
+.word tile_buffer07
+.word tile_buffer08
+.word tile_buffer09
+.word tile_buffer010
+.word tile_buffer011
+.word tile_buffer012
+
+
+tile_buffer01: .byte 0,0,0,0,0,0,0,0
+tile_buffer02: .byte 0,0,0,0,0,0,0,0
+tile_buffer03: .byte 0,0,0,0,0,0,0,0
+tile_buffer04: .byte 0,0,0,0,0,0,0,0
+tile_buffer05: .byte 0,0,0,0,0,0,0,0
+tile_buffer06: .byte 0,0,0,0,0,0,0,0
+tile_buffer07: .byte 0,0,0,0,0,0,0,0
+tile_buffer08: .byte 0,0,0,0,0,0,0,0
+tile_buffer09: .byte 0,0,0,0,0,0,0,0
+tile_buffer010: .byte 0,0,0,0,0,0,0,0
+tile_buffer011: .byte 0,0,0,0,0,0,0,0
+tile_buffer012: .byte 0,0,0,0,0,0,0,0
+
+
+
+I tried for example:
+
+unsigned char tile_buffer01 [8];
+unsigned char tile_buffer02 [8];
+unsigned char tile_buffer03 [8];
+unsigned char tile_buffer04 [8];
+unsigned char tile_buffer05 [8];
+unsigned char tile_buffer06 [8];
+unsigned char tile_buffer07 [8];
+unsigned char tile_buffer08 [8];
+unsigned char tile_buffer09 [8];
+unsigned char tile_buffer10 [8];
+unsigned char tile_buffer11 [8];
+unsigned char tile_buffer12 [8];
+unsigned char *tile_buffer [] =  {tile_buffer01, tile_buffer02,
+tile_buffer03, tile_buffer04, tile_buffer05, tile_buffer06, tile_buffer07,
+tile_buffer08, tile_buffer09, tile_buffer10, tile_buffer11, tile_buffer12};
+
+but it didn't work I get teste.c(29) Error: Constant expression expected
+teste.c(29): Warning: Converting integer to pointer without a cast
+.
+.
+.
+
+Thank you
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu May 27 11:56:18 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8425.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] c question"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8423.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] c question"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8428.html" title="Next message in this discussion thread">Marc 'BlackJack Rintsch: "Re: [cc65] ASM to C help a n00b"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8428.html" title="Message sent in reply to this message">Marc 'BlackJack Rintsch: "Re: [cc65] ASM to C help a n00b"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="8439.html" title="Message sent in reply to this message">S M: "Re: [cc65] ASM to C help a n00b"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8424" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8424" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8424" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-05-27 11:56:20 CEST
+</em></small></p>
+</body>
+</html>

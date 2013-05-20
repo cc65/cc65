@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Mouse API Proposals</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Mouse API Proposals" />
+<meta name="Date" content="2009-08-28" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Mouse API Proposals</h1>
+<!-- received="Fri Aug 28 12:03:36 2009" -->
+<!-- isoreceived="20090828100336" -->
+<!-- sent="Fri, 28 Aug 2009 12:03:29 +0200" -->
+<!-- isosent="20090828100329" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Mouse API Proposals" -->
+<!-- id="f97798c20908280303vd56cfe3l8c4df251f4d63df8@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20090826185115.GA18344&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6758.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Chicken and Egg Problem (?)&quot;">Next message</a> ]
+[ <a href="6756.html" title="Oliver Schmidt: &quot;Re: [cc65] Chicken and Egg Problem (?)&quot;">Previous message</a> ]
+[ <a href="6748.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Mouse API Proposals&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Mouse%20API%20Proposals">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-08-28 12:03:29</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Uz,
+
+&gt; Ok, give me a few days. We can discuss the results when I'm done.
+
+No problem, it's more 'important' than 'urgent'...
+
+&gt;&gt; One question left though: Should the new c128 and apple2(enh) mouse
+&gt;&gt; drivers be able to accomodate 40/80 col switching on the fly or detect
+&gt;&gt; the videomode only on INSTALL?
+&gt;
+&gt; I would say, it depends. If it's easy to do, then yes. If not, just define
+&gt; that users will have to reload the driver after a mode switch. There's also
+&gt; the IOCTL call which may be used to implement driver specific stuff.
+
+On the Apple II it's certainly feasable.
+
+Regarding the mouse callbacks:
+
+As mentioned before the Apple II has no sprite hardware so the
+callbacks draw the cursor into the screen. Because of the complexities
+of doing this in graphics mode (feasable without interaction with the
+foreground app at all ?) the Apple II default callbacks support text
+mode only.
+
+And those Apple II default callbacks obviously need character
+coordinates - just like the &quot;text&quot; mouse driver will provide them to
+the user. So the idea seems logical to have the driver call into the
+callbacks with character coordinates and thus doing the mapping only
+once in the driver. But then the callbacks become dependent from the
+&quot;text&quot; mouse driver - which from the logical perspective makes sense
+as they only work in text mode anyway. And even if I some day come up
+with graphics mode callbacks they will be so large that one wants to
+have them separated.
+
+What do I want to say with all this Apple II specifics? When we have
+two classes of mouse drivers (with pixel and character coordinates) it
+might makes sense to have two classes of mouse callbacks too. Maybe
+just a naming convention or macros with the names or the mouse drivers
+somehow containing references to their prefered callbacks or...
+
+Certainly not wanting to bother but if we would introduce those two
+mouse callback classes then on the CBMs the difference (again produced
+from a single source) might be that the ones for &quot;text&quot; mouse drivers
+come with internal sprite handling (if technically feasable with
+reasonable effort) and the ones for &quot;pixel&quot; mouse drivers are the
+currently existing ones.
+
+Just some thoughts, Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Aug 28 12:03:36 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6758.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Chicken and Egg Problem (?)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6756.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Chicken and Egg Problem (?)"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6748.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Mouse API Proposals"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6757" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6757" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6757" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-08-28 12:03:39 CEST
+</em></small></p>
+</body>
+</html>

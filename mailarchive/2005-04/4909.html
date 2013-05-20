@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Atari executables w/ Atari</title>
+<meta name="Author" content="Shawn Jefferson (jefferson_shawn_a8bit1yahoo.com)" />
+<meta name="Subject" content="Re: [cc65] Atari executables w/ AtariMax flashcart" />
+<meta name="Date" content="2005-04-04" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Atari executables w/ AtariMax flashcart</h1>
+<!-- received="Mon Apr  4 17:20:51 2005" -->
+<!-- isoreceived="20050404152051" -->
+<!-- sent="Mon, 4 Apr 2005 08:20:47 -0700 (PDT)" -->
+<!-- isosent="20050404152047" -->
+<!-- name="Shawn Jefferson" -->
+<!-- email="jefferson_shawn_a8bit1yahoo.com" -->
+<!-- subject="Re: [cc65] Atari executables w/ AtariMax flashcart" -->
+<!-- id="20050404152048.20779.qmail@web52210.mail.yahoo.com" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4910.html" title="Kolja Nikolaus Sträter: &quot;[cc65] Target BBC - info only&quot;">Next message</a> ]
+[ <a href="4908.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Nested Functions&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Shawn Jefferson &lt;<a href="mailto:jefferson_shawn_a8bit1yahoo.com?Subject=Re:%20[cc65]%20Atari%20executables%20w/%20AtariMax%20flashcart">jefferson_shawn_a8bit1yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-04-04 17:20:47</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>--- Christian Groessler &lt;chris&#64;groessler&#46;<!--nospam-->org&gt; wrote:
+&gt; &gt; I have no doubt that your procedure works (my
+&gt; program
+&gt; &gt; runs fine from DOS with the _txtinit call in it),
+&gt; 
+&gt; I have to admit, that I didn't really test the
+&gt; routine.
+&gt; If you run the program from DOS, E: is already
+&gt; initialized and the
+&gt; routine does nothing. 
+
+I even commented out the part of the routine that
+checks to see if E: is already opened as part of my
+testing.  It did seem to work.
+ 
+&gt; It depends on whether the problem is only a bug in
+&gt; the AtariMax
+&gt; routines. If regular (game) cartridges start up with
+&gt; E: initialized,
+&gt; the routine shouldn't be needed.
+&gt; But if not, I think it makes sense to have such a
+&gt; routine.
+
+According to De Re Atari, E: is not opened until AFTER
+the cartridge init vector has ran.  The AtariMax
+cartridge exe menu program runs via the init vector. 
+I think it could easily be changed to use the run
+vector instead.  I will try that out as soon as I can.
+ 
+&gt; Can you put a cartridge image on the AtariMax, and
+&gt; simulate a real
+&gt; cartridge startup? Then we could test the E:
+&gt; behaviour.
+
+Yes, I can probably do that too.
+ 
+I'll let you know what I find out.
+
+--
+Shawn Jefferson
+
+
+
+		
+__________________________________ 
+Do you Yahoo!? 
+Yahoo! Mail - Find what you need with new enhanced search. 
+<a href="http://info.mail.yahoo.com/mail_250">http://info.mail.yahoo.com/mail_250</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Apr  4 17:20:51 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4910.html" title="Next message in the list">Kolja Nikolaus Sträter: "[cc65] Target BBC - info only"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4908.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Nested Functions"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4909" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4909" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4909" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-04-04 17:20:57 CEST
+</em></small></p>
+</body>
+</html>

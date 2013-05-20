@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Really big and complex config </title>
+<meta name="Author" content="Payton Byrd (plbyrd1gmail.com)" />
+<meta name="Subject" content="[cc65] Really big and complex config files" />
+<meta name="Date" content="2012-06-12" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Really big and complex config files</h1>
+<!-- received="Tue Jun 12 06:36:14 2012" -->
+<!-- isoreceived="20120612043614" -->
+<!-- sent="Mon, 11 Jun 2012 23:35:12 -0500" -->
+<!-- isosent="20120612043512" -->
+<!-- name="Payton Byrd" -->
+<!-- email="plbyrd1gmail.com" -->
+<!-- subject="[cc65] Really big and complex config files" -->
+<!-- id="CAJm6qqfn00QdMJcQostUkQd=Rzrv_c+zsW01Dq8anOjq6h9dQA@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10373.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Really big and complex config files&quot;">Next message</a> ]
+[ <a href="10371.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] cgetc() and repeating keys&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10373.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Really big and complex config files&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Payton Byrd &lt;<a href="mailto:plbyrd1gmail.com?Subject=Re:%20[cc65]%20Really%20big%20and%20complex%20config%20files">plbyrd1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-06-12 06:35:12</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Are there any practical limits to the complexity and size of linker config
+files?  I have a huge config file and some really strange things are
+starting to happen such as methods being left out of binaries.
+
+Here's the current config:
+
+SYMBOLS {
+    __STACKSIZE__:   type = weak,   value = $0800; # 2k stack
+	__DISPATCHERSIZE__: type = weak, value = $2800; # 12k
+	__OVERLAYSIZE__: type = weak, value = $2000; # 8k
+	__BUFFERSSIZE__: type = weak, value - $0D00;
+	__TAPESIZE__: type = weak, value = $00BF;
+
+	__DPLOADADDR__: type = import;
+	__CDLOADADDR__: type = import;
+}
+MEMORY {
+    ZP:			start = $0002, size = $001A;
+	CPUSTACK:	start = $0100, size = $0100;
+
+    RAM:		file = &quot;&quot;,				define = yes,	start = $0800, size = $2300,	fill = no;
+	BUFFER:		file = &quot;&quot;,				define = yes,	start = $2B00, size =
+__BUFFERSSIZE__, fill = no;
+	ROM1:		file = &quot;easycli.bin&quot;,	define = yes,	start = $8000, size =
+$2000,			fill = yes, fillval= $ff;
+	ROM2:		file = &quot;easycli.bin&quot;,	define = yes,	start = $A000, size =
+$1000,			fill = yes, fillval= $ff;
+	ROM3:		file = &quot;easycli.bin&quot;,	define = yes,	start = $B000, size =
+$0700,			fill = yes, fillval= $ff;
+	ROM4:		file = &quot;easycli.bin&quot;,	define = yes,	start = $B700, size =
+$0100,			fill = yes, fillval= $ff;
+	EAPI:		file = &quot;easycli.bin&quot;,	define = yes,	start = $B800, size =
+$0780,			fill = yes, fillval= $ff;
+	ULTIMAX:	file = &quot;easycli.bin&quot;,	define = yes,	start = $FF80, size =
+$007A,			fill = yes, fillval= $ff;
+	VECTORS:	file = &quot;easycli.bin&quot;,	define = yes,	start = $FFFA, size =
+$0006,			fill = yes, fillval= $ff;
+	EAPIRAM:	file = &quot;&quot;,				define = yes,	start = $C000, size = $0300,			fill = yes;
+	RAM2:		file = &quot;&quot;,				define = yes,	start = $C300, size = $0C00,			fill = yes;
+	RAM3:		file = &quot;&quot;,				define = yes,	start = $CF00, size = $0100,			fill = yes;
+	TAPE:		file = &quot;&quot;,				define = yes,	start = $033C, size = $00BF,			fill = yes;
+	TAPE2:		file = &quot;&quot;,				define = yes,	start = $033C, size = $00BF,			fill = yes;
+
+	CMDLET:		file = &quot;cmd.test&quot;,		define = yes,	start = $8000 -
+__DISPATCHERSIZE__ - __OVERLAYSIZE__, size = __OVERLAYSIZE__, fill =
+no;
+
+	DPLA:		file = &quot;ovl.dispatcher&quot;,define = yes,	start = $8000 -
+__DISPATCHERSIZE__, size = $0002, fill = no;
+	DP:			file = &quot;ovl.dispatcher&quot;,define = yes,	start = $8000 -
+__DISPATCHERSIZE__, size = __DISPATCHERSIZE__, fill = no;
+	CDLA:		file = &quot;cmd.cd&quot;,		define = yes,	start = $8000 -
+__DISPATCHERSIZE__ - __OVERLAYSIZE__, size = $0005, fill = no;
+	CD:			file = &quot;cmd.cd&quot;,		define = yes,	start = $8000 -
+__DISPATCHERSIZE__ - __OVERLAYSIZE__ + 3, size = __OVERLAYSIZE__ - 3,
+fill = no;
+	DIRLA:		file = &quot;cmd.dir&quot;,		define = yes,	start = $8000 -
+__DISPATCHERSIZE__ - __OVERLAYSIZE__, size = $0005, fill = no;
+	DIR:		file = &quot;cmd.dir&quot;,		define = yes,	start = $8000 -
+__DISPATCHERSIZE__ - __OVERLAYSIZE__ + 3, size = __OVERLAYSIZE__ - 3,
+fill = no;
+	MKDIRLA:	file = &quot;cmd.mkdir&quot;,		define = yes,	start = $8000 -
+__DISPATCHERSIZE__ - __OVERLAYSIZE__, size = $0005, fill = no;
+	MKDIR:		file = &quot;cmd.mkdir&quot;,		define = yes,	start = $8000 -
+__DISPATCHERSIZE__ - __OVERLAYSIZE__ + 3, size = __OVERLAYSIZE__ - 3,
+fill = no;
+	DELLA:		file = &quot;cmd.del&quot;,		define = yes,	start = $8000 -
+__DISPATCHERSIZE__ - __OVERLAYSIZE__, size = $0005, fill = no;
+	DEL:		file = &quot;cmd.del&quot;,		define = yes,	start = $8000 -
+__DISPATCHERSIZE__ - __OVERLAYSIZE__ + 3, size = __OVERLAYSIZE__ - 3,
+fill = no;
+	RMDIRLA:	file = &quot;cmd.rmdir&quot;,		define = yes,	start = $8000 -
+__DISPATCHERSIZE__ - __OVERLAYSIZE__, size = $0005, fill = no;
+	RMDIR:		file = &quot;cmd.rmdir&quot;,		define = yes,	start = $8000 -
+__DISPATCHERSIZE__ - __OVERLAYSIZE__ + 3, size = __OVERLAYSIZE__ - 3,
+fill = no;
+	RENLA:		file = &quot;cmd.ren&quot;,		define = yes,	start = $8000 -
+__DISPATCHERSIZE__ - __OVERLAYSIZE__, size = $0005, fill = no;
+	REN:		file = &quot;cmd.ren&quot;,		define = yes,	start = $8000 -
+__DISPATCHERSIZE__ - __OVERLAYSIZE__ + 3, size = __OVERLAYSIZE__ - 3,
+fill = no;
+	COPYLA:		file = &quot;cmd.copymove&quot;,	define = yes,	start = $8000 -
+__DISPATCHERSIZE__ - __OVERLAYSIZE__, size = $0005, fill = no;
+	COPY:		file = &quot;cmd.copymove&quot;,	define = yes,	start = $8000 -
+__DISPATCHERSIZE__ - __OVERLAYSIZE__ + 3, size = __OVERLAYSIZE__ - 3,
+fill = no;
+	HELPLA:		file = &quot;cmd.help&quot;,		define = yes,	start = $8000 -
+__DISPATCHERSIZE__ - __OVERLAYSIZE__, size = $0005, fill = no;
+	HELP:		file = &quot;cmd.help&quot;,		define = yes,	start = $8000 -
+__DISPATCHERSIZE__ - __OVERLAYSIZE__ + 3, size = $4000 - ($8000 -
+__DISPATCHERSIZE__ - __OVERLAYSIZE__) - 3, fill = no;
+	EXECLA:		file = &quot;cmd.exec&quot;,		define = yes,	start = $8000 -
+__DISPATCHERSIZE__ - __OVERLAYSIZE__, size = $0005, fill = no;
+	EXEC:		file = &quot;cmd.exec&quot;,		define = yes,	start = $8000 -
+__DISPATCHERSIZE__ - __OVERLAYSIZE__ + 3, size = __OVERLAYSIZE__ -
+__TAPESIZE__ - 3, fill = yes, fillval = $ff;
+	EXECLO:		file = &quot;cmd.exec&quot;,		define = yes,	start = $8000 -
+__DISPATCHERSIZE__ - __TAPESIZE__, size = __TAPESIZE__, fill = no;
+
+	HELPCD:		file = &quot;help.cd&quot;,		define = yes,	start = $4000, size =
+$1800, fill = no;
+	HELPDIR:	file = &quot;help.dir&quot;,		define = yes,	start = $4000, size =
+$1800, fill = no;
+	HELPMKDIR:	file = &quot;help.mkdir&quot;,	define = yes,	start = $4000, size =
+$1800, fill = no;
+	HELPRMDIR:	file = &quot;help.rmdir&quot;,	define = yes,	start = $4000, size =
+$1800, fill = no;
+	HELPDEL:	file = &quot;help.del&quot;,		define = yes,	start = $4000, size =
+$1800, fill = no;
+	HELPREN:	file = &quot;help.ren&quot;,		define = yes,	start = $4000, size =
+$1800, fill = no;
+	HELPPATH:	file = &quot;help.path&quot;,		define = yes,	start = $4000, size =
+$1800, fill = no;
+	HELPCOPY:	file = &quot;help.copy&quot;,		define = yes,	start = $4000, size =
+$1800, fill = no;
+	HELPMOVE:	file = &quot;help.move&quot;,		define = yes,	start = $4000, size =
+$1800, fill = no;
+	HELPHELP:	file = &quot;help.help&quot;,		define = yes,	start = $4000, size =
+$1800, fill = no;
+}
+SEGMENTS {
+	ULTIMAX:  load = ULTIMAX,	type = ro;
+	VECTORS:  load = VECTORS,	type = ro;
+	EAPI:	  load = EAPI,		type = ro, define = yes;
+    STARTUP:  load = ROM1,      type = ro;
+    LOWCODE:  load = ROM1,      type = ro,                optional = yes;
+    INIT:     load = ROM1,      type = ro,  define = yes, optional = yes;
+    CODE:     load = ROM1,      type = ro, define = yes;
+	LOADER:	  load = ROM3,		run = RAM2, type = ro, define = yes;
+	RUNNER:	  load = ROM3,		run = TAPE, type = ro, define = yes;
+	COPYFILE: load = ROM4,		run = RAM3, type = ro, define = yes;
+    DATA:     load = ROM1,		run = RAM, type = rw, define = yes;
+	BUFFERS:  load = BUFFER,	type = bss, define = yes;
+    RODATA:   load = ROM1,      type = ro, define = yes;
+    BSS:      load = RAM,		type = bss, define = yes;
+	HEAP:	  load = RAM,		type = bss, optional = yes;
+    ZEROPAGE: load = ZP,		type = zp,	define = yes;
+
+	DPLA:	  load = DPLA,		type = ro, define = yes;
+	DPCODE:	  load = DP,		type = ro, define = yes;
+
+	CMDLET:	  load = CMDLET,	type = ro, define = yes;
+
+	CDLA:	  load = CDLA,		type = ro, define = yes;
+	CDCODE:	  load = CD,		type = ro, define = yes;
+
+	DIRECTORYLA:	  load = DIRLA,		type = ro, define = yes;
+	DIRECTORYCODE:	  load = DIR,		type = ro, define = yes;
+
+	MKDIRLA:	  load = MKDIRLA,	type = ro, define = yes;
+	MKDIRCODE:	  load = MKDIR,		type = ro, define = yes;
+
+	DELLA:		load = DELLA,	type = ro, define = yes;
+	DELCODE:	  load = DEL,		type = ro, define = yes;
+
+	RMDIRLA:		load = RMDIRLA,	type = ro, define = yes;
+	RMDIRCODE:	  load = RMDIR,		type = ro, define = yes;
+
+	RENLA:		load = RENLA,	type = ro, define = yes;
+	RENCODE:	  load = REN,		type = ro, define = yes;
+
+	COPYLA:		load = COPYLA,		type = ro, define = yes;
+	COPYCODE:	load = COPY,		type = ro, define = yes;
+
+	HELPLA:		load = HELPLA,	type = ro, define = yes;
+	HELPCODE:	load = HELP,		type = ro, define = yes;
+
+	EXECLA:		load = EXECLA,		type = ro, define = yes;
+	EXECCODE:	load = EXEC,		type = ro, define = yes;
+	EXECLOCODE:	load = EXECLO,	run = TAPE2, type = ro, define = yes;
+
+	HELPCD:		load = HELPCD,	type = ro, define = yes;
+	HELPDIR:	load = HELPDIR,	type = ro, define = yes;
+	HELPMKDIR:	load = HELPMKDIR,	type = ro, define = yes;
+	HELPRMDIR:	load = HELPRMDIR,	type = ro, define = yes;
+	HELPDEL:	load = HELPDEL,	type = ro, define = yes;
+	HELPREN:	load = HELPREN,	type = ro, define = yes;
+	HELPPATH:	load = HELPPATH,	type = ro, define = yes;
+	HELPCOPY:	load = HELPCOPY,	type = ro, define = yes;
+	HELPMOVE:	load = HELPMOVE,	type = ro, define = yes;
+	HELPHELP:	load = HELPHELP,	type = ro, define = yes;
+}
+FEATURES {
+    CONDES: segment = INIT,
+	    type    = constructor,
+	    label   = __CONSTRUCTOR_TABLE__,
+	    count   = __CONSTRUCTOR_COUNT__;
+    CONDES: segment = RODATA,
+	    type    = destructor,
+	    label   = __DESTRUCTOR_TABLE__,
+	    count   = __DESTRUCTOR_COUNT__;
+    CONDES: segment = RODATA,
+	    type    = interruptor,
+	    label   = __INTERRUPTOR_TABLE__,
+	    count   = __INTERRUPTOR_COUNT__;
+}
+
+
+-- 
+Payton Byrd
+&lt;<a href="http://www.paytonbyrd.com">http://www.paytonbyrd.com</a>&gt;
+&lt;<a href="http://it.toolbox.com/blogs/paytonbyrd">http://it.toolbox.com/blogs/paytonbyrd</a>&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Jun 12 06:36:14 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10373.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Really big and complex config files"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10371.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] cgetc() and repeating keys"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10373.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Really big and complex config files"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10373.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Really big and complex config files"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10372" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10372" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10372" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-06-12 06:36:19 CEST
+</em></small></p>
+</body>
+</html>

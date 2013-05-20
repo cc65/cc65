@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] CBM LFN Question</title>
+<meta name="Author" content="silverdr1wfmh.org.pl (silverdr1wfmh.org.pl)" />
+<meta name="Subject" content="Re: [cc65] CBM LFN Question" />
+<meta name="Date" content="2010-10-24" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] CBM LFN Question</h1>
+<!-- received="Sun Oct 24 20:38:31 2010" -->
+<!-- isoreceived="20101024183831" -->
+<!-- sent="Sun, 24 Oct 2010 20:38:21 +0200" -->
+<!-- isosent="20101024183821" -->
+<!-- name="silverdr1wfmh.org.pl" -->
+<!-- email="silverdr1wfmh.org.pl" -->
+<!-- subject="Re: [cc65] CBM LFN Question" -->
+<!-- id="94E6E6F9-297A-4C0B-BE7E-5F1D15B4C21F@wfmh.org.pl" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="20101024160047.GA8945&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8691.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] CBM LFN Question&quot;">Next message</a> ]
+[ <a href="8689.html" title="Groepaz: &quot;Re: [cc65] CBM LFN Question&quot;">Previous message</a> ]
+[ <a href="8680.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] CBM LFN Question&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8692.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] CBM LFN Question&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:silverdr1wfmh.org.pl?Subject=Re:%20[cc65]%20CBM%20LFN%20Question">silverdr1wfmh.org.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-10-24 20:38:21</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 2010-10-24, at 18:00, Ullrich von Bassewitz wrote:
+
+&gt; Logical file numbers are like file handles. The bad thing about them is, that
+&gt; they aren't assigned by the kernal (which could easily track the ones already
+&gt; used), but by the user.
+&gt; 
+&gt; If the library uses a certain lfn, it cannot prevent the user from using the
+&gt; same one in his own code.
+
+How about &quot;forgetting&quot; the numbers? I mean if we use POSIX style I/O, we shouldn't care about this.
+
+&gt; This defeats modular programming and is the reason
+&gt; for the hassle in the library and the &quot;be careful&quot; statements in regard to
+&gt; mixing POSIX file I/O and CBM file I/O.
+&gt; 
+&gt; Lfns 1 and 2 are used by LOAD and SAVE if I remember correctly. This is the
+&gt; reason why the library uses lfns starting with 3. The other assumptions are
+&gt; necessary because of the way, logical file numbers work on the commodores. One
+&gt; could also write a &quot;logical file number dispatcher&quot; that could by used by the
+&gt; library and user code,
+
+Some time ago - I wrote a short code that scans the file table and returns available &quot;filehandle&quot;, unless the limit of ten concurrent files is reached. AFAIR that limit was the only thing that I had to take care of. I wrote it exactly because I felt like I 1) didn't want to hardcode any LFN numbers 2) didn't want to limit what the user might have opened prior to running my prg. Maybe something like that could go into lib? I should still have it somewhere but if memory serves, it was quite trivial.
+
+-- 
+SD!
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Oct 24 20:38:31 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8691.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] CBM LFN Question"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8689.html" title="Previous message in the list">Groepaz: "Re: [cc65] CBM LFN Question"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8680.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] CBM LFN Question"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8692.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] CBM LFN Question"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8692.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] CBM LFN Question"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8690" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8690" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8690" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-10-24 20:38:33 CEST
+</em></small></p>
+</body>
+</html>

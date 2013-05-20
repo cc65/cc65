@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Atari executables w/ Atari</title>
+<meta name="Author" content="Carsten Strotmann (Carsten Strotmann private Mail) (carsten1strotmann.de)" />
+<meta name="Subject" content="Re: [cc65] Atari executables w/ AtariMax flashcart" />
+<meta name="Date" content="2005-03-28" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Atari executables w/ AtariMax flashcart</h1>
+<!-- received="Mon Mar 28 13:11:52 2005" -->
+<!-- isoreceived="20050328111152" -->
+<!-- sent="Mon, 28 Mar 2005 13:11:30 +0200" -->
+<!-- isosent="20050328111130" -->
+<!-- name="Carsten Strotmann (Carsten Strotmann private Mail)" -->
+<!-- email="carsten1strotmann.de" -->
+<!-- subject="Re: [cc65] Atari executables w/ AtariMax flashcart" -->
+<!-- id="1112008291.19966.8.camel@localhost" -->
+<!-- inreplyto="87mzsok0s7.fsf&#64;strommasten.groessler.org" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4848.html" title="Shawn Jefferson: &quot;Re: [cc65] Atari executables w/ AtariMax flashcart&quot;">Next message</a> ]
+[ <a href="4846.html" title="Christian Groessler: &quot;Re: [cc65] Atari executables w/ AtariMax flashcart&quot;">Previous message</a> ]
+[ <a href="4846.html" title="Christian Groessler: &quot;Re: [cc65] Atari executables w/ AtariMax flashcart&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4848.html" title="Shawn Jefferson: &quot;Re: [cc65] Atari executables w/ AtariMax flashcart&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Carsten Strotmann (Carsten Strotmann private Mail) &lt;<a href="mailto:carsten1strotmann.de?Subject=Re:%20[cc65]%20Atari%20executables%20w/%20AtariMax%20flashcart">carsten1strotmann.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-03-28 13:11:30</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello Christian,
+Hello Shawn,
+
+
+&gt; I've attached a function to do this - it opens E: if it isn't already 
+&gt; initialized. Can you please check whether it works with the cartridge? 
+&gt; Simply add a call to _txtinit() at the start of your program and link 
+&gt; with the attached file.
+&gt; 
+&gt; If it works I could add this function to the Atari runtime lib.
+
+I would vote against a change of the Atari runtime lib. The runtime lob
+can assume the channel E: is open (or even better, channel (IOCB) 0
+being open, so a DOS can redirect screen output to any other device).
+
+IMHO this is a problem (or bug) of the AtariMax Cart. As I see the
+problem the channel 0 to E: is still open, but the AtariMax Menu will
+switch the DisplayList to a custom one and will not switch back. This
+can easily solved in the AtariMax sources, which are OpenSource. It we
+send a patch back to Steve Tucker (AtariMax Author) I'm sure he will
+release a new, fixed version of the AtariMax Software (we should also
+send a patch to use ca65 Assembler instead of TASM).
+
+I don't have much time these days, but if needed, I prepare such patch
+for Steve.
+
+Best regards
+
+Carsten
+
+-- 
+Carsten Strotmann (Carsten Strotmann private Mail)
+&lt;carsten&#64;strotmann&#46;<!--nospam-->de&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<div>
+<ul>
+<li>application/pgp-signature attachment: <a href="../att-4847/signature.asc">This is a digitally signed message part</a></li>
+</ul>
+<!-- attachment="signature.asc" -->
+</div>
+<span id="received"><dfn>Received on</dfn> Mon Mar 28 13:11:52 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4848.html" title="Next message in the list">Shawn Jefferson: "Re: [cc65] Atari executables w/ AtariMax flashcart"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4846.html" title="Previous message in the list">Christian Groessler: "Re: [cc65] Atari executables w/ AtariMax flashcart"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4846.html" title="Message to which this message replies">Christian Groessler: "Re: [cc65] Atari executables w/ AtariMax flashcart"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4848.html" title="Next message in this discussion thread">Shawn Jefferson: "Re: [cc65] Atari executables w/ AtariMax flashcart"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4847" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4847" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4847" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-03-28 13:11:59 CEST
+</em></small></p>
+</body>
+</html>

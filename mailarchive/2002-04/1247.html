@@ -1,0 +1,174 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] Version 2.8.0 of the compiler</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="[cc65] Version 2.8.0 of the compiler package released">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] Version 2.8.0 of the compiler package released</h1>
+<!-- received="Fri Apr 12 23:06:22 2002" -->
+<!-- isoreceived="20020412210622" -->
+<!-- sent="Fri, 12 Apr 2002 23:06:27 +0200" -->
+<!-- isosent="20020412210627" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="[cc65] Version 2.8.0 of the compiler package released" -->
+<!-- id="20020412230627.A19829@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Version%202.8.0%20of%20the%20compiler%20package%20released"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-04-12 23:06:27
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1246.html">Ullrich von Bassewitz: "Re: [cc65] volatile"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+I'm proud to announce version 2.8.0 of CC65, a C crosscompiler /
+crossassembler combo for 6502 systems.
+
+CC65 has C and runtime library support for many of the old 6502 machines,
+including
+
+  - The Commodore C64, C128 and the C16, C116, Plus/4 machines.
+  - The CBM 510 (aka P500), a quite rare Commodore machine (programs
+    run in bank 0).
+  - The CBM 600/700 family (programs run in bank 1).
+  - Newer PET machines (not 2001)
+  - The Apple ][ (library support by Kevin Ruland &lt;<a href="mailto:kevin_at_rodin.wustl.edu?Subject=Re:%20[cc65]%20Version%202.8.0%20of%20the%20compiler%20package%20released">kevin_at_rodin.wustl.edu</a>&gt;)
+  - The Atari 8 bit machines (thanks to the Atari team: Christian Groessler
+    &lt;<a href="mailto:cpg_at_aladdin.de?Subject=Re:%20[cc65]%20Version%202.8.0%20of%20the%20compiler%20package%20released">cpg_at_aladdin.de</a>&gt;, Mark Keates &lt;<a href="mailto:markk_at_dendrite.co.uk?Subject=Re:%20[cc65]%20Version%202.8.0%20of%20the%20compiler%20package%20released">markk_at_dendrite.co.uk</a>&gt;, Freddy Offenga
+    &lt;<a href="mailto:taf_offenga_at_yahoo.com?Subject=Re:%20[cc65]%20Version%202.8.0%20of%20the%20compiler%20package%20released">taf_offenga_at_yahoo.com</a>&gt; and David Lloyd, &lt;<a href="mailto:dmlloyd_at_atari-central.com?Subject=Re:%20[cc65]%20Version%202.8.0%20of%20the%20compiler%20package%20released">dmlloyd_at_atari-central.com</a>&gt;).
+  - GEOS for the C64 and C128 (GEOSLib by Maciej Witkowiak &lt;<a href="mailto:ytm_at_elysium.pl?Subject=Re:%20[cc65]%20Version%202.8.0%20of%20the%20compiler%20package%20released">ytm_at_elysium.pl</a>&gt;)
+
+The libraries are fairly portable, so creating a version for other 6502s
+shouldn't be too much work.
+
+
+New features in this release are:
+
+  * Linker support for Lunix/o65. Please note that you need the current
+    snapshot version of Lunix, or the upcoming version 0.21, which will
+    be released some time in the future.
+
+  * conio support for GEOS (by Maciej Witkowiak, &lt;<a href="mailto:ytm_at_friko.onet.pl?Subject=Re:%20[cc65]%20Version%202.8.0%20of%20the%20compiler%20package%20released">ytm_at_friko.onet.pl</a>&gt;).
+    This means that any program using the conio API will run under GEOS
+    with a simple recompile!
+
+  * RS232 support for the Atari machines (added by Christian Groessler,
+    &lt;<a href="mailto:cpg_at_aladdin.de?Subject=Re:%20[cc65]%20Version%202.8.0%20of%20the%20compiler%20package%20released">cpg_at_aladdin.de</a>&gt;). The uip TCP stack including the web server is
+    usable with this addition, so you can have your own Atari web server
+    with the new version.
+
+  * RS232 support for the C128. This will make uip available for use with
+    the C128.
+
+  * Several changes regarding code generation and optimizations:
+
+      - Compares do now generate better code thanks to a hint from Piotr
+        Fusik.
+
+      - 65C02 code is back.
+
+      - &quot;Optimize for size&quot; will work again.
+
+  * More flexible character code translation.
+
+  * sscanf is now available. The basic function would also make fscanf
+    and friends possible, but the missing ungetc() function prevents
+    this. Scanf for files streams will probably be available in the next
+    version.
+
+  * Bugfixes and minor improvements as usual.
+
+
+There is still no support for the following features:
+
+  * Floats and bit fields.
+
+  * stdio file routines on most systems. The 8 bit Ataris are the first
+    machines that do have full file I/O support. Please note that the
+    complete CBM family doesn't have stdio file support!
+
+  * The 80 column mode on the C128 is not supported by the conio library.
+
+
+Available packages:
+
+As usual I will provide the complete sources and several binary packages,
+including RPMs for RedHat Linux. Linux is the primary development
+platform, so the sources do compile out of the box on Linux machines.
+
+Please note that there are separate RPMs for the compiler proper and the
+target specific libraries. To develop for one of the predefined target
+systems you need the compiler RPM package *and* one of the target machine
+packages.
+
+Binaries for DOS and and Windows will follow or may already be available
+at the time you read this. OS/2 packages will again be available, but
+since there are almost no downloads for OS/2, so the host platform may
+get dropped in the near future (again). As with the RPM packages, you
+need the package for the development system (Windows, etc.) *and* one or
+more of the target machine packages.
+
+
+Download:
+
+More information information and a download link, please visit the cc65
+web page at
+
+     	<a href="http://www.cc65.org/">http://www.cc65.org/</a>
+
+
+Thanks to all who sent feedback and suggestions and of course to anyone who
+helped developing cc65!
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Version%202.8.0%20of%20the%20compiler%20package%20released">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Version%202.8.0%20of%20the%20compiler%20package%20released">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1246.html">Ullrich von Bassewitz: "Re: [cc65] volatile"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-04-12 23:06:40 CEST</em>
+</em>
+</small>
+</body>
+</html>

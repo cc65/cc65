@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] C64 Cartridge clarificatio</title>
+<meta name="Author" content="Joseph Rose (rose.joseph121yahoo.com)" />
+<meta name="Subject" content="Re: [cc65] C64 Cartridge clarifications" />
+<meta name="Date" content="2012-03-11" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] C64 Cartridge clarifications</h1>
+<!-- received="Sun Mar 11 15:02:42 2012" -->
+<!-- isoreceived="20120311140242" -->
+<!-- sent="Sun, 11 Mar 2012 07:02:30 -0700 (PDT)" -->
+<!-- isosent="20120311140230" -->
+<!-- name="Joseph Rose" -->
+<!-- email="rose.joseph121yahoo.com" -->
+<!-- subject="Re: [cc65] C64 Cartridge clarifications" -->
+<!-- id="1331474550.60945.YahooMailNeo@web120604.mail.ne1.yahoo.com" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="4F5A7472.2080306&#64;uffe.org" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10103.html" title="Greg King: &quot;Re: [cc65] Moving the stack to a different segment?&quot;">Next message</a> ]
+[ <a href="10101.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Compile problems with newest cc65&quot;">Previous message</a> ]
+[ <a href="10099.html" title="Uffe Jakobsen: &quot;Re: [cc65] C64 Cartridge clarifications&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Joseph Rose &lt;<a href="mailto:rose.joseph121yahoo.com?Subject=Re:%20[cc65]%20C64%20Cartridge%20clarifications">rose.joseph121yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-03-11 15:02:30</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Okay....  What are the proper values for the EXROM and GAME status lines in the CRT format for generic 8k and 16k cartridges at $8000?  Also, what available modes would be good for &gt;16k general-purpose cartridges, and how do I define/program them?  I appreciate the feedback.
+
+
+----- Original Message -----
+From: Uffe Jakobsen &lt;uffe&#64;uffe&#46;<!--nospam-->org&gt;
+To: cc65&#64;musoftware&#46;<!--nospam-->de
+Cc: 
+Sent: Friday, March 9, 2012 4:23 PM
+Subject: Re: [cc65] C64 Cartridge clarifications
+
+
+
+Hi,
+
+On 2012-03-08 08:46, skoe&#64;directbox&#46;<!--nospam-->com wrote:
+&gt;&gt; &gt; AFAIR there is a mistake or a fuzzy description of
+&gt;&gt; &gt; &quot;active/inactive/1/0&quot; in the CRT documentation or even in the CRT
+&gt;&gt; &gt; format, so be careful. A normal 16k Cartridge has both lines low.
+&gt;&gt; 
+
+I agree - the current wording around 0/1/inactive/active in the CRT documentation is quite confusing.
+
+&gt;&gt; 
+&gt;&gt;  and even worse, in vice - where one of the two is inverted (because the
+&gt;&gt;  original AR works like that, and vice basically emulates AR only =P)
+&gt; 
+&gt; This reminds me to another thing: In the CRT/CHIP header these two lines
+&gt; are redundant information: The cartridge type (and therefore the emulation
+&gt; specific to this type) implies the state of these lines anyway. In many
+&gt; cartridges they are even dynamic, so the CHIP header can't know their
+&gt; state.
+&gt; 
+
+I know this is getting more and more OT for this mailinglist (CC65). But this seems like the right place and moment to ask anyway - while we're at the topic of the CRT fileformat....
+
+Regarding Ocean Type 1 cartridges (CRT ID 5) - have someone ever met anything else ?
+
+I cannot find info about Ocean Type &gt;= 2 anywhere...
+
+It seems to me that someone in the beginning of time wanted to assign every Ocean cartridge combination its own type - and then regretted and squashed them all into one format (Ocean Type 1) - does anyone know or remember the actions and reasons ?
+
+Also the updated CRT format file in the Vice svn-tree mentions an Ocean cartridge size of 32Kb... but it is certainly not an Ocean cartridge that I know of... have anyone ever met a 32Kb Ocean cartrigde in the wild ? As far as I know the list of known Ocean cartridges (12 pieces) have been complete for many years.
+
+Thanks
+
+/Uffe
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Mar 11 15:02:42 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10103.html" title="Next message in the list">Greg King: "Re: [cc65] Moving the stack to a different segment?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10101.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Compile problems with newest cc65"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10099.html" title="Message to which this message replies">Uffe Jakobsen: "Re: [cc65] C64 Cartridge clarifications"</a></li>
+<!-- lnextthread="start" -->
+<li><a name="replies" id="replies"></a>
+<dfn>Maybe reply</dfn>: <a href="10095.html" title="Message sent in reply to this message">skoe1directbox.com: "Re: Re: [cc65] C64 Cartridge clarifications"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10102" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10102" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10102" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-03-11 15:02:45 CET
+</em></small></p>
+</body>
+</html>

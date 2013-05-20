@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] linker cfg files</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] linker cfg files">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] linker cfg files</h1>
+<!-- received="Thu Apr 24 17:10:09 2003" -->
+<!-- isoreceived="20030424151009" -->
+<!-- sent="Thu, 24 Apr 2003 17:06:45 +0200" -->
+<!-- isosent="20030424150645" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] linker cfg files" -->
+<!-- id="200304241706.45132.groepaz@gmx.net" -->
+<!-- inreplyto="20030423215658.GA32678@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20linker%20cfg%20files"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2003-04-24 17:06:45
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2887.html">Groepaz: "Re: [cc65] ca65 bug..."</a>
+<li><strong>In reply to:</strong> <a href="2878.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2896.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<li><strong>Next in thread:</strong> <a href="2886.html">Groepaz: "[cc65] ca65 bug..."</a>
+<li><strong>Reply:</strong> <a href="2896.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Wednesday 23 April 2003 23:56, Ullrich von Bassewitz wrote:
+&gt; I've already found this to be a problem with Groepaz NES code.
+&gt; Unfortunately, I don't have an idea for a solution that is 1. easy to
+&gt; handle and 2. easy to implement. Allowing to define stack and heap in the
+&gt; linker config would work, but this would need a complete expression
+&gt; evaluation for the linker, so it is not exactly what I would call &quot;easy to
+&gt; implement&quot;. As it looks now, you will have to live with the existing linker
+&gt; and code, provided that no one has a better suggestion.
+
+MEMORY {
+    [...]
+    RAM: start = $7FF, size = $c801, define = yes, file = %O;
+}
+SEGMENTS {
+    [...]
+   STACK: load = RAM, type = rw, define = yes;
+   HEAP: load= RAM, type = rw, define = yes;
+}
+FEATURES {
+    [...]
+}
+SYMBOLS {
+    [...]
+    __STACKSIZE__ = $800;	# 2K stack
+    __HEAPSIZE__ = -1		# -1 == all of the remaining space in segment
+						# maybe to get rid of the -1 kludges, make &quot;all remaining&quot;
+						# the default when __HEAPSIZE__ is omitted.
+}
+
+i fail to see the problem with that :o) you dont need expression evaluation 
+here (you didnt just wanted to move the dodgy calc-from-bss stuff into the 
+linker script eh? tsts :=))) and most of whats needed to support this should 
+be implemented already as i see it... the linker just needs to grab the size 
+of heap and stack from the &quot;symbols&quot; section and then &quot;load&quot; it like any 
+other segment. .... actually if you reserve space manually in stack/heap 
+segment (which is still kinda dodgy) this should work fine with the current 
+linker as is.
+
+oh and this should even allow to write a quite generic crt0 aswell that can 
+deal with all kinda memory layouts (no idea how demanded that is though :=P)
+
+gpz
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20linker%20cfg%20files">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2887.html">Groepaz: "Re: [cc65] ca65 bug..."</a>
+<li><strong>In reply to:</strong> <a href="2878.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2896.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<li><strong>Next in thread:</strong> <a href="2886.html">Groepaz: "[cc65] ca65 bug..."</a>
+<li><strong>Reply:</strong> <a href="2896.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-04-24 17:13:03 CEST</em>
+</em>
+</small>
+</body>
+</html>

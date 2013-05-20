@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Color palettes</title>
+<meta name="Author" content="Karri Kaksonen (karri1sipo.fi)" />
+<meta name="Subject" content="[cc65] Color palettes" />
+<meta name="Date" content="2012-10-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Color palettes</h1>
+<!-- received="Tue Oct 23 12:52:31 2012" -->
+<!-- isoreceived="20121023105231" -->
+<!-- sent="Tue, 23 Oct 2012 13:52:13 +0300" -->
+<!-- isosent="20121023105213" -->
+<!-- name="Karri Kaksonen" -->
+<!-- email="karri1sipo.fi" -->
+<!-- subject="[cc65] Color palettes" -->
+<!-- id="508676DD.8060505@sipo.fi" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10969.html" title="Oliver Schmidt: &quot;Re: [cc65] Color palettes&quot;">Next message</a> ]
+[ <a href="10967.html" title="Oliver Schmidt: &quot;Re: [cc65] dio_query_sectcount() on Atari ?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10969.html" title="Oliver Schmidt: &quot;Re: [cc65] Color palettes&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Karri Kaksonen &lt;<a href="mailto:karri1sipo.fi?Subject=Re:%20[cc65]%20Color%20palettes">karri1sipo.fi</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-10-23 12:52:13</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi to everybody.
+
+There is a very cool discussion going on at 
+<a href="http://www.wayofthepixel.net/index.php?topic=4306.0;all">http://www.wayofthepixel.net/index.php?topic=4306.0;all</a>
+
+This discusses an optimal 16 color palette that can be used for any 
+game! The results are really amazing. See some screenshots at 
+<a href="http://www.pixeljoint.com/pixelart/64505.htm">http://www.pixeljoint.com/pixelart/64505.htm</a>
+
+In any case an Australian girl Cammy created a palette for the Lynx 
+around these ideas and I really like it much much more than the previous 
+boring default palette.
+
+As the colors change a lot from the previous values I had to use new 
+color names in the Lynx tgi driver.
+
+/* Color defines */
+#define COLOR_BLACK             0x00
+#define COLOR_RED               0x01
+#define COLOR_PINK              0x02
+#define COLOR_LIGHTGREY         0x03
+#define COLOR_GREY              0x04
+#define COLOR_DARKGREY          0x05
+#define COLOR_BROWN             0x06
+#define COLOR_PEACH             0x07
+#define COLOR_YELLOW            0x08
+#define COLOR_LIGHTGREEN        0x09
+#define COLOR_GREEN             0x0A
+#define COLOR_DARKBROWN         0x0B
+#define COLOR_VIOLET            0x0C
+#define COLOR_BLUE              0x0D
+#define COLOR_LIGHBLUE          0x0E
+#define COLOR_WHITE             0x0F
+
+The COLOR_BLACK is actually COLOR_TRANSPARENT for sprites and 
+COLOR_DARKBROWN is used as sprite black.
+
+If someone believes that this change breaks something please comment.
+--
+Karri
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Oct 23 12:52:31 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10969.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Color palettes"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10967.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] dio_query_sectcount() on Atari ?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10969.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Color palettes"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10969.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Color palettes"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10976.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Color palettes"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10968" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10968" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10968" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-10-23 12:52:36 CEST
+</em></small></p>
+</body>
+</html>

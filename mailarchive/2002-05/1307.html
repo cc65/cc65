@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] 65(S)C02 and additional t</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] 65(S)C02 and additional target...">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] 65(S)C02 and additional target...</h1>
+<!-- received="Mon May 13 17:58:18 2002" -->
+<!-- isoreceived="20020513155818" -->
+<!-- sent="Mon, 13 May 2002 17:58:23 +0200" -->
+<!-- isosent="20020513155823" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] 65(S)C02 and additional target..." -->
+<!-- id="20020513175823.A25060@trixie.musoftware.de" -->
+<!-- inreplyto="10DF6DB2771A934086EF4B4DD03AD76F0AB462@pacemail.pace.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%2065(S)C02%20and%20additional%20target..."><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-05-13 17:58:23
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1306.html">Christian Krüger: "[cc65] 65(S)C02 and additional target..."</a>
+<li><strong>In reply to:</strong> <a href="1306.html">Christian Krüger: "[cc65] 65(S)C02 and additional target..."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1310.html">Stephan Lesch: "[cc65] Problem with kbhit()?"</a>
+<li><strong>Next in thread:</strong> <a href="1308.html">Christian Krüger: "Re: [cc65] 65(S)C02 and additional target..."</a>
+<li><strong>Reply:</strong> <a href="1310.html">Stephan Lesch: "[cc65] Problem with kbhit()?"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Mon, May 13, 2002 at 05:41:21PM +0200, Christian Krüger wrote:
+&gt; Because the 'Atari-Lynx-adaption' of an former version of cc65
+&gt; is rather outdated (no ANSI etc.), I like to see the reunion
+&gt; of the Lynx back to cc65 'mainstream' development.
+&gt;
+&gt; How can I influence the development in this direction?
+
+This would be just another port, so if you're willing to write the necessary
+libraries, it is no problem to add them to the distribution (but please read
+the the paragraph about the patch policy on the web page). As far as I know,
+the Lynx is a game console, so probably many of the standard files cannot be
+used, which would make the port rather simple. Regardless of that, I would
+prefer that the libraries are portable were possible. If one of the existing
+libraries cannot be ported it's not a problem. But if it can be ported, I
+would prefer a ported version over some other library that does the same thing
+a different way.
+
+&gt; This should not be a big problem, since the SC02 is just a 65C02
+&gt; (and should also benefit from the enhanced instructions) but without
+&gt; the single-bit instructions BBR/BBS/RMB/SMB. It's important
+&gt; that also the assembler dissallow the usage of this instructions
+&gt; if the 65SC02 target is selected...
+
+65C02 support in the assembler is actually 65SC02 support.
+
+&gt; Is there any chance for this improvement? Does the compiler
+&gt; acually uses (in C02-mode) the BBR/BBS/RMB/SMB instructions?
+
+In 65C02 mode, the compiler generates 65SC02 code, but only with optimization
+enabled. So the compiler should work for the Lynx without any problems.
+Writing the linker config and C startup files would be the first steps to add
+support for the Lynx. You may want to have a look at the existing files for
+some other platform (I would suggest the Plus/4, since it is complete but
+still simple compared to some other machines [C64, Atari]).
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%2065(S)C02%20and%20additional%20target...">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%2065(S)C02%20and%20additional%20target...">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1306.html">Christian Krüger: "[cc65] 65(S)C02 and additional target..."</a>
+<li><strong>In reply to:</strong> <a href="1306.html">Christian Krüger: "[cc65] 65(S)C02 and additional target..."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1310.html">Stephan Lesch: "[cc65] Problem with kbhit()?"</a>
+<li><strong>Next in thread:</strong> <a href="1308.html">Christian Krüger: "Re: [cc65] 65(S)C02 and additional target..."</a>
+<li><strong>Reply:</strong> <a href="1310.html">Stephan Lesch: "[cc65] Problem with kbhit()?"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-05-13 17:58:22 CEST</em>
+</em>
+</small>
+</body>
+</html>

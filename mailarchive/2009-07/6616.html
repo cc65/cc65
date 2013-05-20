@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] testsuite reloaded (die ultima</title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="[cc65] testsuite reloaded (die ultimative lobhudelei :))" />
+<meta name="Date" content="2009-07-27" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] testsuite reloaded (die ultimative lobhudelei :))</h1>
+<!-- received="Mon Jul 27 17:07:31 2009" -->
+<!-- isoreceived="20090727150731" -->
+<!-- sent="Mon, 27 Jul 2009 17:07:21 +0200" -->
+<!-- isosent="20090727150721" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="[cc65] testsuite reloaded (die ultimative lobhudelei :))" -->
+<!-- id="200907271707.22637.groepaz@gmx.net" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6617.html" title="Groepaz: &quot;Re: [cc65] &quot;overlay&quot; files&quot;">Next message</a> ]
+[ <a href="6615.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Feature request: default arguments for functions.&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6619.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] testsuite reloaded (die ultimative lobhudelei :))&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20testsuite%20reloaded%20(die%20ultimative%20lobhudelei%20:))">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-07-27 17:07:21</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>oookay :) some recent ramblings on c.s.c. made me look at my compiler 
+testsuite again, i have updated it a bit and i ran it on the latest snapshot 
+in various configurations (c89/c99/cc65 standard that is). i also added a few 
+more tests that check certain things that were reported as bugs in older 
+versions. and guess what? 2.12.9 gloriously passes *every single test*, 
+including some of the weird ones that exposed some bugs in earlier versions. 
+(and for giggles: including one test that gcc manages to screw up, depending 
+on optimization settings). thats awesome, really. many thanks and much 
+respect to Uz, and everyone else involved in bringing the compiler to this 
+state.
+
+i will put up a webpage some time later with the detailed reports, i'd like to 
+add even more tests - and atleast one that breaks something :) - before 
+though, since right now the results are a bit &quot;boring&quot; =P (btw, if someone 
+knows any regression test collections other than what sdcc and lcc comes 
+with - i have included those already - point me to them please)
+
+... and then said ramblings on usenet mentioned dhrystone.c, which made me 
+curious enough to compile it with cc65 too :) and again, the outcome looks 
+totally awesome. check this:
+
+MACHINE     MICROPROCESSOR      OPERATING       COMPILER      DHRYSTONES/SEC.
+TYPE                            SYSTEM                        NO REG    REGS
+--------------------------	------------	-----------	---------------
+Commodore 64  6510-1Mhz       C64 ROM         C Power 2.9 trim    19     34
+Commodore 64  6510-1MHz       C64 ROM         C Power 2.8         36     36
+Apple IIe     65C02-1.02Mhz   DOS 3.3         Aztec CII v1.05i    37     37
+Commodore128  8502-2Mhz       C128 ROM        C Power 128  trim   43     68
+Commodore 64  6510-0.98MHz    C64 ROM         cc65 2.12.9         50     52
+Home Brew     Z80-4.00Mhz     CPM-80          Hisoft C++          53     53
+Home Brew     Z80-2.5Mhz      CPM-80 v2.2     Aztec CII v1.05g    91     91
+Commodore128  8502-2Mhz       C128 ROM        cc65 2.12.9        100    105
+
+(this is compiled with -Osir, which i think is fair enough considering what 
+kind of optimizations other compilers do even at very conservative 
+optimization levels. the numbers drop by less than 5 points when using -O 
+only, so its still very good even then)
+
+as a sidenote: interisting how the worst compiler gains most from using 
+register variables, and the best compilers gain very little :)
+
+-- 
+
+<a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    <a href="http://magicdisk.untergrund.net">http://magicdisk.untergrund.net</a>
+<a href="http://www.pokefinder.org">http://www.pokefinder.org</a>        <a href="http://ftp.pokefinder.org">http://ftp.pokefinder.org</a>
+
+In a society in which there is no law, and in theory no compulsion, the only 
+arbiter of behaviour is public opinion. But public opinion, because of the 
+tremendous urge to conformity in gregarious animals, is less tolerant than 
+any system of law. When human beings are governed by &quot;thou shalt not,&quot; the 
+individual can practice a certain amount of eccentricity; when they are 
+supposedly governed by &quot;love&quot; or &quot;reason,&quot; he is under continuous pressure to 
+make him behave exactly the same way as everyone else. 
+&lt;George Orwell&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Jul 27 17:07:31 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6617.html" title="Next message in the list">Groepaz: "Re: [cc65] &quot;overlay&quot; files"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6615.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Feature request: default arguments for functions."</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6619.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] testsuite reloaded (die ultimative lobhudelei :))"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6619.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] testsuite reloaded (die ultimative lobhudelei :))"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6616" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6616" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6616" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-07-27 17:07:34 CEST
+</em></small></p>
+</body>
+</html>

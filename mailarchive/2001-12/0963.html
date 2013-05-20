@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[4]: [cc65] Compile problem</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[4]: [cc65] Compile problem">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[4]: [cc65] Compile problem</h1>
+<!-- received="Mon Dec 10 20:04:58 2001" -->
+<!-- isoreceived="20011210190458" -->
+<!-- sent="Mon, 10 Dec 2001 20:03:48 +0100" -->
+<!-- isosent="20011210190348" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[4]: [cc65] Compile problem" -->
+<!-- id="236794992.20011210200348@gmx.net" -->
+<!-- inreplyto="200112101811.TAA15729@color.sics.se" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[4]:%20[cc65]%20Compile%20problem"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2001-12-10 20:03:48
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0964.html">Adam Dunkels: "Re: [cc65] Compile problem"</a>
+<li><strong>Previous message:</strong> <a href="0962.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<li><strong>In reply to:</strong> <a href="0960.html">Adam Dunkels: "Re: Re[2]: [cc65] Compile problem"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0964.html">Adam Dunkels: "Re: [cc65] Compile problem"</a>
+<li><strong>Reply:</strong> <a href="0964.html">Adam Dunkels: "Re: [cc65] Compile problem"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Adam,
+
+Monday, December 10, 2001, 7:11:16 PM, you wrote:
+
+AD&gt; Being able to type &quot;make&quot; in an arbitrary directory and hope to rebuild the
+AD&gt; right files for the right just doesn't work. If you use GNU make, you can 
+AD&gt; specify a working directory, however, with &quot;gmake -C /adam/project&quot;. Perhaps 
+AD&gt; this is the closest thing to your needs?
+
+no, using -C isnt exactly the solution either (it would require
+entering another path specific to your local machine)
+
+AD&gt; I think that the behavour that ca65/cc65 exhibits is the more common
+AD&gt; behaviour. I haven't come across any compilers that lets you specify &quot;include 
+AD&gt; file relative to where this file lives&quot; (but then I haven't come across very 
+AD&gt; many compilers).  The common behaviour is that #include files are searched 
+AD&gt; relative to all -I paths and some default paths (., /usr/include and friends 
+AD&gt; as well as a few others).
+
+eh? just try this... create 2 .h files in the same directory, let one
+of them include the other using its filename ONLY. now create a .c
+file somewhere else in your filesystem and include the previous .h
+file (the one that includes the other that is ;=)) using a relative
+path.
+
+try compiling the latter file - this works for me on a dozen of
+compilers (well all i have currently installed, except turbo-c (and
+cc65 obviously) ;D)
+
+however, i was referring to the ca65 assembler alone anyway (dunno if
+that makes any difference though)
+
+AD&gt; CFLAGS = -I../src/include -I../src/arch/cc65/include -I../src/include/ipv4
+
+AD&gt; This way, all includes are kept in diffrent directories and the paths are 
+AD&gt; relative to the makefile and not to the root of the filesystem.
+
+this makes another assumption though...that is cc65 beeing installed
+at a specific location. mmmmh
+
+however, trying relative paths in the -I line might be a working
+solution for what i want to do... didnt think of that :o)
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[4]:%20[cc65]%20Compile%20problem">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[4]:%20[cc65]%20Compile%20problem">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0964.html">Adam Dunkels: "Re: [cc65] Compile problem"</a>
+<li><strong>Previous message:</strong> <a href="0962.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<li><strong>In reply to:</strong> <a href="0960.html">Adam Dunkels: "Re: Re[2]: [cc65] Compile problem"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0964.html">Adam Dunkels: "Re: [cc65] Compile problem"</a>
+<li><strong>Reply:</strong> <a href="0964.html">Adam Dunkels: "Re: [cc65] Compile problem"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:44 CET</em>
+</em>
+</small>
+</body>
+</html>

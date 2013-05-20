@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Atari Library dosdetect.s</title>
+<meta name="Author" content="Shawn Jefferson (jefferson_shawn_a8bit1yahoo.com)" />
+<meta name="Subject" content="[cc65] Atari Library dosdetect.s" />
+<meta name="Date" content="2007-03-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Atari Library dosdetect.s</h1>
+<!-- received="Sun Mar 25 03:01:17 2007" -->
+<!-- isoreceived="20070325010117" -->
+<!-- sent="Sat, 24 Mar 2007 18:01:03 -0700" -->
+<!-- isosent="20070325010103" -->
+<!-- name="Shawn Jefferson" -->
+<!-- email="jefferson_shawn_a8bit1yahoo.com" -->
+<!-- subject="[cc65] Atari Library dosdetect.s" -->
+<!-- id="002201c76e79$0fd27f20$fade4418@ORANGE2" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5659.html" title="Andreas Koch: &quot;[cc65] Character encoding - configurable?&quot;">Next message</a> ]
+[ <a href="5657.html" title="Karri Kaksonen: &quot;[cc65] Makefiles for large projects&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5662.html" title="Christian Groessler: &quot;Re: [cc65] Atari Library dosdetect.s&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Shawn Jefferson &lt;<a href="mailto:jefferson_shawn_a8bit1yahoo.com?Subject=Re:%20[cc65]%20Atari%20Library%20dosdetect.s">jefferson_shawn_a8bit1yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-03-25 03:01:03</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+I'm working on a project where it would be nice to be
+able to detect when I'm running with NODOS.  I noticed
+that the Atari library defaults to ATARIDOS when it
+can't detect the DOS.  Could a change similiar to what
+I've done below be made?
+
+The following files would need changes (as far as I
+can tell): dosdetect.s, getargs.s getdefdev.s
+
+With dosdetect.s I tested running from the Atarimax
+Maxflash cartridge and from MyPicoDOS, both report
+NODOS for _dos_type.  If a DOS does exist (and I
+tested about 10 different DOS versions), there will
+always be $00 $07 in $702/$703.  It would be nice to
+detect other versions of DOS, but the overhead might
+not be worth it, since dosdetect is always linked in. 
+There are subtle differences in the the $700-70F area
+that might help if a &quot;bigger&quot; dosdetect were to be
+written.
+
+dosdetect.s:
+;
+; Freddy Offenga &amp; Christian Groessler, June 2004
+;
+; detect the DOS version we're running on
+;
+
+	.include        &quot;atari.inc&quot;
+	.constructor    detect,26
+	.export         __dos_type
+
+;
+------------------------------------------------------------------------
+; DOS type detection
+
+.segment        &quot;INIT&quot;
+
+detect: lda     $703
+	cmp     #7
+	bne     nodos
+
+	lda     #ATARIDOS
+	sta     __dos_type      ; set default
+
+	lda     DOS
+	cmp     #'S'            ; SpartaDOS
+	beq     spdos
+	cmp     #'M'            ; MyDOS
+	beq     mydos
+
+	ldy     #COMTAB
+	lda     #$4C
+	cmp     (DOSVEC),y
+	bne     done
+
+	ldy     #ZCRNAME
+	cmp     (DOSVEC),y
+	bne     done
+
+	ldy     #6              ; OS/A+ has a jmp here
+	cmp     (DOSVEC),y
+	beq     done
+	lda     #OSADOS
+	sta     __dos_type
+	rts
+
+nodos:  lda     #NODOS
+	sta     __dos_type
+	rts
+
+spdos:  lda     #SPARTADOS
+	sta     __dos_type
+	rts
+
+mydos:  lda     #MYDOS
+	sta     __dos_type
+done:   rts
+
+;
+------------------------------------------------------------------------
+; Data
+
+	.bss
+
+__dos_type:     .res    1
+
+getargs.s (only changes I made):
+	lda     __dos_type      ; which DOS?
+	cmp     #ATARIDOS
+	beq     nargdos         ; DOS does not support
+arguments
+	cmp     #NODOS
+	beq     nargdos
+	cmp     #MYDOS
+	bne     argdos          ; DOS supports arguments
+nargdos:rts
+
+getdefdev.s (only changes I made):
+	lda     __dos_type      ; which DOS?
+	cmp     #ATARIDOS
+	beq     finish
+	cmp     #MYDOS
+	beq     finish
+	cmp     #NODOS
+	beq     finish
+
+With getargs.s and getdefdev.s, it might be better to
+check for the existence of a DOS and branch based on
+that (only two I think support those features?
+SpartaDOS and OSA)
+
+
+
+ 
+____________________________________________________________________________
+________
+Never miss an email again!
+Yahoo! Toolbar alerts you the instant new Mail arrives.
+<a href="http://tools.search.yahoo.com/toolbar/features/mail/">http://tools.search.yahoo.com/toolbar/features/mail/</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Mar 25 03:01:17 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5659.html" title="Next message in the list">Andreas Koch: "[cc65] Character encoding - configurable?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5657.html" title="Previous message in the list">Karri Kaksonen: "[cc65] Makefiles for large projects"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5662.html" title="Next message in this discussion thread">Christian Groessler: "Re: [cc65] Atari Library dosdetect.s"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5662.html" title="Message sent in reply to this message">Christian Groessler: "Re: [cc65] Atari Library dosdetect.s"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5658" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5658" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5658" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-03-25 03:01:20 CEST
+</em></small></p>
+</body>
+</html>

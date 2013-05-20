@@ -1,0 +1,139 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] Emulator/Debugger</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="[cc65] Emulator/Debugger">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] Emulator/Debugger</h1>
+<!-- received="Tue Feb 12 19:34:51 2002" -->
+<!-- isoreceived="20020212183451" -->
+<!-- sent="Tue, 12 Feb 2002 19:34:55 +0100" -->
+<!-- isosent="20020212183455" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="[cc65] Emulator/Debugger" -->
+<!-- id="20020212193455.A8784@trixie.musoftware.de" -->
+<!-- inreplyto="5924710833.20020212164743@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Emulator/Debugger"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-02-12 19:34:55
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1080.html">Mike McCarty: "Re: Re[2]: [cc65] library header bug correction - and some compiler hazzle"</a>
+<li><strong>In reply to:</strong> <a href="1078.html">groepaz: "Re[2]: [cc65] library header bug correction - and some compiler hazzle"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1089.html">groepaz: "Re: [cc65] Emulator/Debugger"</a>
+<li><strong>Next in thread:</strong> <a href="1079.html">MagerValp: "Re: [cc65] library header bug correction - and some compiler hazzle"</a>
+<li><strong>Reply:</strong> <a href="1089.html">groepaz: "Re: [cc65] Emulator/Debugger"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Tue, Feb 12, 2002 at 04:47:43PM +0100, groepaz wrote:
+&gt; mmmmh, dunno about that (nor do i really care :=P) but i took that
+&gt; testsuite from some lcc-distribution .zip (jolze's 65816 port
+&gt; actually) so i guess its under gpl aswell.....
+
+Large parts of the authors web pages are currently unaccessible, but as far as
+I remember lcc is not GPLed.
+
+&gt; however, since the testsuite is probably not interisting for most ppl
+&gt; anyway (except taking its programs as examples for own work) it
+&gt; shouldnt hurt to distribute it seperatly anyway.
+
+It would be nice to make it part of the source package, so people working with
+the compiler would be able to run the test suite.
+
+&gt; however, actually another project of mine is a retargetable debugger,
+[..]
+
+For now, rr.exex seems to have some problems. When trying to start it, I get
+
+    warning: couldn't find .ini file rrrr.ini
+    error in ini file : couldnt find section port
+
+Interestingly, the name of the ini file changes with the command line. If I do
+not execute &quot;rr&quot; but &quot;rr.exe&quot;, I get the following:
+
+    warning: couldn't find .ini file rr.exerr.ini
+    error in ini file : couldnt find section port
+
+So I renamed rr.ini --&gt; rrrr.ini and tried again. This time I get
+
+    couldnt change screensize to 80x50
+
+Next try: I started a new command line interpreter (cmd.exe instead of
+4nt.exe). Now I do get a blue screen with a header and a footer line, but the
+program does not accept any keys.
+
+Operating system was Windows NT 4.0 (english version).
+
+&gt; mmmh since my knowledge in programming any network stuff is less than
+&gt; zero, some other guy gotta implement this :=P
+
+TCP sockets are rather easy to do and they are more portable than named pipes
+and similar stuff.
+
+&gt; now my question is, WHAT embedded hardware is that with a 6502 inside?
+
+It depends. But I know definitely, that several people are using cc65 together
+with embedded or home made hardware, some of them are actually on this list:-)
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Emulator/Debugger">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Emulator/Debugger">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1080.html">Mike McCarty: "Re: Re[2]: [cc65] library header bug correction - and some compiler hazzle"</a>
+<li><strong>In reply to:</strong> <a href="1078.html">groepaz: "Re[2]: [cc65] library header bug correction - and some compiler hazzle"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1089.html">groepaz: "Re: [cc65] Emulator/Debugger"</a>
+<li><strong>Next in thread:</strong> <a href="1079.html">MagerValp: "Re: [cc65] library header bug correction - and some compiler hazzle"</a>
+<li><strong>Reply:</strong> <a href="1089.html">groepaz: "Re: [cc65] Emulator/Debugger"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-02-12 19:34:57 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Floating point support</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Floating point support">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Floating point support</h1>
+<!-- received="Wed May 22 21:01:30 2002" -->
+<!-- isoreceived="20020522190130" -->
+<!-- sent="Wed, 22 May 2002 21:01:35 +0200" -->
+<!-- isosent="20020522190135" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Floating point support" -->
+<!-- id="20020522210135.B27678@trixie.musoftware.de" -->
+<!-- inreplyto="8711985158.20020522151501@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Floating%20point%20support"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-05-22 21:01:35
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1382.html">groepaz: "Re: [cc65] Char set questions"</a>
+<li><strong>In reply to:</strong> <a href="1378.html">groepaz: "Re: [cc65] Floating point support"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1389.html">groepaz: "Re[2]: [cc65] Floating point support"</a>
+<li><strong>Next in thread:</strong> <a href="1360.html">Christian Krüger: "Re: [cc65] statics in zero page"</a>
+<li><strong>Reply:</strong> <a href="1389.html">groepaz: "Re[2]: [cc65] Floating point support"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Wed, May 22, 2002 at 03:15:01PM +0200, groepaz wrote:
+&gt; so you are saying that for example a grafics-library should contain
+&gt; only portable routines, and one target-specific setpixel routine?
+&gt; and if not, please explain whats different between that and the floats
+&gt; coz i just dont get it.
+
+The difference is that the graphics interface is not covered by a standard
+while floating point arithmetic is.
+
+&gt; we arent talking about writing a portable program (and yes i agree to
+&gt; what you were saying when it comes to that), we are talking about
+&gt; writing libraries used to compile the portable program =&gt; totally
+&gt; different thing.
+
+When talking about C, portability means adhering to the standard. If libraries
+differ from the standard they are not portable.
+
+[writing a fp library]
+&gt; yeah, a theoretically nice, but practically unuseable solution. slow
+&gt; and large.... sounds like windoze(tm) to me ;=P
+
+So where is the proof that the ROM routines are faster than something written
+by someone else? Steve Judd once mentioned that he was writing a floating
+point library, and I would bet a craddle of beer against a bottle of mineral
+water that his routines would blow the C64 ROM routines to pieces (speedwise).
+The space argument is more valid, but I will not judge about that before I've
+seen how large such floating point routines would be.
+
+&gt; the point is, theres no point in makeing _the library_ portable -
+&gt; except for the heck of it.
+
+A portable library means that the interface is portable. A portable interface
+means an interface that adheres to the C standard. And the ROM routines do NOT
+adhere to the C standard, so they are NOT portable.
+
+&gt; i would however prefer a compiler that produces the best code possible
+&gt; - not one whose libraries sourcecode looks most beautiful. thats just
+&gt; a non argument.
+
+Doing floating point on a 6502 system is stupid anyway, no serious program
+will use it. And the not so serious programs will not be hurt by the few
+additional bytes needed.
+
+&gt; i disassembled the entire kernal routines for that matter... those are
+&gt; large and slow already, and they provide less accuracy then IEE would
+&gt; require.
+
+Are you sure about that? As far as I know, both the CBM implementation and the
+IEEE 32 bit format have an almost identical precision, the differences are in
+the internal representation, and some border conditions.
+
+&gt; whythehell would i
+&gt; even consider using IEE floats here? to bloat my code and make it 10
+&gt; times slower?
+
+Maybe you can explain how you come to these numbers? I hear you talking, but I
+start wondering if we are talking about the same thing :-)
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Floating%20point%20support">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Floating%20point%20support">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1382.html">groepaz: "Re: [cc65] Char set questions"</a>
+<li><strong>In reply to:</strong> <a href="1378.html">groepaz: "Re: [cc65] Floating point support"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1389.html">groepaz: "Re[2]: [cc65] Floating point support"</a>
+<li><strong>Next in thread:</strong> <a href="1360.html">Christian Krüger: "Re: [cc65] statics in zero page"</a>
+<li><strong>Reply:</strong> <a href="1389.html">groepaz: "Re[2]: [cc65] Floating point support"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-05-22 21:01:50 CEST</em>
+</em>
+</small>
+</body>
+</html>

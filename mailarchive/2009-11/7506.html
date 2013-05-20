@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Splitting crt0.s files in </title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Splitting crt0.s files in two?" />
+<meta name="Date" content="2009-11-05" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Splitting crt0.s files in two?</h1>
+<!-- received="Thu Nov  5 16:49:09 2009" -->
+<!-- isoreceived="20091105154909" -->
+<!-- sent="Thu, 5 Nov 2009 16:47:55 +0100" -->
+<!-- isosent="20091105154755" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Splitting crt0.s files in two?" -->
+<!-- id="20091105154755.GA4014@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="525517.19359.qm&#64;web56506.mail.re3.yahoo.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7507.html" title="Fatih Aygün: &quot;Re: [cc65] Splitting crt0.s files in two?&quot;">Next message</a> ]
+[ <a href="7505.html" title="Karri Kaksonen: &quot;Re: [cc65] Splitting crt0.s files in two?&quot;">Previous message</a> ]
+[ <a href="7500.html" title="Fatih Aygün: &quot;[cc65] Splitting crt0.s files in two?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7507.html" title="Fatih Aygün: &quot;Re: [cc65] Splitting crt0.s files in two?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Splitting%20crt0.s%20files%20in%20two?">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-11-05 16:47:55</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Thu, Nov 05, 2009 at 03:04:39AM -0800, Fatih AygÃ¼n wrote:
+&gt; The first scenario is: I want to write a non-C assembly program. I end up writing an EXE header and footer,
+&gt; which I basically copy from crt0.s. If the header/footer were in a separate file, I would just link that and forget
+&gt; about it.
+
+I cannot see a real advantage here. For an assembly program, the complete code
+in the startup file is almost useless. And when using a header from somewhere,
+you need a matching linker config and program entry point. In addition, you
+will have to tell the linker to add the header from the library. All this
+together is probably too much for any casual ca65 user.
+
+If this were a real advantage, why has no one before used this approach? It is
+up to you, to write a small module that contains the header in a special
+segment, write a matching linker config and use this as a base for your
+assembler programs. Instead everyody (including me!) just writes the necessary
+header bytes on top of the assembler file, because this is so much simpler.
+
+&gt; The second scenario is: I want to write a C program but I want to use another binary format. Like a bootable
+&gt; disk image, a cartridge image or whatever. I write a custom linker config, I copy the start-up file, I change it
+&gt; so that it creates the header/footer for my binary format. If the C run-time initialization code were in a separate file
+&gt; I would just write the config and binary header, and link to the library as usual. Moreover, it could be possible
+&gt; to supply some alternative config files and header/footer files with the cc65 package for some often used
+&gt; binary formats.
+
+Again, I cannot see that a real advantage here. A disk image is usually
+created by other tools than ld65. A cartridge needs a new startup code anyway,
+because initialization differs. So you have to change the startup code. And
+when doing so, it's just 5 seconds to replace the SYS header by a &quot;CBM80&quot;
+string or whatever.
+
+You're probably right if you say, that alternative startup files, for example
+for ROM cartridges, would a an idea worth thinking about. But I cannot see a
+real reason for splitting up the startup files.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Nov  5 16:49:09 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7507.html" title="Next message in the list">Fatih Aygün: "Re: [cc65] Splitting crt0.s files in two?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7505.html" title="Previous message in the list">Karri Kaksonen: "Re: [cc65] Splitting crt0.s files in two?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7500.html" title="Message to which this message replies">Fatih Aygün: "[cc65] Splitting crt0.s files in two?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7507.html" title="Next message in this discussion thread">Fatih Aygün: "Re: [cc65] Splitting crt0.s files in two?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7507.html" title="Message sent in reply to this message">Fatih Aygün: "Re: [cc65] Splitting crt0.s files in two?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7506" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7506" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7506" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-11-05 16:49:13 CET
+</em></small></p>
+</body>
+</html>

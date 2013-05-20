@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Filenames for POSIX functi</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Filenames for POSIX functins on CBM targets" />
+<meta name="Date" content="2012-08-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Filenames for POSIX functins on CBM targets</h1>
+<!-- received="Fri Aug 10 13:43:55 2012" -->
+<!-- isoreceived="20120810114355" -->
+<!-- sent="Fri, 10 Aug 2012 13:43:37 +0200" -->
+<!-- isosent="20120810114337" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Filenames for POSIX functins on CBM targets" -->
+<!-- id="CACT=u735=S-LcihHk+c6DyyCtP-_+ancJ_P2_uFhUToy1UAhVw@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20120809212350.GA22822&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10589.html" title="Oliver Schmidt: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">Next message</a> ]
+[ <a href="10587.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">Previous message</a> ]
+[ <a href="10581.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10592.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Filenames%20for%20POSIX%20functins%20on%20CBM%20targets">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-08-10 13:43:37</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt; We had this discussion several times.
+
+I know.
+
+&gt; As you can see from the discussion that
+&gt; comes up (again), the issue is unsatisfactory but a proper solution is
+&gt; complex.
+
+Maybe there's a sweet spot between &quot;all&quot; and &quot;nothing&quot;
+
+&gt;   * We want to be able to specify subdirectories.
+
+That sort of surprises me. I seem to remember that your position
+usually was (is ?) that optional add-ons to a target (be it software
+or hardware) are not entitled to be supported by the C library. So if
+they don't fall into a category supported by loadable drivers they're
+out of luck.
+
+&gt;   * There are already kernal replacements that use a special syntax for both.
+&gt;
+&gt;   * Everybody has his pet syntax for this purpose.
+
+A missing standard is from my perspective no excuse to not support it at all.
+
+&gt;   * Most people have just one floppy (#8) and won't really benefit, but will
+&gt;     have to pay the price (= memory) for a complex file name parser.
+
+Hm, I personally can't judge on that. But I remember well that I got
+quite a lot negative feedback on Contiki in several forums for not
+supporting other unit numbers than #8. That negative feedback was the
+reason why we changed _curunit from being initialized to #8 to being
+initialized from ZP location $BA (?). So I have at least an indication
+that there's a real world need for other unit numbers. And I don't
+think that people asking for something different than #8 don't have
+something connected to #8. From that presumption I deduct that unit
+selection is useful.
+
+&gt;   * CBM people are used to specify the device number separately.
+
+Surely. But they are as well used to C64 specific programs written in
+asm. Here we're about C programs - that at least I like to be
+cross-target. And from that cross-target perspective it is obligatory
+that a single string can represent all potential file locations.
+
+If we want to go cross-target we sometimes need to move away from what
+people are used to. An example: On the Apple II drives are specified
+by a slot (1-7) and a drive (0-1). But the cc65 dio API identifies a
+drive by a single number. So I &quot;invented&quot; a mapping and documented it:
+<a href="http://www.cc65.org/snapshot-doc/apple2-9.html#ss9.3">http://www.cc65.org/snapshot-doc/apple2-9.html#ss9.3</a>
+
+&gt; A special,
+&gt;     cc65 only syntax will confuse most users more than it helps.
+
+Es long as a simple filename without unit and/or drive specification
+still works as before a can't see any harm done - beside C libary code
+increase. But that increase might be smaller than i.e. the special
+handling for opendir() inserted in open() - and opendir() isn't much
+used either...
+
+Okay, now for some - maybe naive - thoughts:
+
+Currently we have something like &quot;1#abc.txt&quot;. So if that is clearly
+understood to mean file &quot;abc.txt&quot; on drive 0 then I have a hard time
+to see why &quot;8#1#abc.txt&quot; couldn't be as well understood as file
+&quot;abc.txt&quot; on unit 8 on drive 0. The (maybe a little hacky idea) would
+be to allow only units 2-15(?) to be selceted this way.
+
+Examples:
+
+filename = &quot;9#abc.txt&quot;
+- Unit 9
+- *filename+3 processed as today
+
+filename = &quot;8#1#abc.txt&quot;
+- Unit 8
+- *filename+3 processed as today
+
+filename = &quot;0#abc.txt&quot;
+- Default Unit
+- *filename+0 processed as today
+
+filename = &quot;1#9#abc.txt&quot;
+- Invalid filename
+
+I imagine parsing this could be quite compact and having only an
+additional optional prefix allows copy-free processing of the
+remainder.
+
+opendir()/chdir() would work with &quot;8#&quot;, &quot;1#&quot; or &quot;8#1#&quot; and curdir()
+would usually return &quot;8#0#&quot;.
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Aug 10 13:43:55 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10589.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10587.html" title="Previous message in the list">Spiro Trikaliotis: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10581.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10592.html" title="Next message in this discussion thread">silverdr1wfmh.org.pl: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10592.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10594.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10639.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10588" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10588" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10588" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-08-10 13:43:59 CEST
+</em></small></p>
+</body>
+</html>

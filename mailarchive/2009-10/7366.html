@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Colormania (was: TGI summa</title>
+<meta name="Author" content="Daniel Serpell (daniel.serpell1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] Colormania (was: TGI summary)" />
+<meta name="Date" content="2009-10-28" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Colormania (was: TGI summary)</h1>
+<!-- received="Wed Oct 28 00:12:33 2009" -->
+<!-- isoreceived="20091027231233" -->
+<!-- sent="Tue, 27 Oct 2009 20:12:26 -0300" -->
+<!-- isosent="20091027231226" -->
+<!-- name="Daniel Serpell" -->
+<!-- email="daniel.serpell1gmail.com" -->
+<!-- subject="Re: [cc65] Colormania (was: TGI summary)" -->
+<!-- id="f0796bb70910271612x260c339at32f8d86acd3292f4@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20091027193731.GB14559&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7367.html" title="Shawn Jefferson: &quot;RE: [cc65] Colormania (was: TGI summary)&quot;">Next message</a> ]
+[ <a href="7365.html" title="Jonathan Graham Harston: &quot;[cc65] Re: Atari TGI drivers, finally&quot;">Previous message</a> ]
+[ <a href="7357.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Colormania (was: TGI summary)&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7367.html" title="Shawn Jefferson: &quot;RE: [cc65] Colormania (was: TGI summary)&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Daniel Serpell &lt;<a href="mailto:daniel.serpell1gmail.com?Subject=Re:%20[cc65]%20Colormania%20(was:%20TGI%20summary)">daniel.serpell1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-10-28 00:12:26</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Tue, Oct 27, 2009 at 4:37 PM, Ullrich von Bassewitz &lt;uz&#64;musoftware&#46;<!--nospam-->de&gt; wrote:
+&gt;
+&gt; On Tue, Oct 27, 2009 at 04:19:57PM -0300, Daniel Serpell wrote:
+&gt;&gt; The problem with the above is that a program that is designed to
+&gt;&gt; run on the Atari mode 9 normally expects index 0 to be black and
+&gt;&gt; index 15 to be white, with all the 14 grays in between, and this
+&gt;&gt; mapping will break the expectations.
+&gt;
+&gt; I cannot see a problem with that, since cc65 is not (any more) an Atari
+&gt; compiler. For a casual programmer, it is probably more important to have a
+&gt; program run on another machine without much trouble. An Atari hardcode
+&gt; programmer on the other side has no problem to change the palette.
+&gt;
+
+But then, having a tgi driver for mode 9 has little sense, better use one of
+the other modes (hires of 4-color).
+
+&gt;&gt; Perhaps a new api could be designed modeled on, for example,
+&gt;&gt; how X11 works:
+&gt;
+&gt; Please come back to the ground:-) We're talking about 6502 machines with some
+&gt; 10KB of memory. And TGI is the &quot;Tiny Graphics Interface&quot;. It was designed to
+&gt; dive into simple graphics programming rather quickly. It was never designed as
+&gt; a competitor to OpenGL or DirectX.
+
+Yes, I know :-)
+
+But perhaps a simpler implementation, using the color definitions
+can be implemented, like:
+
+unsigned char black = tgi_alloc_color(COLOR_BLACK);
+unsigned char white = tgi_alloc_color(COLOR_WHITE);
+// ....
+
+Then, the implementation is only a few bytes:
+
+   ; See if the color is already allocated
+   ldx #0
+SEARCH:
+   cmp PALETTE,x
+   beq  OK
+   inx
+   cpx ALOC_COLORS
+   bne SEARCH
+   ; Color not allocated already.
+   cpx #MAX_COLORS
+   beq ERR ; No more palette entries available
+   sta PALETTE,x
+   ; Now, set the palette ... hardware dependent
+   inc ALOC_COLORS
+OK:
+   txa
+   rts
+ERR:
+   lda #255 ; Return 255 on error
+   rts
+
+So, it's about 30 bytes for the full definition. And instead of
+a tgi_free_color, simply a &quot;tgi_free_all_colors&quot; that sets ALOC_COLORS
+back to 0.
+
+Also, in Atari, the already existing COLOR_XXX macros list
+palette color values, so the implementation above is complete
+if using the OS shadow palette registers as PALETTE.
+
+    Daniel.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Oct 28 00:12:33 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7367.html" title="Next message in the list">Shawn Jefferson: "RE: [cc65] Colormania (was: TGI summary)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7365.html" title="Previous message in the list">Jonathan Graham Harston: "[cc65] Re: Atari TGI drivers, finally"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7357.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Colormania (was: TGI summary)"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7367.html" title="Next message in this discussion thread">Shawn Jefferson: "RE: [cc65] Colormania (was: TGI summary)"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7366" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7366" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7366" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-10-28 00:12:36 CET
+</em></small></p>
+</body>
+</html>

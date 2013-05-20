@@ -1,0 +1,137 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Detecting first free byte</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Detecting first free byte of RAM?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Detecting first free byte of RAM?</h1>
+<!-- received="Sat Mar 17 23:27:44 2001" -->
+<!-- isoreceived="20010317222744" -->
+<!-- sent="Sat, 17 Mar 2001 23:27:53 +0100" -->
+<!-- isosent="20010317222753" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Detecting first free byte of RAM?" -->
+<!-- id="20010317232753.A19279@trixie.musoftware.de" -->
+<!-- inreplyto="3.0.3.32.20010317154735.007e09ac@pop.radiks.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Detecting%20first%20free%20byte%20of%20RAM?"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2001-03-17 23:27:53
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0447.html">BlackJack/Civitas: "Re: [cc65] Detecting first free byte of RAM?"</a>
+<li><strong>Previous message:</strong> <a href="0445.html">Jim Lawless: "[cc65] Detecting first free byte of RAM?"</a>
+<li><strong>In reply to:</strong> <a href="0445.html">Jim Lawless: "[cc65] Detecting first free byte of RAM?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0447.html">BlackJack/Civitas: "Re: [cc65] Detecting first free byte of RAM?"</a>
+<li><strong>Reply:</strong> <a href="0447.html">BlackJack/Civitas: "Re: [cc65] Detecting first free byte of RAM?"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+					     
+On Sat, Mar 17, 2001 at 03:47:35PM -0600, Jim Lawless wrote:
+&gt; I'm using CC65 for C64 coding.  How does one detect the first unused
+&gt; byte of RAM?  ( I'd like to define some variables, then use the rest
+&gt; of the C64's RAM as a continguous block of memory. )
+
+There are several possible solutions. The first one would be to use a short
+assembler file like this:
+
+	.export	_freemem;
+	.import __BSS_RUN__, __BSS_SIZE__
+	_freemem = __BSS_RUN__ + __BSS_SIZE__
+
+In C, you use
+
+      	extern unsigned char freemem[];
+
+freemem[0] is then the first byte of the free memory area.
+
+Please note that you may not use malloc/free with this method, because these
+routines will also use the free memory between the BSS and stack.
+
+Which brings me to the second method: Just use malloc() and free() to allocate
+memory from the heap (which is the memory not used by the program). Calling
+
+      	unsigned char* Buf = malloc (256);
+
+will allocate a block of 256 bytes (if possible) and place it's address into
+Buf.
+
+A third, dirty and non-portable method that is similar to the first one would
+be to access the variables used to implement the heap:
+
+      	extern unsigned char* _horg;
+      	extern unsigned char* _hend;
+
+_horg contains the address of the first byte of free memory, _hend contains
+the last byte, so
+
+      	unsigned freespace = (_hend - _horg);
+
+will calculate the amount of free space.
+
+Note that this method may stop working with any future compiler release, since
+in theory you're not allowed to access reserved identifiers used by the
+implementation. So I would avoid using this method for any serious program.
+And: This method will also collide with the heap routines.
+
+Regards
+
+
+	Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Detecting%20first%20free%20byte%20of%20RAM?">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Detecting%20first%20free%20byte%20of%20RAM?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0447.html">BlackJack/Civitas: "Re: [cc65] Detecting first free byte of RAM?"</a>
+<li><strong>Previous message:</strong> <a href="0445.html">Jim Lawless: "[cc65] Detecting first free byte of RAM?"</a>
+<li><strong>In reply to:</strong> <a href="0445.html">Jim Lawless: "[cc65] Detecting first free byte of RAM?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0447.html">BlackJack/Civitas: "Re: [cc65] Detecting first free byte of RAM?"</a>
+<li><strong>Reply:</strong> <a href="0447.html">BlackJack/Civitas: "Re: [cc65] Detecting first free byte of RAM?"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:39 CET</em>
+</em>
+</small>
+</body>
+</html>

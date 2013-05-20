@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Odd problems creating a ne</title>
+<meta name="Author" content="L. Adamson (leaf1dizzydragon.net)" />
+<meta name="Subject" content="Re: [cc65] Odd problems creating a new target." />
+<meta name="Date" content="2012-06-24" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Odd problems creating a new target.</h1>
+<!-- received="Sun Jun 24 04:00:18 2012" -->
+<!-- isoreceived="20120624020018" -->
+<!-- sent="Sat, 23 Jun 2012 21:59:57 -0400" -->
+<!-- isosent="20120624015957" -->
+<!-- name="L. Adamson" -->
+<!-- email="leaf1dizzydragon.net" -->
+<!-- subject="Re: [cc65] Odd problems creating a new target." -->
+<!-- id="CACz_Yz3w=45a6J+oMkKj92=eHVYEr35YQk4q=9J2E6Ed-a9Yaw@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20120623214826.GA11374&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10390.html" title="Oliver Schmidt: &quot;Re: [cc65] Odd problems creating a new target.&quot;">Next message</a> ]
+[ <a href="10388.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Odd problems creating a new target.&quot;">Previous message</a> ]
+[ <a href="10388.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Odd problems creating a new target.&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10390.html" title="Oliver Schmidt: &quot;Re: [cc65] Odd problems creating a new target.&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: L. Adamson &lt;<a href="mailto:leaf1dizzydragon.net?Subject=Re:%20[cc65]%20Odd%20problems%20creating%20a%20new%20target.">leaf1dizzydragon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-06-24 03:59:57</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Sat, Jun 23, 2012 at 5:48 PM, Ullrich von Bassewitz &lt;uz&#64;musoftware&#46;<!--nospam-->de&gt;wrote:
+
+&gt; On Sat, Jun 23, 2012 at 05:34:37PM -0400, L. Adamson wrote:
+&gt; &gt;     I'm fairly certain that the problem is somewhere in my
+&gt; &gt;    code, or something I'm not doing that I should be, rather than some
+&gt; kind
+&gt; &gt;    of incompatibility.
+&gt;
+&gt; My suggestion is to lookup the symbol &quot;sp&quot; in the map file. It should
+&gt; reside
+&gt; somewhere in the zero page. The word value at this zero page address is the
+&gt; stack pointer for the C stack. Set a breakpoint at _main in your emulator
+&gt; and
+&gt; check that the address space, sp points to is correct and writable.
+&gt;
+
+Yay!  I got it working!
+
+I'm almost afraid to share what the problem was.  It was really, really
+silly. &gt;_&gt;  Suffice to say, putting the C stack in a 64k high memory map
+doesn't work too well on an emulator that defaults to 8k.  In my defense,
+I'd have expected the emulator to at least complain if missing memory were
+accessed, even if the program continued to run...  &lt;_&lt;
+
+Thank you all again for your assistance.  I hope nobody went haring off on
+too-circuitous a wild goose chase on my behalf!
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Jun 24 04:00:18 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10390.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Odd problems creating a new target."</a></li>
+<li><dfn>Previous message</dfn>: <a href="10388.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Odd problems creating a new target."</a></li>
+<li><dfn>In reply to</dfn>: <a href="10388.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Odd problems creating a new target."</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10390.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Odd problems creating a new target."</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10390.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Odd problems creating a new target."</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10389" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10389" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10389" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-06-24 04:00:23 CEST
+</em></small></p>
+</body>
+</html>

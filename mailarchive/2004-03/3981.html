@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Link Options and Atari Ban</title>
+<meta name="Author" content="Shawn Jefferson (jefferson_shawn_a8bit1yahoo.com)" />
+<meta name="Subject" content="Re: [cc65] Link Options and Atari Bank Switching..." />
+<meta name="Date" content="2004-03-04" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Link Options and Atari Bank Switching...</h1>
+<!-- received="Thu Mar  4 18:06:01 2004" -->
+<!-- isoreceived="20040304170601" -->
+<!-- sent="Thu, 4 Mar 2004 09:05:26 -0800 (PST)" -->
+<!-- isosent="20040304170526" -->
+<!-- name="Shawn Jefferson" -->
+<!-- email="jefferson_shawn_a8bit1yahoo.com" -->
+<!-- subject="Re: [cc65] Link Options and Atari Bank Switching..." -->
+<!-- id="20040304170526.31044.qmail@web41212.mail.yahoo.com" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="3BEAE8F834936647A2D11E7BA875236E0F755D&#64;dlee2k07.itg.ti.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="3982.html" title="Raj Wurttemberg: &quot;[cc65] Anyone awake?&quot;">Next message</a> ]
+[ <a href="3980.html" title="Martin, Chris: &quot;[cc65] Link Options and Atari Bank Switching...&quot;">Previous message</a> ]
+[ <a href="3980.html" title="Martin, Chris: &quot;[cc65] Link Options and Atari Bank Switching...&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Shawn Jefferson &lt;<a href="mailto:jefferson_shawn_a8bit1yahoo.com?Subject=Re:%20[cc65]%20Link%20Options%20and%20Atari%20Bank%20Switching...">jefferson_shawn_a8bit1yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-03-04 18:05:26</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Chris,
+
+&quot;Martin, Chris&quot; &lt;cmartin&#64;ti&#46;<!--nospam-->com&gt; wrote:Hello,
+
+&gt;I have some code that uses the Atari 130XE bank 
+&gt;switching to do some things. In my link.cfg file, I 
+&gt;have basically defined all code to be placed between 
+&gt;the 0x8000 and 0xbc1f address space. However, my code
+
+&gt;has grown to a point where it will no longer fit in 
+&gt;this space. 
+
+I did exactly this with one of my projects.
+
+&gt;I would like to place code in the address spaces:
+&gt;0x2800-0x3fff and 0x8000-0xbc1f. I am not sure 
+&gt;exactly how to break this up.
+
+Here's the linker config file from my project:
+
+MEMORY {
+    ZP: start = $82, size = $7E, type = rw;
+    HEADER: start = $0000, size = $6, file = %O;
+    RAM1: start = $2000, size = $2000, file = %O;
+    BANK: start = $4000, size = $3FFF, type = ro;
+    SECHDR: start = $0000, size = $4, file = %O;
+    RAM2: start = $8000, size = $3C1F, file = %O;
+}
+SEGMENTS {
+    EXEHDR: load = HEADER, type = wprot;
+    CODE: load = RAM1, type = wprot, define = yes;
+    BSS: load = RAM1, type = bss, define = yes;
+    CHKHDR: load = SECHDR, type = wprot;
+    CODE2: load = RAM2, type = wprot, define = yes;
+    DATA: load = RAM2, type = rw;
+    RODATA: load = RAM2, type = wprot;
+    ZEROPAGE: load = ZP, type = zp;
+    AUTOSTRT: load = RAM2, type = wprot, define = yes;
+}
+FEATURES {
+    CONDES: segment = RODATA,
+	    type = constructor,
+	    label = __CONSTRUCTOR_TABLE__,
+	    count = __CONSTRUCTOR_COUNT__;
+    CONDES: segment = RODATA,
+	    type = destructor,
+	    label = __DESTRUCTOR_TABLE__,
+	    count = __DESTRUCTOR_COUNT__;
+}
+SYMBOLS {
+    __STACKSIZE__ = $800;       # 2K stack
+}
+
+Then you can control where code is placed with:
+#pragma codeseg(&quot;CODE2&quot;)
+
+But there are several things you need to watch out
+for:
+
+1. The standard crt0.s file (startup code) calculates
+the BSS segment and the autostart segement assuming
+the standard linker configuration.  That is why my
+segments above are arranged in the manner they are.
+
+2. When the atari loads the file it loads it at the
+start address and loads it contiguously.  You need to
+somehow account for the big space at $4000-7FFF. 
+Luckily the atari can do multiple load segments in one
+file.  That is the point of the SECHDR stuff above.
+
+Here's a file that is linked to my project to
+accomplish that:
+
+    .import __CODE2_LOAD__, __AUTOSTRT_LOAD__
+
+; CHUNK HEADER
+    .segment &quot;CHKHDR&quot;
+    .word __CODE2_LOAD__
+    .word __AUTOSTRT_LOAD__ - 1
+    .code
+    .reloc
+
+My project left the $4000-7FFF area alone so that I
+could use it all for data storage.  If you are going
+to place code there then you will have to do something
+similiar but have some way to load the additional code
+to the extended memory yourself (from an external file
+I think.)  You may be able to make use of the init
+vector of an atari executable for this function
+perhaps... never tried that myself.
+
+
+
+__________________________________
+Do you Yahoo!?
+Yahoo! Search - Find what you’re looking for faster
+<a href="http://search.yahoo.com">http://search.yahoo.com</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Mar  4 18:06:01 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="3982.html" title="Next message in the list">Raj Wurttemberg: "[cc65] Anyone awake?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="3980.html" title="Previous message in the list">Martin, Chris: "[cc65] Link Options and Atari Bank Switching..."</a></li>
+<li><dfn>In reply to</dfn>: <a href="3980.html" title="Message to which this message replies">Martin, Chris: "[cc65] Link Options and Atari Bank Switching..."</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#3981" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#3981" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#3981" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-03-04 18:06:07 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Extended memory</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Extended memory">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Extended memory</h1>
+<!-- received="Thu Nov 21 00:43:30 2002" -->
+<!-- isoreceived="20021120234330" -->
+<!-- sent="Thu, 21 Nov 2002 00:43:29 +0100" -->
+<!-- isosent="20021120234329" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Extended memory" -->
+<!-- id="20021120234329.GA6833@trixie.musoftware.de" -->
+<!-- inreplyto="4416091472.20021120234849@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Extended%20memory"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-11-21 00:43:29
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1754.html">groepaz: "Re[2]: [cc65] Extended memory"</a>
+<li><strong>In reply to:</strong> <a href="1754.html">groepaz: "Re[2]: [cc65] Extended memory"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1757.html">groepaz: "Re[2]: [cc65] Extended memory"</a>
+<li><strong>Next in thread:</strong> <a href="1756.html">groepaz: "[cc65] warez gallore :)"</a>
+<li><strong>Reply:</strong> <a href="1757.html">groepaz: "Re[2]: [cc65] Extended memory"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Wed, Nov 20, 2002 at 11:48:49PM +0100, groepaz wrote:
+&gt; well... i'd say thats the responsibility of the programmer...
+
+Unfortunately, a programmer does not know, which modules from a library
+contain code with these requirements.
+
+&gt; i see 2 possible solutions here...
+[...]
+
+Wait... I forgot, that I did this before and that there is an easy solution:-)
+
+Just place the code that has to go into low memory into a special segment
+(which is always the same, regardless of the module). Then place this segment
+as first segment into the memory area using the linker config. In fact, this
+approach does exactly the same as your suggestion of a &quot;place at the
+beginning&quot; linker command. The C128 uses this solution, since the interrupt
+handler for the RS232 module has to go into low memory.
+
+There is still the problem that the segment can exceed the non banked memory,
+but it is a solution that works with the current capabilities.
+
+&gt; how do you go through the build/install cycle then after having
+&gt; changed stuff in the compiler or library code? i mean... manually
+&gt; going through the directories and typing make and copying stuff to
+&gt; /usr/bin etc pp just isnt really acceptable when there is a shell or
+&gt; make util that could easily do that kinda boring work for me ,=)
+
+There are only two directories: src and libsrc. When I've changed something in
+the libsrc directory, I enter
+
+        (cd ..; make -s c64lib)
+
+and when working on the compiler or any other of the binaries, a simple
+
+        make -f make/gcc.mak
+
+is enough. Since the bash does have the &quot;!&quot; operator to repeat old commands,
+the latter may also be abbreviated as
+
+        !make
+
+Copying stuff into /usr/bin is not needed, and not a good idea. First, I'm
+using the full path to the compiler in my makefiles. Most tests are done in a
+&quot;test&quot; directory that is part of my cc65 tree, and the makefile in this
+directory contains the lines
+
+        SYS	= pet
+
+        CC65_LIB= ../libsrc
+        CRT0   	= $(CC65_LIB)/$(SYS).o
+        CLIB	= $(CC65_LIB)/$(SYS).lib
+        CC     	= ../src/cc65/cc65
+        AS	= ../src/ca65/ca65
+        LD	= ../src/ld65/ld65
+
+Second, it is always better to have the files in /usr/bin managed by a package
+manager. So I'm usually building RPMs when I want to have a new compiler
+version installed systemwide. With the new fresh snapshot RPMs built each
+night, this will become even easier in the future:-)
+
+So this is neither complicated nor boring. Besides that, a top level
+&quot;makefile&quot; could just be a shell script that does
+
+        make -C src -f make/gcc.mak
+        make -C libsrc -s
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Extended%20memory">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Extended%20memory">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1754.html">groepaz: "Re[2]: [cc65] Extended memory"</a>
+<li><strong>In reply to:</strong> <a href="1754.html">groepaz: "Re[2]: [cc65] Extended memory"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1757.html">groepaz: "Re[2]: [cc65] Extended memory"</a>
+<li><strong>Next in thread:</strong> <a href="1756.html">groepaz: "[cc65] warez gallore :)"</a>
+<li><strong>Reply:</strong> <a href="1757.html">groepaz: "Re[2]: [cc65] Extended memory"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-11-21 00:43:42 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] A Few Good Optimizations</title>
+<meta name="Author" content="maspethrose71aol.com (maspethrose71aol.com)" />
+<meta name="Subject" content="[cc65] A Few Good Optimizations" />
+<meta name="Date" content="2010-11-12" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] A Few Good Optimizations</h1>
+<!-- received="Fri Nov 12 17:21:17 2010" -->
+<!-- isoreceived="20101112162117" -->
+<!-- sent="Fri, 12 Nov 2010 11:20:54 -0500 (EST)" -->
+<!-- isosent="20101112162054" -->
+<!-- name="maspethrose71aol.com" -->
+<!-- email="maspethrose71aol.com" -->
+<!-- subject="[cc65] A Few Good Optimizations" -->
+<!-- id="8CD509CB7153394-2150-7C0B5@webmail-m101.sysops.aol.com" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8841.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Forced imports by linker config&quot;">Next message</a> ]
+[ <a href="8839.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Forced imports by linker config&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8847.html" title="Groepaz: &quot;Re: [cc65] A Few Good Optimizations&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:maspethrose71aol.com?Subject=Re:%20[cc65]%20A%20Few%20Good%20Optimizations">maspethrose71aol.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-11-12 17:20:54</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I have a few good optimizatios for code written in cc65 C:
+
+*    Declaring an auto variable as static can save code.
+*    Register declarations can save space in functions that don't call other functions.
+*    If you need a certain calculation performed on the same piece of data several times, calculate it once and assign it to a variable.  If on several pieces of data at different times, write a function from that calculation and call it as needed.
+*    If you need to call a function with the same parameters several times, create a wrapper function to supply the repeated parameters and call it with only the variant parameters.
+*    If you need to reference a certain member of a struct or element of an array such that it takes extra calculations to access it, create a pointer to it or copy it to a static variable, a pointer if you need to modify it and a static variable if yoyu just need use the data.
+*    If you use a function that will return the same value in your target and offers no other functionalite, try defining it as a const or using #define.
+*    Using simpler functions usually saves code.
+
+In exchange for these, I ask the following:
+
+*    That these optimizations be placed in cc65's documentation,
+*    That I be honored with these optimizations :), and
+*    That others post their optimizations here.
+--------------------
+Joseph Rose, a.k.a. Harry Potter
+Working magic in the computer community...or at least striving to!  :(
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Nov 12 17:21:17 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8841.html" title="Next message in the list">silverdr1wfmh.org.pl: "Re: [cc65] Forced imports by linker config"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8839.html" title="Previous message in the list">silverdr1wfmh.org.pl: "Re: [cc65] Forced imports by linker config"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8847.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] A Few Good Optimizations"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8847.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] A Few Good Optimizations"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8855.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] A Few Good Optimizations"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8858.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] A Few Good Optimizations"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8840" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8840" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8840" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-11-12 17:21:20 CET
+</em></small></p>
+</body>
+</html>

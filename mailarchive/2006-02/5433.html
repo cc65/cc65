@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] &quot;thought experiment&q</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] &quot;thought experiment&quot;, would it be possible to write a c64-kernal replacement with cc65? [scanned]" />
+<meta name="Date" content="2006-02-21" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] &quot;thought experiment&quot;, would it be possible to write a c64-kernal replacement with cc65? [scanned]</h1>
+<!-- received="Tue Feb 21 11:35:18 2006" -->
+<!-- isoreceived="20060221103518" -->
+<!-- sent="Tue, 21 Feb 2006 11:34:59 +0100" -->
+<!-- isosent="20060221103459" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] &quot;thought experiment&quot;, would it be possible to write a c64-kernal replacement with cc65? [scanned]" -->
+<!-- id="20060221103459.GA23099@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="1140515438.5387.8.camel&#64;localhost.localdomain" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5434.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Proposal for CA65 improvement(?): .maclib directive&quot;">Next message</a> ]
+[ <a href="5432.html" title="Spiro Trikaliotis: &quot;[cc65] Proposal for CA65 improvement(?): .maclib directive&quot;">Previous message</a> ]
+[ <a href="5431.html" title="Markus Stehr: &quot;[cc65] &quot;thought experiment&quot;, would it be possible to write a c64-kernal replacement with cc65? [scanned]&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20&amp;quot;thought%20experiment&amp;quot;,%20would%20it%20be%20possible%20to%20write%20a%20c64-kernal%20replacement%20with%20cc65?%20[scanned]">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2006-02-21 11:34:59</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Tue, Feb 21, 2006 at 10:50:38AM +0100, Markus Stehr wrote:
+&gt; Its just a thought experiment that i had recently, would it be possible
+&gt; to write a kernal replacement with just cc65, without inline asm and
+&gt; without any libary?
+
+You cannot write any C non trivial program without a library, because many
+things (like copying, multiplication, shifts, ...) are implemented as library
+subroutines.
+
+&gt; Or is the C overhead too big for an 8-bit kernal?
+
+Depending on your knowledge and the program, the result will be several times
+the size of a comparable assembler program.
+
+&gt; I wouldnt aim compatibility with this, but some sort of modern OS on an
+&gt; 8-bitter.
+
+Existing &quot;modern&quot; OSes for 6502 machines are written in assembler (Lunix for
+example) and have memory problems despite this. 
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Feb 21 11:35:18 2006</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5434.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Proposal for CA65 improvement(?): .maclib directive"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5432.html" title="Previous message in the list">Spiro Trikaliotis: "[cc65] Proposal for CA65 improvement(?): .maclib directive"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5431.html" title="Message to which this message replies">Markus Stehr: "[cc65] &quot;thought experiment&quot;, would it be possible to write a c64-kernal replacement with cc65? [scanned]"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5433" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5433" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5433" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2006-02-21 11:35:20 CET
+</em></small></p>
+</body>
+</html>

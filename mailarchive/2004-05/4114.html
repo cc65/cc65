@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Announcement: cc65 2.10.1 rele</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="[cc65] Announcement: cc65 2.10.1 released" />
+<meta name="Date" content="2004-05-06" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Announcement: cc65 2.10.1 released</h1>
+<!-- received="Thu May  6 12:16:26 2004" -->
+<!-- isoreceived="20040506101626" -->
+<!-- sent="Thu, 6 May 2004 12:16:22 +0200" -->
+<!-- isosent="20040506101622" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="[cc65] Announcement: cc65 2.10.1 released" -->
+<!-- id="20040506101622.GA15268@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4115.html" title="Groepaz: &quot;Re: [cc65] Announcement: cc65 2.10.1 released&quot;">Next message</a> ]
+[ <a href="4113.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] cc65 not producing .s output file&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4115.html" title="Groepaz: &quot;Re: [cc65] Announcement: cc65 2.10.1 released&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Announcement:%20cc65%202.10.1%20released">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-05-06 12:16:22</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I'm proud to announce cc65 version 2.10.1. cc65 is a complete cross
+development package for 65(C)02 systems, including a powerful macro assembler,
+a C compiler, linker, librarian and several other tools.
+
+cc65 has C and runtime library support for many of the old 6502 machines,
+including
+
+  - The Commodore VIC20 (contributed by Steve Schmidtke
+    &lt;steve_schmidtke&#64;hotmail&#46;<!--nospam-->com&gt;).
+
+  - The Commodore C64 and C128.
+
+  - The Commodore C16, C116 and Plus/4.
+
+  - The CBM 510 (aka P500), a quite rare Commodore machine (programs
+    run in bank 0).
+
+  - The CBM 600/700 family (programs run in bank 1).
+
+  - Newer PET machines (not 2001)
+
+  - The Apple ][ (library support by Kevin Ruland &lt;kevin&#64;rodin&#46;<!--nospam-->wustl.edu&gt;)
+
+  - The Atari 8 bit machines (thanks to the Atari team: Christian Groessler
+    &lt;cpg&#64;aladdin&#46;<!--nospam-->de&gt;, Mark Keates &lt;markk&#64;dendrite&#46;<!--nospam-->co.uk&gt;, Freddy Offenga
+    &lt;taf_offenga&#64;yahoo&#46;<!--nospam-->com&gt; and David Lloyd, &lt;dmlloyd&#64;atari-central&#46;<!--nospam-->com&gt;).
+
+  - GEOS for the C64 and C128 (by Maciej Witkowiak &lt;ytm&#64;elysium&#46;<!--nospam-->pl&gt;)
+
+  - The Nintendo Entertainment System (NES) (contributed by Groepaz,
+    &lt;groepaz&#64;gmx&#46;<!--nospam-->net&gt;.
+
+  - The Supervision console (contributed by Peter Trauner,
+    &lt;peter.trauner&#64;utanet&#46;<!--nospam-->at&gt;) (startup code and linker config only).
+
+  - The Oric Atmos (this one is - still - BETA!).
+
+The libraries are fairly portable, so creating a version for other 6502s
+shouldn't be too much work.
+
+
+Changes to the last version:
+
+This is a minor release that fixes known problems in version 2.10.0 (see
+
+        <a href="http://www.cc65.org/bugs.php">http://www.cc65.org/bugs.php</a>
+
+for a list). It does not contain new features.
+
+
+Available packages:
+
+As usual I will provide the complete sources and several binary packages,
+including RPMs for RedHat Linux 9. Linux is the primary development
+platform, so the sources do compile out of the box on Linux machines.
+
+Please note that there are separate RPMs for the compiler proper and the
+target specific libraries. To develop for one of the predefined target
+systems you need the compiler RPM package *and* one of the target machine
+packages.
+
+Starting with this version, the docs are also in a separate package, so
+if you want docs (recommended), be sure to download the cc65-doc archive.
+
+Binaries for DOS and and Windows should also be available at the time you read
+this. OS/2 packages will again be available, but since there are almost no
+downloads for OS/2, so the host platform may get dropped in the near future
+(again). As with the RPM packages, you need the package for the development
+system (Windows, etc.) *and* one or more of the target machine packages, plus
+optionally the doc package.
+
+
+Download:
+
+For more information and a download link, please visit the cc65 web page at
+
+     	<a href="http://www.cc65.org/">http://www.cc65.org/</a>
+
+
+Mailing list:
+
+There is a mailing list for discussing cc65 related issues (programming,
+suggestions, bugs, ...). See
+
+        <a href="http://www.cc65.org/#List">http://www.cc65.org/#List</a>
+
+for information on how to subscribe to this list.
+
+-----------
+
+Thanks to all who sent feedback and suggestions, and of course to anyone who
+helped developing cc65.
+
+I wish you a merry christmas and lots of fun with this new cc65 release!
+
+Regards
+
+
+	Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu May  6 12:16:26 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4115.html" title="Next message in the list">Groepaz: "Re: [cc65] Announcement: cc65 2.10.1 released"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4113.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] cc65 not producing .s output file"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4115.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] Announcement: cc65 2.10.1 released"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4115.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] Announcement: cc65 2.10.1 released"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4114" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4114" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4114" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-05-06 12:16:35 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Input string routine for a</title>
+<meta name="Author" content="Karri Kaksonen (karri1sipo.fi)" />
+<meta name="Subject" content="Re: [cc65] Input string routine for a line of data?" />
+<meta name="Date" content="2011-06-07" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Input string routine for a line of data?</h1>
+<!-- received="Tue Jun  7 06:55:48 2011" -->
+<!-- isoreceived="20110607045548" -->
+<!-- sent="Tue, 07 Jun 2011 07:55:23 +0300" -->
+<!-- isosent="20110607045523" -->
+<!-- name="Karri Kaksonen" -->
+<!-- email="karri1sipo.fi" -->
+<!-- subject="Re: [cc65] Input string routine for a line of data?" -->
+<!-- id="4DEDAF3B.4000403@sipo.fi" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="3980D29488F643C6816BE8A73A7EF9CD&#64;ORANGE2" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9502.html" title="thefox xofeht: &quot;[cc65] Problem with .align&quot;">Next message</a> ]
+[ <a href="9500.html" title="Shawn Jefferson: &quot;RE: [cc65] Input string routine for a line of data?&quot;">Previous message</a> ]
+[ <a href="9500.html" title="Shawn Jefferson: &quot;RE: [cc65] Input string routine for a line of data?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Karri Kaksonen &lt;<a href="mailto:karri1sipo.fi?Subject=Re:%20[cc65]%20Input%20string%20routine%20for%20a%20line%20of%20data?">karri1sipo.fi</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-06-07 06:55:23</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>In games you cannot use blocking inputs. The cc65 also supports kbhit().
+
+An non-blocking input module could look like:
+
+check_for_user_input() {
+   char joy;
+   if (kbhit()) {
+     char ch = cgetc();
+     ... // Append one character to your input string
+   }
+   joy = joy_read(JOY_1);
+   if (JOY_BTN_UP(joy)) {
+   }
+     ...
+   }
+}
+
+Basically most (all?) Lynx games follow a very simple pattern.
+
+initialize();
+while (running) {
+   advance_game();
+   check_for_user_input();
+   if (display_not_busy()) {
+     update_display();
+   }
+   update_sound();
+}
+
+Using blocking input would cause the game to break animation and sound.
+
+The other choice is to use threads and allow the input thread to use 
+blocking input.
+--
+Karri
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Jun  7 06:55:48 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9502.html" title="Next message in the list">thefox xofeht: "[cc65] Problem with .align"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9500.html" title="Previous message in the list">Shawn Jefferson: "RE: [cc65] Input string routine for a line of data?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9500.html" title="Message to which this message replies">Shawn Jefferson: "RE: [cc65] Input string routine for a line of data?"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9501" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9501" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9501" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-06-07 06:55:50 CEST
+</em></small></p>
+</body>
+</html>

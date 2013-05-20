@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Possible optimizer errors </title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Possible optimizer errors with -Oi" />
+<meta name="Date" content="2012-04-03" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Possible optimizer errors with -Oi</h1>
+<!-- received="Tue Apr  3 14:53:10 2012" -->
+<!-- isoreceived="20120403125310" -->
+<!-- sent="Tue, 3 Apr 2012 14:53:03 +0200" -->
+<!-- isosent="20120403125303" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Possible optimizer errors with -Oi" -->
+<!-- id="20120403125303.GA31301@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="4F7A71F7.7060103&#64;sipo.fi" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10236.html" title="Christopher Pow: &quot;[cc65] Fwd: NESICIDE + VICE&quot;">Next message</a> ]
+[ <a href="10234.html" title="Karri Kaksonen: &quot;Re: [cc65] Possible optimizer errors with -Oi&quot;">Previous message</a> ]
+[ <a href="10232.html" title="Karri Kaksonen: &quot;[cc65] Possible optimizer errors with -Oi&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Possible%20optimizer%20errors%20with%20-Oi">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-04-03 14:53:03</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Tue, Apr 03, 2012 at 06:43:51AM +0300, Karri Kaksonen wrote:
+&gt; Any ideas of how to pinpoint this?
+
+The easiest idea (for you :-) is to send me the code, so I can try to track it
+down.
+
+Another idea is to do what I will do if you send me the code:
+
+  * First check if the problem disappears with other values of --codesize.
+    If so, compare the generated assembly code.
+
+  * Then, generate a list of the optimization steps applied by the compiler.
+    This is done with &quot;cc65 --list-opt-steps&quot;. Feed this into a text file.
+
+  * Prepend a '-' before the first half of the steps, then run cc65 on your
+    code, adding &quot;--debug-opt filename&quot; to the command line. &quot;filename&quot; is the
+    name of the file containing the optimization steps created in the last
+    step.
+
+  * Using a sort of binary search, try to nail down the problem to one
+    optimization step. Binary search means: If the problem disappear when
+    disabling half of the steps, it must have been caused by one of the
+    disabled steps. So re-enable half of them and retry. Repeat until one step
+    is left. Compare the generated assembly with and without this step.
+
+If this sounds complicated, you may want to take comfort in the fact that it's
+even more complicated in reality:-) Some steps depend on others, and sometimes
+a bug is caused by a combination of steps, which can be quite confusing. It
+can mean for example that the bug is gone when disabling one of of the
+optimization steps and it is also gone when disabling the other half:-)
+
+So if you are able to avoid above procedure, then do it:-) For example by
+changing the code slightly. If the bug disappears, compare the generated code
+around the point where the C code has changed.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Apr  3 14:53:10 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10236.html" title="Next message in the list">Christopher Pow: "[cc65] Fwd: NESICIDE + VICE"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10234.html" title="Previous message in the list">Karri Kaksonen: "Re: [cc65] Possible optimizer errors with -Oi"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10232.html" title="Message to which this message replies">Karri Kaksonen: "[cc65] Possible optimizer errors with -Oi"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10235" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10235" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10235" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-04-03 14:53:13 CEST
+</em></small></p>
+</body>
+</html>

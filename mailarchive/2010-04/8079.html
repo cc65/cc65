@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: RE: [cc65] Scalable UI without float?</title>
+<meta name="Author" content="Payton Byrd (plbyrd1gmail.com)" />
+<meta name="Subject" content="RE: [cc65] Scalable UI without float?" />
+<meta name="Date" content="2010-04-21" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>RE: [cc65] Scalable UI without float?</h1>
+<!-- received="Wed Apr 21 06:02:07 2010" -->
+<!-- isoreceived="20100421040207" -->
+<!-- sent="Tue, 20 Apr 2010 23:01:55 -0500" -->
+<!-- isosent="20100421040155" -->
+<!-- name="Payton Byrd" -->
+<!-- email="plbyrd1gmail.com" -->
+<!-- subject="RE: [cc65] Scalable UI without float?" -->
+<!-- id="4bce78b9.9753f10a.7176.5221@mx.google.com" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="[cc65] Scalable UI without float?" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8080.html" title="Karri Kaksonen: &quot;Re: [cc65] Please critique this makefile&quot;">Next message</a> ]
+[ <a href="8078.html" title="Robin Harbron: &quot;Re: [cc65] Scalable UI without float?&quot;">Previous message</a> ]
+[ <a href="8076.html" title="Payton Byrd: &quot;[cc65] Scalable UI without float?&quot;">Maybe in reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8097.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Scalable UI without float?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Payton Byrd &lt;<a href="mailto:plbyrd1gmail.com?Subject=RE:%20[cc65]%20Scalable%20UI%20without%20float?">plbyrd1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-04-21 06:01:55</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I told you I was tired. :)  Multiply first is the answer I was looking for.
+
+-----Original Message-----
+From: Kevin Schuetz &lt;scrapdog&#64;runbox&#46;<!--nospam-->com&gt;
+Sent: Tuesday, April 20, 2010 10:55 PM
+To: cc65&#64;musoftware&#46;<!--nospam-->de
+Subject: Re: [cc65] Scalable UI without float?
+
+I would recommend using some sort of fixed-point arithmetic.
+
+However, if you do want to continue defining positions in terms of 
+percentages, the simplest answer to your problem would be to multiply 
+first, then divide.
+
+gotoxy(Item1X*screensize/100,0); cputs(Item1);
+gotoxy(Item2X*screensize/100,0); cputs(Item2);
+gotoxy(Item3X*screensize/100,0); cputs(Item3);
+gotoxy(Item4X*screensize/100,0); cputs(Item4);
+gotoxy(Item5X*screensize/100,0); cputs(Item5);
+
+
+
+
+
+On 4/20/2010 10:37 PM, Payton Byrd wrote:
+&gt; Maybe I'm just tired, but I cannot come up with a good solution for this.
+&gt;
+&gt; What I'm trying to do is locate text on the screen using conio at 
+&gt; relative positions based on the screen width.  For example, I want to 
+&gt; define five positions for five menu items:
+&gt;
+&gt; Item 1: 0%
+&gt; Item 2: 20%
+&gt; Item 3: 40%
+
+
+[The entire original message is not included]
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Apr 21 06:02:07 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8080.html" title="Next message in the list">Karri Kaksonen: "Re: [cc65] Please critique this makefile"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8078.html" title="Previous message in the list">Robin Harbron: "Re: [cc65] Scalable UI without float?"</a></li>
+<li><dfn>Maybe in reply to</dfn>: <a href="8076.html" title="Message to which this message replies">Payton Byrd: "[cc65] Scalable UI without float?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8097.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Scalable UI without float?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8097.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Scalable UI without float?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8079" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8079" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8079" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-04-21 06:02:10 CEST
+</em></small></p>
+</body>
+</html>

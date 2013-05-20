@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] cc65 v2.7.0 released</title>
+<meta name="Author" content="Atheist (atheist_at_hellspawn.dnsalias.net)">
+<meta name="Subject" content="Re: [cc65] cc65 v2.7.0 released">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] cc65 v2.7.0 released</h1>
+<!-- received="Sun Oct 14 20:32:08 2001" -->
+<!-- isoreceived="20011014183208" -->
+<!-- sent="Sun, 14 Oct 2001 20:32:06 +0200 (CEST)" -->
+<!-- isosent="20011014183206" -->
+<!-- name="Atheist" -->
+<!-- email="atheist_at_hellspawn.dnsalias.net" -->
+<!-- subject="Re: [cc65] cc65 v2.7.0 released" -->
+<!-- id="3893.192.168.0.94.1003084326.squirrel@hellspawn.dnsalias.net" -->
+<!-- inreplyto="15305.48541.969943.917115@panini.cling.gu.se" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Atheist (<a href="mailto:atheist_at_hellspawn.dnsalias.net?Subject=Re:%20[cc65]%20cc65%20v2.7.0%20released"><em>atheist_at_hellspawn.dnsalias.net</em></a>)<br>
+<strong>Date:</strong> 2001-10-14 20:32:06
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0815.html">Ullrich von Bassewitz: "Re: [cc65] cc65 v2.7.0 released"</a>
+<li><strong>Previous message:</strong> <a href="0813.html">Atheist: "Re: [cc65] FTP mirror"</a>
+<li><strong>In reply to:</strong> <a href="0811.html">MagerValp: "Re: [cc65] cc65 v2.7.0 released"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0815.html">Ullrich von Bassewitz: "Re: [cc65] cc65 v2.7.0 released"</a>
+<li><strong>Reply:</strong> <a href="0815.html">Ullrich von Bassewitz: "Re: [cc65] cc65 v2.7.0 released"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+&gt;&gt;&gt;&gt;&gt;&gt; &quot;UvB&quot; == Ullrich von Bassewitz &lt;<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%20v2.7.0%20released">uz_at_musoftware.de</a>&gt; writes:
+&gt;
+&gt; MV&gt; I'm afraid I didn't have time to test the beta earlier, and I get
+&gt; MV&gt; the following error when trying to compile the libraries on a
+&gt; MV&gt; Solaris 8 machine:
+&gt;
+&gt; UvB&gt; This does not seem to be a serious problem. Did you check if the
+&gt; UvB&gt; header files are in the search path and readable (permissions)?
+
+Same problem under OS/2 with emx/gcc...
+Now I haven't time to check the problem, tomorrow I will...
+
+AFLAGS=&quot;-t geos&quot; \
+make -C geos || exit 1
+make[2]: Entering directory `/SOURCE/cc65-2.7.0/libsrc/geos'
+make[3]: Entering directory `/SOURCE/cc65-2.7.0/libsrc/geos/common'
+abort.c(9): Error: Include file `stdlib.h' not found
+abort.c(10): Error: Include file `geos.h' not found
+abort.c(14): Warning: Function call without a prototype
+abort.c(14): Error: Undefined symbol: `CBOLDON'
+abort.c(14): Error: `)' expected
+abort.c(14): Error: `;' expected
+abort.c(14): Error: `;' expected
+abort.c(14): Error: Undefined symbol: `CPLAINTEXT'
+abort.c(14): Error: `;' expected
+abort.c(14): Error: Expression expected
+abort.c(14): Error: `;' expected
+abort.c(14): Error: Expression expected
+abort.c(14): Fatal: Too many errors
+make[3]: *** [abort.o] Error 1
+make[3]: Leaving directory `/SOURCE/cc65-2.7.0/libsrc/geos/common'
+
+
+During compiling I see a warning on a type of variable... but probabily
+is not important... I will check.
+
+-- 
+Regards,
+Mirco
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%20v2.7.0%20released">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0815.html">Ullrich von Bassewitz: "Re: [cc65] cc65 v2.7.0 released"</a>
+<li><strong>Previous message:</strong> <a href="0813.html">Atheist: "Re: [cc65] FTP mirror"</a>
+<li><strong>In reply to:</strong> <a href="0811.html">MagerValp: "Re: [cc65] cc65 v2.7.0 released"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0815.html">Ullrich von Bassewitz: "Re: [cc65] cc65 v2.7.0 released"</a>
+<li><strong>Reply:</strong> <a href="0815.html">Ullrich von Bassewitz: "Re: [cc65] cc65 v2.7.0 released"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:43 CET</em>
+</em>
+</small>
+</body>
+</html>

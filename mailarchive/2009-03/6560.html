@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Read only data seg ( atari )</title>
+<meta name="Author" content="Winslow, Dan D (US SSA) (dan.winslow1baesystems.com)" />
+<meta name="Subject" content="[cc65] Read only data seg ( atari )" />
+<meta name="Date" content="2009-03-26" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Read only data seg ( atari )</h1>
+<!-- received="Thu Mar 26 16:43:32 2009" -->
+<!-- isoreceived="20090326154332" -->
+<!-- sent="Thu, 26 Mar 2009 08:43:20 -0700" -->
+<!-- isosent="20090326154320" -->
+<!-- name="Winslow, Dan D (US SSA)" -->
+<!-- email="dan.winslow1baesystems.com" -->
+<!-- subject="[cc65] Read only data seg ( atari )" -->
+<!-- id="7nahfj$2l82ts@dmzms99802.na.baesystems.com" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6561.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Read only data seg ( atari )&quot;">Next message</a> ]
+[ <a href="6559.html" title="Winslow, Dan D (US SSA): &quot;[cc65] Atari-specific printf question&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6561.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Read only data seg ( atari )&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Winslow, Dan D (US SSA) &lt;<a href="mailto:dan.winslow1baesystems.com?Subject=Re:%20[cc65]%20Read%20only%20data%20seg%20(%20atari%20)">dan.winslow1baesystems.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-03-26 16:43:20</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi. 
+I am trying to segregate code and data into loadable blocks that can be
+loaded into banked (and non-banked) RAM. The standard loadable image is
+supposed to be one .com file that loads at $8000. The other chunks are
+intended to be written by the linker into xxxx.bnk files that can be
+loaded at run time by a loader contained in the .com file segment. The
+config file I am using can be seen at the end of the message.
+
+At runtime, the normal .com file gets loaded, and then it runs a bank
+loader program that loads the mainbank.bnk file into memory at $4000.
+
+My question relates to the read-only-data segment. I find if I have a
+definition like :
+
+#pragma codeseg  (&quot;MAINSEG&quot;)
+#pragma dataseg  (&quot;MAINDAT&quot;)
+#pragma rodataseg(&quot;MAINROD&quot;)
+#pragma bssseg   (&quot;MAINBSS&quot;)
+
+char * test( void )
+{
+  return &quot;hi there&quot;;
+}
+
+The address returned for the literal in the return statement is not
+correct. I can see ( in a hex editor ) that the literal is embedded into
+the mainbank.bnk file, but not at the address that gets returned by the
+function. It seems like the program counter gets off or is not
+incremented when a rodataseg is emitted? I am very sure that the loader
+function is loading the mainbank.bnk file at the correct address and is
+loading all of it. A dump of memory after the load looks exactly like
+the mainbank.bnk file on disk.
+
+If I omit the rodataseg pragma, then the literal gets generated into the
+primary .com image and the function returns the correct address for the
+literal.
+
+I am aware that there is an example of handling a memory hole for banked
+ram in the docs, but that is not quite what I am trying to do.
+
+So, am I not understanding something about the way the rodataseg gets
+handled or is it something else? 
+
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+--------
+FEATURES {
+    STARTADDRESS: default = $8000;
+}
+SYMBOLS {
+    __STACKSIZE__	= $200;		# 512b parm stack
+    __RESERVED_MEMORY__: value = $1, weak = yes;
+}
+MEMORY {
+    ZP:      start = $0082, size = $007E,   type = rw, define = yes;
+    HEADER:  start = $0000, size = $0006,   file = %O;
+    RAM:     start = %S   , size = $BC20 - __STACKSIZE__ - %S,
+define=yes, file = %O;
+    TRAILER: start = $0000, size = $0006,   file = %O;
+    
+    BANK0:   start = $4000, size = $4000,  define=yes, file =
+&quot;bank0.bnk&quot;;
+    BANK1:   start = $4000, size = $4000,  define=yes, file =
+&quot;bank1.bnk&quot;;
+    BANK2:   start = $4000, size = $4000,  define=yes, file =
+&quot;bank2.bnk&quot;;
+    BANK3:   start = $4000, size = $4000,  define=yes, file =
+&quot;bank3.bnk&quot;;    
+    MAINBANK:start = $4000, size = $4000, define=yes, file =
+&quot;mainbank.bnk&quot;;
+    DATAMEM: start = $2000, size = $2000, define=yes, file =
+&quot;databank.bnk&quot;;
+}
+SEGMENTS {
+    EXEHDR:   load = HEADER,  type = ro;
+    LOWCODE:  load = RAM,     type = ro, define = yes, optional = yes;
+    INIT:     load = RAM,     type = ro, define = yes, optional = yes;
+    CODE:     load = RAM,     type = ro, define = yes;
+    RODATA:   load = RAM,     type = ro, define = yes;
+    DATA:     load = RAM,     type = rw, define = yes;
+    BSS:      load = RAM,     type = bss,define = yes;
+    HEAP:     load = RAM,     type = bss, optional = yes; # must sit
+just below stack
+    ZEROPAGE: load = ZP,      type = zp;
+    EXTZP:    load = ZP,      type = zp, optional = yes;
+    AUTOSTRT: load = TRAILER, type = ro;
+
+    DATASEG : load = DATAMEM, type = ro,  define=yes, optional = yes;
+
+    DATADAT : load = DATAMEM, type = rw,  define=yes, optional = yes;
+    DATAROD : load = DATAMEM, type = ro,  define=yes, optional = yes;
+    DATABSS : load = DATAMEM, type = bss, define=yes, optional = yes;
+
+    MAINSEG: load = MAINBANK, type = ro,  define=yes, optional = yes;
+    MAINDAT: load = MAINBANK, type = rw,  define=yes, optional = yes;
+    MAINBSS: load = MAINBANK, type = bss, define=yes, optional = yes;
+    MAINROD: load = MAINBANK, type = ro,  define=yes, optional = yes;
+    
+    BANK0DAT: load = BANK0,   type = rw,  define=yes, optional = yes;
+    BANK0BSS: load = BANK0,   type = bss, define=yes, optional = yes;
+    BANK0SEG: load = BANK0,   type = ro,  define=yes, optional = yes;
+    BANK0ROD: load = BANK0,   type = ro,  define=yes, optional = yes;
+    
+    BANK1DAT: load = BANK1,   type = rw,  define=yes, optional = yes;
+    BANK1BSS: load = BANK1,   type = bss, define=yes, optional = yes;
+    BANK1SEG: load = BANK1,   type = ro,  define=yes, optional = yes;
+    BANK1ROD: load = BANK1,   type = ro,  define=yes, optional = yes;
+
+    
+    BANK2DAT: load = BANK2,   type = rw,  define=yes, optional = yes;
+    BANK2BSS: load = BANK2,   type = bss, define=yes, optional = yes;
+    BANK2SEG: load = BANK2,   type = ro,  define=yes, optional = yes;
+    BANK2ROD: load = BANK2,   type = ro,  define=yes, optional = yes;
+
+    
+    BANK3DAT: load = BANK3,   type = rw,  define=yes, optional = yes;
+    BANK3BSS: load = BANK3,   type = bss, define=yes, optional = yes;
+    BANK3SEG: load = BANK3,   type = ro,  define=yes, optional = yes;
+    BANK3ROD: load = BANK3,   type = ro,  define=yes, optional = yes;
+
+
+}
+
+FEATURES {
+    CONDES: segment = INIT,
+	    type = constructor,
+	    label = __CONSTRUCTOR_TABLE__,
+	    count = __CONSTRUCTOR_COUNT__;
+    CONDES: segment = RODATA,
+	    type = destructor,
+	    label = __DESTRUCTOR_TABLE__,
+	    count = __DESTRUCTOR_COUNT__;
+    CONDES: type = interruptor,
+	    segment = RODATA,
+	    label = __INTERRUPTOR_TABLE__,
+	    count = __INTERRUPTOR_COUNT__;
+}
+
+Dan Winslow
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Mar 26 16:43:32 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6561.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Read only data seg ( atari )"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6559.html" title="Previous message in the list">Winslow, Dan D (US SSA): "[cc65] Atari-specific printf question"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6561.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Read only data seg ( atari )"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6561.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Read only data seg ( atari )"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6560" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6560" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6560" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-03-26 16:43:34 CET
+</em></small></p>
+</body>
+</html>

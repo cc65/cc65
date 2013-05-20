@@ -1,0 +1,185 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] c64 question</title>
+<meta name="Author" content="Arvid Norberg (c99ang_at_cs.umu.se)">
+<meta name="Subject" content="Re: [cc65] c64 question">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] c64 question</h1>
+<!-- received="Wed Mar  7 22:52:13 2001" -->
+<!-- isoreceived="20010307215213" -->
+<!-- sent="Wed, 07 Mar 2001 22:51:40 GMT" -->
+<!-- isosent="20010307225140" -->
+<!-- name="Arvid Norberg" -->
+<!-- email="c99ang_at_cs.umu.se" -->
+<!-- subject="Re: [cc65] c64 question" -->
+<!-- id="200103072152.WAA28487@mail.umu.se" -->
+<!-- inreplyto="[cc65] c64 question" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Arvid Norberg (<a href="mailto:c99ang_at_cs.umu.se?Subject=Re:%20[cc65]%20c64%20question"><em>c99ang_at_cs.umu.se</em></a>)<br>
+<strong>Date:</strong> 2001-03-07 23:51:40
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0438.html">MagerValp: "Re: [cc65] c64 question"</a>
+<li><strong>Previous message:</strong> <a href="0436.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<li><strong>Maybe in reply to:</strong> <a href="0432.html">Arvid Norberg: "[cc65] c64 question"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0438.html">MagerValp: "Re: [cc65] c64 question"</a>
+<li><strong>Reply:</strong> <a href="0438.html">MagerValp: "Re: [cc65] c64 question"</a>
+<li><strong>Reply:</strong> <a href="0439.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello,
+
+Thanks for all your answers.
+
+&gt;There is no such declaration for cc65, because the compiler does not 
+have
+&gt;enough information to generate the necessary code. Here is why:
+&gt;
+&gt;An interrupt may not execute C code, without some helper code written 
+in
+&gt;assembler, because several routines may not interrupted and then 
+called
+&gt;recursively. This is not the fault of cc65, it's a problem of the 
+6502,
+&gt;because it is not able to manipulate 16 bit values in one atomic 
+transaction.
+
+What happens when the 6502 gets an interrupt?
+I've always imagined that the folowing steps are performed by the CPU:
+ 1. CPU registers were pushed onto the stack (a, x, y, pc).
+ 2. execution jumped to the interrupt handler
+ 3. when rti is reached, the resgisters are popped back and execution 
+continues where it was interrupted.
+
+I don't see what pushing ints onto the stack has to do with this.
+
+&gt; [...]
+&gt;If this routine is interrupted while the overflow from low to high 
+byte of the
+&gt;stack pointer is not corrected, any C routine using the stack (and 
+most do)
+&gt;that is called in an interrupt will overwrite parts of the stack that 
+are not
+&gt;owned by the function. The same is true for all other functions 
+manipulating
+&gt;the stack pointer.
+&gt;
+&gt;So one condition for calling C code in an interrupt would be a 
+separate stack.
+&gt;This stack switching cannot be done by the compiler, because the 
+second stack
+&gt;has to be allocated somewhere, and the compiler has no knowledge how 
+to do
+&gt;that. This is the main reason that just using an additional keyword 
+for
+&gt;declaring interrupt handlers is not enough.
+
+This means that I don't understand why the stack get messed up.
+
+&gt;Another problem is that there are &quot;registers&quot; in the zeropage that may 
+be
+&gt;trashed by the code executed in the interrupt.
+&gt;
+&gt;So, the second condition for calling C code in an interrupt handler 
+would be
+&gt;that the zero page locations needed by the compiler must be saved 
+before
+&gt;calling C code and restored afterwards.
+&gt;
+
+This, I can understand, is a problem.
+(Not that I know what those register migth contain, especially for a 
+void function that takes no parameters).
+
+&gt; [...]
+&gt;Apart from that, it is better to use a &quot;void&quot; parameter list for 
+functions
+&gt;that don't take any parameters. If the compiler knows that there are 
+no
+&gt;parameters, it is able to generate better code. An empty parameter 
+list means
+&gt;in C: &quot;This function may take any number of arguments&quot;, which means 
+that the
+&gt;compiler has to generate code to remember the number of parameters 
+passed.
+
+Thanks, I'm just using c++ too much these days. ;)
+
+I would appreciate answers to my questions, but if you don't want to 
+spend your time on answering them, I won't blame you.
+
+--------------------
+
+I also think I've found a minor bug in cc65. The following code:
+
+#include &lt;conio.h&gt;
+
+void main(void)
+{
+	char a = -1;
+	if (a &lt; 0 || a &gt; 2) cputs(&quot;a &lt; 0 or a &gt; 2\n&quot;);
+}
+
+generates the following warning, when compiled.
+
+test.c(6): Warning: Condition is never true
+
+
+thanks,
+
+---
+Arvid Norberg
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20c64%20question">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0438.html">MagerValp: "Re: [cc65] c64 question"</a>
+<li><strong>Previous message:</strong> <a href="0436.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<li><strong>Maybe in reply to:</strong> <a href="0432.html">Arvid Norberg: "[cc65] c64 question"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0438.html">MagerValp: "Re: [cc65] c64 question"</a>
+<li><strong>Reply:</strong> <a href="0438.html">MagerValp: "Re: [cc65] c64 question"</a>
+<li><strong>Reply:</strong> <a href="0439.html">Ullrich von Bassewitz: "Re: [cc65] c64 question"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:39 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Config files and heap spac</title>
+<meta name="Author" content="Christian Groessler (chris1groessler.org)" />
+<meta name="Subject" content="Re: [cc65] Config files and heap space" />
+<meta name="Date" content="2009-05-28" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Config files and heap space</h1>
+<!-- received="Thu May 28 22:16:58 2009" -->
+<!-- isoreceived="20090528201658" -->
+<!-- sent="Thu, 28 May 2009 22:18:56 +0200 (CEST)" -->
+<!-- isosent="20090528201856" -->
+<!-- name="Christian Groessler" -->
+<!-- email="chris1groessler.org" -->
+<!-- subject="Re: [cc65] Config files and heap space" -->
+<!-- id="alpine.BSO.1.10.0905282202070.14819@vigilia.groessler.org" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="F276036850359C4D8F93F7B19189838203AF2C6F&#64;exchmbox.omaha.org" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6583.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] HEAP from here to there&quot;">Next message</a> ]
+[ <a href="6581.html" title="Thomas Giesel: &quot;Re: Re: [cc65] HEAP from here to there&quot;">Previous message</a> ]
+[ <a href="6577.html" title="Dan Winslow: &quot;[cc65] Config files and heap space&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Christian Groessler &lt;<a href="mailto:chris1groessler.org?Subject=Re:%20[cc65]%20Config%20files%20and%20heap%20space">chris1groessler.org</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-05-28 22:18:56</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Dan,
+
+On Wed, 20 May 2009, Dan Winslow wrote:
+
+&gt; void heap_avail(void)
+&gt; {
+&gt;     int x;
+&gt;     char *t;
+&gt;     x=10;
+&gt;     while(1)
+&gt;     {
+&gt;       t=malloc(x);
+&gt;       if ( !t ) break;
+&gt;       free(t);
+&gt;       x+=10;
+&gt;     }
+&gt;     if ( x &gt; 10 ) 
+&gt;       x-=10;
+&gt;     else
+&gt;       x=0;
+&gt;     cprintf(&quot;heap avail: %i bytes\r\n&quot;,x);
+&gt; }
+
+[snip]
+
+&gt; If the the config file I am using has the start address set at 2E00 ( 
+&gt; STARTADDRESS: default = $2E00; ), I get around 30k reported by the above 
+&gt; function. If the config file I am using has the start address set at 
+&gt; 2000 ( which should be ok with the DOS I am using ), I get 0 k 
+&gt; reported. The program seems to run fine either way..altough I am not 
+&gt; using malloc in my code (yet).
+
+
+You are using &quot;int&quot; for &quot;x&quot;, and if you set the start address to 0x2000, 
+it overflows and becomes negative. Then the final check (x &gt; 10) sets it 
+to 0.
+
+I've tried a slightly modified version of your program, and I get 34200 
+available bytes.
+
+
+#include &lt;atari.h&gt;
+#include &lt;conio.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+void heap_avail(void)
+{
+  unsigned int x;
+  char *t;
+  x=10;
+  while(1) {
+    t=malloc(x);
+    if (! t) break;
+    free(t);
+    x+=10;
+  }
+  if (x &gt; 10)
+    x-=10;
+  else
+    x=0;
+  cprintf(&quot;heap avail: %u bytes\r\n&quot;,x);
+}
+
+int main(void)
+{
+  heap_avail();
+  if (_dos_type != 1) cgetc();
+  return 0;
+}
+
+
+I had similar strange experiences in the past and nowadays I always 
+declare variables &quot;unsigned&quot; by default, unless I know I will really have 
+to deal with negative values.
+
+regards,
+chris
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu May 28 22:16:58 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6583.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] HEAP from here to there"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6581.html" title="Previous message in the list">Thomas Giesel: "Re: Re: [cc65] HEAP from here to there"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6577.html" title="Message to which this message replies">Dan Winslow: "[cc65] Config files and heap space"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6582" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6582" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6582" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-05-28 22:17:00 CEST
+</em></small></p>
+</body>
+</html>

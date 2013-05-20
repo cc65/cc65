@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Zeropage Regbank</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="[cc65] Zeropage Regbank" />
+<meta name="Date" content="2009-02-06" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Zeropage Regbank</h1>
+<!-- received="Fri Feb  6 10:39:16 2009" -->
+<!-- isoreceived="20090206093916" -->
+<!-- sent="Fri, 6 Feb 2009 10:38:12 +0100" -->
+<!-- isosent="20090206093812" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="[cc65] Zeropage Regbank" -->
+<!-- id="20090206093812.GA17272@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6472.html" title="Tachdaun: &quot;Re: [cc65] Zeropage Vars&quot;">Next message</a> ]
+[ <a href="6470.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] STACKSIZE - What's the right size?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6474.html" title="Tachdaun: &quot;[cc65] What's in atmos.lib?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Zeropage%20Regbank">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-02-06 10:38:12</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>----- Forwarded message from Shawn Jefferson &lt;sjefferson&#64;shaw&#46;<!--nospam-->ca&gt; -----
+&gt; Hmmm, for some reason my reply is not getting through to the cc65 list.
+
+I will use this opportunity to remind everyone that several types of mails are
+dropped by the mailing list server. The following is from the info mail
+everybody got when subscribing:
+
+------------------------------------------------------------------------------
+WHEN POSTING TO THE LIST, PLEASE KEEP THE FOLLOWING IN MIND:
+
+  [...]
+
+  2. Please do not send program binaries or other attachments to the list.
+     Place them on a ftp or web server and post a link instead. If you don't
+     have ftp or web space available, please contact me in private mail.
+
+  3. When answering, please keep quoted material down to a minimum. There are
+     several filters for incoming mail, and you will NOT get notified in case
+     of a problem - your mail will simply be dropped.
+------------------------------------------------------------------------------
+
+&gt; I did look at the documentation for cc65 before asking this question.
+&gt; According to the dox:
+&gt;
+&gt; --register-space
+[...]
+&gt; -----
+&gt;
+&gt; Which seems to say to me that the compiler doesn't automatically use this
+&gt; space for local variables declared as &quot;register&quot;.
+
+It does, but it will not allocate this space. You will have to make sure that
+the register space is big enough (for example by supplying a modified
+zeropage.o module).
+
+&gt; Just in general, using zeropage variables may speed up some loops and make
+&gt; the code smaller.
+
+See here:
+
+        <a href="http://www.cc65.org/doc/cc65-9.html">http://www.cc65.org/doc/cc65-9.html</a>
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Feb  6 10:39:16 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6472.html" title="Next message in the list">Tachdaun: "Re: [cc65] Zeropage Vars"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6470.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] STACKSIZE - What's the right size?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6474.html" title="Next message in this discussion thread">Tachdaun: "[cc65] What's in atmos.lib?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6474.html" title="Message sent in reply to this message">Tachdaun: "[cc65] What's in atmos.lib?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6471" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6471" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6471" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-02-06 10:39:19 CET
+</em></small></p>
+</body>
+</html>

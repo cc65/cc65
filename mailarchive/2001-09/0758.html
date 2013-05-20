@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] snapshot #1</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] snapshot #1">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] snapshot #1</h1>
+<!-- received="Wed Sep 26 17:17:24 2001" -->
+<!-- isoreceived="20010926151724" -->
+<!-- sent="Wed, 26 Sep 2001 17:17:27 +0200" -->
+<!-- isosent="20010926151727" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] snapshot #1" -->
+<!-- id="20010926171727.A31020@trixie.musoftware.de" -->
+<!-- inreplyto="1218137286.20010926154708@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20snapshot%20#1"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2001-09-26 17:17:27
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0759.html">Ullrich von Bassewitz: "Re: [cc65] snapshot #1"</a>
+<li><strong>Previous message:</strong> <a href="0757.html">groepaz: "Re[4]: [cc65] snapshot #1"</a>
+<li><strong>In reply to:</strong> <a href="0755.html">groepaz: "Re[2]: [cc65] snapshot #1"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0760.html">groepaz: "Re[2]: [cc65] snapshot #1"</a>
+<li><strong>Reply:</strong> <a href="0760.html">groepaz: "Re[2]: [cc65] snapshot #1"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Wed, Sep 26, 2001 at 03:47:08PM +0200, groepaz wrote:
+&gt; hehe ;=P i was actually already wondering why it became that quiet on
+&gt; the list since i posted my stuff ;=) before everyone seems to be in
+&gt; urgent need for that file-stuff hehe ,=) (maybe my code is just to bad
+&gt; to serve them well? mmh....but damn i'd like to know THAT aswell ;=P)
+
+What I've seen it is quite C64 specific but as I said I didn't have a closer
+look because I have so many open topics with the current development compiler
+and I didn't want to start new ones.
+
+&gt; mmmh.... may it be even possible to port bigger c64 programs then?
+&gt; what about the kernal/basic rom in the p500 (never heard of a C510
+&gt; ;=)) .... maybe an interisting target for a WiLD! Demo ;=P
+
+Well, what I said was not correct. Programs on the C64 have 50K memory
+available, on the CBM510 it is 48K. This is somewhat less as with the CBM610
+machines, mostly because I had to move the complete VIC data including the
+character ROM into the execution bank to make sprites possible (which are
+needed for the mouse support). But this does also mean that the character data
+is also in RAM and modifyable.
+
+&gt; would you sent that main.c to me in private mail? i'd love to checkout
+&gt; what you actually changed in the code to make it faster :=)
+
+I will send you the changed source in private mail and add it as a new sample
+program to the head branch. Most of the changes are for readbility, some more
+to support other platforms than the C64, and a great part of the remaining
+changes do not help with the current stable compiler version. See my next mail
+for a discussion of the changes that were responsible for the first 50%
+speedup.
+
+&gt; 12 fps is VERY acceptable now i think, considering how hard the job
+&gt; for the compiler is in this case :=)
+
+Here is what the current development compiler generates for the inner loop:
+
+;
+; for (i = 0; i &lt; 40; ++i, ++scrn) {
+;
+	.dbg	line, &quot;test.c&quot;, 115
+	lda     #$00
+	sta     L0109+0
+L0155:	lda     L0109+0
+	cmp     #$28
+	bcs     L014F
+;
+; *scrn = (xbuf[i] + ybuf[ii]);
+;
+	.dbg	line, &quot;test.c&quot;, 116
+	lda     _scrn+0
+	ldx     _scrn+0+1
+	sta     ptr1
+	stx     ptr1+1
+	ldx     L0109+0
+	lda     L0106+0,x
+	sta     sreg
+	ldx     L010A+0
+	lda     L0108+0,x
+	clc
+	adc     sreg
+	ldy     #$00
+	sta     (ptr1),y
+;
+; for (i = 0; i &lt; 40; ++i, ++scrn) {
+;
+	.dbg	line, &quot;test.c&quot;, 115
+	inc     L0109+0
+	inc     _scrn+0
+	bne     L0155
+	inc     _scrn+0+1
+	jmp     L0155
+
+I think this is rather good, and it is almost impossible to generate better
+code with an all purpose compiler/optimizer.
+
+&gt; pretty much definetly YES ;=P if anything, i am writing those little
+&gt; samples to show ppl what can be done and how ;=)
+
+Thanks!
+
+&gt; anyway, it works fine so far, just one question: how can i make SURE
+&gt; that this library-module will be linked in say straight after the
+&gt; startup-code (so it will never appear in the memory which is banked
+&gt; under the basic-rom) ?
+
+You may add the module as the second module on the command line, or you may
+use a special memory setup. When using banking you will probably need such a
+setup anyway, because some of the code may be banked, while other code and all
+of the data must always be available.
+
+Regards
+
+
+        Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20snapshot%20#1">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20snapshot%20#1">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0759.html">Ullrich von Bassewitz: "Re: [cc65] snapshot #1"</a>
+<li><strong>Previous message:</strong> <a href="0757.html">groepaz: "Re[4]: [cc65] snapshot #1"</a>
+<li><strong>In reply to:</strong> <a href="0755.html">groepaz: "Re[2]: [cc65] snapshot #1"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0760.html">groepaz: "Re[2]: [cc65] snapshot #1"</a>
+<li><strong>Reply:</strong> <a href="0760.html">groepaz: "Re[2]: [cc65] snapshot #1"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:42 CET</em>
+</em>
+</small>
+</body>
+</html>

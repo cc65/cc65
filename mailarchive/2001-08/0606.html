@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Graphics library</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Graphics library">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Graphics library</h1>
+<!-- received="Mon Aug 13 15:58:12 2001" -->
+<!-- isoreceived="20010813135812" -->
+<!-- sent="Mon, 13 Aug 2001 15:58:15 +0200" -->
+<!-- isosent="20010813135815" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Graphics library" -->
+<!-- id="20010813155815.A31083@trixie.musoftware.de" -->
+<!-- inreplyto="Pine.GSO.4.20.0108131529050.19115-100000@studserv.stud.uni-hannover.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Graphics%20library"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2001-08-13 15:58:15
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0607.html">groepaz: "Re[2]: [cc65] Graphics library"</a>
+<li><strong>Previous message:</strong> <a href="0605.html">daniel pralle: "Re: [cc65] Graphics library"</a>
+<li><strong>In reply to:</strong> <a href="0605.html">daniel pralle: "Re: [cc65] Graphics library"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0607.html">groepaz: "Re[2]: [cc65] Graphics library"</a>
+<li><strong>Reply:</strong> <a href="0607.html">groepaz: "Re[2]: [cc65] Graphics library"</a>
+<li><strong>Reply:</strong> <a href="0608.html">MagerValp: "Re: [cc65] Graphics library"</a>
+<li><strong>Reply:</strong> <a href="0621.html">Andre Majorel: "Re: [cc65] Graphics library"</a>
+<li><strong>Reply:</strong> <a href="0642.html">Maciej Witkowiak: "Re: [cc65] Graphics library"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Mon, Aug 13, 2001 at 03:31:56PM +0200, daniel pralle wrote:
+&gt; I could help you porting the C64-lib to the atari.
+
+There is currently no library to port. But your input would be valuable for
+the design of the API. My current idea is to use something similar to the old
+borland graphics interface for DOS:
+
+    unsigned char initgraph (unsigned char mode);
+    /* Initialize the graphics screen to the given mode, return the new mode.
+     * Not all modes are available on all systems, check the returned mode
+     * to see if the initialization was successful.
+     */
+
+    void closegraph (void);
+    /* End graphics mode, switch back to text mode */
+	
+    void cleargraphscreen (void);
+    /* Clear the screen */
+
+    unsigned char getgraphmode (void);
+    /* Return the current graphics mode */
+
+    void setcolor (unsigned char color);
+    /* Set the current drawing color */
+
+    unsigned char getcolor (void);
+    /* Return the current drawing color */
+
+    unsigned char getmaxcolor (void);
+    /* Return the maximum supported color number (the number of colors would
+     * then be getmaxcolor()+1).
+     */
+
+    unsigned getmaxx (void);
+    /* Return the maximum x coordinate. The resolution in x direction is
+     * getmaxx() + 1
+     */
+
+    unsigned getmaxy (void);
+    /* Return the maximum y coordinate. The resolution in y direction is
+     * getmaxy() + 1
+     */
+
+    unsigned char getpixel (int x, int y);
+    /* Get the color value of a pixel */
+
+    void putpixel (int x, int y);
+    /* Plot a point in the current drawing color */
+
+    void line (int x1, int y1, int x2, int y2);
+    /* Draw a line in the current drawing color */
+
+    void circle (int x, int y, unsigned radius);
+    /* Draw a circle in the current drawing color */
+
+    void outtext (int x, int y, const char* text);
+    /* Print a text in graphics mode */
+
+...and maybe some more routines like ellipse, arc, settextstyle and so on.
+
+Having different line styles would be nice, but the implementation is rather
+complex and makes the whole library larger, so I think it's ok to support just
+lines without patterns in a first step. Other optional functions that may be
+added later:
+
+    void setwritemode (unsigned char mode);
+    /* Set a plot mode (PUT, XOR, OR, AND, ...) */
+
+    void setfillpattern (unsigned char pattern);
+    /* Set a pattern for area fills */
+
+    void bar (unsigned x1, unsigned y1, unsigned x2, unsigned y2);
+    /* Draw a bar (a filled rectangle) using the current fill pattern */
+
+    ....
+
+Which colors are supported depends on the machine and the graphics mode. The
+getmax..() functions are used to query the mode settings at runtime.
+
+Using zero as the default text mode will make it easy to check for errors and
+switch back to text mode without knowing which grahpics mode is active. Having
+loadable drivers may be an idea for machines with lots of different graphics
+modes, but the implementation is complex, and I would prefer a simple but
+working solution to a high tech one fits all approach that will never get
+done, because it's too complex.
+
+Regards
+			  
+
+        Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Graphics%20library">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Graphics%20library">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0607.html">groepaz: "Re[2]: [cc65] Graphics library"</a>
+<li><strong>Previous message:</strong> <a href="0605.html">daniel pralle: "Re: [cc65] Graphics library"</a>
+<li><strong>In reply to:</strong> <a href="0605.html">daniel pralle: "Re: [cc65] Graphics library"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0607.html">groepaz: "Re[2]: [cc65] Graphics library"</a>
+<li><strong>Reply:</strong> <a href="0607.html">groepaz: "Re[2]: [cc65] Graphics library"</a>
+<li><strong>Reply:</strong> <a href="0608.html">MagerValp: "Re: [cc65] Graphics library"</a>
+<li><strong>Reply:</strong> <a href="0621.html">Andre Majorel: "Re: [cc65] Graphics library"</a>
+<li><strong>Reply:</strong> <a href="0642.html">Maciej Witkowiak: "Re: [cc65] Graphics library"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:41 CET</em>
+</em>
+</small>
+</body>
+</html>

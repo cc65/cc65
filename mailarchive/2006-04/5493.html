@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] linker bug</title>
+<meta name="Author" content="Andrew J. Kroll (forge1dr.ea.ms)" />
+<meta name="Subject" content="[cc65] linker bug" />
+<meta name="Date" content="2006-04-27" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] linker bug</h1>
+<!-- received="Thu Apr 27 16:21:01 2006" -->
+<!-- isoreceived="20060427142101" -->
+<!-- sent="Thu, 27 Apr 2006 10:20:48 -0400 (EDT)" -->
+<!-- isosent="20060427142048" -->
+<!-- name="Andrew J. Kroll" -->
+<!-- email="forge1dr.ea.ms" -->
+<!-- subject="[cc65] linker bug" -->
+<!-- id="200604271420.k3REKmB2024714@dr.ea.ms" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5494.html" title="Ullrich von Bassewitz: &quot;[cc65] Linker feature (was: linker bug)&quot;">Next message</a> ]
+[ <a href="5492.html" title="silverdr1inet.com.pl: &quot;Re: [cc65] overlapping segments, segment groups?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5494.html" title="Ullrich von Bassewitz: &quot;[cc65] Linker feature (was: linker bug)&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Andrew J. Kroll &lt;<a href="mailto:forge1dr.ea.ms?Subject=Re:%20[cc65]%20linker%20bug">forge1dr.ea.ms</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2006-04-27 16:20:48</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>While compiling one of my projects, I tripped an odd bug in the link phase.
+
+I have provided an example tarball @ <a href="http://dr.ea.ms/~oldfart/CC65/">http://dr.ea.ms/~oldfart/CC65/</a>
+
+The problem is that ld65 sees _main only in object files. It should really
+not matter if it is inside an archive either. The bug was found while 
+I was tring to link together a program that has a rather large amount of
+object files, and it is a speedup and easier to link up from a single 
+archive of routines than 30 files.
+
+I know your going to ask &quot;why are you putting main() in the archive&quot;
+
+Simple answer... because it should not matter if main() IS in the archive
+or in the initial object file, and because it is a speedup trick on
+certain slow native compilers. This is (again) the first compiler I have ran
+across that falls apart when I do something, and it seems bizzarre to have
+to constantly modify things for one compiler.
+
+Reguardless, it is a bug. Hope you can fix it this weekend. Thank you.
+
+Yours,
+-- 
+Andrew J. Kroll
+Software and Hardware Engineer and Consultant
+Grafixoft <a href="http://dr.ea.ms/HW/">http://dr.ea.ms/HW/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Apr 27 16:21:01 2006</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5494.html" title="Next message in the list">Ullrich von Bassewitz: "[cc65] Linker feature (was: linker bug)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5492.html" title="Previous message in the list">silverdr1inet.com.pl: "Re: [cc65] overlapping segments, segment groups?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5494.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "[cc65] Linker feature (was: linker bug)"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5494.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "[cc65] Linker feature (was: linker bug)"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5493" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5493" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5493" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2006-04-27 16:21:04 CEST
+</em></small></p>
+</body>
+</html>

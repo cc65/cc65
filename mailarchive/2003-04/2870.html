@@ -1,0 +1,166 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] linker cfg files</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] linker cfg files">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] linker cfg files</h1>
+<!-- received="Tue Apr 22 15:32:05 2003" -->
+<!-- isoreceived="20030422133205" -->
+<!-- sent="Tue, 22 Apr 2003 15:28:29 +0200" -->
+<!-- isosent="20030422132829" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] linker cfg files" -->
+<!-- id="200304221528.29547.groepaz@gmx.net" -->
+<!-- inreplyto="3EA2B89D.BFE7BB33@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20linker%20cfg%20files"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2003-04-22 15:28:29
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2869.html">sandree: "Re: [cc65] linker cfg files"</a>
+<li><strong>In reply to:</strong> <a href="2867.html">3843416: "[cc65] linker cfg files"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2871.html">Stephan Lesch: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="2871.html">Stephan Lesch: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="2872.html">Stephan Lesch: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="2874.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Sunday 20 April 2003 17:11, 3843416 wrote:
+&gt; MEMORY {
+&gt;  ZP: start = $02, size = $1A, type = rw;
+&gt;  RAMLO: start = $07ff, size = $1800, define = yes, file = %O;
+&gt;   BMP: start = $2000, size = $1f40, define = yes, file = %O;
+&gt;   RAM: start = $3f3e, size = $4000, define = yes, file = %O;
+&gt; }
+
+slight mistake :o)
+
+&gt;   BMP: start = $2000, size = $1f3e, define = yes, file = %O;
+                                           ^^^^^^^^^^^^^
+&gt;   RAM: start = $3f3e, size = $4000, define = yes, file = %O;
+
+try to change that.... i have no clue how the linker deals with overlapping 
+segments, but if it doesnt throw an error (which it should probably.... UZ??? 
+:O)) i would expect it to garble the output..... maybe changing this is 
+already the solution to your problem.
+
+&gt; SEGMENTS {
+&gt;   BITMAP: load = BMP, type = bss;
+&gt;   STARTUP: load = RAMLO, type = wprot;
+&gt;   CODE: load = RAMLO, type = wprot;
+&gt;   RODATA: load = RAMLO, type = wprot;
+&gt;  DATA: load = RAM, type = rw;
+&gt;  BSS: load = RAM, type = bss, define = yes;
+&gt;  ZEROPAGE: load = ZP, type = zp;
+&gt; }
+
+ok....uhmz...except there is no &quot;LOWCODE&quot; segment (which the startupcode uses) 
+... sure this is what you want? (dont you get warnings about missing 
+segments?)
+
+&gt; FEATURES {
+&gt;  CONDES: segment = RODATA,
+&gt;   type = constructor,
+&gt;   label = __CONSTRUCTOR_TABLE__,
+&gt;   count = __CONSTRUCTOR_COUNT__;
+&gt;  CONDES: segment = RODATA,
+&gt;   type = destructor,
+&gt;   label = __DESTRUCTOR_TABLE__,
+&gt;   count = __DESTRUCTOR_COUNT__;
+&gt; }
+&gt; SYMBOLS {
+&gt;  __STACKSIZE__ = $800; # 2K stack
+&gt; }
+
+also ok... btw stacksize can be easily reduced to like $400 bytes or even less 
+(i've used $0200 bytes for the pcengine stuff and it still works ok for 
+me..... probably not for deep recursion stuff and alike though :=P)
+
+&gt; then i used following assembly prg to reserve storage in the
+&gt; BITMAP segment:
+&gt;
+&gt; .segment &quot;BITMAP&quot;
+&gt; .res 8000,0
+
+this might work, but it is not sane.... it doesnt garantee (? err) at which 
+memory location this block will be allocated.... however since you have 
+defined a seperate section &quot;BMP&quot; and dont use it for anything else, it will 
+still work :=)
+
+in this case, you might omit the above completely and just use the &quot;BMP&quot; 
+section manually (if you dont use it for other stuff than bitmap that is)... 
+this might save you some bytes in the final binary (however not in this case, 
+since the BMP section is located in the middle of the binary so it can not be 
+ommited from the output file)
+
+&gt; the rest was done in c. i expect malloc to reserve storage in this
+&gt; segment, so that the program crashes. yes, that is what it does.
+&gt; without using this memory configuration the program ran already.
+
+so are you using malloc at all? (just asking because the above &quot;res 8000,0&quot; 
+will not use malloc but allocate space at compile time).
+
+tjam.... maybe you can post an as-small-as-possible testprogram that leads to 
+the same problem?
+
+gpz
+
+btw as someone else suggested.... you can avoid lotta trouble of you use the 
+ram under kernel/io for bitmap graphics (and you also dont loose all the 
+valueable space for your c-program)
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20linker%20cfg%20files">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2869.html">sandree: "Re: [cc65] linker cfg files"</a>
+<li><strong>In reply to:</strong> <a href="2867.html">3843416: "[cc65] linker cfg files"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2871.html">Stephan Lesch: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="2871.html">Stephan Lesch: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="2872.html">Stephan Lesch: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="2874.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-04-22 15:35:49 CEST</em>
+</em>
+</small>
+</body>
+</html>

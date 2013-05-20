@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] declaring variables after code</title>
+<meta name="Author" content="Steve Davison (64subnet1gmail.com)" />
+<meta name="Subject" content="[cc65] declaring variables after code" />
+<meta name="Date" content="2010-04-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] declaring variables after code</h1>
+<!-- received="Fri Apr 23 00:54:48 2010" -->
+<!-- isoreceived="20100422225448" -->
+<!-- sent="Thu, 22 Apr 2010 15:54:31 -0700" -->
+<!-- isosent="20100422225431" -->
+<!-- name="Steve Davison" -->
+<!-- email="64subnet1gmail.com" -->
+<!-- subject="[cc65] declaring variables after code" -->
+<!-- id="n2p6c36ebcc1004221554l955408e7kc56a0cc949a9ef7e@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8109.html" title="Groepaz: &quot;Re: [cc65] declaring variables after code&quot;">Next message</a> ]
+[ <a href="8107.html" title="Payton Byrd: &quot;Re: [cc65] Please be patient... More questions&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8109.html" title="Groepaz: &quot;Re: [cc65] declaring variables after code&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Steve Davison &lt;<a href="mailto:64subnet1gmail.com?Subject=Re:%20[cc65]%20declaring%20variables%20after%20code">64subnet1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-04-23 00:54:31</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I just deduced that cc65 does not allow variables to be defined
+in a scope after code has been encountered...  as illustrated in
+this nonsense code:
+
+
+void func( int var)
+{
+    int temp;
+    int tot = 1;
+    tot += var;                     // First code
+    temp = tot - var;
+
+    int i;       // new bss var (line 75)... ERROR (see below)
+    for (i = 0;  i &lt; temp;  ++i)
+        ++tot;
+
+    // This is also a problem, even if it's at the top of
+    // the function
+    for (int x=0;  x&lt;3;  ++x)
+        ;
+}
+
+
+MAIN.C(75): Error: Expression expected
+MAIN.C(75): Warning: Statement has no effect
+MAIN.C(75): Error: `;' expected
+MAIN.C(75): Error: Undefined symbol: `i'
+
+I haven't found  mention of this limitation in the docs or
+archives, and it is valid in C99 standard.  It seems to make
+it impossible to ever declare a variable in a for loop header,
+even though that new variable has a scope internal to the loop.
+
+What am I missing?
+// Steve
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Apr 23 00:54:48 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8109.html" title="Next message in the list">Groepaz: "Re: [cc65] declaring variables after code"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8107.html" title="Previous message in the list">Payton Byrd: "Re: [cc65] Please be patient... More questions"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8109.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] declaring variables after code"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8109.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] declaring variables after code"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8112.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Re: [cc65] declaring variables after code"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8108" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8108" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8108" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-04-23 00:54:50 CEST
+</em></small></p>
+</body>
+</html>

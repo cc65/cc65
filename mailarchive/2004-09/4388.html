@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] experimental porting libraries</title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="[cc65] experimental porting libraries" />
+<meta name="Date" content="2004-09-04" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] experimental porting libraries</h1>
+<!-- received="Sat Sep  4 07:28:43 2004" -->
+<!-- isoreceived="20040904052843" -->
+<!-- sent="Sat, 4 Sep 2004 07:20:02 +0200" -->
+<!-- isosent="20040904052002" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="[cc65] experimental porting libraries" -->
+<!-- id="200409040720.03080.groepaz@gmx.net" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="000601c4923d$5efe4900$14662c42&#64;palace" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4389.html" title="Christian Groessler: &quot;Re: [cc65] Atari: Loading code with DOS 2.0 help?&quot;">Next message</a> ]
+[ <a href="4387.html" title="Greg King: &quot;Re: [cc65] Atari: Loading code with DOS 2.0 help?&quot;">Previous message</a> ]
+[ <a href="4387.html" title="Greg King: &quot;Re: [cc65] Atari: Loading code with DOS 2.0 help?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4410.html" title="Christian Groessler: &quot;Re: [cc65] experimental porting libraries&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20experimental%20porting%20libraries">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-09-04 07:20:02</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>i've uploaded some of the code that has been collecting
+dust on my hd for a while now... all of this is going to
+somehow end up on the contiki cvs in a while, but its 
+still a bit &quot;dirty&quot; at many places......however it 
+might still be useful for some (afterall, i managed to
+port contiki with it...)
+
+<a href="ftp://ftp.musoftware.de/pub/groepaz/cc65-portlib.zip">ftp://ftp.musoftware.de/pub/groepaz/cc65-portlib.zip</a>
+
+this contains a lot of code for various systems (gbc/gba/
+gp32/pcengine etc etc), most interisting probably the
+conio and joystick compatible stuff. most cc65 apps that
+use these apis should just work fine with it. if you are
+adventurous, there is a very very barebones (and non
+working) implementation for the speccy...maybe someone
+wants to look at it and provide a woring version (that
+would help with porting contiki to the speccy too :))
+
+<a href="ftp://ftp.musoftware.de/pub/groepaz/cc65-portlib-samples.zip">ftp://ftp.musoftware.de/pub/groepaz/cc65-portlib-samples.zip</a>
+
+some small test progs, including the latest version of my
+tetris clone.
+
+<a href="ftp://ftp.musoftware.de/pub/groepaz/portlib_pc.zip">ftp://ftp.musoftware.de/pub/groepaz/portlib_pc.zip</a>
+
+contains a lot of rather ugly pc related code, but also
+a quite well working implementation of the conio api and
+a few other things that were needed to make tetris work.
+(please DONT look at stuff like the vga and sdl related
+thingies - i have written them many many years ago and
+they are only in there coz some of my tools rely on them)
+
+that pc crap is tested on win32 and x86linux, and almost
+working on mac-osx (latest changed not in this zip i 
+believe). it should however work on cygwin too, and
+even on djgpp - but you will have to update the makefiles.
+
+the zips are just a snapshot of my workdirs and no real
+distribution or anything - so there is source and 
+objectfiles and everything cluttered together...oh well :=P
+
+have fun!
+
+gpz
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Sep  4 07:28:43 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4389.html" title="Next message in the list">Christian Groessler: "Re: [cc65] Atari: Loading code with DOS 2.0 help?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4387.html" title="Previous message in the list">Greg King: "Re: [cc65] Atari: Loading code with DOS 2.0 help?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4387.html" title="Message to which this message replies">Greg King: "Re: [cc65] Atari: Loading code with DOS 2.0 help?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4410.html" title="Next message in this discussion thread">Christian Groessler: "Re: [cc65] experimental porting libraries"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4410.html" title="Message sent in reply to this message">Christian Groessler: "Re: [cc65] experimental porting libraries"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4388" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4388" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4388" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-09-04 07:28:52 CEST
+</em></small></p>
+</body>
+</html>

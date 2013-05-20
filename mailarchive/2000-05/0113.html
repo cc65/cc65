@@ -1,0 +1,216 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] Version 2.4.1 released</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="[cc65] Version 2.4.1 released">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] Version 2.4.1 released</h1>
+<!-- received="Sat May  6 13:18:56 2000" -->
+<!-- isoreceived="20000506111856" -->
+<!-- sent="Sat, 6 May 2000 13:18:41 +0200" -->
+<!-- isosent="20000506111841" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="[cc65] Version 2.4.1 released" -->
+<!-- id="20000506131841.A6624@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Version%202.4.1%20released"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2000-05-06 13:18:41
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0114.html">Groepaz: "[cc65] repeating code blocks"</a>
+<li><strong>Previous message:</strong> <a href="../2000-04/0112.html">David Lloyd: "Re: [cc65] Adding a listing output feature"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0114.html">Groepaz: "[cc65] repeating code blocks"</a>
+<li><strong>Reply:</strong> <a href="0114.html">Groepaz: "[cc65] repeating code blocks"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+I have released version 2.4.1 of the cc65 C compiler.
+
+Version 2.4.1 is a bugfix release. It includes all existing patches for
+version 2.4.0 plus the new random number generator from Sidney. The Atari and
+GEOS code is NOT part of this release. I'm somewhat sorry about this, but the
+changes were too big for a bugfix release, and including them would have
+needed a lot more testing. I wanted to provide a stable version for general
+use without much effort from my side, so that the work on the next major
+version can go on without pressure.
+
+Since I'm the proud owner of an old Sun machine now, I'm able to provide not
+only binary RPMs for Intel but also for sparc machines. The new RPMs are GPG
+signed with my GPG private key (available from my homepage).
+
+The official announcement is appended below (it does not include anything
+spectacular, it's mostly the same as for every other version:-)
+
+Have fun!
+
+
+	Uz
+
+
+
+----------------------------------------------------------------------------
+
+I'm proud to announce version 2.4.1 of CC65, a C crosscompiler /
+crossassembler combo for 6502 systems.
+
+CC65 has C and runtime library support for most CBM machines, and -
+thanks to the great work of Kevin Ruland - for the Apple ][. The
+libraries are fairly portable, so creating a version for other 6502s
+shouldn't be too much work.
+
+Here is a list of the compiler features:
+
+  * Includes a C compiler, macro assembler, archiver, linker and a
+    frontend (compile &amp; link) utility. The assembler generates
+    relocatable object files, the linker is very configurable and allows
+    overlays, ROMable code, splitted output and much more.
+
+  * The compiler is not quite ISO compatible, however, a large subset
+    is supported.
+
+  * Supported target systems are:
+
+    	- C64
+    	- C128
+    	- C16, C116, Plus/4
+    	- CBM 600/700 family (programs run in bank 1)
+    	- Newer PET machines (not 2001)
+	- The Apple ][
+
+    For all these systems a precompiled runtime and C library is
+    available. Supporting more targets is not very difficult since the C
+    library was written with portability in mind.
+
+  * Several system specific support routines like a conio library or
+    modules for joystick access are available.
+
+  * The assembler and linker do also support the 65816 as a target,
+    however, the compiler is not able to generate code for this CPU and
+    there is no RTL support.
+
+  * Lots of docs and a few sample programs included.
+
+  * Easy interfacing between C code and assembler.
+
+  * Fullscreen debugger for most machines as a linkable module.
+
+  * Full sourcecode available as well as binaries for
+
+  	- Linux (RedHat 6.x RPMs for Intel and Sparc machines)
+  	- DOS
+  	- Windows 95/98/NT
+
+
+
+Version 2.4.1 is mainly a bug fix version. It includes patches for all bugs
+in 2.4.0 that were real errors and not just inconvenient. In addition, the
+random number generator has been replaced by an improved version written by
+Sidney Cadot. Apart from that, there are no new features in this version.
+
+
+
+More information:
+
+For your convenience, I've put all doc files also on the web server:
+
+    <a href="http://www.von-bassewitz.de/uz/cc65/doc/">http://www.von-bassewitz.de/uz/cc65/doc/</a>
+
+The cc65 main page
+
+    <a href="http://www.von-bassewitz.de/uz/cc65/">http://www.von-bassewitz.de/uz/cc65/</a>
+
+will get updated to reflect the new version in the next few days.
+
+There is also a cc65 mailing list. To subscribe, send a mail to
+<a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Version%202.4.1%20released">majordomo_at_musoftware.de</a> with the command
+
+    subscribe cc65
+
+in the body of the mail.
+
+
+
+Available packages:
+
+As usual I will provide the complete sources and several binary packages
+binaries. There's a binary RPM for RedHat which is probably the fastest
+way to get going if you're running RedHat Linux. Since this is also my
+development platform, new features and bug fixes are first available for
+Linux.
+
+Binaries for DOS and and Windows will follow or may already be available
+at the time you read this. While the sources do still compile under OS/2,
+I have dropped support for OS/2 binaries, since were almost no downloads
+of the OS/2 version.
+
+
+
+Download:
+
+For more information and links to the FTP server, see
+
+    	<a href="http://www.von-bassewitz.de/uz/cc65/">http://www.von-bassewitz.de/uz/cc65/</a>
+
+For direct download, use
+
+        <a href="ftp://ftp.musoftware.de/pub/uz/cc65/">ftp://ftp.musoftware.de/pub/uz/cc65/</a>
+
+
+
+Thanks to all who sent feedback and suggestions!
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Version%202.4.1%20released">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Version%202.4.1%20released">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0114.html">Groepaz: "[cc65] repeating code blocks"</a>
+<li><strong>Previous message:</strong> <a href="../2000-04/0112.html">David Lloyd: "Re: [cc65] Adding a listing output feature"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0114.html">Groepaz: "[cc65] repeating code blocks"</a>
+<li><strong>Reply:</strong> <a href="0114.html">Groepaz: "[cc65] repeating code blocks"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:36 CET</em>
+</em>
+</small>
+</body>
+</html>

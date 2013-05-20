@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] TGI preview</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] TGI preview" />
+<meta name="Date" content="2009-11-20" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] TGI preview</h1>
+<!-- received="Fri Nov 20 01:40:13 2009" -->
+<!-- isoreceived="20091120004013" -->
+<!-- sent="Fri, 20 Nov 2009 01:40:07 +0100" -->
+<!-- isosent="20091120004007" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] TGI preview" -->
+<!-- id="20091120004007.GA4281@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="135979.14386.qm&#64;web56504.mail.re3.yahoo.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7623.html" title="Anthony Lawther: &quot;Re: [cc65] TGI preview&quot;">Next message</a> ]
+[ <a href="7621.html" title="Fatih Aygün: &quot;Re: [cc65] TGI preview&quot;">Previous message</a> ]
+[ <a href="7621.html" title="Fatih Aygün: &quot;Re: [cc65] TGI preview&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7623.html" title="Anthony Lawther: &quot;Re: [cc65] TGI preview&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20TGI%20preview">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-11-20 01:40:07</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Thu, Nov 19, 2009 at 03:12:38PM -0800, Fatih AygÃ¼n wrote:
+&gt; &gt; Now the question is how to handle this stuff. Having the line clipper hang is
+&gt; &gt; ugly, but handling (or checking for) integer overflows withing the line
+&gt; &gt; clipper eats memory and performance. Any votes?
+&gt;
+&gt; Can the clipper cope with small negative values?
+
+Yes, that's no problem. It does signed 16 bit arithmetic, with a 32 bit
+intermediate result when multiplying, so even coordinates far outside the
+visible screen should be ok. The problematic code was:
+
+    tgi_outtextxy ((XRes - tgi_textwidth (Text)) / 2, Y, Text);
+
+XRes and the result of tgi_textwidth() were both unsigneds, but the latter
+larger than the former, so the result of the subtraction was negative.
+Dividing by two was done for unsigned, not for signed and so the result was
+something like 0x7FD8. This caused an integer overflow in the clipping code,
+because even a small increment made the value negative. Casting to int before
+the divide makes the code work.
+
+&gt; If so, I'd vote for faster &amp; smaller code.
+
+Ok. Vote taken:-)
+
+&gt; What's the maximum resolution for tgi targets anyway? If documented
+&gt; properly, tgi_line being unable to cope with coords larger than say,
+&gt; 1024 shouldn't hurt anybody.
+
+The limits cannot be given as definite values, because a formula like
+
+  tgi_clip_y1 += (tgi_xmax - tgi_clip_x1) * tgi_clip_dy / tgi_clip_dx
+
+is calculated. So larger X values are acceptable if the Y values are small and
+vice versa. But possible coordinates are definitely much larger than +/- 2^10.
+My estimate is that anything up to 2^14 is safe. In my case I had generated a
+value near 2^15 because of the error.
+
+What I don't like is the idea that the routine just hangs for these values.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Nov 20 01:40:13 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7623.html" title="Next message in the list">Anthony Lawther: "Re: [cc65] TGI preview"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7621.html" title="Previous message in the list">Fatih Aygün: "Re: [cc65] TGI preview"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7621.html" title="Message to which this message replies">Fatih Aygün: "Re: [cc65] TGI preview"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7623.html" title="Next message in this discussion thread">Anthony Lawther: "Re: [cc65] TGI preview"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7623.html" title="Message sent in reply to this message">Anthony Lawther: "Re: [cc65] TGI preview"</a></li>
+<li><dfn>Reply</dfn>:  <a href="7624.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] TGI preview"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7622" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7622" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7622" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-11-20 01:40:15 CET
+</em></small></p>
+</body>
+</html>

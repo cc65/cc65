@@ -1,0 +1,44 @@
+Submitted By: Mario Fetka (mario dot fetka at gmail dot com)
+Date: 2009-02-02
+Initial Package Version: 2.12.0
+Origin: me
+Upstream Status: unknown
+Description: reorder link command to work with --as-needed link command
+ 
+diff -Naur cc65-2.12.0.orig/src/cc65/make/gcc.mak cc65-2.12.0/src/cc65/make/gcc.mak
+--- cc65-2.12.0.orig/src/cc65/make/gcc.mak	2005-12-11 12:40:50.000000000 +0000
++++ cc65-2.12.0/src/cc65/make/gcc.mak	2009-02-02 21:59:15.607008243 +0000
+@@ -110,7 +110,7 @@
+ endif
+ 
+ $(EXE):	$(OBJS) $(LIBS)
+-	$(CC) $(LDFLAGS) -o $(EXE) $(CFLAGS) $(OBJS) $(LIBS)
++	$(CC) $(CFLAGS) $(OBJS) $(LIBS) $(LDFLAGS) -o $(EXE)
+ 	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $(EXE) ; fi
+ 
+ clean:
+diff -Naur cc65-2.12.0.orig/src/cl65/make/gcc.mak cc65-2.12.0/src/cl65/make/gcc.mak
+--- cc65-2.12.0.orig/src/cl65/make/gcc.mak	2005-12-11 12:40:50.000000000 +0000
++++ cc65-2.12.0/src/cl65/make/gcc.mak	2009-02-02 22:00:23.431638032 +0000
+@@ -37,7 +37,7 @@
+ 
+ 
+ cl65:	$(OBJS) $(LIBS)
+-	$(CC) $(LDFLAGS) -o cl65 $(OBJS) $(LIBS)
++	$(CC) $(OBJS) $(LIBS) $(LDFLAGS) -o cl65
+ 	@if [ $(OS2_SHELL) ] ;	then $(EBIND) cl65 ; fi
+ 
+ clean:
+diff -Naur cc65-2.12.0.orig/src/od65/make/gcc.mak cc65-2.12.0/src/od65/make/gcc.mak
+--- cc65-2.12.0.orig/src/od65/make/gcc.mak	2005-12-11 12:40:51.000000000 +0000
++++ cc65-2.12.0/src/od65/make/gcc.mak	2009-02-02 22:01:31.053718478 +0000
+@@ -33,7 +33,7 @@
+ 
+ 
+ $(EXE):	$(OBJS)
+-	$(CC) $(LDFLAGS) -o $(EXE) $(CFLAGS) $(OBJS) $(LIBS)
++	$(CC) $(CFLAGS) $(OBJS) $(LIBS) $(LDFLAGS) -o $(EXE)
+ 	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $(EXE) ; fi
+ 
+ clean:
+

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] TGI bitmap font problem</title>
+<meta name="Author" content="Greg King (greg.king41verizon.net)" />
+<meta name="Subject" content="Re: [cc65] TGI bitmap font problem" />
+<meta name="Date" content="2011-07-18" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] TGI bitmap font problem</h1>
+<!-- received="Mon Jul 18 11:28:13 2011" -->
+<!-- isoreceived="20110718092813" -->
+<!-- sent="Mon, 18 Jul 2011 04:17:32 -0400" -->
+<!-- isosent="20110718081732" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king41verizon.net" -->
+<!-- subject="Re: [cc65] TGI bitmap font problem" -->
+<!-- id="003201cc452c$fe8f8d40$443efea9@monarch" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="20110717132901.GA27564&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9600.html" title="Greg King: &quot;Re: [cc65] sizof zp registers&quot;">Next message</a> ]
+[ <a href="9598.html" title="Oliver Schmidt: &quot;Re: [cc65] sizof zp registers&quot;">Previous message</a> ]
+[ <a href="9595.html" title="Ullrich von Bassewitz: &quot;[cc65] TGI bitmap font problem&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king41verizon.net?Subject=Re:%20[cc65]%20TGI%20bitmap%20font%20problem">greg.king41verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-07-18 10:17:32</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: &quot;Ullrich von Bassewitz&quot;; on Sun, July 17, 2011; at 09:29 AM -0400
+&gt;
+&gt; There's a problem with scaled bitmap fonts when using an 8.8
+&gt; fixed-point scaling factor: Where does the next character begin?
+
+A better way of asking the question is:  Where does the current
+character end (the next character must begin at the next pixel, of
+course)?
+
+&gt;
+&gt; Assume a text string starting at 100,100 with a scaling factor
+&gt; of $0180 (= 1.5). If the width of the font is 9, the character would
+&gt; be scaled using 1.5, which gives a width of 9 * 1.5 = 13.5.
+&gt; Does the next character begin at 113.5, 113, or 114?
+
+We cannot plot a half-pixel!  Therefore, the real question is:
+Do we plot that character as 13 or 14 pixels wide.
+
+&gt;
+&gt; What if we have a scale factor of $140 (= 1.25). In the example above,
+&gt; the width would be 9 * 1.25 = 11.25.
+&gt;
+&gt; Assuming we start the next char. at the next full pixel, string-width
+&gt; calculation becomes really complex, because it is not just
+&gt; width*length, but for each character, the width must be added and
+&gt; rounding must be done.
+
+Again, I say that the real question is, do we truncate, round, or
+augment the fractional part of the character-width, _not_ the next
+position?  (It must be done in the same way that the font actually is
+drawn on the screen.)
+
+P.S., I wonder how the Lynx's hardware graphics engine answers those
+questions.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Jul 18 11:28:13 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9600.html" title="Next message in the list">Greg King: "Re: [cc65] sizof zp registers"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9598.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] sizof zp registers"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9595.html" title="Message to which this message replies">Ullrich von Bassewitz: "[cc65] TGI bitmap font problem"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9599" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9599" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9599" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-07-18 11:28:17 CEST
+</em></small></p>
+</body>
+</html>

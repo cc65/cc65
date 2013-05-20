@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] c question</title>
+<meta name="Author" content="Chiron Bramberger (chiron1bramberger.com)" />
+<meta name="Subject" content="Re: [cc65] c question" />
+<meta name="Date" content="2010-05-28" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] c question</h1>
+<!-- received="Fri May 28 06:52:28 2010" -->
+<!-- isoreceived="20100528045228" -->
+<!-- sent="Fri, 28 May 2010 00:52:19 -0400" -->
+<!-- isosent="20100528045219" -->
+<!-- name="Chiron Bramberger" -->
+<!-- email="chiron1bramberger.com" -->
+<!-- subject="Re: [cc65] c question" -->
+<!-- id="BA8A801E-5149-4CFF-B809-1DE7735EA611@bramberger.com" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="AANLkTinV4BX8WTM_LfTAB67zFyiwDWrHpHgqF7TcFjzP&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8441.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Universal Makefile: Some advanced magic wanted?&quot;">Next message</a> ]
+[ <a href="8439.html" title="S M: &quot;Re: [cc65] ASM to C help a n00b&quot;">Previous message</a> ]
+[ <a href="8427.html" title="Mark J. Reed: &quot;Re: [cc65] c question&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Chiron Bramberger &lt;<a href="mailto:chiron1bramberger.com?Subject=Re:%20[cc65]%20c%20question">chiron1bramberger.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-05-28 06:52:19</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Thanks - this is great! I will meditate on all these responses.
+
+
+On 27-May-10, at 7:21 AM, Mark J. Reed wrote:
+
+On Thu, May 27, 2010 at 2:32 AM, Chiron Bramberger  
+&lt;chiron&#64;bramberger&#46;<!--nospam-->com&gt; wrote:
+But what does the * mean (on_the_right*)? I really want to truly  
+understand this and not just how to &quot;make it go&quot;. I want to get it.
+
+It means the same thing, just from the other side. :)
+
+Basically, the asterisk means &quot;thing pointed to by&quot;.  So &quot;*x&quot; means  
+&quot;the thing pointed to by x&quot;.
+
+Thus, the declaration &quot;int *x&quot; means &quot;the thing pointed to by x is an  
+integer&quot;.  But that doesn't make much sense; you're not declaring the  
+thing pointed to by x.  Instead, you're declaring x.  What is the  
+type of x?  If you slide the * over  to get  &quot;int* x&quot;, then the rules  
+of C declarations tell you that x is of type &quot;int*&quot;.  So &quot;int *&quot;  
+means &quot;pointer to int&quot;.
+
+More generally, the trailing * only shows up in type expressions, and  
+means that the type under discussion is a pointer to whatever type  
+came before the *.  (The * is one of the things that gives C &quot;type  
+expressions&quot; instead of just type names.)
+
+Type expressions are important because  a pointer is not just a  
+memory address; it's a memory address plus information about what is  
+expected to be found at that memory address.  A memory address by  
+itself is not useful in C - you can't dereference it until the  
+compiler knows what type of value to retrieve from it.  You do that  
+by typecasting - putting a type expression in parentheses in front of  
+a value tells the compiler &quot;treat this value as this type&quot;.
+
+Typecasting by itself has nothing to do with pointers . . . (int) x  
+means &quot;treat x as an integer&quot;, and can be used whether x is a char or  
+an unsigned int or a float or whatever.  This is very useful for  
+pointers because the original meaning of * depends heavily on the  
+type of what comes after.  If x is a pointer to int, then *x is an  
+int.  If x is a pointer to char, then *x is a char.  But if you  
+combine the dereferencing with typecasting, you can get any kind of  
+value out of any pointer.  Which lets you do the C equivalent of  
+PEEK, among other things.
+
+For example, pretend that at address 0xC000 you have the two bytes  
+0x01 and 0x02.  Then:
+
+*((char *)0xC000)  is the character '\01'.
+
+  *((int *)0xC000) the integer value 0x0201.
+
+Note that that this assignment:
+
+int x  = *((char *)0xC000);
+
+Will assign 1 to x, not 0x0201.  The whole value is cast to an int  
+because it's being assigned to an integer variable; you could make  
+that explicit with another typecast:
+
+int x = (int)(*((char *)0xC000));
+
+but that doesn't change how the pointer is dereferenced.  The inner  
+typecast does that, and you only ever get a char value out of the  
+expression.
+
+Types are tied to sizes, and this matters when you do arithmetic on  
+pointer values, because offsets are automatically multiplied by the  
+size of the thing pointed to.  So given this:
+
+int *x = (int *)0xC000;
+
+Then x+1 is not pointing to 0xC001 but 0xC002.  This is how arrays  
+work in C: the compiler turns foo[bar] into *(foo+bar).
+
+
+-- 
+Mark J. Reed &lt;markjreed&#64;gmail&#46;<!--nospam-->com&gt;
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri May 28 06:52:28 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8441.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Universal Makefile: Some advanced magic wanted?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8439.html" title="Previous message in the list">S M: "Re: [cc65] ASM to C help a n00b"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8427.html" title="Message to which this message replies">Mark J. Reed: "Re: [cc65] c question"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8440" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8440" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8440" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-05-28 06:52:33 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Regbank</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Regbank">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Regbank</h1>
+<!-- received="Thu Jan  2 22:32:11 2003" -->
+<!-- isoreceived="20030102213211" -->
+<!-- sent="Thu, 2 Jan 2003 22:32:09 +0100" -->
+<!-- isosent="20030102213209" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Regbank" -->
+<!-- id="20030102213209.GB22456@trixie.musoftware.de" -->
+<!-- inreplyto="200301022102.h02L2tX03553@localhost.localdomain" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Regbank"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-01-02 22:32:09
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2191.html">Christian Groessler: "Re: [cc65] ATARI Multijoy Joystickdriver"</a>
+<li><strong>In reply to:</strong> <a href="2189.html">Debrune Jérôme: "[cc65] [CC65] Regbank"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2198.html">Debrune Jérôme: "Re: [cc65] Regbank"</a>
+<li><strong>Next in thread:</strong> <a href="2194.html">Groepaz: "[cc65] LUnix"</a>
+<li><strong>Reply:</strong> <a href="2198.html">Debrune Jérôme: "Re: [cc65] Regbank"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Thu, Jan 02, 2003 at 10:02:54PM +0100, Debrune Jérôme wrote:
+&gt; What does regbank in crt0.s ?
+
+regbank is no longer in crt0.s, it has been moved into a separate module
+called zeropage.s. It is used for register variables (which are kept in the
+zero page for the 6502).
+
+&gt; I mean, is it possible to use regbank without troubles, in asm routine and
+&gt; restore old values in regbank (At the end of the function) ?
+
+Yes. The calling function expects the values in regbank to survive a function
+call, so as long as you save the space on function entry and restore it on
+function exit, you may use regbank as you want.
+
+&gt; how can grab zp variables if ptr1,2,3,4,tmp1,tmp2,tmp3,tmp4 are used in a
+&gt; routine ? (That is why i would like to use regbank).
+
+&quot;sreg&quot; is one more zero page location that is safe to use. It contains the
+high word of a long value and is not expected to be saved across a function
+call. If you need even more zeropage locations, it depends on your code: If
+you want to write portable code, your only choice is to use regbank, and
+accept the overhead of saving and restoring it. If your code is written for
+one machine only, you can also use additional zero page locations that are
+known to be available on this specific machine. Either use numeric addresses,
+or create a special zero page segment and extend the linker config
+accordingly.
+
+&gt; BTW, is it possible to have a 2.9.0 release for atmos on cc65 ?
+
+There is no separate Atmos package, because this package would only consist of
+the startup file. The startup file alone is not of much use, because there is
+not a single chance to do I/O, not even a &quot;Hello world&quot; program can be
+written. On the other side, the &quot;atmos&quot; target is understood by all tools,
+including the linker, so cc65 *can* generate code for the Atmos.
+
+&gt; If something  is missing for this release ask me
+
+Having some code to do I/O would be useful (either file support, so printf()
+and friends would work, or conio support, so cprintf() and cgetc() would
+work). Once there is at least rudimentary library support, I will generate a
+separate Atmos package containing atmos.o and atmos.lib.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Regbank">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Regbank">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2191.html">Christian Groessler: "Re: [cc65] ATARI Multijoy Joystickdriver"</a>
+<li><strong>In reply to:</strong> <a href="2189.html">Debrune Jérôme: "[cc65] [CC65] Regbank"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2198.html">Debrune Jérôme: "Re: [cc65] Regbank"</a>
+<li><strong>Next in thread:</strong> <a href="2194.html">Groepaz: "[cc65] LUnix"</a>
+<li><strong>Reply:</strong> <a href="2198.html">Debrune Jérôme: "Re: [cc65] Regbank"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-01-02 22:32:14 CET</em>
+</em>
+</small>
+</body>
+</html>

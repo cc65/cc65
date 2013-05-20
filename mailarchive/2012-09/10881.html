@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] longbranch to local labels</title>
+<meta name="Author" content="Daniel Pralle (dpralle1gmx.de)" />
+<meta name="Subject" content="Re: [cc65] longbranch to local labels" />
+<meta name="Date" content="2012-09-18" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] longbranch to local labels</h1>
+<!-- received="Tue Sep 18 22:37:55 2012" -->
+<!-- isoreceived="20120918203755" -->
+<!-- sent="Tue, 18 Sep 2012 22:37:45 +0200" -->
+<!-- isosent="20120918203745" -->
+<!-- name="Daniel Pralle" -->
+<!-- email="dpralle1gmx.de" -->
+<!-- subject="Re: [cc65] longbranch to local labels" -->
+<!-- id="20120918223745.65ea0d7d@pferd" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="20120917222425.56067802&#64;pferd" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10882.html" title="thefox xofeht: &quot;Re: [cc65] longbranch to local labels&quot;">Next message</a> ]
+[ <a href="10880.html" title="Spiro Trikaliotis: &quot;Re: [cc65] [ld65] Overwriting fillval for one segment only?&quot;">Previous message</a> ]
+[ <a href="10878.html" title="Daniel Pralle: &quot;Re: [cc65] longbranch to local labels&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10882.html" title="thefox xofeht: &quot;Re: [cc65] longbranch to local labels&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Daniel Pralle &lt;<a href="mailto:dpralle1gmx.de?Subject=Re:%20[cc65]%20longbranch%20to%20local%20labels">dpralle1gmx.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-09-18 22:37:45</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I am not sure if the this eMail came thru. At least I did not receive
+it and it is not in my spam-folder:
+
+
+
+Fixed the redhat spec-file. Some typos and some missing files were not
+added to the file list. Seems like no one really uses redhat RPMs.
+
+If some one is interested here is the DIFF (the first lines are just
+needed for snapshots):
+
+-----------------------------------------------------------------
+
+13c13
+&lt; %define name cc65
+---
+&gt; %define name cc65-snapshot  
+15c15
+&lt; %define version 2.13.2
+---
+&gt; %define version 2.13.9.20120916  
+171c171
+&lt; %attr(644,root,root)        %{_libdir}/cc65/tgi/atr*.emd
+---
+&gt; %attr(644,root,root)        %{_libdir}/cc65/emd/atr*.emd  
+174a175
+&gt; %attr(644,root,root)        %{_libdir}/cc65/cfg/atari-*.cfg  
+195c196
+&lt; %attr(644,root,root)        %{_libdir}/cc65/tgi/atmos-*.ser
+---
+&gt; %attr(644,root,root)        %{_libdir}/cc65/ser/atmos-*.ser  
+266a268
+&gt; %attr(644,root,root)        %{_libdir}/cc65/cfg/c64-*.cfg  
+331a334
+&gt; %attr(644,root,root)        %{_libdir}/cc65/lib/geos-apple.lib  
+337c340
+&lt; 
+---
+&gt; %attr(644,root,root)        %{_libdir}/cc65/cfg/geos-*.cfg  
+503c506
+&lt; install -s -m 755 src/od65/sp65 $RPM_BUILD_ROOT%{_bindir}
+---
+&gt; install -s -m 755 src/sp65/sp65 $RPM_BUILD_ROOT%{_bindir}  
+
+
+------------------------------------------------------------------
+
+
+
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Sep 18 22:37:55 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10882.html" title="Next message in the list">thefox xofeht: "Re: [cc65] longbranch to local labels"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10880.html" title="Previous message in the list">Spiro Trikaliotis: "Re: [cc65] [ld65] Overwriting fillval for one segment only?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10878.html" title="Message to which this message replies">Daniel Pralle: "Re: [cc65] longbranch to local labels"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10882.html" title="Next message in this discussion thread">thefox xofeht: "Re: [cc65] longbranch to local labels"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10882.html" title="Message sent in reply to this message">thefox xofeht: "Re: [cc65] longbranch to local labels"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10892.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] longbranch to local labels"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10881" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10881" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10881" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-09-18 22:37:58 CEST
+</em></small></p>
+</body>
+</html>

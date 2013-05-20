@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Possible bug in cc65</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Possible bug in cc65" />
+<meta name="Date" content="2012-03-26" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Possible bug in cc65</h1>
+<!-- received="Mon Mar 26 18:39:01 2012" -->
+<!-- isoreceived="20120326163901" -->
+<!-- sent="Mon, 26 Mar 2012 18:38:46 +0200" -->
+<!-- isosent="20120326163846" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Possible bug in cc65" -->
+<!-- id="20120326163846.GA8791@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="1332778845.77443.YahooMailNeo&#64;web120606.mail.ne1.yahoo.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10188.html" title="Johan Kotlinski: &quot;Re: [cc65] Possible bug in cc65&quot;">Next message</a> ]
+[ <a href="10186.html" title="Christopher Pow: &quot;Re: [cc65] VICE file formats&quot;">Previous message</a> ]
+[ <a href="10185.html" title="Joseph Rose: &quot;[cc65] Possible bug in cc65&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10188.html" title="Johan Kotlinski: &quot;Re: [cc65] Possible bug in cc65&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Possible%20bug%20in%20cc65">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-03-26 18:38:46</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Mon, Mar 26, 2012 at 09:20:45AM -0700, Joseph Rose wrote:
+&gt;    I've been working on a cartridge libary for cc65's C64 platform and have
+&gt;    been encountering problems with one of the demos.  I converted a part of
+&gt;    the demo to run outside the demo (i.e. in the normal configuration) and
+&gt;    found the same two bugs; 1. cputsxy() displays garbage text and; 2. the
+&gt;    output for rand() is too regular.  I have the code here:
+
+I don't see a call to cputsxy in your code, so I don't know what you mean with
+&quot;cputsxy() displays garbage&quot;. 
+
+Regarding rand(): The standard doesn't make any statements about the quality
+of the pseudo-random numbers generated. I think that the quality of the
+generator is quite ok with regard to its size and speed. If you think
+otherwise, feel free to use your own improved random number generator.
+                                     
+One more comment: Using any of the conio functions to write beyond the end of
+one line is non portable and may cause undefined behaviour.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Mar 26 18:39:01 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10188.html" title="Next message in the list">Johan Kotlinski: "Re: [cc65] Possible bug in cc65"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10186.html" title="Previous message in the list">Christopher Pow: "Re: [cc65] VICE file formats"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10185.html" title="Message to which this message replies">Joseph Rose: "[cc65] Possible bug in cc65"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10188.html" title="Next message in this discussion thread">Johan Kotlinski: "Re: [cc65] Possible bug in cc65"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10187" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10187" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10187" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-03-26 18:39:05 CEST
+</em></small></p>
+</body>
+</html>

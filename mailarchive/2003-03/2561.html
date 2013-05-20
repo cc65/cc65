@@ -1,0 +1,139 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: RE: [cc65] malloc and Sort.c(26): Er</title>
+<meta name="Author" content="Greg Long (cc65_at_maneuveringspeed.com)">
+<meta name="Subject" content="RE: [cc65] malloc and Sort.c(26): Error: Expression expected">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>RE: [cc65] malloc and Sort.c(26): Error: Expression expected</h1>
+<!-- received="Tue Mar  4 08:24:55 2003" -->
+<!-- isoreceived="20030304072455" -->
+<!-- sent="Mon, 3 Mar 2003 23:23:44 -0800" -->
+<!-- isosent="20030304072344" -->
+<!-- name="Greg Long" -->
+<!-- email="cc65_at_maneuveringspeed.com" -->
+<!-- subject="RE: [cc65] malloc and Sort.c(26): Error: Expression expected" -->
+<!-- id="005001c2e21e$fd6f47e0$8001a8c0@ENDEAVOR" -->
+<!-- inreplyto="20030304070728.GA592@siphon.tcs.hut.fi" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Greg Long (<a href="mailto:cc65_at_maneuveringspeed.com?Subject=RE:%20[cc65]%20malloc%20and%20Sort.c(26):%20Error:%20Expression%20expected"><em>cc65_at_maneuveringspeed.com</em></a>)<br>
+<strong>Date:</strong> 2003-03-04 08:23:44
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2560.html">Marko Mäkelä: "Re: [cc65] malloc and Sort.c(26): Error: Expression expected"</a>
+<li><strong>In reply to:</strong> <a href="2560.html">Marko Mäkelä: "Re: [cc65] malloc and Sort.c(26): Error: Expression expected"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2562.html">Marko Mäkelä: "Re: [cc65] malloc and Sort.c(26): Error: Expression expected"</a>
+<li><strong>Reply:</strong> <a href="2562.html">Marko Mäkelä: "Re: [cc65] malloc and Sort.c(26): Error: Expression expected"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Thank you, I don't mean to make this a tutorial or support-line thread,
+but I'm bound to have a few other questions. :)
+
+Programming the c64 is clearly quite a cult thing nowadays since its
+practicality is quite limited, but I think it's important we don't
+forget how.  I have an immaculate 1982 c64 that I recently acquired
+which has almost no dust in the keyboard - I swear it was never used.  I
+fired it up to run it, but don't routinely.
+
+In the 80's and early 90's without any formal training my programming
+was BASIC compiled with Blitz! and of course, Assembly code, I used Yves
+Han's Fast Assembler.
+
+I'm itching to write a game or something cool for the 64 just to say I
+still can. :)
+
+I will get a book on C.	At OIT (www.oit.edu) we don't touch C, but live
+and breathe C++ in the Software Engineering program.
+
+Thanks,
+Greg Long
+former co-sysop Westwood BBS, Hillsboro OR, 1985-1988
+
+-----Original Message-----
+From: <a href="mailto:owner-cc65_at_musoftware.de?Subject=RE:%20[cc65]%20malloc%20and%20Sort.c(26):%20Error:%20Expression%20expected">owner-cc65_at_musoftware.de</a> [mailto:<a href="mailto:owner-cc65_at_musoftware.de?Subject=RE:%20[cc65]%20malloc%20and%20Sort.c(26):%20Error:%20Expression%20expected">owner-cc65_at_musoftware.de</a>] On
+Behalf Of Marko Mäkelä
+Sent: Monday, March 03, 2003 11:07 PM
+To: <a href="mailto:cc65_at_musoftware.de?Subject=RE:%20[cc65]%20malloc%20and%20Sort.c(26):%20Error:%20Expression%20expected">cc65_at_musoftware.de</a>
+Subject: Re: [cc65] malloc and Sort.c(26): Error: Expression expected
+
+
+On Mon, Mar 03, 2003 at 10:46:20PM -0800, Greg Long wrote:
+&gt; Is there an unusual syntax for malloc?  I notice it doesn't like to 
+&gt; take anything but a constant.
+
+It's a good idea to produce a minimal input file that triggers the
+error. In this case, I'd suspect two other errors in your code:
+
+&gt; 	unsigned int* ra; //declare array
+&gt; 	ra = (unsigned int*) malloc(sizeof(unsigned int[size] ));
+&gt; 	
+&gt; 	unsigned int i = size;//line 20
+
+The string &quot;//&quot; might not be a comment delimiter in the dialect of C
+that cc65 supports.  Use /* */ comments instead.
+
+Also, you can't declare variables except in the beginning of a block.
+Swap the lines starting with &quot;ra&quot; and &quot;unsigned int i&quot;, and it should
+work.  I'd rather write the four above lines like this:
+
+unsigned int i = size;
+unsigned int* ra = malloc (size * sizeof *ra);
+
+Disclaimer: I haven't used cc65 yet, only other C compilers.
+
+	Marko
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=RE:%20[cc65]%20malloc%20and%20Sort.c(26):%20Error:%20Expression%20expected">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=RE:%20[cc65]%20malloc%20and%20Sort.c(26):%20Error:%20Expression%20expected">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2560.html">Marko Mäkelä: "Re: [cc65] malloc and Sort.c(26): Error: Expression expected"</a>
+<li><strong>In reply to:</strong> <a href="2560.html">Marko Mäkelä: "Re: [cc65] malloc and Sort.c(26): Error: Expression expected"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2562.html">Marko Mäkelä: "Re: [cc65] malloc and Sort.c(26): Error: Expression expected"</a>
+<li><strong>Reply:</strong> <a href="2562.html">Marko Mäkelä: "Re: [cc65] malloc and Sort.c(26): Error: Expression expected"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-03-04 08:25:00 CET</em>
+</em>
+</small>
+</body>
+</html>

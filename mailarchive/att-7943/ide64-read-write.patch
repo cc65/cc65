@@ -1,0 +1,482 @@
+#
+# Add blockread/write support if IDE64 is present.
+# This makes a big difference in I/O speed.
+# Only for C64, to not bloat the other archs.
+#
+# <soci@c64.rulez.org> Kajtar Zsolt 14.03.2010
+#
+diff -urN cc65-snapshot-2.13.9.20100309/libsrc/c64/kernal.s cc65-snapshot-2.13.9.20100309.new/libsrc/c64/kernal.s
+--- cc65-snapshot-2.13.9.20100309/libsrc/c64/kernal.s	2009-09-27 20:45:08.000000000 +0200
++++ cc65-snapshot-2.13.9.20100309.new/libsrc/c64/kernal.s	2010-03-14 11:16:06.132074578 +0100
+@@ -42,6 +42,8 @@
+         .export         UDTIM
+         .export         SCREEN
+         .export         IOBASE
++        .export         IDE64BLKRD
++        .export         IDE64BLKWR
+ 
+ 
+ ;-----------------------------------------------------------------------------
+@@ -85,4 +87,6 @@
+ UDTIM		= $FFEA
+ SCREEN		= $FFED
+ IOBASE		= $FFF3
++IDE64BLKRD	= $DEF4
++IDE64BLKWR	= $DEF1
+ 
+diff -urN cc65-snapshot-2.13.9.20100309/libsrc/c64/Makefile cc65-snapshot-2.13.9.20100309.new/libsrc/c64/Makefile
+--- cc65-snapshot-2.13.9.20100309/libsrc/c64/Makefile	2010-02-15 00:12:54.000000000 +0100
++++ cc65-snapshot-2.13.9.20100309.new/libsrc/c64/Makefile	2010-03-14 12:25:13.552074508 +0100
+@@ -67,7 +67,10 @@
+         revers.o                \
+         systime.o               \
+         sysuname.o              \
+-        tgi_mode_table.o
++        tgi_mode_table.o        \
++        read.o			\
++        write.o			\
++        rwcommon.o
+ 
+ #--------------------------------------------------------------------------
+ # Drivers
+diff -urN cc65-snapshot-2.13.9.20100309/libsrc/c64/read.s cc65-snapshot-2.13.9.20100309.new/libsrc/c64/read.s
+--- cc65-snapshot-2.13.9.20100309/libsrc/c64/read.s	1970-01-01 01:00:00.000000000 +0100
++++ cc65-snapshot-2.13.9.20100309.new/libsrc/c64/read.s	2010-03-14 12:51:46.780074091 +0100
+@@ -0,0 +1,151 @@
++;
++; Ullrich von Bassewitz, 16.11.2002
++; IDE64 blockread support, Kajtar Zsolt 14.03.2010
++;
++; int read (int fd, void* buf, unsigned count);
++;
++
++        .export         _read
++        .constructor    initstdin
++
++        .import         IDE64BLKRD
++        .import         rwide64prepare, rwide64finish
++
++        .import         SETLFS, OPEN, CHKIN, BASIN, CLRCH, READST
++        .import         rwcommon, rwcommonend, rwsetflags
++        .import         popax
++        .import         __oserror
++        .importzp       ptr1, ptr2, ptr3, tmp1, tmp2, tmp3
++
++        .include        "fcntl.inc"
++        .include        "../cbm/cbm.inc"
++        .include        "../cbm/filedes.inc"
++
++
++;--------------------------------------------------------------------------
++; initstdin: Open the stdin file descriptors for the keyboard
++     
++.segment        "INIT"
++
++.proc   initstdin
++
++        lda     #LFN_READ
++        sta     fdtab+STDIN_FILENO
++        lda     #STDIN_FILENO + LFN_OFFS
++        ldx     #CBMDEV_KBD
++        stx     unittab+STDIN_FILENO
++        ldy     #$FF
++        jsr     SETLFS
++        jmp     OPEN            ; Will always succeed
++
++.endproc
++
++;--------------------------------------------------------------------------
++; _read
++
++.code
++
++.proc   _read
++
++        jsr     rwcommon        ; Pop params, check handle
++        bcs     errout          ; Invalid handle, errno already set
++
++; Check if the LFN is valid and the file is open for reading
++
++        lsr                     ; File open for reading?
++        bcc     notopen
++
++; Check the EOF flag. If it is set, don't read anything
++
++        asl
++        bmi     eof
++
++; Blockread possible?
++
++        and     #LFN_NBLKRD
++        bne     nblk
++
++        jsr     CHKIN
++        bcs     error
++
++; check support
++
++        jsr     rwide64prepare
++        bcs     nosup
++
++; read
++
++        jsr     IDE64BLKRD
++        bcs     nosup
++        jmp     rwide64finish
++
++nosup:  lda     #LFN_NBLKRD
++        jsr     rwsetflags
++
++; Valid lfn. Make it the input file
++
++nblk:   jsr     CHKIN
++        bcs     error
++
++; Decrement the count
++
++@L3:    inc     ptr1
++        bne     @L0
++        inc     ptr1+1
++        beq     done            ; Branch always
++
++; Read the next byte
++
++@L0:    jsr     BASIN
++        tax                     ; Save the input byte
++
++        jsr     READST          ; Read the IEEE status
++        cmp     #1              ; Save it
++        and     #%10111111      ; Check anything but the EOI bit
++        bne     error5          ; Assume device not present
++
++; Store the byte just read
++
++        tay
++        txa
++        sta     (ptr2),y
++        inc     ptr2
++        bne     @L1
++        inc     ptr2+1          ; *buf++ = A;
++
++; Get the status again and check the EOI bit
++
++@L1:    bcc     @L3             ; Loop if no end of file
++
++; Set the EOI flag and bail out
++
++        lda     #LFN_EOF
++        jsr     rwsetflags
++
++; Read done, close the input channel
++
++done:   jsr     CLRCH
++
++; Return the number of chars read
++
++eof:    jmp     rwcommonend
++
++; Error entry, file is not open
++
++notopen:
++        lda     #3              ; File not open
++        bne     error
++
++; Error entry, status not ok
++
++error5: jsr     CLRCH
++	lda     #5              ; Device not present
++error:  sta     __oserror
++errout: lda     #$FF
++        tax                     ; Return -1
++        rts
++
++.endproc
++
++
++
+diff -urN cc65-snapshot-2.13.9.20100309/libsrc/c64/rwcommon.s cc65-snapshot-2.13.9.20100309.new/libsrc/c64/rwcommon.s
+--- cc65-snapshot-2.13.9.20100309/libsrc/c64/rwcommon.s	1970-01-01 01:00:00.000000000 +0100
++++ cc65-snapshot-2.13.9.20100309.new/libsrc/c64/rwcommon.s	2010-03-14 12:52:11.944824334 +0100
+@@ -0,0 +1,119 @@
++;
++; Ullrich von Bassewitz, 17.11.2002
++; IDE64 blockread/write support, Kajtar Zsolt 14.03.2010
++;
++; Common stuff for the read/write routines
++;
++
++        .export         rwcommon, rwcommonend, rwsetflags
++        .export         rwide64prepare, rwide64finish
++
++        .import         CLRCH
++        .import         popax
++        .importzp       ptr1, ptr2, ptr3, tmp2
++
++        .include        "errno.inc"
++        .include        "../cbm/filedes.inc"
++
++
++;--------------------------------------------------------------------------
++; rwcommon: Pop the parameters from stack, preprocess them and place them
++; into zero page locations. Return carry set if the handle is invalid,
++; return carry clear if it is ok. If the carry is clear, the handle is
++; returned in A.
++
++.proc   rwcommon
++
++        eor     #$FF
++        sta     ptr1
++        txa
++        eor     #$FF
++        sta     ptr1+1          ; Remember -count-1
++
++        jsr     popax           ; Get buf
++        sta     ptr2
++        stx     ptr2+1
++
++        sta     ptr3
++        stx     ptr3+1          ; for length
++
++        jsr     popax           ; Get the handle
++        cpx     #$01
++        bcs     invhandle
++        cmp     #MAX_FDS
++        bcs     invhandle
++        adc     #LFN_OFFS       ; Carry is already clear
++        sta     tmp2
++        tax
++        lda     fdtab-LFN_OFFS,x; Get flags for this handle
++        rts                     ; Return with carry clear
++
++invhandle:
++        lda     #EINVAL
++        sta     __errno
++        lda     #0
++        sta     __errno+1
++        rts                     ; Return with carry set
++
++.endproc
++
++.proc   rwsetflags
++        ldx     tmp2
++        ora     fdtab-LFN_OFFS,x; Get flags for this handle
++        sta     fdtab-LFN_OFFS,x; Get flags for this handle
++        rts
++.endproc
++
++.proc   rwide64prepare
++        sec
++        lda     $031b
++        eor     #$de
++        bne     noide           ;open vector set?
++        lda     $de60
++        eor     #$49
++        bne     noide           ;check identification
++        lda     $de61
++        eor     #$44
++        bne     noide
++        lda     $de62
++        eor     #$45
++        bne     noide
++        clc
++        lda     ptr1            ;setup registers
++        eor     #255
++        tax
++        lda     ptr1+1
++        eor     #255
++        tay
++        lda     #ptr2
++noide:  rts
++.endproc
++
++.proc   rwide64finish
++
++        txa
++        pha
++        tya
++        pha
++        jsr     CLRCH
++        pla
++        tax
++        pla
++        rts
++
++.endproc
++
++.proc   rwcommonend
++        lda     ptr2
++        sec
++        sbc     ptr3
++        pha
++        lda     ptr2+1
++        sbc     ptr3+1
++        tax
++        pla
++        rts
++
++.endproc
++
++
+diff -urN cc65-snapshot-2.13.9.20100309/libsrc/c64/write.s cc65-snapshot-2.13.9.20100309.new/libsrc/c64/write.s
+--- cc65-snapshot-2.13.9.20100309/libsrc/c64/write.s	1970-01-01 01:00:00.000000000 +0100
++++ cc65-snapshot-2.13.9.20100309.new/libsrc/c64/write.s	2010-03-14 12:51:57.061074090 +0100
+@@ -0,0 +1,133 @@
++;
++; Ullrich von Bassewitz, 16.11.2002
++; IDE64 blockwrite support, Kajtar Zsolt 14.03.2010
++;
++; int write (int fd, const void* buf, unsigned count);
++;
++
++        .export         _write
++        .constructor    initstdout
++
++        .import         IDE64BLKWR
++        .import         rwide64prepare, rwide64finish
++
++        .import         SETLFS, OPEN, CKOUT, BSOUT, CLRCH, IDE64BLKWR
++        .import         rwcommon, rwcommonend, rwsetflags, rwide64prepare, rwide64finish
++        .import         __oserror
++        .importzp       sp, ptr1, ptr2
++
++        .include        "fcntl.inc"
++        .include        "../cbm/cbm.inc"
++        .include        "../cbm/filedes.inc"
++
++
++;--------------------------------------------------------------------------
++; initstdout: Open the stdout and stderr file descriptors for the screen.
++
++.segment        "INIT"
++
++.proc   initstdout
++
++        lda     #LFN_WRITE
++        sta     fdtab+STDOUT_FILENO
++        sta     fdtab+STDERR_FILENO
++        lda     #CBMDEV_SCREEN
++        sta     unittab+STDOUT_FILENO
++        sta     unittab+STDERR_FILENO
++        lda     #STDOUT_FILENO + LFN_OFFS
++        jsr     @L1
++        lda     #STDERR_FILENO + LFN_OFFS
++@L1:    ldx     #CBMDEV_SCREEN
++        ldy     #$FF
++        jsr     SETLFS
++        jmp     OPEN            ; Will always succeed
++
++.endproc
++
++;--------------------------------------------------------------------------
++; _write
++                      
++.code
++
++.proc   _write
++
++        jsr     rwcommon        ; Pop params, check handle
++        bcs     errout          ; Invalid handle, errno already set
++
++; Check if the LFN is valid and the file is open for writing
++
++        tay
++        and     #LFN_WRITE      ; File open for writing?
++        beq     notopen
++
++        tya
++        and     #LFN_NBLKWR
++        bne     nblk
++
++        jsr     CKOUT
++        bcs     error
++
++; check support
++
++        jsr     rwide64prepare
++        bcs     nosup
++
++; write
++
++        jsr     IDE64BLKWR
++        bcs     nosup
++        jmp     rwide64finish
++
++nosup:  lda     #LFN_NBLKWR
++        jsr     rwsetflags
++
++; Valid lfn. Make it the output file
++
++nblk:   jsr     CKOUT
++        bcs     error
++        bcc     @L2
++
++; Output the next character from the buffer
++
++@L0:    ldy     #0
++        lda     (ptr2),y
++        inc     ptr2
++        bne     @L1
++        inc     ptr2+1          ; A = *buf++;
++@L1:    jsr     BSOUT
++        bcs     error           ; Bail out on errors
++
++; Decrement count
++
++@L2:    inc     ptr1
++        bne     @L0
++        inc     ptr1+1
++        bne     @L0
++
++; Wrote all chars, close the output channel
++
++        jsr     CLRCH
++
++; Return the number of chars written
++
++        jmp     rwcommonend
++
++; Error entry, file is not open
++
++notopen:
++        lda     #3              ; File not open
++        bne     error
++
++; Error entry, status not ok
++
++error5: lda     #5              ; Device not present
++error:  sta     __oserror
++errout: lda     #$FF
++        tax                     ; Return -1
++        rts
++
++.endproc
++
++
++
++
+diff -urN cc65-snapshot-2.13.9.20100309/libsrc/cbm/filedes.inc cc65-snapshot-2.13.9.20100309.new/libsrc/cbm/filedes.inc
+--- cc65-snapshot-2.13.9.20100309/libsrc/cbm/filedes.inc	2002-11-17 23:45:55.000000000 +0100
++++ cc65-snapshot-2.13.9.20100309.new/libsrc/cbm/filedes.inc	2010-03-14 10:50:25.453824335 +0100
+@@ -15,6 +15,8 @@
+ LFN_READ        = $01   ; Open for reading
+ LFN_WRITE       = $02   ; Open for writing
+ LFN_OPEN        = (LFN_READ | LFN_WRITE)
++LFN_NBLKRD      = $20   ; No blockread
++LFN_NBLKWR      = $40   ; No blockwrite
+ LFN_EOF         = $80   ; Read to EOF
+ 
+ LFN_STDIN       = LFN_OFFS+0
+diff -urN cc65-snapshot-2.13.9.20100309/libsrc/Makefile cc65-snapshot-2.13.9.20100309.new/libsrc/Makefile
+--- cc65-snapshot-2.13.9.20100309/libsrc/Makefile	2009-12-21 22:14:21.000000000 +0100
++++ cc65-snapshot-2.13.9.20100309.new/libsrc/Makefile	2010-03-14 12:42:16.912074509 +0100
+@@ -131,7 +131,7 @@
+ # C64
+ 
+ c64lib:
+-	for i in c64 cbm common runtime conio dbg em joystick mouse serial tgi zlib; do \
++	for i in cbm c64 common runtime conio dbg em joystick mouse serial tgi zlib; do \
+ 	    $(MAKE) SYS=c64 -C $$i || exit 1; \
+ 	    $(AR) a c64.lib $$i/*.o;\
+ 	done
+
+

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Calling another program: e</title>
+<meta name="Author" content="silverdr1wfmh.org.pl (silverdr1wfmh.org.pl)" />
+<meta name="Subject" content="Re: [cc65] Calling another program: exec() ?" />
+<meta name="Date" content="2011-01-24" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Calling another program: exec() ?</h1>
+<!-- received="Mon Jan 24 15:41:15 2011" -->
+<!-- isoreceived="20110124144115" -->
+<!-- sent="Mon, 24 Jan 2011 15:34:26 +0100" -->
+<!-- isosent="20110124143426" -->
+<!-- name="silverdr1wfmh.org.pl" -->
+<!-- email="silverdr1wfmh.org.pl" -->
+<!-- subject="Re: [cc65] Calling another program: exec() ?" -->
+<!-- id="5625E2D4-8B03-4DE5-9482-9615E5858E3C@wfmh.org.pl" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="20110124133751.GA31440&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9174.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Calling another program: exec() ?&quot;">Next message</a> ]
+[ <a href="9172.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Calling another program: exec() ?&quot;">Previous message</a> ]
+[ <a href="9172.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Calling another program: exec() ?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9174.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Calling another program: exec() ?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:silverdr1wfmh.org.pl?Subject=Re:%20[cc65]%20Calling%20another%20program:%20exec()%20?">silverdr1wfmh.org.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-01-24 15:34:26</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 2011-01-24, at 14:37, Ullrich von Bassewitz wrote:
+
+&gt; At least for the CBMs I doubt that something like exec() is doable without
+&gt; nasty tricks.
+
+Depends how we define &quot;nasty&quot; ;-) My definition would apply if we would like to account for _every_ possible combination of load addresses/starting methods. If we come up with sensible convention for the external prgs to be started, it could fit into &quot;reasonable&quot; pool of tricks.
+
+&gt; Assuming that the program to load is a BASIC program, or has a
+&gt; BASIC header, it must be loaded to the BASIC start and started by a call to
+&gt; BASIC. Since for the C64 the BASIC ROM is switched off, and the memory in
+&gt; question is occupied by the running program, an implementation would have to
+&gt; copy a small loader stub somewhere. Problem is that there is no safe
+&gt; &quot;somewhere&quot;. Maybe someone has a good idea but all I can think of may collide
+&gt; with some sort of other program, customized kernal ROMs or whatever.
+
+I recall we were doing this sort of stuff using page two and three locations, back in the days. Now - since I didn't find it - it must be in the docs somewhere, but I am not the first time missing a sort of mem usage map of standard cc65 targets configurations. Are all the &quot;typical&quot; page two/three locations used by default config/runtime already?
+
+&gt; The best idea would probably be to actually terminate the running program and
+&gt; run a new one instead, eventually passing some arguments as if they were
+&gt; passed on the &quot;command line&quot;. This is the easiest and cleanest solution.
+
+This seem to fit into the same place as the stub-loader you mentioned. Get into &quot;safe&quot; place then exit the caller plus load'n run the callee. All in one chunk seems to be the least &quot;nasty&quot; approach.
+
+-- 
+SD!----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Jan 24 15:41:15 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9174.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Calling another program: exec() ?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9172.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Calling another program: exec() ?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9172.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Calling another program: exec() ?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9174.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Calling another program: exec() ?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9174.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Calling another program: exec() ?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9176.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Calling another program: exec() ?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9173" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9173" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9173" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-01-24 15:41:18 CET
+</em></small></p>
+</body>
+</html>

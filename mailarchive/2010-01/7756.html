@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] 16x16 multiply routine overflo</title>
+<meta name="Author" content="Shawn Jefferson (sjefferson1shaw.ca)" />
+<meta name="Subject" content="[cc65] 16x16 multiply routine overflow detection" />
+<meta name="Date" content="2010-01-19" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] 16x16 multiply routine overflow detection</h1>
+<!-- received="Tue Jan 19 02:20:46 2010" -->
+<!-- isoreceived="20100119012046" -->
+<!-- sent="Mon, 18 Jan 2010 17:20:39 -0800" -->
+<!-- isosent="20100119012039" -->
+<!-- name="Shawn Jefferson" -->
+<!-- email="sjefferson1shaw.ca" -->
+<!-- subject="[cc65] 16x16 multiply routine overflow detection" -->
+<!-- id="4DED26ABF4F24B909D6BAD321A71835E@ORANGE2" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7757.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] 16x16 multiply routine overflow detection&quot;">Next message</a> ]
+[ <a href="7755.html" title="Thomas Giesel: &quot;Re: [cc65] Relative paths during compilation&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7757.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] 16x16 multiply routine overflow detection&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Shawn Jefferson &lt;<a href="mailto:sjefferson1shaw.ca?Subject=Re:%20[cc65]%2016x16%20multiply%20routine%20overflow%20detection">sjefferson1shaw.ca</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-01-19 02:20:39</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+ 
+
+I'm trying to a slightly modified version of the tosumulax routine from the
+runtime in one of my projects, and what I'd like to be able to do is detect
+when the result may overflow the 2 bytes, and in that case just return
+65535.  The problem I have is that I don't really understand the routine
+very well, and can't figure out where/how to do an overflow check?  I was
+hoping someone here might be able to help, or at the very least say it isn't
+possible with this algorithm.
+
+ 
+
+Here's the routine from the lib runtime (I doing the full 16x16):
+
+ 
+
+tosumulax:
+
+        sta            ptr4
+
+        txa                     ; High byte zero
+
+            stx        ptr4+1               ; Save right operand
+
+            jsr         popsreg             ; Get left operand
+
+ 
+
+; Do ptr4:ptr4+1 * sreg:sreg+1 --&gt; AX
+
+ 
+
+            lda        #0
+
+            ldx        sreg+1              ; Get high byte into register for
+speed
+
+            sta        tmp1
+
+            ldy        #16                   ; Number of bits
+
+ 
+
+        lsr     ptr4+1
+
+        ror     ptr4            ; Get first bit into carry
+
+&#64;L0:    bcc     &#64;L1
+
+ 
+
+            clc
+
+            adc       sreg
+
+            pha
+
+            txa                                ; hi byte of left op
+
+            adc       tmp1
+
+            sta        tmp1
+
+            pla
+
+ 
+
+&#64;L1:    ror     tmp1
+
+            ror        a
+
+            ror        ptr4+1
+
+            ror        ptr4
+
+        dey
+
+        bne     &#64;L0
+
+ 
+
+            lda        ptr4                   ; Load the result
+
+            ldx        ptr4+1
+
+            rts                                ; Done
+
+ 
+
+ 
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Jan 19 02:20:46 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7757.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] 16x16 multiply routine overflow detection"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7755.html" title="Previous message in the list">Thomas Giesel: "Re: [cc65] Relative paths during compilation"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7757.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] 16x16 multiply routine overflow detection"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7757.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] 16x16 multiply routine overflow detection"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7756" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7756" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7756" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-01-19 02:20:49 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] ca65 question</title>
+<meta name="Author" content="Greg King (greg.king41verizon.net)" />
+<meta name="Subject" content="Re: [cc65] ca65 question" />
+<meta name="Date" content="2008-01-30" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] ca65 question</h1>
+<!-- received="Wed Jan 30 21:30:22 2008" -->
+<!-- isoreceived="20080130203022" -->
+<!-- sent="Wed, 30 Jan 2008 15:22:55 -0500" -->
+<!-- isosent="20080130202255" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king41verizon.net" -->
+<!-- subject="Re: [cc65] ca65 question" -->
+<!-- id="001401c8637e$f0445ba0$443efea9@monarch" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="88C4E607-CF73-4FA0-9D58-4A1C3464E640&#64;inet.com.pl" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="../2008-02/5948.html" title="silverdr1inet.com.pl: &quot;Re: [cc65] ca65 question&quot;">Next message</a> ]
+[ <a href="5946.html" title="silverdr1inet.com.pl: &quot;Re: [cc65] ca65 question&quot;">Previous message</a> ]
+[ <a href="5946.html" title="silverdr1inet.com.pl: &quot;Re: [cc65] ca65 question&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="../2008-02/5948.html" title="silverdr1inet.com.pl: &quot;Re: [cc65] ca65 question&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king41verizon.net?Subject=Re:%20[cc65]%20ca65%20question">greg.king41verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-01-30 21:22:55</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: silverdr; on Sunday, January 27, 2008; at 11:57 AM -0500
+&gt;
+&gt; On 2008-01-27, at 13:38, Ullrich von Bassewitz wrote:
+&gt;
+&gt; &gt; On Sun, Jan 27, 2008 at 05:32:52AM +0100, silverdr wrote:
+&gt;
+&gt; &gt;&gt; Hm, that is interesting, in any case.  So, the main difference
+&gt; &gt;&gt; between .global and set of .import/.export is that one doesn't have
+&gt; &gt;&gt; to care about whether a particular module exports or imports the
+&gt; &gt;&gt; symbol -- it just comes out of the context (or rather, content) of
+&gt; &gt;&gt; a particular file?  Smart indeed, and will certainly come in handy.
+&gt; &gt;
+&gt; &gt; The nice thing is that you can use the same &quot;header&quot; file for both
+&gt; &gt; purposes:
+&gt; &gt; The module that implements an API and others that use it. This will
+&gt; &gt; give you a
+&gt; &gt; great range of consistency between the modules.
+&gt;
+&gt; Exactly -- that's what I understood, and it's a really smart (even if
+&gt; *NOW* seemingly almost obvious ;-) way to deal with the ever-growing
+&gt; amount of inter-dependent .exports and .imports, in an efficient and
+&gt; elegant way.  Even if it doesn't address my original question, I find
+&gt; it immediately an invaluable, general-purpose hint.
+
+Both of them have their own advantage:  .GLOBAL supports the goal of getting
+the consistency that Uz described.  But, .IMPORT/.EXPORT does some
+error-checking.
+
+If you mistype a label-name, then the assembler will catch it.  CA65 will
+tell you which file, and possibly which line, has your mistake.
+
+When you use .GLOBAL, you won't find out about your mistake until you link
+the object files.  And, LD65 won't know where you messed up; you will be
+forced to search through your source files (while hoping that you will
+recognize the typo).
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Jan 30 21:30:22 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="../2008-02/5948.html" title="Next message in the list">silverdr1inet.com.pl: "Re: [cc65] ca65 question"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5946.html" title="Previous message in the list">silverdr1inet.com.pl: "Re: [cc65] ca65 question"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5946.html" title="Message to which this message replies">silverdr1inet.com.pl: "Re: [cc65] ca65 question"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="../2008-02/5948.html" title="Next message in this discussion thread">silverdr1inet.com.pl: "Re: [cc65] ca65 question"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="../2008-02/5948.html" title="Message sent in reply to this message">silverdr1inet.com.pl: "Re: [cc65] ca65 question"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5947" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5947" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5947" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-01-30 21:30:26 CET
+</em></small></p>
+</body>
+</html>

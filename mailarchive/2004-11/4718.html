@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Atari bug report and conio</title>
+<meta name="Author" content="Christian Groessler (chris1groessler.org)" />
+<meta name="Subject" content="Re: [cc65] Atari bug report and conio feature request" />
+<meta name="Date" content="2004-11-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Atari bug report and conio feature request</h1>
+<!-- received="Tue Nov 23 22:47:03 2004" -->
+<!-- isoreceived="20041123214703" -->
+<!-- sent="Tue, 23 Nov 2004 22:46:53 +0100 (CET)" -->
+<!-- isosent="20041123214653" -->
+<!-- name="Christian Groessler" -->
+<!-- email="chris1groessler.org" -->
+<!-- subject="Re: [cc65] Atari bug report and conio feature request" -->
+<!-- id="Pine.LNX.4.30.0411232245550.10087-100000@ds9.groessler.org" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20041123130445.31339.qmail&#64;web54608.mail.yahoo.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4719.html" title="MagerValp: &quot;[cc65] scanf again&quot;">Next message</a> ]
+[ <a href="4717.html" title="Fatih : &quot;Re: [cc65] Atari bug report and conio feature request&quot;">Previous message</a> ]
+[ <a href="4715.html" title="Fatih : &quot;[cc65] Atari bug report and conio feature request&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Christian Groessler &lt;<a href="mailto:chris1groessler.org?Subject=Re:%20[cc65]%20Atari%20bug%20report%20and%20conio%20feature%20request">chris1groessler.org</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-11-23 22:46:53</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+On Tue, 23 Nov 2004, Fatih Aygün wrote:
+
+&gt; I have discovered following (small) bugs in Atari
+&gt; library:
+&gt;
+&gt; In the file atari.inc the following line:
+&gt;
+&gt; SIZEF2	= $D00A		;player 2 size
+&gt;
+&gt; shoud be:
+&gt;
+&gt; SIZEP2	= $D00A		;player 2 size
+&gt;
+&gt; And in the file atari.h the following line:
+&gt;
+&gt; #define CH_VLINE        0x16
+&gt;
+&gt; should be:
+&gt;
+&gt; #define CH_VLINE        0x7C
+&gt;
+&gt; because character 0x16 is &quot;left |&quot; not the &quot;middle |&quot;.
+
+Thanks for spotting.
+I've fixed it in the development version.
+
+regards,
+chris
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Nov 23 22:47:03 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4719.html" title="Next message in the list">MagerValp: "[cc65] scanf again"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4717.html" title="Previous message in the list">Fatih : "Re: [cc65] Atari bug report and conio feature request"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4715.html" title="Message to which this message replies">Fatih : "[cc65] Atari bug report and conio feature request"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4718" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4718" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4718" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-11-23 22:47:14 CET
+</em></small></p>
+</body>
+</html>

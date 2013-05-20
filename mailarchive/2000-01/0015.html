@@ -1,0 +1,176 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Back on Track</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Back on Track">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Back on Track</h1>
+<!-- received="Thu Jan 20 11:35:01 2000" -->
+<!-- isoreceived="20000120103501" -->
+<!-- sent="Thu, 20 Jan 2000 11:34:48 +0100 (CET)" -->
+<!-- isosent="20000120103448" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Back on Track" -->
+<!-- id="200001201034.LAA05865@trixie.musoftware.de" -->
+<!-- inreplyto="38861FAD.7E657808@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Back%20on%20Track"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2000-01-20 11:34:48
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0016.html">Ullrich von Bassewitz: "Re: Sv: [cc65] Back on Track"</a>
+<li><strong>Previous message:</strong> <a href="0014.html">Martin Ancher Holm - Bankdata: "Sv: [cc65] Back on Track"</a>
+<li><strong>In reply to:</strong> <a href="0013.html">Groepaz: "[cc65] Back on Track"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0021.html">Groepaz: "Re: [cc65] Back on Track"</a>
+<li><strong>Reply:</strong> <a href="0021.html">Groepaz: "Re: [cc65] Back on Track"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+&gt; However... maybe someone remembers that i talked about writing a filesystem some
+&gt; (long) time ago, and actually it IS happening! I have already written a lot of
+&gt; 'lowlevel' drive routines (basically wrapper functions to kernal routines) and
+&gt; i have built a file-system on it, that is already quite comfortable as long as
+&gt; you
+&gt; stick with commodore limitations (only one file at a time, no seeking)...
+
+That's good news!
+
+It should even be possible to read/write more than one file at a time:
+Just remember the file handle used in the last kernal call. On the next
+write or read, check if the file handle is the same, if not, use CHKOUT to
+switch to the other file handle (channel). The limitation for seek seems
+to be real, however...
+
+&gt; some other (already working or in-the-making) features are:
+&gt;
+&gt; - true iso-style path/filenames like
+&gt;
+&gt;   8:\myfile.txt		(you can alternativly use letters instead of numbers for the
+&gt; drive)
+
+Maybe you could use the forward slash or accept it as well. Forward
+slashes are more portable than backslashes.
+
+&gt; oh... one other question is, that i looked at the RTL and couldnt find the point
+&gt; where lseek() would kick in the i/o routines... also, would my open() have to
+&gt; deal with eg stdout as a parameter?!
+&gt;
+&gt; talking of standard out.... your printf() should ALWAYS print to screen, no
+&gt; matter
+&gt; a file is open or not ;=) took me some time to figure out that some printf sent
+&gt; garbage to the drive instead of printing info on the screen 8=)) (dont use
+&gt; $ffd2! :P)
+
+lseek is not there, because I don't know of any drive that supports it. If
+you find a way to support it, adding a prototype (and the corresponding
+ANSI C function fseek) is no problem.
+
+The low level functions should handle three file descriptors without any
+further action:
+
+	0     	stdin
+	1     	stdout
+	2     	stderr
+
+With this in mind, the current behaviour of printf() makes sense: It
+writes to stdout which is mapped to the file handle with the value one.
+
+It should even be possible to close or reopen the first three file
+descriptors, so the best way is probably to open them using the normal
+kernal calls at program start.
+
+While all this needs some special handling in the low level routines, it
+is very portable, because this is the way, it is defined by the C standard
+(the C standard does not define the low level functions open/close/read/
+write, but the high level functions like fprintf. But it makes sense to
+mirror the behaviour of the high level functions in the low level ones,
+and it is common use).
+
+&gt; mmmh... actually i have written a little command-line interpreter for testing my
+&gt; file routines... soon i will have added some kind of 'batchfile' capability as
+&gt; well and then it will only be a matter of running 2 C-programs at different
+&gt; memory locations ... i need to dig a bit deeper into the RTL and the compiler
+&gt; though (what about that o65 fileformat? would that be a good solution?)
+
+o65 is a good solution for a relocatable executable format. It is not a
+very good solution for an object file format for a crosscompiler or
+crossassembler.
+
+The format is quite simple. This is an advantage for the loader (which
+runs on a 6502 machine). On the other side, the simplicity means there is
+no way to do the more complex things that would be possible on the PC when
+using it as an object file format for a crossdevelopment tool. Examples
+for such an additional features would be support for more segments (you
+need this on machines with two non-adjacent ROMs), or debug information.
+
+So yes, o65 would be a good candidate for what you are planning to do.
+
+&gt; oh...don't ask for the code yet,its a mess,you dont want to have it like this
+&gt; ;=P
+&gt; as soon as its cleaned up and all standarized, i will post it.
+
+I'm looking forward to it! Maybe you can send me the diffs so I can verify
+that they are working with the current development version, and we can
+talk about any open issues. This is only a suggestion, of course.
+
+Regards
+
+
+	Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Back%20on%20Track">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Back%20on%20Track">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0016.html">Ullrich von Bassewitz: "Re: Sv: [cc65] Back on Track"</a>
+<li><strong>Previous message:</strong> <a href="0014.html">Martin Ancher Holm - Bankdata: "Sv: [cc65] Back on Track"</a>
+<li><strong>In reply to:</strong> <a href="0013.html">Groepaz: "[cc65] Back on Track"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0021.html">Groepaz: "Re: [cc65] Back on Track"</a>
+<li><strong>Reply:</strong> <a href="0021.html">Groepaz: "Re: [cc65] Back on Track"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:35 CET</em>
+</em>
+</small>
+</body>
+</html>

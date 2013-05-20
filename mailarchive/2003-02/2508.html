@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-7">
+<title>cc65 mailing list archive: Re: [cc65] Lynx target</title>
+<meta name="Author" content="Shawn Jefferson (sjefferson_at_sd62.bc.ca)">
+<meta name="Subject" content="Re: [cc65] Lynx target">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Lynx target</h1>
+<!-- received="Wed Feb 26 01:29:41 2003" -->
+<!-- isoreceived="20030226002941" -->
+<!-- sent="Tue, 25 Feb 2003 16:29:12 -0800" -->
+<!-- isosent="20030226002912" -->
+<!-- name="Shawn Jefferson" -->
+<!-- email="sjefferson_at_sd62.bc.ca" -->
+<!-- subject="Re: [cc65] Lynx target" -->
+<!-- id="se5b99e8.084@gwmail.sd62.bc.ca" -->
+<!-- charset="ISO-8859-7" -->
+<!-- inreplyto="[cc65] Lynx target" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Shawn Jefferson (<a href="mailto:sjefferson_at_sd62.bc.ca?Subject=Re:%20[cc65]%20Lynx%20target"><em>sjefferson_at_sd62.bc.ca</em></a>)<br>
+<strong>Date:</strong> 2003-02-26 01:29:12
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2507.html">Ullrich von Bassewitz: "Re: [cc65] Lynx target"</a>
+<li><strong>Maybe in reply to:</strong> <a href="2428.html">Shawn Jefferson: "[cc65] Lynx target"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2510.html">Groepaz: "Re: [cc65] Lynx target"</a>
+<li><strong>Reply:</strong> <a href="2510.html">Groepaz: "Re: [cc65] Lynx target"</a>
+<li><strong>Reply:</strong> <a href="2515.html">Ullrich von Bassewitz: "Re: [cc65] Lynx target"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+&gt;&gt;&gt; Ullrich von Bassewitz &lt;<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Lynx%20target">uz_at_musoftware.de</a>&gt; 02/25/03 03:43PM &gt;&gt;&gt;
+
+&gt;But since these problems are triggered by using the optimizer, and you state
+&gt;that the problems vanish when doing so, I would say that your problems have a
+&gt;different cause.
+
+I'll have to do some more testing, but since you stated that no one has tested the 65C02 code generation... it may be that something is not generating properly.  I have saved three assembly listings from my programs compiled in different ways (one with -O, one with --cpu 65C02 and one without, but haven't looked at them yet.)  Most likely this stems from errors on my part, but I'll let you know if it's not.
+
+&gt;&gt; Another question: I have setup a _mikey.h and _suzy.h file with a struct
+&gt;&gt; layout of the hardware address used by those chips (as per the _antic.h file)
+&gt;&gt; and I have a #define SUZY (*(struct __suzy *) 0xFC00) in my lynx.h file.  How
+&gt;&gt; do I use this structure?  If I do var = SUZY.joystick in my code the compiler
+&gt;&gt; complains bitterly.
+&gt;
+&gt;Just using the struct as any other struct variable should work. You may have
+&gt;an error somewhere in your definition, but since &quot;the compiler complains
+&gt;bitterly&quot; is just as good as &quot;it does not work&quot;, I'm not able to diagnose
+&gt;anything else:-)
+
+I would have expected the compiler to complain at the #include for the struct and #define if there were something wrong with it, but it only complains when I try to use the struct.
+
+test.c(27): Error: Identifier expected
+test.c(27): Error: Illegal function call
+test.c(27): Error: Integer expression expected
+test.c(27): Error: `;' expected
+test.c(27): Error: Expression expected
+test.c(27): Error: `;' expected
+test.c(27): Error: Expression expected
+test.c(27): Error: `;' expected
+test.c(27): Error: Expression expected
+test.c(27): Error: `;' expected
+test.c(27): Error: Expression expected
+test.c(27): Fatal: Too many errors
+
+That's my error message above when trying to use the struct.
+
+―
+Shawn Jefferson
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Lynx%20target">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2507.html">Ullrich von Bassewitz: "Re: [cc65] Lynx target"</a>
+<li><strong>Maybe in reply to:</strong> <a href="2428.html">Shawn Jefferson: "[cc65] Lynx target"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2510.html">Groepaz: "Re: [cc65] Lynx target"</a>
+<li><strong>Reply:</strong> <a href="2510.html">Groepaz: "Re: [cc65] Lynx target"</a>
+<li><strong>Reply:</strong> <a href="2515.html">Ullrich von Bassewitz: "Re: [cc65] Lynx target"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-02-26 01:30:43 CET</em>
+</em>
+</small>
+</body>
+</html>

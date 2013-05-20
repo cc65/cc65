@@ -1,0 +1,225 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] linker cfg files</title>
+<meta name="Author" content="Greg King (gngking_at_erols.com)">
+<meta name="Subject" content="Re: [cc65] linker cfg files">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] linker cfg files</h1>
+<!-- received="Tue May 20 22:16:11 2003" -->
+<!-- isoreceived="20030520201611" -->
+<!-- sent="Tue, 20 May 2003 16:11:22 -0400" -->
+<!-- isosent="20030520201122" -->
+<!-- name="Greg King" -->
+<!-- email="gngking_at_erols.com" -->
+<!-- subject="Re: [cc65] linker cfg files" -->
+<!-- id="000f01c31f0c$5741bb20$6d6b2c42@palace" -->
+<!-- inreplyto="[cc65] linker cfg files" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Greg King (<a href="mailto:gngking_at_erols.com?Subject=Re:%20[cc65]%20linker%20cfg%20files"><em>gngking_at_erols.com</em></a>)<br>
+<strong>Date:</strong> 2003-05-20 22:11:22
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3030.html">Groepaz: "Re: [cc65] OT: Atari ML help"</a>
+<li><strong>Maybe in reply to:</strong> <a href="../2003-04/2867.html">3843416: "[cc65] linker cfg files"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3032.html">Groepaz: "[cc65] library search path"</a>
+<li><strong>Reply:</strong> <a href="3032.html">Groepaz: "[cc65] library search path"</a>
+<li><strong>Reply:</strong> <a href="3033.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="../2003-08/3209.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+From: Ullrich von Bassewitz
+Date: Friday, April 25, 2003, 06:10 AM
+&gt;
+&gt; But, Shawn and Groepaz are right with one thing:  This won't work with
+&gt; the current library code, because the heap is initialized to start
+&gt; at the end of the BSS segment, and extends to the bottom of the stack,
+&gt; which, in turn, is placed at the end of the RAM memory section.
+&gt; And, there is no way to use a HEAP segment as a general solution,
+&gt; because the linker can only handle fixed-size segments, while the heap
+&gt; size should vary, depending on the size of the program.
+
+I recognize a challenge when I see one.  I believe that I have discovered
+a way to do it:
+
+Only the linker-script defines the heap and the stack.  ld65 determines
+most of their addresses when a program is built.  BSS, the heap,
+and the stack don't need to be next to each other.  The heap can be
+stationary (pre-set location and size) or mobile (as in the C64).
+They can be changed without changing the library.
+
+Two segments, in different memory-areas,
+are used as fences around the heap.
+
+The crt0.s files set the stack-pointer to
+&quot;(__STK_START__ + __STK_SIZE__)&quot;.
+stkchk.s uses &quot;__STK_SIZE__&quot; instead of &quot;__STACKSIZE__&quot;.
+
+This file defines the heap's pointers:
+=====================================================================
+; _heap.s
+;
+; Names that describe the heap:
+; static size_t        _heaporg;      /* Bottom of heap */
+; struct freeblock*    _heapfirst;    /* First free-block in list */
+; struct freeblock*    _heaplast;     /* Last free-block in list */
+; size_t*              _heapptr;      /* Current top */
+; size_t               _heapend;      /* Upper limit */
+        .constructor   initheap
+        .include       &quot;_heap.inc&quot;
+; Initiation -- is run during start-up.
+;
+initheap:
+        lda  #&lt;__heaporg
+        ldx  #&gt;__heaporg
+        sta  __heapptr
+        stx  __heapptr+1
+        rts
+        .bss
+__heapfirst:
+        .res 2         ; zerobss puts NULL here
+__heaplast:
+        .res 2
+__heapptr:
+        .res 2
+        .segment &quot;HEAP&quot;
+__heaporg:
+        .segment &quot;HEAPEND&quot;
+__heapend:
+=====================================================================
+
+malloc.s, _heapmaxavail.s, _heapmemavail.s, _heap.h, heaptest.c,
+and strdup-test.c use &quot;__heaporg&quot; and &quot;__heapend&quot; as immediate-addresses,
+instead of, as variables.
+
+Here are the relevant parts of the C64 target's configuration-script:
+
+MEMORY {
+    ZP: ...
+    RAM: start = $07FF, size = $c801;
+    STK: start = $c800, size = $0800, define = yes, file = &quot;&quot;;
+}
+SEGMENTS {
+    ZEROPAGE: load = ZP, type = zp;
+    STARTUP: load = RAM, type = wp;
+    ...
+    ...
+    ...
+    BSS:     load = RAM, type = bss, define = yes;
+    HEAP:    load = RAM, type = bss;
+    HEAPEND: load = STK, type = bss;
+}
+...
+    ...
+    ...
+#SYMBOLS {
+#    __STACKSIZE__ = $800; # (delete this section)
+#}
+
+And, here are the relevant parts of the NES target's configuration-script:
+
+MEMORY {
+    ZP:  ...
+    # ...
+    HEADER: ... , type = ro, ...
+    # ...
+    # - data (load)
+    # Hardware Vectors at end of 2nd 16k ROM
+    ROM0: start = $8000, size = $8000, type = ro, fill = yes;
+    # ...
+    ROM2: ... , type = ro, ...
+    # ...
+    # $0500-$0800 3 pages for cc65's parameter stack
+    STK:  start = $0500, size = $0300, define = yes, file = &quot;&quot;;
+    # ...
+    # - data (run)
+    # - bss
+    # - heap
+    RAM0: start = $6000, size = $2000;
+    RAM1: start = $8000, size = 1;
+}
+
+SEGMENTS {
+    ZEROPAGE: load = ZP,     type = zp;
+    HEADER:   load = HEADER, type = wp;
+    STARTUP:  load = ROM0,   type = wp;
+    CODE:     load = ROM0,   type = ro;
+    RODATA:   load = ROM0,   type = ro;
+    DATA:     load = ROM0,   type = rw,  define = yes, run = RAM0;
+    VECTORS:  load = ROM0,   type = ro,                start = $fff4;
+    CHARS:    load = ROM2,   type = ro;
+    BSS:      load = RAM0,   type = bss, define = yes;
+    HEAP:     load = RAM0,   type = bss;
+    HEAPEND:  load = RAM1,   type = bss;
+}
+
+...
+    ...
+    ...
+
+#SYMBOLS {
+#    __STACKSIZE__ = $0300;  # (delete this section)
+#}
+
+The NES's heap and stack have a different relationship.
+But, the library code is the same as it is for the C64's configuration
+(and, for other configurations).
+
+P.S.,
+(I removed &quot;define=yes&quot; from ROM0, STARTUP, CODE, and RODATA.
+They aren't needed, because the __DATA_SIZE__ number of bytes
+should be copied from __DATA_LOAD__ to __DATA_RUN__.)
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20linker%20cfg%20files">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3030.html">Groepaz: "Re: [cc65] OT: Atari ML help"</a>
+<li><strong>Maybe in reply to:</strong> <a href="../2003-04/2867.html">3843416: "[cc65] linker cfg files"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3032.html">Groepaz: "[cc65] library search path"</a>
+<li><strong>Reply:</strong> <a href="3032.html">Groepaz: "[cc65] library search path"</a>
+<li><strong>Reply:</strong> <a href="3033.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="../2003-08/3209.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-05-20 22:17:16 CEST</em>
+</em>
+</small>
+</body>
+</html>

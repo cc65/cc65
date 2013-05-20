@@ -1,0 +1,207 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Lynx target</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] Lynx target">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Lynx target</h1>
+<!-- received="Mon Apr 28 18:42:46 2003" -->
+<!-- isoreceived="20030428164246" -->
+<!-- sent="Mon, 28 Apr 2003 18:39:00 +0200" -->
+<!-- isosent="20030428163900" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] Lynx target" -->
+<!-- id="200304281839.00071.groepaz@gmx.net" -->
+<!-- inreplyto="20030428140551.GB4979@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Lynx%20target"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2003-04-28 18:39:00
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2914.html">Groepaz: "Re: [cc65] Lynx target"</a>
+<li><strong>In reply to:</strong> <a href="2911.html">Ullrich von Bassewitz: "Re: [cc65] Lynx target"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2917.html">Ullrich von Bassewitz: "Re: [cc65] Lynx target"</a>
+<li><strong>Reply:</strong> <a href="2917.html">Ullrich von Bassewitz: "Re: [cc65] Lynx target"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Monday 28 April 2003 16:05, Ullrich von Bassewitz wrote:
+&gt; I thought about using &quot;drive:filename&quot;, but this syntax is already used by
+&gt; the CBM dual drives. So I came up with the current solution. I think it
+&gt; will be difficult to find a syntax that works and feels &quot;natural&quot; on every
+&gt; platform.
+
+well &quot;find&quot; ? why not take some existing standard such as the ISO naming 
+sheme? thats what i was going to suggest... the ISO style 
+&quot;drive:filename;version&quot; (we can omit the version, its even allowed by ISO). 
+i've seen this used more than once actually (the psx and the dc for example 
+use it, also some hackery released for gb/gba). its simple enough to be 
+supported in any environment, and it also allows for most complex setups (ie 
+many drives and subdirectories)
+
+as for the dual drives...well, this can not be the reason for not doing things 
+like i said above :) invent something to handle cbm dual drives then, dont 
+pollute the whole thing with this rather exceptional stuff :) (the same is 
+true for stuff like handling subdirectories...if its machine dependend, its 
+not very useful IMHO)
+
+&gt; First, write a loadable module that uses an extended memory driver to
+&gt; implement something filesystem like, but with different names than the
+&gt; existing ones (maybe ramdisk_write(), or rd_write() or similar). Then add
+&gt; another loadable module that hooks into the kernal jump vector somehow and
+&gt; redirects OPEN/BSOUT/CLOSE calls for a drive with a spcific number.
+&gt;
+&gt; I don't say that this is a very elegant solution, but it avoids having to
+&gt; rewrite all existing POSIX file I/O routines. 
+
+mmmh yes, it would work.... mmmh... would this also work with more than one of 
+these special drivers. (in the far future, i will need irq-loader for the 
+1541 and extended memory filesystem at once)) mmmmh
+
+it sounds like a good intermediate solution for me...so the question is how to 
+design those two drivers so IF someone in the far distant future rewrites the 
+posix stuff, you dont have to rewrite all those drivers aswell :=)
+
+&gt; After a lot of complaints I
+&gt; had decided to do them myself, despite the fact that this was exactly what
+&gt; I was trying to avoid for years, and therefore I'm not going to rewrite
+&gt; them just a few month later:-)
+
+:o) i can understand ofcoz :=P 
+
+&gt; Maybe we can link the ram disk driver into the high level interface
+&gt; instead? This would probably be easier, because it's platform dependent,
+&gt; and the FILE type is already a structure that could easily take function
+&gt; vectors for the low level functions. This means that you cannot use write()
+&gt; for such a ram disk, but having fwrite() and friends should also be ok.
+
+mmmh yeah well...it would limit the thing somewhat though. (not for newly 
+written code, but for porting existing code that uses write() it would 
+eventually add lotta extra work)
+
+could this be made somewhat universal then ? (ie, have irq-loader for 1541, 
+ram-disc and maybe a /dev/ttyS0 ? :o))
+
+&gt; The question is if we want to implement anything that is implementable:-)
+
+eh :) honest :=P
+
+infact i like the minimalistic lib and api of cc65 so much, that i am already 
+(not really on purpose...it just happens :=)) copy it for working on the gba, 
+gp32, psx etc :o). IMHO such an api must do two things 1) be small and tiny 
+and dont do things that arent needed and b) make any possible operation 
+available in a portable fashion. (this doesnt mean it has to offer comfort or 
+lots of redundant utility code). cc65 is actually pretty good with the first, 
+but with the second point it sometimes lacks the one or other little 
+detail.... the conio lib is a good example here, its pretty complete and fast 
+and tiny at the same time, but some things just cant be done. (for example 
+reading a character from screen is not possible, thats why my cpeekchar stuff 
+:=)). that problem with file i/o would be another thing like this.....as it 
+is, its just not possible to for example use an irq or fastloader (which you 
+really want to do when writing a serious game for example)... thats the only 
+reason for suggesting all this, preventing future hackery :)
+
+&gt; If I look at my TODO list, I have enough work for at least half a year. And
+&gt; this doesn't include all the new features suggested in the list:-)
+
+well noone is is expecting YOU to do the work i guess :=) (however, i know 
+that even with other peoples stuff there is still work for you left...)
+
+&gt; My current &quot;short list&quot; for the next release contains this:
+&gt;
+&gt;   * Serial drivers as loadable modules, maybe drivers for some other
+&gt; machines that have a 6551, because these can be easily derived from the
+&gt; existing C64 driver.
+
+i like this one too :o) btw if you'd just define the api and implement one of 
+the drivers i am sure other people could convert other existing drivers 
+easily....
+
+&gt;   * Complete existing C64 TGI driver (OUTTEXT is missing).
+
+he :) i could add that, think i've even such a routine laying around 
+(optimized for size and not for speed though i think, so it'll be rather 
+slow). is the api defined in detail for that? i have to admit i didnt really 
+look at that yet :=)
+
+&gt;   * Simulator working with a few basic chip modules but without frontend.
+&gt;
+&gt;   * Consolidate debugging output into one file (linker).
+&gt;
+&gt;   * NES and (if possible) pcengine support (your stuff with some cleanup).
+
+as for that, since i am always working on/debugging/testing on real thing/etc 
+the actual nes library stuff.... if you could just add the crt0 (and some 
+solution for the heap thing :/) so i can continue working with that, then i 
+could clean up one of the other files after the other and just send it 
+over...
+
+&gt;   * Maybe: Allow .ALIGN to work for arbitrary program base addresses.
+
+i like that idea :o)
+
+&gt; This stuff plus the usual bugfixes and minor improvement will give me work
+&gt; for quite some time. The switch to serial driver modules will also need
+&gt; work from other people (the Atari driver code has to be adapted).
+
+guess i'll make a proper (nmi driven) driver for the silversurfer then too, 
+should be easy enough :)
+
+however... i wouldnt mind if such a (maybe more detailed) todo list would be 
+available somewhere...maybe seperatily on the snapshot ftp or sth... some of 
+the tasks really look like other ppl could also do them, if they only knew 
+what to do :=)
+
+gpz
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Lynx%20target">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2914.html">Groepaz: "Re: [cc65] Lynx target"</a>
+<li><strong>In reply to:</strong> <a href="2911.html">Ullrich von Bassewitz: "Re: [cc65] Lynx target"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2917.html">Ullrich von Bassewitz: "Re: [cc65] Lynx target"</a>
+<li><strong>Reply:</strong> <a href="2917.html">Ullrich von Bassewitz: "Re: [cc65] Lynx target"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-04-28 18:42:50 CEST</em>
+</em>
+</small>
+</body>
+</html>

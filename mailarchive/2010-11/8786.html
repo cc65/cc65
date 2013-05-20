@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: An idea to resolve this (Was: Re:</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="Re: An idea to resolve this (Was: Re: [cc65] ca65 for stand-alone asm projects)" />
+<meta name="Date" content="2010-11-06" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: An idea to resolve this (Was: Re: [cc65] ca65 for stand-alone asm projects)</h1>
+<!-- received="Sat Nov  6 20:37:14 2010" -->
+<!-- isoreceived="20101106193714" -->
+<!-- sent="Sat, 6 Nov 2010 20:37:00 +0100" -->
+<!-- isosent="20101106193700" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="Re: An idea to resolve this (Was: Re: [cc65] ca65 for stand-alone asm projects)" -->
+<!-- id="20101106193700.GT20839@trikaliotis.net" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="1289042207.10767.14.camel&#64;katzenrechner" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8787.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">Next message</a> ]
+[ <a href="8785.html" title="Agent Friday: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">Previous message</a> ]
+[ <a href="8780.html" title="Markus Stehr: &quot;An idea to resolve this (Was: Re: [cc65] ca65 for stand-alone asm projects)&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+[ <a href="8781.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20An%20idea%20to%20resolve%20this%20(Was:%20Re:%20[cc65]%20ca65%20for%20stand-alone%20asm%20projects)">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-11-06 20:37:00</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello,
+
+* On Sat, Nov 06, 2010 at 12:16:47PM +0100 Markus Stehr wrote:
+ 
+&gt; Just an idea, what if ca65 would get a new pseudo-OP called .option?
+&gt; So, if you write a C64 program you would write .option c64 and the
+&gt; assembler would automaticly create those loader address bytes at the
+&gt; start.
+
+Adding to what Uz already said: I think one of the big advantages of
+ca65 actually is that it is a very professional assembler. If you have
+worked with good assemblers for different systems, you know what I mean.
+
+In fact, ca65 is pretty much agnostic of the target machine - and this
+is a good thing. Creating something like a basic loader or a program
+start address is not actually the task of the assembler. You have to
+give it yourself.
+
+It is very well in the basic philosophy &quot;one task, one tool.&quot; It is one
+of its biggest advantages: It does its job pretty well, but it does not
+try to do more than that. This can be left of for other tools or for the
+user.
+
+Or would you expect ca65 (and the linker) to generate a full GEOS file
+in VLIW format if you want to compile for GEOS?
+
+
+Another thing: If someone believes ca65 is too complicted, he most
+probably actually does not need its features. For such a person, this
+assembler is probably not the right tool. Many years ago, I could not
+believe why someone would need something like a linker. I would have
+argued like &quot;ca65 should generate a ready-to-run executable
+out-of-the-box.&quot;
+
+Time has gone by, and many projects later, I found out what benefit it
+can have to be able to not have to do it. Even in my active C64 times,
+when I tried to write my first simple GEOS program, I found out that
+having the load address added is a bad thing, as GEOS did not like this.
+You had to use some (simple, yes) tricks in order to let GEOS load such
+an executable, or you had to do some postprocessing in order to remove
+the load address.
+
+To make a long discussion short: Instead of trying to add features that
+can be &quot;solved&quot; rather easily for everyone who knows what he is doing -
+something that one can expect from an assembler programmer -, Uz should
+concentrate on what he has always done: Fix bugs if they surface, add
+the core of the tools, and make one of the greatest free
+compiler/assembler systems out there. ;)
+
+ 
+&gt; Just my thoughts.
+
+Same here, 
+Spiro.
+
+-- 
+Spiro R. Trikaliotis                              <a href="http://opencbm.sf.net/">http://opencbm.sf.net/</a>
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>                     <a href="http://www.viceteam.org/">http://www.viceteam.org/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Nov  6 20:37:14 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8787.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8785.html" title="Previous message in the list">Agent Friday: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8780.html" title="Message to which this message replies">Markus Stehr: "An idea to resolve this (Was: Re: [cc65] ca65 for stand-alone asm projects)"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8781.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8786" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8786" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8786" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-11-06 20:37:17 CET
+</em></small></p>
+</body>
+</html>

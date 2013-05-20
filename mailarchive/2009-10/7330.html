@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] TGI summary</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="[cc65] TGI summary" />
+<meta name="Date" content="2009-10-26" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] TGI summary</h1>
+<!-- received="Mon Oct 26 20:54:26 2009" -->
+<!-- isoreceived="20091026195426" -->
+<!-- sent="Mon, 26 Oct 2009 20:49:22 +0100" -->
+<!-- isosent="20091026194922" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="[cc65] TGI summary" -->
+<!-- id="20091026194922.GA19988@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7331.html" title="Oliver Schmidt: &quot;Re: [cc65] TGI summary&quot;">Next message</a> ]
+[ <a href="7329.html" title="Oliver Schmidt: &quot;Re: [cc65] Atari TGI drivers, finally&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7331.html" title="Oliver Schmidt: &quot;Re: [cc65] TGI summary&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20TGI%20summary">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-10-26 20:49:22</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Among all the mails discussing the TGI API, I've somewhat lost track about
+what is consensus. I'm trying to write a summary, please let me know if I
+got something wrong.
+
+  * The new Atari drivers will use a black/white palette. (this one was
+    easy:-)
+
+  * Drivers must not clip lines, this will be done by the tgi_line wrapper.
+    Actually I have a prototype implementation of a line clipper already
+    running.
+
+  * The cgetc functions have to be checked not to write to the screen if the
+    cursor is switched off. Should there be a third state, &quot;cursor on&quot;,
+    &quot;cursor off&quot; and &quot;don't touch&quot; to ease this?
+
+  * Palette and color management stays as it is. Colors are actually indices
+    into the default palette. If a programmer changes the palette, he has to
+    implement his own color names or whatever.
+
+  * It is not possible to come up with a color naming scheme that actually
+    works. Everyone (I think) agreed that using the conio color names for
+    TGI graphics is not a good idea, but defining TGI_COLOR_XX macros is
+    actually impossible, because these may be different even between two
+    drivers on the same platform. So we don't have a solution here.
+
+As a final note (this was not discussed): I don't know how many drivers do not
+implement OUTTEXT. Most drivers derived from the C64 driver will not have it,
+because I was too lazy at that time:-) This should be added so programs can
+rely on it.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Oct 26 20:54:26 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7331.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] TGI summary"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7329.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Atari TGI drivers, finally"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7331.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] TGI summary"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7331.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] TGI summary"</a></li>
+<li><dfn>Reply</dfn>:  <a href="7332.html" title="Message sent in reply to this message">Fatih Aygün: "[cc65] Re: TGI summary (Atari update)"</a></li>
+<li><dfn>Reply</dfn>:  <a href="7336.html" title="Message sent in reply to this message">Daniel Serpell: "Re: [cc65] TGI summary"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7330" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7330" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7330" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-10-26 20:54:28 CET
+</em></small></p>
+</body>
+</html>

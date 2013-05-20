@@ -1,0 +1,160 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] code generation</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] code generation">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] code generation</h1>
+<!-- received="Tue Sep 16 02:38:53 2003" -->
+<!-- isoreceived="20030916003853" -->
+<!-- sent="Tue, 16 Sep 2003 02:34:17 +0200" -->
+<!-- isosent="20030916003417" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] code generation" -->
+<!-- id="200309160234.17368.groepaz@gmx.net" -->
+<!-- inreplyto="20030915095908.GB20030@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20code%20generation"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2003-09-16 02:34:17
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3392.html">Shawn Jefferson: "Re: [cc65] Atari stack pointer?"</a>
+<li><strong>In reply to:</strong> <a href="3389.html">Ullrich von Bassewitz: "Re: [cc65] code generation"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3396.html">Ullrich von Bassewitz: "Re: [cc65] code generation"</a>
+<li><strong>Next in thread:</strong> <a href="3394.html">Groepaz: "Re: [cc65] code generation"</a>
+<li><strong>Next in thread:</strong> <a href="3377.html">Maciej Witkowiak: "Re: [cc65] Optimizing C code"</a>
+<li><strong>Reply:</strong> <a href="3396.html">Ullrich von Bassewitz: "Re: [cc65] code generation"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Monday 15 September 2003 11:59, Ullrich von Bassewitz wrote:
+
+&gt; You will have to live with non perfect code if you're using a C compiler.
+&gt; And if I add several hundred lines of C code to the compiler just to remove
+&gt; 5 bytes out of an 8K project written for a 6502 platform, the disadvantages
+&gt; are far greater than the advantages.
+
+if you are looking from the viewpoint of the compiler programmer, yes ofcoz 
+:o) not many disadvantages for anyone else though hehe :)) 
+
+&gt; cc65 is not a highly optimizing compiler and it will never be one (at least
+&gt; not in the next few years). One reason is the implementation of the
+&gt; compiler (generating explicit parse trees and intermediate code would be
+&gt; needed), the second one is the strange architecture of the 6502. So you
+&gt; will have to live with the fact that cc65 generated code will always be
+&gt; suboptimal. I know this is hard, I'm myself working with (other) compilers
+&gt; where I have to avoid looking at the generated code because this makes me
+&gt; very unhappy:-)
+
+you are working with SDCC ?! *GGG*
+
+but seriously, considering the 6502 arch and the fact that making a c compiler 
+for that is kindof challanging by itself, and suboptimal code is more 
+expected than anything remotely efficient - cc65 does its job amazingly well 
+already, atleast at places where the programmer is aware of cc65's behaviour 
+:)
+
+however, from the democoder's point of view i have to say that every possible 
+optimization needs to be done - and there are no excuses :=P I do still 
+understand what your reasons are, and if i would be writing a compiler i 
+would probably argue in a simelar way - thats why i started toying with opt65 
+and the pattern-based optimizing myself.... who carez how the compiler 
+generated code looks like if some additional optimizer run can remove the 
+suboptimal bits? :o) (i'm using a simelar pattern based thing for SDCC/z80 
+code too for that matter :=)) - i would also rate things like the 
+labels-in-inline-asm problem more important than things i can circumvent more 
+or less easily.
+
+&gt; So why not send me an example of this code snippet together with the
+&gt; generated assembler code and a few numbers that say something like &quot;26
+&gt; occurences in a 626 line real world program, 513 bytes saved&quot;? 
+
+i'll do as soon as i improved opt65's output a bit so you can easily see what 
+it does without having to manually compare (currently it only allows to 
+switch between *massive* debug output and none at all...not really fun to 
+read :)) still gotta debug the opt65 linecounter stuff too....cant believe 
+the current numbers myself (checking against small testprograms says 
+everything is correct though :/)
+
+&gt; It is not
+&gt; that I refuse to add additional peephole steps, I just want to have a
+&gt; reason for doing so.
+
+maybe beeing the best 8bit compiler out there could be a reason.... i fear 
+thats already the case though :=P (for that matter, did anyone ever see the 
+compiler from western digital? damned f****r didnt even want to tell me a 
+price nor give any other further info about its capabilities ...grrr, could 
+be really interisting to see it in action - if only to see that it sux :)))
+
+hehe well, i'll try to make opt65 output some useful statistics aswell (ie 
+ouput what optimization was applied how often etc) :) it would probably be 
+interisting too what kindof possible optimizations could be added to cc65's 
+optimizer that are NOT catched by opt65 anyway.
+
+&gt; Which is the reason why there is no __Y__ and __X__:-) If you need explicit
+&gt; loads of these registers, use inline assembly, so you are in control of all
+&gt; the code.
+
+yes, i see .... gotta do that :) making the compiler throw a warning if an 
+__AX__ assignment is done anywhere in a macro except its start is probably 
+kindof hard i guess? :)
+
+
+ok whatever, getting the latest snapshot and then do some more testing :o)
+
+gpz
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20code%20generation">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3392.html">Shawn Jefferson: "Re: [cc65] Atari stack pointer?"</a>
+<li><strong>In reply to:</strong> <a href="3389.html">Ullrich von Bassewitz: "Re: [cc65] code generation"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3396.html">Ullrich von Bassewitz: "Re: [cc65] code generation"</a>
+<li><strong>Next in thread:</strong> <a href="3394.html">Groepaz: "Re: [cc65] code generation"</a>
+<li><strong>Next in thread:</strong> <a href="3377.html">Maciej Witkowiak: "Re: [cc65] Optimizing C code"</a>
+<li><strong>Reply:</strong> <a href="3396.html">Ullrich von Bassewitz: "Re: [cc65] code generation"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-09-16 02:39:10 CEST</em>
+</em>
+</small>
+</body>
+</html>

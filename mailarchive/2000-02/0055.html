@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] ld65 Config Question</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] ld65 Config Question">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] ld65 Config Question</h1>
+<!-- received="Sat Feb 19 11:41:21 2000" -->
+<!-- isoreceived="20000219104121" -->
+<!-- sent="Sat, 19 Feb 2000 11:41:08 +0100 (CET)" -->
+<!-- isosent="20000219104108" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] ld65 Config Question" -->
+<!-- id="200002191041.LAA24593@trixie.musoftware.de" -->
+<!-- inreplyto="20000219035113.A2403@mad" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20ld65%20Config%20Question"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2000-02-19 11:41:08
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0056.html">Ullrich von Bassewitz: "Re: [cc65] ld65 Config Question"</a>
+<li><strong>Previous message:</strong> <a href="0054.html">Tim Vanderhoek: "[cc65] ld65 Config Question"</a>
+<li><strong>In reply to:</strong> <a href="0054.html">Tim Vanderhoek: "[cc65] ld65 Config Question"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0057.html">Tim Vanderhoek: "Re: [cc65] ld65 Config Question"</a>
+<li><strong>Reply:</strong> <a href="0057.html">Tim Vanderhoek: "Re: [cc65] ld65 Config Question"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+&gt; It looks like it's either a simple modification to config.c or very
+&gt; difficult to do.  It may well be simple but I just can't see so at
+&gt; this time of the day...  :)
+
+With just LOAD= given, the RUN memory area will be made identical to LOAD.
+Allowing RUN and LOAD to point both to the same area should not be too
+difficult, but I will have to check that twice, because this setup is the
+default today but means something else.
+
+I will have a look at it and send you a patch as usual:-)
+
+&gt; Maybe the easiest way to do it is to trick the linker into secretly
+&gt; creating an extra segment, say &quot;DATASAVED&quot;, that just happens to be
+&gt; the same size as DATA?
+
+The only solution that will work without changing the linker is to create a
+separate memory area that just holds the original copy of the data segment.
+Unfortunately, you have to make the size of this area fixed.
+
+&gt; [Yes, I do have valid reasons for wanting separate load and run
+&gt;  segments on the same ram chip :) ...if the ram chip is loaded through a
+&gt;  serial port which is then disconnected, with no permanantly writeable
+&gt;  memory areas available, then one would want two copies of the DATA.]
+
+This is weird. Some people complain about the complexity of the linker
+configuration and others find new problems every week that cannot be solved
+because the linker config is too simple:-)
+
+Regards
+
+
+	Uz
+
+
+
+P.S.:
+I found yesterday that the .ELSEIF directive in the assembler is broken. It is
+not completely broken, so it works in the most common situations, but not in
+others. If anyone has problems, please use .ELSE/.IF instead.
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20ld65%20Config%20Question">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20ld65%20Config%20Question">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0056.html">Ullrich von Bassewitz: "Re: [cc65] ld65 Config Question"</a>
+<li><strong>Previous message:</strong> <a href="0054.html">Tim Vanderhoek: "[cc65] ld65 Config Question"</a>
+<li><strong>In reply to:</strong> <a href="0054.html">Tim Vanderhoek: "[cc65] ld65 Config Question"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0057.html">Tim Vanderhoek: "Re: [cc65] ld65 Config Question"</a>
+<li><strong>Reply:</strong> <a href="0057.html">Tim Vanderhoek: "Re: [cc65] ld65 Config Question"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:35 CET</em>
+</em>
+</small>
+</body>
+</html>

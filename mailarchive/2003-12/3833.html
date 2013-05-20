@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] cosmetic and optimization</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] cosmetic and optimization">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] cosmetic and optimization</h1>
+<!-- received="Tue Dec  9 10:06:18 2003" -->
+<!-- isoreceived="20031209090618" -->
+<!-- sent="Tue, 9 Dec 2003 10:06:14 +0100" -->
+<!-- isosent="20031209090614" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] cosmetic and optimization" -->
+<!-- id="20031209090614.GA5378@trixie.musoftware.de" -->
+<!-- inreplyto="004f01c3bdd7$d4726170$970606d5@acer5j0jdwij8z" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20cosmetic%20and%20optimization"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-12-09 10:06:14
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3832.html">carlos: "[cc65] cosmetic and optimization"</a>
+<li><strong>In reply to:</strong> <a href="3832.html">carlos: "[cc65] cosmetic and optimization"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3836.html">Spiro Trikaliotis: "Re: [cc65] cosmetic and optimization"</a>
+<li><strong>Reply:</strong> <a href="3836.html">Spiro Trikaliotis: "Re: [cc65] cosmetic and optimization"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Mon, Dec 08, 2003 at 11:08:36PM +0100, carlos wrote:
+&gt; is ist possible that the underscore will be threated in a way, that it is
+&gt; displayed as a thin line instead of a thick one? It's ok for now, but i
+&gt; think the thick one looks a little bit strange.
+
+Because it is difficult to have a solution for a cosmetic issue that suits
+everybody, and because a custom solution is so easy, I do usually refuse to
+make any changes to the character map. In case of your request, someone with a
+real TV set instead of a monitor might be glad about the thick line.
+
+But don't despair, there's a simple solution: Using
+
+        #pragma charmap()
+
+you can have your own character set translation. Just create a header file
+named &quot;mycharset.h&quot;, with the line
+
+        #pragma charmap (0x5F, 164);
+
+in it. Every time you include this header file, the underline (code 0x5F) in
+your source is translated into a thin underline in the target. If you think
+you created a really outstanding new character mapping, you can also make a
+user contribution from it.
+
+        <a href="http://www.cc65.org/contribs.php">http://www.cc65.org/contribs.php</a>
+
+contains information on how to do this.
+
+&gt; Another thing is, that the sequence
+&gt;
+&gt; charvar = (unsigned char)(intvar&gt;&gt;8);
+&gt;
+&gt; will be translated into:
+
+I know. There are lots of statements that do generate suboptimal code. This is
+true for &quot;big&quot; C compilers (like gcc), and even more for small ones like cc65.
+Adding optimizatons like the one you requested is always a tradeoff, because
+it adds code to the compiler backend, which has to be maintained and may
+contain bugs. So before adding such code I do usually ask &quot;is it worth it?&quot;,
+and in your case my answer was &quot;no&quot;. Improved code would save 1 byte and 2
+cycles for each occurrance found. In an average C source, how many times do
+you use above statement? Lets say it's a big program, and shifting a 16 bit
+value by 8 is heavily used. Having 100 of these shifts (which means that a
+bigger program with 10000 lines will have 1% of the source doing just these
+shifts, so it is a real lot) will save just 100 bytes and 200 cycles (may be
+more if used in loops). An average program will have 3 or 4 of these shifts,
+making such an optimization neglectible.
+
+So while I may add such an optimization some time, I don't see an urgent need
+for it. This may of course change if you show me a cool program that would
+benefit heavily from it. I have done this in the past (for example for the
+plasma demo and for Adam Dunkels Contiki operating system), and I will do so
+in the future.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20cosmetic%20and%20optimization">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20cosmetic%20and%20optimization">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3832.html">carlos: "[cc65] cosmetic and optimization"</a>
+<li><strong>In reply to:</strong> <a href="3832.html">carlos: "[cc65] cosmetic and optimization"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3836.html">Spiro Trikaliotis: "Re: [cc65] cosmetic and optimization"</a>
+<li><strong>Reply:</strong> <a href="3836.html">Spiro Trikaliotis: "Re: [cc65] cosmetic and optimization"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-12-09 10:07:15 CET</em>
+</em>
+</small>
+</body>
+</html>

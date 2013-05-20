@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] A question about .org and </title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="Re: [cc65] A question about .org and the linker" />
+<meta name="Date" content="2005-09-05" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] A question about .org and the linker</h1>
+<!-- received="Mon Sep  5 23:15:48 2005" -->
+<!-- isoreceived="20050905211548" -->
+<!-- sent="Mon, 5 Sep 2005 23:15:38 +0200" -->
+<!-- isosent="20050905211538" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="Re: [cc65] A question about .org and the linker" -->
+<!-- id="200509052315.38501.groepaz@gmx.net" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="36DBAB88-6E4E-485F-B740-56A05CA52F2A&#64;science-and-technology.nl" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5205.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] A question about .org and the linker&quot;">Next message</a> ]
+[ <a href="5203.html" title="Sidney Cadot: &quot;[cc65] A question about .org and the linker&quot;">Previous message</a> ]
+[ <a href="5203.html" title="Sidney Cadot: &quot;[cc65] A question about .org and the linker&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5205.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] A question about .org and the linker&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20A%20question%20about%20.org%20and%20the%20linker">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-09-05 23:15:38</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Monday 05 September 2005 23:11, Sidney Cadot wrote:
+&gt; Hi guys,
+[...]
+&gt; Now I know how to get this fixed by juggling a linker file, but I
+&gt; would like to be able to nail a piece of code really at a certain
+&gt; address using .ORG only. Is there a way to do this (without using to
+&gt; the linker config?). Is the current behavior intentional?
+&gt;
+&gt; [ You may ask why I would want this. The reason is that I have
+&gt; scanned/OCRed/corrected 128 pages of Atari OS source code, and I
+&gt; would like to get this to work with ca65 with minimal changes. I
+&gt; really wouldn't like to put extra &quot;.segment&quot; directives in the code,
+&gt; for example. ]
+
+you are confusing the traditional meaning of &quot;.org&quot; (=put code at this adress) 
+with how its handled in modern assemblers with linker (=use this as a base 
+for the program counter).
+
+check the paragraph about simulating turbo-assembler behavior with ca65 in the 
+docs (dont remember exactly where it was....but its there i promise :=P), it 
+shows what to do to achive what you want.
+
+-- 
+
+<a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>
+<a href="http://www.gc-linux.org/docs/yagcd.html">http://www.gc-linux.org/docs/yagcd.html</a>
+<a href="http://www.pokefinder.org">http://www.pokefinder.org</a>
+<a href="http://ftp.pokefinder.org">http://ftp.pokefinder.org</a>
+
+Easy to learn = hard to use, Easy to use = hard to learn, Easy to learn and 
+use = won't do what you want it to, Powerful = hard to learn and use, 
+Menu-driven = easy to learn. 
+&lt;Stephen Manes&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Sep  5 23:15:48 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5205.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] A question about .org and the linker"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5203.html" title="Previous message in the list">Sidney Cadot: "[cc65] A question about .org and the linker"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5203.html" title="Message to which this message replies">Sidney Cadot: "[cc65] A question about .org and the linker"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5205.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] A question about .org and the linker"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5204" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5204" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5204" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-09-05 23:15:50 CEST
+</em></small></p>
+</body>
+</html>

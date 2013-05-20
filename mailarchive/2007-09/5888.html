@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Re: The most critical operatio</title>
+<meta name="Author" content="Emanuele Fornara (emanuele.fornara1gmail.com)" />
+<meta name="Subject" content="[cc65] Re: The most critical operations of the C runtime" />
+<meta name="Date" content="2007-09-21" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Re: The most critical operations of the C runtime</h1>
+<!-- received="Fri Sep 21 08:53:43 2007" -->
+<!-- isoreceived="20070921065343" -->
+<!-- sent="Fri, 21 Sep 2007 08:53:29 +0200" -->
+<!-- isosent="20070921065329" -->
+<!-- name="Emanuele Fornara" -->
+<!-- email="emanuele.fornara1gmail.com" -->
+<!-- subject="[cc65] Re: The most critical operations of the C runtime" -->
+<!-- id="f6f17a0c0709202353n23834057xdbdabb28ca5f99b2@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="f6f17a0c0709130036k555938ddkef72d40b7b46bb74&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5889.html" title="MagerValp: &quot;Re: [cc65] Memory in atari&quot;">Next message</a> ]
+[ <a href="5887.html" title="German Gonzalez: &quot;[cc65] Memory in atari&quot;">Previous message</a> ]
+[ <a href="5875.html" title="Emanuele Fornara: &quot;[cc65] The most critical operations of the C runtime&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Emanuele Fornara &lt;<a href="mailto:emanuele.fornara1gmail.com?Subject=Re:%20[cc65]%20Re:%20The%20most%20critical%20operations%20of%20the%20C%20runtime">emanuele.fornara1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-09-21 08:53:29</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Thank you all for your suggestions.
+
+
+1) open/close/read/write - dynamic module - loadable drivers
+
+My idea was to provide a couple of high level operations:
+
+jar_load(0x2000, &quot;module.rom&quot;); // map the whole file
+jar_load_ex(0x2000, 10000UL, 200, &quot;module.rom&quot;); // map 200 bytes
+
+I haven't looked yet into how/if can I use these for dynamic modules.
+However, I don't think I would be able to provide &quot;standard&quot; drivers;
+even the joystick driver would be hard to implement (some weird
+latching behavior in MIDP2); more on TGI below.
+
+
+2) memset, memcpy, DMA
+
+For a while I toyed with the idea of letting the IO chip only access
+page 2, but I already let the genie out of the bottle with the latest
+version of the VM; FILL/COPY are pretty much a given now.
+
+
+3) math operations
+
+I was sort of planning to put a register-based math subsystem in the
+IO chip; I wasn't so sure, but I agree that it would really help to
+calculate array offsets.  I guess it would be helpful to have some
+pseudo-registers pointing to a bank of 16-bit slots on page 0 (some of
+them would &quot;happen&quot; to coincide with locations used by cc65).
+
+
+4) low level C runtime
+
+(I actually posted a message about this, I guess it got lost
+somewhere... never mind, my opinion has changed since then anyway)
+
+Here is where I struggle; at the end probably the best way for me to
+proceed is to write a little game and see which functions are actually
+called.
+
+I recompiled a program (pngtest.c) with optimizations enabled (I've
+released the test programs without compiling them with '-O'! This
+should speak volumes about how much I cared about performance until
+now...) and now I have some hints:
+
+- pushax, if you are careful and use chars, is less used than I thought.
+
+- enter/leave, if you are careful, are less used then I thought.
+
+- pusha/incsp* are probably too short.
+
+All in all the generated code, with '-O' ;-), doesn't look bad to me.
+
+
+Some notes about math and TGI here (WARNING! page with Applet):
+
+<a href="http://jbit.sourceforge.net/demo/sdk_mandelbrot.html">http://jbit.sourceforge.net/demo/sdk_mandelbrot.html</a>
+
+
+
+Emanuele
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Sep 21 08:53:43 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5889.html" title="Next message in the list">MagerValp: "Re: [cc65] Memory in atari"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5887.html" title="Previous message in the list">German Gonzalez: "[cc65] Memory in atari"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5875.html" title="Message to which this message replies">Emanuele Fornara: "[cc65] The most critical operations of the C runtime"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5888" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5888" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5888" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-09-21 08:53:46 CEST
+</em></small></p>
+</body>
+</html>

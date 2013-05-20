@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] CBM POSIX I/O - USR Files</title>
+<meta name="Author" content="silverdr1wfmh.org.pl (silverdr1wfmh.org.pl)" />
+<meta name="Subject" content="Re: [cc65] CBM POSIX I/O - USR Files" />
+<meta name="Date" content="2010-03-30" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] CBM POSIX I/O - USR Files</h1>
+<!-- received="Tue Mar 30 13:28:17 2010" -->
+<!-- isoreceived="20100330112817" -->
+<!-- sent="Tue, 30 Mar 2010 13:28:11 +0200" -->
+<!-- isosent="20100330112811" -->
+<!-- name="silverdr1wfmh.org.pl" -->
+<!-- email="silverdr1wfmh.org.pl" -->
+<!-- subject="Re: [cc65] CBM POSIX I/O - USR Files" -->
+<!-- id="A7EEF7B3-1F00-49EA-8BAF-21DA1A7BAEB5@wfmh.org.pl" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="f97798c21003300116s3503b937sb0b306d3191bb593&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8015.html" title="Groepaz: &quot;Re: [cc65] CBM POSIX I/O - USR Files&quot;">Next message</a> ]
+[ <a href="8013.html" title="Groepaz: &quot;Re: [cc65] CBM POSIX I/O - USR Files&quot;">Previous message</a> ]
+[ <a href="8010.html" title="Oliver Schmidt: &quot;Re: [cc65] CBM POSIX I/O - USR Files&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8015.html" title="Groepaz: &quot;Re: [cc65] CBM POSIX I/O - USR Files&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:silverdr1wfmh.org.pl?Subject=Re:%20[cc65]%20CBM%20POSIX%20I/O%20-%20USR%20Files">silverdr1wfmh.org.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-03-30 13:28:11</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 2010-03-30, at 10:16, Oliver Schmidt wrote:
+
+&gt; If I understands things right then this is something I did all the
+&gt; time without thinking about it:
+&gt; 
+&gt; - Using C1541 to write files to a .D64 image (without giving the type
+&gt; thus writing PRG)
+&gt; - Using cc65 POSIX I/O to read those files (without setting _filetype
+&gt; thus reading USR)
+
+I think setting _filetype is important on creating/writing the file. As the posted previously test code showed, it is not needed on reading. Therefore using cc65 I/O you create USR by default, which is IMHO quite understandable. If you read, you read it just by name, which (having in mind that only Groepaz' DOS allows duplicate names :-) is also very much fine.
+
+&gt; 
+&gt; &lt;flame&gt; That sort of reminds me on Windows saving upper/lowercase
+&gt; filenames but reading them without caring about the case &lt;/flame&gt;
+&gt; 
+
+There is more filesystems, which are not case sensitive. Under OSX you can choose whether you want the filesystem to be case sensitive or not for example.
+
+[...]
+
+&gt;&gt; [...]
+&gt;&gt; More or less ;-) The difference is that you have to specify that you want to load USR file. Otherwise you get FILE TYPE MISMATCH error. Other than that - the same (AFAIR).
+&gt; 
+&gt; I tried that yesterday evening using VICE 1.21 on Win32 and could
+&gt; _not_ reproduce that error. I saved a file using C1541 using &quot;,u&quot; and
+&gt; verified that it showed up as USR. Then I entered
+&gt; 
+&gt; LOAD &quot;MYFILE&quot;, 8
+&gt; 
+&gt; and experienced the same behaviour with a PRG file of the same conent:
+&gt; The system prints READY but I don't get a prompt anymore. I understand
+&gt; thios behaviour as the file in question doesn't have a valid load
+&gt; address in the first two bytes.
+
+I was writing off my head but you forced me to set my gear up and test it. Seems that I didn't lie ;-) Things behave as I described (with standard DOS and KERNAL).
+
+Do you have &quot;True drive emulation&quot; turned on? This is crucial if you want to check things out. Also current version of VICE is 2.2! 1.2 is quite... outdated to say the least. I can imagine that it may behave somewhat differently than the current version. Grab the latest version, turn &quot;true drive emulation&quot; on and then check things out.
+
+&gt;&gt;&gt; 
+&gt;&gt;&gt; And what about LOAD,* ? Does it load the first PRG file or load the
+&gt;&gt;&gt; first &lt;whatever&gt; file?
+&gt;&gt; 
+&gt;&gt; Depends. It either loads the most recently accessed file or - if you are freshly initialised - the first PRG file.
+&gt;&gt; To make sure you actually load the very first file, you put a colon before the asterisk. But then the file must be PRG or you get the familiar (already) error, unless you specify the type.
+&gt; 
+&gt; Again I was _not_ able to reproduce that. Putting an USR file first on
+&gt; .D64 image and using the 'Autostart image' feature of VICE (which
+&gt; prints 'LOAD &quot;*,8,1') the system was obviously trying to load the
+&gt; (bogus) USR file instead of a (valid) PRG file being the second in the
+&gt; image.
+
+Again - I double verified that now - works as described. Do you have &quot;True drive emulation&quot; turned on? This is crucial if you want to check things out.
+
+&gt; I'd be happy if I could really understand these things for a reason
+&gt; beside pure curiosity: I need to put a data file first on a image (for
+&gt; certain reasons) and would like to keep the users (and especially the
+&gt; VICE autostart feature) from trying to load it and thus locking up
+&gt; their machine.
+
+It is quickly becoming off-topic here but one more comment: AFAIR current VICE's autostart feature turns &quot;true drive emulation&quot; OFF by default. This _may_ cause different behaviour. You have to instruct current VICE NOT to turn true drive emulation off when autostarting a disk image.
+
+HTH.
+
+P. S. Here are the 507 bytes of the disk image I used for testing:
+
+<a href="http://zennon.internetdsl.pl/testimage.d64.zip">http://zennon.internetdsl.pl/testimage.d64.zip</a>
+
+It has the same BASIC program (with two bytes loading address) different only with text printed. One is USR TEST, the other is PRG TEST. They are written in the directory as both USR (first) and PRG (second). Check for yourself (with standard ROMs, true drive emulation on, and current VICE. Or real hardware).
+
+-- 
+SD!
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Mar 30 13:28:17 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8015.html" title="Next message in the list">Groepaz: "Re: [cc65] CBM POSIX I/O - USR Files"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8013.html" title="Previous message in the list">Groepaz: "Re: [cc65] CBM POSIX I/O - USR Files"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8010.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] CBM POSIX I/O - USR Files"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8015.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] CBM POSIX I/O - USR Files"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8015.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] CBM POSIX I/O - USR Files"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8017.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] CBM POSIX I/O - USR Files"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8014" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8014" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8014" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-03-30 13:28:19 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] C64DTV: different stack an</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] C64DTV: different stack and zero page position + cc65" />
+<meta name="Date" content="2010-11-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] C64DTV: different stack and zero page position + cc65</h1>
+<!-- received="Mon Nov 29 21:46:18 2010" -->
+<!-- isoreceived="20101129204618" -->
+<!-- sent="Mon, 29 Nov 2010 21:46:09 +0100" -->
+<!-- isosent="20101129204609" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] C64DTV: different stack and zero page position + cc65" -->
+<!-- id="20101129204609.GA29274@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="20101129144839.GN13821&#64;vega.lgb.hu" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9006.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] cbm_readdir&quot;">Next message</a> ]
+[ <a href="9004.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] strcmp() and memcmp()&quot;">Previous message</a> ]
+[ <a href="9002.html" title="G·bor LÈn·rt: &quot;[cc65] C64DTV: different stack and zero page position + cc65&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9014.html" title="G·bor LÈn·rt: &quot;Re: [cc65] C64DTV: different stack and zero page position + cc65&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20C64DTV:%20different%20stack%20and%20zero%20page%20position%20%2B%20cc65">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-11-29 21:46:09</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Mon, Nov 29, 2010 at 03:48:39PM +0100, G√°bor L√©n√°rt wrote:
+&gt; I'm thinking to try some coding on my little C64-DTV3. However a question
+&gt; has come into my mind: is there any requirement (of cc65) that zero page is
+&gt; always at location $0000 and stack at $0100?
+
+I'm not aware of any such requirement. I cannot rule out that there are a very
+few library modules that use something like
+
+        tsx
+        lda     $104,x
+
+but if so, I would assume that they are platform specific anyway.
+
+There may also be accesses to the zero page using non zero page addressing
+modes, but I cannot currently imagine when this could happen. At least there
+are no such tricks in the compiler.
+
+So while I cannot completely rule out the possibility that there are such
+constructs, I do assume that chances are very good that your code will run
+without problems.
+
+&gt; It's a question because on DTV
+&gt; you can relocate them (but as far as I know it's true for C128 too?), so for
+&gt; example STA $00 and STA $0000 won't mean the same memory location anymore.
+
+The C128 has a MMU that does actual memory remapping. So on this machine, when
+the zero page is remapped, accessing it using absolute addressing will still
+work.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Nov 29 21:46:18 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9006.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] cbm_readdir"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9004.html" title="Previous message in the list">silverdr1wfmh.org.pl: "Re: [cc65] strcmp() and memcmp()"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9002.html" title="Message to which this message replies">G·bor LÈn·rt: "[cc65] C64DTV: different stack and zero page position + cc65"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9014.html" title="Next message in this discussion thread">G·bor LÈn·rt: "Re: [cc65] C64DTV: different stack and zero page position + cc65"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9014.html" title="Message sent in reply to this message">G·bor LÈn·rt: "Re: [cc65] C64DTV: different stack and zero page position + cc65"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9005" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9005" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9005" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-11-29 21:46:21 CET
+</em></small></p>
+</body>
+</html>

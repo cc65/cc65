@@ -1,0 +1,302 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Back on Track</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] Back on Track">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Back on Track</h1>
+<!-- received="Thu Jan 20 21:48:25 2000" -->
+<!-- isoreceived="20000120204825" -->
+<!-- sent="Thu, 20 Jan 2000 21:48:01 +0100" -->
+<!-- isosent="20000120204801" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] Back on Track" -->
+<!-- id="38877481.7F895EB2@gmx.net" -->
+<!-- inreplyto="200001201034.LAA05865@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Back%20on%20Track"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2000-01-20 21:48:01
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0022.html">Spiro Trikaliotis: "Re: [cc65] cc65 and VICE"</a>
+<li><strong>Previous message:</strong> <a href="0020.html">Ullrich von Bassewitz: "Re: [cc65] cc65 and VICE"</a>
+<li><strong>In reply to:</strong> <a href="0015.html">Ullrich von Bassewitz: "Re: [cc65] Back on Track"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0025.html">Ullrich von Bassewitz: "Re: [cc65] Back on Track"</a>
+<li><strong>Reply:</strong> <a href="0025.html">Ullrich von Bassewitz: "Re: [cc65] Back on Track"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+HyhO! ... 
+
+&gt; I guess the IDE64-harddisk controller will work fine then. It runs with an 
+&gt; expanded basic, that accept standard kernel-calls on unit 12.
+
+Thats the reason for starting with a kernal-'driver' actually... it will just
+work
+fine with anything out there, it will nicely make use of the speeddos i have
+(*G*)
+and also have a load() and loadexec() thing that works with eg the actionreplay
+fastloader. (are there corrosponding 'standard' functions for loading and/or
+running another executeable?)
+
+&gt; It should even be possible to read/write more than one file at a time:
+&gt; Just remember the file handle used in the last kernal call. On the next
+&gt; write or read, check if the file handle is the same, if not, use CHKOUT to
+&gt; switch to the other file handle (channel). The limitation for seek seems
+&gt; to be real, however...
+
+well, my knowledge in that particular question is a bit rusty, but as far as
+i can remember its only possible to have more than one file open for READING,
+but only one for write... however, it'll handle the kernal-file-id's like you
+say ofcoz when dealing with different files...
+
+however, seeking WILL also be supported by the kernal-driver, but will perform
+awfully bad ofcoz (only way to seek would be to read sequentially from the
+start,
+not quite cool performance if you fseek(-1,...) in a loop ;=P).
+
+there will be, however, a somewhat 'generic' driver for floppy-drives though,
+that
+will support real seeking via direkt disc-access.
+
+&gt; Maybe you could use the forward slash or accept it as well. Forward
+&gt; slashes are more portable than backslashes.
+
+good idea... wasn't aware of that. well... actually, did you ever see a
+backslash
+on a c64 ? :=P (it was a typo of mine last time, its 8:/path/file.ext ofcoz ;=))
+
+&gt; lseek is not there, because I don't know of any drive that supports it. If
+&gt; you find a way to support it, adding a prototype (and the corresponding
+&gt; ANSI C function fseek) is no problem.
+
+just fine with me then ;=)
+
+&gt; The low level functions should handle three file descriptors without any
+&gt; further action:
+&gt; 
+&gt;         0       stdin
+&gt;         1       stdout
+&gt;         2       stderr
+
+ehrm... /me confused =) ... do you mean that first descriptor my open() returns
+should be 3 and whenever my read/write routines are called with descriptors 0-2
+as parameters they should simply map the call to stdin etc ? IF so, what is the
+standard way to SET what IS the, eg, stdin ?! (what c-function ? or should the
+OS somehow define this?)
+ 
+&gt; With this in mind, the current behaviour of printf() makes sense: It
+&gt; writes to stdout which is mapped to the file handle with the value one.
+
+well.... ehrm... yes it MAKES some kind of sence, if you would consider the cbm
+kernal calls beeing standard C-style i/o functions. but however, in real life
+this behaviour won't make sence, even less with a filesystem like the one i
+am doing ;=P ($ffd2 is actually one of the low-level routines of the kernal
+driver ... and because of that, the 'user' wouldnt be supposed to call this
+one directly) for practical use it would make much more sence if you'd use a
+&quot;screen-only&quot; kernal call for printf() - if someone wanted to specifically
+write to a file, he would use fprintf() anyway ;=P (and your fprintf calls
+write doesnt it?) - it would obviously have the backdraw that printf() could no
+more me mapped to a file (by defining a file as stdout) but if you WANTED to do
+that, it would mean that printf had to call my filesystem and pass its data
+through it... making screenoutput via printf unacceptable slow.
+
+&gt; It should even be possible to close or reopen the first three file
+&gt; descriptors, so the best way is probably to open them using the normal
+&gt; kernal calls at program start.
+
+now this sentence confuses me again... so CBM_KERNAL file-descriptors 0-2 ????
+(nonononono that dont make sence ;=P)
+
+&gt; While all this needs some special handling in the low level routines, it
+&gt; is very portable, because this is the way, it is defined by the C standard
+&gt; (the C standard does not define the low level functions open/close/read/
+&gt; write, but the high level functions like fprintf. But it makes sense to
+&gt; mirror the behaviour of the high level functions in the low level ones,
+&gt; and it is common use).
+
+yes, i am doing the same.... i want all the open/read/close etc bla stuff
+to work just it does on the c-compiler(s) i am used to ;=P its not *that*
+much special handling actually, most annoying issues are related to string
+parsing/conversion atm =)
+ 
+&gt; o65 is a good solution for a relocatable executable format. It is not a
+&gt; very good solution for an object file format for a crosscompiler or
+&gt; crossassembler.
+&gt; 
+&gt; The format is quite simple. This is an advantage for the loader (which
+&gt; runs on a 6502 machine). On the other side, the simplicity means there is
+&gt; no way to do the more complex things that would be possible on the PC when
+&gt; using it as an object file format for a crossdevelopment tool. Examples
+&gt; for such an additional features would be support for more segments (you
+&gt; need this on machines with two non-adjacent ROMs), or debug information.
+&gt; 
+&gt; So yes, o65 would be a good candidate for what you are planning to do.
+
+cool... is there some good specs on this around somewhere? =P
+
+&gt; I'm looking forward to it! Maybe you can send me the diffs so I can verify
+&gt; that they are working with the current development version, and we can
+&gt; talk about any open issues. This is only a suggestion, of course.
+
+well... atm the whole thing looks like that all functions have a fs_ prefix and
+i just #include all the .c and .h files in my test-program... i still have to
+split the files into smaller ones and compile it all into a library, but the
+way its now is somewhat easier to handle for me atm ;) I dont think it'll 
+cause any probs with further versions of the compiler anyway... i dont use any
+fancy C tricks (hate that shit ;P) and try to reduce complexity where i can.
+sneak-peaks into the code will be available as soon as i am satisfied with the
+appearance of the code. (code is art you know :P)
+
+&gt; I have some specification on the 1571 (that I found on the Internet), that even includes specification on the build-in MFM-controller. A driver to read PC-disks in 1571 and 1581 can be made.
+&gt; 
+
+in electronic format? gimme! :=P
+
+&gt; &gt; Does this mean that every program that is compiled with cc65, will have
+&gt; the drivers build-in? Wouldn't the best thing be, the drivers as a part of
+&gt; the Operating System?
+&gt; 
+&gt; This is true for all features that are not supported by a standard
+&gt; machine. If the software that is running as an operating system does not
+&gt; have a specific feature, every program generated by cc65 that wants to use
+&gt; the feature must have code linked in to support it.
+&gt; 
+&gt; On the other side, libraries for other operating systems (remember that
+&gt; cc65 is not C64 specific) do not need the additional code. One example is
+&gt; the support for ACE (which has been dropped some time ago): Since ACE has
+&gt; a very C like file interface and did support a lot of CMD equipment in the
+&gt; kernel, the file I/O routines needed for cc65 were very small. (This was
+&gt; the reason why the first implementation of file I/O was for ACE: It was
+&gt; very easy to do, and I'm a lazy person:-). Most of the file I/O routines
+&gt; were just wrappers that stored registers in specific locations, and called
+&gt; an ACE function.
+&gt; 
+
+exactly.... there will be a few #defines though to be able to recompile the
+filesystem for a specific situation (eg if you only want one drive and just
+kernal calls a whole lot of the code is redundant and can be left out)
+
+i would *LOVE* to support LOADABLE device drivers so one wouldnt need to
+recompile
+everything for every little change of conditions... but i honestly dont 
+know how i could do this using cc65.... any ideas? 
+
+&gt; I was just sitting down to write file i/o when I heard about your posting
+&gt; to the list.  You sound to be much farther along than I.  The question now
+&gt; is what can I do to help?  Either I could offer my help to you or announce
+&gt; that I will work on something else.  I have a lot of experience with assembly
+&gt; coding but I am rusty in C and not very familiar with cc65.  I'm pretty
+&gt; good at optimizing and have a good understanding of math, I could probably
+&gt; write a fast loader if I had to but I've only written a 32 cycle fast transfer
+&gt; routine (2 wire) which doesn't do anything practical.
+
+well... basically, once the filesystem itself is completed, cleaned and most
+important the api (the backend ofcoz :P) is documented everyone could start
+adding specific drivers (think about a driver that supports seeking on a 1581!
+or one that maps a filesystem to a REU! :P)
+
+at this momemt, all i need is info on different types of drives... eg:
+
+- how does the directory (read via &quot;$&quot; file) exactly look like? any differences
+to a 1541?
+- any differences to 1541 with accessing the error/cmd channel?
+- same for the direkt-access channels
+- any additional dos commands (all i know is &quot;H:discname,id&quot; for renaming a disk
+using action-replay) - the filesys will support them if possible
+- whats the dir-track on the disc? how is the layout different to a 1541 disc?
+- whats the disc layout? (how much tracks,sectors per track)
+- how *exactly* does changing directories and partitions work? (give me examples
+in cbm-basic ;=P)
+- anything else ;=)
+
+ok.... so far so good =P
+
+oh, one thing... how could i have an initialized list of strings? define it
+in .byte as asm ? mmmpf.... C w/o initialized structs somewhat lacks
+functionality ;(
+
+gpz
+
+-- 
+........................................................
+
+		            /^\
+                            \ /  
+      ASCII RIBBON CAMPAIGN  X  AGAINST HTML MAIL
+                            / \  
+
+........................................................
+
+             .--.--.--.----..--.--.--.-----.----.
+   C=64     /  /  /  /  .  /  .  .  /  .  /  .  /\
+           /  /  /__/  /__/  /  /  /  /  /  /  / /
+   PC     /     /  /  /\_/  /  /  /  __ /  /  / /
+         /  /  /  /  / //  /  /  /  /  /  /  / /
+   PSX  /  /  /  /  / //  /  /  /  /  /  /  / /
+       /__/__/__/__/ //__/__/__/_____/__/__/ / 
+       \__\__\__\__\/ \__\__\__\_____\__\__\/  Groepaz
+
+........................................................
+.. <a href="http://fly.to/hitmen-c64">http://fly.to/hitmen-c64</a> ............................
+..... the hitmen c64 home page .........................
+.. <a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a> .......................
+..... hitmen psx section ...............................
+.. <a href="http://start.at/hitnav64">http://start.at/hitnav64</a> ............................
+..... biggest c64 link collection around ...............
+.. <a href="http://fly.to/hitmen-groepaz">http://fly.to/hitmen-groepaz</a> ........................
+..... my little personal page ..........................
+........................................................
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Back%20on%20Track">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0022.html">Spiro Trikaliotis: "Re: [cc65] cc65 and VICE"</a>
+<li><strong>Previous message:</strong> <a href="0020.html">Ullrich von Bassewitz: "Re: [cc65] cc65 and VICE"</a>
+<li><strong>In reply to:</strong> <a href="0015.html">Ullrich von Bassewitz: "Re: [cc65] Back on Track"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0025.html">Ullrich von Bassewitz: "Re: [cc65] Back on Track"</a>
+<li><strong>Reply:</strong> <a href="0025.html">Ullrich von Bassewitz: "Re: [cc65] Back on Track"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:35 CET</em>
+</em>
+</small>
+</body>
+</html>

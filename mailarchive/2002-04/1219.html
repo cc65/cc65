@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] how about commercial prgs?</title>
+<meta name="Author" content="Adam Dunkels (adam_at_sics.se)">
+<meta name="Subject" content="Re: [cc65] how about commercial prgs?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] how about commercial prgs?</h1>
+<!-- received="Tue Apr  2 14:00:33 2002" -->
+<!-- isoreceived="20020402120033" -->
+<!-- sent="Tue, 2 Apr 2002 14:00:32 +0200" -->
+<!-- isosent="20020402120032" -->
+<!-- name="Adam Dunkels" -->
+<!-- email="adam_at_sics.se" -->
+<!-- subject="Re: [cc65] how about commercial prgs?" -->
+<!-- id="200204021200.OAA16311@color.sics.se" -->
+<!-- inreplyto="20020401132403.B4922@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Adam Dunkels (<a href="mailto:adam_at_sics.se?Subject=Re:%20[cc65]%20how%20about%20commercial%20prgs?"><em>adam_at_sics.se</em></a>)<br>
+<strong>Date:</strong> 2002-04-02 14:00:32
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1218.html">Mike McCarty: "Re: [cc65] how about commercial prgs?"</a>
+<li><strong>In reply to:</strong> <a href="1215.html">Ullrich von Bassewitz: "Re: [cc65] how about commercial prgs?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1220.html">Ullrich von Bassewitz: "Re: [cc65] how about commercial prgs?"</a>
+<li><strong>Next in thread:</strong> <a href="../2002-03/1191.html">MagerValp: "Re: [cc65] how about commercial prgs?"</a>
+<li><strong>Reply:</strong> <a href="1220.html">Ullrich von Bassewitz: "Re: [cc65] how about commercial prgs?"</a>
+<li><strong>Reply:</strong> <a href="1227.html">Mike McCarty: "Re: [cc65] how about commercial prgs?"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Monday 01 April 2002 13.24, you wrote:
+&gt; On Sun, Mar 31, 2002 at 09:49:55PM +0200, BlackJack/Civitas wrote:
+&gt; &gt; Like you I'm not a lawyer. I guess it's possible to distribute code
+&gt; &gt; with a double license - GPL and your cc65 license. So the source code
+&gt; &gt; itself can be redistributed under GPL terms and it's still legal to
+&gt; &gt; compile it against your runtime library.
+&gt;
+&gt; This would mean that anyone writing programs that are going to be compiled
+&gt; with cc65, and distributed in binary form must double license them, which
+&gt; effectively disables any provisions of the GPL. I'm pretty sure that
+&gt; Stallman, when hearing this, would be at least as upset as I have been a
+&gt; few days ago:-)
+&gt;
+&gt; FYI, here is the paragraph from the GPL I was refering to all the time:
+&gt;
+&gt;         These requirements apply to the modified work as a whole.  If
+&gt;         identifiable sections of that work are not derived from the
+&gt;         Program, and can be reasonably considered independent and
+&gt;         separate works in themselves, then this License, and its
+&gt;         terms, do not apply to those sections when you distribute them
+&gt;         as separate works.  But when you distribute the same sections
+&gt;         as part of a whole which is a work based on the Program, the
+&gt;         distribution of the whole must be on the terms of this
+&gt;         License, whose permissions for other licensees extend to the
+&gt;         entire whole, and thus to each and every part regardless of
+&gt;         who wrote it.
+&gt;
+&gt; As far as I understand this, it demands definitely that any code
+&gt; distributed in a binary that is GPLed is covered by the GPL itself. So in
+&gt; case of a program compiled with cc65 and linked against the cc65 runtime,
+&gt; the GPL demands that the cc65 library routines are covered by the GPL -
+&gt; which is not possible because the authors have to agree with such a change.
+&gt; This means in fact that a program compiled with cc65 and distributed,
+&gt; cannot include any GPLed code.
+
+I believe your interpretation is slightly wrong. The GPL forces you to make 
+the full sourcecode avaliable for binaries where (parts of) the code is 
+covered by the GPL, but it doesn't force you to actually relicense the whole 
+code. As long as the non-GPL parts are freely distributable, everything works 
+fine.
+
+Consider this: It would be perfectly legal and OK for me to modify a version 
+of cc65, perhaps add a Java front-end to it, and make my changes avaliable 
+under the GPL. Anyone who wishes to distribute my modified cc65 as a binary 
+must make the full source code avaliable - both the source code for my 
+modifications and for cc65. This works because the cc65 license permits free 
+distribution is source form. But it doesn't place any kinds of restrictions 
+on the actual cc65 code - only on my modifications. 
+
+If someone would take a GPL covered program from a third-party and link it 
+against, say, Ullrich's RS232 library code, it would be perfectly legal. The 
+reason is that the library code is free - it doesn't place any additional 
+conditions on the GPL code. There is nothing that forces the RS232 code to be 
+relicensed under the GPL.
+
+In the specific case of standard compiler libraries such as the standard C 
+library, I believe there are some special wording in the GPL to make it 
+possible to compile GPL code even with proprietary libraries. 
+
+/adam
+-- 
+Adam Dunkels &lt;<a href="mailto:adam_at_sics.se?Subject=Re:%20[cc65]%20how%20about%20commercial%20prgs?">adam_at_sics.se</a>&gt;
+<a href="http://www.sics.se/~adam">http://www.sics.se/~adam</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20how%20about%20commercial%20prgs?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1218.html">Mike McCarty: "Re: [cc65] how about commercial prgs?"</a>
+<li><strong>In reply to:</strong> <a href="1215.html">Ullrich von Bassewitz: "Re: [cc65] how about commercial prgs?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1220.html">Ullrich von Bassewitz: "Re: [cc65] how about commercial prgs?"</a>
+<li><strong>Next in thread:</strong> <a href="../2002-03/1191.html">MagerValp: "Re: [cc65] how about commercial prgs?"</a>
+<li><strong>Reply:</strong> <a href="1220.html">Ullrich von Bassewitz: "Re: [cc65] how about commercial prgs?"</a>
+<li><strong>Reply:</strong> <a href="1227.html">Mike McCarty: "Re: [cc65] how about commercial prgs?"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-04-02 14:02:18 CEST</em>
+</em>
+</small>
+</body>
+</html>

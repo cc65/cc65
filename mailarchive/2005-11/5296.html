@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Need help getting started </title>
+<meta name="Author" content="PH (shackman1alpinecom.net)" />
+<meta name="Subject" content="Re: [cc65] Need help getting started with cc65 NES" />
+<meta name="Date" content="2005-11-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Need help getting started with cc65 NES</h1>
+<!-- received="Wed Nov 23 18:34:38 2005" -->
+<!-- isoreceived="20051123173438" -->
+<!-- sent="Wed, 23 Nov 2005 11:40:18 -0600" -->
+<!-- isosent="20051123174018" -->
+<!-- name="PH" -->
+<!-- email="shackman1alpinecom.net" -->
+<!-- subject="Re: [cc65] Need help getting started with cc65 NES" -->
+<!-- id="4384A982.5080505@alpinecom.net" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20051123045226.GA21921&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5297.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Need help getting started with cc65 NES&quot;">Next message</a> ]
+[ <a href="5295.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Need help getting started with cc65 NES&quot;">Previous message</a> ]
+[ <a href="5294.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Need help getting started with cc65 NES&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5297.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Need help getting started with cc65 NES&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: PH &lt;<a href="mailto:shackman1alpinecom.net?Subject=Re:%20[cc65]%20Need%20help%20getting%20started%20with%20cc65%20NES">shackman1alpinecom.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-11-23 18:40:18</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>The new nes.o file worked for me.  I used it with 2.11.9.20051121-1 and 
+it compiles correctly as long as the optimize switch isn't used.  There 
+is still an issue with the optimizer.
+
+Thanks,
+Paul
+
+Ullrich von Bassewitz wrote:
+
+&gt;Good morning!
+&gt;
+&gt;On Mon, Nov 21, 2005 at 01:10:02PM -0600, PH wrote:
+&gt;  
+&gt;
+&gt;&gt;I removed the optimize switch, and that helped it compile.
+&gt;&gt;Unfortunately, it didn't help the original bug.
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;The NES startup file contains a small sloppiness that made it break when more
+&gt;segments were added to the library and the linker config. There may be more
+&gt;problems, but let's try this fix first:
+&gt;
+&gt;---------------------------------------------------------------------------
+&gt;Index: libsrc/nes/crt0.s
+&gt;===================================================================
+&gt;RCS file: /usr/local/cvsroot/uz/c64/cc65/libsrc/nes/crt0.s,v
+&gt;retrieving revision 1.4
+&gt;diff -u -r1.4 crt0.s
+&gt;--- libsrc/nes/crt0.s	22 May 2003 22:32:04 -0000	1.4
+&gt;+++ libsrc/nes/crt0.s	23 Nov 2005 04:40:52 -0000
+&gt;&#64;&#64; -98,9 +98,9 &#64;&#64;
+&gt;
+&gt; ; Copy the .data segment to RAM
+&gt;
+&gt;-        lda     #&lt;(__ROM0_START__ + __STARTUP_SIZE__+ __CODE_SIZE__+ __RODATA_SIZE__)
+&gt;+        lda     #&lt;(__DATA_LOAD__)
+&gt;         sta     ptr1
+&gt;-        lda     #&gt;(__ROM0_START__ + __STARTUP_SIZE__+ __CODE_SIZE__+ __RODATA_SIZE__)
+&gt;+        lda     #&gt;(__DATA_LOAD__)
+&gt;         sta     ptr1+1
+&gt;         lda     #&lt;(__DATA_RUN__)
+&gt;         sta     ptr2
+&gt;---------------------------------------------------------------------------
+&gt;
+&gt;Either apply the patch and recompile the startup code, or grab a replacement
+&gt;nes.o file from
+&gt;
+&gt;        <a href="ftp://ftp.musoftware.de/pub/uz/cc65/nes.o">ftp://ftp.musoftware.de/pub/uz/cc65/nes.o</a>
+&gt;
+&gt;Then, replace the nes.o file that comes with 2.11.0 and recompile your
+&gt;program. Once I have positive feedback, I will make the change official.
+&gt;
+&gt;Regards
+&gt;
+&gt;
+&gt;        Uz
+&gt;
+&gt;
+&gt;  
+&gt;
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Nov 23 18:34:38 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5297.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Need help getting started with cc65 NES"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5295.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Need help getting started with cc65 NES"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5294.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Need help getting started with cc65 NES"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5297.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Need help getting started with cc65 NES"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5297.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Need help getting started with cc65 NES"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5296" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5296" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5296" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-11-23 18:34:42 CET
+</em></small></p>
+</body>
+</html>

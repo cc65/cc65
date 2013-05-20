@@ -1,0 +1,185 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] Version 2.5 final beta availa</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="[cc65] Version 2.5 final beta available">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] Version 2.5 final beta available</h1>
+<!-- received="Sat Jul 15 13:33:04 2000" -->
+<!-- isoreceived="20000715113304" -->
+<!-- sent="Sat, 15 Jul 2000 13:32:49 +0200" -->
+<!-- isosent="20000715113249" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="[cc65] Version 2.5 final beta available" -->
+<!-- id="20000715133249.A10069@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Version%202.5%20final%20beta%20available"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2000-07-15 13:32:49
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0152.html">Ullrich von Bassewitz: "[cc65] cc65 version 2.5.0 released"</a>
+<li><strong>Previous message:</strong> <a href="../2000-06/0150.html">Ullrich von Bassewitz: "Re: [cc65] Question about ca65 object files"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+									  
+I have copied the final beta for version 2.5 cc65-sources-beta-2.5-03.tar.gz
+to the ftp server a few minutes ago. The new version is feature complete. This
+means I will not add any new features, just fix bugs if there are any new
+ones.
+
+The differences to beta-02 are:
+
+  a. New GEOS resource compiler code from Maciek.
+
+  b. Added GEOS documentation and GEOS sample code, included new versions
+     from Maciek.
+
+  c. More token handling function for the assembler.
+
+  d. Some other, minor changes.
+
+
+With the new functions mentioned under c., it is now possible to write macros
+that look like real instructions. One problem with macros implementations for
+common 6502 assemblers is that they don't handle this stuff very well. As an
+example, have a look at the following ldax macro, that loads a 16 bit value
+into a/x. Without the new features, it must be implemented several times under
+different names, to get different addressing modes right:
+
+	; ldax immidiate
+	.macro	ldaxim	arg
+		lda	#&lt;(arg)
+		ldx	#&gt;(arg)
+	.endm
+
+	; ldax absolute
+	.macro	ldaxabs	arg
+		lda	(arg)
+		ldx	1+(arg)
+	.endm
+
+Now you can do things like this with the builtin functions, which make use of
+the macro much more intuitive:
+
+	; ldax implementation for immidiate and absolute loads
+	.macro	ldax	arg
+
+ 		.if (.match(.left(1,arg), #))
+		; Immidiate addressing
+		lda	#&lt;(.right (.tcount (arg)-1, arg))
+	 	ldx	#&gt;(.right (.tcount (arg)-1, arg))
+		.else
+       	       	; Absolute addressing
+		lda	arg
+		ldx	1+(arg)
+		.endif
+
+	.endm
+
+This allows use of the macro as
+
+	ldax	#1234
+or
+  	ldax	$1234
+
+Of course a real implementation would have better error checking and more
+features in the macro itself (using lda/tax if low and high byte are identical
+for example), the version used above is very simple to show the concept.
+
+---
+
+One thing to note is that I have been very careful with more builtin
+functions. It is easy to find more functions that seem to be required.
+Unfortunately, it is far easier to add new functions, than to remove them once
+they are in use. I cannot foresee every use of the new token handling
+functions (which are some sort of programming language inside the assembler),
+and there seem to be a few problems that should get addressed in the future if
+they cause real pain (you will find one these inconsistencies of you try to
+add indirect Y addressing to the macro above). So I will wait until I get some
+feedback before adding more such stuff.
+
+This is also the reason, I did not add a .REPEAT instruction as promised. On
+one side, .REPEAT is easily emulated using recursive macros, so there's no
+*real* need for it. On the other side, having a real implementation would have
+involved adding mutable symbols (which are const right now). I'm not sure
+about all consequences of having mutable symbols, so I delayed this until it
+is proven that there is a definite need for it.
+
+---
+
+The beta package includes the full GEOS docs from Maciek, so you should be
+able to write GEOS programs with it without any need for other packages. For
+this reason I have removed the GEOSLib archive on the FTP server. The same is
+true for the Atari stuff (which was already in a working state in the last
+beta).
+
+The only open stuff for the final 2.5 release are fixes for two known problems
+in the library. Once this is done, I will release version 2.5. So keep the
+feedback coming:-)
+
+Have fun!
+
+
+   	Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Version%202.5%20final%20beta%20available">uz_at_musoftware.de</a>
+
+
+</pre>
+<hr noshade>
+<ul>
+<li>application/pgp-signature attachment: <a href="../att-0151/01-part">stored</a>
+</ul>
+<!-- attachment="01-part" -->
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Version%202.5%20final%20beta%20available">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0152.html">Ullrich von Bassewitz: "[cc65] cc65 version 2.5.0 released"</a>
+<li><strong>Previous message:</strong> <a href="../2000-06/0150.html">Ullrich von Bassewitz: "Re: [cc65] Question about ca65 object files"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:36 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] tgi_init functionality cha</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] tgi_init functionality change request" />
+<meta name="Date" content="2004-10-30" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] tgi_init functionality change request</h1>
+<!-- received="Sat Oct 30 12:50:15 2004" -->
+<!-- isoreceived="20041030105015" -->
+<!-- sent="Sat, 30 Oct 2004 12:50:11 +0200" -->
+<!-- isosent="20041030105011" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] tgi_init functionality change request" -->
+<!-- id="20041030105011.GA27948@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="Pine.LNX.4.58.0410281747310.9984&#64;kosh.sipo.fi" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4672.html" title="Karri Kaksonen: &quot;Re: [cc65] tgi_init functionality change request&quot;">Next message</a> ]
+[ <a href="4670.html" title="Karri Kaksonen: &quot;[cc65] tgi_init functionality change request&quot;">Previous message</a> ]
+[ <a href="4670.html" title="Karri Kaksonen: &quot;[cc65] tgi_init functionality change request&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4672.html" title="Karri Kaksonen: &quot;Re: [cc65] tgi_init functionality change request&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20tgi_init%20functionality%20change%20request">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-10-30 12:50:11</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Thu, Oct 28, 2004 at 06:56:01PM +0300, Karri Kaksonen wrote:
+&gt; I noticed that the tgi_init code will clear the screen and set the palette
+&gt; at startup. Unfortunately it does not set the draw page before clearing
+&gt; the screen resulting in wiping out random memory areas in the Lynx.
+
+You can either have your draw page setup in the INIT entry of the driver, or
+the C wrapper can be changed to set the page before clearing the screen. Maybe
+the latter is the better idea.
+
+&gt; I would like to change the tgi_init so that it does not set the palette
+&gt; and it does not clear the screen.
+&gt;
+&gt; These things should not be done before we have set up the hardware
+&gt; pointers and the screen interrupts. The interrupts have to be set
+&gt; up outside the driver. So the recommended workflow maight be:
+[...]
+
+Not a good idea. The driver should work after calling tgi_init without
+anything else. If this is not possible, we will have to think about changing
+the TGI driver spec to make it possible. Mouse drivers can have an interrupt
+routed to the driver. If interrupts are necessary for TGI to make it work on
+the Lynx, my suggestion would be to make this addition, instead of ressorting
+to additional driver specific calls. tgi_ioctl is nice for optional functions,
+but if it is necessary to call tgi_ioctl to make the driver work at all,
+something is wrong, and we have to rethink the API.
+
+&gt; The Lynx also has an image on screen at load-time. I don't like the idea
+&gt; that the screen is forced to black by the driver. Perhaps I would like
+&gt; a smooth palette fade from the original image to the applications first
+&gt; screen.
+&gt;
+&gt; Could these changes be made? To get the old behaviour you need to call:
+&gt;
+&gt; tgi_setpalette(tgi_getdefaultpalette());
+&gt; tgi_clear();
+&gt;
+&gt; after calling tgi_init().
+
+I have to admit that I don't like the proposed changes. The idea is that after
+calling tgi_init, the driver is initialized to some standard values, and the
+&quot;drawing paper&quot; is empty. In detail, the following initializations are made:
+
+  - Call the INIT function of the driver.
+
+  - Set the palette to the default palette.
+
+  - Set the drawing color to the maximum colour (assuming this is a visible
+    color).
+
+  - Set the text style and magnification to horizontal text with size 1.
+
+  - Clear the screen.
+
+While it is not a must, I think that people expect some sort of initialization
+from calling tgi_init(). At least this is what I would do.
+
+What we could do is to move the sequence above into the driver (it is
+currently executed by the C wrapper). This would allow some drivers to
+implement a different behaviour. The drawback is that all existing drivers
+have to be changed, and that it leaves the door open to all sorts if minor
+issues with initialization: One driver will not set the color or palette, the
+other will not clear the screen, and the third needs an extra call after
+tgi_init to do some driver specific initialization, otherwise it won't work.
+
+Is it really so bad to have the screen cleared after the program starts? You
+can still fade in your first application screen, there's nothing in the driver
+concept that prevents this.
+
+My suggestion would be to make the necessary changes so that the INIT entry of
+the driver is able to really initialize the driver, even if this means adding
+an interrupt entry (changes for other drivers are minimal, since this
+&quot;function&quot; is just a vector that points to an RTS). Regarding the
+initialization behaviour, I would prefer to leave it as it is (maybe add a
+call to set the pages).
+
+Maybe we should work out the Lynx interrupt issue when I'm back at home, so it
+is clear how this works, and what is possible. Things may become clearer
+after that.
+
+Regards
+
+
+  	Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Oct 30 12:50:15 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4672.html" title="Next message in the list">Karri Kaksonen: "Re: [cc65] tgi_init functionality change request"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4670.html" title="Previous message in the list">Karri Kaksonen: "[cc65] tgi_init functionality change request"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4670.html" title="Message to which this message replies">Karri Kaksonen: "[cc65] tgi_init functionality change request"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4672.html" title="Next message in this discussion thread">Karri Kaksonen: "Re: [cc65] tgi_init functionality change request"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4672.html" title="Message sent in reply to this message">Karri Kaksonen: "Re: [cc65] tgi_init functionality change request"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4671" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4671" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4671" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-10-30 12:50:25 CEST
+</em></small></p>
+</body>
+</html>

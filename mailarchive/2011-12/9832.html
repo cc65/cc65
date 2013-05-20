@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Re: ca65 ascii translation</title>
+<meta name="Author" content="Greg King (greg.king41verizon.net)" />
+<meta name="Subject" content="Re: [cc65] Re: ca65 ascii translation" />
+<meta name="Date" content="2011-12-18" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Re: ca65 ascii translation</h1>
+<!-- received="Sun Dec 18 22:19:22 2011" -->
+<!-- isoreceived="20111218211922" -->
+<!-- sent="Sun, 18 Dec 2011 16:18:34 -0500" -->
+<!-- isosent="20111218211834" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king41verizon.net" -->
+<!-- subject="Re: [cc65] Re: ca65 ascii translation" -->
+<!-- id="005401ccbdca$ad39edc0$443efea9@monarch" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="CAL0fNgXki1aWkCzOOnudpV3SUOU6+WC_HWJ8Om7ZHX3CTxq+ZQ&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9833.html" title="Greg King: &quot;Re: [cc65] C64 fast-loader suggestion?&quot;">Next message</a> ]
+[ <a href="9831.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65 ascii translation&quot;">Previous message</a> ]
+[ <a href="9824.html" title="Chris Cureau: &quot;[cc65] Re: ca65 ascii translation&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9834.html" title="Chris Cureau: &quot;Re: [cc65] Re: ca65 ascii translation&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king41verizon.net?Subject=Re:%20[cc65]%20Re:%20ca65%20ascii%20translation">greg.king41verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-12-18 22:18:34</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: &quot;Chris Cureau&quot;; on Friday, Dec. 16, 2011; at 01:46 PM -0500
+&gt;
+&gt; On Fri, Dec 16, 2011 at 12:44 PM, Chris Cureau wrote:
+&gt; &gt;
+&gt; &gt; I'm running a bit of code here which should work, from all I can
+&gt; &gt; see.  But, it isn't.  I'm wondering if ca65 is translating it
+&gt; &gt; incorrectly?  Not shown is readerr, which simply reads and prints
+&gt; &gt; the error channel.  When I run the code, it reports a 73 (as I
+&gt; &gt; would expect from a reset drive), then a &quot;62, FILE NOT FOUND&quot;.
+&gt; &gt; The drive should open &quot;#&quot; as a buffer.  Am I doing something wrong?
+&gt; &gt; code:
+&gt; &gt;
+&gt; &gt; ;        set up command channel
+&gt; &gt;         lda #15                 ;logical file number 15
+&gt; &gt;         ldx #8                  ;device 8
+&gt; &gt;         ldy #15                 ;secondary address 15
+&gt; &gt;         jsr SETLFS              ;set LA, FA, SA
+&gt; &gt;         lda #0                  ;zero-length file-name
+&gt; &gt;         jsr SETNAM
+&gt; &gt;         jsr OPEN                ;open command channel
+&gt; &gt;         jsr readerr
+&gt; &gt;
+&gt; &gt; ;        set up for random access
+&gt; &gt;         lda #2           ;logical file number 2
+&gt; &gt;         ldx #8           ;device 8
+&gt; &gt;         ldy #2           ;secondary address 2
+&gt; &gt;         jsr SETLFS       ;set LA, FA, SA
+&gt; &gt;         lda #1
+&gt; &gt;         ldx #&gt;buffer
+&gt; &gt;         ldy #&lt;buffer     ;set file name
+&gt; &gt;         jsr SETNAM
+&gt; &gt;         jsr OPEN         ;open command channel
+&gt; &gt;         jsr readerr
+&gt; &gt; ...
+&gt; &gt; ; data
+&gt; &gt; buffer:
+&gt; &gt;         .byte &quot;#&quot;
+&gt; &gt; drvcmd:
+&gt; &gt;         .byte &quot;U1 2 0 18 1&quot;
+&gt; &gt; endcmd:
+&gt;
+&gt; The buffer lines above should read:
+&gt;        lda #drvcmd-buffer               ;single-character file-name
+&gt;         ldx #&lt;buffer
+&gt;         ldy #&gt;buffer     ;set file name
+&gt;
+&gt; I had modified them while &quot;grasping at straws&quot; ... sorry.
+
+(I apologize for not answerring your mail that was sent through
+Sourceforge.  I don't look at stuff from there as often as I should.)
+That &quot;FILE NOT FOUND&quot; certainly explains the &quot;NO CHANNEL&quot; message that
+you had seen before.
+
+Only letters need to be converted; numerals and most punctuation are the
+same in both character sets.  So, that's not the problem.
+
+I just had an evil thought:
+Are you practicing coding on a real C128 or in VICE?  VICE is the only
+place where I have seen that error when trying to open &quot;#&quot;.  And then,
+it was only when I was using a virtual drive, and I had forgotten to
+attach a disk image.  In that situation, VICE sent the name to the host
+OS, which knows nothing about &quot;#&quot;.  So, of course, it complained.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Dec 18 22:19:22 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9833.html" title="Next message in the list">Greg King: "Re: [cc65] C64 fast-loader suggestion?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9831.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] ca65 ascii translation"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9824.html" title="Message to which this message replies">Chris Cureau: "[cc65] Re: ca65 ascii translation"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9834.html" title="Next message in this discussion thread">Chris Cureau: "Re: [cc65] Re: ca65 ascii translation"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9834.html" title="Message sent in reply to this message">Chris Cureau: "Re: [cc65] Re: ca65 ascii translation"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9832" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9832" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9832" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-12-18 22:19:26 CET
+</em></small></p>
+</body>
+</html>

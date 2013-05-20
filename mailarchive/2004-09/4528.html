@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-15" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] cfg-files and the linker and s</title>
+<meta name="Author" content="Mats Andrén (matan3251student.liu.se)" />
+<meta name="Subject" content="[cc65] cfg-files and the linker and so on.." />
+<meta name="Date" content="2004-09-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] cfg-files and the linker and so on..</h1>
+<!-- received="Sat Sep 25 16:53:49 2004" -->
+<!-- isoreceived="20040925145349" -->
+<!-- sent="Sat, 25 Sep 2004 16:55:12 +0200" -->
+<!-- isosent="20040925145512" -->
+<!-- name="Mats Andrén" -->
+<!-- email="matan3251student.liu.se" -->
+<!-- subject="[cc65] cfg-files and the linker and so on.." -->
+<!-- id="908840349.20040925165512@student.liu.se" -->
+<!-- charset="ISO-8859-15" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4529.html" title="Groepaz: &quot;Re: [cc65] cfg-files and the linker and so on..&quot;">Next message</a> ]
+[ <a href="4527.html" title="MagerValp: &quot;RE: [cc65] Get user input? Floating point?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4529.html" title="Groepaz: &quot;Re: [cc65] cfg-files and the linker and so on..&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Mats Andrén &lt;<a href="mailto:matan3251student.liu.se?Subject=Re:%20[cc65]%20cfg-files%20and%20the%20linker%20and%20so%20on..">matan3251student.liu.se</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-09-25 16:55:12</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello!
+
+Yet another one (me) trying to get into cc65...
+
+I'm coding a tool for C64 and I want to place a specific part of the
+code at $1000 in memory (a music player). That part is 100% assembler
+and the size of it is not know beforehand, but simply depends on how
+big that part of the source becomes. Except for that I want to let
+cc65 decide where to put the rest of the program (and editor for the
+musicplayer, diskdrive-code and so on) which will be written mostly in
+C. As a first step I modified the C64.cfg file a bit to look like
+this:
+
+MEMORY {
+    ZP: start = $02, size = $1A, type = rw, define = yes;
+    LORAM: 
+        start  = $07ff
+        size   = $0801
+        fill   = yes
+        define = yes;
+    PLAYERRAM:
+        start  = $1000
+        size   = $1000
+        fill   = yes
+        define = yes;
+    RAM:
+        start  = $2000
+        size   = $a000
+        define = yes;
+}
+
+SEGMENTS {
+    STARTUP:
+        load = LORAM, type = wprot;
+    LOWCODE: 
+        load = LORAM
+        type = wprot
+        optional = yes;
+    CODE:
+        load = RAM, type = wprot;
+    RODATA:
+        load = RAM, type = wprot;
+    DATA:
+        load = RAM, type = rw;
+    BSS:
+        load = RAM, type = bss
+        define = yes;
+    ZEROPAGE:
+        load = ZP, type = zp;
+}
+
+FEATURES {
+    CONDES:
+        segment = RODATA,
+            type = constructor,
+            label = __CONSTRUCTOR_TABLE__,
+            count = __CONSTRUCTOR_COUNT__;
+    CONDES:
+        segment = RODATA,
+            type = destructor,
+            label = __DESTRUCTOR_TABLE__,
+            count = __DESTRUCTOR_COUNT__;
+    # condes functions with type 2 are called in the interrupt
+    CONDES:
+        segment = RODATA,
+            type = 2,
+            label = __IRQFUNC_TABLE__,
+            count = __IRQFUNC_COUNT__;
+}
+
+SYMBOLS {
+    __STACKSIZE__ = $800;       # 2K stack
+}
+
+This works nicely, but the RAM area after the startupcode
+($08xx-$0fff) is now unused since the editor code segment currently
+starts at $2000. Now let's say that I'd like to be able to simply
+relocate the asm-player-code to some other adress, like $6000 or
+whatever, then I'd obviously like to have some of the editor-code
+going before that segment and some of it after it since the memory
+after the player-code would be to small to hold the complete editor code.
+Is that possible somehow, or am I asking too much? Perhaps I have to
+do this by myself, by changing here and there in my C code where
+different parts of the C code should go, so some of it ends up before
+the player and some of it ends up after it?
+
+Also, the size of the asm-player-code is not really known, but changes
+as I do changes to the player-code. Could the linker (or something
+else) somehow detect where the playercode ends and automatically make
+the C code start right after it, without me having to explicitly
+define beforehand how big the asm-player-code-segment should be in the
+cfg-file?
+
+Also, should I really be required to have that &quot;fill = yes&quot;-snippet in
+the cfg-file to make the linker understand that I don't want a binary
+that only contains the code I've actually written, but that I actually
+want it to automatically end up at those places in memory that I have
+specified in the cfg-file, with chunks of empty space in between? I
+thought &quot;load = $xxxx&quot; was supposed to take care of that?
+
+I am really new to cc65 (even though I have used ca65 a bit before),
+so please bear with me if I'm just confused and do not make sense.
+
+Any suggestion for a better cfg-file for me?
+
+Have a nice day!
+
+/Mats
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Sep 25 16:53:49 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4529.html" title="Next message in the list">Groepaz: "Re: [cc65] cfg-files and the linker and so on.."</a></li>
+<li><dfn>Previous message</dfn>: <a href="4527.html" title="Previous message in the list">MagerValp: "RE: [cc65] Get user input? Floating point?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4529.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] cfg-files and the linker and so on.."</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4529.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] cfg-files and the linker and so on.."</a></li>
+<li><dfn>Reply</dfn>:  <a href="4534.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] cfg-files and the linker and so on.."</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4528" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4528" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4528" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-09-25 16:53:58 CEST
+</em></small></p>
+</body>
+</html>

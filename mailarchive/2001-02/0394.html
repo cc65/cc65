@@ -1,0 +1,176 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] odd results</title>
+<meta name="Author" content="troy silvey (tbsilvey_at_juno.com)">
+<meta name="Subject" content="Re: [cc65] odd results">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] odd results</h1>
+<!-- received="Mon Feb 26 04:12:53 2001" -->
+<!-- isoreceived="20010226031253" -->
+<!-- sent="Sun, 25 Feb 2001 22:17:07 -0500" -->
+<!-- isosent="20010226031707" -->
+<!-- name="troy silvey" -->
+<!-- email="tbsilvey_at_juno.com" -->
+<!-- subject="Re: [cc65] odd results" -->
+<!-- id="20010225.222011.6862.1.tbsilvey@juno.com" -->
+<!-- inreplyto="20010225.164920.6862.0.tbsilvey@juno.com" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> troy silvey (<a href="mailto:tbsilvey_at_juno.com?Subject=Re:%20[cc65]%20odd%20results"><em>tbsilvey_at_juno.com</em></a>)<br>
+<strong>Date:</strong> 2001-02-26 04:17:07
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0395.html">troy silvey: "Re: [cc65] scanf ?"</a>
+<li><strong>Previous message:</strong> <a href="0393.html">Andre Majorel: "Re: [cc65] scanf ?"</a>
+<li><strong>In reply to:</strong> <a href="0390.html">troy silvey: "Re: [cc65] odd results"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0398.html">Maciej Witkowiak: "Re: [cc65] odd results"</a>
+<li><strong>Reply:</strong> <a href="0398.html">Maciej Witkowiak: "Re: [cc65] odd results"</a>
+<li><strong>Reply:</strong> <a href="0399.html">BlackJack/Civitas: "Re: [cc65] odd results"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+&gt;Is this the whole routine? What is 'more'? Is the second if (more==1) 
+&gt;ever true?
+
+This is the complete routine. It waits for  either the space bar
+to be pressed (60) to change the menu choice, or the return key
+ (1) to make the choice and exit the routine. If the space bar is
+pressed, the sprite is moved, pmenu is incremented and
+flow returns to the top of the routine to wait for the next
+key press. pmenu ranges form 255(-1) to 7.
+ *time is the jiffy clock to add a delay to key
+presses and *clearkeybuffer keeps the buffer from spraying
+charters on the screen when I get to other routines.
+'more' is just a reusable global variable.
+The routine exits when &quot;return&quot; key (1) is pressed. It is supposed
+to return the value pmenu to be used in a switch routine.
+pmenu holds the right values in this routine, but nothing
+is returned to the calling main function. This is the same
+function I found the bug in with the VIC.spr0_y=VIC.spr0_y+4;
+statments, so I wondered if there was a  bug with the
+return value. 
+
+
+*** update to trouble shooting
+Here is what I found........
+
+I have been using VisualC++ 6 as my editor. My code is
+simple and Ansi enough that it will compile with VC++
+without errors.  It has great syntax error catching for a
+newbie like me.
+This function was  originally written with
+out the return value at the end of the function. I want to
+exit the function when more==1 and continue in a loop
+if it is not. VC++ gave a warning about the missing
+return at the end of the function, even though the
+intended return was in the (more==1) subroutine. I added the
+bogus return to end the warning. When CC65 compiles,
+it is not returning the value in the (more==1) block.
+it returns the value at the second incorrect return; statement.
+It should never reach this second return; . And if I remove
+it, the first and proper return statment returns the correct
+carry value.  The code is working ok now, but what if I wanted
+to return differrent values from different blocks. CC65 is
+not sending back the right on in this function.     
+
+
+
+I have these lines in main......
+    carry=(choiceA(0));
+    printf(&quot;carry = %d &quot;, carry);
+
+carry is a value from 255(-1) to 7 in the function.
+I added print statements to prove it in my program.
+
+
+unsigned char choiceA(unsigned char pmenu)
+{
+    while (!((more=*keypress)==60 || more==1))
+        {} 
+    *clearkeybuffer=0;
+    if (more==60)
+        {
+            if (VIC.spr0_y&gt;162)
+                {VIC.spr0_y=106;}
+            VIC.spr0_y=VIC.spr0_y+4;
+            VIC.spr0_y=VIC.spr0_y+4;
+           ++pmenu;
+            if (pmenu&gt;6)
+                {pmenu=255;}
+        }
+    if (more==1)
+        {	
+             *clearkeybuffer=0;
+             VIC.spr_ena=0;
+             return pmenu; // *** this is when I want to exit
+        }
+    *time1=0;	// delay the user imput to stop sprite run-a-way
+    while (*time1&lt;10)
+        {}
+    choiceA(pmenu);
+    return 0; // **** bogus return to make the compiler happy
+                     // and the reason I keep getting 0 for a carry value
+                     // what ever I put here get returned. not pmenu
+above.			
+}
+
+thanks
+troy
+
+________________________________________________________________
+GET INTERNET ACCESS FROM JUNO!
+Juno offers FREE or PREMIUM Internet access for less!
+Join Juno today!  For your FREE software, visit:
+<a href="http://dl.www.juno.com/get/tagj">http://dl.www.juno.com/get/tagj</a>.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20odd%20results">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0395.html">troy silvey: "Re: [cc65] scanf ?"</a>
+<li><strong>Previous message:</strong> <a href="0393.html">Andre Majorel: "Re: [cc65] scanf ?"</a>
+<li><strong>In reply to:</strong> <a href="0390.html">troy silvey: "Re: [cc65] odd results"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0398.html">Maciej Witkowiak: "Re: [cc65] odd results"</a>
+<li><strong>Reply:</strong> <a href="0398.html">Maciej Witkowiak: "Re: [cc65] odd results"</a>
+<li><strong>Reply:</strong> <a href="0399.html">BlackJack/Civitas: "Re: [cc65] odd results"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:39 CET</em>
+</em>
+</small>
+</body>
+</html>

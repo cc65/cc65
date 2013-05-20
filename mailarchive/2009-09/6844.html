@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] New 80 col switch API</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] New 80 col switch API" />
+<meta name="Date" content="2009-09-06" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] New 80 col switch API</h1>
+<!-- received="Sun, 6 Sep 2009 23:55:21 +0200" -->
+<!-- isoreceived="20090906215521" -->
+<!-- sent="Sun, 6 Sep 2009 23:55:21 +0200" -->
+<!-- isosent="20090906215521" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] New 80 col switch API" -->
+<!-- id="f97798c20909061455i481d6fb8n6894156a2dbd0db4@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6845.html" title="Jonathan Graham Harston: &quot;[cc65] Re: New 80 col switch API&quot;">Next message</a> ]
+[ <a href="6843.html" title="Oliver Schmidt: &quot;Re: [cc65] testsuite results ...&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6847.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] New 80 col switch API&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20New%2080%20col%20switch%20API">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-09-06 23:55:21</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+Some years ago I planned to implement C library support on the Apple
+//e for switching to 80 col mode and back. I asked Uz if I should
+implement the existing C128 API toggle_videomode(). Uz told me that he
+was quite unhappy with toggle_videomode() - for obvious reasons - and
+that I should rather follow the style of i.e. textcolor(): One
+parameter and the return value giving the previous setting.
+
+As 80 col mode switching is the feature asked most for on the Apple
+//e I'm about to implement it now for the upcoming cc65 release. So it
+makes sense to replace the exsisting toggle_videomode() with the &quot;new&quot;
+API on the C128 too. As far as I understand ZP location $D7 ('mode')
+allows to determine the current setting so this seems very easy to do.
+Anyway I'd prefer this change being made by a &quot;regular&quot; CBM
+contributor.
+
+From my perspective the actual &quot;new&quot; API could look like this:
+
+unsigned char __fastcall__ videomode (unsigned char mode);
+
+#define VIDEOMODE_40COL 0x??
+#define VIDEOMODE_80COL 0x??
+
+Thanks in advance, Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun, 6 Sep 2009 23:55:21 +0200</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6845.html" title="Next message in the list">Jonathan Graham Harston: "[cc65] Re: New 80 col switch API"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6843.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] testsuite results ..."</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6847.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] New 80 col switch API"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6847.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] New 80 col switch API"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6853.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] New 80 col switch API"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6844" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6844" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6844" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-09-06 23:55:30 CEST
+</em></small></p>
+</body>
+</html>

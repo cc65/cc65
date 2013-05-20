@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Linker is not following config</title>
+<meta name="Author" content="Payton Byrd (plbyrd1gmail.com)" />
+<meta name="Subject" content="[cc65] Linker is not following configuration file" />
+<meta name="Date" content="2012-01-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Linker is not following configuration file</h1>
+<!-- received="Wed Jan 25 04:47:59 2012" -->
+<!-- isoreceived="20120125034759" -->
+<!-- sent="Tue, 24 Jan 2012 21:47:20 -0600" -->
+<!-- isosent="20120125034720" -->
+<!-- name="Payton Byrd" -->
+<!-- email="plbyrd1gmail.com" -->
+<!-- subject="[cc65] Linker is not following configuration file" -->
+<!-- id="CAJm6qqfkHu+TwAB9BjN1z5Pb_S5g1XT62n6+uvxT8=6bMUa_WQ@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9962.html" title="Marc 'BlackJack' Rintsch: &quot;Re: [cc65] Linker is not following configuration file&quot;">Next message</a> ]
+[ <a href="9960.html" title="Greg King: &quot;Re: [cc65] gettimeofday()&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9962.html" title="Marc 'BlackJack' Rintsch: &quot;Re: [cc65] Linker is not following configuration file&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Payton Byrd &lt;<a href="mailto:plbyrd1gmail.com?Subject=Re:%20[cc65]%20Linker%20is%20not%20following%20configuration%20file">plbyrd1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-01-25 04:47:20</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>OK, here's the scenario.  I want to leave a hole from $1000 to $3000 for
+loading in music files.  I've setup my linker config as such:
+
+SYMBOLS {
+    __LOADADDR__:    type = import;
+    __EXEHDR__:      type = import;
+    __STACKSIZE__:   type = weak,   value = $0800; # 2k stack
+    __OVERLAYSIZE__: type = weak,   value = $4000;
+    __SCIENCELOADADDR__: type = import;
+    __COMBATLOADADDR__: type = import;
+	__PLANETLOADADDR__: type = import;
+	__SETUPLOADADDR__: type = import;
+}
+MEMORY {
+    ZP:       file = &quot;&quot;, define = yes, start = $0002, size = $001A;
+    LOADADDR: file = %O,               start = $07FF, size = $0002;
+    HEADER:   file = %O,               start = $0801, size = $000C;
+    RAM1:      file = %O, define = yes, start = $080D, size = $07F3; #
+- __STACKSIZE__ - __OVERLAYSIZE__;
+	MUSIC:		file = %O, define = yes, start = $1000, size = $2000;
+	RAM:		file = %O, define = yes, start = $3000, size = $6000;
+    SCIENCELA:   file = &quot;science.ovl&quot;,           start = $D000 -
+__OVERLAYSIZE__, size = $0002;
+    SCIENCE:     file = &quot;science.ovl&quot;,           start = $D000 -
+__OVERLAYSIZE__, size = __OVERLAYSIZE__;
+    COMBATLA:   file = &quot;combat.ovl&quot;,           start = $D000 -
+__OVERLAYSIZE__, size = $0002;
+    COMBAT:     file = &quot;combat.ovl&quot;,           start = $D000 -
+__OVERLAYSIZE__, size = __OVERLAYSIZE__;
+    PLANETLA:   file = &quot;planet.ovl&quot;,           start = $D000 -
+__OVERLAYSIZE__, size = $0002;
+    PLANET:     file = &quot;planet.ovl&quot;,           start = $D000 -
+__OVERLAYSIZE__, size = __OVERLAYSIZE__;
+    SETUPLA:   file = &quot;setup.ovl&quot;,           start = $D000 -
+__OVERLAYSIZE__, size = $0002;
+    SETUP:     file = &quot;setup.ovl&quot;,           start = $D000 -
+__OVERLAYSIZE__, size = __OVERLAYSIZE__;
+}
+SEGMENTS {
+    LOADADDR: load = LOADADDR, type = ro;
+    EXEHDR:   load = HEADER,   type = ro;
+    STARTUP:  load = RAM1,      type = ro;
+    LOWCODE:  load = RAM,      type = ro,                optional = yes;
+    INIT:     load = RAM,      type = ro,  define = yes, optional = yes;
+    CODE:     load = RAM,      type = ro;
+    SCIENCELA: load = SCIENCELA, type = ro;
+    SCIENCECODE: load = SCIENCE,     type = ro,  define = yes;
+    COMBATLA: load = COMBATLA, type = ro;
+    COMBATCODE: load = COMBAT,     type = ro,  define = yes;
+    PLANETLA: load = PLANETLA, type = ro;
+    PLANETCODE: load = PLANET,     type = ro,  define = yes;
+    SETUPLA: load = SETUPLA, type = ro;
+    SETUPCODE: load = SETUP,     type = ro,  define = yes;
+    RODATA:   load = RAM,      type = ro;
+    DATA:     load = RAM,      type = rw;
+    ZPSAVE:   load = RAM,      type = bss;
+    BSS:      load = RAM,      type = bss, define = yes;
+    ZEROPAGE: load = ZP,       type = zp;
+}
+
+Looking at this configuration, the startup code should go to $080D and
+everything else should start at $3000 for main code and $9000 for the
+overlays.  The map file generated by the linker shows the following:
+
+Segment list:
+-------------
+Name                   Start     End    Size  Align
+----------------------------------------------------
+ZEROPAGE              000002  00001B  00001A  00001
+
+LOADADDR              0007FF  000800  000002  00001
+EXEHDR                000801  00080C  00000C  00001
+STARTUP               00080D  00088D  000081  00001
+INIT                  003000  003087  000088  00001
+CODE                  003088  004D23  001C9C  00001
+
+RODATA                004D24  005260  00053D  00001
+DATA                  005261  005661  000401  00001
+ZPSAVE                005662  00567B  00001A  00001
+BSS                   00567C  0058C5  00024A  00001
+COMBATCODE            009000  009028  000029  00001
+
+COMBATLA              009000  009001  000002  00001
+PLANETCODE            009000  009028  000029  00001
+PLANETLA              009000  009001  000002  00001
+SCIENCECODE           009000  009051  000052  00001
+SCIENCELA             009000  009001  000002  00001
+
+SETUPCODE             009000  009777  000778  00001
+SETUPLA               009000  009001  000002  00001
+
+This looks like exactly what I am expecting to happen.
+
+HOWEVER, this is not what gets output in the executable file.  As you can
+see, the init code should end at $088D, but here's the disassembly:
+
+(C:$1093) d 0880
+.C:0880   9A         TXS
+.C:0881   AE 43 58   LDX $5843
+.C:0884   86 01      STX $01
+.C:0886   60         RTS
+.C:0887   D8         CLD
+.C:0888   20 93 55   JSR $5593
+.C:088b   4C D6 55   JMP $55D6
+.C:088e   A0 08      LDY #$08
+.C:0890   F0 07      BEQ $0899
+.C:0892   A9 80      LDA #$80
+.C:0894   A2 30      LDX #$30
+.C:0896   4C B1 55   JMP $55B1
+.C:0899   60         RTS
+.C:089a   A5 BA      LDA $BA
+.C:089c   D0 04      BNE $08A2
+.C:089e   A9 08      LDA #$08
+.C:08a0   85 BA      STA $BA
+.C:08a2   8D 6E 58   STA $586E
+.C:08a5   60         RTS
+.C:08a6   A9 01      LDA #$01
+.C:08a8   8D 5C 58   STA $585C
+
+Notice that the last code in INIT is JMPing to $55d6.  Unfortunately,
+there's no code there.
+
+(C:$08ab) d 55d6
+.C:55d6   FF FF FF   ISB $FFFF,X
+.C:55d9   FF FF FF   ISB $FFFF,X
+.C:55dc   FF FF FF   ISB $FFFF,X
+.C:55df   FF FF FF   ISB $FFFF,X
+.C:55e2   FF FF FF   ISB $FFFF,X
+.C:55e5   FF FF FF   ISB $FFFF,X
+.C:55e8   FF FF FF   ISB $FFFF,X
+.C:55eb   FF FF FF   ISB $FFFF,X
+.C:55ee   FF FF FF   ISB $FFFF,X
+.C:55f1   FF FF FF   ISB $FFFF,X
+.C:55f4   FF FF FF   ISB $FFFF,X
+.C:55f7   FF FF FF   ISB $FFFF,X
+.C:55fa   FF FF FF   ISB $FFFF,X
+.C:55fd   FF FF FF   ISB $FFFF,X
+
+I'm obviously not doing something right here, but I cannot figure it out.
+ Please help.
+-- 
+Payton Byrd
+&lt;<a href="http://www.paytonbyrd.com">http://www.paytonbyrd.com</a>&gt;
+&lt;<a href="http://it.toolbox.com/blogs/paytonbyrd">http://it.toolbox.com/blogs/paytonbyrd</a>&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Jan 25 04:47:59 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9962.html" title="Next message in the list">Marc 'BlackJack' Rintsch: "Re: [cc65] Linker is not following configuration file"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9960.html" title="Previous message in the list">Greg King: "Re: [cc65] gettimeofday()"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9962.html" title="Next message in this discussion thread">Marc 'BlackJack' Rintsch: "Re: [cc65] Linker is not following configuration file"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9962.html" title="Message sent in reply to this message">Marc 'BlackJack' Rintsch: "Re: [cc65] Linker is not following configuration file"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9963.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Linker is not following configuration file"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9961" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9961" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9961" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-01-25 04:48:03 CET
+</em></small></p>
+</body>
+</html>

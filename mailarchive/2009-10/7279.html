@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Atari TGI drivers, finally</title>
+<meta name="Author" content="Fatih Aygün (cyco1301yahoo.com)" />
+<meta name="Subject" content="Re: [cc65] Atari TGI drivers, finally" />
+<meta name="Date" content="2009-10-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Atari TGI drivers, finally</h1>
+<!-- received="Sun Oct 25 02:19:13 2009" -->
+<!-- isoreceived="20091025001913" -->
+<!-- sent="Sat, 24 Oct 2009 18:19:07 -0700 (PDT)" -->
+<!-- isosent="20091025011907" -->
+<!-- name="Fatih Aygün" -->
+<!-- email="cyco1301yahoo.com" -->
+<!-- subject="Re: [cc65] Atari TGI drivers, finally" -->
+<!-- id="417236.76496.qm@web56502.mail.re3.yahoo.com" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="20091024185356.GB27438&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7280.html" title="Fatih Aygün: &quot;Re: [cc65] Atari TGI drivers, finally&quot;">Next message</a> ]
+[ <a href="7278.html" title="Fatih Aygün: &quot;Re: [cc65] Atari TGI drivers, finally&quot;">Previous message</a> ]
+[ <a href="7273.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Atari TGI drivers, finally&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7283.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Atari TGI drivers, finally&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Fatih Aygün &lt;<a href="mailto:cyco1301yahoo.com?Subject=Re:%20[cc65]%20Atari%20TGI%20drivers,%20finally">cyco1301yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-10-25 02:19:07</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt;&gt; * cgetc() tries to manualy remove the cursor from the screen. this causes some
+
+&gt;&gt;   pixels to be inverted when the function is called.
+&gt; This can be easily fixed by switching off the cursor using &quot;cursor (0);&quot; after
+&gt; establishing graphics mode. At least, if cgetc is implemented correctly
+
+Of course, how come I couldn't think of it? :)
+
+&gt; As discussed a few days ago. LINE must not clip. This should be done (but is
+&gt; currently not) in the wrapper code, so coordinates passed to LINE are always
+&gt; valid.
+
+I saw the discussion and I reviewed some clipping algorithms. But even the simplest
+ones need signed integer divisions, which is not an area where 6502 shines. But, then 
+again, if we can assume that clipping is already done, the LINE routines can be greatly
+optimized. Most clipping algos will not spend much time if the coords are already in 
+range. So it may be reasonable to make out-of-range calls pay but let the in-range calls
+get away with little overhead.
+
+But since the wrapper does not implement clipping, for the time being, I can't replace the
+LINE routine. Because assuming valid parameters when it's not the case would wipe out
+random memory locations.
+
+Regards,
+Fatih.
+
+
+      
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Oct 25 02:19:13 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7280.html" title="Next message in the list">Fatih Aygün: "Re: [cc65] Atari TGI drivers, finally"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7278.html" title="Previous message in the list">Fatih Aygün: "Re: [cc65] Atari TGI drivers, finally"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7273.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Atari TGI drivers, finally"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7283.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Atari TGI drivers, finally"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7283.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Atari TGI drivers, finally"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7279" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7279" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7279" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-10-25 02:19:15 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Problem with 16/32-bit var</title>
+<meta name="Author" content="MagerValp (MagerValp1cling.gu.se)" />
+<meta name="Subject" content="Re: [cc65] Problem with 16/32-bit variables and conditions" />
+<meta name="Date" content="2005-03-11" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Problem with 16/32-bit variables and conditions</h1>
+<!-- received="Fri Mar 11 13:27:10 2005" -->
+<!-- isoreceived="20050311122710" -->
+<!-- sent="Fri, 11 Mar 2005 13:27:07 +0100" -->
+<!-- isosent="20050311122707" -->
+<!-- name="MagerValp" -->
+<!-- email="MagerValp1cling.gu.se" -->
+<!-- subject="Re: [cc65] Problem with 16/32-bit variables and conditions" -->
+<!-- id="16945.36507.890395.851349@panini.cling.gu.se" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="42318954.3070203&#64;sidsa.es" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4813.html" title="Carlos Sánchez de La Lama: &quot;Re: [cc65] Problem with 16/32-bit variables and conditions&quot;">Next message</a> ]
+[ <a href="4811.html" title="Carlos Sánchez de La Lama: &quot;[cc65] Problem with 16/32-bit variables and conditions&quot;">Previous message</a> ]
+[ <a href="4811.html" title="Carlos Sánchez de La Lama: &quot;[cc65] Problem with 16/32-bit variables and conditions&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4813.html" title="Carlos Sánchez de La Lama: &quot;Re: [cc65] Problem with 16/32-bit variables and conditions&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: MagerValp &lt;<a href="mailto:MagerValp1cling.gu.se?Subject=Re:%20[cc65]%20Problem%20with%2016/32-bit%20variables%20and%20conditions">MagerValp1cling.gu.se</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-03-11 13:27:07</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt;&gt;&gt;&gt;&gt; &quot;CSdLL&quot; == Carlos Sánchez de La Lama &lt;csanchez&#64;sidsa&#46;<!--nospam-->es&gt; writes:
+
+CSdLL&gt; As long as I understand, this will only test the last byte of
+CSdLL&gt; &quot;a&quot; for a zero value, because the Zero flag will be set in the
+CSdLL&gt; last (8-bit) load instruction in the ldeax0sp subroutine. If I
+CSdLL&gt; call the test function with a=0xff00 the condition would be
+CSdLL&gt; (incorrectly) found to be false.
+
+CSdLL&gt; Am I right?
+
+Looks like it:
+
+  #include &lt;stdio.h&gt;
+
+  int test(unsigned long a) {
+    if (a) {
+      return(1);
+    }
+    return(0);
+  }
+
+  int main (void) {
+    printf(&quot;test(0) == %s\n&quot;, test(0) ? &quot;true&quot; : &quot;false&quot;);
+    printf(&quot;test(1) == %s\n&quot;, test(1) ? &quot;true&quot; : &quot;false&quot;);
+    printf(&quot;test(0xff00) == %s\n&quot;, test(0xff00) ? &quot;true&quot; : &quot;false&quot;);
+    return(0);
+  }
+
+gives:
+
+  test(0) == false
+  test(1) == true
+  test(0xff00) == false
+
+-- 
+    ___          .     .  .         .       . +  .         .      o   
+  _|___|_   +   .  +     .     +         .  Per Olofsson, arkadspelare
+    o-o    .      .     .   o         +          MagerValp&#64;cling&#46;<!--nospam-->gu.se
+     -       +            +    .     <a href="http://www.cling.gu.se/~cl3polof/">http://www.cling.gu.se/~cl3polof/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Mar 11 13:27:10 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4813.html" title="Next message in the list">Carlos Sánchez de La Lama: "Re: [cc65] Problem with 16/32-bit variables and conditions"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4811.html" title="Previous message in the list">Carlos Sánchez de La Lama: "[cc65] Problem with 16/32-bit variables and conditions"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4811.html" title="Message to which this message replies">Carlos Sánchez de La Lama: "[cc65] Problem with 16/32-bit variables and conditions"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4813.html" title="Next message in this discussion thread">Carlos Sánchez de La Lama: "Re: [cc65] Problem with 16/32-bit variables and conditions"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4813.html" title="Message sent in reply to this message">Carlos Sánchez de La Lama: "Re: [cc65] Problem with 16/32-bit variables and conditions"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4812" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4812" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4812" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-03-11 13:27:16 CET
+</em></small></p>
+</body>
+</html>

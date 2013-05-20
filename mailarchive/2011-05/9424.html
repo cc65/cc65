@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] TGI palettes (was: TGI col</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] TGI palettes (was: TGI colors revisited)" />
+<meta name="Date" content="2011-05-13" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] TGI palettes (was: TGI colors revisited)</h1>
+<!-- received="Fri May 13 16:38:20 2011" -->
+<!-- isoreceived="20110513143820" -->
+<!-- sent="Fri, 13 May 2011 16:38:12 +0200" -->
+<!-- isosent="20110513143812" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] TGI palettes (was: TGI colors revisited)" -->
+<!-- id="BANLkTi=SYYC7=aC71WCFofRPEMHFJT+3RQ@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20110513135353.GA11950&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9425.html" title="Oliver Schmidt: &quot;Re: [cc65] TGI palettes (was: TGI colors revisited)&quot;">Next message</a> ]
+[ <a href="9423.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] TGI palettes (was: TGI colors revisited)&quot;">Previous message</a> ]
+[ <a href="9423.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] TGI palettes (was: TGI colors revisited)&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20TGI%20palettes%20(was:%20TGI%20colors%20revisited)">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-05-13 16:38:12</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Uz,
+
+&gt;&gt; There is another option, the one used by earlier X windows functions. In those,
+&gt;&gt; you can &quot;allocate&quot; a new color, and the driver returns the best approximation
+&gt;&gt; of that color.
+
+&gt; I have to admit that I didn't like this idea in the first place. But after
+&gt; thinking about it for a while, it looks like it has some advantages over the
+&gt; palette approach.
+
+Exactly the same experience here.
+
+As pointed out I especially like the idea of the application not
+needing to distinguish between &quot;direct colors&quot; and palettes. This is a
+significant step towards TGI application portability.
+
+And the implementation in non-palette drivers causes so little
+overhead that it is well justified by the portability opportunies.
+After all the major overhead seems to stem from the fact that
+tgi_setcolor() parameters can't be constants anymore but rather have
+to be always variables.
+
+&gt; We can also pass larger values than a byte to tgi_alloccolor, so the argument
+&gt; could actually contain RGB values on platforms that support it. So an
+&gt; application for the Lynx could either use the TGI_COLOR_XXX macros or pass
+&gt; encoded R/G/B values to the tgi_alloccolor function. It won't be portable any
+&gt; more, but can fully support all colors.
+
+Yes, I thought that too. Designing the tgi_alloccolor() parameter
+carefully allows for a &quot;smooth transition&quot; from the &quot;very portable&quot;
+macros to the &quot;less portable&quot; RGB values. I say less portable because
+I understand that certain Atari modes allow to choose from 128 colors.
+This sounds more like RGB values than named colors...
+
+&gt; One drawback is that existing programs need additional code and must be
+&gt; converted, since the TGI_COLOR_XXX macros may no longer be passed to
+&gt; tgi_setcolor.
+
+I volunteer to adjust the TGI demo.
+
+The TGI programs in the user contribution area don't use any colors at
+all (anymore) - in other words they never call tgi_setcolor(). Why?
+Because today color usage is so inconsistent accross TGI drivers that
+only black&amp;white TGI programs are portable. With the color allocation
+approach it would become feasable to add some color (again) to the
+programs - which I volunteer to do.
+
+&gt; I would refrain from adding things like tgi_darken/lightencolor, because color
+&gt; effects won't look good when made portable anyway.
+
+Full ACK.
+
+Again my perspective may be (too) narrow, but today any TGI
+application that wants to go beyond black&amp;white on the C64 _NEEDS_ to
+use palettes! And without any additional precautions this palette
+usage makes the application not work as intended anymore on most other
+TGI drivers. I believe that the color allocation approach helps to
+improve this situation.
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri May 13 16:38:20 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9425.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] TGI palettes (was: TGI colors revisited)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9423.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] TGI palettes (was: TGI colors revisited)"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9423.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] TGI palettes (was: TGI colors revisited)"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9424" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9424" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9424" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-05-13 16:38:23 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] cc65 + tcp/ip howto and/or</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] cc65 + tcp/ip howto and/or example" />
+<meta name="Date" content="2011-01-03" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] cc65 + tcp/ip howto and/or example</h1>
+<!-- received="Mon Jan  3 15:54:24 2011" -->
+<!-- isoreceived="20110103145424" -->
+<!-- sent="Mon, 3 Jan 2011 15:54:16 +0100" -->
+<!-- isosent="20110103145416" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] cc65 + tcp/ip howto and/or example" -->
+<!-- id="AANLkTikTP7barWpBHLJd_uhs50r9RRORAkvYDa25csf2@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20110103141746.GI30776&#64;vega.lgb.hu" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9105.html" title="Oliver Schmidt: &quot;Re: [cc65] cc65 + tcp/ip howto and/or example&quot;">Next message</a> ]
+[ <a href="9103.html" title="Dan Winslow: &quot;RE: [cc65] cc65 + tcp/ip howto and/or example&quot;">Previous message</a> ]
+[ <a href="9099.html" title="Gábor Lénárt: &quot;Re: [cc65] cc65 + tcp/ip howto and/or example&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+[ <a href="9095.html" title="Oliver Schmidt: &quot;Re: [cc65] cc65 + tcp/ip howto and/or example&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20cc65%20%2B%20tcp/ip%20howto%20and/or%20example">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-01-03 15:54:16</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Gábor,
+
+&gt;&gt; - Have you ever written a GUI application? The GUI core calls you when
+&gt;&gt; your screen area needs to be (re-)drawn. [...] uIP is using the very same
+&gt;&gt; paradigm for networking [...]
+
+&gt; Yes, I know about the event-driven programming model, and I've coded for GTK
+&gt; on Linux both in C and Python. But now I am really unsure why you mention
+&gt; this, it sounds like you think I have some negative feeling against this.
+
+No, not at all. I mentioned it for this: Many people looking at uIP
+are irritated by the fact that you can't just call a uIP to send out a
+packet. Rather you need to deal with events and callbacks. This seems
+unnatural to uIP newbies. But if you see the parallel to GUI
+programming than it's easy to see why it is the natural way to do it -
+but this parallel tends to only work for someone with experience with
+GUI programming. Therefore my question...
+
+&gt; After reading your mail, I have the thought that you really misunderstood
+&gt; something, or I can't express myself clearly, which can be the case since my
+&gt; English is far from being perfect, I think. So: I don't want a POSIX like
+&gt; API: not because it sucks, but because it's not suitable for C64 or anything
+&gt; like that.
+
+That was certainly clear from you mail. I just wanted to point out
+that even if you had those APIs you'd still end up with some &quot;event
+driven programming&quot; - which is something many people want to avoid.
+
+&gt; IP65 is perfect to
+&gt; learn about how to program a TFE on I/O level and things like that which is
+&gt; more a quick way for me learn.
+
+If your goal is to learn about TFE / RR-Net then uIP / Contiki will
+certainly put too much abstraction in your way. If your goal is to
+write some working IP program than I'd argue that Contiki could get
+you there more quickly although its complexity...
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Jan  3 15:54:24 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9105.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] cc65 + tcp/ip howto and/or example"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9103.html" title="Previous message in the list">Dan Winslow: "RE: [cc65] cc65 + tcp/ip howto and/or example"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9099.html" title="Message to which this message replies">Gábor Lénárt: "Re: [cc65] cc65 + tcp/ip howto and/or example"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9095.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] cc65 + tcp/ip howto and/or example"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9104" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9104" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9104" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-01-03 15:54:27 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Is an abc-driver acceptable?</title>
+<meta name="Author" content="Karri Kaksonen (karri1sipo.fi)" />
+<meta name="Subject" content="[cc65] Is an abc-driver acceptable?" />
+<meta name="Date" content="2004-10-20" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Is an abc-driver acceptable?</h1>
+<!-- received="Wed Oct 20 08:19:11 2004" -->
+<!-- isoreceived="20041020061911" -->
+<!-- sent="Wed, 20 Oct 2004 09:26:18 +0300 (EEST)" -->
+<!-- isosent="20041020062618" -->
+<!-- name="Karri Kaksonen" -->
+<!-- email="karri1sipo.fi" -->
+<!-- subject="[cc65] Is an abc-driver acceptable?" -->
+<!-- id="Pine.LNX.4.58.0410200852460.29966@kosh.sipo.fi" -->
+<!-- charset="US-ASCII" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4638.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] makefile problems&quot;">Next message</a> ]
+[ <a href="4636.html" title="Karri Kaksonen: &quot;[cc65] tgi and joystick experiment&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Karri Kaksonen &lt;<a href="mailto:karri1sipo.fi?Subject=Re:%20[cc65]%20Is%20an%20abc-driver%20acceptable?">karri1sipo.fi</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-10-20 08:26:18</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+Now after getting a bit familiar with the tgi and joy drivers I would like
+to write a small abc-driver to take care of melodies and sound effects.
+
+The abc would be an implementation of abc-music notation with some small
+additions.
+
+This driver requires some kind of mechanism for maintaining a sound
+waveform without CPU support. The Lynx has a timer, a shift register and a
+xor-gate that is good enough for this purpose. I hope the other targets have
+something similar or better.
+
+The calls I planned to use are
+
+ - abc_instrument( channel, instrument );
+
+ - abc_tempo( channel, tempo );
+
+ - abc_volume( channel, volume );
+
+ - abc_play_tune( channel, tune );
+
+ - abc_update();
+
+where channel = 0..n number of separate melodies the hardware can
+play simultaneously.
+
+tune = &quot;CCCE DDDG FFEE 4D&quot;; A melody where notes are described in ASCII
+letters.
+
+abc_update(void); is called frequently (perhaps once per graphics frame)
+to keep the music going.
+
+Every target should also create some defines that makes setting up good
+instruments easier like:
+
+#define ABC_FLUTE 1
+#define ABC_DRUM  2
+#define ABC_EXPLOSION 3
+...
+
+These could then be used by the programmer like:
+
+abc_instrument(0, ABC_FLUTE);
+abc_play_tune(0, &quot;CDEFGAB5c&quot;);
+abc_instrument(1, ABC_DRUM);
+abc_play_tune(1, &quot;C3zC3zcccc&quot;);
+while (1) {
+    usleep(100ms);
+    abc_update();
+}
+
+I know that this is quite far from any ANSI standards etc. But I have
+used abc-notation in several Lynx games already and I like it.
+
+Besides, if someone wants to create another sound driver you could then
+just create a different set of drivers for it like mid_* for a midi driver
+or smp_* for digitized samples. Or whatever...
+
+Comments? Would this be a good addition to our set of drivers? Or should I
+keep this to myself.
+
+--
+Cheers,
+
+Karri
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Oct 20 08:19:11 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4638.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] makefile problems"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4636.html" title="Previous message in the list">Karri Kaksonen: "[cc65] tgi and joystick experiment"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4637" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4637" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4637" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-10-20 08:19:20 CEST
+</em></small></p>
+</body>
+</html>

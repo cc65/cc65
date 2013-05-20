@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Odd problems creating a new ta</title>
+<meta name="Author" content="L. Adamson (leaf1dizzydragon.net)" />
+<meta name="Subject" content="[cc65] Odd problems creating a new target." />
+<meta name="Date" content="2012-06-21" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Odd problems creating a new target.</h1>
+<!-- received="Thu Jun 21 15:29:48 2012" -->
+<!-- isoreceived="20120621132948" -->
+<!-- sent="Thu, 21 Jun 2012 09:27:57 -0400" -->
+<!-- isosent="20120621132757" -->
+<!-- name="L. Adamson" -->
+<!-- email="leaf1dizzydragon.net" -->
+<!-- subject="[cc65] Odd problems creating a new target." -->
+<!-- id="CACz_Yz1mYEHydfJ_sExvW6JMfB48hVxEhmp56Y-R6q-3ao+QLw@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10378.html" title="Oliver Schmidt: &quot;Re: [cc65] Odd problems creating a new target.&quot;">Next message</a> ]
+[ <a href="10376.html" title="Joseph Rose: &quot;[cc65] Hidden64/MemBank128 hidden/far strings&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10378.html" title="Oliver Schmidt: &quot;Re: [cc65] Odd problems creating a new target.&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: L. Adamson &lt;<a href="mailto:leaf1dizzydragon.net?Subject=Re:%20[cc65]%20Odd%20problems%20creating%20a%20new%20target.">leaf1dizzydragon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-06-21 15:27:57</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi folks!  'Tis interesting to be back on the 6502 after retiring the ][e
+years ago. :P
+
+I apologize for my ignorance, but I am having some odd problems trying to
+create a new target.  The &quot;machine&quot; I am trying to target is the &quot;65EL02&quot;,
+which is a virtual machine included in a certain module for Minecraft.  It
+very closely resembles a 65816, except a few opcodes have been changed
+(namely those that are used to access memory above 64k).
+
+Anyway, after the bootloader runs, the CPU is in 6502 mode, so I figure I
+can tell cc65 that it's just a 65c02 and everything will be a-ok...
+
+Here's a little background, before I link to my code and describe the
+problem I am having:
+
+The machine's memory map looks like this:
+0000-0099 zeropage
+0100-0199 p-stack
+0200-0299 r-stack (I /think/ this is just used by the bundled FORTH
+interpreter, but I'm not entirely sure yet).
+0300-0399 device output (there may be 7 devices attached, but the
+bootloader defaults this to the screen).
+0400-0499 device input (this also contains the bootloader code, which loads
+the program at 0500, then switches itself off to change this area to device
+input).
+0500-ffff RAM.
+
+The CPU does not implement interrupt vectors.  It supports the WAI
+instruction, and the interrupt is hooked to a timer, but it does not branch
+to an interrupt vector when an interrupt is raised.  Just halts the CPU
+until the timer fires.
+
+More details of this machine can be found at <a href="http://www.eloraam.com/?p=255">http://www.eloraam.com/?p=255</a>
+A virtual machine that emulates this virtual machine outside of Minecraft
+(head-explode!), which I am using to test my code, can be found at the
+bottom of this page: <a href="http://bigfootinformatika.hu/65el02/">http://bigfootinformatika.hu/65el02/</a>
+
+I've been following the documentation on the cc65 website regarding setting
+up a new target, using the supervision lib as a base.
+
+Here are the files I have created:
+rpc8e.cfg: <a href="http://pastebin.com/5CedRuQT">http://pastebin.com/5CedRuQT</a>
+crt0.s: <a href="http://pastebin.com/Wz4sTSPP">http://pastebin.com/Wz4sTSPP</a> (note that init and exit code is
+commented out. 6502 housekeeping is done by the bootloader and not needed,
+as well).
+test.c: <a href="http://pastebin.com/nLnkvZNF">http://pastebin.com/nLnkvZNF</a>
+build.sh (a temporary thing until I get things working, then I'll write a
+makefile): <a href="http://pastebin.com/vsvEF7Tn">http://pastebin.com/vsvEF7Tn</a>
+(the dd stuff at the end of build.sh makes sure the file is padded out to
+at least 128 bytes; otherwise the bootloader won't load it)
+
+Aaaaand, here's the weird problem:
+
+If you look in test.c, you'll see that there is a block that &quot;works&quot; and a
+block that &quot;breaks&quot;.  When I do not initialize or assign to the local
+variable 'c', everything works swimmingly.  However, if I try to initialize
+c in its declaration (ie char c = 0x23;), or try to assign to it (as is in
+the for loop), things get weird.
+
+I end up with a main routine fragment that looks like this (in the
+emulator's disassembly of the memory at the IP):
+
+0513 lda #$23 ; Prints a '#' character on the screen.
+0515 sta $0310
+
+0518 jmp $051E ; Not sure what is going on here.  The for loop happens
+after this block...  I think. &gt;_&gt;
+051B jmp $0518
+051E ldx #$00
+0520 lda #$20
+0522 ldy #$00
+0524 sta ($00),y
+0526 ldy #$00
+0528 ldx #$00
+052A lda ($00),y
+052C cmp #$80
+052E jsr $0587
+...
+0587 00 brk
+0598 00 brk
+&lt;etc etc etc&gt;
+
+See, at the end of that fragment, the code JSRs to a zeroed section of
+memory, resulting in Unhappiness.  I'm at my wit's end trying to figure out
+why.  I have a feeling there's something wrong with my memory map
+definition in the .cfg, but I've piddled it around to no avail.
+
+Here's a disassembly of the whole image: <a href="http://pastebin.com/xGnQskM9">http://pastebin.com/xGnQskM9</a>
+
+Thanks for reading!  Any insight would be greatly appreciated. :3
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Jun 21 15:29:48 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10378.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Odd problems creating a new target."</a></li>
+<li><dfn>Previous message</dfn>: <a href="10376.html" title="Previous message in the list">Joseph Rose: "[cc65] Hidden64/MemBank128 hidden/far strings"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10378.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Odd problems creating a new target."</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10378.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Odd problems creating a new target."</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10377" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10377" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10377" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-06-21 15:29:52 CEST
+</em></small></p>
+</body>
+</html>

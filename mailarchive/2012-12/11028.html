@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] ca65 Feature request</title>
+<meta name="Author" content="Jeremy Turner (jeremiah.turner1gmail.com)" />
+<meta name="Subject" content="[cc65] ca65 Feature request" />
+<meta name="Date" content="2012-12-21" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] ca65 Feature request</h1>
+<!-- received="Fri Dec 21 20:54:00 2012" -->
+<!-- isoreceived="20121221195400" -->
+<!-- sent="Fri, 21 Dec 2012 14:53:38 -0500" -->
+<!-- isosent="20121221195338" -->
+<!-- name="Jeremy Turner" -->
+<!-- email="jeremiah.turner1gmail.com" -->
+<!-- subject="[cc65] ca65 Feature request" -->
+<!-- id="CAPsggwsjkhkMcXFZ-N_b77NVS5a3gOLEeEhTct07ukqLfYeN0g@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11029.html" title="Brad Smith: &quot;[cc65] ca65 macro suggestion: .PARAM to accompany .PARAMCOUNT&quot;">Next message</a> ]
+[ <a href="11027.html" title="Groepaz: &quot;Re: [cc65] ca65: .local command in .macros&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Jeremy Turner &lt;<a href="mailto:jeremiah.turner1gmail.com?Subject=Re:%20[cc65]%20ca65%20Feature%20request">jeremiah.turner1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-12-21 20:53:38</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Two things that would make things better for me:
+
+I briefly contacted Uz about the 1st one:
+
+1) A pseudo function to evaluate if an string (or token) is a valid macro
+or instruction name. Right now I have code that needs to call other macros
+using tokens and just does so, hoping that the token or string is a valid
+macro (or instruction). It would be nice to be able to tell before and do
+something about it (.error for example.)
+
+2) Overloading of instructions. I see that there is a
+.feature ubiquitous_idents, but this seems to turn off all instruction
+matching. I would prefer a method where all instructions work normally
+unless a macro was defined to overload them, in which case you could do
+something and then call the original instruction.
+
+For example I like and use this syntax where I have control over it:
+
+lda foo[ 3 + x ]
+
+Basically I can do:
+
+.macro array_syntax I O
+  ; process O
+  ; ouput I O
+.endmacro
+
+array_syntax lda foo[ 3 + x ]
+
+I process it with macro code and turn it into lda foo+3,x and output that
+code from the macro. I don't think I can't do that if I have &quot;lda foo[ 3 +
+x ]&quot; bare on a line unless I use ubiquitous_idents and process everything
+down to .byte output. Would it be difficult to overload the instruction
+only if it is defined and then call the original instruction somehow?
+
+I suppose I could use something like lda_ or _lda but I would rather not.
+
+Thanks
+JT
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Dec 21 20:54:00 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11029.html" title="Next message in the list">Brad Smith: "[cc65] ca65 macro suggestion: .PARAM to accompany .PARAMCOUNT"</a></li>
+<li><dfn>Previous message</dfn>: <a href="11027.html" title="Previous message in the list">Groepaz: "Re: [cc65] ca65: .local command in .macros"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#11028" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#11028" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#11028" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-12-21 20:54:03 CET
+</em></small></p>
+</body>
+</html>

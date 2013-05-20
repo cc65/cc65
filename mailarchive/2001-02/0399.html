@@ -1,0 +1,170 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] odd results</title>
+<meta name="Author" content="BlackJack/Civitas (blackjack_at_civitas64.de)">
+<meta name="Subject" content="Re: [cc65] odd results">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] odd results</h1>
+<!-- received="Mon Feb 26 20:04:34 2001" -->
+<!-- isoreceived="20010226190434" -->
+<!-- sent="Mon, 26 Feb 2001 19:36:03 +0100" -->
+<!-- isosent="20010226183603" -->
+<!-- name="BlackJack/Civitas" -->
+<!-- email="blackjack_at_civitas64.de" -->
+<!-- subject="Re: [cc65] odd results" -->
+<!-- id="01022619360300.00653@s8n" -->
+<!-- inreplyto="20010225.222011.6862.1.tbsilvey@juno.com" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> BlackJack/Civitas (<a href="mailto:blackjack_at_civitas64.de?Subject=Re:%20[cc65]%20odd%20results"><em>blackjack_at_civitas64.de</em></a>)<br>
+<strong>Date:</strong> 2001-02-26 19:36:03
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0400.html">Mike McCarty: "Re: [cc65] odd results"</a>
+<li><strong>Previous message:</strong> <a href="0398.html">Maciej Witkowiak: "Re: [cc65] odd results"</a>
+<li><strong>In reply to:</strong> <a href="0394.html">troy silvey: "Re: [cc65] odd results"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0400.html">Mike McCarty: "Re: [cc65] odd results"</a>
+<li><strong>Reply:</strong> <a href="0400.html">Mike McCarty: "Re: [cc65] odd results"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi troy,
+
+&gt;[code]
+&gt;    if (more==1)
+&gt;        {
+&gt;             *clearkeybuffer=0;
+&gt;             VIC.spr_ena=0;
+&gt;             return pmenu; // *** this is when I want to exit
+&gt;        }
+&gt;    *time1=0;	// delay the user imput to stop sprite run-a-way
+&gt;    while (*time1&lt;10)
+&gt;        {}
+&gt;    choiceA(pmenu);
+
+This is not a 'jmp choiceA(pmenu)' but a 'jsr'! So it doesn't jump to the 
+start of this routine but returns if the 'return pmenu' is executed in the 
+if(more==1) branch. The result is simply thrown away and then the next 
+line (return 0;) is reached!
+
+A quick fix would be to write 'return choiceA(pmenu);' (and forget the 
+'return 0;') but then you are using a recursive function call[1] where it 
+is absolutly unecessary.
+
+The standard way of executing a codeblock again and again is to put it 
+into an endless loop with  'for (;;) { ...code... }' 
+or 'while (1) { ...code... }'
+
+Somewhere in ...code... you have to use 'return' or 'break' to exit this 
+loop.
+
+&gt;    return 0; // **** bogus return to make the compiler happy
+&gt;                     // and the reason I keep getting 0 for a carry value
+&gt;                     // what ever I put here get returned. not pmenu
+&gt;above.
+
+As I mentioned above this return is not that bogus. If you don't hit the 
+return key the first time this routine runs, this line will be executed. 
+CC65 let you leave this return out but inserts it silently for you.
+
+[1] recursive functions call:
+
+Just a quick description. Everytime a function is called it allocates 
+memory for the given argument(s) on the stack (and this is also true for 
+local variables that are not declared 'static').
+
+So if you call the same function within the function body, the local 
+variables are allocated again and are independent from the first call.
+
+Let's have a look at this code:
+
+1:void f(unsigned char x) {
+2:	if (x&gt;0) f(x-1);
+3:	printf(&quot;%d &quot;, x);
+4:}
+
+This will print all numbers from 0 to x. Let's trace 'f(2)' step by step:
+
+Step (Linenumber)
+1. (1) x is created on top of the stack and set to 2 (Stack = 2)
+2. (2) x is greater than 0 so call f with x-1 = 1 as argument. This is a
+      jsr not a jmp so we will return here!)
+3. (1) x is created on top of the stack and set to 2 (Stack = 1,2)
+4. (2) x is still greater than 0 so we call f again with x-1 = 0
+5. (1) again a local x is created on the stack (Stack = 0,1,2)
+6. (2) now the if is skipped.
+7. (3) print x (=0), remove x from the stack (Stack = 1,2) and return
+       to the point where the function was called (that was in step 4)
+8. (3) we are now in line 3 again (right behind the f(x-1);) and print
+       x (=1), remove x from the stack (Stack = 2) and again return to
+       the caller (this one was in step 2)
+9. (3) print x (=2), remove x from stack and return to the caller.       
+
+One popular examples of recursive functions are fibonacci numbers. The 
+definition is: Every fibonacci number is the sum of the two previous. With 
+fib(0) = 0 and fib(1) = 1.
+
+unsigned long fib(unsigned long n) {
+	if (n&lt;2) return n;
+	return fib(n-1) + fib(n-2);
+}
+
+Ciao,
+	Marc 'BlackJack' Rintsch
+-- 
+_ _____  __  __ _____________________________________________________
+ /  __/ /_/  \_\ CiViTAS - &quot;Lameness rulez&quot;
+/  /   ____  ____ <a href="http://www.civitas64.de">http://www.civitas64.de</a>
+\  \_ / /\ \/ /\ \ mailto:<a href="mailto:blackjack_at_civitas64.de?Subject=Re:%20[cc65]%20odd%20results">blackjack_at_civitas64.de</a>  
+ \___/_/  \__/  \_\ C64 forever...
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20odd%20results">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0400.html">Mike McCarty: "Re: [cc65] odd results"</a>
+<li><strong>Previous message:</strong> <a href="0398.html">Maciej Witkowiak: "Re: [cc65] odd results"</a>
+<li><strong>In reply to:</strong> <a href="0394.html">troy silvey: "Re: [cc65] odd results"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0400.html">Mike McCarty: "Re: [cc65] odd results"</a>
+<li><strong>Reply:</strong> <a href="0400.html">Mike McCarty: "Re: [cc65] odd results"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:39 CET</em>
+</em>
+</small>
+</body>
+</html>

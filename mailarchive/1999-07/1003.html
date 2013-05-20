@@ -1,0 +1,228 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Re: still need support wi</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] Re: still need support with low-level file stuff?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Re: still need support with low-level file stuff?</h1>
+<!-- received="Sun Jul 11 15:19:20 1999" -->
+<!-- isoreceived="19990711131920" -->
+<!-- sent="Sun, 11 Jul 1999 15:18:25 +0200" -->
+<!-- isosent="19990711131825" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] Re: still need support with low-level file stuff?" -->
+<!-- id="378899A1.CBF85DD5@gmx.net" -->
+<!-- inreplyto="m1133of-000brTC@wuschel.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Re:%20still%20need%20support%20with%20low-level%20file%20stuff?"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 1999-07-11 15:18:25
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="1004.html">Ullrich von Bassewitz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<li><strong>Previous message:</strong> <a href="1002.html">Ullrich von Bassewitz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<li><strong>In reply to:</strong> <a href="1002.html">Ullrich von Bassewitz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1004.html">Ullrich von Bassewitz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<li><strong>Reply:</strong> <a href="1004.html">Ullrich von Bassewitz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Ullrich von Bassewitz wrote:
+&gt; 
+&gt; &gt; well.... i dont pretty much agree with you... there is actually NO
+&gt; &gt; difference
+&gt; &gt; in using PRG, SEQ, USR, REL or whatever files, since direct raw access
+&gt; &gt; worx
+&gt; &gt; with all of these in the same way. also lseek() and stuff aint a real
+&gt; &gt; problem
+&gt; &gt; since we could use a thing simelar to what 'crackers' refer to as IFFL.
+&gt; &gt; this
+&gt; &gt; would probably work without having to seek through the whole file, since
+&gt; &gt; it'll
+&gt; &gt; work on a 254-bytes block basis, and also the last readen block could be
+&gt; &gt; buffered (in the drive). i know that would still cause some problems if
+&gt; &gt; you
+&gt; &gt; would be lseek()'ing like a mad dog, but it'll still work (however)
+&gt; &gt; the other problem (opening several files at once for reading and
+&gt; &gt; writing) may
+&gt; &gt; be a harder thing to solve, but keeping the above mentioned technique in
+&gt; &gt; mind,
+&gt; &gt; it will still be possible with a clever drive-code.
+&gt; 
+&gt; It seems you know more about this than I. Maybe you can elaborate this a bit,
+&gt; so we can find a possible technical solution. If we have one, the only thing
+&gt; left is to find someone who writes the code:-)
+
+well honestly... after over 15 years hacking the c64, i guess there's
+not
+much left on that topic that i dont understand 8=)
+
+i will just leech the latest compiler now and then have a look how much
+work it'll be to write something like that =)
+
+&gt; The C standard says nothing about the signedness of chars. Both signed and
+&gt; unsigned chars are allowed. Traditionally, PC compilers tend to use signed
+&gt; chars, while Unix compilers often have unsigned chars. The choice to use
+&gt; unsigned characters for cc65 does not only give better code, but it is in full
+&gt; compliance with the ISO C standard. Programs that depend on the signedness of
+&gt; chars are non portable.
+&gt; 
+&gt; If you need a specific character type (signed or unsigned), declare it as
+&gt; such. If you don't specify the signedness explicitly, the compiler is free to
+&gt; choose.
+&gt; 
+&gt;     signed char sc;     /* A signed character */
+&gt;     unsigned char uc;   /* An unsigned character */
+&gt;     char c;             /* Signedness depends on the implementation */
+
+aaaah, ok... sorry then, i thought the signed/unsigned keyword isnt
+available 
+at all (that is, i ALWAYS declare my stuff as signed/unsigned)
+
+&gt; &gt; Also i noticed that you mention the INT datatype in
+&gt; &gt; quite some places of the docs, and since you seem to be one of the ppl
+&gt; &gt; that like to &quot;follow the rulez&quot; i just wanted to point out that INT is
+&gt; &gt; by far
+&gt; &gt; not standard, and lots of literature  (ehrm orthograpy sux =)  advices
+&gt; &gt; to
+&gt; &gt; no more use it, at least not for portable code (use short/u_short
+&gt; &gt; instead
+&gt; &gt; for example)
+&gt; 
+&gt; I'm not sure what you're refering to. I don't remember mentioning a datatype
+&gt; named INT in the docs, and a
+&gt; 
+&gt;         grep INT *
+&gt; 
+&gt; in the doc directory shows no match. If you're talking about int (as opposed
+&gt; to INT), this is a standard datatype with well defined semantics. I don't see
+&gt; any problems with portability when using ints.
+
+yeah... ofcoz i ment int... and well, i have read quite some stuff about
+C
+lately, and i remember that there were certain problems with int and it
+should be replaced by some other datatype. i think the major problem
+was,
+that the amount of bits in an int is not defined (in opossite to
+short/long)
+so you may get some probs when porting the code.
+ 
+&gt; &gt; however, i have noticed there is now
+&gt; &gt; also a
+&gt; &gt; MAKE-utility for cc65, so i guess that should be no prob now doing that
+&gt; &gt; with
+&gt; &gt; more sourcefiles.
+&gt; 
+&gt; There is no make utility (you may want to consider GNU make if you need one),
+&gt; but the cl65 compile and link utility allows the translation of a multi-file
+&gt; project with one command.
+
+yeah... thats what i ment =)
+
+&gt; 
+&gt; &gt; oh, another quick question i was wondering about.... my editor needs to
+&gt; &gt; bank out ALL kernal/basic rom and also need access to ram under i/o at
+&gt; &gt; certain times... will the runtime library work with that? and, will i
+&gt; &gt; need to rewrite lots of the other libs to make them work independent
+&gt; &gt; from the roms?! or would it just compile and WORK? 8=) (that'll be very
+&gt; &gt; nice really hehe)
+&gt; 
+&gt; The compiler generated code, the runtime library and the standard C library do
+&gt; not depend on any ROM code. The startup code uses kernal calls, as well as the
+&gt; conio module. Most other C64 specific routines do not call the kernal. The
+&gt; BASIC ROM is never used, in fact, it's banked out in the standard
+&gt; configuration.
+
+ok.... seems to work for me then =) i need a custom conio anyway
+(keyboard-
+scanner that can detect several keys pressed at once) so guess that wont
+be
+a problem...
+
+whatever.... gotta play around with the new compiler now i guess =)
+
+regards
+
+gpz/hit
+
+-- 
+........................................................
+
+		            /^\
+                            \ /  
+      ASCII RIBBON CAMPAIGN  X  AGAINST HTML MAIL
+                            / \  
+
+........................................................
+
+             .--.--.--.----..--.--.--.-----.----.
+   C=64     /  /  /  /  .  /  .  .  /  .  /  .  /\
+           /  /  /__/  /__/  /  /  /  /  /  /  / /
+   PC     /     /  /  /\_/  /  /  /  __ /  /  / /
+         /  /  /  /  / //  /  /  /  /  /  /  / /
+   PSX  /  /  /  /  / //  /  /  /  /  /  /  / /
+       /__/__/__/__/ //__/__/__/_____/__/__/ / 
+       \__\__\__\__\/ \__\__\__\_____\__\__\/  Groepaz
+
+........................................................
+.. <a href="http://fly.to/hitmen-c64">http://fly.to/hitmen-c64</a> ............................
+..... the hitmen c64 home page .........................
+.. <a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a> .......................
+..... hitmen psx section ...............................
+.. <a href="http://start.at/hitnav64">http://start.at/hitnav64</a> ............................
+..... biggest c64 link collection around ...............
+.. <a href="http://fly.to/hitmen-groepaz">http://fly.to/hitmen-groepaz</a> ........................
+..... my little personal page ..........................
+........................................................
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Re:%20still%20need%20support%20with%20low-level%20file%20stuff?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="1004.html">Ullrich von Bassewitz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<li><strong>Previous message:</strong> <a href="1002.html">Ullrich von Bassewitz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<li><strong>In reply to:</strong> <a href="1002.html">Ullrich von Bassewitz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1004.html">Ullrich von Bassewitz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<li><strong>Reply:</strong> <a href="1004.html">Ullrich von Bassewitz: "Re: [cc65] Re: still need support with low-level file stuff?"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:44 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] Global/local labels and scope</title>
+<meta name="Author" content="Mats Andrén (matan325_at_student.liu.se)">
+<meta name="Subject" content="[cc65] Global/local labels and scopes (ca65)">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] Global/local labels and scopes (ca65)</h1>
+<!-- received="Mon Jan 12 16:57:54 2004" -->
+<!-- isoreceived="20040112155754" -->
+<!-- sent="Mon, 12 Jan 2004 16:57:43 +0100" -->
+<!-- isosent="20040112155743" -->
+<!-- name="Mats Andrén" -->
+<!-- email="matan325_at_student.liu.se" -->
+<!-- subject="[cc65] Global/local labels and scopes (ca65)" -->
+<!-- id="5.2.0.9.2.20040112162938.01a58d90@pop.student.liu.se" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Mats Andrén (<a href="mailto:matan325_at_student.liu.se?Subject=Re:%20[cc65]%20Global/local%20labels%20and%20scopes%20(ca65)"><em>matan325_at_student.liu.se</em></a>)<br>
+<strong>Date:</strong> 2004-01-12 16:57:43
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3941.html">Ullrich von Bassewitz: "Re: [cc65] CIA Timers, SID gate, Structs Vs Poking, NES?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3943.html">MagerValp: "Re: [cc65] Global/local labels and scopes (ca65)"</a>
+<li><strong>Reply:</strong> <a href="3943.html">MagerValp: "Re: [cc65] Global/local labels and scopes (ca65)"</a>
+<li><strong>Reply:</strong> <a href="3944.html">Ullrich von Bassewitz: "Re: [cc65] Global/local labels and scopes (ca65)"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello there!
+
+I just recently started using ca65 and I've been reading the 
+ca65-documentation about scopes, local and global labels, and such. As far 
+as I have understood, there is no way of simply declaring a label Global 
+within a scope? Sometimes, when working with selfmodifying code (for 
+optimization purposes) I find it useful to &quot;break&quot; the .scope-hierarchy. 
+So, If I have some code like this:
+
+;------------------------------------------------------
+; MY EXAMPLE SUBROUTINE, WITH TWO DIFFERENT ENTRYPOINTS
+
+EntrypointA:
+.scope
+       lda #$xx
+       sta dest+1
+       lda #$yy
+       sta dest+2
+       jmp MainFunction
+
+EntrypointB:
+       lda #$zz
+       sta dest+1
+       lda #$ww
+       sta dest+2
+       jmp MainFunction
+
+MainFunction:
+       jsr calculatesomevalue
+dest: sta $ffff
+       rts
+.endscope
+
+;------------------------------------------------------
+; MAIN PROGRAM
+       ...
+       jsr EntrypointA
+       jsr EntrypointB
+       ...
+
+;------------------------------------------------------
+
+...it does not work out at all, of course, even though I still find this a 
+sensible way to structure asm-code in some occasions.
+
+Either I'll have to do one .scope/.endscope-pair for each Entrypoint to 
+make EntrypointB being a globally visible lable, wich means I have to use 
+some extensive naming scheme to keep track of all the scopes. &quot;dest&quot; would 
+then loose it's local scope-&quot;feeling&quot;, since I would have to preceed all 
+access to it with some specific scope-information (scoopex::dest f.ex.) to 
+access it.
+
+..or either I'd have to put all the Entrypoints within a named scope (let's 
+say &quot;thisfunction&quot;) and access them with scope specific information, like this:
+
+       jsr thisfunction::EntrypointA
+       jsr thisfunction::EntrypointB
+
+While it may not look so bad here in my example, it would introduce quite 
+some naming overhead into my project (which I am converting right now from 
+DASM-sources). The possibility to just declare EntrypointB as Global would 
+be so much easier than all that explicit naming stuff. What do you say? Am 
+I simply fucked up, or is there actually some sense in this? :) Maybe it is 
+actually already possible to do this, only I haven't realized how to do it 
+nicely?
+
+I'm using:
+ca65 V2.10.0 - (C) Copyright 1998-2003 Ullrich von Bassewitz
+
+That should be 2004 now, right? :)
+
+ca65 rules! Have a nice day!
+
+(Also I have some problems using the BSS-segments, but that's another 
+issue. Couldn't really find any code examples using it. Any hints on where 
+to look?)
+
+/Autoboy
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Global/local%20labels%20and%20scopes%20(ca65)">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3941.html">Ullrich von Bassewitz: "Re: [cc65] CIA Timers, SID gate, Structs Vs Poking, NES?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3943.html">MagerValp: "Re: [cc65] Global/local labels and scopes (ca65)"</a>
+<li><strong>Reply:</strong> <a href="3943.html">MagerValp: "Re: [cc65] Global/local labels and scopes (ca65)"</a>
+<li><strong>Reply:</strong> <a href="3944.html">Ullrich von Bassewitz: "Re: [cc65] Global/local labels and scopes (ca65)"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2004-01-12 16:58:56 CET</em>
+</em>
+</small>
+</body>
+</html>

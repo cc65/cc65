@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] [ld65] Overwriting fillval</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="Re: [cc65] [ld65] Overwriting fillval for one segment only?" />
+<meta name="Date" content="2012-09-05" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] [ld65] Overwriting fillval for one segment only?</h1>
+<!-- received="Wed Sep  5 20:32:37 2012" -->
+<!-- isoreceived="20120905183237" -->
+<!-- sent="Wed, 5 Sep 2012 20:31:37 +0200" -->
+<!-- isosent="20120905183137" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="Re: [cc65] [ld65] Overwriting fillval for one segment only?" -->
+<!-- id="20120905183137.GF22300@trikaliotis.net" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="20120905115256.GA25756&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10808.html" title="Oliver Schmidt: &quot;Re: [cc65] Uniform mass storage device discovery and file locations&quot;">Next message</a> ]
+[ <a href="10806.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Uniform mass storage device discovery and file locations&quot;">Previous message</a> ]
+[ <a href="10803.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] [ld65] Overwriting fillval for one segment only?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10815.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] [ld65] Overwriting fillval for one segment only?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20[cc65]%20[ld65]%20Overwriting%20fillval%20for%20one%20segment%20only?">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-09-05 20:31:37</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello,
+
+* On Wed, Sep 05, 2012 at 01:52:56PM +0200 Ullrich von Bassewitz wrote:
+&gt; 
+&gt; On Mon, Sep 03, 2012 at 08:55:12PM +0200, Spiro Trikaliotis wrote:
+&gt; &gt; Thus, what I would need is: Define the fillvalue for a memory area (this
+&gt; &gt; already works), but if needed, overwrite it for one specific segment
+&gt; &gt; with another fillval.
+&gt; &gt;
+&gt; &gt; Does this make sense?
+&gt; 
+&gt; Partially:-)
+
+I see, you have more experience with this stuff. ,)
+
+Ok, let's dig into it.
+
+&gt; What exactly is part of the segment?
+
+The same rules apply as to memory area: Everything from the beginning of
+the segment until the end of it, with:
+
+1. The beginning is where the first defined byte of the segment is
+   placed (that is, filler bytes before the first byte do not count),
+
+and
+
+2. the end is defined as the last byte before the next segment begins
+   (according to rule #1).
+   If there is no next segment, until the end.
+
+   That is, filler btes at the end of the segment are part of that
+   segment.
+
+
+Sound reasonable to me, and it fits memory areas, at least as far as I
+can tell.
+
+So, specifically:
+
+&gt;   * Any fills that are caused by .res use the value from the segment.
+
+Yes, part of that segment
+
+&gt;   * Any fills caused by .align at a given location within the source do also
+&gt;     use the fill value from the segment.
+
+If the .align is inside of the segment, yes.
+
+If the .align is for the first part of the segment, no.
+
+&gt;   * But how about alignment between the sections of a segment? Is this space
+&gt;     part of the segment or just part of the memory area?
+
+Part of the segment.
+
+&gt;   * And how about alignment at the start of a segment caused by .align
+&gt;     statements in the source? Is this alignment part of the segment or not?
+
+No, it is not (cf. above).
+
+&gt;   * Similar for fill bytes caused by the ALIGN, OFFSET or START attributes in
+&gt;     the linker config. Is the space part of the segment?
+
+No, because these fill bytes are placed before the segment.
+
+
+For me, it sounds reasonable. Any objections, not only from you, but
+perhaps also from others?
+
+Regards,
+Spiro.
+
+-- 
+Spiro R. Trikaliotis
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Sep  5 20:32:37 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10808.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Uniform mass storage device discovery and file locations"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10806.html" title="Previous message in the list">Spiro Trikaliotis: "Re: [cc65] Uniform mass storage device discovery and file locations"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10803.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] [ld65] Overwriting fillval for one segment only?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10815.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] [ld65] Overwriting fillval for one segment only?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10815.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] [ld65] Overwriting fillval for one segment only?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10807" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10807" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10807" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-09-05 20:32:40 CEST
+</em></small></p>
+</body>
+</html>

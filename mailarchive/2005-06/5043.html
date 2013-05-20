@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Re: signals</title>
+<meta name="Author" content="Jonathan Graham Harston (jgh1arcade.demon.co.uk)" />
+<meta name="Subject" content="[cc65] Re: signals" />
+<meta name="Date" content="2005-06-02" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Re: signals</h1>
+<!-- received="Thu Jun  2 15:00:27 2005" -->
+<!-- isoreceived="20050602130027" -->
+<!-- sent="02 Jun 2005 12:48:42 +0100" -->
+<!-- isosent="20050602114842" -->
+<!-- name="Jonathan Graham Harston" -->
+<!-- email="jgh1arcade.demon.co.uk" -->
+<!-- subject="[cc65] Re: signals" -->
+<!-- id="050602135504@arcade.demon.co.uk" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5044.html" title="Ullrich von Bassewitz: &quot;[cc65] Reminder&quot;">Next message</a> ]
+[ <a href="5042.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Changes between 2.10.1 and current 2.10.5?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5046.html" title="dominic beesley: &quot;Re: [cc65] Re: signals&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Jonathan Graham Harston &lt;<a href="mailto:jgh1arcade.demon.co.uk?Subject=Re:%20[cc65]%20Re:%20signals">jgh1arcade.demon.co.uk</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-06-02 13:48:42</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt; Message-ID: &lt;429C4ADE.6080801&#64;brahms&#46;<!--nospam-->demon.co.uk&gt;
+ 
+dominic beesley &lt;dominic&#64;brahms&#46;<!--nospam-->demon.co.uk&gt; wrote:
+&gt; What if the user presses break, what if I _dont_ set up an
+&gt; Escape handler and the user presses Escape. What if a program is
+&gt; in a long loop (doing file stuff) and the user presses Escape
+&gt; and nothing happens? they'll press Break and make just as much
+&gt; of a mess.
+ 
+There are many instances where pressing Escape &quot;does nothing&quot;,
+because the computer is in the middle of something and hasn't got
+to the end and checked the escape flag yet.
+ 
+  *SAVE name 0+1000000
+ 
+isn't going to respond to the Escape flag being set until it has
+finished.  PLOT 96 (draw a circle) isn't going to check the Escape
+flag until it has stopped drawing. A really impatient user could
+get bored at any time and press Break. If the user presses Break
+they deserve whatever they get. 
+ 
+&gt; Also on many you've got to be careful about what you expect to
+&gt; be safe; structures may be half updated, variables not correctly
+&gt; set (although this is probably worse in 6502 as even a simple
+&gt; increment on a 16bit no. will take a number of instructions).
+ 
+If you abort on the background Escape event in the middle of:
+ 
+  strcpy(src,dst);
+ 
+then the destination memory will be left in an inconsistant state.
+ 
+ 
+ 
+&gt; It looks as if there are two camps on this, those that dont want any form of
+&gt; out-of-band signals sue to escape and those that do. I think I may put
+&gt; all this
+&gt; stuff in the BBC library but have it compile-time switchable some how
+&gt; (either
+&gt; when compiling the end program or when compiling the library).
+ 
+That's the solution I was working towards with Small-C. Let the
+programmer chose whether to use os_checkescape() themselves, or
+allow the Escape event to abort the program instead of setting the
+Escape flag.
+ 
+I'm now thinkinking of adding another os_* escape function, that
+does something like:
+ 
+os_something()
+{
+if !os_checkescape() return(void);
+os_byte(126, 0);
+os_error(17, &quot;Escape&quot;);
+}
+ 
+so mainline code can just call os_something() and have the error
+generation done for it if an escape state is set.
+ 
+Now I've got my BBC hard drive interface working, I really should
+copy the C compiler over to is and do some more work on it.
+ 
+-- 
+J.G.Harston - jgh&#64;arcade&#46;<!--nospam-->demon.co.uk - mdfs.net/User/JGH
+BBC IDE Hard Drive Interface - <a href="http://mdfs.net/Info/Comp/BBC/IDE">http://mdfs.net/Info/Comp/BBC/IDE</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Jun  2 15:00:27 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5044.html" title="Next message in the list">Ullrich von Bassewitz: "[cc65] Reminder"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5042.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Changes between 2.10.1 and current 2.10.5?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5046.html" title="Next message in this discussion thread">dominic beesley: "Re: [cc65] Re: signals"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5046.html" title="Message sent in reply to this message">dominic beesley: "Re: [cc65] Re: signals"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5043" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5043" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5043" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-06-02 15:00:31 CEST
+</em></small></p>
+</body>
+</html>

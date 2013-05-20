@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] [ca65] Include dir behaviour c</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="[cc65] [ca65] Include dir behaviour change between 2.13.3 and 2.13.9" />
+<meta name="Date" content="2012-07-27" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] [ca65] Include dir behaviour change between 2.13.3 and 2.13.9</h1>
+<!-- received="Fri Jul 27 20:01:56 2012" -->
+<!-- isoreceived="20120727180156" -->
+<!-- sent="Fri, 27 Jul 2012 19:39:02 +0200" -->
+<!-- isosent="20120727173902" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="[cc65] [ca65] Include dir behaviour change between 2.13.3 and 2.13.9" -->
+<!-- id="20120727173902.GZ25913@trikaliotis.net" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10516.html" title="Oliver Schmidt: &quot;Re: [cc65] [ca65] Include dir behaviour change between 2.13.3 and 2.13.9&quot;">Next message</a> ]
+[ <a href="10514.html" title="Oliver Schmidt: &quot;Re: [cc65] C64 POSIX dirent stuff actually working?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10516.html" title="Oliver Schmidt: &quot;Re: [cc65] [ca65] Include dir behaviour change between 2.13.3 and 2.13.9&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20[cc65]%20[ca65]%20Include%20dir%20behaviour%20change%20between%202.13.3%20and%202.13.9">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-07-27 19:39:02</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello,
+
+wenn including files from a ca65 source file, the behaviour of where the
+file is searched has changed between 2.13.3 and a recent build of 2.13.9.
+
+As I do not believe the previous behaviour was documented, I am not sure
+if I would classify this as a bug, as annoyance, or as a wishlist item. ;)
+
+I uploaded a tarball which should show what I am speaking about. You can
+find it at 
+
+  <a href="http://www.trikaliotis.net/Download/test.ca65.tar.gz">http://www.trikaliotis.net/Download/test.ca65.tar.gz</a>
+
+Now, what is happening?
+
+Let's start with the outline of the directory tree:
+
+[A1] root_generic.i65: includes specific.i65
+[A2] a1/test.a65:      includes ../root-generic.i65
+[A3] a1/specific.i65:  writes &quot;a1/specific.i65&quot; into the object file
+[A4] a2/test.a65:      includes ../root-generic.i65
+[A5] a2/specific.i65:  writes &quot;a2/specific.i65&quot; into the object file
+
+Now, do &quot;cd a1; make test.a65&quot; and &quot;cd a2; make test.a65&quot;, respectively.
+we get the following result:
+
+a. cd a1; ca65 test.a65
+   [A2] includes [A1] includes [A3]; as expected
+
+b. cd a2; ca65 test.a65
+   [A4] includes [A1] includes [A5]; as expected
+
+Here, both variants of ca65 behave the same, and they behave as I would
+have expected.
+
+
+Now for the second test:
+
+[B1] b1/b1-generic.i65: includes specific.i65
+[B2] b1/test.a65:       includes b1-generic.i65
+[B3] b1/specific.i65:   writes &quot;b1/specific.i65&quot; into the object file
+[B4] b2/test.a65:       includes ../b1/b1-generic.i65
+[B5] b2/specific.i65:   writes &quot;b2/specific.i65&quot; into the object file
+
+To summarize the difference: [A1] is placed ia nthe root, [B1] is placed
+into b1/. Thus, [B2] and [B4] include [B1] from b1/, not from the root
+directory.
+
+Building these test cases like above results in the following behaviour:
+
+c. cd b1; ca65 test.a65
+   [B2] includes [B1] includes [B3]; as expected
+
+d. cd b2; ca65 test.a65
+   for 2.13.3:
+   [B4] includes [B1] includes [B5]; as expected
+
+   for 2.13.9
+   [B4] includes [B1] includes [B3]; THIS IS WEIRD!
+
+As I said, I would expect to take the sfile specific.i65 from the
+directory where ca65 was called from; however, in this last case, it is
+not for 2.13.9.
+
+Yes, I know, the directory structure is not optimal in the first place,
+but it was the simplest scenario I couold come up with the show this
+behaviour.
+
+In the tarball, there is also a directory output/ which contains the
+outputs I get from the assembly listing for 2.13.3 and 2.13.9, as well
+as a diff between both. Additionally, the outputs of cc65 --version and
+ca65 --version are included, too. (Wouldn't it be good to add the
+svn version also to the output of ca65 and possibly other commands?)
+
+I'd expect the changed behaviour to have occurred around svn version
+4662, but I did not test specifically.
+
+BTW: ca65 --version reports copyright -2011 for current 2.13.9, but
+-2012 for 2.13.3. This seems a little bit add, as the current 2.13.9 is
+clearly newer.
+
+Regards,
+Spiro.
+
+-- 
+Spiro R. Trikaliotis
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Jul 27 20:01:56 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10516.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] [ca65] Include dir behaviour change between 2.13.3 and 2.13.9"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10514.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] C64 POSIX dirent stuff actually working?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10516.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] [ca65] Include dir behaviour change between 2.13.3 and 2.13.9"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10516.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] [ca65] Include dir behaviour change between 2.13.3 and 2.13.9"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10518.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] [ca65] Include dir behaviour change between 2.13.3 and 2.13.9"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10515" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10515" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10515" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-07-27 20:02:00 CEST
+</em></small></p>
+</body>
+</html>

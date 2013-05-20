@@ -1,0 +1,137 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Compile problem</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Compile problem">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Compile problem</h1>
+<!-- received="Mon Dec 10 19:27:01 2001" -->
+<!-- isoreceived="20011210182701" -->
+<!-- sent="Mon, 10 Dec 2001 19:27:03 +0100" -->
+<!-- isosent="20011210182703" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Compile problem" -->
+<!-- id="20011210192703.A30443@trixie.musoftware.de" -->
+<!-- inreplyto="13621767607.20011210165402@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Compile%20problem"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2001-12-10 19:27:03
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0962.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<li><strong>Previous message:</strong> <a href="0960.html">Adam Dunkels: "Re: Re[2]: [cc65] Compile problem"</a>
+<li><strong>In reply to:</strong> <a href="0959.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0962.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<li><strong>Reply:</strong> <a href="0962.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Mon, Dec 10, 2001 at 04:54:02PM +0100, groepaz wrote:
+&gt; err... sorry, no :o) using -I is not a &quot;clean&quot; solution.... for once
+&gt; it would mean that each .inc file has to have a unique filename (which
+&gt; is not an option for me since i have &quot;config.inc&quot; etc in various
+&gt; directories) and nonetheless it makes it impossible to write code (and
+&gt; makefiles etc) that is totally independent of absolute local paths.
+&gt; from my understanding &quot;-I&quot; should be used to tell the assembler where
+&gt; to find &quot;common&quot; includes (such as common libraries of your &quot;OS&quot;) but
+&gt; NOT where to find includefiles that are selfcontained within the code
+&gt; you are trying to compile.
+
+This is not correct. -I may be used for your own files and it may even be used
+within a project. In fact, cc65 itself uses -I to point to header files that
+are shared between the binary tools, it does *not* use relative paths.
+
+And, since directory handling is often non portable (there may be platforms
+with a different path separator, without a concept for a &quot;subdirectory&quot;, or
+with a different notation for &quot;parent directory&quot;) many guidelines for writing
+portable code say *not* to use a path in an include statement (the coding
+guidelines for the Mozilla project are an example).
+
+So I have to admit that I'm not really convinced. While it is possible to
+change the current behaviour, and it wouldn't be too much work, it
+
+  * will increase code size and make the search routines more complex,
+
+  * will change the current behaviour and may break existing code,
+
+  * may not meet other peoples expectations about the search algorithm.
+
+There are other details that will complicate the implementation: By using the
+path to an include file as the new search path for new include files, paths
+may &quot;add up&quot;, getting longer and longer, eventually growing outside of some
+operating system limits (DOS for example has just about 60 characters for a
+path available). So special code would be required to cleanup path elements,
+and this code will require platform dependent knowledge - something I've
+managed to keep outside of the cc65 source until today.
+
+&gt; whatever, all and all these problems can be easily solved by
+&gt; &quot;searching relative to current file&quot; aswell (right after searching
+&gt; pathes given by -I option at best) - and thats actually the kind of
+&gt; behaviour i'd expect from any decent compiler/assembler out there.
+&gt; (except borland turbo-c which suffers from the same problem hehehehe ;D)
+
+For C compilers, the standard does not specify any search algorithm, it does
+not even talk about search paths or paths in include statements, and all this
+for a reason: It would be non portable to do so.
+		 
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Compile%20problem">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Compile%20problem">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0962.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<li><strong>Previous message:</strong> <a href="0960.html">Adam Dunkels: "Re: Re[2]: [cc65] Compile problem"</a>
+<li><strong>In reply to:</strong> <a href="0959.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0962.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<li><strong>Reply:</strong> <a href="0962.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:44 CET</em>
+</em>
+</small>
+</body>
+</html>

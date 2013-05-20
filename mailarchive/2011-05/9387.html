@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Re: TGI colors revisited</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Re: TGI colors revisited" />
+<meta name="Date" content="2011-05-03" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Re: TGI colors revisited</h1>
+<!-- received="Tue May  3 23:17:08 2011" -->
+<!-- isoreceived="20110503211708" -->
+<!-- sent="Tue, 3 May 2011 23:16:53 +0200" -->
+<!-- isosent="20110503211653" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Re: TGI colors revisited" -->
+<!-- id="BANLkTimuyJshNcUBYugQiFz4AbYj+z0dyg@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="000301cc09c4$828201e0$443efea9&#64;monarch" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9388.html" title="Oliver Schmidt: &quot;Re: [cc65] Re: TGI colors revisited&quot;">Next message</a> ]
+[ <a href="9386.html" title="Greg King: &quot;Re: [cc65] TGI_MODE_... gone&quot;">Previous message</a> ]
+[ <a href="9384.html" title="Greg King: &quot;Re: [cc65] Re: TGI colors revisited&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9391.html" title="Karri Kaksonen: &quot;Re: [cc65] Re: TGI colors revisited&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Re:%20TGI%20colors%20revisited">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-05-03 23:16:53</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Greg,
+
+&gt; The Lynx library _will_ have conio support (20 columns by 12 lines)!
+
+Cool !
+
+&gt;&gt; Just to make sure there's no misunderstanding which might result in
+&gt;&gt; potentially unnecessary work on your side:
+&gt;&gt;
+&gt;&gt; - The default palette needs to contain the values 0, 1, ..., 14, 15,
+&gt;&gt; in that order.
+&gt;&gt;
+&gt;&gt; - The TGI functions tgi_setpalette/tgi_getpalette/tgi_getdefpalette
+&gt;&gt; need to operate on palettes being 16 bytes large.
+&gt;&gt; So, there needs to be some mapping between the &quot;TGI palette&quot;
+&gt;&gt; and the &quot;12-bit palette&quot;.
+&gt;&gt;
+&gt;&gt; - If you feel that this doesn't give a fine-grained enough
+&gt;&gt; control over the colors used, you might consider to provide some
+&gt;&gt; tgi_ioctl function to manipulate the 12-bit palette directly.
+&gt;
+&gt; My reason for not replying sooner is that the implications are too
+&gt; complex to be digested quickly.  But, I see that I must speak up before
+&gt; the misunderstandings go too far.
+
+I see. Thanks for your involvement.
+
+&gt; First things first:  Those new rules mean that tgi_getdefpalette() has
+&gt; become pointless!  It always will return the exact same thing -- on all
+&gt; platforms.  A program can generate an ascending array if it's needed.
+&gt; When it isn't needed, that function just wastes space in the driver.
+
+If I understand you correctly then you don't disagree (at least right
+now) to the usefullness of those rules. So you agree that the result
+of those rules is a default palette constructed from ascending values.
+
+That given I absolutely see your point regarding tgi_getdefpalette().
+However consider the following:
+
+1. We, the TGI insiders, know how a default palette looks like. But
+that doesn't necessarily mean that every TGI application programmer
+should be required to know it. Thinking very carefully about the ways
+he can use the TGI_COLOR_... macros he could potentially reason it but
+he shouldn't be required to know. But one can say: &quot;The TGI
+application programmer can just call tgi_getpalette() and save it
+before potential calls to tgi_setpalette() to get the default
+palette.&quot;
+
+2.  If you look at the source of tgi_init() in the TGI kernel you'll
+see that the TGI kernel basically does a
+tgi_setpalette(tgi_getdefpalette()). The idea behind this is most
+likely that the TGI driver can omit certain initializations (palette,
+view page, draw page, drawing color, text style) because they are done
+by the TGI kernel via the driver entry points. But there's no reason
+why the TGI kernel shouldn't know about the way default palettes look
+like so it could create the ascending values. However tgi_setpalette()
+requires a pointer to the array so the TGI kernel would need to
+actually build that array im memory - all this is certainly larger
+than the array of values in the driver.
+
+So the result is: If you don't want to redesign the roles of the TGI
+kernel and driver on tgi_init() then tgi_getdefpalette() comes for
+free.
+
+&gt; The Lynx's graphics engine uses two palettes: the hardware palette is
+&gt; the 12-bit one that Karri described, the software palette actually is a
+&gt; mapping table.  The number that we give to tgi_setcolor() is used as an
+&gt; index into the pen (or paint-brush) table; the value from that table is
+&gt; used as an index into the hardware-palette table.  That second
+&gt; (hardware) index is stored on the screen.
+
+I must admit I haven't fully understood...
+
+&gt; In order to allow the palette manipulation that you have described
+&gt; earlier, we must use the brush table as the TGI palette.  But, after the
+&gt; palette is changed, there might not be a one-to-one match between the
+&gt; values that were given to tgi_setcolor() and the values that are
+&gt; returned when tgi_getpixel() is used on &quot;old&quot; pixels (ones that were
+&gt; drawn before the palette was changed)!
+
+If I understand you right than this approach wouldn't fit the
+semantics of a palette. A palette means - at least from my perspective
+- that setting a (different) palette immediately causes re-coloring of
+all already displayed pixels.
+
+The usual approach would rather be to translate the values in the TGI
+palette into values for the 12-bit palette on calls to
+tgi_setpalette(). A call to tgi_getpalette() could either return a
+shadow copy of the last TGI palette given to tgi_setpalette() or
+alternatively translate values in the 12-bit palette back into values
+in the TGI palette. Or do I miss the point why this generally doesn't
+work on the Lynx?
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue May  3 23:17:08 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9388.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Re: TGI colors revisited"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9386.html" title="Previous message in the list">Greg King: "Re: [cc65] TGI_MODE_... gone"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9384.html" title="Message to which this message replies">Greg King: "Re: [cc65] Re: TGI colors revisited"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9391.html" title="Next message in this discussion thread">Karri Kaksonen: "Re: [cc65] Re: TGI colors revisited"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9391.html" title="Message sent in reply to this message">Karri Kaksonen: "Re: [cc65] Re: TGI colors revisited"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9387" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9387" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9387" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-05-03 23:17:10 CEST
+</em></small></p>
+</body>
+</html>

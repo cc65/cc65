@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Running C program in a car</title>
+<meta name="Author" content="Payton Byrd (plbyrd1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] Running C program in a cart" />
+<meta name="Date" content="2012-05-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Running C program in a cart</h1>
+<!-- received="Fri May 25 23:30:33 2012" -->
+<!-- isoreceived="20120525213033" -->
+<!-- sent="Fri, 25 May 2012 16:28:50 -0500" -->
+<!-- isosent="20120525212850" -->
+<!-- name="Payton Byrd" -->
+<!-- email="plbyrd1gmail.com" -->
+<!-- subject="Re: [cc65] Running C program in a cart" -->
+<!-- id="CAJm6qqeAQiAenmHwHSE7jMZmqePZLPf1oOCM5BJrzrzrLbqyWw@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20120525211555.GA17339&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10305.html" title="Groepaz: &quot;Re: [cc65] Running C program in a cart&quot;">Next message</a> ]
+[ <a href="10303.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Running C program in a cart&quot;">Previous message</a> ]
+[ <a href="10303.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Running C program in a cart&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10309.html" title="Greg King: &quot;Re: [cc65] Running C program in a cart&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Payton Byrd &lt;<a href="mailto:plbyrd1gmail.com?Subject=Re:%20[cc65]%20Running%20C%20program%20in%20a%20cart">plbyrd1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-05-25 23:28:50</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Fri, May 25, 2012 at 4:15 PM, Ullrich von Bassewitz &lt;uz&#64;musoftware&#46;<!--nospam-->de&gt;wrote:
+
+&gt;
+&gt; Good evening!
+&gt;
+&gt; On Fri, May 25, 2012 at 03:28:38PM -0500, Payton Byrd wrote:
+&gt; &gt;    Now, the cart compiles and loads into VICE, and when it's loaded as a
+&gt; Cart
+&gt; &gt;    the screen and border turn white which is as expected based on the
+&gt; code in
+&gt; &gt;    the header.  The compiled binary then drops straight into the CC65
+&gt; &gt;    initialization code that is normally at 2061 as you would expect.  The
+&gt; &gt;    problem is that somewhere during initialization the system goes into
+&gt; an
+&gt; &gt;    infinite loop of displaying garbage on the screen.
+&gt;
+&gt; I don't know much about C64 carts, but aren't they enabled by modifying
+&gt; $01?
+&gt; If so, the startup code will probably disable the cart from where the code
+&gt; is
+&gt; loaded because it modifies $01 to switch off the BASIC ROM.
+&gt;
+Yes, this is my initial thought as well.  I've added code before the cc65
+init to copy all of the memory from $8000 to $BFFF to RAM before performing
+the init, so when the cart is disabled the correct code should still be in
+place.   However, this does not change the behavior of the program.
+
+Here is my current header and config (yes, I know I am wasting a lot of RAM
+with my memory copy code, I just used copy paste to get it done quickly)
+
+;
+; Ullrich von Bassewitz, 2010-11-13
+;
+; This module supplies the load address that is expected by Commodore
+; machines in the first two bytes of an excutable disk file.
+;
+
+
+        ; The following symbol is used by linker config to force the module
+        ; to get included into the output file
+        .export         __ROMLOADADDRESS__: absolute = 1
+
+.segment        &quot;ROMLA&quot;
+
+		.word	$8009
+		.word	$8009
+		.byte   'c' + $80
+		.byte   'b' + $80
+		.byte   'm' + $80
+		.byte   $38, $30
+
+		lda #$01
+		sta $d020
+		sta $d021
+
+		ldx #$00
+loop:
+		lda $8000,x
+		sta $8000,x
+		lda $8100,x
+		sta $8100,x
+		lda $8200,x
+		sta $8200,x
+		lda $8300,x
+		sta $8300,x
+		lda $8400,x
+		sta $8400,x
+		lda $8500,x
+		sta $8500,x
+		lda $8600,x
+		sta $8600,x
+		lda $8700,x
+		sta $8700,x
+		lda $8800,x
+		sta $8800,x
+		lda $8900,x
+		sta $8900,x
+		lda $8A00,x
+		sta $8A00,x
+		lda $8B00,x
+		sta $8B00,x
+		lda $8C00,x
+		sta $8C00,x
+		lda $8D00,x
+		sta $8D00,x
+		lda $8E00,x
+		sta $8E00,x
+		lda $8F00,x
+		sta $8F00,x
+		dex
+		bne loop
+
+loop2:
+		lda $9000,x
+		sta $9000,x
+		lda $9100,x
+		sta $9100,x
+		lda $9200,x
+		sta $9200,x
+		lda $9300,x
+		sta $9300,x
+		lda $9400,x
+		sta $9400,x
+		lda $9500,x
+		sta $9500,x
+		lda $9600,x
+		sta $9600,x
+		lda $9700,x
+		sta $9700,x
+		lda $9800,x
+		sta $9800,x
+		lda $9900,x
+		sta $9900,x
+		lda $9A00,x
+		sta $9A00,x
+		lda $9B00,x
+		sta $9B00,x
+		lda $9C00,x
+		sta $9C00,x
+		lda $9D00,x
+		sta $9D00,x
+		lda $9E00,x
+		sta $9E00,x
+		lda $9F00,x
+		sta $9F00,x
+		dex
+		bne loop2
+
+loop3:
+		lda $A000,x
+		sta $A000,x
+		lda $A100,x
+		sta $A100,x
+		lda $A200,x
+		sta $A200,x
+		lda $A300,x
+		sta $A300,x
+		lda $A400,x
+		sta $A400,x
+		lda $A500,x
+		sta $A500,x
+		lda $A600,x
+		sta $A600,x
+		lda $A700,x
+		sta $A700,x
+		lda $A800,x
+		sta $A800,x
+		lda $A900,x
+		sta $A900,x
+		lda $AA00,x
+		sta $AA00,x
+		lda $AB00,x
+		sta $AB00,x
+		lda $AC00,x
+		sta $AC00,x
+		lda $AD00,x
+		sta $AD00,x
+		lda $AE00,x
+		sta $AE00,x
+		lda $AF00,x
+		sta $AF00,x
+		dex
+		bne loop3
+
+loop4:
+		lda $B000,x
+		sta $B000,x
+		lda $B100,x
+		sta $B100,x
+		lda $B200,x
+		sta $B200,x
+		lda $B300,x
+		sta $B300,x
+		lda $B400,x
+		sta $B400,x
+		lda $B500,x
+		sta $B500,x
+		lda $B600,x
+		sta $B600,x
+		lda $B700,x
+		sta $B700,x
+		lda $B800,x
+		sta $B800,x
+		lda $B900,x
+		sta $B900,x
+		lda $BA00,x
+		sta $BA00,x
+		lda $BB00,x
+		sta $BB00,x
+		lda $BC00,x
+		sta $BC00,x
+		lda $BD00,x
+		sta $BD00,x
+		lda $BE00,x
+		sta $BE00,x
+		lda $BF00,x
+		sta $BF00,x
+		dex
+		bne loop4
+
+		lda $01
+		pha
+		and #$F8
+		ora #$06
+		sta $01
+
+		;lda #$02
+		;sta $8217
+
+		lda #$03
+		sta $d020
+		sta $d021
+
+		jmp $8200
+
+
+SYMBOLS {
+    __STACKSIZE__:   type = weak,   value = $0800; # 2k stack
+    __OVERLAYSIZE__: type = weak,   value = $0000;
+	__ROMLOADADDRESS__: type = import;
+}
+MEMORY {
+    ZP:       file = &quot;&quot;, define = yes, start = $0002, size = $001A;
+    RAM:      file = &quot;&quot;, define = yes, start = $080D, size = $8000 -
+$080D, fill = no;
+    ROM1LA:		file = &quot;easycli.bin&quot;, start = $8000, size = $0200, fill = yes;
+	ROM1:		file = &quot;easycli.bin&quot;, define = yes, start = $8200, size =
+$1E00, fill = yes;
+	RAM2:		file = &quot;&quot;, define = yes, start = $C000, size = $1000, fill = yes;
+}
+SEGMENTS {
+	ROMLA:	  load = ROM1LA,	type = ro, define = yes, optional = no;
+    STARTUP:  load = ROM1,      type = ro;
+    LOWCODE:  load = ROM1,      type = ro,                optional = yes;
+    INIT:     load = ROM1,      type = ro,  define = yes, optional = yes;
+    CODE:     load = ROM1,      type = ro, define = yes;
+    RODATA:   load = ROM1,      type = ro;
+    DATA:     load = RAM,		type = rw, define = yes;
+    ZPSAVE:   load = RAM,		type = bss;
+    BSS:      load = RAM,		type = bss, define = yes;
+    ZEROPAGE: load = ZP,		type = zp;
+}
+FEATURES {
+    CONDES: segment = INIT,
+	    type    = constructor,
+	    label   = __CONSTRUCTOR_TABLE__,
+	    count   = __CONSTRUCTOR_COUNT__;
+    CONDES: segment = RODATA,
+	    type    = destructor,
+	    label   = __DESTRUCTOR_TABLE__,
+	    count   = __DESTRUCTOR_COUNT__;
+    CONDES: segment = RODATA,
+	    type    = interruptor,
+	    label   = __INTERRUPTOR_TABLE__,
+	    count   = __INTERRUPTOR_COUNT__;
+}
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri May 25 23:30:33 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10305.html" title="Next message in the list">Groepaz: "Re: [cc65] Running C program in a cart"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10303.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Running C program in a cart"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10303.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Running C program in a cart"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10309.html" title="Next message in this discussion thread">Greg King: "Re: [cc65] Running C program in a cart"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10309.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] Running C program in a cart"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10304" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10304" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10304" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-05-25 23:30:36 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] Graphics library</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] Graphics library">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] Graphics library</h1>
+<!-- received="Mon Aug 13 21:48:31 2001" -->
+<!-- isoreceived="20010813194831" -->
+<!-- sent="Mon, 13 Aug 2001 21:47:25 +0200" -->
+<!-- isosent="20010813194725" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] Graphics library" -->
+<!-- id="1395245271.20010813214725@gmx.net" -->
+<!-- inreplyto="20010813213906.A1537@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20Graphics%20library"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2001-08-13 21:47:25
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0627.html">M Ancher: "Re: [cc65] Graphics library"</a>
+<li><strong>Previous message:</strong> <a href="0625.html">Ullrich von Bassewitz: "Re: [cc65] Graphics library"</a>
+<li><strong>In reply to:</strong> <a href="0625.html">Ullrich von Bassewitz: "Re: [cc65] Graphics library"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0629.html">M Ancher: "Re: [cc65] Graphics library"</a>
+<li><strong>Reply:</strong> <a href="0629.html">M Ancher: "Re: [cc65] Graphics library"</a>
+<li><strong>Reply:</strong> <a href="0636.html">groepaz: "[cc65] command line parser hack"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+UvB&gt; Yes, but it's a nice starting point. Writing in C needs a lot less time, and
+UvB&gt; rewriting things in assembler once the algorithms are ok is always an option.
+
+yeah thats why i want gfx-support for cc65 libs ;=)
+
+&gt;&gt; as for me, i'd like to implement 2 additional gfx-modes besides
+&gt;&gt; standard hires (320x200 b/w that is) ... 80x50x4 colors (simelar to
+&gt;&gt; the 4x4 fli mode often used in demos, but a lot faster) and 40x25x256
+&gt;&gt; shades of grey (fastest mode possible on a c64... this one should
+&gt;&gt; perform somewhat fast even when wrapped into clumsy c-code ;=))
+
+UvB&gt; This points out another problem: Since the mode is selected at runtime, the
+UvB&gt; linker does not know, which code to include, so it has to include the code for
+UvB&gt; all available modes. Which means that all programs written to utilize
+UvB&gt; 320x200x2 on the C64 will have lots of dead code linked in. One obvious
+UvB&gt; solution would be loadable drivers (as with the original BGI concept), but
+UvB&gt; this leads to several other problems (relocation, disk i/o needed, ...) so I
+UvB&gt; would prefer an easier approach if there is one.
+
+mmmh well.... that is a (_THE_) problem indeed... if we want tight
+code, we can only have ONE gfx-mode (and we dont need all those
+functions that deal with finding out the current or available
+gfx-mode or resolution) - and if we want a flexible library, we will end
+up with loads of dead code linked in. ... mmmmh ... sounds to me as if having
+a set of simelar functions for each gfx-mode in a seperate module
+which you'd have to select (link in) at compile time.
+
+the more about the gfx-mode used is hardcoded in the actual
+application, the better (=faster) anyway....... hey, maybe if one of
+those 'low resolution' modes is fast enough, i'll implement some
+standard demo effects (i like the idea of benchmarking compiled code
+against handwritten assembler hehe ,=)) ;=D
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20Graphics%20library">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20Graphics%20library">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0627.html">M Ancher: "Re: [cc65] Graphics library"</a>
+<li><strong>Previous message:</strong> <a href="0625.html">Ullrich von Bassewitz: "Re: [cc65] Graphics library"</a>
+<li><strong>In reply to:</strong> <a href="0625.html">Ullrich von Bassewitz: "Re: [cc65] Graphics library"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0629.html">M Ancher: "Re: [cc65] Graphics library"</a>
+<li><strong>Reply:</strong> <a href="0629.html">M Ancher: "Re: [cc65] Graphics library"</a>
+<li><strong>Reply:</strong> <a href="0636.html">groepaz: "[cc65] command line parser hack"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:41 CET</em>
+</em>
+</small>
+</body>
+</html>

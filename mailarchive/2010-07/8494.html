@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="iso-8859-15"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Bounty for Soft-80 CONIO L</title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="Re: [cc65] Bounty for Soft-80 CONIO Library for C64" />
+<meta name="Date" content="2010-07-04" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Bounty for Soft-80 CONIO Library for C64</h1>
+<!-- received="Sun Jul  4 02:52:40 2010" -->
+<!-- isoreceived="20100704005240" -->
+<!-- sent="Sun, 4 Jul 2010 02:51:29 +0200" -->
+<!-- isosent="20100704005129" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="Re: [cc65] Bounty for Soft-80 CONIO Library for C64" -->
+<!-- id="201007040251.29852.groepaz@gmx.net" -->
+<!-- charset="iso-8859-15" -->
+<!-- inreplyto="AANLkTimEtNVABGD9AAeUEJl17DcBJf951ptoiNf06kK8&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8495.html" title="Christian Krüger: &quot;[cc65] Problem passing ',' as argument to a macro...&quot;">Next message</a> ]
+[ <a href="8493.html" title="Payton Byrd: &quot;Re: [cc65] Bounty for Soft-80 CONIO Library for C64&quot;">Previous message</a> ]
+[ <a href="8492.html" title="Payton Byrd: &quot;Re: [cc65] Bounty for Soft-80 CONIO Library for C64&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20Bounty%20for%20Soft-80%20CONIO%20Library%20for%20C64">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-07-04 02:51:29</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Sonntag 04 Juli 2010, you wrote:
+&gt; I don't see the drop in CONIO replacement.  
+
+its a drop in replacement, its just different than you thought it would be :)
+
+&gt; I also think it's fair to
+&gt; request the demo programs I specified in the requirements.  
+
+well, the first one is trivial. but the second one is impossible - since 
+buffering screen content (or even reading screen content) is not supported by 
+conio at all. (but infact my implementation does, as i needed it for my tetris 
+thingy)
+
+&gt; I want to be
+&gt; able to do this and it work:
+&gt; 
+&gt; #ifdef __C64__
+&gt; #include&lt;soft80-conio.h&gt;
+&gt; #else
+&gt; #include&lt;conio.h&gt;
+&gt; #endif
+
+i actually prefer to simply link another library and NOT change the individual 
+program. but again, if you really wanted this, the changes would be trivial. 
+(but ugly =P)
+
+&gt; BTW, I've already stated that I'll seed the bounty with $50.  I'll go
+&gt; further and say that I'll match another $50, from other donations.  If
+&gt; you're interested in picking up the bounty then I'll get amigaguy to post
+&gt;  it on his bounty site.
+thats not exactly how a bounty works though - you dont ask people wether they 
+are interested first. you put up the money, and then when someone is 
+eventually interested, he claims the bounty :) and i surely wont do that 
+before the $$$ counter meets whatever i think is suitable. and ofcourse i wont 
+tell what that would be either, because thats also not how a bounty works :)
+
+-- 
+
+<a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    <a href="http://magicdisk.untergrund.net">http://magicdisk.untergrund.net</a>
+<a href="http://www.pokefinder.org">http://www.pokefinder.org</a>        <a href="http://ftp.pokefinder.org">http://ftp.pokefinder.org</a>
+
+When you take stuff from one writer, it's plagiarism; but when you take it 
+from many writers, it's research. 
+&lt;Wilson Mizner&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Jul  4 02:52:40 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8495.html" title="Next message in the list">Christian Krüger: "[cc65] Problem passing ',' as argument to a macro..."</a></li>
+<li><dfn>Previous message</dfn>: <a href="8493.html" title="Previous message in the list">Payton Byrd: "Re: [cc65] Bounty for Soft-80 CONIO Library for C64"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8492.html" title="Message to which this message replies">Payton Byrd: "Re: [cc65] Bounty for Soft-80 CONIO Library for C64"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8494" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8494" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8494" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-07-04 02:52:43 CEST
+</em></small></p>
+</body>
+</html>

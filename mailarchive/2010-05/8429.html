@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] ASM to C help a n00b</title>
+<meta name="Author" content="S M (san.mes1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] ASM to C help a n00b" />
+<meta name="Date" content="2010-05-27" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] ASM to C help a n00b</h1>
+<!-- received="Thu May 27 14:32:25 2010" -->
+<!-- isoreceived="20100527123225" -->
+<!-- sent="Thu, 27 May 2010 13:32:19 +0100" -->
+<!-- isosent="20100527123219" -->
+<!-- name="S M" -->
+<!-- email="san.mes1gmail.com" -->
+<!-- subject="Re: [cc65] ASM to C help a n00b" -->
+<!-- id="AANLkTinu0pjMC9T7g2vXmo9ooxRdco6tPlLwPkwex87Q@mail.gmail.com" -->
+<!-- charset="windows-1252" -->
+<!-- inreplyto="201005271411.45286.marc&#64;rintsch.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8430.html" title="Marc 'BlackJack Rintsch: &quot;Re: [cc65] ASM to C help a n00b&quot;">Next message</a> ]
+[ <a href="8428.html" title="Marc 'BlackJack Rintsch: &quot;Re: [cc65] ASM to C help a n00b&quot;">Previous message</a> ]
+[ <a href="8428.html" title="Marc 'BlackJack Rintsch: &quot;Re: [cc65] ASM to C help a n00b&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8430.html" title="Marc 'BlackJack Rintsch: &quot;Re: [cc65] ASM to C help a n00b&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: S M &lt;<a href="mailto:san.mes1gmail.com?Subject=Re:%20[cc65]%20ASM%20to%20C%20help%20a%20n00b">san.mes1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-05-27 14:32:19</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello
+
+I tried your code and I got the same error on the line uint8_t
+*tile_buffers[] = {tile_buffer01, tile_buffer02, tile_buffer03,
+   tile_buffer04, tile_buffer05, tile_buffer06, tile_buffer07,
+   tile_buffer08, tile_buffer09, tile_buffer10, tile_buffer11,
+   tile_buffer12};
+
+as I was getting on line 29 previously with
+
+unsigned char *tile_buffer [] =  {tile_buffer01, tile_buffer02,
+tile_buffer03, tile_buffer04, tile_buffer05, tile_buffer06,
+tile_buffer07, tile_buffer08, tile_buffer09, tile_buffer10,
+tile_buffer11, tile_buffer12};
+
+The code(arrays char tile_buffer) I posted in my first email was taken from
+a working z88dk c file , I am porting that game to the c64. I might change
+it later on to optimize for example create just an array of size 96 instead
+of the 12 arrays.
+
+Thank you
+
+
+
+
+2010/5/27 Marc 'BlackJack Rintsch &lt;marc&#64;rintsch&#46;<!--nospam-->de&gt;
+
+&gt; On Thursday 27 May 2010, S M wrote:
+&gt; &gt; How can I have the following but in C?:
+&gt;
+&gt; What exactly of this do you need in C?  I mean do you really need two
+&gt; names for the low and high part of the pointer to the `char0` for
+&gt; example?  Or is that just more convenient in ASM.
+&gt;
+&gt; &gt; I tried for example:
+&gt; &gt;
+&gt; &gt; unsigned char tile_buffer01 [8];
+&gt; &gt; unsigned char tile_buffer02 [8];
+&gt; &gt; unsigned char tile_buffer03 [8];
+&gt; &gt; unsigned char tile_buffer04 [8];
+&gt; &gt; unsigned char tile_buffer05 [8];
+&gt; &gt; unsigned char tile_buffer06 [8];
+&gt; &gt; unsigned char tile_buffer07 [8];
+&gt; &gt; unsigned char tile_buffer08 [8];
+&gt; &gt; unsigned char tile_buffer09 [8];
+&gt; &gt; unsigned char tile_buffer10 [8];
+&gt; &gt; unsigned char tile_buffer11 [8];
+&gt; &gt; unsigned char tile_buffer12 [8];
+&gt; &gt; unsigned char *tile_buffer [] =  {tile_buffer01, tile_buffer02,
+&gt; &gt; tile_buffer03, tile_buffer04, tile_buffer05, tile_buffer06,
+&gt; &gt; tile_buffer07, tile_buffer08, tile_buffer09, tile_buffer10,
+&gt; &gt; tile_buffer11, tile_buffer12};
+&gt; &gt;
+&gt; &gt; but it didn't work I get teste.c(29) Error: Constant expression
+&gt; &gt; expected teste.c(29): Warning: Converting integer to pointer without
+&gt; &gt; a cast .
+&gt;
+&gt; That's not 29 lines so you don't get that error for just the shown
+&gt; source.  Just that compiles fine for me.  Here's what I used:
+&gt;
+&gt; ----
+&gt;
+&gt; #include &lt;stdint.h&gt;
+&gt;
+&gt; uint8_t tile_buffer01[8];
+&gt; uint8_t tile_buffer02[8];
+&gt; uint8_t tile_buffer03[8];
+&gt; uint8_t tile_buffer04[8];
+&gt; uint8_t tile_buffer05[8];
+&gt; uint8_t tile_buffer06[8];
+&gt; uint8_t tile_buffer07[8];
+&gt; uint8_t tile_buffer08[8];
+&gt; uint8_t tile_buffer09[8];
+&gt; uint8_t tile_buffer10[8];
+&gt; uint8_t tile_buffer11[8];
+&gt; uint8_t tile_buffer12[8];
+&gt;
+&gt; uint8_t *tile_buffers[] = {tile_buffer01, tile_buffer02, tile_buffer03,
+&gt;     tile_buffer04, tile_buffer05, tile_buffer06, tile_buffer07,
+&gt;    tile_buffer08, tile_buffer09, tile_buffer10, tile_buffer11,
+&gt;    tile_buffer12};
+&gt;
+&gt; int main(void)
+&gt; {
+&gt;    return 0;
+&gt; }
+&gt;
+&gt; ----
+&gt;
+&gt; Again the question: Is that really what you need in C?  Do you change
+&gt; the content of the pointer array within the program?  If not then::
+&gt;
+&gt;  uint8_t tile_buffers[12][8];
+&gt;
+&gt; would be much shorter.  Even if the pointer table to the individual
+&gt; buffers is needed at runtime I would write it that way because
+&gt; enumerating variable names is a &quot;code smell&quot; indicating that you really
+&gt; wanted an array in the first place.
+&gt;
+&gt; Ciao,
+&gt;        Marc 'BlackJack' Rintsch
+&gt; --
+&gt; “Think of it!  With VLSI we can pack 100 ENIACS in 1 cm².”
+&gt;                                         -- Alan J. Perlis
+&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu May 27 14:32:25 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8430.html" title="Next message in the list">Marc 'BlackJack Rintsch: "Re: [cc65] ASM to C help a n00b"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8428.html" title="Previous message in the list">Marc 'BlackJack Rintsch: "Re: [cc65] ASM to C help a n00b"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8428.html" title="Message to which this message replies">Marc 'BlackJack Rintsch: "Re: [cc65] ASM to C help a n00b"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8430.html" title="Next message in this discussion thread">Marc 'BlackJack Rintsch: "Re: [cc65] ASM to C help a n00b"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8430.html" title="Message sent in reply to this message">Marc 'BlackJack Rintsch: "Re: [cc65] ASM to C help a n00b"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8429" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8429" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8429" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-05-27 14:32:28 CEST
+</em></small></p>
+</body>
+</html>

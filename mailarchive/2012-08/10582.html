@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Trying to compile an old progr</title>
+<meta name="Author" content="Markus Stehr (bastetfurry1ircnet.de)" />
+<meta name="Subject" content="[cc65] Trying to compile an old programm with custom c64.cfg, faulty config file?" />
+<meta name="Date" content="2012-08-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Trying to compile an old programm with custom c64.cfg, faulty config file?</h1>
+<!-- received="Fri Aug 10 00:13:55 2012" -->
+<!-- isoreceived="20120809221355" -->
+<!-- sent="Fri, 10 Aug 2012 00:13:40 +0200" -->
+<!-- isosent="20120809221340" -->
+<!-- name="Markus Stehr" -->
+<!-- email="bastetfurry1ircnet.de" -->
+<!-- subject="[cc65] Trying to compile an old programm with custom c64.cfg, faulty config file?" -->
+<!-- id="1344550420.16614.7.camel@katzenrechner" -->
+<!-- charset="UTF-8" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10583.html" title="Shawn Jefferson: &quot;RE: [cc65] Trying to compile an old programm with custom c64.cfg, faulty config file?&quot;">Next message</a> ]
+[ <a href="10581.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10583.html" title="Shawn Jefferson: &quot;RE: [cc65] Trying to compile an old programm with custom c64.cfg, faulty config file?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Markus Stehr &lt;<a href="mailto:bastetfurry1ircnet.de?Subject=Re:%20[cc65]%20Trying%20to%20compile%20an%20old%20programm%20with%20custom%20c64.cfg,%20faulty%20config%20file?">bastetfurry1ircnet.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-08-10 00:13:40</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Heyho List! :)
+
+I am trying to compile an old programm with the latest SVN and got some
+curious bugs in my config file, at least i think it is.
+
+I have music on $1000, a charset at $2000 and cc65 should compile my
+main programm to $3000, here is the config file:
+
+SYMBOLS {
+    __LOADADDR__:  type = import;
+    __EXEHDR__:    type = import;
+    __STACKSIZE__: type = weak,   value = $0800; # 2k stack
+}
+MEMORY {
+    ZP:       file = &quot;&quot;, define = yes, start = $0002, size = $001A;
+    LOADADDR: file = %O,               start = $07FF, size = $0002;
+    HEADER:   file = %O,               start = $0801, size = $000C;
+    MUSIC: start = $1000, size = $1000, file = %O, define = yes, fill =
+yes;
+    CHARSET: start = $2000, size = $1000, file = %O, define = yes, fill
+= yes;
+    RAM:      file = %O, define = yes, start = $3000, size = $87F3 -
+__STACKSIZE__;
+}
+SEGMENTS {
+    LOADADDR: load = LOADADDR, type = ro;
+    EXEHDR:   load = HEADER,   type = ro;
+    STARTUP:  load = RAM,      type = ro;
+    LOWCODE:  load = RAM,      type = ro,                optional = yes;
+    INIT:     load = RAM,      type = ro,  define = yes, optional = yes;
+    music:    load = MUSIC, type = ro;
+    charset:  load = CHARSET, type = ro;
+    CODE:     load = RAM,      type = ro;
+    RODATA:   load = RAM,      type = ro;
+    DATA:     load = RAM,      type = rw;
+    ZPSAVE:   load = RAM,      type = bss;
+    BSS:      load = RAM,      type = bss, define = yes;
+    ZEROPAGE: load = ZP,       type = zp;
+}
+FEATURES {
+    CONDES: segment = INIT,
+	    type    = constructor,
+	    label   = __CONSTRUCTOR_TABLE__,
+	    count   = __CONSTRUCTOR_COUNT__;
+    CONDES: segment = RODATA,
+	    type    = destructor,
+	    label   = __DESTRUCTOR_TABLE__,
+	    count   = __DESTRUCTOR_COUNT__;
+    CONDES: segment = RODATA,
+	    type    = interruptor,
+	    label   = __INTERRUPTOR_TABLE__,
+	    count   = __INTERRUPTOR_COUNT__;
+}
+
+The curious thing here is that the music is placed where the startup
+code should be, at $080d, and not at $1000.
+
+So what am i missing here?
+
+Greets,
+Markus
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Aug 10 00:13:55 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10583.html" title="Next message in the list">Shawn Jefferson: "RE: [cc65] Trying to compile an old programm with custom c64.cfg, faulty config file?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10581.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10583.html" title="Next message in this discussion thread">Shawn Jefferson: "RE: [cc65] Trying to compile an old programm with custom c64.cfg, faulty config file?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10583.html" title="Message sent in reply to this message">Shawn Jefferson: "RE: [cc65] Trying to compile an old programm with custom c64.cfg, faulty config file?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10582" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10582" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10582" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-08-10 00:13:59 CEST
+</em></small></p>
+</body>
+</html>

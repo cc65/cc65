@@ -1,0 +1,206 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] c64 question</title>
+<meta name="Author" content="Adam Dunkels (trident_at_c64.org)">
+<meta name="Subject" content="Re: [cc65] c64 question">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] c64 question</h1>
+<!-- received="Tue Mar  6 12:09:20 2001" -->
+<!-- isoreceived="20010306110920" -->
+<!-- sent="Tue, 6 Mar 2001 12:07:16 +0100" -->
+<!-- isosent="20010306110716" -->
+<!-- name="Adam Dunkels" -->
+<!-- email="trident_at_c64.org" -->
+<!-- subject="Re: [cc65] c64 question" -->
+<!-- id="01030612071603.10884@sidewalker.sics.se" -->
+<!-- inreplyto="200103061017.LAA24895@mail.umu.se" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Adam Dunkels (<a href="mailto:trident_at_c64.org?Subject=Re:%20[cc65]%20c64%20question"><em>trident_at_c64.org</em></a>)<br>
+<strong>Date:</strong> 2001-03-06 12:07:16
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0434.html">groepaz: "Re: [cc65] c64 question"</a>
+<li><strong>Previous message:</strong> <a href="0432.html">Arvid Norberg: "[cc65] c64 question"</a>
+<li><strong>In reply to:</strong> <a href="0432.html">Arvid Norberg: "[cc65] c64 question"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0434.html">groepaz: "Re: [cc65] c64 question"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Tuesday 06 March 2001 12:17, you wrote:
+&gt; Hello,
+&gt;
+&gt; I'm sorry to a post computer-specific question here, but you guys are
+&gt; my last hope.. ;)
+&gt;
+&gt; What I'm trying to do is to scroll the lines 100 through 150 by using a
+&gt; raster-interrupt (two actually). But I can't get it to work.
+
+What happens? One good thing I used to do when testing was to do stuff with 
+the border color (0xd020), like setting it to 1 (white) in the first 
+interrupt and to 0 (black) in the second. Then you usually can see what's 
+going on. 
+
+A few things that I see in this program:
+
+When exiting from an interrupt, you only want to call 0xea31 once per raster 
+update. This function takes quite alot of time to execute, and there is no 
+need to call it more often that 50 times per second. Also, since it takes 
+time, the second interrupt might go off while executing 0xea31, and things 
+will be generally messed up. Instead, the first interrupt should jump to 
+0xea7e (which is at the end of the 0xea31 routine).
+
+Upon entry of the interrupt routines, the compiler generates a jump to the 
+&quot;enter&quot; function. At the end of the function, the compiler generates a jump 
+to the &quot;leave&quot; function. The purpose of these functions is to adjust the cc65 
+runtime stack to account for local variables. Since you jump to 0xea31 before 
+&quot;leave&quot; is called, the runtime stack might be screwed up. Since these 
+interrupts are executed 100 times per seconds, the stack is then totally 
+trashed in a few tenths of a second. 
+
+/adam
+
+&gt; My questions are:
+&gt;
+&gt; What am I missing? why doesn't it work the way I want it to?
+&gt; If I want to make a function that ends with an &quot;rti&quot; instead of &quot;rts&quot;,
+&gt; is there a keyword/modifier in cc65 that does that to a function?
+&gt; in some compilers you can to write:
+&gt;
+&gt; interrupt void IRQ_handler(void)
+&gt; {
+&gt; 	...
+&gt; }
+&gt;
+&gt; ok then, here's the source:
+&gt; -------------------
+&gt;
+&gt; #include &lt;c64.h&gt;
+&gt; #include &lt;6502.h&gt;
+&gt;
+&gt; #define irq_vector (*(void**)0x314)
+&gt;
+&gt; void IRQ_handler_bottom();
+&gt; void IRQ_handler_top();
+&gt; void main();
+&gt;
+&gt; void IRQ_handler_top()
+&gt; {
+&gt; 	if (VIC.irr &amp; 1) // make sure we got a raster interrupt
+&gt; 	{
+&gt; 		static unsigned char a = 0;
+&gt; 		a = (a + 1) &amp; 7; // increase the scroll-counter
+&gt;
+&gt; 		// select 38 column mode and scroll this part of the screen 'a'
+&gt; pixels
+&gt; 		VIC.ctrl2 = a;
+&gt;
+&gt; 		// let the next interrupt handler get executed on line 150
+&gt; 		irq_vector = IRQ_handler_bottom;
+&gt; 		VIC.rasterline = 150;
+&gt;
+&gt; 		// tell the VIC-chip that we have handled the interrupt
+&gt; 		VIC.irr &amp;= ~1;
+&gt; 	}
+&gt;
+&gt; 	// jump to the standard interrupt routine
+&gt; 	__asm__(&quot;	jmp	$ea31&quot;);
+&gt; }
+&gt;
+&gt; void IRQ_handler_bottom()
+&gt; {
+&gt; 	if (VIC.irr &amp; 1) // make sure we got a raster interrupt
+&gt; 	{
+&gt; 		// select 40 columns mode and
+&gt; 		VIC.ctrl2 = 0x8;
+&gt;
+&gt; 		// let the first interrupt handler get executed on line 100
+&gt; 		irq_vector = IRQ_handler_top;
+&gt; 		VIC.rasterline = 100;
+&gt;
+&gt; 		// tell the VIC-chip that we have handled the interrupt
+&gt; 		VIC.irr &amp;= ~1;
+&gt; 	}
+&gt;
+&gt; 	// jump to the standard interrupt routine
+&gt; 	__asm__(&quot;	jmp	$ea31&quot;);
+&gt; }
+&gt;
+&gt;
+&gt; void main()
+&gt; {
+&gt; 	SEI(); // make sure we don't get an interrupt while we are setting
+&gt; up our own
+&gt;
+&gt; 	irq_vector = IRQ_handler_top;
+&gt;
+&gt; 	CIA1.icr = 0x7f;
+&gt; 	VIC.imr = 1;			// enable raster IRQ
+&gt; 	VIC.rasterline = 100;	// the line where we want to get an
+&gt; interrupt
+&gt;
+&gt; 	CLI(); // enable interrupts again
+&gt;
+&gt; 	while (1); // just wait here
+&gt; }
+&gt;
+&gt;
+&gt; ---
+&gt; Arvid Norberg
+&gt; ----------------------------------------------------------------------
+&gt; To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20c64%20question">majordomo_at_musoftware.de</a> with
+&gt; the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+
+-- 
+Adam Dunkels &lt;<a href="mailto:trident_at_c64.org?Subject=Re:%20[cc65]%20c64%20question">trident_at_c64.org</a>&gt;
+C64 coder/musician
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20c64%20question">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0434.html">groepaz: "Re: [cc65] c64 question"</a>
+<li><strong>Previous message:</strong> <a href="0432.html">Arvid Norberg: "[cc65] c64 question"</a>
+<li><strong>In reply to:</strong> <a href="0432.html">Arvid Norberg: "[cc65] c64 question"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0434.html">groepaz: "Re: [cc65] c64 question"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:39 CET</em>
+</em>
+</small>
+</body>
+</html>

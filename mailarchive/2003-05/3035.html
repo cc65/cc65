@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] library search path</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] library search path">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] library search path</h1>
+<!-- received="Thu May 22 15:18:44 2003" -->
+<!-- isoreceived="20030522131844" -->
+<!-- sent="Thu, 22 May 2003 15:09:00 +0200" -->
+<!-- isosent="20030522130900" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] library search path" -->
+<!-- id="200305221509.00918.groepaz@gmx.net" -->
+<!-- inreplyto="20030522092007.GD29162@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20library%20search%20path"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2003-05-22 15:09:00
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3034.html">Ullrich von Bassewitz: "Re: [cc65] library search path"</a>
+<li><strong>In reply to:</strong> <a href="3034.html">Ullrich von Bassewitz: "Re: [cc65] library search path"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3036.html">Ullrich von Bassewitz: "Re: [cc65] library search path"</a>
+<li><strong>Next in thread:</strong> <a href="3033.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="3036.html">Ullrich von Bassewitz: "Re: [cc65] library search path"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Thursday 22 May 2003 11:20, Ullrich von Bassewitz wrote:
+&gt; On Thu, May 22, 2003 at 10:27:59AM +0200, Groepaz wrote:
+&gt; &gt; mmmh... maybe i'm just overlooking something....but isnt there a way to
+&gt; &gt; tell ld65 an additional path to search for library files? it seems to me
+&gt; &gt; that the way it is i would either to have my own library installed at the
+&gt; &gt; same place as cc65 does (dont like this) or give a full path to the
+&gt; &gt; library when linking (better, but still not very convinient). i wouldnt
+&gt; &gt; mind a commandline switch simelar to -I here (-L seems to be common in
+&gt; &gt; other linkers).
+&gt;
+&gt; Ok, noted:-)
+
+:O)
+
+just noticed another little problem (i'm preparing my &quot;portlib&quot; stuff for 
+contiki etc :=))
+
+for the include search path it would be nice to be able to explicitly state if 
+the path given is searched before or after the builtin/default search path. 
+(the same is true for the library search path but its probably much less of a 
+potential problem here).
+
+the &quot;portlib&quot; i am writing targets not only cc65-supported machines, and it 
+mimics the cc65 api for those that cant be supported by cc65 directly 
+(because they have different cpu ofcoz :=)).
+
+in my portlib's &quot;include&quot; directory there are header-files with the same names 
+as those supplied by cc65, for example &quot;conio.h&quot;. however there are (or may 
+be) also header files which are not supplied by cc65, so this 
+include-directory is added to the include-search-path also for cc65-supported 
+machines.
+
+now the problem is, if i include eg &quot;conio.h&quot; in my program and compile it for 
+a cc65-supported target, cc65 will look in my portlib's include directory 
+first, and find and use the conio.h presented there... and there is no way to 
+make it use the conio.h supplied by cc65 except for crude thinks like using 
+full pathes when including, or even renaming one of both files.
+
+in other words, currently any user-supplied header file will override (found 
+before) any header file supplied by cc65. what i need is the opposite, cc65 
+header files override (found before) any user defined headers.
+
+maybe the latter could also be simply made the default... i dont see any bad 
+side-effects atleast. (except that it kinda forces ppl not to have their 
+headers named like those supplied by cc65...which isnt really a bad thing per 
+se :=))
+
+gpz
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20library%20search%20path">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3034.html">Ullrich von Bassewitz: "Re: [cc65] library search path"</a>
+<li><strong>In reply to:</strong> <a href="3034.html">Ullrich von Bassewitz: "Re: [cc65] library search path"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3036.html">Ullrich von Bassewitz: "Re: [cc65] library search path"</a>
+<li><strong>Next in thread:</strong> <a href="3033.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="3036.html">Ullrich von Bassewitz: "Re: [cc65] library search path"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-05-22 15:19:33 CEST</em>
+</em>
+</small>
+</body>
+</html>

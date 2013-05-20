@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Question on 1351 mouse</title>
+<meta name="Author" content="Greg King (greg.king41verizon.net)" />
+<meta name="Subject" content="Re: [cc65] Question on 1351 mouse" />
+<meta name="Date" content="2010-02-18" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Question on 1351 mouse</h1>
+<!-- received="Thu Feb 18 05:14:45 2010" -->
+<!-- isoreceived="20100218041445" -->
+<!-- sent="Wed, 17 Feb 2010 22:36:45 -0500" -->
+<!-- isosent="20100218033645" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king41verizon.net" -->
+<!-- subject="Re: [cc65] Question on 1351 mouse" -->
+<!-- id="000801cab050$e4962d80$443efea9@monarch" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="FF1BC30E-6122-436E-BCD3-5D76B2E05EC5&#64;wfmh.org.pl" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7908.html" title="Greg King: &quot;[cc65] Extra Zero-page Segments&quot;">Next message</a> ]
+[ <a href="7906.html" title="Greg King: &quot;Re: [cc65] Customization of cc65 for new targets&quot;">Previous message</a> ]
+[ <a href="7905.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Question on 1351 mouse&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7912.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Question on 1351 mouse&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king41verizon.net?Subject=Re:%20[cc65]%20Question%20on%201351%20mouse">greg.king41verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-02-18 04:36:45</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: silverdr; on Wed., Feb. 17, 2010; at 05:59 PM -0500
+&gt;
+&gt; On 2010-02-17, at 21:31, Greg King wrote:
+&gt;
+&gt; &gt; The driver prevents the keyboard from interfering by changing the
+&gt; &gt; keyboard's output port into an input port while the driver reads its
+&gt; &gt; controller device.  That disables a wire that is left active by the
+&gt; &gt; Kernal.  That wire is used by the STOP-key to break out of BASIC
+&gt; &gt; programs -- CC65 programs don't use that feature.  The wire is
+&gt; &gt; shared by these keys:
+&gt; &gt; STOP, &quot;Q&quot;, Commodore, Space, &quot;2&quot;, CTRL, Left-Arrow, and &quot;1&quot;.
+&gt; &gt; I listed them, in order, from bit 7 over to bit 0.  The rightmost
+&gt; &gt; five keys can look like joystick switches.
+&gt; &gt;
+&gt; &gt; The driver prevents the mouse/joystick from interfering by
+&gt; &gt; &quot;blinding&quot; the keyboard scanner while any button/switch is active.
+&gt;
+&gt; How does it distinguish between key and button/switch activation?
+&gt; E.g., between SPACE and LMB/FIRE in control port I?
+
+It doesn't need to distinguish between anything.
+&quot;The driver prevents the keyboard from interfering ...&quot; means that the
+Space-bar isn't seen.  No key can be seen because all keyboard &quot;wires&quot;
+are de-activated.
+
+The keyboard is a bunch of &quot;cross-point&quot; switches.  An output port is
+connected to the columns; and, an input port is connected to the rows.
+Normally, when you push a key, it electrically connects one column to
+one row.  The scanner shifts a zero-bit across the output byte.  That
+&quot;pulls down&quot; each column wire, in turn.  When the cross-connected wire
+is &quot;grounded&quot;, a zero-bit is seen at the input port.  Then, the scanner
+has a sixteen-bit number with two zero-bits (and, fourteen one-bits) in
+it.  The firmware knows how to decode that into a character.  But, none
+of the wires can be grounded (by the Kernal) while the mouse driver has
+the output port switched to input.  Therefore, the keyboard is almost
+invisible!  [I say &quot;almost&quot; because certain combinations of simultaneous
+key-presses can connect two rows together through a column.  If a
+joystick has grounded one of those rows, then the other row, too, will
+be grounded.  But, sane people don't type like that -- so, we're safe.
+:-) ]
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Feb 18 05:14:45 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7908.html" title="Next message in the list">Greg King: "[cc65] Extra Zero-page Segments"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7906.html" title="Previous message in the list">Greg King: "Re: [cc65] Customization of cc65 for new targets"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7905.html" title="Message to which this message replies">silverdr1wfmh.org.pl: "Re: [cc65] Question on 1351 mouse"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7912.html" title="Next message in this discussion thread">silverdr1wfmh.org.pl: "Re: [cc65] Question on 1351 mouse"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7912.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] Question on 1351 mouse"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7907" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7907" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7907" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-02-18 05:14:49 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="iso-8859-2"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-2" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Loadable overlays</title>
+<meta name="Author" content="Maciej Witkowiak (ytm1elysium.pl)" />
+<meta name="Subject" content="Re: [cc65] Loadable overlays" />
+<meta name="Date" content="2006-07-30" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Loadable overlays</h1>
+<!-- received="Sun Jul 30 12:58:59 2006" -->
+<!-- isoreceived="20060730105859" -->
+<!-- sent="Sun, 30 Jul 2006 12:58:48 +0200" -->
+<!-- isosent="20060730105848" -->
+<!-- name="Maciej Witkowiak" -->
+<!-- email="ytm1elysium.pl" -->
+<!-- subject="Re: [cc65] Loadable overlays" -->
+<!-- id="20060730105848.GA30387@spektr.localdomain" -->
+<!-- charset="iso-8859-2" -->
+<!-- inreplyto="20060730095408.GA7424&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5543.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Loadable overlays&quot;">Next message</a> ]
+[ <a href="5541.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Loadable overlays&quot;">Previous message</a> ]
+[ <a href="5541.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Loadable overlays&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5543.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Loadable overlays&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Maciej Witkowiak &lt;<a href="mailto:ytm1elysium.pl?Subject=Re:%20[cc65]%20Loadable%20overlays">ytm1elysium.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2006-07-30 12:58:48</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Ullrich von Bassewitz dnia 30 lip 2006 o 11:54 +0200 napisał:
+&gt; &gt; But as I said, it will have a big performance impact
+&gt; &gt; given that cc65 calls some library routines quite
+&gt; &gt; often.
+&gt; 
+&gt; Not only that there is a performance impact, there's also the problem of the
+&gt; jump table size. As I said, the runtime consists of several hundred functions.
+&gt; This means that you will have spend about 1K just for the jump table.
+
+LUnix uses something what was called a virtual jump table. There is include file
+with a list of kernel functions, starting with magic value and incrementing by
+two:
+
+.import LUNIXKERNEL
+lkf_set_zpsize   = LUNIXKERNEL+0
+lkf_get_moduleif = LUNIXKERNEL+2
+...
+
+The kernel has a table with actual addresses of these functions:
+
+kfunc_tab:
+	.word	set_zpsize
+	.word	get_modueif
+...
+
+The o65 loader replaces all LUNIXKERNEL references with the addresses from
+kfunc_tab so there is no runtime performance penalty.
+
+LNG's jump table has only 70 entries, that is much less than hundreds of C
+lib runtime functions so the argument about the sacrificed space stands.
+
+M.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Jul 30 12:58:59 2006</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5543.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Loadable overlays"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5541.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Loadable overlays"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5541.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Loadable overlays"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5543.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Loadable overlays"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5543.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Loadable overlays"</a></li>
+<li><dfn>Reply</dfn>:  <a href="5546.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] Loadable overlays"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5542" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5542" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5542" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2006-07-30 12:59:01 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] snapshot #1</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] snapshot #1">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] snapshot #1</h1>
+<!-- received="Wed Sep 26 14:58:40 2001" -->
+<!-- isoreceived="20010926125840" -->
+<!-- sent="Wed, 26 Sep 2001 14:58:43 +0200" -->
+<!-- isosent="20010926125843" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] snapshot #1" -->
+<!-- id="20010926145843.A30037@trixie.musoftware.de" -->
+<!-- inreplyto="19726179736.20010917224919@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20snapshot%20#1"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2001-09-26 14:58:43
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0755.html">groepaz: "Re[2]: [cc65] snapshot #1"</a>
+<li><strong>Previous message:</strong> <a href="0753.html">groepaz: "[cc65] snapshot #1"</a>
+<li><strong>In reply to:</strong> <a href="0753.html">groepaz: "[cc65] snapshot #1"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0755.html">groepaz: "Re[2]: [cc65] snapshot #1"</a>
+<li><strong>Reply:</strong> <a href="0755.html">groepaz: "Re[2]: [cc65] snapshot #1"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Mon, Sep 17, 2001 at 10:49:19PM +0200, groepaz wrote:
+&gt; i have finally found some sparetime to put this stuff i have always
+&gt; been talking about together ,) just dont expect too much, this is all
+&gt; at a real alpha state...maybe useful though if used with caution.
+
+Sorry for the late answer. I didn't find the time to have a closer look at all
+the sources, but...
+
+I've recently added support for the Commodore 510 (aka P500) to the compiler
+package. It is on par with CBM610 support, plus mouse and joystick routines.
+When doing tests, I noticed that is is quite easy to port programs from the
+C64 (or C128) to the P500, because it does also have a VIC and a SID and even
+somewhat more free memory than the C64. As a result, the mousedemo and nachtm
+samples do also run on the P500.
+
+When searching for more sample programs, I found the plasma.c code in your
+package. It was rather slow with the official compiler release (2 frames per
+second), and contained too much C64 specific code for my taste. So I did some
+code cleanup (which improved the speed by almost 50%) and added a few macros
+to make it compile for both, the C64 and CBM510.
+
+The nice thing when writing your own compiler is that you can add
+optimizations that will make your benchmark programs look good:-) (all chip
+makers do this to get higher SPEC ratings). Adding such optimizations improved
+the fps of the plasma.c sample by about 400% - it does now run with ~12 frames
+per second (pure C!), and looks really great.
+
+Because sample code is a great way to show people what is possible with the
+compiler, and to get them started using the tool chain, I would like to ask if
+you would allow me to distribute this code as part of the cc65 samples?
+
+And, if anyone else is willing to contribute code that is written in C and
+suitable as a sample program, please contact me. Things like graphics and
+sound are great, because they are appealing for many end users.
+
+I will definitely try to get a new release out of the door, but unfortunately
+there are several areas where more work is needed because essential features
+are missing (there are programs that won't compile). I don't know, if I will
+be able to have a closer look at your libraries until then.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20snapshot%20#1">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20snapshot%20#1">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0755.html">groepaz: "Re[2]: [cc65] snapshot #1"</a>
+<li><strong>Previous message:</strong> <a href="0753.html">groepaz: "[cc65] snapshot #1"</a>
+<li><strong>In reply to:</strong> <a href="0753.html">groepaz: "[cc65] snapshot #1"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0755.html">groepaz: "Re[2]: [cc65] snapshot #1"</a>
+<li><strong>Reply:</strong> <a href="0755.html">groepaz: "Re[2]: [cc65] snapshot #1"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:42 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] New version of debug info avai</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="[cc65] New version of debug info available" />
+<meta name="Date" content="2011-08-19" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] New version of debug info available</h1>
+<!-- received="Fri Aug 19 14:49:00 2011" -->
+<!-- isoreceived="20110819124900" -->
+<!-- sent="Fri, 19 Aug 2011 14:48:52 +0200" -->
+<!-- isosent="20110819124852" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="[cc65] New version of debug info available" -->
+<!-- id="20110819124852.GA28057@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9620.html" title="thefox xofeht: &quot;Re: [cc65] New version of debug info available&quot;">Next message</a> ]
+[ <a href="9618.html" title="Marc 'BlackJack' Rintsch: &quot;Re: [cc65] Possible Multi-Subscript Bug&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9620.html" title="thefox xofeht: &quot;Re: [cc65] New version of debug info available&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20New%20version%20of%20debug%20info%20available">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-08-19 14:48:52</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>As some may have noticed, I have worked on improvements of debug information
+in the last few weeks.
+
+I've now reached a milestone, where things are still somewhat incomplete, but
+the new code is useful enough to be shown to and tested by a wider audience.
+
+The most exciting news is probably that a lot more information is now
+available. This includes a complete list of scopes (including structures and
+enums) together with their relations. This means that a program can ask for
+all scopes in a module, parent and child scope relations, the ranges a scope
+occupies in the different segments and so on.
+
+Symbol information has been improved, too. It is possible to lookup the parent
+symbol for a cheap local label, the scope a symbol is in, and the list of
+symbols in a scope. For each symbol, the point of definition and all points of
+reference in the sources can be retrieved. Imports and exports can be
+identified and it is possible to lookup the export that corresponds to an
+import, or the vice versa.
+
+The list of modules (= object files) is available, and for each module the
+list of source files, the main scope and other information can be retrieved.
+
+The bad thing is that both, the format of the debug info file and the API has
+changed. This means that you cannot read older debug info files with this
+version of the dbginfo module. The API is now heavily based on ids, which can
+be thought of as a primary index for each type of item. Most lookups are now
+really fast (which does not mean that they were slow before:-). Especially
+lookup by id is just an array access.
+
+What is missing:
+
+  * Spans for modules: Lookup which part of a segment comes from which module.
+    This is a minor addition that will probably come soon.
+
+  * More debug information from C sources. This is something bigger and may
+    take additional time.
+
+The old dbgtest program is gone and has been replaced by what I call &quot;debug
+info shell&quot;. It allows to interactively load a debug info file and dig around
+in the supplied information. It is somewhat incomplete and docs are missing
+but you may find it helpful.
+
+Regarding documentation: I have started to add something to the Wiki but as
+everyone knows docs have low priority because no one reads them anyway:-) I
+will nevertheless try to add something useful here over the weekend.
+
+A new snapshot has been created while I have been writing this, so go ahead,
+have a look at the new version and tell me that you think. Is anything missing
+or would additional API calls be helpful?
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Aug 19 14:49:00 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9620.html" title="Next message in the list">thefox xofeht: "Re: [cc65] New version of debug info available"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9618.html" title="Previous message in the list">Marc 'BlackJack' Rintsch: "Re: [cc65] Possible Multi-Subscript Bug"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9620.html" title="Next message in this discussion thread">thefox xofeht: "Re: [cc65] New version of debug info available"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9620.html" title="Message sent in reply to this message">thefox xofeht: "Re: [cc65] New version of debug info available"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9621.html" title="Message sent in reply to this message">thefox xofeht: "Re: [cc65] New version of debug info available"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9624.html" title="Message sent in reply to this message">thefox xofeht: "Re: [cc65] New version of debug info available"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9635.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] New version of debug info available"</a></li>
+<li><dfn>Reply</dfn>:  <a href="../2011-09/9642.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] New version of debug info available"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9619" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9619" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9619" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-08-19 14:49:04 CEST
+</em></small></p>
+</body>
+</html>

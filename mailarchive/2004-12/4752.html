@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Help, bug making me insane</title>
+<meta name="Author" content="Shawn Jefferson (jefferson_shawn_a8bit1yahoo.com)" />
+<meta name="Subject" content="Re: [cc65] Help, bug making me insane" />
+<meta name="Date" content="2004-12-16" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Help, bug making me insane</h1>
+<!-- received="Thu Dec 16 17:18:52 2004" -->
+<!-- isoreceived="20041216161852" -->
+<!-- sent="Thu, 16 Dec 2004 08:18:49 -0800 (PST)" -->
+<!-- isosent="20041216161849" -->
+<!-- name="Shawn Jefferson" -->
+<!-- email="jefferson_shawn_a8bit1yahoo.com" -->
+<!-- subject="Re: [cc65] Help, bug making me insane" -->
+<!-- id="20041216161849.95550.qmail@web52201.mail.yahoo.com" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="20041215183337.76669.qmail&#64;web52207.mail.yahoo.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4753.html" title="Karri Kaksonen: &quot;Re: [cc65] Re: abc music specification&quot;">Next message</a> ]
+[ <a href="4751.html" title="Shawn Jefferson: &quot;[cc65] Help, bug making me insane&quot;">Previous message</a> ]
+[ <a href="4751.html" title="Shawn Jefferson: &quot;[cc65] Help, bug making me insane&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Shawn Jefferson &lt;<a href="mailto:jefferson_shawn_a8bit1yahoo.com?Subject=Re:%20[cc65]%20Help,%20bug%20making%20me%20insane">jefferson_shawn_a8bit1yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-12-16 17:18:49</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Crisis averted, I'm sane!  Sorry for the extra
+traffic.
+
+After hours and hours of looking at my code and
+printing out variables, I decided to print everything
+out.  I also added code to reread each sector as it
+was written to the hard drive.  I finally pinpointed
+my error.  I was doing an AND where I should have been
+doing an addition or an OR.  It was in a routine
+called by the copy_image routine.  What threw me is
+that this routine worked when called by other
+routines, and only failed under certain circumstances
+(called from this routine).
+
+--
+Shawn
+
+--- Shawn Jefferson &lt;jefferson_shawn_a8bit&#64;yahoo&#46;<!--nospam-->com&gt;
+wrote:
+
+&gt; For some reason, this routine that did work
+&gt; previously
+&gt; doesn't seem to now after making some changes to my
+&gt; program.  Thinking to forestall my descent into
+&gt; complete madness I hoped that someone here could
+&gt; look
+&gt; it over and see if there were any obvious mistakes
+&gt; that I am overlooking.
+
+
+__________________________________________________
+Do You Yahoo!?
+Tired of spam?  Yahoo! Mail has the best spam protection around 
+<a href="http://mail.yahoo.com">http://mail.yahoo.com</a> 
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Dec 16 17:18:52 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4753.html" title="Next message in the list">Karri Kaksonen: "Re: [cc65] Re: abc music specification"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4751.html" title="Previous message in the list">Shawn Jefferson: "[cc65] Help, bug making me insane"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4751.html" title="Message to which this message replies">Shawn Jefferson: "[cc65] Help, bug making me insane"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4752" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4752" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4752" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-12-16 17:19:02 CET
+</em></small></p>
+</body>
+</html>

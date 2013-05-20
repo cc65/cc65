@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Filenames for POSIX functi</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Filenames for POSIX functins on CBM targets" />
+<meta name="Date" content="2012-08-12" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Filenames for POSIX functins on CBM targets</h1>
+<!-- received="Sun Aug 12 21:56:25 2012" -->
+<!-- isoreceived="20120812195625" -->
+<!-- sent="Sun, 12 Aug 2012 21:56:04 +0200" -->
+<!-- isosent="20120812195604" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Filenames for POSIX functins on CBM targets" -->
+<!-- id="CACT=u72-UjcpSsjbu9oGi0t_kOhYHviesXo4beAKwABshsSz5g@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20120812193531.GO1982&#64;trikaliotis.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10681.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">Next message</a> ]
+[ <a href="10679.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">Previous message</a> ]
+[ <a href="10678.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10681.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Filenames for POSIX functins on CBM targets&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Filenames%20for%20POSIX%20functins%20on%20CBM%20targets">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-08-12 21:56:04</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt; The point is: I can have the same code to access floppy drives on all
+&gt; (?) platforms CC65 supports, on all devices that it supports. The small
+&gt; setup that is platform-specific does not count for me here.
+&gt;
+&gt; BTW, the setup could be hidden in a chdir() function, making it
+&gt; cross-platform again.
+
+I see this from a somewhat different perspective. It's about
+declarative vs. programmatic.
+
+The string I'm asking for declares the location of a file. Independent
+from some point in the runtime of a program and independent from other
+files and other aspects of the environment like current &lt;whatever&gt;.
+
+The _curunit is something I need to set before opening a file and need
+to keep track of when opening another file. It's basically like having
+only relative paths in a modern OS. Non-trivial file i/o programs
+typically come to the point of converting all relative paths into
+absolute paths and use only those.
+
+This is not just a question of some setup - at least to me.
+
+&gt;&gt; Again - Im _NOT_ looking for a single path syntax for all targets! I'm
+&gt;&gt; only looking for _SOME_ path syntax on every target. But the CBMs have
+&gt;&gt; none at all. Therefore there's no need at all to find such a char.
+&gt;
+&gt; No? I thought you proposed the colon?
+
+Only for the CBMs and only because the drive specifier already uses
+them. I don't care at all what char it is. It would be great if it
+could be entered from the keyboard with reasonable effort.
+
+I don't even ask for a specific char. I only ask for the equivalent of
+an absolute pathname on CBM for the POSIX functions. A single string
+that when interpreted contains all information necessary to know the
+location and name of a file. For CBMs only!
+
+The other targets are already fine the way they are.
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Aug 12 21:56:25 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10681.html" title="Next message in the list">silverdr1wfmh.org.pl: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10679.html" title="Previous message in the list">Spiro Trikaliotis: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10678.html" title="Message to which this message replies">Spiro Trikaliotis: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10681.html" title="Next message in this discussion thread">silverdr1wfmh.org.pl: "Re: [cc65] Filenames for POSIX functins on CBM targets"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10680" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10680" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10680" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-08-12 21:56:28 CEST
+</em></small></p>
+</body>
+</html>

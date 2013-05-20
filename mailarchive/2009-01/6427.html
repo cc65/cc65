@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] another little bug :)</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] another little bug :)" />
+<meta name="Date" content="2009-01-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] another little bug :)</h1>
+<!-- received="Thu Jan 29 21:06:08 2009" -->
+<!-- isoreceived="20090129200608" -->
+<!-- sent="Thu, 29 Jan 2009 21:03:31 +0100" -->
+<!-- isosent="20090129200331" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] another little bug :)" -->
+<!-- id="20090129200331.GA20154@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="200901291630.56354.groepaz&#64;gmx.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6428.html" title="Dirk Jagdmann: &quot;Re: [cc65] another little bug :)&quot;">Next message</a> ]
+[ <a href="6426.html" title="Groepaz: &quot;Re: [cc65] another little bug :)&quot;">Previous message</a> ]
+[ <a href="6426.html" title="Groepaz: &quot;Re: [cc65] another little bug :)&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6428.html" title="Dirk Jagdmann: &quot;Re: [cc65] another little bug :)&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20another%20little%20bug%20:)">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-01-29 21:03:31</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Thu, Jan 29, 2009 at 04:30:54PM +0100, Groepaz wrote:
+&gt; mmmmh, i am not sure if i understand why this is a problem... ofcourse when i
+&gt; remap 0 to something else then the c string functions will no more work. but
+&gt; i can just aswell remap some other character to 0 and screw up the string
+&gt; functions too =)
+
+No, you can't:-) Zero is neither allowed for the index, nor for the value.
+
+&gt; what i mean is... i should be allowed to shoot into my feet when i want to :)
+&gt;
+&gt; or is there a more subtle reason that would prevent the compiler from actually
+&gt; working when 0 is mapped to something else?
+
+There was once a reason for it, which is now probably gone (I would have to
+check the code more thoroughly to make it sure): The literal pool (a big chunk
+of memory that contains all the strings in a module) was once managed as one
+big string. When the compiler accessed the pool itself, it was necessary that
+the terminating zeroes were in place.
+
+If there is no real reason (besides allowing people to shoot themselves in
+their feet) for a change, I would leave it this way. 
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Jan 29 21:06:08 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6428.html" title="Next message in the list">Dirk Jagdmann: "Re: [cc65] another little bug :)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6426.html" title="Previous message in the list">Groepaz: "Re: [cc65] another little bug :)"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6426.html" title="Message to which this message replies">Groepaz: "Re: [cc65] another little bug :)"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6428.html" title="Next message in this discussion thread">Dirk Jagdmann: "Re: [cc65] another little bug :)"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6428.html" title="Message sent in reply to this message">Dirk Jagdmann: "Re: [cc65] another little bug :)"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6427" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6427" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6427" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-01-29 21:06:10 CET
+</em></small></p>
+</body>
+</html>

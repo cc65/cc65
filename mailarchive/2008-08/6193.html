@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] DA65 Selfmodification</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] DA65 Selfmodification" />
+<meta name="Date" content="2008-08-05" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] DA65 Selfmodification</h1>
+<!-- received="Tue Aug  5 00:27:27 2008" -->
+<!-- isoreceived="20080804222727" -->
+<!-- sent="Tue, 5 Aug 2008 00:27:16 +0200" -->
+<!-- isosent="20080804222716" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] DA65 Selfmodification" -->
+<!-- id="20080804222716.GB14971@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="007d01c8f674$201649f0$4120fea9&#64;CASCADE" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6194.html" title="Markus Stehr: &quot;Re: [cc65] New subversion source code repository&quot;">Next message</a> ]
+[ <a href="6192.html" title="Ullrich von Bassewitz: &quot;[cc65] Snapshots working again&quot;">Previous message</a> ]
+[ <a href="6189.html" title="Stefan: &quot;Re: [cc65] DA65 Selfmodification&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6195.html" title="Stefan: &quot;[cc65] Passing variables from asm to c and vice versa&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20DA65%20Selfmodification">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-08-05 00:27:16</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Mon, Aug 04, 2008 at 10:53:18PM +0200, Stefan wrote:
+&gt; I want to pass constants from a c programm to an assembler program.
+&gt; If i use #define statements, the constans are only defined while the
+&gt; preprocessor
+&gt; is active. So i had the idea to use enum instead, which i hopefully can
+&gt; import into the
+&gt; assembler code. Is this a good idea? I don't know how i can do it, else.
+
+There is no way to do that automatically. Both, #defines and enums aren't
+passed to the assembler file by name.
+
+The other way (passing constants from assembler to C) is possible but weird.
+To do that, define and export the constants in an assembler module:
+
+        .export         _foo = 1
+        .export         _bar = 2
+
+Be sure to use underlines so that the symbols are accessible from C. In the C
+source use something like
+
+        extern char foo, bar;           /* Type doesn't matter */
+
+Then make #defines from that:
+
+        #define FOO ((int) &amp;foo)
+        #define BAR ((int) &amp;bar)
+
+One problem of this approach is that the #defines are not known at compile
+time. Using real constants, the optimizer can usually do a better job.
+
+I would suggest using an assembler file that contains an .enum declaration and
+a small perl script that translates this into a C header.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Aug  5 00:27:27 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6194.html" title="Next message in the list">Markus Stehr: "Re: [cc65] New subversion source code repository"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6192.html" title="Previous message in the list">Ullrich von Bassewitz: "[cc65] Snapshots working again"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6189.html" title="Message to which this message replies">Stefan: "Re: [cc65] DA65 Selfmodification"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6195.html" title="Next message in this discussion thread">Stefan: "[cc65] Passing variables from asm to c and vice versa"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6193" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6193" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6193" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-08-05 00:27:29 CEST
+</em></small></p>
+</body>
+</html>

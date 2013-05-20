@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Atari file i/o functions</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Atari file i/o functions">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Atari file i/o functions</h1>
+<!-- received="Tue Apr 23 22:27:00 2002" -->
+<!-- isoreceived="20020423202700" -->
+<!-- sent="Tue, 23 Apr 2002 22:27:06 +0200" -->
+<!-- isosent="20020423202706" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Atari file i/o functions" -->
+<!-- id="20020423222706.A8640@trixie.musoftware.de" -->
+<!-- inreplyto="scc55cda.025@gwmail.sd62.bc.ca" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Atari%20file%20i/o%20functions"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-04-23 22:27:06
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1286.html">Shawn Jefferson: "[cc65] Atari file i/o functions"</a>
+<li><strong>In reply to:</strong> <a href="1286.html">Shawn Jefferson: "[cc65] Atari file i/o functions"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1288.html">Shawn Jefferson: "Re: [cc65] Atari file i/o functions"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Tue, Apr 23, 2002 at 01:08:28PM -0700, Shawn Jefferson wrote:
+&gt; Unfortunately, my grasp of assembler is weak.  I've attempted to code the
+&gt; ftell function (only implementing seeking from the beginning of the file at
+&gt; the moment) but haven't tested it as I don't even know if I can build the
+&gt; Atari lib myself or not.
+
+Building the library is no problem if you're using Linux, as most other people
+do. Using some other Unix should also work, maybe with some minor glitches. If
+you're using something else, you are completely on your own :-)
+
+&gt; Also... looking at the way the functions are layed out.. fseek calls lseek
+&gt; in the atari library... and ftell calls lseek as well.  That doesn't seem like
+&gt; the best way to do it, since you will want to call lseek with different
+&gt; offsets depending on what whence is (SEEK_SET, SEEK_CUR, SEEK_END) and ftell
+&gt; would/should just call the CIO with command 38 to get the current file
+&gt; position.
+
+Maybe Christian can answer this in more detail, but as far as I understand the
+sources, lseek is just a dummy function that returns an error code.
+
+Apart from this, the implementation seems to be correct: lseek as defined by
+POSIX returns the current file position as a side effect. This side effect is
+used in ftell(), while fseek() is based on the main function of lseek
+(positioning the file pointer).
+
+&gt; How tied is the system to calling lseek in this manner for these functions?
+&gt; I imagine other platforms are implementing their own versions of lseek and
+&gt; changing this might break them.
+
+The Atari is currently the only system that has a working standard file I/O,
+so if there were changes, they wouldn't break anything. But as it looks for
+me, the current implementation is correct, the only problem is that the (Atari
+specific) lseek function is currently not implemented.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Atari%20file%20i/o%20functions">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Atari%20file%20i/o%20functions">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1286.html">Shawn Jefferson: "[cc65] Atari file i/o functions"</a>
+<li><strong>In reply to:</strong> <a href="1286.html">Shawn Jefferson: "[cc65] Atari file i/o functions"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1288.html">Shawn Jefferson: "Re: [cc65] Atari file i/o functions"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-04-23 22:27:04 CEST</em>
+</em>
+</small>
+</body>
+</html>

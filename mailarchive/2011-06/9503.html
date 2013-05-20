@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-15" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Additional pages with C64-HI.T</title>
+<meta name="Author" content="marcas (marcas1chello.at)" />
+<meta name="Subject" content="[cc65] Additional pages with C64-HI.TGI" />
+<meta name="Date" content="2011-06-07" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Additional pages with C64-HI.TGI</h1>
+<!-- received="Tue Jun  7 14:11:16 2011" -->
+<!-- isoreceived="20110607121116" -->
+<!-- sent="Tue, 07 Jun 2011 13:55:19 +0200" -->
+<!-- isosent="20110607115519" -->
+<!-- name="marcas" -->
+<!-- email="marcas1chello.at" -->
+<!-- subject="[cc65] Additional pages with C64-HI.TGI" -->
+<!-- id="4DEE11A7.2070508@chello.at" -->
+<!-- charset="ISO-8859-15" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9504.html" title="Oliver Schmidt: &quot;Re: [cc65] Additional pages with C64-HI.TGI&quot;">Next message</a> ]
+[ <a href="9502.html" title="thefox xofeht: &quot;[cc65] Problem with .align&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9504.html" title="Oliver Schmidt: &quot;Re: [cc65] Additional pages with C64-HI.TGI&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: marcas &lt;<a href="mailto:marcas1chello.at?Subject=Re:%20[cc65]%20Additional%20pages%20with%20C64-HI.TGI">marcas1chello.at</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-06-07 13:55:19</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+I am currently playing around with the TGI module for c64 (C64-HI.TGI).
+
+How can I tell TGI that i want to have more than 1 page for usage with 
+setdrawpage/setviewpage ? Getpgecount just returns 1. Is there some kind 
+of ioctl to achieve this? Or is there currently no way to define a 
+second draw page?
+I know 8000 Bytes is a lot of RAM, but it would be nice to provide at 
+least a second page.
+
+Is the (macro asm) source for C64-HI.TGI available somewhere, i did not 
+find it. Maybe someone can give me a hint where to find it.
+
+Are there plans for C64 Multicolor yet?
+
+Kind regards marcas
+
+
+P.S.: A nice function for use in tgidemo.c , free of charge :-) :
+
+
+void DoSierpinski(void)
+{
+     static const char Palette[2] = { COLOR_BLUE, COLOR_LIGHTBLUE };
+     uint8_t y;
+     uint16_t x=tgi_getxres()&gt;&gt;1;
+
+     tgi_setpalette (Palette);
+     tgi_setcolor (COLOR_FORE);
+     bordercolor (COLOR_LIGHTBLUE);
+
+     for(;;)
+     {
+         switch (rand()%3)
+         {
+             case 0:
+                 x = (x+(tgi_getxres()&gt;&gt;1))&gt;&gt;1;
+                 y = y&gt;&gt;1;
+                 break;
+             case 1:
+                 x = x&gt;&gt;1;
+                 y = (y+tgi_getyres())&gt;&gt;1;
+                 break;
+             case 2:
+                 x = (x+tgi_getxres())&gt;&gt;1;
+                 y = (y+tgi_getyres())&gt;&gt;1;
+                 break;
+         }
+
+         tgi_setpixel (x, y);
+
+         if (kbhit ())
+         {
+             cgetc ();
+             tgi_clear ();
+             return;
+         }
+     }
+}
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Jun  7 14:11:16 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9504.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Additional pages with C64-HI.TGI"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9502.html" title="Previous message in the list">thefox xofeht: "[cc65] Problem with .align"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9504.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Additional pages with C64-HI.TGI"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9504.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Additional pages with C64-HI.TGI"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9509.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Additional pages with C64-HI.TGI"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9503" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9503" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9503" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-06-07 14:11:19 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] &quot;--feature labels_wit</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] &quot;--feature labels_without_colons&quot; not always working with 2.11.0?" />
+<meta name="Date" content="2005-11-15" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] &quot;--feature labels_without_colons&quot; not always working with 2.11.0?</h1>
+<!-- received="Tue Nov 15 18:27:37 2005" -->
+<!-- isoreceived="20051115172737" -->
+<!-- sent="Tue, 15 Nov 2005 18:27:25 +0100" -->
+<!-- isosent="20051115172725" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] &quot;&ndash;&ndash;feature labels_without_colons&quot; not always working with 2.11.0?" -->
+<!-- id="20051115172725.GA8705@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="20051115110200.GA21657&#64;trikaliotis.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5258.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Need help getting started with cc65 NES&quot;">Next message</a> ]
+[ <a href="5256.html" title="PH: &quot;Re: [cc65] Need help getting started with cc65 NES&quot;">Previous message</a> ]
+[ <a href="5253.html" title="Spiro Trikaliotis: &quot;Re: [cc65] &quot;--feature labels_without_colons&quot; not always working with 2.11.0?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5268.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] &quot;--feature labels_without_colons&quot; not always working with 2.11.0?&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20&amp;quot;--feature%20labels_without_colons&amp;quot;%20not%20always%20working%20with%202.11.0?">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-11-15 18:27:25</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Tue, Nov 15, 2005 at 12:02:00PM +0100, Spiro Trikaliotis wrote:
+&gt; To me, it seems that HadWS is not correctly reset if an include file is
+&gt; opened.
+
+That sounds reasonable, since I have changed token handling for include files
+to fix a problem with the listing file.
+
+&gt; 1. remove HadWS completely from main.c; this way, you can define labels
+&gt;    without colons even after spaces or tabs;
+&gt;    (Is there a reason why a label without colon is not allowed after a
+&gt;    whitespace?)
+
+Yes, there's a reason. Without HadWS, there's no way to distinguish between
+opcodes, macros and labels. This is also difficult for the reader.
+
+        foo     lda,y
+        bar     lda,y
+        baz     foo
+
+Each one of &quot;foo&quot;, &quot;bar&quot; and &quot;baz&quot; can be a macro or a label (if
+labels_without_colons is in effect).
+
+&gt; 2. make HadWS more global to be able to update it accordingly when a
+&gt;    file is included;
+&gt; 3. when a file is included, let the scanner generate a &quot;CR&quot; by itself.
+
+I will have to check which of these is the better solution. Thanks for looking
+at the problem!
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Nov 15 18:27:37 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5258.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Need help getting started with cc65 NES"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5256.html" title="Previous message in the list">PH: "Re: [cc65] Need help getting started with cc65 NES"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5253.html" title="Message to which this message replies">Spiro Trikaliotis: "Re: [cc65] &quot;--feature labels_without_colons&quot; not always working with 2.11.0?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5268.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] &quot;--feature labels_without_colons&quot; not always working with 2.11.0?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5257" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5257" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5257" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-11-15 18:27:40 CET
+</em></small></p>
+</body>
+</html>

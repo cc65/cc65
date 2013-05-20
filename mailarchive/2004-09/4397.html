@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Including binary-stuff que</title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="Re: [cc65] Including binary-stuff question" />
+<meta name="Date" content="2004-09-06" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Including binary-stuff question</h1>
+<!-- received="Mon Sep  6 17:26:18 2004" -->
+<!-- isoreceived="20040906152618" -->
+<!-- sent="Mon, 6 Sep 2004 17:18:10 +0200" -->
+<!-- isosent="20040906151810" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="Re: [cc65] Including binary-stuff question" -->
+<!-- id="200409061718.11965.groepaz@gmx.net" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="20040906095711.GA351149&#64;kosh.hut.fi" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4398.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Including binary-stuff question&quot;">Next message</a> ]
+[ <a href="4396.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Including binary-stuff question&quot;">Previous message</a> ]
+[ <a href="4394.html" title="Marko Mäkelä: &quot;Re: [cc65] Including binary-stuff question&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4398.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Including binary-stuff question&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20Including%20binary-stuff%20question">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-09-06 17:18:10</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Monday 06 September 2004 11:57, Marko Mäkelä wrote:
+&gt; On Mon, Sep 06, 2004 at 12:27:28PM +0300, Karri Kaksonen wrote:
+&gt; &gt; In lyxass I had a command ibytes that I could use to include raw binary
+&gt; &gt; sprite data like:
+&gt; &gt; 
+&gt; &gt; my_hero: ibytes &quot;sprites/myhero.spr&quot;
+&gt; &gt; 
+&gt; &gt; Is there a similar command available in the cc65 assembler?
+&gt; 
+&gt; Have you considered writing a simple program that converts the binary
+&gt; data to hexadecimal notation?  Something like the following, for
+&gt; generating C code on a unix-like system:
+&gt; 
+&gt; echo &quot;static const unsigned char my_hero[] = {&quot;
+&gt; od -w12 -vt x1 &lt; sprites/myhero.spr \
+&gt; | sed -ne 's/ \(..\)/ 0x\1,/g;s/^[0-9]* /  /p'
+&gt; echo &quot;};&quot;
+&gt; 
+&gt; It shouldn't be too hard to adapt the above for producing ca65 code.
+&gt; It's best to include rules for such generated files in the Makefile,
+&gt; listing the source files and the code generator script as dependencies.
+
+*yawn*
+
+why would any sane person do that? to increase compile time by
+large extend? argls :(
+
+gpz
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Sep  6 17:26:18 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4398.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Including binary-stuff question"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4396.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Including binary-stuff question"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4394.html" title="Message to which this message replies">Marko Mäkelä: "Re: [cc65] Including binary-stuff question"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4398.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Including binary-stuff question"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4398.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Including binary-stuff question"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4397" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4397" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4397" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-09-06 17:26:27 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] da65 hangs in infinite loo</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] da65 hangs in infinite loop" />
+<meta name="Date" content="2007-06-12" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] da65 hangs in infinite loop</h1>
+<!-- received="Tue Jun 12 09:28:24 2007" -->
+<!-- isoreceived="20070612072824" -->
+<!-- sent="Tue, 12 Jun 2007 09:28:14 +0200" -->
+<!-- isosent="20070612072814" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] da65 hangs in infinite loop" -->
+<!-- id="20070612072814.GA5044@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="18029.55428.277555.18090&#64;hal.cling.gu.se" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5708.html" title="MagerValp: &quot;[cc65] implicit make rules delete temp files, and a da65 request (was: da65 hangs in infinite loop)&quot;">Next message</a> ]
+[ <a href="5706.html" title="Dan: &quot;Re: [cc65] da65 hangs in infinite loop&quot;">Previous message</a> ]
+[ <a href="5705.html" title="MagerValp: &quot;[cc65] da65 hangs in infinite loop&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5708.html" title="MagerValp: &quot;[cc65] implicit make rules delete temp files, and a da65 request (was: da65 hangs in infinite loop)&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20da65%20hangs%20in%20infinite%20loop">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-06-12 09:28:14</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Tue, Jun 12, 2007 at 01:19:32AM +0200, MagerValp wrote:
+&gt; Putting a label in the middle of a wordtable hangs da65 with 100% cpu usage:
+
+The PC is not incremented when DataByteLine is called:
+
+--- data.c      30 Jan 2006 21:03:13 -0000      1.15
++++ data.c      12 Jun 2007 07:19:40 -0000
+&#64;&#64; -88,6 +88,7 &#64;&#64;
+      */
+     if (Count &lt; MemberSize) {
+        DataByteLine (Count);
++        PC += Count;
+        return Count;
+     }
+
+This error is in a few more places in data.c and will be fixed in the
+repository.
+
+Problem is that the label will destroy the table alignment. For a quick fix,
+you will have to make the first word of the table a ByteTable.
+
+Thanks for the report!
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Jun 12 09:28:24 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5708.html" title="Next message in the list">MagerValp: "[cc65] implicit make rules delete temp files, and a da65 request (was: da65 hangs in infinite loop)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5706.html" title="Previous message in the list">Dan: "Re: [cc65] da65 hangs in infinite loop"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5705.html" title="Message to which this message replies">MagerValp: "[cc65] da65 hangs in infinite loop"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5708.html" title="Next message in this discussion thread">MagerValp: "[cc65] implicit make rules delete temp files, and a da65 request (was: da65 hangs in infinite loop)"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5708.html" title="Message sent in reply to this message">MagerValp: "[cc65] implicit make rules delete temp files, and a da65 request (was: da65 hangs in infinite loop)"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5707" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5707" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5707" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-06-12 09:28:27 CEST
+</em></small></p>
+</body>
+</html>

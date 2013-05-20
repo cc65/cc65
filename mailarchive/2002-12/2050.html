@@ -1,0 +1,216 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Escape keys</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Escape keys">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Escape keys</h1>
+<!-- received="Sat Dec 14 13:12:30 2002" -->
+<!-- isoreceived="20021214121230" -->
+<!-- sent="Sat, 14 Dec 2002 13:12:28 +0100" -->
+<!-- isosent="20021214121228" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Escape keys" -->
+<!-- id="20021214121228.GA7288@trixie.musoftware.de" -->
+<!-- inreplyto="002801c2a317$e7555620$11282c42@palace" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Escape%20keys"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-12-14 13:12:28
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2049.html">Greg King: "Re: [cc65] Escape keys"</a>
+<li><strong>In reply to:</strong> <a href="2048.html">Greg King: "Re: [cc65] Escape keys"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2053.html">Groepaz: "Re: [cc65] Escape keys"</a>
+<li><strong>Next in thread:</strong> <a href="2052.html">Groepaz: "Re: [cc65] Escape keys"</a>
+<li><strong>Next in thread:</strong> <a href="2049.html">Greg King: "Re: [cc65] Escape keys"</a>
+<li><strong>Reply:</strong> <a href="2053.html">Groepaz: "Re: [cc65] Escape keys"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Fri, Dec 13, 2002 at 01:47:41PM -0500, Greg King wrote:
+&gt; MagerValp's way is more transparent.
+
+This may be true. But it doesn't work, which is a small disadvantage:-)
+
+Here is an example of code that is very common when evaluating key responses:
+
+        switch (cgetc ()) {
+
+            case CH_STOP:
+                /* Handle stop */
+                break;
+
+            case CH_ESC:
+                /* Handle escape */
+                break;
+
+        }
+
+This will give &quot;Error: Duplicate case label&quot; on platforms where both keys are
+defined to the same value.
+
+&gt; A programmer should not need to wonder if
+&gt; a key exists or not -- he simply should use it!  Each implementation &quot;secretly&quot;
+&gt; should take care of those &quot;niggling&quot; little details about &quot;Is it there?&quot;, &quot;Where
+&gt; is it?&quot;, &quot;How does it look?&quot;, &quot;Should there be a substitute?&quot;, and &quot;What should
+&gt; be that substitute?&quot;.
+
+While this is true in theory, and I do share your opinion, there are several
+problems that prevent such a solution. Plus, we're mixing several things up in
+the discussion, which makes it even more difficult to determine what the real
+problem is.
+
+Let me make a list of things to consider:
+
+  1. The only way to &quot;nullify&quot; a key (as with an empty function that does
+     nothing), is not to define it. Defining it to an duplicated value will
+     give problems as shown in my example above.
+
+  2. Defining a key, even if it does not exist will also give problems. I
+     found one of these problems when doing the change for the CH_ESC key. One
+     of the minor annoyances with the debugger module was that the routine to
+     input numbers or text could not be aborted (at least I thought so). After
+     the change, which removed CH_ESC from the cbm.h header file and defined
+     it only for machines that do have an ESC key, I found that it is indeed
+     possible to abort this function, but the abort key was CH_ESC - which
+     does not exist as a real key on the C64. Because CH_ESC was defined, I
+     never noticed that.
+
+  3. If we start to globally define keys that do not really exist on some
+     platforms, we will quickly run into problems. The CBM-II series for
+     example has distinct keycodes for 20 function keys. If we follow the same
+     rule as with the escape key that does not exist on some machines, we
+     would have to invent replacement key combinations for all these functions
+     keys, just to make sure that a program can &quot;just use&quot; them. Consequently
+     this would mean that we get the union of all available keys, and we will
+     have to invent dozens of replacement key codes for each machine not
+     supporting a particular key. This replacement key codes may clash with
+     other key combinations, an application might want to use. It is easy to
+     see that this cannot be a sound solution.
+
+  4. A big problem in this discussion is that we're mixing up key codes and
+     functions assigned to these key codes. This is understandable, since many
+     keys are associated with functions (while some others are not), but it's
+     not really helpful.
+
+     If we understand the ESC key as the key that produces the escape
+     character, instead of thinking of it as an &quot;abort&quot; key, things will
+     become clearer. The conio library is very low level, so it should not
+     care about key functions, it should just care about key codes. It is the
+     job of a higher level library (like MagerValps simplemenu) to assign
+     functions to special key codes. The conio library does not know which
+     functions are needed by an application, and how they might be
+     implemented, so defining an assignment from key code to a specific
+     function (for example a &quot;page down&quot; function) will always be
+     dissatisfying.
+
+     Now, if we say it's the job of a higher level library to assign functions
+     to key codes, it would also be the job of this library to resolve the
+     differences between the platforms. Because on this layer, it is known,
+     which functions are needed and (mostly) what they do, this is possible
+     and will give satisfying results.
+
+  5. Another problem which was introduced by me when doing the first versions
+     of the conio library is mixing up keys on the keyboard and character
+     codes for output. This led Christian to add something like CH_EOL - a
+     name that is understandable if you think about printing something, but
+     does not make sense when thinking about character code input.
+
+     While all Commodore machines make use of the escape code when outputing
+     characters, some of the do not have an escape key - so this becomes
+     confusing if we don't separate the two.
+
+Trying to combine all these things leads to the following possible solution:
+
+  1. Key codes generated on input and characters used for output should become
+     separate things. This means that the Commodore machines will have CH_ESC
+     (the escape character) but not all of them will have KEY_ESC (the escape
+     key).
+
+  2. Defining all possible keys for all possible machines is not a good idea.
+     Instead, it is definitely important to know if a machine has a specific
+     key or not.
+
+  3. It is the job of a higher level library to assign functions to key codes.
+     If within conio key codes for a machine are only defined if a key does
+     exist, it is easy for this upper level library to check this define and
+     use a replacement. 
+
+Above proposal will give us three separate types of codes:
+
+  1. Output characters:   CH_ESC, CH_HLINE, CH_VLINE
+
+  2. Input key codes:     KEY_ESC, KEY_F1, KEY_F2
+
+  3. Key functions:       KF_ABORT, KF_HELP, KF_SAVE
+
+Only 1. and 2. are defined by conio.
+
+To support writing of portable programs, it may be an idea, to develop some
+guidelines, which key codes to use for a program function. This may also help
+developers, since many programmers people just know one or two platforms
+really well. But, because these guidelines cover a higher layer, they would
+not be part of conio.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Escape%20keys">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Escape%20keys">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2049.html">Greg King: "Re: [cc65] Escape keys"</a>
+<li><strong>In reply to:</strong> <a href="2048.html">Greg King: "Re: [cc65] Escape keys"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2053.html">Groepaz: "Re: [cc65] Escape keys"</a>
+<li><strong>Next in thread:</strong> <a href="2052.html">Groepaz: "Re: [cc65] Escape keys"</a>
+<li><strong>Next in thread:</strong> <a href="2049.html">Greg King: "Re: [cc65] Escape keys"</a>
+<li><strong>Reply:</strong> <a href="2053.html">Groepaz: "Re: [cc65] Escape keys"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-12-14 13:12:55 CET</em>
+</em>
+</small>
+</body>
+</html>

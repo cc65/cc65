@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] First release candidate av</title>
+<meta name="Author" content="Per Olofsson (magervalp1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] First release candidate available" />
+<meta name="Date" content="2009-09-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] First release candidate available</h1>
+<!-- received="Tue Sep 29 16:54:17 2009" -->
+<!-- isoreceived="20090929145417" -->
+<!-- sent="Tue, 29 Sep 2009 16:54:10 +0200" -->
+<!-- isosent="20090929145410" -->
+<!-- name="Per Olofsson" -->
+<!-- email="magervalp1gmail.com" -->
+<!-- subject="Re: [cc65] First release candidate available" -->
+<!-- id="1b8385e00909290754icc317b7wcc50cf7ee6a49b0c@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20090929142017.GA26721&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7092.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] First release candidate available&quot;">Next message</a> ]
+[ <a href="7090.html" title="Ullrich von Bassewitz: &quot;[cc65] First release candidate available&quot;">Previous message</a> ]
+[ <a href="7090.html" title="Ullrich von Bassewitz: &quot;[cc65] First release candidate available&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7092.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] First release candidate available&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Per Olofsson &lt;<a href="mailto:magervalp1gmail.com?Subject=Re:%20[cc65]%20First%20release%20candidate%20available">magervalp1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-09-29 16:54:10</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>OK, I tested svn 4277 with a project that uses a custom crt0.s, and
+ran into problems:
+
+Invader:rpg pelle$ make
+ld65  -C rpg.cfg -m rpg.map --dbgfile rpg.dbg -Ln rpg.sym -o rpg.prg
+crt0.o main.o irq.o kbd.o rnd.o div.o str_from_int_asm.o console.o
+gfx.o time.o time_since.o anim.o map.o map_create_zone.o
+map_creature.o map_load.o map_location.o map_names.o map_object.o
+map_view.o tile.o tileset.o view_buf.o view_buf_render.o view.o
+fov_buf.o fov.o fov_asm.o loader.o town.o creature.o resources.o
+resource_data.o game.o status.o err.o cmd_common.o cmd_prompt.o
+cmd_name.o cmd_zoom.o world.o world_cmd_move.o zone.o zone_cmd_move.o
+location.o location_cmd_move.o location_cmd_attack.o file_load.o
+file_tab.o exodecrunch.o ../lib/uloadm3.lib
+/usr/local/lib/cc65/lib/c64.lib
+ld65: Warning: Duplicate external identifier: `_exit'
+ld65: Error: Missing memory area assignment for segment `ZPSAVE'
+make: *** [rpg.prg] Error 1
+Invader:rpg pelle$ l rpg.prg
+-rw-r--r--  1 pelle  staff  13881 29 Sep 16:37 rpg.prg
+Invader:rpg pelle$
+
+First of all the failed linking still creates a (broken) prg file. I
+would expect it not to create an output file if it fails.
+
+I assume that this is related to the startup code being moved into the
+library, but no map file is created so it's hard to tell what's going
+on. This is my crt0.s:
+
+	.export _exit
+	
+	
+	.importzp sp, spsave
+	
+	.import zerobss
+	.import callmain
+	
+	.import __RAM_START__, __RAM_SIZE__
+
+
+	.segment &quot;STARTUP&quot;
+
+	.word init		; load address
+init:
+	jsr zerobss
+
+;	tsx
+;	stx spsave		; Save the system stack ptr
+
+	lda #&lt;(__RAM_START__ + __RAM_SIZE__)
+	sta sp
+	lda #&gt;(__RAM_START__ + __RAM_SIZE__)
+	sta sp+1		; Set argument stack ptr
+
+	jmp callmain
+
+_exit:
+	lda #3
+:	sta $d020
+	eor #8
+	bne :-
+
+I added the magic .export __STARTUP__:absolute = 1 (is this documented
+somewhere?), which took care of crt0, but something is still
+requesting a ZPSAVE segment. Any ideas?
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Sep 29 16:54:17 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7092.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] First release candidate available"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7090.html" title="Previous message in the list">Ullrich von Bassewitz: "[cc65] First release candidate available"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7090.html" title="Message to which this message replies">Ullrich von Bassewitz: "[cc65] First release candidate available"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7092.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] First release candidate available"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7092.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] First release candidate available"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7091" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7091" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7091" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-09-29 16:54:19 CEST
+</em></small></p>
+</body>
+</html>

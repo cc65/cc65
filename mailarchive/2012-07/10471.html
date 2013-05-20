@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Aw: Re: [cc65] Common macros for dire</title>
+<meta name="Author" content="A. Fachat (fachat1web.de)" />
+<meta name="Subject" content="Aw: Re: [cc65] Common macros for dirent.d_type" />
+<meta name="Date" content="2012-07-06" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Aw: Re: [cc65] Common macros for dirent.d_type</h1>
+<!-- received="Fri Jul  6 18:51:35 2012" -->
+<!-- isoreceived="20120706165135" -->
+<!-- sent="Fri, 06 Jul 2012 18:50:26 +0200" -->
+<!-- isosent="20120706165026" -->
+<!-- name="A. Fachat" -->
+<!-- email="fachat1web.de" -->
+<!-- subject="Aw: Re: [cc65] Common macros for dirent.d_type" -->
+<!-- id="3136833.QNOZjFZ1Xm@euler" -->
+<!-- charset="iso-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10472.html" title="Groepaz: &quot;Re: [cc65] Common macros for dirent.d_type&quot;">Next message</a> ]
+[ <a href="10470.html" title="Oliver Schmidt: &quot;Re: [cc65] Common macros for dirent.d_type&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: A. Fachat &lt;<a href="mailto:fachat1web.de?Subject=Re:%20Aw:%20Re:%20[cc65]%20Common%20macros%20for%20dirent.d_type">fachat1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-07-06 18:50:26</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi there,
+
+I'm trying this one without quoting, hopefully this goes through to the list 
+now. (sorry if it's a bit late, some versions got rejected...)
+
+First of all - Commodore BASIC does not know about the file type at all. The 
+drive decides which file type to use.
+
+It does this based on 1) secondary IEC/IEEE488 address and 2) file name 
+extension.
+
+1) on secondary address 0 and 1 - for LOAD and SAVE respectively - the drive 
+selects PRG files. Those are supposed to be used for executables. On any other 
+secondary address (i.e. &gt;= 2) the drive by default uses SEQ.
+Just try an OPEN 1,8,2,&quot;NAME,W&quot; - it will create a SEQ file, the &quot;,W&quot; is for 
+write mode. But, you can even load a SEQ file with LOAD&quot;NAME,S&quot;,8
+
+2) However, when creating a file with an open like shown above, you can 
+optionally add a file type to the name to determine what type of file to create. 
+For example an OPEN 1,8,2,&quot;NAME,U,W&quot; will create a USR file.
+
+Opening a file for reading can be done with the file type as well
+OPEN1,8,2,&quot;NAME,S,R&quot; - it will only find those files that have the correct type, 
+anything else gives a FILE TYPE MISMATCH.
+Opening the file without file type like &quot;OPEN1,8,2,&quot;NAME,R&quot; will open the file 
+with that name without regard to the file type
+(file names are unique across types)
+
+Note: you can also create PRG files using the open method with file type: 
+OPEN1,8,2,&quot;FILE,P,W&quot;
+
+So I am wondering why a C program actually needs a default file type at all. 
+Just use IEC secondary addresses 2 or greater, then the drive will create SEQ 
+files.
+Or let the user add a &quot;,P&quot; or &quot;,U&quot; to the file name to get specific file types.
+
+Of course someone has mentioned existing programs using PRG files. I am 
+wondering what they are. I know assemblers and compilers create
+PRG files of course, but any program that does data processing should (IMHO) 
+stay away from SEQ files, to avoid accidential loading.
+
+André
+
+P.S.: tested with VICE xpet and a 2031 true drive emulation.
+P.P.S.: If VICE does behave differently on the virtual drives, it should 
+probably be fixed.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Jul  6 18:51:35 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10472.html" title="Next message in the list">Groepaz: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10470.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10471" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10471" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10471" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-07-06 18:51:38 CEST
+</em></small></p>
+</body>
+</html>

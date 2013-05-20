@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Target &quot;BBC&quot;</title>
+<meta name="Author" content="Kolja Nikolaus Sträter (k1kollus.de)" />
+<meta name="Subject" content="Re: [cc65] Target &quot;BBC&quot;" />
+<meta name="Date" content="2005-03-30" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Target &quot;BBC&quot;</h1>
+<!-- received="Wed Mar 30 14:54:33 2005" -->
+<!-- isoreceived="20050330125433" -->
+<!-- sent="Wed, 30 Mar 2005 14:55:47 +0200" -->
+<!-- isosent="20050330125547" -->
+<!-- name="Kolja Nikolaus Sträter" -->
+<!-- email="k1kollus.de" -->
+<!-- subject="Re: [cc65] Target &quot;BBC&quot;" -->
+<!-- id="424AA1D3.7010609@kollus.de" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20050330080055.GC29497&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4855.html" title="Shawn Jefferson: &quot;Re: [cc65] Atari executables w/ AtariMax flashcart&quot;">Next message</a> ]
+[ <a href="4853.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Target &quot;BBC&quot;&quot;">Previous message</a> ]
+[ <a href="4853.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Target &quot;BBC&quot;&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4861.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Target &quot;BBC&quot;&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Kolja Nikolaus Sträter &lt;<a href="mailto:k1kollus.de?Subject=Re:%20[cc65]%20Target%20&amp;quot;BBC&amp;quot;">k1kollus.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-03-30 14:55:47</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Ullrich von Bassewitz wrote:
+
+&gt; Well, in some places the code could definitely be clearer, but thanks
+&gt; anyway:-) Especially in support for the platforms, there's quite some help
+&gt; from other people (hint, hint! :-)
+&gt;
+Sure, but I think you're being modest. I have looked through the code 
+quite a bit, and I like it.
+And anyway it's such a great thing to be able to write programs in 
+almost-complete C, although it'd sure be nice to have floats :-) (but 
+not essential for me).
+
+&gt; Since the linker config does already exist, the only thing needed to get
+&gt; simple programs running is the necessary startup code. Writing it should be
+&gt; easy with some knowledge about the machine and a look at the startup code of
+&gt; the other platforms. If you have the startup code, most of the C library will
+&gt; work, since it is platform independent. You can then add more support (conio,
+&gt; ...) later.
+&gt;
+Of course I noticed the BBC isn't on the supported list, but it might 
+have been a recent addition and not found it's way into the docs, the 
+existence of (just) the config is a bit confusing in that respect.
+
+I was looking at the code for the VC20, and about to follow the path you 
+describe, but then I thought isn't it quite likely somebody would have 
+done this already. Actually now Jonathan responded, and I saw his BBC 
+Basic site, I'm sure the reason it hasn't been done for the BBC yet, is 
+that BBC Basic was just such a well designed Basic (which comes down to 
+all the interesting people at Acorn working on the 6502 and BBC-Basic in 
+the early 80s). Retro-people perhaps haven't been as inclined to write 
+in C as they have for other platforms.
+
+&gt; If you start working on bbc support, and want your changes to go into the
+&gt; official distribution, I would strongly suggest that you do that with at least
+&gt; some consultation with me. There are guidelines to follow, and it would
+&gt; probably be frustrating if I had to refuse your code, because it doesn't fit
+&gt; into existing or planned concepts. Second, someone else could work on the same
+&gt; goal. Early coordination will prevent later frustration.
+&gt; 
+The first version of my code won't need much, it's more a 
+platform-testing kind of thing (since I'm writing for a load of 
+platforms in parallel, only two of which are retro by the way) so this 
+isn't worth getting yours or other peoples attention for.
+
+However, if I also port the bigger, second version of my program (which 
+I'm planning to do) then I would have to get more things to work, parts 
+of conio certainly. If and when that happens I would definitely consult 
+with you beforehand, so we can make sure that we don't reinvent wheels.
+
+I'm glad to see, the project is still alive, ie. you're still looking at 
+the mailing list. I'm always half expecting for all the retro-things to 
+vanish, but then 6502s are still being sold, and emulators are still 
+being updated. Quite strange really, if you think about it...
+
+All the best,
+
+Kolja Sträter
+
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Mar 30 14:54:33 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4855.html" title="Next message in the list">Shawn Jefferson: "Re: [cc65] Atari executables w/ AtariMax flashcart"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4853.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Target &quot;BBC&quot;"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4853.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Target &quot;BBC&quot;"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4861.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Target &quot;BBC&quot;"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4861.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Target &quot;BBC&quot;"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4854" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4854" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4854" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-03-30 14:54:39 CEST
+</em></small></p>
+</body>
+</html>

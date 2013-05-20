@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] OT: Question about Power C and</title>
+<meta name="Author" content="Payton Byrd (kingdurin1yahoo.com)" />
+<meta name="Subject" content="[cc65] OT: Question about Power C and C128" />
+<meta name="Date" content="2005-07-05" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] OT: Question about Power C and C128</h1>
+<!-- received="Tue Jul  5 05:57:54 2005" -->
+<!-- isoreceived="20050705035754" -->
+<!-- sent="Mon, 4 Jul 2005 20:57:47 -0700 (PDT)" -->
+<!-- isosent="20050705035747" -->
+<!-- name="Payton Byrd" -->
+<!-- email="kingdurin1yahoo.com" -->
+<!-- subject="[cc65] OT: Question about Power C and C128" -->
+<!-- id="20050705035747.70368.qmail@web40604.mail.yahoo.com" -->
+<!-- charset="iso-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5090.html" title="Karri Kaksonen: &quot;Re: [cc65] OT: Question about Power C and C128&quot;">Next message</a> ]
+[ <a href="5088.html" title="dominic beesley: &quot;[cc65] gloal __fastcall__&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5090.html" title="Karri Kaksonen: &quot;Re: [cc65] OT: Question about Power C and C128&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Payton Byrd &lt;<a href="mailto:kingdurin1yahoo.com?Subject=Re:%20[cc65]%20OT:%20Question%20about%20Power%20C%20and%20C128">kingdurin1yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-07-05 05:57:47</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I know this is off topic, but I figured it's the most
+likely place for someone to have run across my
+scenario.
+
+I am writing a game in Power C for the 128.  I'm
+having a problem enumerating a two dimensional char*
+array declared like this:
+
+char* _sVerbs =
+{
+    { &quot;n&quot;, &quot;N&quot;, &quot;orth&quot; },
+    { &quot;s&quot;, &quot;S&quot;, &quot;outh&quot; },
+ /** etc. **/
+};
+
+No matter what I do, I can only get the first row of
+data which always returns back &quot;n&quot;, &quot;N&quot;, and &quot;orth&quot;. 
+I've tried directly indexing the array like this:
+
+_sVerbs[i][0] where i is the row I want.
+
+I've tried indexing the pointer:
+
+*(_sVerbs + (i * sizeof(char*))[0]
+
+I've tried getting a pointer to the inner array:
+
+char** sLine = _sVerbs[i];
+s = sLine[0];
+
+No matter what I do I always get back the first row of
+the array regardless of the value of i.
+
+Is this a known problem with Power C that I should
+avoid, or am I just being completely stupid?
+
+Thanks in advance!
+
+
+		
+____________________________________________________ 
+Yahoo! Sports 
+Rekindle the Rivalries. Sign up for Fantasy Football 
+<a href="http://football.fantasysports.yahoo.com">http://football.fantasysports.yahoo.com</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Jul  5 05:57:54 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5090.html" title="Next message in the list">Karri Kaksonen: "Re: [cc65] OT: Question about Power C and C128"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5088.html" title="Previous message in the list">dominic beesley: "[cc65] gloal __fastcall__"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5090.html" title="Next message in this discussion thread">Karri Kaksonen: "Re: [cc65] OT: Question about Power C and C128"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5090.html" title="Message sent in reply to this message">Karri Kaksonen: "Re: [cc65] OT: Question about Power C and C128"</a></li>
+<li><dfn>Reply</dfn>:  <a href="5092.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] OT: Question about Power C and C128"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5089" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5089" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5089" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-07-05 05:57:57 CEST
+</em></small></p>
+</body>
+</html>

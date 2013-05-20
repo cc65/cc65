@@ -1,0 +1,170 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] input for C64</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] input for C64">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] input for C64</h1>
+<!-- received="Sun Mar  4 22:30:22 2001" -->
+<!-- isoreceived="20010304213022" -->
+<!-- sent="Sun, 4 Mar 2001 22:30:28 +0100" -->
+<!-- isosent="20010304213028" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] input for C64" -->
+<!-- id="20010304223028.A9838@trixie.musoftware.de" -->
+<!-- inreplyto="20010304.161029.12702.0.tbsilvey@juno.com" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20input%20for%20C64"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2001-03-04 22:30:28
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0420.html">Andre Majorel: "Re: [cc65] disassembly"</a>
+<li><strong>Previous message:</strong> <a href="0418.html">troy silvey: "Re: [cc65] input for C64"</a>
+<li><strong>In reply to:</strong> <a href="0418.html">troy silvey: "Re: [cc65] input for C64"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0422.html">troy silvey: "Re: [cc65] input for C64"</a>
+<li><strong>Reply:</strong> <a href="0422.html">troy silvey: "Re: [cc65] input for C64"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Sun, Mar 04, 2001 at 04:10:22PM -0500, troy silvey wrote:
+&gt; To your credit, the puts() seems to work perfectly so far for the 64.
+&gt; I was hoping gets() would too.
+
+I was hoping that, too:-) The read() function is a hack, and it seems to be
+wrong. It might be possible to fix it, but it would be a hack anyway, so I
+don't like that idea. I will remove the read() function from the makefile, so
+you will get a linker error for future releases when trying to use gets(),
+fgets() or similar.
+
+&gt; I've tried to use some of the functions, but I havn't gotten the
+&gt; complete hang of it yet. Results are still messy.
+&gt; I'll study it more and try and put it to work.
+
+Here is a routine that reads one line of input using the console functions:
+
+
+    char* cgets (char* Buf, unsigned Size)
+    /* Similar to fgets, but uses console I/O */
+    {
+	char C;
+	unsigned Count = 0;
+
+	/* Remember the current cursor and enable it */
+	unsigned char SavedCursor = cursor (1);
+
+	/* Be sure not to write outside the buffer */
+	while (Count &lt; Size-1) {
+
+	    /* Read one character and check for the final CR. We won't
+	     * output the newline, which should be ok in most cases.
+	      */
+	    if ((C = cgetc()) == '\n') {
+	     	break;
+	    }
+
+	    /* Echo the input character just read */
+	    cputc (C);
+
+	    /* Store it into the buffer */
+	    Buf [Count++] = C;
+	}
+
+	/* Terminate the buffer */
+	Buf [Count] = '\0';
+
+	/* Restore the old cursor state */
+	cursor (SavedCursor);
+
+	/* Return the buffer pointer */
+	return Buf;
+    }
+
+
+It is called &quot;cgets&quot; because it works similar to fgets but reads from the
+console. It would probably be a better idea to return the number of characters
+in the buffer instead of the buffer pointer, but since gets returns a buffer
+pointer, I've used the same convention for this function.
+
+&gt; I know you're doing CC65 for fun, not profit so I hate to bring up
+&gt; things that would cause you more work. So far CC65 has gone
+&gt; along way to help me learn C. And even finding and working
+&gt; around some of limits of CC65 has helped me learn.
+
+I'm glad to hear that, and I'm happy about all suggestions, even if I'm not
+able or willing to honour them:-)
+
+&gt; You mentioned trying to impement some scanf features in a future
+&gt; version. It seems to me that gets() would be a good alternative.
+&gt; Data conversions could be done by other fuctions already included.
+&gt; Would gets be any easier or compact to add than scanf ?
+
+Doing gets() right would mean adding file support since gets() is just a
+special file function reading from stdin. And I've personally decided not to
+add file support in the near future, since I don't need it.
+
+For real programs, gets() would not be a good idea anyway, because it has
+similar problems as the BASIC &quot;INPUT&quot; command. It would accept cursor commands
+and similar stuff. Nothing you want to use in a program that you want to show
+other people:-)
+
+Regards
+
+
+	Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20input%20for%20C64">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20input%20for%20C64">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0420.html">Andre Majorel: "Re: [cc65] disassembly"</a>
+<li><strong>Previous message:</strong> <a href="0418.html">troy silvey: "Re: [cc65] input for C64"</a>
+<li><strong>In reply to:</strong> <a href="0418.html">troy silvey: "Re: [cc65] input for C64"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0422.html">troy silvey: "Re: [cc65] input for C64"</a>
+<li><strong>Reply:</strong> <a href="0422.html">troy silvey: "Re: [cc65] input for C64"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:39 CET</em>
+</em>
+</small>
+</body>
+</html>

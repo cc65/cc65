@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] conio tabs</title>
+<meta name="Author" content="MagerValp (MagerValp1cling.gu.se)" />
+<meta name="Subject" content="Re: [cc65] conio tabs" />
+<meta name="Date" content="2004-09-22" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] conio tabs</h1>
+<!-- received="Wed Sep 22 17:58:41 2004" -->
+<!-- isoreceived="20040922155841" -->
+<!-- sent="Wed, 22 Sep 2004 17:58:39 +0200" -->
+<!-- isosent="20040922155839" -->
+<!-- name="MagerValp" -->
+<!-- email="MagerValp1cling.gu.se" -->
+<!-- subject="Re: [cc65] conio tabs" -->
+<!-- id="16721.41263.382992.650249@panini.cling.gu.se" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="200409221644.08919.groepaz&#64;gmx.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4494.html" title="Groepaz: &quot;Re: [cc65] conio tabs&quot;">Next message</a> ]
+[ <a href="4492.html" title="Groepaz: &quot;Re: [cc65] Programs switch to lowercase on C64.&quot;">Previous message</a> ]
+[ <a href="4491.html" title="Groepaz: &quot;Re: [cc65] conio tabs&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4494.html" title="Groepaz: &quot;Re: [cc65] conio tabs&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: MagerValp &lt;<a href="mailto:MagerValp1cling.gu.se?Subject=Re:%20[cc65]%20conio%20tabs">MagerValp1cling.gu.se</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-09-22 17:58:39</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt;&gt;&gt;&gt;&gt; &quot;G&quot; == Groepaz  &lt;groepaz&#64;gmx&#46;<!--nospam-->net&gt; writes:
+
+Uz&gt; So the question is: Do we want to change the design criterias
+Uz&gt; behind conio? Of course it can be improved. I've already
+Uz&gt; considered adding a cscroll() function which allows scrolling -
+Uz&gt; not automatically, but when requested by the programmer. This
+Uz&gt; seems to fit better into the current conio design. But adding
+Uz&gt; automatic scrolling and tab interpretation do change the idea
+Uz&gt; behind conio, and so before adding anthing like that, I would like
+Uz&gt; to discuss if this is really what we want.
+
+G&gt; i would vote against tab interpretation and scrolling, IF there is
+G&gt; a seperate function to allow scrolling arbritary sections of the
+G&gt; screen in any direction. that would be much more useful in the end,
+G&gt; and keep the rest of the api small and clean and fast. (and uhm,
+G&gt; who really needs tabs?)
+
+I'm voting for it. The point of the library is to make it convenient
+to do text output, and having it overwrite memory and crash the
+program because you do one cprintf statement too much (something
+that's bitten me more than once) isn't very elegant. Having to
+manually check where the cursor is after every print statement, to see
+if we need to call cscroll, sounds kinda clunky. In some apps multi-
+directional region scrolling would be better, in some apps simple
+screen scrolling is all you need.
+
+-- 
+    ___          .     .  .         .       . +  .         .      o   
+  _|___|_   +   .  +     .     +         .  Per Olofsson, arkadspelare
+    o-o    .      .     .   o         +          MagerValp&#64;cling&#46;<!--nospam-->gu.se
+     -       +            +    .     <a href="http://www.cling.gu.se/~cl3polof/">http://www.cling.gu.se/~cl3polof/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Sep 22 17:58:41 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4494.html" title="Next message in the list">Groepaz: "Re: [cc65] conio tabs"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4492.html" title="Previous message in the list">Groepaz: "Re: [cc65] Programs switch to lowercase on C64."</a></li>
+<li><dfn>In reply to</dfn>: <a href="4491.html" title="Message to which this message replies">Groepaz: "Re: [cc65] conio tabs"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4494.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] conio tabs"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4494.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] conio tabs"</a></li>
+<li><dfn>Reply</dfn>:  <a href="4499.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] conio tabs"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4493" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4493" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4493" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-09-22 17:58:50 CEST
+</em></small></p>
+</body>
+</html>

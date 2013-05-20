@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] --create-dep for ca65?</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] --create-dep for ca65?" />
+<meta name="Date" content="2010-05-04" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] --create-dep for ca65?</h1>
+<!-- received="Tue May  4 22:28:46 2010" -->
+<!-- isoreceived="20100504202846" -->
+<!-- sent="Tue, 4 May 2010 22:28:37 +0200" -->
+<!-- isosent="20100504202837" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] &ndash;&ndash;create&ndash;dep for ca65?" -->
+<!-- id="20100504202837.GA1266@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="20100504201604.GA1179&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8338.html" title="Payton Byrd: &quot;Re: [cc65] Need some help with a memory leak&quot;">Next message</a> ]
+[ <a href="8336.html" title="Marc 'BlackJack Rintsch: &quot;Re: [cc65] Need some help with a memory leak&quot;">Previous message</a> ]
+[ <a href="8335.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] --create-dep for ca65?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8340.html" title="Oliver Schmidt: &quot;Re: [cc65] --create-dep for ca65?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20--create-dep%20for%20ca65?">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-05-04 22:28:37</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Tue, May 04, 2010 at 10:16:04PM +0200, Ullrich von Bassewitz wrote:
+&gt; &gt; - If for some reson or another Uz doesn't do so then we'll just stick
+&gt; &gt; to the plain ca65 for assembling. Thus we'll be back at -I for the
+&gt; &gt; compiling and aseembling (and --bin-include-dir).
+&gt;
+&gt; My current plans are to add --bin-include-dir to the assembler and increase
+&gt; the magic behind -I so it will work for assembler files.
+
+The latter part had been canceled because it doesn't work. -I is additive, so 
+&quot;-I foo -I bar&quot; will add two paths. So there is no way to meet all
+expectations for
+
+        cl65 -I cdir cexample.c -I asmdir asmexample.s
+
+(one would expect the second -I to override the first) and
+
+        cl65 -I dir1 -example1.c -I dir2 example2.c
+
+(second directory should be added, so second file is compiled with two -I
+switches).
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue May  4 22:28:46 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8338.html" title="Next message in the list">Payton Byrd: "Re: [cc65] Need some help with a memory leak"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8336.html" title="Previous message in the list">Marc 'BlackJack Rintsch: "Re: [cc65] Need some help with a memory leak"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8335.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] --create-dep for ca65?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8340.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] --create-dep for ca65?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8340.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] --create-dep for ca65?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8337" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8337" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8337" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-05-04 22:28:48 CEST
+</em></small></p>
+</body>
+</html>

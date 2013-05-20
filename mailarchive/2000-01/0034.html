@@ -1,0 +1,273 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: Sv: [cc65] Back on Track</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: Sv: [cc65] Back on Track">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: Sv: [cc65] Back on Track</h1>
+<!-- received="Fri Jan 21 22:12:29 2000" -->
+<!-- isoreceived="20000121211229" -->
+<!-- sent="Fri, 21 Jan 2000 22:12:03 +0100" -->
+<!-- isosent="20000121211203" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: Sv: [cc65] Back on Track" -->
+<!-- id="3888CBA3.F201F032@gmx.net" -->
+<!-- inreplyto="002c01bf6408$497036b0$8e04080a@bd000658.bankdata.lan" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20Sv:%20[cc65]%20Back%20on%20Track"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2000-01-21 22:12:03
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0035.html">Spiro Trikaliotis: "Re: Sv: [cc65] Back on Track"</a>
+<li><strong>Previous message:</strong> <a href="0033.html">MagerValp: "Re: Sv: Sv: [cc65] Back on Track"</a>
+<li><strong>In reply to:</strong> <a href="0029.html">Martin Ancher Holm - Bankdata: "Sv: [cc65] Back on Track"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0039.html">Ullrich von Bassewitz: "Re: Sv: [cc65] Back on Track"</a>
+<li><strong>Reply:</strong> <a href="0039.html">Ullrich von Bassewitz: "Re: Sv: [cc65] Back on Track"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+HOLLA! you better correct my errors fast... i am coding this nite ;=P hehehehe
+
+&gt; In other OSes than 'BASIC on CBM' standard input and output and error, are used, because you can redirect them all to a file or a printer etc.
+&gt; 
+&gt; Since 'BASIC on CBM' OS doesn't support redirection; stdin, stdout and stderr makes no sence.
+
+wrong... CMD is the command.. it was explained already... if it would NOT be 
+supported, why should there be my problems with printf? 8=)
+
+&gt; 
+&gt; No, no, I don't want to leave out stdin, stdout and stderr. I want to enable 'BASIC on CBM' OS to support redirection.
+&gt; 
+&gt; Maybe tree pointers in memory could point to strings for stdin, stdout, stderr.
+ [snip]
+
+that'll be a poor way to do it actually... kernal HAS most of the functionality
+needed, its
+just a little weird to use ;=)
+
+
+&gt; Well, you could keep a seek pointer with every file, so at least forward
+&gt; seeks would be possible w/o going through the _whole_ file.
+
+ofcoz... this improvement is so obvious that i ofcoz thought about it 8=)
+
+&gt; Another way would be to only read the 2 first bytes from the needed blocks
+&gt; &gt;from the disc, so you would need need to transfer all the unneeded bytes
+&gt; over the serial bus, this should speed up the seek a little. You could
+&gt; also keep track of all these link bytes once read (i.e., when the first
+&gt; seek is started), so you can make further seeks() much more faster...
+&gt; 
+&gt; &gt;there will be, however, a somewhat 'generic' driver for floppy-drives though,
+&gt; &gt;that
+&gt; &gt;will support real seeking via direkt disc-access.
+&gt; 
+&gt; Hm, it seems you thought about something similar to my thoughts above,
+&gt; didn't you?
+
+yes... actually my 'kernal-disc' driver will read through the sector chain
+when you open() a file and buffer the link-list somewhere. this way real
+'random' access a'la relative files (even performing better IMHO) is quite
+easy to implement. Ofcoz seeks will still be slow...(well, if the r/w head
+must NOT move tracks, it should be fairly acceptable) but compared to the
+brute force method above it'll be lightening fast =P
+
+however, once these two 'generic' kernal drivers work ok, i will challenge
+myself on a really 1541 specific one with fastload, 2bit transfer... buffering
+stuff on the DRIVE rather than the c64... could even do fancy shit like reading
+sectors in advance and buffering in drive mem ;=P
+
+[snip]
+
+... so about the redirection stuff, i'll sum up what i have understood (i think
+i got it, but please correct me if i am wrong even in some nasty detail ;=P)
+
+i understand rooting printf through the filesystem makes sence... it will
+require (maybe) some modification on your printf call though (it shouldnt go
+directly to $ffd2 but to some other routine that i will provide)
+
+what i will do is:
+
+called in fs_init():
+
+	open FILENO_STDIN/filehandle 0, keyboard device driver
+	open FILENO_STDOUT/filehandle 1, screen device driver
+	open FILENO_STDERR/filehandle 2, screen device driver
+
+... subsequent calls to open() will return handles 3,4,5,... for easier
+internal handling (this should be perfectly standard compliant, is it?!)
+
+... a &quot;device driver&quot; (rather a dummy and some quick-checks ;=P) for keyboard
+and screen will be added and hooked to read/write. 
+
+... a printf replacement will map stdin etc to their defined filehandles (at
+this point, how *exactly * do printf/fprintf/write corrospond?! is printf just
+some #define printf fprintf(stdout ... thing or really a direct call to $ffd2?
+(i have to admit... erhm... i could check myself ;=P) ... just wanna make sure i
+could savely replace your printf() without effecting any other stuff (oh, and
+are you using some other related kernal calls somewhere in your libs? these
+could cause some quite weird and hard to find bugs if so ;P)
+
+... at run time, the user could redefine stdin/sdtout/stderr by the following
+procedure:
+
+	close(FILENO_STDIN);
+	close(FILENO_STDOUT);
+	close(FILENO_STDERR);
+
+	// the ORDER of these is important!!!
+
+        fd=open(&quot;a:/myinfile&quot;);          // returns fd=0
+        fd=open(&quot;b:/myoutfile&quot;);         // returns fd=1
+        fd=open(&quot;c:/myerrfile&quot;);         // returns fd=2
+
+
+
+called in fs_shutdown():
+
+	close FILENO_STDIN/filehandle 0, keyboard device driver
+	close FILENO_STDOUT/filehandle 1, screen device driver
+	close FILENO_STDERR/filehandle 2, screen device driver
+
+[snip]
+
+&gt; It is usually called &quot;exec&quot;, but this is a rather complex call and probably
+&gt; not suitable for 6502 machines.
+
+yeah true... supposed to be able to return to the caller etc right? obviously
+not really suitable with &lt;64k ram 8=)
+
+&gt; Andre Fachat has a very good description on his home page. Unfortunately,
+&gt; his homepage location changed lately and I don't have the new URL handy.
+
+mmmh, too bad =(
+
+&gt; The compiler and linker are quite fast on todays hardware. But you are
+&gt; right: code that is relocatable at runtime would be nice. But it is not
+&gt; there currently.
+
+well thing isnt that i fear compile time (should take less than a second
+here compiling everything ;=P) but once more than one or two drivers exist,
+it'll make quite a lot of sence not to have them all in memory and beeing
+able to load them at runtime. actually i have thought about it a bit already
+and a simple solution could be:
+
+to load a device driver, just malloc() the needed memory for the driver, then
+load the driver there using built in kernal driver. somewhere in the file
+(preferably at the start) could be a jumptable to the driver service routines,
+or a table with offsets. then just init the driver and adjust some calls in the
+filesystem. the driver itself probably wouldnt need any relocation (i think?!)
+due to it being very low-levelish not needing any direct memory access/jumps or
+subroutine calls. (i may be wrong with the later though).
+
+although this could turn out as a satisfying solution, it has one major draw-
+back that i dont really like, and that is that drivers would HAVE to be loaded
+at the start of your program, before you malloc() any other memory - or your
+heap will get corrupted. also it wont be possible to remove/add drivers at
+runtime, which would be a neat feature indeed.
+
+&gt; It depends an what you want exactly. You may use
+&gt; 
+&gt;     static const char* Msg[] = {
+&gt;         &quot;Bla&quot;,
+&gt;         &quot;Fasel&quot;,
+&gt;         &quot;Foo&quot;,
+&gt;     };
+&gt; 
+&gt; or you may use
+&gt; 
+&gt;     static const char Msg[6][] = {
+&gt;         &quot;Bla&quot;,
+&gt;         &quot;Fasel&quot;,
+&gt;         &quot;Foo&quot;,
+&gt;     };
+
+yes! all i wanted is THIS ;=P mmmh... was that added just recently? i tried that
+sometime when i started writing my cmd-line interpreter but i couldnt get
+it to compile 8=) have to check asap with the recent version hehe ;=)
+
+...
+
+gpz
+
+-- 
+........................................................
+
+		            /^\
+                            \ /  
+      ASCII RIBBON CAMPAIGN  X  AGAINST HTML MAIL
+                            / \  
+
+........................................................
+
+             .--.--.--.----..--.--.--.-----.----.
+   C=64     /  /  /  /  .  /  .  .  /  .  /  .  /\
+           /  /  /__/  /__/  /  /  /  /  /  /  / /
+   PC     /     /  /  /\_/  /  /  /  __ /  /  / /
+         /  /  /  /  / //  /  /  /  /  /  /  / /
+   PSX  /  /  /  /  / //  /  /  /  /  /  /  / /
+       /__/__/__/__/ //__/__/__/_____/__/__/ / 
+       \__\__\__\__\/ \__\__\__\_____\__\__\/  Groepaz
+
+........................................................
+.. <a href="http://fly.to/hitmen-c64">http://fly.to/hitmen-c64</a> ............................
+..... the hitmen c64 home page .........................
+.. <a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a> .......................
+..... hitmen psx section ...............................
+.. <a href="http://start.at/hitnav64">http://start.at/hitnav64</a> ............................
+..... biggest c64 link collection around ...............
+.. <a href="http://fly.to/hitmen-groepaz">http://fly.to/hitmen-groepaz</a> ........................
+..... my little personal page ..........................
+........................................................
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20Sv:%20[cc65]%20Back%20on%20Track">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0035.html">Spiro Trikaliotis: "Re: Sv: [cc65] Back on Track"</a>
+<li><strong>Previous message:</strong> <a href="0033.html">MagerValp: "Re: Sv: Sv: [cc65] Back on Track"</a>
+<li><strong>In reply to:</strong> <a href="0029.html">Martin Ancher Holm - Bankdata: "Sv: [cc65] Back on Track"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0039.html">Ullrich von Bassewitz: "Re: Sv: [cc65] Back on Track"</a>
+<li><strong>Reply:</strong> <a href="0039.html">Ullrich von Bassewitz: "Re: Sv: [cc65] Back on Track"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:35 CET</em>
+</em>
+</small>
+</body>
+</html>

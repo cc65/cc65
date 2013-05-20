@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] local .res ?</title>
+<meta name="Author" content="Anders Åstrand (andast1kth.se)" />
+<meta name="Subject" content="[cc65] local .res ?" />
+<meta name="Date" content="2007-11-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] local .res ?</h1>
+<!-- received="Fri Nov 23 13:51:30 2007" -->
+<!-- isoreceived="20071123125130" -->
+<!-- sent="Fri, 23 Nov 2007 13:51:19 +0100 (CET)" -->
+<!-- isosent="20071123125119" -->
+<!-- name="Anders Åstrand" -->
+<!-- email="andast1kth.se" -->
+<!-- subject="[cc65] local .res ?" -->
+<!-- id="56223.213.114.179.176.1195822279.squirrel@webmail.sys.kth.se" -->
+<!-- charset="iso-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5921.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] local .res ?&quot;">Next message</a> ]
+[ <a href="5919.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Library in ROM&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5921.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] local .res ?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Anders Åstrand &lt;<a href="mailto:andast1kth.se?Subject=Re:%20[cc65]%20local%20.res%20?">andast1kth.se</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-11-23 13:51:19</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello all.
+
+I'm using the great ca65 assembler and have a question. Is it possible to
+make some kind of local .res for parts of code that just use memory
+temporarily? At the moment I do something like this.
+
+.segment &quot;ZEROPAGE&quot;: zeropage
+zp_temp: .res 32
+
+And then functions can use those 32 bytes for whatever they want,
+something like this:
+
+.import zp_temp
+.proc stuff
+   tempAddr = zp_temp + $00
+   tempAddr2 = zp_temp + $02
+
+   ...
+
+.endproc
+
+Now, it would be nice to not having to do the increments manually and let
+the linker find out what size the temp-mem needs to be (by checking how
+much whatever proc that uses most temp-mem uses). Is this at all possible?
+If not, which way do you recommend for handling this?
+
+Sincerely,
+Anders
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Nov 23 13:51:30 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5921.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] local .res ?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5919.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Library in ROM"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5921.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] local .res ?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5921.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] local .res ?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5920" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5920" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5920" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-11-23 13:51:33 CET
+</em></small></p>
+</body>
+</html>

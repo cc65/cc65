@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Think i have triggered a bug w</title>
+<meta name="Author" content="Markus Stehr (bastetfurry1ircnet.de)" />
+<meta name="Subject" content="[cc65] Think i have triggered a bug with -Oirs" />
+<meta name="Date" content="2010-01-17" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Think i have triggered a bug with -Oirs</h1>
+<!-- received="Sun Jan 17 17:25:27 2010" -->
+<!-- isoreceived="20100117162527" -->
+<!-- sent="Sun, 17 Jan 2010 17:25:13 +0100" -->
+<!-- isosent="20100117162513" -->
+<!-- name="Markus Stehr" -->
+<!-- email="bastetfurry1ircnet.de" -->
+<!-- subject="[cc65] Think i have triggered a bug with -Oirs" -->
+<!-- id="1263745513.5518.9.camel@katzenrechner" -->
+<!-- charset="UTF-8" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7754.html" title="Markus Stehr: &quot;Re: [cc65] Think i have triggered a bug with -Oirs&quot;">Next message</a> ]
+[ <a href="7752.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Relative paths during compilation&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7754.html" title="Markus Stehr: &quot;Re: [cc65] Think i have triggered a bug with -Oirs&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Markus Stehr &lt;<a href="mailto:bastetfurry1ircnet.de?Subject=Re:%20[cc65]%20Think%20i%20have%20triggered%20a%20bug%20with%20-Oirs">bastetfurry1ircnet.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-01-17 17:25:13</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi List! :)
+
+I think i have triggered a bug with the optimization rule -Oirs.
+While rendering a pseudo-3d-dungeon view i get graphical glitches with
+this option. If i remove it the glitches are gone. Strangely, i tryed to
+catch the glitch with a bunch of cgetc(); from conio.h (Single-Stepping
+trough the drawing process...) and its gone.
+
+My Version:
+bastetfurry&#64;katzenrechner:~/projekte/lon&#46;<!--nospam-->c64$ cc65 --version
+cc65 V2.13.0
+SVN version: unknown
+
+I cant recreate this with a simple programm so i would need to send the
+whole (small) project to someone who wants to look at it.
+If someone can make some sense out of a snippet too, here is the snippet
+that is causing the bug:
+
+//	cgetc();
+	if(mazeview[1][1]&gt;0)
+	{
+		for(x=0;x&lt;3;++x)
+		{
+			VIDEO_RAM[0x078+x] = 102;VIDEO_RAM[0x0a0+x] = 102;VIDEO_RAM[0x0c8+x]
+= 102;
+			VIDEO_RAM[0x0f0+x] = 102;VIDEO_RAM[0x118+x] = 102;VIDEO_RAM[0x140+x]
+= 102;
+		}
+
+		VIDEO_RAM[0x07b] = 102;
+//		VIDEO_RAM[0x0a3] = 102;VIDEO_RAM[0x0a4] = 102;
+//		VIDEO_RAM[0x0cb] = 102;VIDEO_RAM[0x0cc] = 102;
+//		VIDEO_RAM[0x0f3] = 102;VIDEO_RAM[0x0f4] = 102;
+//		VIDEO_RAM[0x11b] = 102;VIDEO_RAM[0x11c] = 102;
+//		VIDEO_RAM[0x143] = 102;
+	}
+//	cgetc();
+
+If i compile it like this the glitch is there, if i enable the first
+cgetc its gone. If i compile this without -Oirs its gone too.
+
+Hope thats enough, if not, i am happy to send the bughunter the complete
+source. ;)
+
+Greets,
+Markus
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Jan 17 17:25:27 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7754.html" title="Next message in the list">Markus Stehr: "Re: [cc65] Think i have triggered a bug with -Oirs"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7752.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Relative paths during compilation"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7754.html" title="Next message in this discussion thread">Markus Stehr: "Re: [cc65] Think i have triggered a bug with -Oirs"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7754.html" title="Message sent in reply to this message">Markus Stehr: "Re: [cc65] Think i have triggered a bug with -Oirs"</a></li>
+<li><dfn>Reply</dfn>:  <a href="7760.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Think i have triggered a bug with -Oirs"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7753" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7753" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7753" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-01-17 17:25:30 CET
+</em></small></p>
+</body>
+</html>

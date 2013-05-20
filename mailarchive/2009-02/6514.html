@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] calling an asm .proc from </title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="Re: [cc65] calling an asm .proc from C with arguments" />
+<meta name="Date" content="2009-02-19" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] calling an asm .proc from C with arguments</h1>
+<!-- received="Thu Feb 19 10:22:32 2009" -->
+<!-- isoreceived="20090219092232" -->
+<!-- sent="Thu, 19 Feb 2009 10:22:33 +0100" -->
+<!-- isosent="20090219092233" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="Re: [cc65] calling an asm .proc from C with arguments" -->
+<!-- id="200902191022.34608.groepaz@gmx.net" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="499C8184.5040305&#64;gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6515.html" title="Maspethrose71aol.com: &quot;[cc65] GameCartVicA bug solved!&quot;">Next message</a> ]
+[ <a href="6513.html" title="Charles Doty: &quot;Re: [cc65] NES Development - Playpower introduction&quot;">Previous message</a> ]
+[ <a href="6512.html" title="Tachdaun: &quot;[cc65] calling an asm .proc from C with arguments&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+[ <a href="6513.html" title="Charles Doty: &quot;Re: [cc65] NES Development - Playpower introduction&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20calling%20an%20asm%20.proc%20from%20C%20with%20arguments">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-02-19 10:22:33</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Mittwoch 18 Februar 2009, Tachdaun wrote:
+&gt; I'm re-writing my library in asm, but still want to link it from C code.
+&gt; So I would like to know how to access the arguments from within the asm
+&gt; .proc
+&gt;
+&gt; I think this may be target-specific, as in nes.cfg says:
+&gt; &quot;# $0500-$0800 3 pages for cc65 parameter stack&quot;
+&gt;
+&gt; I've seen from generated asm code, that cc65 uses some routines such as
+&gt; &quot;pushax&quot;, but I don't yet totaly understand it.
+&gt; any help would be appreciated.
+
+look at the sourcecode of the runtime library, and also at the code which the 
+compiler generates from your library. it should be fairly easy to understand 
+the calling conventions then.
+
+-- 
+
+<a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    <a href="http://magicdisk.untergrund.net">http://magicdisk.untergrund.net</a>
+<a href="http://www.pokefinder.org">http://www.pokefinder.org</a>        <a href="http://ftp.pokefinder.org">http://ftp.pokefinder.org</a>
+
+Perhaps there should be a new 'quantum' datatype; you would be able to take 
+its address or value, but not both simultaneously. 
+&lt;Michael Shields&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Feb 19 10:22:32 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6515.html" title="Next message in the list">Maspethrose71aol.com: "[cc65] GameCartVicA bug solved!"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6513.html" title="Previous message in the list">Charles Doty: "Re: [cc65] NES Development - Playpower introduction"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6512.html" title="Message to which this message replies">Tachdaun: "[cc65] calling an asm .proc from C with arguments"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6513.html" title="Next message in this discussion thread">Charles Doty: "Re: [cc65] NES Development - Playpower introduction"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6514" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6514" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6514" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-02-19 10:22:34 CET
+</em></small></p>
+</body>
+</html>

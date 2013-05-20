@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Support for the EMMA II sy</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Support for the EMMA II system?" />
+<meta name="Date" content="2004-04-28" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Support for the EMMA II system?</h1>
+<!-- received="Wed Apr 28 21:39:08 2004" -->
+<!-- isoreceived="20040428193908" -->
+<!-- sent="Wed, 28 Apr 2004 21:39:02 +0200" -->
+<!-- isosent="20040428193902" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Support for the EMMA II system?" -->
+<!-- id="20040428193902.GA30268@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="003d01c42d18$97303340$0100a8c0&#64;inet" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4096.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] macro arguments&quot;">Next message</a> ]
+[ <a href="4094.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] C64 command line (again)&quot;">Previous message</a> ]
+[ <a href="4092.html" title="Mats Byggmastar: &quot;[cc65] Support for the EMMA II system?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4098.html" title="Mats Byggmastar: &quot;Re: [cc65] Support for the EMMA II system?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Support%20for%20the%20EMMA%20II%20system?">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-04-28 21:39:02</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Wed, Apr 28, 2004 at 03:01:50PM +0300, Mats Byggmastar wrote:
+&gt; Just joined the list, as I found CC65 a couple of days ago.
+
+Welcome!
+
+&gt; I've done some simple tests with the CC65 tools and found that the
+&gt; assembler and linker would be usable as is. However, it would be
+&gt; extremely cool to also be able to use the C compiler and parts
+&gt; of the standard librarys. Maybe someone has done something already
+&gt; for EMMA II ? If not, where would I start, making the appropriate
+&gt; changes in crt0.s and so on. Any hints and help would be
+&gt; appreciated.
+
+You will have to come up with a memory layout, and generate a linker config
+for it. With a linker config and a working crt0 file, you can start writing C
+programs. But keep in mind that 1.5K of RAM is not much, there are C functions
+with almost that size (the printf family of functions for example).
+
+As for the crt0 file, the best approach would be to have a look at one of the
+existing ones, for example that of the c16 (it's a good example because it is
+rather small).
+
+There is no documentation on &quot;how to create the necessary code for a new
+system&quot;, but the minimum requirements are rather small as said above.
+
+If you have any more specific questions, feel free to ask.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Apr 28 21:39:08 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4096.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] macro arguments"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4094.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] C64 command line (again)"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4092.html" title="Message to which this message replies">Mats Byggmastar: "[cc65] Support for the EMMA II system?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4098.html" title="Next message in this discussion thread">Mats Byggmastar: "Re: [cc65] Support for the EMMA II system?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4098.html" title="Message sent in reply to this message">Mats Byggmastar: "Re: [cc65] Support for the EMMA II system?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4095" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4095" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4095" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-04-28 21:39:15 CEST
+</em></small></p>
+</body>
+</html>

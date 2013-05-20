@@ -1,0 +1,220 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] library header bug cor</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] library header bug correction - and some compiler hazzle">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] library header bug correction - and some compiler hazzle</h1>
+<!-- received="Tue Feb 12 16:47:57 2002" -->
+<!-- isoreceived="20020212154757" -->
+<!-- sent="Tue, 12 Feb 2002 16:47:43 +0100" -->
+<!-- isosent="20020212154743" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] library header bug correction - and some compiler hazzle" -->
+<!-- id="5924710833.20020212164743@gmx.net" -->
+<!-- inreplyto="20020212155646.A7607@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20library%20header%20bug%20correction%20-%20and%20some%20compiler%20hazzle"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2002-02-12 16:47:43
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1077.html">Ullrich von Bassewitz: "[cc65] Atari800 Emulator"</a>
+<li><strong>In reply to:</strong> <a href="1076.html">Ullrich von Bassewitz: "Re: [cc65] library header bug correction - and some compiler hazzle"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1080.html">Mike McCarty: "Re: Re[2]: [cc65] library header bug correction - and some compiler hazzle"</a>
+<li><strong>Next in thread:</strong> <a href="1079.html">MagerValp: "Re: [cc65] library header bug correction - and some compiler hazzle"</a>
+<li><strong>Reply:</strong> <a href="1080.html">Mike McCarty: "Re: Re[2]: [cc65] library header bug correction - and some compiler hazzle"</a>
+<li><strong>Reply:</strong> <a href="1081.html">Ullrich von Bassewitz: "[cc65] Emulator/Debugger"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+UvB&gt; This is a good idea and I would love to have such a test suite myself.
+UvB&gt; Copyright may be a problem, at least if the test suite is to be distributed
+UvB&gt; together with the cc65 source.
+
+mmmmh, dunno about that (nor do i really care :=P) but i took that
+testsuite from some lcc-distribution .zip (jolze's 65816 port
+actually) so i guess its under gpl aswell..... i have seen some parts
+of that suite (eg the floating-point test &quot;paranoia&quot;) in other
+testsuites aswell so i dont think its much of a problem.
+
+however, since the testsuite is probably not interisting for most ppl
+anyway (except taking its programs as examples for own work) it
+shouldnt hurt to distribute it seperatly anyway. (actually makes a lot
+of sence, since i have wrapped all modifications required to compile
+on cc65 in #ifdefs it may be useful for other &quot;small c&quot;
+compiler-developers later on aswell.)
+
+UvB&gt;   1. Write it in clean ANSI C and keep it portable.
+
+sure thing, all my tools are like this :o)
+
+UvB&gt;   2. Make it very limited. Just cover the features not covered in enough depth
+UvB&gt;      by the existing emulators. While such a 6502 emulator would be useful for
+UvB&gt;      many things that are difficult with the current machine specific
+UvB&gt;      emulators, there is no sense in duplicating code and effort. &quot;Limited&quot;
+UvB&gt;      would also mean no support for illegal opcodes, time synchronisation or
+UvB&gt;      other fancy stuff.
+
+yes ofcoz, i am not willing to spend any time on a vic or sid or
+whatever machine-specific emulation either..... i thought just about
+taking an existing cpu-core (marat f.'s used to be nice) and throwing
+the necessary ram/rom stuff around it. actually, we did this some time
+ago for driving a simple sid-emulator on the psx....prolly i can just
+take that code and recompile (dont remember how many psx-specific
+hacks are in there though)
+
+UvB&gt;   3. Within it's limited range, make it configurable. Allow ROM and RAM
+UvB&gt;      regions and the address of the &quot;kernal trap&quot; subroutine to be specified
+UvB&gt;      in a config file. Design the config file syntax to be extensible. This
+UvB&gt;      would also make it possible to offer limited support for simple 6502
+UvB&gt;      peripherials later.
+
+mmmmh yeah could do this aswell.....
+
+UvB&gt;   4. This emulator system could be a separate cc65 target machine with library
+UvB&gt;      support.
+
+mmmmh :=P THAT doesnt really make sence for me :=) how would that be
+of any use (more than an emulator that behaves like an existing
+machine that is) ?
+
+thats actually one of the things i still dont understand with GDB....
+that &quot;simulator&quot; target is just useless kindof :o)
+
+UvB&gt; Apart from being able to use a real test suite, and test platform independent
+UvB&gt; code (like heap routines or similar things), this sort of emulator would be
+UvB&gt; useful for something I'm missing a lot: Source level debugging. The current
+UvB&gt; problem is, that none of the existing emulators has such a feature, and, since
+UvB&gt; the feature is not really needed for a C64, Atari or [insert your favourite 8
+UvB&gt; bit machine here] emulator, the chance to add it and keep it current is pretty
+UvB&gt; low. Besides that, having source level debugging in VICE would not help the
+UvB&gt; Atari or Apple people.
+
+sourcelevel debugging is one of the things i keep nagging the VICE
+team with ;=P hehe
+
+however, actually another project of mine is a retargetable debugger,
+which WILL have support for sourcelevel debugging with cc65 (and
+possibly one or two other c64 compilers/assemblers) some time in the
+future..... look at www.webnova.de/rust/silversurfer/ if you want to
+see how it looks like atm (win32 only atm though) .... this debugger
+actually is also ment to feature that kind of &quot;simpliest&quot; emulator
+sooner or later (so you can do so-called &quot;ice breaker&quot; debugging,
+tracewalk etc)
+
+oh btw, on that site is also the rs232 module i hacked for use with
+the silversurfer...... polling mode, inefficient, and buggy :=P lol
+(actually i didnt understand the api you defined in all its details
+and so i made have done some things wrong...... my plain asm driver
+works neato :o))
+
+UvB&gt; So my idea is to add
+
+UvB&gt;   5. very, very limited debugging support. That means,
+
+UvB&gt;        a. Allow to start the program at a specific address.
+UvB&gt;        b. Allow to interrupt the program (assuming it goes berserk).
+UvB&gt;        c. Allow to read and write memory cells or ranges.
+UvB&gt;        d. Add up to 10 breakpoints.
+
+UvB&gt;      d. could actually be solved by using c. (insert a BRK instruction plus
+UvB&gt;      some code), but it simplifies things if d. is an extra feature.
+
+yeah except the breakpoint, thats pretty much the minimal requirement
+for an emulator isnt it? :o)
+
+&quot;real&quot; breakpoints are easily implemented though (and possibly also
+good help to debug the emulator itself) so why not....
+
+UvB&gt; All these things should be done using a command interface. The command
+UvB&gt; interface would be very simple, unfriendly, and optionally routed via a TCP
+UvB&gt; socket or a similar mechanism. This in turn would make it possible to write a
+UvB&gt; front end that is user friendly, may have a GUI, and allows source level
+UvB&gt; debugging while talking to the emulator over the socket (I would prefer a TCP
+UvB&gt; socket over some other mechanism, since this would work on any platform, even
+UvB&gt; on Windows, which some people seem to prefer for reasons unknown to me).
+
+UvB&gt; Having separated the frontend and the backend (the emulator), one could for
+UvB&gt; example attach the frontend to a slightly modified version of Markos prlink to
+UvB&gt; debug programs on a real machine. Or, as another example, the VICE people may
+UvB&gt; decide to add such an interface to VICE, so the front end could be used for
+UvB&gt; debugging programs in VICE.
+
+mmmh since my knowledge in programming any network stuff is less than
+zero, some other guy gotta implement this :=P
+
+the frontend/backend seperation is a good idea though i guess..... i
+am just heading for a simple commandline-driven tool though, such
+mechanisms are to be done from someone else than me :)
+
+UvB&gt; As an additional advantage, people writing code for embedded hardware could
+UvB&gt; use this emulator at least partially to test code.
+
+THAT is a good point (and answer for my question from above ;D)
+
+now my question is, WHAT embedded hardware is that with a 6502 inside?
+i know its still in use in some toys from asia, and i'd like to see
+one :o) (and i bet it would be helluva funny to rip such a thing apart
+and make it act dull by writing own software :=))
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20library%20header%20bug%20correction%20-%20and%20some%20compiler%20hazzle">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20library%20header%20bug%20correction%20-%20and%20some%20compiler%20hazzle">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1077.html">Ullrich von Bassewitz: "[cc65] Atari800 Emulator"</a>
+<li><strong>In reply to:</strong> <a href="1076.html">Ullrich von Bassewitz: "Re: [cc65] library header bug correction - and some compiler hazzle"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1080.html">Mike McCarty: "Re: Re[2]: [cc65] library header bug correction - and some compiler hazzle"</a>
+<li><strong>Next in thread:</strong> <a href="1079.html">MagerValp: "Re: [cc65] library header bug correction - and some compiler hazzle"</a>
+<li><strong>Reply:</strong> <a href="1080.html">Mike McCarty: "Re: Re[2]: [cc65] library header bug correction - and some compiler hazzle"</a>
+<li><strong>Reply:</strong> <a href="1081.html">Ullrich von Bassewitz: "[cc65] Emulator/Debugger"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-02-12 16:48:08 CET</em>
+</em>
+</small>
+</body>
+</html>

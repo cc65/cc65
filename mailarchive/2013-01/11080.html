@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] News for 2013</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] News for 2013" />
+<meta name="Date" content="2013-01-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] News for 2013</h1>
+<!-- received="Thu, 10 Jan 2013 17:54:09 +0100" -->
+<!-- isoreceived="20130110165409" -->
+<!-- sent="Thu, 10 Jan 2013 17:54:09 +0100" -->
+<!-- isosent="20130110165409" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] News for 2013" -->
+<!-- id="8843698596563725196@unknownmsgid" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20130109201851.GA5324&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11081.html" title="Spiro Trikaliotis: &quot;Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)&quot;">Next message</a> ]
+[ <a href="11079.html" title="silverdr1wfmh.org.pl: &quot;Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)&quot;">Previous message</a> ]
+[ <a href="11066.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] News for 2013&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="11090.html" title="Oliver Schmidt: &quot;Re: [cc65] News for 2013&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20News%20for%202013">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2013-01-10 17:54:09</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt; The approach you've described will mostly work, but
+&gt; from my experience, something is missing.
+
+What I stated wasn't claiming to be sufficient - just necessary ;-)
+
+&gt; What about routines in the library that aren't part of any target library?
+&gt; Example: Stefan Haubenthal reported a bug in the printf family of functions.
+&gt; Who is going to fix that in your scenario? (Before anybody asks: It is unfixed
+&gt; until now).
+
+From my (maybe limited) perspective work on the shared C library
+wasn't the primary problem in the past because it could be done by any
+single contributor without any specific target experience. Therefore I
+didn't mention it in my already (too) long message.
+
+&gt; And what about the subsystems? Having three target library maintainers agree
+&gt; on something is good, but this is more or less coincidence if all three have
+&gt; just their systems in mind.
+
+I imagined that this where the work of the 'library architect' starts...
+
+&gt; And then, you have picked the three most similar systems in your example
+&gt; above.
+
+I know...
+
+&gt; Stefan Haubenthal has volunteered as a maintainer for the Atmos target,
+&gt; which is great!
+
+Indeed :-)
+
+&gt; So the three maintained systems would be complete even without
+&gt; counting the Atari (which, by the way is maintained by Christian).
+
+I absolutely intentionally didn't want to presume any of those!
+Having provided most of the contributions for a target in the past
+might be different from being the 'named maintainer' I was describing
+in my message. And working with you might be different from working
+with me. So everybody should express his will on his own!
+
+&gt; But the Atmos never had real mass storage devices as far as I know.
+
+As the lack of mass storage for several targets was the main driver
+behind my initiative to include statically linked drivers into the C
+library it should be clear that I'm
+- aware of this
+- care about those targets
+
+&gt; Doesn't
+&gt; this break your concept of target maintainers working together to create
+&gt; momentum?
+
+I don't see so - at least currently. If a certain target isn't
+suitable for a certain topic like
+- directory i/o when there's no mass storage
+- tgi stuff when there's only text video
+- sound stuff when there's no sound chip
+- ...
+them the maintainer of that target is supposed to say so - and then
+he's just out of the game for that topic.
+
+The &quot;interesting&quot; scenario is when a target is generally considered
+applicable to a certain topic but the maintainer states otherwise as
+he's not interested (enough) for a discussion/implementation.
+
+I'd say it's a question of the quality of the work of the 'library
+architect' how such a situation is handled.
+
+&gt; Similar thing is the Lynx (maintained by Karri): It is a console,
+&gt; which has slightly other requirements than a home computer system like the
+&gt; Apple ][.
+
+Again I'm pretty aware of that. I did i.e. several hours of research
+just to make sure that the aspect ratio I added to its tgi driver is
+indeed exactly 1.
+
+&gt; Having the Apple, CBM and Atari maintainers agree on something might create a
+&gt; bad solution for the Atmos or the Lynx (or other systems).
+
+But those decisions have been made in the past many times. What i.e.
+about the intrinsic overhead of loadable drivers for targets without
+mass storage? Or their overhead for targets with exactly one
+mouse/joystick/graphics mode/serial interface?
+
+&gt; So I do really
+&gt; think that it would be advantageous to have someone who cares about the
+&gt; library as such, speaks up for not very well maintained systems or thinks
+&gt; about general concepts without regard to a specific target.
+
+Hm, I get more and more the notion that there's a misunderstanding. I
+was under the impression that the 'library architect' from your OP is
+that very person you're describing here. I don't want to remove it
+from the picture - especially after it sort of looks/looked like I
+might be it ;-)
+
+
+I didn't want to say that the active maintainers decide alone. I
+wanted to say that they play part in the decision process - simply
+because it just doen't make sense to me to ask somebody to commit
+himself to implement something he didn't have chance to be part of the
+decision.
+
+Or to put it in other words: Whoever commits to implement for a
+certain target gets in turn the guarantee to take part in the decision
+process.
+
+I think the past there were sometimes way more voices in discussions
+than hands actually willing to work on the result of the discussion.
+That sometimes demotivated contributors and I consider it therefore
+contraprodictive.
+
+That doesn't mean that discussions are supposed to happen behind
+closed doors. It's supposed to mean that - to put in very plain words
+- the ones doing the work should be the ones deciding. Simply because
+in open-source that setup usually motivates - and is just more fun.
+
+&gt; But anyway, thanks for your feedback. I will need to think about possible solutions.
+
+Yeah, ceasing control doesn't necessarily feel good ;-))
+
+And again - I intentionally let several days pass by before entering
+this thread. And still - if there's somebody &quot;out there&quot; interested in
+the 'library architect' role (and feeling to have potentially less
+misunderstandings with Uz) please speak up!
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu, 10 Jan 2013 17:54:09 +0100</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11081.html" title="Next message in the list">Spiro Trikaliotis: "Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="11079.html" title="Previous message in the list">silverdr1wfmh.org.pl: "Re: Cursory analyses of CBM readdir bug (was: [cc65] Re: readdir bug)"</a></li>
+<li><dfn>In reply to</dfn>: <a href="11066.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] News for 2013"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="11090.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] News for 2013"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="11090.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] News for 2013"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#11080" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#11080" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#11080" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2013-01-10 17:54:31 CET
+</em></small></p>
+</body>
+</html>

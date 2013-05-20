@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Running C program in a car</title>
+<meta name="Author" content="Greg King (greg.king41verizon.net)" />
+<meta name="Subject" content="Re: [cc65] Running C program in a cart" />
+<meta name="Date" content="2012-05-26" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Running C program in a cart</h1>
+<!-- received="Sat May 26 03:59:33 2012" -->
+<!-- isoreceived="20120526015933" -->
+<!-- sent="Fri, 25 May 2012 21:58:26 -0400" -->
+<!-- isosent="20120526015826" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king41verizon.net" -->
+<!-- subject="Re: [cc65] Running C program in a cart" -->
+<!-- id="001301cd3ae3$2c33ec80$443efea9@monarch" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="CAJm6qqeAQiAenmHwHSE7jMZmqePZLPf1oOCM5BJrzrzrLbqyWw&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10310.html" title="Payton Byrd: &quot;Re: [cc65] Running C program in a cart&quot;">Next message</a> ]
+[ <a href="10308.html" title="Egan Ford: &quot;[cc65] looking for very fast integer mult and div 6502 asm code&quot;">Previous message</a> ]
+[ <a href="10304.html" title="Payton Byrd: &quot;Re: [cc65] Running C program in a cart&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10310.html" title="Payton Byrd: &quot;Re: [cc65] Running C program in a cart&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king41verizon.net?Subject=Re:%20[cc65]%20Running%20C%20program%20in%20a%20cart">greg.king41verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-05-26 03:58:26</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: &quot;Payton Byrd&quot;; on Friday, May 25, 2012; at 05:28 PM -0400
+&gt;
+&gt; &gt; On Fri, May 25, 2012 at 4:15 PM, Ullrich von Bassewitz
+&gt; &gt;
+&gt; &gt; On Fri, May 25, 2012 at 03:28:38PM -0500, Payton Byrd wrote:
+&gt; &gt; &gt; Now, the cart compiles and loads into VICE; and, when it's loaded
+&gt; &gt; &gt; as a Cart, the screen and border turn white, which is as expected
+&gt; &gt; &gt; based on the code in the header.  The compiled binary then drops
+&gt; &gt; &gt; straight into the CC65 initialization code that is normally at
+&gt; &gt; &gt; 2061, as you would expect.  The problem is that somewhere during
+&gt; &gt; &gt; initialization the system goes into an infinite loop of displaying
+&gt; &gt; &gt; garbage on the screen.
+&gt; &gt;
+&gt; &gt; I don't know much about C64 carts, but aren't they enabled by
+&gt; &gt; modifying $01?  If so, the startup code will probably disable
+&gt; &gt; the cart from where the code is loaded because it modifies $01
+&gt; &gt; to switch off the BASIC ROM.
+&gt;
+&gt; Yes, this is my initial thought as well.  I've added code before
+&gt; the cc65 init to copy all of the memory from $8000 to $BFFF to RAM
+&gt; before performing the init; so, when the cart is disabled, the correct
+&gt; code still should be in place.  However, that does not change the
+&gt; behavior of the program.
+&gt;
+&gt; Here is my current header and config. ...
+&gt;
+&gt; . . . .
+
+The cart header can be written as:
+
+    .segment &quot;ROMLA&quot;
+
+    .addr cold_start
+    .addr cold_start
+    .byte &quot;CBM80&quot;
+
+cold_start:
+    lda #$01
+    sta $d020
+    sta $d021
+
+The signature text will be translated into proper PetSCII.
+
+&gt;
+&gt;     DATA:     load = RAM, type = rw, define = yes;
+
+As Groepaz said, that should be
+    DATA:     load = ROM1, run = RAM, type = rw, define = yes;
+
+OK, with those things out of the way, I can give you the bad news:  The
+cartridge launcher doesn't initiate the computer -- the cart must do
+that job!  Look at a disassembly of the Kernal.  The reset-code, at
+$FCE2, sets the stack pointer, then looks for a cart.  If it finds one,
+it immediately jumps to that cart.  Only if there is no cart does the
+Kernal do a sequence of subroutine-calls that initiates the system.  So,
+your cart header must duplicate that list of JSRs.  Therefore, the
+header must look like this:
+
+CINT   = $ff81
+IOINIT = $ff84
+RAMTAS = $ff87
+RESTOR = $ff8a
+
+    .segment &quot;ROMLA&quot;
+
+    .addr cold_start
+    .addr cold_start
+    .byte &quot;CBM80&quot;
+
+cold_start:
+    jsr IOINIT
+    jsr RAMTAS
+    jsr RESTOR
+    jsr CINT
+    cli
+
+    lda #$01
+    sta $d020
+    sta $d021
+
+; memcpy code ...
+
+A companion problem is that BASIC doesn't start your code; therefore,
+the start-up module mustn't return to BASIC.  So, instead of
+&quot;jmp $8200&quot;, the header must do:
+
+warm_start:
+    jsr startup
+    jmp warm_start
+
+startup:
+    .end
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat May 26 03:59:33 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10310.html" title="Next message in the list">Payton Byrd: "Re: [cc65] Running C program in a cart"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10308.html" title="Previous message in the list">Egan Ford: "[cc65] looking for very fast integer mult and div 6502 asm code"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10304.html" title="Message to which this message replies">Payton Byrd: "Re: [cc65] Running C program in a cart"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10310.html" title="Next message in this discussion thread">Payton Byrd: "Re: [cc65] Running C program in a cart"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10310.html" title="Message sent in reply to this message">Payton Byrd: "Re: [cc65] Running C program in a cart"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10309" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10309" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10309" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-05-26 03:59:36 CEST
+</em></small></p>
+</body>
+</html>

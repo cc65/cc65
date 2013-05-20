@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Atari bug report and conio fea</title>
+<meta name="Author" content="Fatih  (cyco1301yahoo.com)" />
+<meta name="Subject" content="[cc65] Atari bug report and conio feature request" />
+<meta name="Date" content="2004-11-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Atari bug report and conio feature request</h1>
+<!-- received="Tue Nov 23 14:04:49 2004" -->
+<!-- isoreceived="20041123130449" -->
+<!-- sent="Tue, 23 Nov 2004 05:04:44 -0800 (PST)" -->
+<!-- isosent="20041123130444" -->
+<!-- name="Fatih " -->
+<!-- email="cyco1301yahoo.com" -->
+<!-- subject="[cc65] Atari bug report and conio feature request" -->
+<!-- id="20041123130445.31339.qmail@web54608.mail.yahoo.com" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="20041123100803.GA1272&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4716.html" title="Groepaz: &quot;Re: [cc65] Atari bug report and conio feature request&quot;">Next message</a> ]
+[ <a href="4714.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Optimizer bug?&quot;">Previous message</a> ]
+[ <a href="4714.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Optimizer bug?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4716.html" title="Groepaz: &quot;Re: [cc65] Atari bug report and conio feature request&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Fatih  &lt;<a href="mailto:cyco1301yahoo.com?Subject=Re:%20[cc65]%20Atari%20bug%20report%20and%20conio%20feature%20request">cyco1301yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-11-23 14:04:44</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+I have discovered following (small) bugs in Atari
+library:
+
+In the file atari.inc the following line:
+
+SIZEF2	= $D00A		;player 2 size
+
+shoud be:
+
+SIZEP2	= $D00A		;player 2 size
+
+And in the file atari.h the following line:
+
+#define CH_VLINE        0x16 
+
+should be:
+
+#define CH_VLINE        0x7C
+
+because character 0x16 is &quot;left |&quot; not the &quot;middle |&quot;.
+
+----
+
+As the second part of the mail, in the conio library,
+is there a way to determine the character that is
+currently displayed on a given position, and possibly
+its attributes (color, inverse etc.). If there isn't
+such a function, wouldn't be a nice addition to the
+library? 
+
+Please note that I don't know if it's possible on all
+platforms...
+
+
+
+__________________________________________________
+Do You Yahoo!?
+Tired of spam?  Yahoo! Mail has the best spam protection around 
+<a href="http://mail.yahoo.com">http://mail.yahoo.com</a> 
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Nov 23 14:04:49 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4716.html" title="Next message in the list">Groepaz: "Re: [cc65] Atari bug report and conio feature request"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4714.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Optimizer bug?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4714.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Optimizer bug?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4716.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] Atari bug report and conio feature request"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4716.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] Atari bug report and conio feature request"</a></li>
+<li><dfn>Reply</dfn>:  <a href="4718.html" title="Message sent in reply to this message">Christian Groessler: "Re: [cc65] Atari bug report and conio feature request"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4715" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4715" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4715" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-11-23 14:04:58 CET
+</em></small></p>
+</body>
+</html>

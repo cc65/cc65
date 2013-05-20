@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Re: Porting to CC65</title>
+<meta name="Author" content="doynax (doynax1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] Re: Porting to CC65" />
+<meta name="Date" content="2010-10-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Re: Porting to CC65</h1>
+<!-- received="Sun Oct 10 16:18:37 2010" -->
+<!-- isoreceived="20101010141837" -->
+<!-- sent="Sun, 10 Oct 2010 16:18:28 +0200" -->
+<!-- isosent="20101010141828" -->
+<!-- name="doynax" -->
+<!-- email="doynax1gmail.com" -->
+<!-- subject="Re: [cc65] Re: Porting to CC65" -->
+<!-- id="AANLkTimjFLzj9LQR1PdwH8pH5nQnaowRVRrh10y7fabV@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20101010125428.GB9405&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8670.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Re: Porting to CC65&quot;">Next message</a> ]
+[ <a href="8668.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] RedHat Specfile&quot;">Previous message</a> ]
+[ <a href="8666.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Re: Porting to CC65&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8670.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Re: Porting to CC65&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: doynax &lt;<a href="mailto:doynax1gmail.com?Subject=Re:%20[cc65]%20Re:%20Porting%20to%20CC65">doynax1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-10-10 16:18:28</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Thanks for your reply, I'll try to elaborate.
+
+&gt;&gt; 2. My old code makes frequent use of a certain &quot;single_page N&quot; macro
+&gt;&gt; which insures that the following N-byte array stays within a single
+&gt;&gt; page. Is there any way I can handle this efficiently in CA65? As far
+&gt;&gt; as I can see just aligning would waste up to 4*(N-1) bytes.
+&gt;
+&gt; That depends. You can use .assert statements if all you want is to get a
+&gt; warning or an error from the linker if the requirements aren't met. You can
+&gt; use segments to actively place these arrays.
+&gt;
+&gt; How does your current code avoid wasting space for alignment?
+
+No, the macro relies on knowing the current PC value to add alignment
+only when necessary. Without a linker it's essentially implemented
+like this:
+
+.mac single_page len
+ .if &gt;* &lt;&gt; &gt;*+(len)
+  .align 256
+ .endif
+.endmac
+
+Here's an example of a typical usage in the player state-machine:
+
+state := *+1
+    jmp (states)
+
+    single_page 5*2
+states:
+st_dead = &lt;*
+    .word do_nothing
+st_walk = &lt;*
+    .word do_walk
+st_jump = &lt;*
+    .word do_jump
+st_crawl = &lt;*
+    .word do_crawl
+st_climb = &lt;*
+    .word do_climb
+
+Granted it's not a critical operation, and for really large stuff like
+full-page tables I can set up a separate segment, but I've got dozens
+of these so a less wasteful approach than a direct .align would be
+nice. Of course ideally I would have liked to place the aligned block
+in a scope and avoid hard-coding a size, but the limitations of ACME
+forced this approach.
+
+To be honest I'm not quite sure how CA65's alignment pseudo-op works.
+Looking at the code it seems to align relative to the start of the
+segment within the object file and exports a minimum alignment
+requirement, yet the linker script still needs an alignment attribute.
+Is the segment alignment forced on each fragment from every object
+file?
+
+&gt;&gt; 3. Should I be using the preprocessor to implement non-trivial loops?
+&gt;&gt; I can't see how to redefine labels imperatively so I tried using macro
+&gt;&gt; recursion but ran into if-nesting limits.
+&gt;
+&gt; My suggestion is to avoid .define (if that is, what you call the
+&gt; &quot;preprocessor&quot;) if you can. .define works on token level, and therefore
+&gt; ignores scoping. You can get all sorts of weird side effects when using it.
+&gt;
+&gt; Apart from that I'm not able to make any suggestions, without knowing a bit
+&gt; more about what you're trying to do.
+
+I meant looping at compile-time in order to generate tables and code,
+e.g. what .repeat is normally used for.
+
+Here's an example of the sort of thing I mean. This macros is used to
+generate sector interleave tables for the drive-code by recursively
+ticking off bits in a bit-mask representing the track:
+
+.mac interleave limit,mask,offset
+ .local bit,reduced,rotated
+
+ bit = 1&lt;&lt;offset
+ reduced = mask&amp;~bit
+
+ .if reduced = 0
+  .byte offset|$00
+  .exitmacro
+ .elseif mask &lt;&gt; reduced
+  .byte offset|$80
+  rotated = offset+drive_interleave
+ .else
+  rotated = offset+1
+ .endif
+
+ interleave limit,reduced,(rotated .mod limit)
+.endmac
+
+Usually this kind of thing can be handled by writing external
+code/data-generator tools, but being able to handle simple cases from
+within the assembler is obviously convenient.
+
+Oh, and I realize that you're swamped with feature requests but better
+error messages for macro expansions would be really nice. I realize
+that you might not save the needed line-information but perhaps you
+could trace the tokens on the offending line or something? It's just
+that half of my code is defined within macros as I have a tendency to
+inline functions which are only called once, and getting a cryptic
+error message for a two-hundred line macro isn't terribly useful..
+
+Also an alternative macro pseudo-op (say .xmac) with pre-evaluated
+parameters (or perhaps a per-argument operator) would be great as it's
+awfully easy to forget to parenthesize expressions. I suppose I should
+be used to this from all those years of writing C code but I still
+managed to get bitten in that interleave macro ;)
+
+&gt; My usual approach is to do it in a similar way as with C sources:
+&gt;
+&gt;  * An include files defines an interface to a module. So it contains
+&gt;    constantds, structures and has .global statements for the external
+&gt;    identifiers, but no data or code definitions.
+&gt;
+&gt;  * The implementation module includes above file and defines the necessary
+&gt;    code and data. In this case the .global directives will turn into .export
+&gt;    statements.
+&gt;
+&gt;  * Other modules will just reference the stuff defined in the include file,
+&gt;    so the .global directives will turn into .import statements.
+&gt;
+&gt; This has proved to work quite well, especially for bigger projects.
+
+That sounds like exactly what I am trying to do, the equivalent of C
+header files, except I tried to export functions within a scope. So I
+might for instance refer access all loader-related functions and
+constants through a loader:: namespace, and ended up with colliding
+scope definitions in the include file and the module code.
+Being able to define the labels outside of the scope they belong to
+would kind of solve this problem but I'd lose the convenience of
+leaving out the prefixes within module itself, so I'll probably go
+back to prefixing my labels with &quot;ld_&quot; instead. Frankly namespaces in
+C++ also always seemed to cause more problems than they solved.
+
+/doynax
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Oct 10 16:18:37 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8670.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Re: Porting to CC65"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8668.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] RedHat Specfile"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8666.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Re: Porting to CC65"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8670.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Re: Porting to CC65"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8670.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Re: Porting to CC65"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8669" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8669" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8669" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-10-10 16:18:40 CEST
+</em></small></p>
+</body>
+</html>

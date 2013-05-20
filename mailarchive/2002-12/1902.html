@@ -1,0 +1,228 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] SimpleMenu 1.0</title>
+<meta name="Author" content="Christian Groessler (cpg_at_aladdin.de)">
+<meta name="Subject" content="Re: [cc65] SimpleMenu 1.0">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] SimpleMenu 1.0</h1>
+<!-- received="Fri Dec  6 23:53:26 2002" -->
+<!-- isoreceived="20021206225326" -->
+<!-- sent="06 Dec 2002 23:44:44 +0100" -->
+<!-- isosent="20021206224444" -->
+<!-- name="Christian Groessler" -->
+<!-- email="cpg_at_aladdin.de" -->
+<!-- subject="Re: [cc65] SimpleMenu 1.0" -->
+<!-- id="87y972daxv.fsf@gibbon.cnet.aladdin.de" -->
+<!-- inreplyto="[cc65] SimpleMenu 1.0" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Christian Groessler (<a href="mailto:cpg_at_aladdin.de?Subject=Re:%20[cc65]%20SimpleMenu%201.0"><em>cpg_at_aladdin.de</em></a>)<br>
+<strong>Date:</strong> 2002-12-06 23:44:44
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1901.html">Ullrich von Bassewitz: "Re: [cc65] preprocessor again..."</a>
+<li><strong>Maybe in reply to:</strong> <a href="1869.html">MagerValp: "[cc65] SimpleMenu 1.0"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1903.html">Groepaz: "[cc65] wrong colors in conio"</a>
+<li><strong>Next in thread:</strong> <a href="1881.html">MagerValp: "Re: [cc65] Think I found a cc65 bug"</a>
+<li><strong>Reply:</strong> <a href="1903.html">Groepaz: "[cc65] wrong colors in conio"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi,
+
+On 12/04/2002 02:46:56 PM PST &quot;Shawn Jefferson&quot; wrote:
+&gt;
+&gt;&gt;
+&gt;&gt;Hi!
+&gt;&gt;&gt;&gt; Ullrich von Bassewitz &lt;<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20SimpleMenu%201.0">uz_at_musoftware.de</a>&gt; 12/04/02 12:44PM &gt;&gt;&gt;
+&gt;
+&gt;&gt;On Wed, Dec 04, 2002 at 08:23:35AM -0800, Shawn Jefferson wrote:
+&gt;&gt;&gt; The program compiled as is (with the modification of replacing cbm.h with
+&gt;&gt;&gt; atari.h), but since the Atari default text mode only supports 1 color, you
+&gt;&gt;&gt; only get one color.  It's a hardware difference.  There were several tricks
+&gt;&gt;&gt; that people did to get a 40x24 color text mode though.
+&gt;&gt;
+&gt;&gt;OOPS, I didn't know that, sorry. So what does then textcolor() function do?
+&gt;&gt;Will it set all existing text to the passed color?
+
+As already noticed, Atari 40x24 text mode is very restricted in it's
+color choices. The background, border and text colors are controlled
+by 3 different color registers. For background and border all
+combinations are possible. But the text color is always the same color
+as the background, the color register only selects the brightness.
+
+The textcolor(), bgcolor() and bordercolor() set these color
+registers.
+
+&gt;
+&gt;It's even worse than that, since in Graphics mode zero, the background and text are both controlled by the same color register.  Another 
+&gt;register controls the luminance value, IIRC.  So textcolor sets the color of the text AND the background!
+&gt;
+&gt;Doing a textcolor(COLOR_RED) on the atari doesn't give you red text, at least it didn't for me.
+
+Use bgcolor() to set the color. textcolor() only selects the luminance
+of the text. The c64-compatible COLOR_xxx defines don't make much
+sense in this context. The brightness is specified by bits 1 to 3 of
+the colorvalue, use textcolor (0xe) for max. bightness, or
+textcolor(0) for max. darkness of the text.
+
+I've attached a simple text program to explore the effects of bgcolor,
+bordercolor and textcolor on the Atari.
+
+regards,
+chris
+
+
+------------------------
+/* $Id: color.c,v 1.3 2002/12/06 01:31:14 chris Exp $
+ *
+ * color test
+ */
+
+#include &quot;conio.h&quot;
+#include &quot;stdio.h&quot;
+#include &quot;atari.h&quot;
+
+unsigned char colors[] = {
+    COLOR_BLACK,
+    COLOR_WHITE,
+    COLOR_RED,
+    COLOR_CYAN,
+    COLOR_VIOLET,
+    COLOR_GREEN,
+    COLOR_BLUE,
+    COLOR_YELLOW,
+    COLOR_ORANGE,
+    COLOR_BROWN,
+    COLOR_LIGHTRED,
+    COLOR_GRAY1,
+    COLOR_GRAY2,
+    COLOR_LIGHTGREEN,
+    COLOR_LIGHTBLUE,
+    COLOR_GRAY3,
+};
+#define NUMCOLORS (sizeof(colors) / sizeof(unsigned char) - 1)
+
+unsigned char *color_names[] = {
+    &quot;COLOR_BLACK&quot;,
+    &quot;COLOR_WHITE&quot;,
+    &quot;COLOR_RED&quot;,
+    &quot;COLOR_CYAN&quot;,
+    &quot;COLOR_VIOLET&quot;,
+    &quot;COLOR_GREEN&quot;,
+    &quot;COLOR_BLUE&quot;,
+    &quot;COLOR_YELLOW&quot;,
+    &quot;COLOR_ORANGE&quot;,
+    &quot;COLOR_BROWN&quot;,
+    &quot;COLOR_LIGHTRED&quot;,
+    &quot;COLOR_GRAY1&quot;,
+    &quot;COLOR_GRAY2&quot;,
+    &quot;COLOR_LIGHTGREEN&quot;,
+    &quot;COLOR_LIGHTBLUE&quot;,
+    &quot;COLOR_GRAY3&quot;,
+};
+
+int main(void)
+{
+    unsigned char bg, border, text, c;
+    unsigned int x, y;
+
+    clrscr();
+    printf(&quot;***********************\n&quot;);
+    printf(&quot;*                     *\n&quot;);
+    printf(&quot;* C O L O R   T E S T *\n&quot;);
+    printf(&quot;*                     *\n&quot;);
+    printf(&quot;***********************\n\n\n&quot;);
+
+    printf(&quot;q    -  quit\n\n&quot;);
+    printf(&quot;1/2  -  loop thru bgcolor\n&quot;);
+    printf(&quot;5/6  -  loop thru bordercolor\n&quot;);
+    printf(&quot;8/9  -  loop thru textcolor\n\n\n&quot;);
+
+    bg = 6;      /* COLOR_BLUE */
+    border = 14; /* COLOR_LIGHTBLUE */
+    text = 14;   /* COLOR_LIGHTBLUE */
+
+    x = wherex(); y = wherey();
+
+    do {
+        textcolor(colors[text]);
+        bgcolor(colors[bg]);
+        bordercolor(colors[border]);
+        gotoxy(x,y);
+        cprintf(&quot;bg:     &lt;%02d&gt;  %3d $%02X  %s               \r\n&quot;,
+                bg, colors[bg], colors[bg], color_names[bg]);
+        gotoxy(x,y + 1);
+        cprintf(&quot;border: &lt;%02d&gt;  %3d $%02X  %s               \r\n&quot;,
+                border, colors[border], colors[border], color_names[border]);
+        gotoxy(x,y + 2);
+        cprintf(&quot;text:   &lt;%02d&gt;  %3d $%02X  %s               \r\n&quot;,
+                text, colors[text], colors[text], color_names[text]);
+        c = cgetc();
+        switch (c) {
+            case '1': bg--;     if (bg == 0xff) bg = NUMCOLORS;         break;
+            case '2': bg++;     if (bg &gt; NUMCOLORS) bg = 0;             break;
+            case '5': border--; if (border == 0xff) border = NUMCOLORS; break;
+            case '6': border++; if (border &gt; NUMCOLORS) border = 0;     break;
+            case '8': text--;   if (text == 0xff) text = NUMCOLORS;     break;
+            case '9': text++;   if (text &gt; NUMCOLORS) text = 0;         break;
+        }
+    }
+    while (c != 'q' &amp;&amp; c != 'Q');
+
+    printf(&quot;\nhit &lt;return&gt; to exit\n&quot;);
+    cgetc();
+}
+------------------------
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20SimpleMenu%201.0">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1901.html">Ullrich von Bassewitz: "Re: [cc65] preprocessor again..."</a>
+<li><strong>Maybe in reply to:</strong> <a href="1869.html">MagerValp: "[cc65] SimpleMenu 1.0"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1903.html">Groepaz: "[cc65] wrong colors in conio"</a>
+<li><strong>Next in thread:</strong> <a href="1881.html">MagerValp: "Re: [cc65] Think I found a cc65 bug"</a>
+<li><strong>Reply:</strong> <a href="1903.html">Groepaz: "[cc65] wrong colors in conio"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-12-06 23:53:43 CET</em>
+</em>
+</small>
+</body>
+</html>

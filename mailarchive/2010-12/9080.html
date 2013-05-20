@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: RE: [cc65] Re: Patch for reading a 'v</title>
+<meta name="Author" content="Dan Winslow (danwinslow1cox.net)" />
+<meta name="Subject" content="RE: [cc65] Re: Patch for reading a 'volatile' pointer" />
+<meta name="Date" content="2010-12-21" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>RE: [cc65] Re: Patch for reading a 'volatile' pointer</h1>
+<!-- received="Tue Dec 21 15:46:05 2010" -->
+<!-- isoreceived="20101221144605" -->
+<!-- sent="Tue, 21 Dec 2010 08:45:55 -0600" -->
+<!-- isosent="20101221144555" -->
+<!-- name="Dan Winslow" -->
+<!-- email="danwinslow1cox.net" -->
+<!-- subject="RE: [cc65] Re: Patch for reading a 'volatile' pointer" -->
+<!-- id="001801cba11d$c60c00b0$52240210$@net" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="AANLkTi=d+zRHHA=3zhQu_4DKmwhD0_dNXfGN+YQMchrz&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9081.html" title="Stefan Wessels: &quot;[cc65] Using ptr3 gives range error&quot;">Next message</a> ]
+[ <a href="9079.html" title="Stefan Wessels: &quot;Re: [cc65] Manic Miner game for C64 more or less done&quot;">Previous message</a> ]
+[ <a href="9074.html" title="Dave Dribin: &quot;Re: [cc65] Re: Patch for reading a 'volatile' pointer&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Dan Winslow &lt;<a href="mailto:danwinslow1cox.net?Subject=RE:%20[cc65]%20Re:%20Patch%20for%20reading%20a%20'volatile'%20pointer">danwinslow1cox.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-12-21 15:45:55</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I don't think you should apply the patch. A language platform should either
+support or not 
+support a given keyword. In this case, the general utility to be gained is
+very small, and 
+the potential harm ( mostly in the form of confusion and perhaps wasted time
+) is larger. 
+
+-----Original Message-----
+From: owner-cc65&#64;musoftware&#46;<!--nospam-->de [mailto:owner-cc65&#64;musoftware&#46;<!--nospam-->de] On Behalf
+Of Dave Dribin
+Sent: Friday, December 17, 2010 10:44 PM
+To: cc65&#64;musoftware&#46;<!--nospam-->de
+Subject: Re: [cc65] Re: Patch for reading a 'volatile' pointer
+
+On Sun, Dec 12, 2010 at 2:58 PM, Ullrich von Bassewitz &lt;uz&#64;musoftware&#46;<!--nospam-->de&gt;
+wrote:
+&gt; Your code is almost exactly identical to what I would have written, when
+&gt; implementing it without changing the compiler structure. But it is just
+about
+&gt; 10-15% of what has to be done, and the missing parts are the reason why I
+&gt; didn't do it. Each and every optimizer routine that removes or rewrites
+code
+&gt; has to check the new CodeEntry flag for every code line in question,
+otherwise
+&gt; volatile processing might work in a few cases, but fail in many others. So
+&gt; while it's a start, it is just that.
+
+Yeah.  I pretty much just hacked in support for the one case I needed. ;)
+
+&gt; So how to proceed? I'm willing to apply the patch in this or a similar
+form,
+&gt; but everybody has to realize that this will change the current situation
+only
+&gt; a bit. Instead of &quot;volatile is parsed but ignored&quot;, which is a clear and
+&gt; unambiguous statement, it would then be &quot;volatile is parsed and might
+&gt; sometimes work&quot;. If this is considered an improvement, I will apply the
+patch.
+
+This is a good question.... I'm not quite I can provide any valuable
+input.  Is 10% of volatile better than 0%?  It is if you're the one
+who wants to use that 10%. ;)  Also, does this help a common case for
+using volatile?  Given the PEEK/POKE macros, accessing specific
+address is pretty common, and often those addresses are hardware
+registers.
+
+Some questions... is volatile something you'd like to eventually fully
+support?  Does this patch help get you there?  If so, perhaps full
+volatile support could be added piecemeal, over time, rather than
+waiting for some grand redesign, in which case this patch is the first
+step towards that.
+
+-Dave
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Dec 21 15:46:05 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9081.html" title="Next message in the list">Stefan Wessels: "[cc65] Using ptr3 gives range error"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9079.html" title="Previous message in the list">Stefan Wessels: "Re: [cc65] Manic Miner game for C64 more or less done"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9074.html" title="Message to which this message replies">Dave Dribin: "Re: [cc65] Re: Patch for reading a 'volatile' pointer"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9080" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9080" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9080" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-12-21 15:46:11 CET
+</em></small></p>
+</body>
+</html>

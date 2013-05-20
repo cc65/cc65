@@ -1,0 +1,247 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] Version 2.2.0 is out</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="[cc65] Version 2.2.0 is out">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] Version 2.2.0 is out</h1>
+<!-- received="Sun Jun 27 21:19:34 1999" -->
+<!-- isoreceived="19990627191934" -->
+<!-- sent="Sun, 27 Jun 1999 21:19:17 +0200 (MEST)" -->
+<!-- isosent="19990627191917" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="[cc65] Version 2.2.0 is out" -->
+<!-- id="m10yKST-000brTC@wuschel.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Version%202.2.0%20is%20out"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 1999-06-27 21:19:17
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="../1999-07/0992.html">MagerValp: "compiler bug?"</a>
+<li><strong>Previous message:</strong> <a href="0990.html">Ullrich von Bassewitz: "Re: Hy!"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+I've just compiled the new version for all systems. I don't have access
+to a current (&gt;= 6.x) SuSE system, so I have dropped SuSE binary support
+for now. RedHat RPMs are available as usual.
+
+Below is a copy of the annoucement. Thanks to everyone who helped to
+improve this version and get it out finally!
+
+Regards
+
+
+	Uz
+
+
+---------------------------------------------------------------------------
+I'm proud to announce version 2.2 of CC65, a C crosscompiler /
+crossassembler combo for 6502 systems.
+
+CC65 has C and runtime library support for most CBM machines. The
+libraries are fairly portable, so creating a version for other 6502s
+shouldn't be too much work.
+
+Here is a list of the compiler features:
+
+  * Includes a C compiler, macro assembler, archiver, linker and a
+    frontend (compile&amp;link) utility. The assembler generates relocatable
+    object files, the linker is very configurable and allows overlays,
+    ROMable code, splitted output and much more.
+
+  * The compiler is not quite ISO compatible, however, a large subset
+    is supported.
+
+  * Supported target systems are:
+
+    	- C64
+    	- C128
+    	- C16, C116, Plus/4
+    	- CBM 600/700 family (programs run in bank 1)
+    	- Newer PET machines (not 2001)
+
+    For all these systems a precompiled runtime and C library is
+    available. Supporting more targets is not very difficult since the C
+    library was written with portability in mind.
+
+  * Several system specific support routines like a conio library or
+    modules for joystick access are available.
+
+  * The assembler and linker do also support the 65816 as a target,
+    however, the compiler is not able to generate code for this CPU and
+    there is no RTL support.
+
+  * Lots of docs and a few sample programs included.
+
+  * Easy interfacing between C code and assembler.
+
+  * Fullscreen debugger for most machines as a linkable module.
+
+  * Full sourcecode available as well as binaries for
+
+	- Linux (RedHat 5.x RPM)
+	- OS/2
+	- DOS
+	- Windows 95/98/NT
+
+
+
+What is new in this version:
+
+  * Several bugs fixed.
+
+  * Several new bugs introduced.
+
+  * Faster and shorter code.
+
+  * New compile and link utility that may be used instead of the naked
+    compiler/assembler for more convenience.
+
+  * Predefined macro packages in the assembler.
+
+  * New compiler features: Old style (K&amp;R) functions are now supported,
+    the #if preprocessor command does correct macro expansions and more.
+
+  * Experimental port of Craig Bruces Swiftlink RS232 library.
+
+
+
+Support for some features is still missing. To name a few:
+
+  * No floats.
+
+  * No file routines. Actually, most stdio routines are there, but the
+    low level file I/O is missing, so you get linker errors if you try to
+    use them with files.
+
+  * The 80 column mode on the C128 is not supported by the conio library.
+
+  * ACE is no longer supported. The old code is still there, but I had
+    not the time to keep it current.
+
+
+
+More information:
+
+For your convenience, I've put all doc files also on the web server:
+
+    <a href="http://www.von-bassewitz.de/uz/cc65/doc/">http://www.von-bassewitz.de/uz/cc65/doc/</a>
+
+The cc65 main page
+
+    <a href="http://www.von-bassewitz.de/uz/cc65/">http://www.von-bassewitz.de/uz/cc65/</a>
+
+will get updated to reflect the new version in the next few days.
+
+There is also a cc65 mailing list. To subscribe, send a mail to
+<a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Version%202.2.0%20is%20out">majordomo_at_musoftware.de</a> with the command
+
+    subscribe cc65
+
+in the body of the mail.
+
+
+
+Help:
+
+Any help is appreciated! There are still areas, where the package is
+incomplete, expecially when it comes to the libraries. If you think about
+investing some time, here's a todo list:
+
+  * File routines for the CBM systems are still missing. The C library
+    uses a layered approach, so there are only 4 routines needed to get
+    most of the higher level stuff up and running. All that is needed are
+    C compatible open/close/read/write functions.
+
+  * Support for the 80 column mode on the C128.
+
+  * Support for ACE or other systems (VIC20, PET, even an Apple or Atari
+    version shouldn't be too difficult).
+
+  * A graphics library. The Plus/4 has a 320*200 mode that is very
+    compatible the C64 and C128. With some clever programming it should
+    be possible to write something that translates for all three
+    platforms without changes.
+
+
+
+Available packages:
+
+As usual I will provide the complete sources and several binary packages
+binaries. There's a binary RPM for RedHat which is probably the fastest
+way to get going if you're running RedHat Linux. Since this is also my
+development platform, new features and bug fixes are first available for
+Linux.
+
+Binaries for DOS, OS/2 and Windows will follow or may already be
+available at the time you read this.
+
+
+
+Download:
+
+For more information and links to the FTP server, see
+
+    	<a href="http://www.von-bassewitz.de/uz/cc65/">http://www.von-bassewitz.de/uz/cc65/</a>
+
+For direct download, use
+
+        <a href="ftp://ftp.musoftware.de/pub/uz/cc65/">ftp://ftp.musoftware.de/pub/uz/cc65/</a>
+
+
+
+Thanks to all who sent feedback and suggestions!
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Version%202.2.0%20is%20out">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Version%202.2.0%20is%20out">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="../1999-07/0992.html">MagerValp: "compiler bug?"</a>
+<li><strong>Previous message:</strong> <a href="0990.html">Ullrich von Bassewitz: "Re: Hy!"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:44 CET</em>
+</em>
+</small>
+</body>
+</html>

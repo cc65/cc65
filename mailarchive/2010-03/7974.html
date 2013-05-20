@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Re: some patches</title>
+<meta name="Author" content="silverdr1wfmh.org.pl (silverdr1wfmh.org.pl)" />
+<meta name="Subject" content="Re: [cc65] Re: some patches" />
+<meta name="Date" content="2010-03-17" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Re: some patches</h1>
+<!-- received="Wed Mar 17 21:07:00 2010" -->
+<!-- isoreceived="20100317200700" -->
+<!-- sent="Wed, 17 Mar 2010 21:06:53 +0100" -->
+<!-- isosent="20100317200653" -->
+<!-- name="silverdr1wfmh.org.pl" -->
+<!-- email="silverdr1wfmh.org.pl" -->
+<!-- subject="Re: [cc65] Re: some patches" -->
+<!-- id="1AE1EE21-69CB-4F7B-A902-F694014D5352@wfmh.org.pl" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="20100317185358.GQ12616&#64;arwen.poofy.goof.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7975.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Re: some patches&quot;">Next message</a> ]
+[ <a href="7973.html" title="Groepaz: &quot;Re: [cc65] Re: some patches&quot;">Previous message</a> ]
+[ <a href="7972.html" title="Aaron J. Grier: &quot;[cc65] Re: some patches&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7977.html" title="Oliver Schmidt: &quot;Re: [cc65] Re: some patches&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:silverdr1wfmh.org.pl?Subject=Re:%20[cc65]%20Re:%20some%20patches">silverdr1wfmh.org.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-03-17 21:06:53</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 2010-03-17, at 19:53, Aaron J. Grier wrote:
+
+&gt; I do not expect all combinations to be built by default.  however,  
+&gt; if I
+&gt; configure with &quot;--enable-ide64&quot; and &quot;--enable-selfmodifying&quot; I am  
+&gt; asking
+&gt; for the above four combinations to be built.  adding &quot;--enable- 
+&gt; con80&quot; to
+&gt; the previous two, and I am asking for eight combinations.
+
+I was thinking along similar lines when I was writing about  
+conditional builds. But I guess the problem starts when e.g. two  
+different options require modifications to the same modules. For  
+example JiffyDOS (not sure if this is a good one) AND ide64 (which I  
+would consider both to be &quot;important&quot;) both would modify read.s and  
+write.s. Then you have to say &quot;either or&quot;, which means more logic to  
+the building process and loss of the modularity goal we wanted to  
+achieve. OR... maintaining an exponentially growing set of  
+combinations of different read.s-es and write.s-es. The same for  
+options modifying other source files. Too bad :-(
+
+Having said that - I would still be happy to have at least the  
+exclusive variations possible.
+
+-- 
+SD!
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Mar 17 21:07:00 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7975.html" title="Next message in the list">silverdr1wfmh.org.pl: "Re: [cc65] Re: some patches"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7973.html" title="Previous message in the list">Groepaz: "Re: [cc65] Re: some patches"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7972.html" title="Message to which this message replies">Aaron J. Grier: "[cc65] Re: some patches"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7977.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Re: some patches"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7974" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7974" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7974" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-03-17 21:07:03 CET
+</em></small></p>
+</body>
+</html>

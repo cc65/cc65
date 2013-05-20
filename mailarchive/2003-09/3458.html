@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Platform specific docs</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Platform specific docs">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Platform specific docs</h1>
+<!-- received="Thu Sep 25 20:19:42 2003" -->
+<!-- isoreceived="20030925181942" -->
+<!-- sent="Thu, 25 Sep 2003 20:19:37 +0200" -->
+<!-- isosent="20030925181937" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Platform specific docs" -->
+<!-- id="20030925181937.GA11688@trixie.musoftware.de" -->
+<!-- inreplyto="200309251754.34597.groepaz@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Platform%20specific%20docs"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-09-25 20:19:37
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3457.html">carlos: "[cc65] sprite x stretch,y stretch"</a>
+<li><strong>In reply to:</strong> <a href="3455.html">Groepaz: "Re: [cc65] Platform specific docs"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3464.html">Groepaz: "Re: [cc65] Platform specific docs"</a>
+<li><strong>Next in thread:</strong> <a href="3461.html">Groepaz: "Re: [cc65] Platform specific docs"</a>
+<li><strong>Reply:</strong> <a href="3464.html">Groepaz: "Re: [cc65] Platform specific docs"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Thu, Sep 25, 2003 at 05:54:34PM +0200, Groepaz wrote:
+&gt; ok so maybe i'll wait a bit... is there some app that can be used for testing
+&gt; anyway (something trivial i mean, its hard to tell if its really the rs232
+&gt; driver when you are testing with contiki :=)) ? would some kind of &quot;mini
+&gt; terminal&quot; be useful? (its just about 10 lines of code anyway :=))
+
+My plan was to use the old uip web server. But I need real hardware for the
+test which is the reason, it is not done yet.
+
+&gt; yes it does...however, i dont think its a problem (except that it doesnt allow
+&gt; for the full theoretical performance). actually i think that it would be good
+&gt; to have both a polling and an irq-driven driver (for my debugging stuff
+&gt; anything irq driven is a nono, however for most other cases its probably
+&gt; preferred). maybe i'll try my luck with an irq driven driver too sometime...i
+&gt; just have no use for it atm :)
+
+I would prefer an interrupt driven driver. But to my suprise, I found that the
+silversurfer uses the NMI, not the IRQ line - in my eyes a wrong design
+decision, because using the IRQ would have removed a lot of problems with disk
+routines and is uncritical for a device that has a 16 byte builtin buffer. So
+maybe there's really a use for the polling driver.
+
+&gt; ok i'll have a look at them... as far as i remember they where more or less
+&gt; finished but need to be made loadable modules.... gotta check that :)
+
+Please keep in mind that variables must be initialized in INIT, because
+otherwise the driver may not work correctly when statically linked.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Platform%20specific%20docs">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Platform%20specific%20docs">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3457.html">carlos: "[cc65] sprite x stretch,y stretch"</a>
+<li><strong>In reply to:</strong> <a href="3455.html">Groepaz: "Re: [cc65] Platform specific docs"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3464.html">Groepaz: "Re: [cc65] Platform specific docs"</a>
+<li><strong>Next in thread:</strong> <a href="3461.html">Groepaz: "Re: [cc65] Platform specific docs"</a>
+<li><strong>Reply:</strong> <a href="3464.html">Groepaz: "Re: [cc65] Platform specific docs"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-09-25 20:20:04 CEST</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] C64 - how to use disk I/O?</title>
+<meta name="Author" content="Andreas Koch (email1kochandreas.com)" />
+<meta name="Subject" content="Re: [cc65] C64 - how to use disk I/O?" />
+<meta name="Date" content="2008-11-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] C64 - how to use disk I/O?</h1>
+<!-- received="Tue Nov 25 18:42:24 2008" -->
+<!-- isoreceived="20081125174224" -->
+<!-- sent="Tue, 25 Nov 2008 18:42:27 +0100" -->
+<!-- isosent="20081125174227" -->
+<!-- name="Andreas Koch" -->
+<!-- email="email1kochandreas.com" -->
+<!-- subject="Re: [cc65] C64 - how to use disk I/O?" -->
+<!-- id="492C3903.9020505@kochandreas.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="6ba4c2a00811250837k6481cf58la7d851efe2029a8a&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6280.html" title="Adrian Siekierka: &quot;Re: [cc65] C64 - how to use disk I/O?&quot;">Next message</a> ]
+[ <a href="6278.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] C64 - how to use disk I/O?&quot;">Previous message</a> ]
+[ <a href="6275.html" title="Adrian Siekierka: &quot;[cc65] C64 - how to use disk I/O?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6280.html" title="Adrian Siekierka: &quot;Re: [cc65] C64 - how to use disk I/O?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Andreas Koch &lt;<a href="mailto:email1kochandreas.com?Subject=Re:%20[cc65]%20C64%20-%20how%20to%20use%20disk%20I/O?">email1kochandreas.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-11-25 18:42:27</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt; Hello. I'm a newcomer to cc65 and C64 programming in general.
+&gt; The question is, how to get disk I/O for the C64 to work?
+&gt; I tried CBM commands - fail.
+&gt; Standard C I/O - fail.
+&gt; I just want to read a PRG file (with no load address, just data) into 
+&gt; memory! Or any other kind of file.
+&gt; It's for my BF interpreter, so it should be possible (with my way) to 
+&gt; just rename a TXT file and add it to a d64.
+&gt; Anyone knows how to read files from a 15x1 with cc65 code on a c64?
+
+ From an older posting of mine:
+
+***file TEST.C start***
+/*demo for cbm_load */
+
+#include &lt;stdio.h&gt;
+#include &lt;time.h&gt;
+#include &lt;conio.h&gt;
+#include &lt;cbm.h&gt;
+#include &lt;dbg.h&gt;
+#include &lt;stdlib.h&gt;
+#include &quot;cbm.h&quot;
+
+unsigned char memory[1024];
+
+int main()
+{
+    unsigned char drive = 8;
+
+    cbm_load(&quot;TEST.C&quot;,drive,memory);
+    memory[40]=0;
+    printf(&quot;Result:\n%s&quot;,memory);	
+    cgetc();
+}
+***file TEST.C end****
+
+This will print &quot;demo for ...&quot;, as cbm_load assumes the first 2 byte to 
+be the address so they aren't loaded.
+
+hope that helps,
+   Andreas
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Nov 25 18:42:24 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6280.html" title="Next message in the list">Adrian Siekierka: "Re: [cc65] C64 - how to use disk I/O?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6278.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] C64 - how to use disk I/O?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6275.html" title="Message to which this message replies">Adrian Siekierka: "[cc65] C64 - how to use disk I/O?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6280.html" title="Next message in this discussion thread">Adrian Siekierka: "Re: [cc65] C64 - how to use disk I/O?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6280.html" title="Message sent in reply to this message">Adrian Siekierka: "Re: [cc65] C64 - how to use disk I/O?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6279" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6279" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6279" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-11-25 18:42:25 CET
+</em></small></p>
+</body>
+</html>

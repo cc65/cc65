@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Re: TGI colors revisited</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Re: TGI colors revisited" />
+<meta name="Date" content="2011-05-05" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Re: TGI colors revisited</h1>
+<!-- received="Thu May  5 14:23:58 2011" -->
+<!-- isoreceived="20110505122358" -->
+<!-- sent="Thu, 5 May 2011 14:23:50 +0200" -->
+<!-- isosent="20110505122350" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Re: TGI colors revisited" -->
+<!-- id="BANLkTinx-1=QzGNO7Pyr=7qJ9bBcU3UwCw@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="4DC0F6F5.3080803&#64;sipo.fi" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9393.html" title="Karri Kaksonen: &quot;Re: [cc65] Re: TGI colors revisited&quot;">Next message</a> ]
+[ <a href="9391.html" title="Karri Kaksonen: &quot;Re: [cc65] Re: TGI colors revisited&quot;">Previous message</a> ]
+[ <a href="9391.html" title="Karri Kaksonen: &quot;Re: [cc65] Re: TGI colors revisited&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9393.html" title="Karri Kaksonen: &quot;Re: [cc65] Re: TGI colors revisited&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Re:%20TGI%20colors%20revisited">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-05-05 14:23:50</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Karri,
+
+&gt;&gt; So the result is: If you don't want to redesign the roles of the TGI
+&gt;&gt; kernel and driver on tgi_init() then tgi_getdefpalette() comes for
+&gt;&gt; free.
+
+&gt; I like the possibility to call tgi_getdefpalette. It allows me to code like:
+&gt;
+&gt; tgi_getdefpalette
+&gt; copy the RGB values indexed by TGI_COLOR_BLUE to my own palette
+&gt; tgi_setpalette
+&gt;
+&gt; After this TGI_COLOR_BLUE works as before even if the rest of the colors in
+&gt; my own palette may be different.
+
+I see. This is btw. exactly style of programming which depends on the
+&quot;rules&quot; I described in my original posting.
+
+&gt;&gt;&gt; In order to allow the palette manipulation that you have described
+&gt;&gt;&gt; earlier, we must use the brush table as the TGI palette. [...]
+
+&gt;&gt; If I understand you right than this approach wouldn't fit the
+&gt;&gt; semantics of a palette. A palette means - at least from my perspective
+&gt;&gt; - that setting a (different) palette immediately causes re-coloring of
+&gt;&gt; all already displayed pixels.
+
+&gt; All indexed palettes work this way. This effect is frequently used for
+&gt; &quot;animation&quot; in games. A good example i Boing in Amiga where the sphere
+&gt; &quot;rotates&quot; due to manipulating the indexed palette.
+
+I'm pretty lost now: Is the brush table an indexed palette? I've been
+researching for more Lynx info but didn't come up with something
+explaining how the 'brush table' and the '12-bit hardware palette'
+work...
+
+&gt;&gt; The usual approach would rather be to translate the values in the TGI
+&gt;&gt; palette into values for the 12-bit palette on calls to
+&gt;&gt; tgi_setpalette(). [...]
+
+&gt; This is a low-level driver. The tgi_getpalette returns a pointer to the
+&gt; hardware palette in the graphics chip. There is no stored &quot;palette&quot; in the
+&gt; driver.
+&gt;
+&gt; The only stored palette in the tgi driver is the default palette.
+&gt;
+&gt; Also the tgi_setpalette will just write to the chips registers directly. It
+&gt; will not store a copy of the palette anywhere.
+&gt;
+&gt; Some programmers even change the palette at start of each scanline to get
+&gt; more colors than 16 on screen at once.
+&gt;
+&gt; I like the current TGI-driver.
+
+Again, I might be missing the point but... The whole story about TGI
+is target-independence. Otherwise it wouldn't be explainable that it
+i.e. doesn't have any sprite support.
+
+Today any TGI program that works with palettes in any way is more or
+less automatically target-dependent :-( The whole story about my
+original posting is to extend the TGI idea of target-independence
+toward palette manipulation.
+
+It is obvious that TGI means for almost all targets that it doesn't
+fully leverage the hardware capabilities. And that therefore TGI
+(without proprietary extensions) is almost always not usefull for
+getting the best out of the hardware.
+
+If you say that you like the current TGI driver than I understand that
+you can use it well for your Lynx-specific development. However that's
+not the design goal of TGI.
+
+If a TGI driver reports 16 colors than the palette used for
+tgi_getdefpalette/tgi_getpalette/tgi_setpalette _HAS_ to consist of 16
+'unsigned char's. If the Lynx TGI driver doesn't use such palettes
+then it just doesn't comply to the TGI driver specification and could
+therefore even considered not being a TGI driver at all.
+
+Still it might be a very useful tool to write great Lynx applications
+- but that's a totally different story...
+
+&gt; What we could do is to choose the best 16
+&gt; colors and give consistent names to them.
+
+For the sake for target-independence I'd suggest - as discussed - to
+use the C64 names.
+
+&gt; The indexes could also be in some
+&gt; kind of order of importance. Then every driver can pick as many colors of
+&gt; the palette as it can.
+
+No, every target has - as discussed - it's own color macros. So
+there's no need nor use in sharing color indexes between targets.
+
+As the Lynx has &quot;only&quot; one driver there's nothing to share/pick from
+for you. Just choose the indexes 0-15 as you like / as you see fit.
+
+&gt; I don't believe in the machine generated palette idea. It would not produce
+&gt; nice colors for such a limited palette. You would need at least 64 colors
+&gt; for making it work.
+
+Once again I'm not sure if I'm understanding you correctly...
+
+- The &quot;fixed&quot; colors 0-15 are supposed to be mapped to the 12-bit RGB
+values using a manually finetuned table.
+
+- The 6-bit color values and the TGI_COLOR_RGB(r,g,b) thingy was
+really just an idea. However 6 bit yield 64 colors.
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu May  5 14:23:58 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9393.html" title="Next message in the list">Karri Kaksonen: "Re: [cc65] Re: TGI colors revisited"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9391.html" title="Previous message in the list">Karri Kaksonen: "Re: [cc65] Re: TGI colors revisited"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9391.html" title="Message to which this message replies">Karri Kaksonen: "Re: [cc65] Re: TGI colors revisited"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9393.html" title="Next message in this discussion thread">Karri Kaksonen: "Re: [cc65] Re: TGI colors revisited"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9393.html" title="Message sent in reply to this message">Karri Kaksonen: "Re: [cc65] Re: TGI colors revisited"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9392" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9392" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9392" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-05-05 14:24:02 CEST
+</em></small></p>
+</body>
+</html>

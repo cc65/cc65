@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] ld65 Config Question</title>
+<meta name="Author" content="Tim Vanderhoek (vanderh_at_ecf.utoronto.ca)">
+<meta name="Subject" content="Re: [cc65] ld65 Config Question">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] ld65 Config Question</h1>
+<!-- received="Sun Feb 20 02:02:20 2000" -->
+<!-- isoreceived="20000220010220" -->
+<!-- sent="Sat, 19 Feb 2000 18:49:00 -0500" -->
+<!-- isosent="20000219234900" -->
+<!-- name="Tim Vanderhoek" -->
+<!-- email="vanderh_at_ecf.utoronto.ca" -->
+<!-- subject="Re: [cc65] ld65 Config Question" -->
+<!-- id="20000219184859.B14794@mad" -->
+<!-- inreplyto="200002191311.OAA24943@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Tim Vanderhoek (<a href="mailto:vanderh_at_ecf.utoronto.ca?Subject=Re:%20[cc65]%20ld65%20Config%20Question"><em>vanderh_at_ecf.utoronto.ca</em></a>)<br>
+<strong>Date:</strong> 2000-02-20 00:49:00
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0059.html">Ullrich von Bassewitz: "Re: [cc65] ld65 Config Question"</a>
+<li><strong>Previous message:</strong> <a href="0057.html">Tim Vanderhoek: "Re: [cc65] ld65 Config Question"</a>
+<li><strong>In reply to:</strong> <a href="0056.html">Ullrich von Bassewitz: "Re: [cc65] ld65 Config Question"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0059.html">Ullrich von Bassewitz: "Re: [cc65] ld65 Config Question"</a>
+<li><strong>Reply:</strong> <a href="0059.html">Ullrich von Bassewitz: "Re: [cc65] ld65 Config Question"</a>
+<li><strong>Reply:</strong> <a href="../2000-03/0062.html">Ullrich von Bassewitz: "Re: [cc65] ld65 Config Question"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Sat, Feb 19, 2000 at 02:11:25PM +0100, Ullrich von Bassewitz wrote:
+&gt; 
+&gt;   * Is there a need to specify which one goes into the memory area first, LOAD
+&gt;     or RUN? Currently LOAD goes first, then RUN. Specifying an additional
+
+Hm.  I can't think of any reasons to need a different order.
+
+An additional level of abstraction in the Config file would probably
+handle most of the wierd cases fairly cleanly, but ...
+
+I'm not sure if it's necessary.
+
+
+&gt;  * Currently the RUN range is never written to the output file, it is not even
+&gt;    written using fill bytes when FILL is set. This is usually ok with the old
+
+I think that if the linker's output is a binary file (ie. basically just
+a verbatim memory image) then all segments should be filled (possible
+exception: the last bss segment).
+
+&gt;             With the new feature this may lead to &quot;holes&quot; in the output file,
+
+Holes are very bad.  :)
+
+There are arguments for filling the RUN area both with FILLVAL and
+with the RUN data.  I think I would fill it with FILLVAL.  POLA.
+
+
+&gt;   * Similar: BSS segments are never written to the output file. Is this needed
+&gt;     to make use of the duplicate LOAD and RUN area feature? Assume this:
+
+Actually, I'd run across this before and modified the linker to output
+the BSS segment.  Then I realized there was no real need (save
+aesthetics) for the segment in question to be type=BSS.  :)
+
+This may be a general truth: someone who needs to put BSS at the
+beginning of memory could probably just as easily get away with saying
+&quot;type = rw&quot;.
+
+I don't think it's necessary to write-out type=bss segments.  There's
+not much that makes a bss segment to be a bss segment, otherwise.  :)
+
+
+&gt;                                 I don't know if this is a realistic setup for
+&gt;     the BSS segment, but people seem to do all sort of things I have never
+
+And it would probably break malloc().  :)
+
+
+-- 
+Signature withheld by request of author.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20ld65%20Config%20Question">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0059.html">Ullrich von Bassewitz: "Re: [cc65] ld65 Config Question"</a>
+<li><strong>Previous message:</strong> <a href="0057.html">Tim Vanderhoek: "Re: [cc65] ld65 Config Question"</a>
+<li><strong>In reply to:</strong> <a href="0056.html">Ullrich von Bassewitz: "Re: [cc65] ld65 Config Question"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0059.html">Ullrich von Bassewitz: "Re: [cc65] ld65 Config Question"</a>
+<li><strong>Reply:</strong> <a href="0059.html">Ullrich von Bassewitz: "Re: [cc65] ld65 Config Question"</a>
+<li><strong>Reply:</strong> <a href="../2000-03/0062.html">Ullrich von Bassewitz: "Re: [cc65] ld65 Config Question"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:35 CET</em>
+</em>
+</small>
+</body>
+</html>

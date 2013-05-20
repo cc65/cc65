@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Atari Disk Image Tool ?</title>
+<meta name="Author" content="Christian Grössler (chris1groessler.org)" />
+<meta name="Subject" content="Re: [cc65] Atari Disk Image Tool ?" />
+<meta name="Date" content="2010-09-28" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Atari Disk Image Tool ?</h1>
+<!-- received="Tue Sep 28 21:07:59 2010" -->
+<!-- isoreceived="20100928190759" -->
+<!-- sent="Tue, 28 Sep 2010 21:07:34 +0200" -->
+<!-- isosent="20100928190734" -->
+<!-- name="Christian Grössler" -->
+<!-- email="chris1groessler.org" -->
+<!-- subject="Re: [cc65] Atari Disk Image Tool ?" -->
+<!-- id="4CA23CF6.2030401@groessler.org" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="AANLkTingNLOR2oZpxOEcVZXn_e5qM31Yek9hCgB2VfKL&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8632.html" title="Oliver Schmidt: &quot;Re: [cc65] Atari Disk Image Tool ?&quot;">Next message</a> ]
+[ <a href="8630.html" title="Dan Winslow: &quot;RE: [cc65] Atari Disk Image Tool ?&quot;">Previous message</a> ]
+[ <a href="8629.html" title="Oliver Schmidt: &quot;Re: [cc65] Atari Disk Image Tool ?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8632.html" title="Oliver Schmidt: &quot;Re: [cc65] Atari Disk Image Tool ?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Christian Grössler &lt;<a href="mailto:chris1groessler.org?Subject=Re:%20[cc65]%20Atari%20Disk%20Image%20Tool%20?">chris1groessler.org</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-09-28 21:07:34</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Oliver,
+
+On 28.09.10 13:20, Oliver Schmidt wrote:
+&gt; Just to make sure I'm not getting this wrong. The &quot;standard&quot; way to
+&gt; run a cc65 program using DOS 2.5 is the L option from the &quot;DOS menu&quot; -
+&gt; correct? If the program ends then a message 'need mem.sav to load this
+&gt; file' is printed and then the DOS menu comes up again. Is this the
+&gt; expected experience?
+
+ From the documentation:
+
+   N. CREATE MEM.SAV Reserves space on a diskette for the
+           program in RAM to be stored while the DUP.SYS file is being
+           used.  For some applications like programming, it is a good
+           idea to create a MEM.SAV file on each new diskette you intend
+           to use as a System Diskette.  As you become more familiar
+           with DOS, you may find there are cases where a MEM.SAV file
+           serves no useful function.  The inconvenience of waiting for
+           MEM.SAV to load into memory may warrant deleting it from the
+           disk.
+
+DUP.SYS is the DOS menu. If it's present, the memory used by DUP.SYS
+will be saved to MEM.SAV and restored when you leave DOS. Mostly useful if
+you enter DOS from BASIC and don't want the BASIC program to be destroyed.
+You can ignore the message.
+
+
+&gt; If I omit DUP.SYS from a DOS 2.5 disk then the emulator tells me that
+&gt; the Atari crashed. If I omit DUP.SYS from a disk containing a
+&gt; STARTUP.SYS, then that program gets successufully loaded. However when
+&gt; the program ends, there's again the crash. From that I deduct that
+&gt; (beside DOS.SYS) DUP.SYS is more or less obligatory (at least for DOS
+&gt; 2.5) - correct?
+
+STARTUP.SYS? As said, DUP.SYS is the DOS menu and as long as you never
+enter the menu (an autostart program which never exits), it's probably not
+needed.
+
+
+&gt; For the Apple2 I've created a C library function named
+&gt; rebootafterexit(). If it is called at some time then exiting the cc65
+&gt; program some time later will not try to get back into DOS but will
+&gt; rather reboot the machine. Maybe something like this would be feasable
+&gt; / would makes sense for the Atari too. Then omitting DUP.SYS would
+&gt; work - but maybe I'm missing some point...
+
+Would an atexit() routine also work, wouldn't it?
+
+Btw., is space so tight that you need to omit DUP.SYS?
+
+regards,
+chris
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Sep 28 21:07:59 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8632.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Atari Disk Image Tool ?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8630.html" title="Previous message in the list">Dan Winslow: "RE: [cc65] Atari Disk Image Tool ?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8629.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] Atari Disk Image Tool ?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8632.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Atari Disk Image Tool ?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8632.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Atari Disk Image Tool ?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8631" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8631" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8631" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-09-28 21:08:02 CEST
+</em></small></p>
+</body>
+</html>

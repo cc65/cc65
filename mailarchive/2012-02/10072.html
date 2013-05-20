@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] MemBank128: Problem with clrsc</title>
+<meta name="Author" content="Joseph Rose (rose.joseph121yahoo.com)" />
+<meta name="Subject" content="[cc65] MemBank128: Problem with clrscr() translation?" />
+<meta name="Date" content="2012-02-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] MemBank128: Problem with clrscr() translation?</h1>
+<!-- received="Wed Feb 29 18:36:18 2012" -->
+<!-- isoreceived="20120229173618" -->
+<!-- sent="Wed, 29 Feb 2012 09:36:09 -0800 (PST)" -->
+<!-- isosent="20120229173609" -->
+<!-- name="Joseph Rose" -->
+<!-- email="rose.joseph121yahoo.com" -->
+<!-- subject="[cc65] MemBank128: Problem with clrscr() translation?" -->
+<!-- id="1330536969.8957.YahooMailNeo@web120601.mail.ne1.yahoo.com" -->
+<!-- charset="iso-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10073.html" title="Payton Byrd: &quot;Re: [cc65] GEOS Reloaded&quot;">Next message</a> ]
+[ <a href="10071.html" title="Oliver Schmidt: &quot;[cc65] GEOS Reloaded&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="../2012-03/10079.html" title="Joseph Rose: &quot;Re: [cc65] MemBank128: Problem with clrscr() translation?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Joseph Rose &lt;<a href="mailto:rose.joseph121yahoo.com?Subject=Re:%20[cc65]%20MemBank128:%20Problem%20with%20clrscr()%20translation?">rose.joseph121yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-02-29 18:36:09</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I'm continuing to work on MemBank128.  I did not lose everything!  :D  I still had Bank 1 and 15 code and a few files that were conveted from them for testing.  However, I ran into a problem with the clrscr() routine: during the function call, the 40-column screen's character data seems to be corrupted.  I think that the kernal routine's writing to the VIC-II's control addresses because it doesn't seem to be affecting the rest of the program otherwise.  The new routine is supposed to run in the LOWCODE segment from Bank 0, switch to Bank 15 to call the kernal function and switch back to Bank 0 before exiting.  Here's the code for the function call:
+----------------------
+_clrscr:
+ lda #$00
+ sta $FF00
+ jsr CLRSCR
+ ;lda #$3F
+ sta $FF01
+ rts
+----------------------
+Joseph Rose, a.k.a. Harry Potter
+Working magic in the computer community
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Feb 29 18:36:18 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10073.html" title="Next message in the list">Payton Byrd: "Re: [cc65] GEOS Reloaded"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10071.html" title="Previous message in the list">Oliver Schmidt: "[cc65] GEOS Reloaded"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="../2012-03/10079.html" title="Next message in this discussion thread">Joseph Rose: "Re: [cc65] MemBank128: Problem with clrscr() translation?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="../2012-03/10079.html" title="Message sent in reply to this message">Joseph Rose: "Re: [cc65] MemBank128: Problem with clrscr() translation?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10072" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10072" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10072" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-02-29 18:36:21 CET
+</em></small></p>
+</body>
+</html>

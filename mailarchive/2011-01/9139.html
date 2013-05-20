@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Multi-purpose memory layou</title>
+<meta name="Author" content="Marc 'BlackJack' Rintsch (marc1rintsch.de)" />
+<meta name="Subject" content="Re: [cc65] Multi-purpose memory layout, ca65, ld65" />
+<meta name="Date" content="2011-01-12" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Multi-purpose memory layout, ca65, ld65</h1>
+<!-- received="Wed Jan 12 15:41:30 2011" -->
+<!-- isoreceived="20110112144130" -->
+<!-- sent="Wed, 12 Jan 2011 15:25:14 +0100" -->
+<!-- isosent="20110112142514" -->
+<!-- name="Marc 'BlackJack' Rintsch" -->
+<!-- email="marc1rintsch.de" -->
+<!-- subject="Re: [cc65] Multi-purpose memory layout, ca65, ld65" -->
+<!-- id="201101121525.24046.marc@rintsch.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="20110112114424.GK30819&#64;vega.lgb.hu" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9140.html" title="Karri Kaksonen: &quot;Re: [cc65] Multi-purpose memory layout, ca65, ld65&quot;">Next message</a> ]
+[ <a href="9138.html" title="Gábor Lénárt: &quot;[cc65] Multi-purpose memory layout, ca65, ld65&quot;">Previous message</a> ]
+[ <a href="9138.html" title="Gábor Lénárt: &quot;[cc65] Multi-purpose memory layout, ca65, ld65&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9140.html" title="Karri Kaksonen: &quot;Re: [cc65] Multi-purpose memory layout, ca65, ld65&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Marc 'BlackJack' Rintsch &lt;<a href="mailto:marc1rintsch.de?Subject=Re:%20[cc65]%20Multi-purpose%20memory%20layout,%20ca65,%20ld65">marc1rintsch.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-01-12 15:25:14</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi GÃ¡bor,
+
+&gt; Sorry for the stupid subject line, but I can't express it better. 
+&gt; The exact problem of mine: I have a program (using only ca65, so
+&gt; assembly project) for Commdore 64 (with basic stub, but it's my own
+&gt; code) which contains large amount of constant data (it's graphical
+&gt; data which is copied to the graphical screen, then I don't need that
+&gt; once more, it's .INCBIN'ed to my program), which is only needed at the
+&gt; beginning of my program. I also use initialized (to zero) bytes during
+&gt; the run of my program, using RES statements in the BSS segment.  My
+&gt; idea is to use my data at the beginning then filling the area to zero
+&gt; and I can use that part of memory as my BSS segment.  However I am
+&gt; really not sure how can I tell this to ca64/ld65.
+
+There where some posts regarding overlays last year on this mailing 
+list, i.e. parts of code/data occupying the same memory but at different 
+times and how to do that with config files.  That sounds much like the 
+problem you are describing.  Just that your data does not come from a 
+file loaded at runtime.
+
+Ciao,
+	Marc 'BlackJack' Rintsch
+-- 
+GOD is REAL â€¦ unless declared INTEGER
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<div>
+<ul>
+<li>application/pgp-signature attachment: <a href="../att-9139/signature.asc_">This is a digitally signed message part.</a></li>
+</ul>
+<!-- attachment="signature.asc_" -->
+</div>
+<span id="received"><dfn>Received on</dfn> Wed Jan 12 15:41:30 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9140.html" title="Next message in the list">Karri Kaksonen: "Re: [cc65] Multi-purpose memory layout, ca65, ld65"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9138.html" title="Previous message in the list">Gábor Lénárt: "[cc65] Multi-purpose memory layout, ca65, ld65"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9138.html" title="Message to which this message replies">Gábor Lénárt: "[cc65] Multi-purpose memory layout, ca65, ld65"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9140.html" title="Next message in this discussion thread">Karri Kaksonen: "Re: [cc65] Multi-purpose memory layout, ca65, ld65"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9140.html" title="Message sent in reply to this message">Karri Kaksonen: "Re: [cc65] Multi-purpose memory layout, ca65, ld65"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9139" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9139" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9139" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-01-12 15:41:33 CET
+</em></small></p>
+</body>
+</html>

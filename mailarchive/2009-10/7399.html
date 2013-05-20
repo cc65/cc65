@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Sharing circle ? (was: Tgi</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Sharing circle ? (was: Tgi circle and font size magnification)" />
+<meta name="Date" content="2009-10-28" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Sharing circle ? (was: Tgi circle and font size magnification)</h1>
+<!-- received="Wed Oct 28 16:06:19 2009" -->
+<!-- isoreceived="20091028150619" -->
+<!-- sent="Wed, 28 Oct 2009 16:05:52 +0100" -->
+<!-- isosent="20091028150552" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Sharing circle ? (was: Tgi circle and font size magnification)" -->
+<!-- id="20091028150552.GA1605@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="f97798c20910280656x2db35686odceff1a2e1c40d69&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7400.html" title="Karri Kaksonen: &quot;Re: [cc65] Sharing circle ?&quot;">Next message</a> ]
+[ <a href="7398.html" title="Oliver Schmidt: &quot;[cc65] Sharing circle ? (was: Tgi circle and font size magnification)&quot;">Previous message</a> ]
+[ <a href="7398.html" title="Oliver Schmidt: &quot;[cc65] Sharing circle ? (was: Tgi circle and font size magnification)&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7400.html" title="Karri Kaksonen: &quot;Re: [cc65] Sharing circle ?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Sharing%20circle%20?%20(was:%20Tgi%20circle%20and%20font%20size%20magnification)">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-10-28 16:05:52</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Wed, Oct 28, 2009 at 02:56:40PM +0100, Oliver Schmidt wrote:
+&gt; Instead of having each driver supply the CIRCLE routine there could be
+&gt; just a single shared routine (incl. clipping) right inside tgi_circle:
+
+I'm just coming back from running, and while I looked at all the autumn
+foliage, I had the same idea:-)
+
+&gt; The interface from the tgi_circle into the driver could look something like this
+&gt; - CIRCLEINIT called once at the start of circle drawing
+&gt; - CIRCLEPLOT called for every pixel to be plotted
+&gt; - CIRCLEDONE called once at the end of circle drawing
+&gt;
+&gt; The CIRCLEPLOT parameters would be identical to SETPIXEL so a driver
+&gt; could implement the three entrypoints by
+&gt; - just returning on CIRCLEINIT and CIRCLEDONE
+&gt; - aliasing CIRCLEPLOT to SETPIXEL
+
+I would even go a step further:
+
+  * No circle support by the driver at all.
+
+  * The wrapper implements circles by using a cosine table and drawing line
+    segments.
+
+This has one disadvantage and a lot of advantages:
+
+  * The circle routine is slower than before.
+
+  * The drivers get smaller and simpler. Part of the saved space could be used
+    to max out the line drawing routine, which becomes more important than
+    before.
+
+  * Ellipses, pie slices or whatever could also be done without much trouble.
+
+  * The sine/cosine routines could be user callable, removing implementations
+    from 3dmaze, tgidemo and all the doom clones for the 6502 machines :-)
+
+  * Programs that don't use circles don't pay for it in terms of code size.
+
+  * The runtime can be used to do multiplications and such. This is not
+    possible from a driver.
+
+  * Circle is the only routine that needs clipping in the driver if we do also
+    change OUTTEXT. This means that clipping can be removed completely from
+    the drivers making them smaller and faster.
+
+Now, how does that sound?
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Oct 28 16:06:19 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7400.html" title="Next message in the list">Karri Kaksonen: "Re: [cc65] Sharing circle ?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7398.html" title="Previous message in the list">Oliver Schmidt: "[cc65] Sharing circle ? (was: Tgi circle and font size magnification)"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7398.html" title="Message to which this message replies">Oliver Schmidt: "[cc65] Sharing circle ? (was: Tgi circle and font size magnification)"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7400.html" title="Next message in this discussion thread">Karri Kaksonen: "Re: [cc65] Sharing circle ?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7400.html" title="Message sent in reply to this message">Karri Kaksonen: "Re: [cc65] Sharing circle ?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7399" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7399" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7399" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-10-28 16:06:22 CET
+</em></small></p>
+</body>
+</html>

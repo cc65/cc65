@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] suppress output after .err</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] suppress output after .error/.end" />
+<meta name="Date" content="2011-01-08" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] suppress output after .error/.end</h1>
+<!-- received="Sat Jan  8 19:50:31 2011" -->
+<!-- isoreceived="20110108185031" -->
+<!-- sent="Sat, 8 Jan 2011 19:50:17 +0100" -->
+<!-- isosent="20110108185017" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] suppress output after .error/.end" -->
+<!-- id="20110108185017.GA13426@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="AANLkTinSpJxC_akNuipF5fPR5C4whTPrHXZfaJwVygw_&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9127.html" title="thefox xofeht: &quot;Re: [cc65] suppress output after .error/.end&quot;">Next message</a> ]
+[ <a href="9125.html" title="thefox xofeht: &quot;[cc65] suppress output after .error/.end&quot;">Previous message</a> ]
+[ <a href="9125.html" title="thefox xofeht: &quot;[cc65] suppress output after .error/.end&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9127.html" title="thefox xofeht: &quot;Re: [cc65] suppress output after .error/.end&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20suppress%20output%20after%20.error/.end">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-01-08 19:50:17</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Thu, Jan 06, 2011 at 08:21:38AM +0200, thefox xofeht wrote:
+&gt; I'm using .error for some asserts in a header file (the header
+&gt; requires the user to define couple of symbols before including it). Is
+&gt; it possible to suppress any compiler output after .error has been
+&gt; used? Currently ca65 happily evalutes the following code and gives
+&gt; additional errors, which makes the output kinda cluttered, making it
+&gt; difficult to spot the actual error.
+
+There are several ways ca65 could be changed to allow that. The first one is
+to disable any checks when .end is used. Another one would be to introduce
+something like .fatal in addition to .error, which would print a message and
+terminate assembly immediately.
+
+I don't know which one is better. Maybe the second one has less side effects.
+Opinions anyone?
+
+Regards
+
+
+        Uz
+
+
+--
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Jan  8 19:50:31 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9127.html" title="Next message in the list">thefox xofeht: "Re: [cc65] suppress output after .error/.end"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9125.html" title="Previous message in the list">thefox xofeht: "[cc65] suppress output after .error/.end"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9125.html" title="Message to which this message replies">thefox xofeht: "[cc65] suppress output after .error/.end"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9127.html" title="Next message in this discussion thread">thefox xofeht: "Re: [cc65] suppress output after .error/.end"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9127.html" title="Message sent in reply to this message">thefox xofeht: "Re: [cc65] suppress output after .error/.end"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9126" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9126" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9126" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-01-08 19:50:35 CET
+</em></small></p>
+</body>
+</html>

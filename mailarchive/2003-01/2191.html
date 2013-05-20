@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] ATARI Multijoy Joystickdr</title>
+<meta name="Author" content="Christian Groessler (cpg_at_aladdin.de)">
+<meta name="Subject" content="Re: [cc65] ATARI Multijoy Joystickdriver">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] ATARI Multijoy Joystickdriver</h1>
+<!-- received="Thu Jan  2 22:22:34 2003" -->
+<!-- isoreceived="20030102212234" -->
+<!-- sent="02 Jan 2003 22:20:52 +0100" -->
+<!-- isosent="20030102212052" -->
+<!-- name="Christian Groessler" -->
+<!-- email="cpg_at_aladdin.de" -->
+<!-- subject="Re: [cc65] ATARI Multijoy Joystickdriver" -->
+<!-- id="87wulnmeob.fsf@power.cnet.aladdin.de" -->
+<!-- inreplyto="[cc65] ATARI Multijoy Joystickdriver" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Christian Groessler (<a href="mailto:cpg_at_aladdin.de?Subject=Re:%20[cc65]%20ATARI%20Multijoy%20Joystickdriver"><em>cpg_at_aladdin.de</em></a>)<br>
+<strong>Date:</strong> 2003-01-02 22:20:52
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2190.html">Ullrich von Bassewitz: "Re: [cc65] CC65 Memory Corruption"</a>
+<li><strong>Maybe in reply to:</strong> <a href="../2002-12/2182.html">Carsten Strotmann: "[cc65] ATARI Multijoy Joystickdriver"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2193.html">Ullrich von Bassewitz: "[cc65] Function returns (was: ATARI Multijoy Joystickdriver)"</a>
+<li><strong>Reply:</strong> <a href="2193.html">Ullrich von Bassewitz: "[cc65] Function returns (was: ATARI Multijoy Joystickdriver)"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi,
+
+On 01/01/2003 10:17:26 PM CET Ullrich von Bassewitz wrote:
+&gt;
+&gt;Yes it should. The C standard calls this &quot;int promotion&quot;. Expressions are
+&gt;always evaluated with type int, never using smaller data types. For cc65, int
+&gt;promotion is done when loading the character into the primary register (a/x).
+&gt;The original compiler had signed characters, which meant that sign extension
+&gt;was quite expensive, and doing it when loading saved some code.
+&gt;
+&gt;The effect of having sign extension when loading is that the compiler expects
+&gt;that a char data type is always extended to an int. Using
+&gt;
+&gt;        unsigned char count = joy_count ();
+&gt;
+&gt;is no problem when joy_count() does not set the X register, but
+&gt;
+&gt;        unsigned count = joy_count ();
+&gt;
+&gt;is, because the compiler doesn't do the conversion from char to int, so the
+&gt;high byte is wrong.
+
+I think this is something which should be documented (sorry, if it
+already is.). It's quite vital information for people writing
+subroutines in assembler.
+
+If I understand it correctly the compiler assumes return values from
+functions to be already &quot;int promoted&quot;. This is quite different from
+the (obvious?) assumption that a function returning char will only
+return a char.
+
+
+&gt;If you are archiving your mail, you may want to have a look at our private
+&gt;mail exchange starting &quot;Sat, 25 Mar 2000 11:56:16 +0100&quot;, where I explained
+&gt;exactly the same thing to you:-)
+
+I knew from that discussion somewhere back in my brain that functions
+should return AX, but I had forgotten the reason.
+
+regards,
+chris
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20ATARI%20Multijoy%20Joystickdriver">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2190.html">Ullrich von Bassewitz: "Re: [cc65] CC65 Memory Corruption"</a>
+<li><strong>Maybe in reply to:</strong> <a href="../2002-12/2182.html">Carsten Strotmann: "[cc65] ATARI Multijoy Joystickdriver"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2193.html">Ullrich von Bassewitz: "[cc65] Function returns (was: ATARI Multijoy Joystickdriver)"</a>
+<li><strong>Reply:</strong> <a href="2193.html">Ullrich von Bassewitz: "[cc65] Function returns (was: ATARI Multijoy Joystickdriver)"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-01-02 22:22:38 CET</em>
+</em>
+</small>
+</body>
+</html>

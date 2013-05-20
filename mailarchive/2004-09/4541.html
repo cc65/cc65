@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Floating point support?</title>
+<meta name="Author" content="Sidney Cadot (sidney1jigsaw.nl)" />
+<meta name="Subject" content="[cc65] Floating point support?" />
+<meta name="Date" content="2004-09-26" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Floating point support?</h1>
+<!-- received="Sun Sep 26 13:02:10 2004" -->
+<!-- isoreceived="20040926110210" -->
+<!-- sent="Sun, 26 Sep 2004 13:02:07 +0200" -->
+<!-- isosent="20040926110207" -->
+<!-- name="Sidney Cadot" -->
+<!-- email="sidney1jigsaw.nl" -->
+<!-- subject="[cc65] Floating point support?" -->
+<!-- id="81AAB79C-0FAB-11D9-BEB2-000A95914D12@jigsaw.nl" -->
+<!-- charset="US-ASCII" -->
+<!-- inreplyto="20040925173947.GA22872&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4542.html" title="Raj Wurttemberg: &quot;RE: [cc65] Get user input? Floating point?&quot;">Next message</a> ]
+[ <a href="4540.html" title="Mats Andrén: &quot;Re[6]: [cc65] cfg-files and the linker and so on..&quot;">Previous message</a> ]
+[ <a href="4532.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Get user input? Floating point?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4544.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Floating point support?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Sidney Cadot &lt;<a href="mailto:sidney1jigsaw.nl?Subject=Re:%20[cc65]%20Floating%20point%20support?">sidney1jigsaw.nl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-09-26 13:02:07</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Ullrich,
+
+&gt; Groepaz is right, there's no floating point, and therefore no %f for 
+&gt; sscanf.
+
+Just out of curiosity... Have you given any thought on adding floating 
+point support to cc65? There's quite a number of applications that 
+could benefit from this.
+
+The way I see it, to get basic support at compiler-level one would 
+need...
+
+(1) An agreed floating point number format
+
+Probably having float==double would suffice at first - although using a 
+4-byte FP format would violate some ISO C requirements.
+
+It's probably not a good idea to piggyback on the formats supported by 
+the platform ROMs - the C64 does 4-byte binary FP format I think, while 
+the Atari uses a 6-byte BCD format.
+
+IEEE-754 4-byte &quot;single&quot; format would be a natural choice IMHO.
+
+(2) 6502 conversion routines from int &lt;-&gt; float and back
+(3) 6502 routines to support + - * / &lt; &gt; &lt;= &gt;= == != operators
+
+(4) When all this is in place, we'd need an overhaul of the assembler 
+and the compiler to support the new types.
+
+Then, to add library-level support, we'd need
+
+(5) 6502 ASCII &lt;-&gt; FP conversion functions (e.g. for scanf/printf)
+(6) A 6502 math library (pow(), exp(), sin(), cos(), ... the works)
+
+Now if such a roadmap (or similar) would be acceptable, I would 
+volunteer to take care of steps (2) and (3).
+
+Best regards, Sidney
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Sep 26 13:02:10 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4542.html" title="Next message in the list">Raj Wurttemberg: "RE: [cc65] Get user input? Floating point?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4540.html" title="Previous message in the list">Mats Andrén: "Re[6]: [cc65] cfg-files and the linker and so on.."</a></li>
+<li><dfn>In reply to</dfn>: <a href="4532.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Get user input? Floating point?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4544.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Floating point support?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4544.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Floating point support?"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="4572.html" title="Message sent in reply to this message">Keates, Mark: "RE: [cc65] Floating point support?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4541" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4541" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4541" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-09-26 13:02:19 CEST
+</em></small></p>
+</body>
+</html>

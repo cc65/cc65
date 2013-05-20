@@ -1,0 +1,152 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] C64 high res color RAM</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] C64 high res color RAM">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] C64 high res color RAM</h1>
+<!-- received="Tue May 28 22:33:37 2002" -->
+<!-- isoreceived="20020528203337" -->
+<!-- sent="Tue, 28 May 2002 22:33:21 +0200" -->
+<!-- isosent="20020528203321" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] C64 high res color RAM" -->
+<!-- id="371428652.20020528223321@gmx.net" -->
+<!-- inreplyto="200205282005.g4SK5mG96819@xcip2.studcs.uni-sb.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20C64%20high%20res%20color%20RAM"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2002-05-28 22:33:21
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1416.html">Stephan Lesch: "Re: [cc65] C64 high res color RAM"</a>
+<li><strong>In reply to:</strong> <a href="1416.html">Stephan Lesch: "Re: [cc65] C64 high res color RAM"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1418.html">groepaz: "Re[3]: [cc65] C64 high res color RAM"</a>
+<li><strong>Reply:</strong> <a href="1418.html">groepaz: "Re[3]: [cc65] C64 high res color RAM"</a>
+<li><strong>Reply:</strong> <a href="1419.html">Stephan Lesch: "Re: Re[2]: [cc65] C64 high res color RAM"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Stephan,
+
+Tuesday, May 28, 2002, 10:05:48 PM, you wrote:
+
+
+&gt;&gt; :=)) eg when an irq occurs while the ram under the vic is banked in =&gt;
+&gt;&gt; crash (regardless of correct vectors at both $ffff/fe and $0314/15 and
+&gt;&gt; regardless where the interupt-service-routine lies in memory)
+
+SL&gt; Huh? I admit I haven't tried it, but why? If the first thing the IRQ
+SL&gt; routine does is save the memory config, then map in the IO area,
+SL&gt; and restore the previous config before exiting, what should happen?
+
+uhmz not so easy to explain i guess.... the point is, that it will
+crash before the interupt routine is even started (ie, one or two
+cycles after the interupt occurs). that is, when the vic tries to
+update flags in eg $d019, and the i/o is banked out something weird
+happens...maybe the vic writes to its own registers simelar to the cpu
+would? i have no idea really :=P
+
+but try it :o) _maybe_ that weird behaviour requires other
+circumstances than just banked out i/o aswell.... it occured to me
+while coding demos that is, never actually bothered doing a simple
+test like this: (maybe you do? ;=)))
+
+       *=$c000
+       
+       sei
+       lda #$35
+       sta $01
+       lda #$01
+       sta $d01a
+       lda #$7f
+       sta $dc0d
+       lda #$f8
+       sta $d012
+       lda #$1b
+       sta $d011
+       lda #&gt;irq
+       sta $ffff
+       lda #&lt;irq
+       sta $fffe
+       lda #$34
+       sta $01
+       cli
+
+       jmp *
+
+       *=$d000
+
+irq:
+       pha
+       lda $01
+       pha
+
+       ; do stuff
+       inc $d020
+       
+       lda $d019    ; inc $d019 aint scpu-safe
+       sta $d019
+       
+       pla
+       sta $01
+       pla
+       rti
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20C64%20high%20res%20color%20RAM">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20C64%20high%20res%20color%20RAM">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1416.html">Stephan Lesch: "Re: [cc65] C64 high res color RAM"</a>
+<li><strong>In reply to:</strong> <a href="1416.html">Stephan Lesch: "Re: [cc65] C64 high res color RAM"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1418.html">groepaz: "Re[3]: [cc65] C64 high res color RAM"</a>
+<li><strong>Reply:</strong> <a href="1418.html">groepaz: "Re[3]: [cc65] C64 high res color RAM"</a>
+<li><strong>Reply:</strong> <a href="1419.html">Stephan Lesch: "Re: Re[2]: [cc65] C64 high res color RAM"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-05-28 22:33:46 CEST</em>
+</em>
+</small>
+</body>
+</html>

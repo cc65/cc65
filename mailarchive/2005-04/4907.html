@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Nested Functions</title>
+<meta name="Author" content="Tedder, Kevin (kevin.tedder1capgemini.com)" />
+<meta name="Subject" content="[cc65] Nested Functions" />
+<meta name="Date" content="2005-04-04" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Nested Functions</h1>
+<!-- received="Mon Apr  4 15:42:07 2005" -->
+<!-- isoreceived="20050404134207" -->
+<!-- sent="Mon, 4 Apr 2005 14:42:00 +0100" -->
+<!-- isosent="20050404134200" -->
+<!-- name="Tedder, Kevin" -->
+<!-- email="kevin.tedder1capgemini.com" -->
+<!-- subject="[cc65] Nested Functions" -->
+<!-- id="02100798E096714296E1F90FEA25B781A0F456@MISSBHXVS04.uki.capgemini.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4908.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Nested Functions&quot;">Next message</a> ]
+[ <a href="4906.html" title="Christian Groessler: &quot;Re: [cc65] Atari executables w/ AtariMax flashcart&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4908.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Nested Functions&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Tedder, Kevin &lt;<a href="mailto:kevin.tedder1capgemini.com?Subject=Re:%20[cc65]%20Nested%20Functions">kevin.tedder1capgemini.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-04-04 15:42:00</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>This message contains information that may be privileged or confidential and is the property of the Capgemini Group. It is intended only for the person to whom it is addressed. If you are not the intended recipient,  you are not authorized to read, print, retain, copy, disseminate,  distribute, or use this message or any part thereof. If you receive this  message in error, please notify the sender immediately and delete all  copies of this message.
+
+  
+
+Help!!!!
+
+I need to declare a nested function and get the following error every time I
+compile it with CC65.  
+
+What am I doing wrong?
+
+ 
+
+===Output===
+
+cc65 -T -O -I ..\..\include -t bbc main.c
+
+main.c(13): Warning: Function must be extern
+
+main.c(13): Error: `;' expected
+
+ 
+
+ 
+
+===source code===
+
+void main(void)
+
+{
+
+    int a;
+
+    int i = 1;
+
+    void xHelp(void)
+
+    {
+
+        cprintf(&quot;Help Message\r\n&quot;);
+
+    };
+
+    for (i=2; i&lt;10; ++i)
+
+    {
+
+        a = a + i;
+
+        xHelp();
+
+    };
+
+}
+
+ 
+
+This techinque will eventually be used to develop a Sideways Rom (SWR) for a
+BBC Micro. As SWRs have no concept of BSS and DATA segments I can not use
+them for this. With SWRs, the data area is defined at runtime from the OS
+and passes a pointer to it when calling the SWR service routine. I intend to
+use the C Stack to hold all variables (as this data will only last for the
+duration of the service call). Therefore on entry to main() all variables
+will be declared and pushed onto the stack and can then be referenced from
+other (nested) functions as they will be in scope.
+
+ 
+
+Kevin.
+
+
+
+begin 666 image001.jpg
+M_]C_X `02D9)1&#64;`!`&#64;$`2 !(``#_[02R4&amp;AO=&amp;]S:&amp;]P(#,N, `X0DE-`^D`
+M`````'&#64;``P```$&#64;`2 `````#!&#64;)2__?_]P,/`EL#1P4H`_P``&#64;```$&#64;`2 ``
+M```&quot;V (H``$```!D`````0`#`P,````!)P\``0`!````````````````8 &#64;`
+M&amp;0&amp;0```````````````````````````````````````````X0DE-`^T`````
+M`! `2 ````$``0!(`````0`!.$))30/S```````(```````````X0DE-! H`
+M``````$``#A&quot;24TG$ ``````&quot;&#64;`!``````````(X0DE-`_4``````$&#64;`+V9F
+M``$`;&amp;9F``8```````$`+V9F``$`H9F:``8```````$`,&#64;````$`6&#64;````8`
+M``````$`-0````$`+0````8```````$X0DE-`_&#64;``````' ``/__________
+M__________________\#Z ````#_____________________________`^&#64;`
+M````_____________________________P/H`````/__________________
+M__________\#Z ``.$))300````````&quot;```X0DE-! (```````(``#A&quot;24T$
+M&quot; ``````$ ````$```) ```&quot;0 `````X0DE-! D``````J(````!````&#64; ``
+M``(```&amp; ```#`````H8`&amp; `!_]C_X `02D9)1&#64;`!`&#64;$`2 !(``#__&#64;`G1FEL
+M92!W&lt;FET=&amp;5N(&amp;)Y($%D;V)E(%!H;W1O&lt;VAO&lt;*&#64;&#64;-&quot;XP`/_N``Y!9&amp;]B90!D
+M&#64; ````'_VP&quot;$``P(&quot; &#64;)&quot; P)&quot;0P1&quot;PH+$14/# P/%1&#64;3$Q43$Q&#64;1# P,# P,
+M$0P,# P,# P,# P,# P,# P,# P,# P,# P,# P!#0L+#0X-$ X.$!0.#&#64;X4
+M% X.#&#64;X4$0P,# P,$1$,# P,# P1# P,# P,# P,# P,# P,# P,# P,# P,
+M# P,#/_ `!$(``(`&#64; ,!(&#64;`&quot;$0$#$0'_W0`$``C_Q $_```!!0$!`0$!`0``
+M```````#``$&quot;! 4&amp;!P&#64;)&quot;&#64;L!``$%`0$!`0$!``````````$``&#64;,$!08'&quot; D*
+M&quot;Q ``00!`P($`&#64;4'!&#64;&#64;%`PPS`0`&quot;$0,$(1(Q!4%181,B&lt;8$R!A21H;%&quot;(R05
+M4L%B,S1R&#64;M%#!R624_#A\6-S-1:BLH,F1)-49$7&quot;HW0V%])5XF7RLX3#TW7C
+M\T8GE*2%M)7$U.3TI;7%U&gt;7U5F9VAI:FML;6YO8W1U=G=X&gt;7I[?'U^?W$0`&quot;
+M`&#64;$&quot;! 0#! 4&amp;!P&lt;&amp;!34!``(1`R$Q$&#64;1!46%Q(A,%,H&amp;1%*&amp;Q0B/!4M'P,R1B
+MX7*&quot;DD-3%6-S-/$E!A:BLH,')C7&quot;TD235*,79$55-G1EXO*SA,/3=&gt;/S1I2D
+MA;25Q-3D]*6UQ=7E]59F=H:6IK;&amp;UN;V)S='5V=WAY&gt;GM\?_V&#64;`,`P$``A$#
+M$0`_`/1.B?T*OZ7\U3]+C^:K_F_Y*T%\K))(?JE)?*R2*GZI27RLDDI^J4E\
+MK))*?JE)?*R22GZI27RLDDI^J4E\K))*?JE)?*R22G__V3A&quot;24T$!&#64;``````
+M!P`!`````0$`__X`)T9I;&amp;4&#64;=W)I='1E;B!B&gt;2!!9&amp;]B92!0:&amp;]T;W-H;W&quot;H
+M(#0N, #_[&#64;`&#46;<!--nospam-->061O8F4`9( ````!_]L`A `,&quot; &#64;-&quot;0T5# P5&amp;A00%!H&#64;&amp;QH:
+M&amp;R B%Q&lt;7%Q&lt;B$0P,# P,#!$,# P,# P,# P,# P,# P,# P,# P,# P,# P,
+M`0T-#1$.$1L1$1L4#&#64;X&#46;<!--nospam-->%!0.#&#64;X&#46;<!--nospam-->%!$,# P,#!$1# P,# P,$0P,# P,# P,
+M# P,# P,# P,# P,# P,# P,# S_P `1&quot; `8!: #`2(``A$!`Q$!_]T`! !:
+M_\0!/P```04!`0$!`0$``````````P`!`&#64;0%!&#64;&lt;(&quot;0H+`0`!!0$!`0$!`0``
+M```````!``(#! 4&amp;!P&#64;)&quot;&#64;L0``$$`0,&quot;! (%!P8(!0,,,P$``A$#!&quot;$2,05!
+M46$3(G&amp;!,&#64;84D:&amp;Q0B,D%5+!8C,T&lt;H+10P&lt;EDE/PX?%C&lt;S46HK*#)D235&amp;1%
+MPJ-T-A?25&gt;)E\K.$P]-UX_-&amp;)Y2DA;25Q-3D]*6UQ=7E]59F=H:6IK;&amp;UN;V
+M-T=79W&gt;'EZ&gt;WQ]?G]Q$``&#64;(!`&#64;0$`P0%!&#64;&lt;'!&#64;4U`0`&quot;$0,A,1($05%A&lt;2(3
+M!3*!D12AL4(CP5+1\#,D8N%R&#64;I)#4Q5C&lt;S3Q)086HK*#!R8UPM)$DU2C%V1%
+M539T9&gt;+RLX3#TW7C\T:4I(6TE&lt;34Y/2EM&lt;75Y?569G:&amp;EJ:VQM;F]B&lt;W1U=G
+M=X&gt;7I[?'_]H`# ,!``(1`Q$`/P&quot;OT3^GX_\`QK/^J:O6UY)T4_K^/_QK/^J:
+MO6&#64;\&gt;*$EL62'9?768&gt;X`^94,C(%3)!$_%&lt;UD7;&#64;ZWF)/^:FDTN&gt;L&amp;J=&lt;U]2N
+MIV9K+F6&amp;0QP+1X!WYO\`T5TJ*E)))(J4DDDDI22222E))))*4DDDDI22222E
+M))))*4DDDDI22222E))))*4DDDDI22222E))))*4DDDDI22222E))))*4DDD
+MDI22222E))))*4DDDDI22222E))))*4DDDDI22222E))))*4DDDDI22222E)
+M)))*4DDDDI22222E))))*4DDDDI22222E))))*4DDDDI22222E))))*4DDDD
+MI22222E))))*4DDDDI22222E))))*4DDDDI22222E))))*4DDDDI22222E))
+M))*4DDDDI22222E))))*4DDDDI22222E))))*4DDDDI22222E))))*4DDDDI
+M22222E))))*4DDDDI22222E))))*4DDDDI22222E))))*4DDDDI22222E)))
+M)*4DDDDI22222E))))*4DDDDI22222E))))*4DDDDI22222E))))*4DDDDI2
+M2222E))))*4DDDDI22222E))))*4DDDDI22222G_T)]&amp;ZH*GTXS**7.=8 ZQ
+M[=UD./\`&#64;_W'L_,78_L&#46;<!--nospam-->E_TA8?&quot;3_P&quot;0:OG9) K0_2U'375-VU^P&gt;8:[_OJS
+M&lt;KH&gt;0^0W7&lt;8.G_F;%\]I(:)?I;H71*^DUN#0/4L(+R.-/HM9_):M1?*J227Z
+MJ27RJDBI^JDE\JI)*?JI)?*J22GZJ27RJDDI^JDE\JI)*?JI)?*J22GZJ27R
+MJDDI^JDE\JI)*?JI)?*J22GZJ27RJDDI^JDE\JI)*?JI)?*J22GZJ27RJDDI
+M^JDE\JI)*?JI)?*J22GZJ27RJDDI^JDE\JI)*?JI)?*J22GZJ27RJDDI^JDE
+M\JI)*?JI)?*J22GZJ27RJDDI^JDE\JI)*?JI)?*J22GZJ27RJDDI^JDE\JI)
+M*?JI)?*J22GZJ27RJDDI^JDE\JI)*?JI)?*J22GZJ27RJDDI^JDE\JI)*?JI
+M)?*J22GZJ27RJDDI^JDE\JI)*?JI)?*J22GZJ27RJDDI^JDE\JI)*?JI)?*J
+M22GZJ27RJDDI^JDE\JI)*?JI)?*J22GZJ27RJDDI^JDE\JI)*?JI)?*J22GZ
+MJ27RJDDI^JDE\JI)*?JI)?*J22GZJ27RJDDI^JDE\JI)*?JI)?*J22GZJ27R
+MJDDI^JDE\JI)*?JI)?*J22GZJ27RJDDI^JDE\JI)*?JI)?*J22GZJ27RJDDI
+M^JDE\JI)*?JI)?*J22GZJ27RJDDI^JDE\JI)*?JI)?*J22GZJ27RJDDI^JDE
+M\JI)*?JI)?*J22GZJ27RJDDI^JDE\JI)*?JI)?*J22GZJ27RJDDI^JDE\JI)
+M*?JI)?*J22GZJ27RJDDI^JDE\JI)*?JI)?*J22GZJ27RJDDI^JDE\JI)*?JI
+M)?*J22GZJ27RJDDI^JDE\JI)*?JI)?*J22GZJ27RJDDI^JDE\JI)*?JI)?*J
+922GZJ27RJDDI^JDE\JI)*?JI)?*J22G_V0``
+`
+end
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Apr  4 15:42:07 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4908.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Nested Functions"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4906.html" title="Previous message in the list">Christian Groessler: "Re: [cc65] Atari executables w/ AtariMax flashcart"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4908.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Nested Functions"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4908.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Nested Functions"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4907" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4907" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4907" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-04-04 15:42:13 CEST
+</em></small></p>
+</body>
+</html>

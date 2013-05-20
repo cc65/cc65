@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] assembler/C stack issue</title>
+<meta name="Author" content="Payton Byrd (plbyrd1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] assembler/C stack issue" />
+<meta name="Date" content="2011-02-04" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] assembler/C stack issue</h1>
+<!-- received="Fri Feb  4 17:26:28 2011" -->
+<!-- isoreceived="20110204162628" -->
+<!-- sent="Fri, 4 Feb 2011 10:26:20 -0600" -->
+<!-- isosent="20110204162620" -->
+<!-- name="Payton Byrd" -->
+<!-- email="plbyrd1gmail.com" -->
+<!-- subject="Re: [cc65] assembler/C stack issue" -->
+<!-- id="AANLkTi==E3G7azkpD+o0K_BE8f_+Rgq1Bj_qnHV5Uu2V@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="67496.40180.qm&#64;web120606.mail.ne1.yahoo.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9213.html" title="Oliver Schmidt: &quot;Re: [cc65] assembler/C stack issue&quot;">Next message</a> ]
+[ <a href="9211.html" title="Joseph Rose: &quot;[cc65] assembler/C stack issue&quot;">Previous message</a> ]
+[ <a href="9211.html" title="Joseph Rose: &quot;[cc65] assembler/C stack issue&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9214.html" title="Groepaz: &quot;Re: [cc65] assembler/C stack issue&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Payton Byrd &lt;<a href="mailto:plbyrd1gmail.com?Subject=Re:%20[cc65]%20assembler/C%20stack%20issue">plbyrd1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-02-04 17:26:20</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Fri, Feb 4, 2011 at 10:19 AM, Joseph Rose &lt;rose.joseph12&#64;yahoo&#46;<!--nospam-->com&gt;wrote:
+
+&gt; If I create a function in assembler and declare it as __fastcall__, which
+&gt; is
+&gt; responsible for popping the stack: the caller or the callee?  What other
+&gt; stack
+&gt; issues do I have to watch out for?  Examples of needed function
+&gt; declarations
+&gt; follow:
+&gt;
+&gt; unsigned char __fastcall__ foo1 (char*);
+&gt; void __fastcall__ foo2 (char*, unsigned char);
+&gt;
+
+I'll give you the same advice that I received the first time I had this
+question.  Write a stub method in C and compile it with the debug option
+turned on using cc65 and then use the resulting .s file as the starting
+point for your assembler functions.
+
+-- 
+Payton Byrd
+&lt;<a href="http://www.paytonbyrd.com">http://www.paytonbyrd.com</a>&gt;
+&lt;<a href="http://it.toolbox.com/blogs/paytonbyrd">http://it.toolbox.com/blogs/paytonbyrd</a>&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Feb  4 17:26:28 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9213.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] assembler/C stack issue"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9211.html" title="Previous message in the list">Joseph Rose: "[cc65] assembler/C stack issue"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9211.html" title="Message to which this message replies">Joseph Rose: "[cc65] assembler/C stack issue"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9214.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] assembler/C stack issue"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9214.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] assembler/C stack issue"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9212" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9212" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9212" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-02-04 17:26:30 CET
+</em></small></p>
+</body>
+</html>

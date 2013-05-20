@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] a question about the write fun</title>
+<meta name="Author" content="Jac Ato (jaxatwork11gmail.com)" />
+<meta name="Subject" content="[cc65] a question about the write function" />
+<meta name="Date" content="2007-02-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] a question about the write function</h1>
+<!-- received="Sat Feb 10 23:58:52 2007" -->
+<!-- isoreceived="20070210225852" -->
+<!-- sent="Sat, 10 Feb 2007 17:58:38 -0500" -->
+<!-- isosent="20070210225838" -->
+<!-- name="Jac Ato" -->
+<!-- email="jaxatwork11gmail.com" -->
+<!-- subject="[cc65] a question about the write function" -->
+<!-- id="1c282c9d0702101458g59cfe179wacc3d1d718dab72c@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5631.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] a question about the write function&quot;">Next message</a> ]
+[ <a href="5629.html" title="Ullrich von Bassewitz: &quot;[cc65] ISO compliance&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5631.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] a question about the write function&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Jac Ato &lt;<a href="mailto:jaxatwork11gmail.com?Subject=Re:%20[cc65]%20a%20question%20about%20the%20write%20function">jaxatwork11gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-02-10 23:58:38</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>In an attempt to implement the printf function on my embedded system,
+I wanted to reroute any queries that are sent through printf to my
+serial function: uart_send_char(char c). But I have failed to do
+exactly that. I've noticed that on the platform that I am working on,
+a modified NES with a serial port, I cannot get cc65 to generate a
+working binary file with the code below. It just wont get to the part
+of the write function. This was checked through my NES simulator. So
+what is the best way of doing the above idea? I have something like:
+
+int main (void){
+	printf(&quot;hello%d&quot;, 2);
+	while(1)
+	return EXIT_SUCCESS;
+}
+
+int __fastcall__ write (int fd, const void* buf, unsigned count){
+	char* temp=buf;
+	char i=0;
+	do{uart_send_char(temp[i++]);}
+	while(count--);
+}
+
+I know that fastcall will get the right most parameter (is it count?)
+from a register instead of the stack, so that my implementation is
+probably wrong. But just to give an idea, this is what I want to do.
+Also, what does fd represents?
+
+Thanks for any help.
+JA
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Feb 10 23:58:52 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5631.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] a question about the write function"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5629.html" title="Previous message in the list">Ullrich von Bassewitz: "[cc65] ISO compliance"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5631.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] a question about the write function"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5631.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] a question about the write function"</a></li>
+<li><dfn>Maybe reply</dfn>:  <a href="5632.html" title="Message sent in reply to this message">Jac Ato: "Re: [cc65] a question about the write function"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5630" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5630" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5630" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-02-10 23:58:55 CET
+</em></small></p>
+</body>
+</html>

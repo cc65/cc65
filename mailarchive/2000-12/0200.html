@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] cc65 2.5 compiled for ATA</title>
+<meta name="Author" content="daniel pralle (daniel.pralle_at_stud.uni-hannover.de)">
+<meta name="Subject" content="Re: [cc65] cc65 2.5 compiled for ATARI Falcon030">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] cc65 2.5 compiled for ATARI Falcon030</h1>
+<!-- received="Mon Dec  4 13:59:44 2000" -->
+<!-- isoreceived="20001204125944" -->
+<!-- sent="Mon, 4 Dec 2000 13:59:42 +0100 (MET)" -->
+<!-- isosent="20001204125942" -->
+<!-- name="daniel pralle" -->
+<!-- email="daniel.pralle_at_stud.uni-hannover.de" -->
+<!-- subject="Re: [cc65] cc65 2.5 compiled for ATARI Falcon030" -->
+<!-- id="Pine.GSO.4.20.0012041350160.29863-100000@studserv.stud.uni-hannover.de" -->
+<!-- inreplyto="20001204121840.A6029@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> daniel pralle (<a href="mailto:daniel.pralle_at_stud.uni-hannover.de?Subject=Re:%20[cc65]%20cc65%202.5%20compiled%20for%20ATARI%20Falcon030"><em>daniel.pralle_at_stud.uni-hannover.de</em></a>)<br>
+<strong>Date:</strong> 2000-12-04 13:59:42
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0201.html">Ullrich von Bassewitz: "Re: [cc65] cc65 2.5 compiled for ATARI Falcon030"</a>
+<li><strong>Previous message:</strong> <a href="0199.html">Ullrich von Bassewitz: "Re: [cc65] cc65 2.5 compiled for ATARI Falcon030"</a>
+<li><strong>In reply to:</strong> <a href="0199.html">Ullrich von Bassewitz: "Re: [cc65] cc65 2.5 compiled for ATARI Falcon030"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0201.html">Ullrich von Bassewitz: "Re: [cc65] cc65 2.5 compiled for ATARI Falcon030"</a>
+<li><strong>Reply:</strong> <a href="0201.html">Ullrich von Bassewitz: "Re: [cc65] cc65 2.5 compiled for ATARI Falcon030"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Mon, 4 Dec 2000, Ullrich von Bassewitz wrote:
+
+&gt; 
+&gt; On Mon, Dec 04, 2000 at 11:23:50AM +0100, Daniel Pralle wrote:
+&gt; &gt; I have compiled cc65 for the Atari F030 running MiNT (LINUX style OS)
+&gt; &gt; When I compile hello.c I get the Error #35 and unkown charackter.
+&gt; &gt; When I compile hello.c on a LINUX-PC no error occurs. Why could this be?
+&gt; 
+&gt; Sorry but there's a whole lot of information missing.
+
+OK, here you go:
+
+by the way, I have written my own hello.c (but the errors occured in the
+samples/hello.c as well but with other Valus!!!)
+
+my hello.c looks like this:
+
+#include &lt;stdio.h&gt;
+
+int main ( void)
+{
+  printf( &quot;Hello, World!&quot;);
+}
+
+
+
+&gt; 
+&gt;   * Which cc65 sources did you compile for the Atari?
+
+cc65-sources-2.50.tar.gz
+
+&gt; 
+&gt;   * Error #35 is &quot;Compiler directive expected&quot;, while &quot;Invalid character&quot; is
+&gt;     error #1. Which one of both did you get?
+&gt; 
+
+Error #35 gives line number 0 !!!!
+invalid charackters where (105) und (110) in MY HELLO.C ( The line was 5,
+counting from ZERO onwards!)
+in the samples/hello.c it was (97) and something else I don't remember. At
+the moment I am at university, so I can&quot;t check it!
+
+
+
+&gt;   * The error message &quot;Invalid character&quot; prints the character code. It would
+&gt;     be really helpful to know this code.
+
+see above
+
+&gt; 
+&gt;   * Where in hello.c did you get this error (knowing at least the line number
+&gt;     would be great)?
+
+above
+
+&gt; 
+&gt;   * Is the Atari using a line separator different from Unix style operating
+&gt;     systems? If so, did you apply any conversions to hello.c?
+
+ATARI uses the MS-DOS Line seperator, but MiNT is LINUX/ UNIX like and I
+edited hello.c with emacs AND an ATARI-Editor saving in UNIX-type. So I
+think that couldn't be the cause!
+
+&gt; 
+&gt; I'm pretty sure that the issue can be resolved without much effort once the
+&gt; exact problem is known.
+
+I hope so!! ;-)
+
+&gt; 
+&gt; Regards
+&gt; 
+&gt; 
+&gt; 	Uz
+&gt; 
+&gt; 
+&gt; --
+&gt; Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%202.5%20compiled%20for%20ATARI%20Falcon030">uz_at_musoftware.de</a>
+&gt; 
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%202.5%20compiled%20for%20ATARI%20Falcon030">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0201.html">Ullrich von Bassewitz: "Re: [cc65] cc65 2.5 compiled for ATARI Falcon030"</a>
+<li><strong>Previous message:</strong> <a href="0199.html">Ullrich von Bassewitz: "Re: [cc65] cc65 2.5 compiled for ATARI Falcon030"</a>
+<li><strong>In reply to:</strong> <a href="0199.html">Ullrich von Bassewitz: "Re: [cc65] cc65 2.5 compiled for ATARI Falcon030"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0201.html">Ullrich von Bassewitz: "Re: [cc65] cc65 2.5 compiled for ATARI Falcon030"</a>
+<li><strong>Reply:</strong> <a href="0201.html">Ullrich von Bassewitz: "Re: [cc65] cc65 2.5 compiled for ATARI Falcon030"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:37 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Building sgml2html Command on </title>
+<meta name="Author" content="Greg King (gngking1erols.com)" />
+<meta name="Subject" content="[cc65] Building sgml2html Command on Cygwin" />
+<meta name="Date" content="2004-10-16" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Building sgml2html Command on Cygwin</h1>
+<!-- received="Sat Oct 16 21:01:49 2004" -->
+<!-- isoreceived="20041016190149" -->
+<!-- sent="Sat, 16 Oct 2004 14:38:26 -0400" -->
+<!-- isosent="20041016183826" -->
+<!-- name="Greg King" -->
+<!-- email="gngking1erols.com" -->
+<!-- subject="[cc65] Building sgml2html Command on Cygwin" -->
+<!-- id="005201c4b3b2$aa019ec0$2d682c42@palace" -->
+<!-- charset="iso-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4630.html" title="Groepaz: &quot;[cc65] makefile problems&quot;">Next message</a> ]
+[ <a href="4628.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Joystick Example Code&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4630.html" title="Groepaz: &quot;[cc65] makefile problems&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:gngking1erols.com?Subject=Re:%20[cc65]%20Building%20sgml2html%20Command%20on%20Cygwin">gngking1erols.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-10-16 20:38:26</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: Ullrich von Bassewitz; on Date: April 21, 2004, at 06:44 AM -0400
+Subject: Re: [cc65] Next release?
+&gt;
+&gt; On Wed, Apr 21, 2004 at 05:19:19AM -0400, Keates, Mark wrote:
+&gt; &gt;
+&gt; &gt; Aside, does anyone know if/how sgml2html can be built under Cygwin?
+&gt;
+&gt; I'm pretty sure you don't want to hear this, but anyway:
+&gt; Using Linux, it builds without problems. :-)
+
+I installed CygWin just so that I could do research on that question. :-)
+
+sgml2html is a command in the &quot;LinuxDoc Tools&quot; package.  It isn't ported to
+CygWin; so, you must build it from the sources.
+
+Do these steps to build/install LinuxDoc Tools:
+
+1. Use CygWin's Setup program to install:
+  a) from the &quot;Devel&quot; category:
+    flex;
+  b) from the &quot;Text&quot; category:
+    OpenSP and libxml2;
+  c) from the &quot;Utils&quot; category:
+    rpm-build.
+
+2. Download two Source RPMs.
+<a href="http://download.fedora.redhat.com/pub/fedora/linux/core/development/SRPMS/sgml-common-0.6.3-17.src.rpm">http://download.fedora.redhat.com/pub/fedora/linux/core/development/SRPMS/sgml-common-0.6.3-17.src.rpm</a>
+<a href="http://download.fedora.redhat.com/pub/fedora/linux/core/development/SRPMS/linuxdoc-tools-0.9.20-14.src.rpm">http://download.fedora.redhat.com/pub/fedora/linux/core/development/SRPMS/linuxdoc-tools-0.9.20-14.src.rpm</a>
+
+3. Start CygWin.  Go to the &quot;/bin&quot; directory.  Add a file-link from
+&quot;nsgmls&quot; to &quot;onsgmls.exe&quot;.
+
+4. Make the &quot;/etc/rpm&quot; directory.  Put these lines into &quot;/etc/rpm/macros&quot;:
+
+%_sysconfdir /etc
+%_localstatedir %{_var}
+%_defaultdocdir %{_datadir}/doc
+
+5. Use these commands:
+
+rpmbuild --nodeps --rebuild &lt;Path to&gt;/sgml-common-0.6.3-17.src.rpm
+
+rpm -U --nodeps /usr/src/rpm/RPMS/noarch/sgml-common-0.6.3-17.cygwin.noarch.rpm
+
+rpmbuild --nodeps --rebuild &lt;Path to&gt;/linuxdoc-tools-0.9.20-14.src.rpm
+
+rpm -U --nodeps /usr/src/rpm/RPMS/*/linuxdoc-tools-0.9.20-14.cygwin.*.rpm
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Oct 16 21:01:49 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4630.html" title="Next message in the list">Groepaz: "[cc65] makefile problems"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4628.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Joystick Example Code"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4630.html" title="Next message in this discussion thread">Groepaz: "[cc65] makefile problems"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4630.html" title="Message sent in reply to this message">Groepaz: "[cc65] makefile problems"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4629" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4629" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4629" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-10-16 21:01:59 CEST
+</em></small></p>
+</body>
+</html>

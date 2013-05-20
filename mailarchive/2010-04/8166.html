@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] How to prototype an assemb</title>
+<meta name="Author" content="Marc 'BlackJack Rintsch (marc1rintsch.de)" />
+<meta name="Subject" content="Re: [cc65] How to prototype an assembler function?" />
+<meta name="Date" content="2010-04-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] How to prototype an assembler function?</h1>
+<!-- received="Sun Apr 25 12:06:56 2010" -->
+<!-- isoreceived="20100425100656" -->
+<!-- sent="Sun, 25 Apr 2010 12:09:44 +0200" -->
+<!-- isosent="20100425100944" -->
+<!-- name="Marc 'BlackJack Rintsch" -->
+<!-- email="marc1rintsch.de" -->
+<!-- subject="Re: [cc65] How to prototype an assembler function?" -->
+<!-- id="201004251209.50023.marc@rintsch.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="y2w1adf4c761004250204u22124adfg3b82a1bbafc0e1d0&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8167.html" title="Steve Davison: &quot;Re: [cc65] Commodore PET keyboard scanning&quot;">Next message</a> ]
+[ <a href="8165.html" title="Payton Byrd: &quot;Re: [cc65] How to prototype an assembler function?&quot;">Previous message</a> ]
+[ <a href="8165.html" title="Payton Byrd: &quot;Re: [cc65] How to prototype an assembler function?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8170.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] How to prototype an assembler function?&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Marc 'BlackJack Rintsch &lt;<a href="mailto:marc1rintsch.de?Subject=Re:%20[cc65]%20How%20to%20prototype%20an%20assembler%20function?">marc1rintsch.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-04-25 12:09:44</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Sunday 25 April 2010, Payton Byrd wrote:
+&gt; Success!!!  Thank you so much for your help.  I was able to get it
+&gt; working with the following assembler code
+
+I think pushing the accu to the C stack is not necessary just like most 
+``ldx #0``\s.  That's automatically generated code from a not so smart 
+compiler.  You could use the X register to save the accu instead of the 
+C stack.  Untested:
+
+.proc _writeVdcRegister
+	tax
+	ldy #0
+	lda (sp),y
+	sta $d600
+	stx $d601
+	jmp incsp1
+
+and for reading the C stack does not to be hit at all:
+
+.proc _readVdcRegister
+	sta $d600
+loop:	bit $d600
+	bpl loop
+	lda $d601
+	ldx #0
+	rts
+
+The return value of the read function is a 16 bit value in A/X (lo/hi).  
+The C standard says all interediate calculations have to be at least in 
+the value range of the `int` type, so that's possibly why the compiler 
+adds all the ``ldx #0``\s because `int`\s are held in A/X in the 
+compiler generated code.
+
+Writing code can be one byte shorter if you reverse the arguments, 
+because the accu can be written to $d600 right away and does not have 
+to be saved in the X register.
+
+Ciao,
+	Marc 'BlackJack' Rintsch
+-- 
+“A mind once stretched by a new idea never regains
+ its original dimension.”
+        --Oliver Wendell Holmes
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<div>
+<ul>
+<li>application/pgp-signature attachment: <a href="../att-8166/signature.asc_">This is a digitally signed message part.</a></li>
+</ul>
+<!-- attachment="signature.asc_" -->
+</div>
+<span id="received"><dfn>Received on</dfn> Sun Apr 25 12:06:56 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8167.html" title="Next message in the list">Steve Davison: "Re: [cc65] Commodore PET keyboard scanning"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8165.html" title="Previous message in the list">Payton Byrd: "Re: [cc65] How to prototype an assembler function?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8165.html" title="Message to which this message replies">Payton Byrd: "Re: [cc65] How to prototype an assembler function?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8170.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] How to prototype an assembler function?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8166" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8166" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8166" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-04-25 12:06:58 CEST
+</em></small></p>
+</body>
+</html>

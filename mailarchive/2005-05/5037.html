@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Re: signals</title>
+<meta name="Author" content="dominic beesley (dominic1brahms.demon.co.uk)" />
+<meta name="Subject" content="Re: [cc65] Re: signals" />
+<meta name="Date" content="2005-05-31" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Re: signals</h1>
+<!-- received="Tue May 31 13:41:38 2005" -->
+<!-- isoreceived="20050531114138" -->
+<!-- sent="Tue, 31 May 2005 12:30:38 +0100" -->
+<!-- isosent="20050531113038" -->
+<!-- name="dominic beesley" -->
+<!-- email="dominic1brahms.demon.co.uk" -->
+<!-- subject="Re: [cc65] Re: signals" -->
+<!-- id="429C4ADE.6080801@brahms.demon.co.uk" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="050531015504&#64;arcade.demon.co.uk" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5038.html" title="dominic beesley: &quot;Re: [cc65] Re: signals&quot;">Next message</a> ]
+[ <a href="5036.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] signals&quot;">Previous message</a> ]
+[ <a href="5033.html" title="Jonathan Graham Harston: &quot;[cc65] Re: signals&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: dominic beesley &lt;<a href="mailto:dominic1brahms.demon.co.uk?Subject=Re:%20[cc65]%20Re:%20signals">dominic1brahms.demon.co.uk</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-05-31 13:30:38</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Jonathan Graham Harston wrote:
+
+&gt;&gt;Message-ID: &lt;4299ACB3.5040203&#64;brahms&#46;<!--nospam-->demon.co.uk&gt;
+&gt;&gt;    
+&gt;&gt;
+&gt; 
+&gt;dominic beesley &lt;dominic&#64;brahms&#46;<!--nospam-->demon.co.uk&gt; wrote:
+&gt;  
+&gt;
+&gt;&gt;I guess really the main worry is that I'm in the middle of
+&gt;&gt;updating one of the file structures. I'm trying to work out if an
+&gt;&gt;Escape is ever delivered in the middle of an OS operation. In
+&gt;&gt;    
+&gt;&gt;
+&gt; 
+&gt;Yes, Escapes can happen at *any* time when IRQs are enabled. The
+&gt;foreground program should check for an escape state at safe points
+&gt;in the program, eg between BASIC statements, at the end or start
+&gt;of loops, after a received keypress.
+&gt;  
+&gt;
+&gt;&gt;which case it gets very messy. Otherwise I'll just try and make
+&gt;&gt;sure that the cleanup code uses some kind of semaphore to protect
+&gt;&gt;other file ops (and possibly delays the Escape handling until
+&gt;&gt;after it has happened).
+&gt;&gt;    
+&gt;&gt;
+&gt; 
+&gt;Don't abort on Escape! It's so much easier. Just let Escape set
+&gt;its flag in the background. Let the foreground check for it.
+&gt; 
+&gt;It's no good saying you'll close all open files (or files opened
+&gt;by the program) on an escape-induced abort. What if you abort
+&gt;halfway through a file delete? The directory may have been written
+&gt;to disk before the free space map has been written. Even worse,
+&gt;only one sector of the directory may have been written, destroying
+&gt;the catalogue!
+&gt; 
+&gt;  
+&gt;
+What if the user presses break, what if I _dont_ set up an Escape handler
+and the user presses Escape. What if a program is in a long loop (doing
+file stuff) and the user presses Escape and nothing happens? they'll press
+Break and make just as much of a mess.
+
+I _wont_ escape during a file delete, file delete can only occur due to 
+a call
+to an OS function, which are protected from Escape. In which situation
+the exit will be delayed until the os function returns.
+
+&gt;&gt;so it means hanging off the interrupt vector somewhere. Also
+&gt;&gt;there is no way of returning from BRK so I'm setting something
+&gt;&gt;    
+&gt;&gt;
+&gt; 
+&gt;There is, it's called setting up an error handler. In machine code
+&gt;you do it by setting BRKV to point to you error handler. In BASIC
+&gt;you do it by using ON ERROR.
+&gt; 
+&gt;  
+&gt;
+I was merely trying to put it into no OS specific terms that Uz et al would
+get as they are non BBC types
+
+It looks as if there are two camps on this, those that dont want any form of
+out-of-band signals sue to escape and those that do. I think I may put 
+all this
+stuff in the BBC library but have it compile-time switchable some how 
+(either
+when compiling the end program or when compiling the library).
+
+Cheers
+
+Dom
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue May 31 13:41:38 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5038.html" title="Next message in the list">dominic beesley: "Re: [cc65] Re: signals"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5036.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] signals"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5033.html" title="Message to which this message replies">Jonathan Graham Harston: "[cc65] Re: signals"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5037" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5037" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5037" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-05-31 13:41:41 CEST
+</em></small></p>
+</body>
+</html>

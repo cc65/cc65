@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Secondary linker configura</title>
+<meta name="Author" content="Karri Kaksonen (karri1sipo.fi)" />
+<meta name="Subject" content="Re: [cc65] Secondary linker configurations" />
+<meta name="Date" content="2009-09-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Secondary linker configurations</h1>
+<!-- received="Fri Sep 25 17:52:21 2009" -->
+<!-- isoreceived="20090925155221" -->
+<!-- sent="Fri, 25 Sep 2009 18:52:04 +0300" -->
+<!-- isosent="20090925155204" -->
+<!-- name="Karri Kaksonen" -->
+<!-- email="karri1sipo.fi" -->
+<!-- subject="Re: [cc65] Secondary linker configurations" -->
+<!-- id="4ABCE724.7000202@sipo.fi" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="f97798c20909250820y9d64fb0v2586e16bb77ad48e&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6998.html" title="Thomas Giesel: &quot;Re: [cc65] c64 kernal 02 vs. 03&quot;">Next message</a> ]
+[ <a href="6996.html" title="Groepaz: &quot;Re: [cc65] Secondary linker configurations&quot;">Previous message</a> ]
+[ <a href="6995.html" title="Oliver Schmidt: &quot;Re: [cc65] Secondary linker configurations&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7002.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Secondary linker configurations&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Karri Kaksonen &lt;<a href="mailto:karri1sipo.fi?Subject=Re:%20[cc65]%20Secondary%20linker%20configurations">karri1sipo.fi</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-09-25 17:52:04</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Oliver Schmidt wrote:
+&gt; Would it be feasable to have &quot;extra libs&quot; instead of &quot;extra objects&quot;:
+&gt; Libs to be placed on the ld65 cmdline before the &quot;normal&quot; target lib,
+&gt; containing alternative implementations of certain functions.
+&gt;
+&gt; Wouldn't that already solve Groepaz' usecase while still keeping the
+&gt; paradigm of &quot;the&quot; C- / runtime-library of the &quot;normal&quot; case ?!?
+&gt;   
+
+The linkers feature to use lists is very nice. It also takes care of 
+replacing modules in the libraries.
+
+ From the Makefile:
+objects= \
+        lnxhdr.o \
+        ...
+
+objlists = \
+        ../resident/objlist \
+        ...
+
+others = \
+        &#64;&#46;<!--nospam-->./resident/objlist \
+        ...
+
+To link stuff:
+
+$(target) : $(objects) $(objlists)
+        $(CL) -t $(SYS) -o $&#64; -m lynxcart&#46;<!--nospam-->map -C lynxcart.cfg \
+        $(objects) $(others) lynx.lib
+
+If I don't like stock modules like kbhit, cgetc I just write my own ones 
+and they automatically replace the stuff in the lynx.lib
+
+I am perfectly happy with this arrangement.
+
+--
+Karri
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Sep 25 17:52:21 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6998.html" title="Next message in the list">Thomas Giesel: "Re: [cc65] c64 kernal 02 vs. 03"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6996.html" title="Previous message in the list">Groepaz: "Re: [cc65] Secondary linker configurations"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6995.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] Secondary linker configurations"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7002.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Secondary linker configurations"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6997" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6997" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6997" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-09-25 17:52:23 CEST
+</em></small></p>
+</body>
+</html>

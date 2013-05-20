@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Newbie question: memcpy</title>
+<meta name="Author" content="MagerValp (MagerValp_at_cling.gu.se)">
+<meta name="Subject" content="Re: [cc65] Newbie question: memcpy">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Newbie question: memcpy</h1>
+<!-- received="Mon Jan 13 14:09:56 2003" -->
+<!-- isoreceived="20030113130956" -->
+<!-- sent="Mon, 13 Jan 2003 14:08:53 +0100" -->
+<!-- isosent="20030113130853" -->
+<!-- name="MagerValp" -->
+<!-- email="MagerValp_at_cling.gu.se" -->
+<!-- subject="Re: [cc65] Newbie question: memcpy" -->
+<!-- id="15906.47717.104089.565710@panini.cling.gu.se" -->
+<!-- inreplyto="3E22A5FF.C5A8E113@web.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> MagerValp (<a href="mailto:MagerValp_at_cling.gu.se?Subject=Re:%20[cc65]%20Newbie%20question:%20memcpy"><em>MagerValp_at_cling.gu.se</em></a>)<br>
+<strong>Date:</strong> 2003-01-13 14:08:53
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2279.html">Tim Schürmann: "[cc65] Newbie question: memcpy"</a>
+<li><strong>In reply to:</strong> <a href="2279.html">Tim Schürmann: "[cc65] Newbie question: memcpy"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2286.html">Tim Schürmann: "Re: [cc65] Newbie question: memcpy"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+&gt;&gt;&gt;&gt;&gt; &quot;TS&quot; == Tim Schürmann &lt;<a href="mailto:tischuer_at_web.de?Subject=Re:%20[cc65]%20Newbie%20question:%20memcpy">tischuer_at_web.de</a>&gt; writes:
+
+TS&gt; I try to backup a hires graphic in memory by using malloc/memcpy.
+TS&gt; Why does the following code won't work? As you can see, i'm using
+TS&gt; loadkoala to exclude any other errors.
+
+The memory that you malloc here:
+
+TS&gt;     /* Allocating mem for backup */
+TS&gt;     bitmap_buffer=(unsigned char*)malloc(8000);
+
+Gets overwritten by your copy here:
+
+TS&gt;     memcpy ((void*)0x2000, bitmap_buffer, 8000);
+
+As no special linker config was used for loadkoala, the memory at
+$2000 is available to cc65's heap and gets allocated by malloc. To
+protect $2000..$3fff, use a linker config like this:
+
+MEMORY {
+    ZP: start = $02, size = $1A, type = rw;
+    RAM1: start = $7FF, size = $1801, define = yes, file = %O;
+    RAM2: start = $4000, size = $9000, define = yes, file = %O;
+}
+SEGMENTS {
+    CODE: load = RAM1, type = wprot;
+    RODATA: load = RAM1, type = wprot;
+    DATA: load = RAM1, type = rw;
+    BSS: load = RAM2, type = bss, define = yes;
+    ZEROPAGE: load = ZP, type = zp;
+}
+FEATURES {
+    CONDES: segment = RODATA,
+            type = constructor,
+            label = __CONSTRUCTOR_TABLE__,
+            count = __CONSTRUCTOR_COUNT__;
+    CONDES: segment = RODATA,
+            type = destructor,
+            label = __DESTRUCTOR_TABLE__,
+            count = __DESTRUCTOR_COUNT__;
+}
+SYMBOLS {
+    __STACKSIZE__ = $800;       # 2K stack
+}
+
+This will use $0800..$1fff for code and $4000..$cfff for the
+dynamically allocated data. I *think* :)
+
+-- 
+    ___          .     .  .         .       . +  .         .      o   
+  _|___|_   +   .  +     .     +         .  Per Olofsson, arkadspelare
+    o-o    .      .     .   o         +          <a href="mailto:MagerValp_at_cling.gu.se?Subject=Re:%20[cc65]%20Newbie%20question:%20memcpy">MagerValp_at_cling.gu.se</a>
+     -       +            +    .     <a href="http://www.cling.gu.se/~cl3polof/">http://www.cling.gu.se/~cl3polof/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Newbie%20question:%20memcpy">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2279.html">Tim Schürmann: "[cc65] Newbie question: memcpy"</a>
+<li><strong>In reply to:</strong> <a href="2279.html">Tim Schürmann: "[cc65] Newbie question: memcpy"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2286.html">Tim Schürmann: "Re: [cc65] Newbie question: memcpy"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-01-13 14:10:13 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] cc65 and VICE</title>
+<meta name="Author" content="Spiro Trikaliotis (Spiro.Trikaliotis_at_gmx.de)">
+<meta name="Subject" content="Re: [cc65] cc65 and VICE">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] cc65 and VICE</h1>
+<!-- received="Thu Jan 20 18:59:38 2000" -->
+<!-- isoreceived="20000120175938" -->
+<!-- sent="Thu, 20 Jan 2000 18:58:42 +0100" -->
+<!-- isosent="20000120175842" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="Spiro.Trikaliotis_at_gmx.de" -->
+<!-- subject="Re: [cc65] cc65 and VICE" -->
+<!-- id="001001bf6370$13016a10$0171a8c0@bonn" -->
+<!-- inreplyto="[cc65] cc65 and VICE" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Spiro Trikaliotis (<a href="mailto:Spiro.Trikaliotis_at_gmx.de?Subject=Re:%20[cc65]%20cc65%20and%20VICE"><em>Spiro.Trikaliotis_at_gmx.de</em></a>)<br>
+<strong>Date:</strong> 2000-01-20 18:58:42
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0020.html">Ullrich von Bassewitz: "Re: [cc65] cc65 and VICE"</a>
+<li><strong>Previous message:</strong> <a href="0018.html">Ullrich von Bassewitz: "Re: [cc65] cc65 and VICE"</a>
+<li><strong>Maybe in reply to:</strong> <a href="0017.html">Spiro Trikaliotis: "[cc65] cc65 and VICE"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0020.html">Ullrich von Bassewitz: "Re: [cc65] cc65 and VICE"</a>
+<li><strong>Reply:</strong> <a href="0020.html">Ullrich von Bassewitz: "Re: [cc65] cc65 and VICE"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+[CR/LF on symbol file]
+
+&gt;The VICE people may of course have a different view of the problem:-) I
+&gt;will send them a mail, they are usually very responsive.
+
+Well, it's me who wants to extend the VICE monitor, so most probably,
+that would be my job... That's the reason I joined the VICE mailing
+list, too.
+
+But, with VICE, people most often want to keep the various versions
+100% compatible with each other, even with the INI files (and so,
+the symbol files, too), so I'm _sure_ they will not want to make
+this modification, especially since it's something generated from
+YACC that complains...
+
+Although I'm not very familiar with YACC, I believe the modification
+of LD is easier than the modification of VICE.
+
+
+
+&gt;  * I will add a type for the generated symbols. [...]
+&gt;  * Symbols will have an associated range, [...]
+
+These improvements sound good!
+
+
+&gt;Both things are possible with the current compiler, but they are not
+&gt;supported by VICE. So, to make them usable, I will have to propose an
+&gt;extension to the VICE monitor.
+
+Well, I asked my question about the debug generations because I want
+to extend the VICE monitor for better debugging.
+
+&gt;  * Write a debugger that resides on the PC, [...]
+
+&gt;    If have put some work into serial support lately to lay the ground for
+&gt;    such a debugger, but it is a lot of work, so don't expect this to come
+&gt;    soon. Currently it's just an idea.
+
+Well, if you need some help, at least for the PC part, I have some sources
+flying around which implement a simple protocol and access the UART
+directly (under DOS).
+
+
+&gt;A source level debugger (as suggested by you) will not be possible with
+&gt;the current compiler, since the RD parser does not generate an abstract
+&gt;intermediate code. This means there is no chance to keep the debug/line
+&gt;information intact while the optimizer works on the generated assembler
+&gt;code.
+
+Well, I know that optimizations are very bad regarding source level
+debuggers; but isn't it possible to generate the references at least
+when compiling w/o any optimizations at all?
+
+
+To be honest: I first went to VICE wanting to improve the monitor,
+and I looked for CC65 because I would need an environment that
+supports the further options (esp. source level debugging) I want
+to add because else, they would be useless. So, I wanted to check
+if it could be handled by CC65 before I propose this extension to
+the VICE group.
+
+My current problems are: Lack of time (currently, I'm writing my master's
+thesis) and that I'm not very familiar with the VICE sources yet, but
+I'm working on this.
+
+Gruﬂ,
+   Spiro.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%20and%20VICE">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0020.html">Ullrich von Bassewitz: "Re: [cc65] cc65 and VICE"</a>
+<li><strong>Previous message:</strong> <a href="0018.html">Ullrich von Bassewitz: "Re: [cc65] cc65 and VICE"</a>
+<li><strong>Maybe in reply to:</strong> <a href="0017.html">Spiro Trikaliotis: "[cc65] cc65 and VICE"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0020.html">Ullrich von Bassewitz: "Re: [cc65] cc65 and VICE"</a>
+<li><strong>Reply:</strong> <a href="0020.html">Ullrich von Bassewitz: "Re: [cc65] cc65 and VICE"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:35 CET</em>
+</em>
+</small>
+</body>
+</html>

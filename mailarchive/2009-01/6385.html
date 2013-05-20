@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Makefiles?</title>
+<meta name="Author" content="Karri Kaksonen (karri1sipo.fi)" />
+<meta name="Subject" content="Re: [cc65] Makefiles?" />
+<meta name="Date" content="2009-01-19" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Makefiles?</h1>
+<!-- received="Mon Jan 19 08:36:00 2009" -->
+<!-- isoreceived="20090119073600" -->
+<!-- sent="Mon, 19 Jan 2009 09:35:43 +0200" -->
+<!-- isosent="20090119073543" -->
+<!-- name="Karri Kaksonen" -->
+<!-- email="karri1sipo.fi" -->
+<!-- subject="Re: [cc65] Makefiles?" -->
+<!-- id="49742D4F.3020309@sipo.fi" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="f97798c20901182317k87e7736ka9e966f6ffeddd8b&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6386.html" title="Andre Majorel: &quot;Re: [cc65] Makefiles?&quot;">Next message</a> ]
+[ <a href="6384.html" title="Oliver Schmidt: &quot;Re: [cc65] Makefiles?&quot;">Previous message</a> ]
+[ <a href="6384.html" title="Oliver Schmidt: &quot;Re: [cc65] Makefiles?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6386.html" title="Andre Majorel: &quot;Re: [cc65] Makefiles?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Karri Kaksonen &lt;<a href="mailto:karri1sipo.fi?Subject=Re:%20[cc65]%20Makefiles?">karri1sipo.fi</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-01-19 08:35:43</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Oliver Schmidt kirjoitti:
+&gt; Hi,
+&gt;
+&gt;   
+&gt;&gt; I need a *small* makefile program for WinXP and WinVista as I have a dial-up
+&gt;&gt; internet connecion.  Can anybody tell me where to find such?  I'm having a
+&gt;&gt; hard time googling it.
+&gt;&gt;     
+&gt;
+&gt; After 10 seconds of googling: <a href="http://www.steve.org.uk/Software/make/">http://www.steve.org.uk/Software/make/</a>
+&gt;
+&gt;   
+
+I have some input to this discussion that is cc65 specific.
+
+One problem with large projects is that you cannot put lots of filenames 
+on the linker command line.
+Therefore I use 3 makefiles to get things done. Please look at the files 
+called &quot;objlists&quot; and &quot;others&quot; to get the idea.
+I have used this technique in Windows and Linux and it works well in 
+both environments.
+
+In the top folder I have a Makefile like this:
+
+/MegaPak/Makefile:
+all:
+    &quot;$(MAKE)&quot; -C resident;
+    &quot;$(MAKE)&quot; -C intro;
+    &quot;$(MAKE)&quot; -C abcmusic;
+    &quot;$(MAKE)&quot; -C mygame;
+    &quot;$(MAKE)&quot; -C music;
+    &quot;$(MAKE)&quot; -C miniloader;
+    &quot;$(MAKE)&quot; -C cart clean;
+    &quot;$(MAKE)&quot; -C cart;
+
+clean:
+    &quot;$(MAKE)&quot; -C resident clean;
+    &quot;$(MAKE)&quot; -C intro clean;
+    &quot;$(MAKE)&quot; -C abcmusic clean;
+    &quot;$(MAKE)&quot; -C mygame clean;
+    &quot;$(MAKE)&quot; -C music clean;
+    &quot;$(MAKE)&quot; -C miniloader clean;
+    &quot;$(MAKE)&quot; -C cart clean;
+
+
+This Makefile compiles all my subdirectories that contain all kind of stuff.
+
+In a subdirectory I have a Makefile like this:
+/MegaPak/miniloader/Makefile:
+################ EDIT THESE ########################
+
+# As we are producing a cart we want to put our code
+# in a loadable segment so that we can load it in RAM
+# when we need it and throw it away after use.
+# Without these defines the code would go into the
+# main RAM and stay there forever.
+CODE_SEGMENT=MINILOADER_CODE
+DATA_SEGMENT=MINILOADER_DATA
+RODATA_SEGMENT=MINILOADER_RODATA
+BSS_SEGMENT=MINILOADER_BSS
+
+# These are the object files we want this makefile to produce
+objects= \
+    aaminiexec.o \
+    minidir.o \
+    minihelp.o \
+    miniload.o
+
+############### DONT EDIT BELOW THIS ############### 
+
+# We are compiling for Atari Lynx
+SYS=lynx
+
+# These are the names of the tools we use
+CO=co65
+CC=cc65
+AS=ca65
+AR=ar65
+SPRPCK=sprpck
+CP=cp
+RM=rm
+ECHO=echo
+TOUCH=touch
+
+# The flag for adding stuff to a library
+ARFLAGS=a
+
+# The flags for compiling C-code
+CFLAGS=-I . -t $(SYS) --add-source -O -Or -Cl -Os
+SEGMENTS=--code-name $(CODE_SEGMENT) \
+    --rodata-name $(RODATA_SEGMENT) \
+    --bss-name $(BSS_SEGMENT) \
+    --data-name $(DATA_SEGMENT)
+
+# Include paths we may need for compilations
+ifeq ($(CC65_INC),)
+    CC65_INC=/usr/lib/cc65/include
+endif
+ifeq ($(CC65_ASMINC),)
+    CC65_ASMINC=&quot;$(CC65_INC)/../asminc&quot;
+endif
+
+# Rule for making a *.o file out of a *.c file
+%.o: %.c
+    $(CC) $(CFLAGS) $(SEGMENTS) -o $(patsubst %c, %s, $(notdir $&lt;)) $&lt;
+    $(AS) -o $&#64; $(AFLAGS) $(*)&#46;<!--nospam-->s
+    $(RM) $*.s
+
+# Rule for making a *.o file out of a *.s file
+%.o: %.s
+    $(AS) -t lynx -I $(CC65_ASMINC) -o $&#64; $(AFLAGS) $&lt;
+
+# Rule for making a *.o file out of a *.bmp file
+%.o : %.bmp
+    $(SPRPCK) -t6 -p2 $&lt;
+    $(ECHO) .global _$* &gt; $*.s
+    $(ECHO) .segment \&quot;$(RODATA_SEGMENT)\&quot; &gt;&gt; $*.s
+    $(ECHO) _$*: .incbin \&quot;$*.spr\&quot; &gt;&gt; $*.s
+    $(AS) -t lynx -o $&#64; $(AFLAGS) $*&#46;<!--nospam-->s
+    $(RM) $*.s
+    $(RM) $*.pal
+    $(RM) $*.spr
+
+all: $(objects)
+    $(TOUCH) objlist
+    $(RM) objlist
+    for obj in $(objects); do $(ECHO) ../miniloader/$$obj &gt;&gt; objlist; done
+
+clean :
+    $(TOUCH) $(objects)
+    $(RM) $(objects)
+    $(TOUCH) objlist
+    $(RM) objlist
+
+
+The interesting thing in this Makefile is that it will list all the 
+objects that are required in a file called &quot;objlist&quot;.
+This objlist file will later be used by the linker.
+
+
+The last Makefile is for creating the actual target cart. In 
+MegaPak/cart/Makefile:
+#
+# makefile to create a complete Atari Lynx cart using the
+# the www.cc65.org compiler
+#
+# Currently the only user applications are &quot;intro&quot; for the startup
+# and &quot;sketch&quot; for a drawing application.
+# If you want more loadable modules you need to add them just like
+# the &quot;sketch&quot; is created.
+# Note: you need to add them to this Makefile, to the directory.s
+# and you have to create a new directory for the new module.
+
+################ EDIT THESE ########################
+
+# These are the object files we want this makefile to produce
+objects= \
+    lnxhdr.o \
+    encrypt1024.o \
+    directory.o \
+    title.o
+
+objlists = \
+    ../resident/objlist \
+    ../miniloader/objlist \
+    ../abcmusic/objlist \
+    ../intro/objlist \
+    ../mygame/objlist \
+    ../music/objlist
+
+others = \
+    &#64;&#46;<!--nospam-->./resident/objlist \
+    &#64;&#46;<!--nospam-->./miniloader/objlist \
+    &#64;&#46;<!--nospam-->./abcmusic/objlist \
+    &#64;&#46;<!--nospam-->./intro/objlist \
+    &#64;&#46;<!--nospam-->./mygame/objlist \
+    &#64;&#46;<!--nospam-->./music/objlist
+
+target = cart.lnx
+
+############### DONT EDIT BELOW THIS ############### 
+
+# We are compiling for Atari Lynx
+SYS=lynx
+
+# These are the names of the tools we use
+CL=cl65
+CO=co65
+CC=cc65
+AS=ca65
+AR=ar65
+SPRPCK=sprpck
+CP=cp
+RM=rm
+ECHO=echo
+TOUCH=touch
+
+# The flag for adding stuff to a library
+ARFLAGS=a
+
+# The flags for compiling C-code
+CFLAGS=-I . -t $(SYS) --add-source -O -Or -Cl -Os
+
+# Include paths we may need for compilations
+ifeq ($(CC65_INC),)
+    CC65_INC=/usr/lib/cc65/include
+endif
+ifeq ($(CC65_ASMINC),)
+    CC65_ASMINC=&quot;$(CC65_INC)/../asminc&quot;
+endif
+
+# Rule for making a *.o file out of a *.c file
+%.o: %.c
+    $(CC) $(CFLAGS) -o $(patsubst %c, %s, $(notdir $&lt;)) $&lt;
+    $(AS) -o $&#64; $(AFLAGS) $(*)&#46;<!--nospam-->s
+    $(RM) $*.s
+
+# Rule for making a *.o file out of a *.s file
+%.o: %.s
+    $(AS) -t lynx -I $(CC65_ASMINC) -o $&#64; $(AFLAGS) $&lt;
+
+# Rule for making a *.o file out of a *.bmp file
+%.o : %.bmp
+    $(SPRPCK) -t6 -p2 $&lt;
+    $(ECHO) .global _$* &gt; $*.s
+    $(ECHO) .segment \&quot;RODATA\&quot; &gt;&gt; $*.s
+    $(ECHO) _$*: .incbin \&quot;$*.spr\&quot; &gt;&gt; $*.s
+    $(AS) -t lynx -o $&#64; $(AFLAGS) $*&#46;<!--nospam-->s
+    $(RM) $*.s
+    $(RM) $*.pal
+    $(RM) $*.spr
+
+all: $(target)
+
+title.o : songbird.bmp
+    $(SPRPCK) -t6 songbird.bmp
+    $(AS) -t lynx -I $(CC65_ASMINC) -o title.o $(AFLAGS) title.s
+    $(RM) songbird.pal
+    $(RM) songbird.spr
+
+$(target) : $(objects) $(objlists)
+    $(CL) -t $(SYS) -o $&#64; -m lynxcart&#46;<!--nospam-->map -C lynxcart.cfg $(objects) 
+$(others) lynx.lib
+    $(RM) null
+
+clean :
+    $(TOUCH) $(objects)
+    $(RM) $(objects)
+    $(TOUCH) $(target)
+    $(RM) $(target)
+    $(TOUCH) lynxcart.map
+    $(RM) lynxcart.map
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Jan 19 08:36:00 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6386.html" title="Next message in the list">Andre Majorel: "Re: [cc65] Makefiles?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6384.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Makefiles?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6384.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] Makefiles?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6386.html" title="Next message in this discussion thread">Andre Majorel: "Re: [cc65] Makefiles?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6386.html" title="Message sent in reply to this message">Andre Majorel: "Re: [cc65] Makefiles?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6387.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Makefiles?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6385" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6385" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6385" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-01-19 08:36:03 CET
+</em></small></p>
+</body>
+</html>

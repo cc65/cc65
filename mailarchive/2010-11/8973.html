@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] String Literal Segment in </title>
+<meta name="Author" content="Agent Friday (64subnet1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] String Literal Segment in C code" />
+<meta name="Date" content="2010-11-28" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] String Literal Segment in C code</h1>
+<!-- received="Sun Nov 28 21:20:13 2010" -->
+<!-- isoreceived="20101128202013" -->
+<!-- sent="Sun, 28 Nov 2010 12:20:07 -0800" -->
+<!-- isosent="20101128202007" -->
+<!-- name="Agent Friday" -->
+<!-- email="64subnet1gmail.com" -->
+<!-- subject="Re: [cc65] String Literal Segment in C code" -->
+<!-- id="AANLkTi=y-GtneYwCkyJQopmK-qiBjfrFQYYmHkmkXfjK@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="672f9.3f158c4b.3a23f4b1&#64;aol.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8974.html" title="Spiro Trikaliotis: &quot;Re: [cc65] RS-232 on the C64&quot;">Next message</a> ]
+[ <a href="8972.html" title="Agent Friday: &quot;[cc65] RS-232 on the C64&quot;">Previous message</a> ]
+[ <a href="8971.html" title="Maspethrose71aol.com: &quot;[cc65] String Literal Segment in C code&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8983.html" title="Groepaz: &quot;Re: [cc65] String Literal Segment in C code&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Agent Friday &lt;<a href="mailto:64subnet1gmail.com?Subject=Re:%20[cc65]%20String%20Literal%20Segment%20in%20C%20code">64subnet1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-11-28 21:20:07</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Sun, Nov 28, 2010 at 10:08 AM,  &lt;Maspethrose7&#64;aol&#46;<!--nospam-->com&gt; wrote:
+&gt; Into which segment do string literals in a C program go?  I need this
+&gt; information for a text adventure and a library.  Thank you in advance.
+
+That would be the &quot;rodata&quot; segment, I believe.  Based on search
+results in the mail list archive, it looks like #pragma rodata-name
+can be used effectively to keep literals together with the overlay
+that uses them.  I assume that you're going for a disk-based string
+table...  I'm not sure how much help cc65 will be for that model,
+but I'm very interested in that solution.
+
+// Agent Friday
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Nov 28 21:20:13 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8974.html" title="Next message in the list">Spiro Trikaliotis: "Re: [cc65] RS-232 on the C64"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8972.html" title="Previous message in the list">Agent Friday: "[cc65] RS-232 on the C64"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8971.html" title="Message to which this message replies">Maspethrose71aol.com: "[cc65] String Literal Segment in C code"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8983.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] String Literal Segment in C code"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8983.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] String Literal Segment in C code"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8973" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8973" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8973" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-11-28 21:20:16 CET
+</em></small></p>
+</body>
+</html>

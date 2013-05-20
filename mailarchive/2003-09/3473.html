@@ -1,0 +1,215 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Supervision support</title>
+<meta name="Author" content="Peter Trauner (peter.trauner_at_utanet.at)">
+<meta name="Subject" content="Re: [cc65] Supervision support">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Supervision support</h1>
+<!-- received="Sat Sep 27 16:57:44 2003" -->
+<!-- isoreceived="20030927145744" -->
+<!-- sent="Sat, 27 Sep 2003 16:31:10 +0200" -->
+<!-- isosent="20030927143110" -->
+<!-- name="Peter Trauner" -->
+<!-- email="peter.trauner_at_utanet.at" -->
+<!-- subject="Re: [cc65] Supervision support" -->
+<!-- id="3F759F2E.9050303@utanet.at" -->
+<!-- inreplyto="20030923090432.GA25740@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Peter Trauner (<a href="mailto:peter.trauner_at_utanet.at?Subject=Re:%20[cc65]%20Supervision%20support"><em>peter.trauner_at_utanet.at</em></a>)<br>
+<strong>Date:</strong> 2003-09-27 16:31:10
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3472.html">Ullrich von Bassewitz: "Re: [cc65] feature questions..."</a>
+<li><strong>In reply to:</strong> <a href="3436.html">Ullrich von Bassewitz: "Re: [cc65] Supervision support"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3476.html">Ullrich von Bassewitz: "Re: [cc65] Supervision support"</a>
+<li><strong>Reply:</strong> <a href="3476.html">Ullrich von Bassewitz: "Re: [cc65] Supervision support"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello ,
+
+Ullrich von Bassewitz wrote:
+
+&gt;&gt;Since this is a console and the program is in ROM, how do I
+&gt;&gt;initialize/handle
+&gt;&gt;non const global variables?
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;You must use different LOAD and RUN addresses and copy the variables from ROM
+&gt;into the RAM. For a standard DATA segment, there's a routine named copydata in
+&gt;the library which does exactly this - you will have to call it in your startup
+&gt;file.
+&gt;  
+&gt;
+Done (shorter than the other version, same linker config).
+
+&gt;&gt;I have 4 linker configuration files for 16, 32, 64, 128kbyte cartridges
+&gt;&gt;(64, 128kbyte are bankswitched).
+&gt;&gt;Is it allowed to support several supervision targets?
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;I would prefer not to have more than one builtin config per platform, so you
+&gt;will have to choose the most common one. It is not more difficult for a user
+&gt;to say &quot;-C sv128.cfg&quot; on the command line instead of &quot;-t sv-128&quot;. The reason
+&gt;for the builtin configurations is not to save the user the trouble to use
+&gt;configuration files at all.
+&gt;  
+&gt;
+Ok.
+
+&gt;&gt;PS: I attached my work files
+&gt;&gt;(how must I deliver/integrate supervision support in cc65?)
+&gt;&gt;(some remarks about my first cc65 usage?)
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;[Next time, please place the files somewhere onto a web or ftp server and just
+&gt;post a link.]
+&gt;
+I see it from the point of a modem user who grabs his emails and goes 
+offline for reading.
+And I thought a 10kbyte attachment is short enough for direct attachment.
+
+&gt;As far as I can see, there are several smaller issues with the files, but
+&gt;nothing serious:
+&gt;
+&gt;  1. Assembler files are named xxx.s, not xxx.asm
+&gt;
+Done.
+
+&gt;  2. All upper case names are used for #defines, structs shouldn't use it.
+&gt;  
+&gt;
+Ok, switched myself to plain C mode.
+
+&gt;  3. Some stuff is already available in the library and should be reused (like
+&gt;     hex2asc).
+&gt;
+This was in my common.asm for my first assembler based stuff and programs.
+
+&gt;  4. I prefer not to have code commented out. If it is not needed, remove it,
+&gt;     if it is needed, enable it. Especially .if/.ifdef is ugly and problematic
+&gt;     to maintain, because some code path is not executed and tested when
+&gt;     making changes.
+&gt;  
+&gt;
+But sometimes it is needed in my opinion. (I will label some of my .if 
+clauses, and removed some code)
+Like plain reset/irq/nmi vectors for 16kbyte cartridges and
+extended vectors with a short reset routine to activate the correct bank 
+before executing
+code in the $8000-$bfff area for 32kbyte cartridges.
+
+&gt;  5. Some stuff is targeted for the 2.9 versions and should be adapted to work
+&gt;     with the head branch.
+&gt;
+How do I get access to the cvs tree? (internet address, id, password; 
+cvs project name; read only access is ok)?
+
+&gt;  6. Not sure about the functions in common.asm: I don't like the idea to have
+&gt;     functions that are similar to the ones from conio but with other names
+&gt;     and prototypes.
+&gt;
+These is my private pure assembler stuff (not to be included in cc65).
+
+&gt;  7. I prefer not to have unneeded types and defines like &quot;byte&quot; and &quot;word&quot;
+&gt;     defined in some header file, because this may collide with identifiers
+&gt;     used by a program. This is especially true for &quot;true&quot; and &quot;false&quot; because
+&gt;     for C99 these are even in the standard. In general: Since you are on the
+&gt;     &quot;other side&quot; of the code (you are writing an implementation, not a
+&gt;     program), please try to be as careful as possible when introducing new
+&gt;     types and names: Someone may have a program that does already use the
+&gt;     types/names in question.
+&gt;
+Did a look into the header files. I have been surprised to find some c99 
+stuff.
+I will use common types, names, defines where possible.
+For the supervision code it is enough to work in cc65 in my opinion.
+(and I don't expect many libraries to be usable for the supervision).
+
+&gt;  8. A few structural changes to the headers to make them similar to the
+&gt;     existing ones would be nice.
+&gt;  
+&gt;
+Added header note.
+
+&gt;Anything mentioned above assumes inclusion into the main cc65 package - if
+&gt;you're planing to distribute your files separately, only 5. and maybe 7. is of
+&gt;relevance.
+&gt;  
+&gt;
+I don't plan large supervision developements.
+It would be nice to have basic supervision support in cc65.
+
+Do you plan to add bit notation support?
+&quot;struct { unsigned char bank:3, prescaler:1, lcd_on:1, irq_dma_on:1, 
+irq_timer_on:1, nmi_on:1 };&quot;
+Do you plan to add optimizations for
+&quot;(const?const:const)|(const?const:const)&quot; ?
+
+2nd try at
+<a href="http://de.briefcase.yahoo.com/grumpfix/public/sv11.zip">http://de.briefcase.yahoo.com/grumpfix/public/sv11.zip</a>
+
+In my opinion 32kbyte cartridge support buildin would be optimal.
+(and please include all 4 config files)
+I don't know if there is a good place for stub.s (default starting point 
+for assembler users).
+I don't know if there is a good place for the technical summary.
+
+Peter
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Supervision%20support">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3472.html">Ullrich von Bassewitz: "Re: [cc65] feature questions..."</a>
+<li><strong>In reply to:</strong> <a href="3436.html">Ullrich von Bassewitz: "Re: [cc65] Supervision support"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3476.html">Ullrich von Bassewitz: "Re: [cc65] Supervision support"</a>
+<li><strong>Reply:</strong> <a href="3476.html">Ullrich von Bassewitz: "Re: [cc65] Supervision support"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-09-27 16:57:55 CEST</em>
+</em>
+</small>
+</body>
+</html>

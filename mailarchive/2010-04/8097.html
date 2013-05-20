@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Scalable UI without float?</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Scalable UI without float?" />
+<meta name="Date" content="2010-04-22" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Scalable UI without float?</h1>
+<!-- received="Thu Apr 22 19:55:56 2010" -->
+<!-- isoreceived="20100422175556" -->
+<!-- sent="Thu, 22 Apr 2010 19:55:50 +0200" -->
+<!-- isosent="20100422175550" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Scalable UI without float?" -->
+<!-- id="20100422175550.GA11515@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="4bce78b9.9753f10a.7176.5221&#64;mx.google.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8098.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Wiki anyone?&quot;">Next message</a> ]
+[ <a href="8096.html" title="Oliver Schmidt: &quot;[cc65] Fwd: Bug in cl65 (?)&quot;">Previous message</a> ]
+[ <a href="8079.html" title="Payton Byrd: &quot;RE: [cc65] Scalable UI without float?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Scalable%20UI%20without%20float?">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-04-22 19:55:50</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Good evening!
+
+On Tue, Apr 20, 2010 at 11:01:55PM -0500, Payton Byrd wrote:
+&gt; I told you I was tired. :)  Multiply first is the answer I was looking for.
+
+Let me use this opportunity to introduce a new library feature of the next
+cc65 version:
+
+As others have already pointed out, changing the order of operations is the
+solution to the problem. But this opens a pitfall: The first operation may
+overflow. Which is not true in your case but may become true for graphics
+operations, where coordinates are in the range of 2^8 or larger.
+
+As an example, assume that we want to calculate the intersection point of a
+line with the right screen border (X coordinate 319 on the C64). If the line
+is determined by x1/y1 and x2/y2, the intersection is aprox.
+
+
+        x = 319
+        y = y1 + (x - x1) * (y2 - y1) / (x2 - x1)
+
+As in your case, we need to do the multiplication before the division. While
+the final result fits nicely in 16 bits, we may get an intermediate result
+that is larger than 16 bits, because we're multiplying X and Y coordinates and
+want to allow screen coordinates that are slightly outside of the visible
+area. One workaround is to introduce casts to long, so multiplication and
+division are done with 32 bit precision. Unfortunately, this is much slower.
+
+To help with this problem, I've added several additional multiplication and
+division routines:
+
+long __fastcall__ cc65_imul16x16r32 (int lhs, int rhs);
+/* Multiplicate two signed 16 bit to yield a signed 32 bit result */
+
+long __fastcall__ cc65_idiv32by16r16 (long rhs, int lhs);
+/* Divide a 32 bit signed value by a 16 bit signed value yielding a 16
+ * bit result and a 16 bit remainder. The former is returned in the lower 16
+ * bit of the result, the latter in the upper. If you don't need the
+ * remainder, just assign (or cast) to an int.
+ */
+
+(for more see cc65.h but beware, not all of them are currently implemented)
+
+So it is possible to have just the intermediate result in the necessary
+precision, increase the speed by a factor of 2-4 (depending on the operands
+and the operation).
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Apr 22 19:55:56 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8098.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Wiki anyone?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8096.html" title="Previous message in the list">Oliver Schmidt: "[cc65] Fwd: Bug in cl65 (?)"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8079.html" title="Message to which this message replies">Payton Byrd: "RE: [cc65] Scalable UI without float?"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8097" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8097" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8097" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-04-22 19:55:58 CEST
+</em></small></p>
+</body>
+</html>

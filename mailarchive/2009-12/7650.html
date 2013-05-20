@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] RODATA strings</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] RODATA strings" />
+<meta name="Date" content="2009-12-03" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] RODATA strings</h1>
+<!-- received="Thu Dec  3 17:23:14 2009" -->
+<!-- isoreceived="20091203162314" -->
+<!-- sent="Thu, 3 Dec 2009 17:23:06 +0100" -->
+<!-- isosent="20091203162306" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] RODATA strings" -->
+<!-- id="20091203162305.GA20085@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="DDF27C15752A48F3ACF1AB02C773770A&#64;ORANGE2" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7651.html" title="Mark J. Reed: &quot;[cc65] Dumb C128 question&quot;">Next message</a> ]
+[ <a href="7649.html" title="Shawn Jefferson: &quot;[cc65] RODATA strings&quot;">Previous message</a> ]
+[ <a href="7649.html" title="Shawn Jefferson: &quot;[cc65] RODATA strings&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7658.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] RODATA strings&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20RODATA%20strings">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-12-03 17:23:06</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Tue, Dec 01, 2009 at 10:42:20PM -0800, Shawn Jefferson wrote:
+&gt; I was looking at an app I wrote trying to reduce size and I noticed I have
+&gt; quite a few strings that are the same in cputs (press any key type
+&gt; messages) calls.  Does cc65 already remove redundancy with these read-only
+&gt; strings?
+
+cc65 doesn't do that. The reason is that the current implementation for string
+literals is ineffective. Currently any string literal is placed into the
+literal pool. A better implementation would be to have a separate literal pool
+for each function - so if a function is removed, literals can be also removed.
+This would mean that merging duplicate strings would work inside a function
+only, which drastically reduces the positive effect.
+
+What I'm usually doing to avoid duplication of string literals is to write
+small functions for this purpose:
+
+    static void HelpPrompt (void)
+    {
+        DisplayPrompt (&quot;Press F1 for help&quot;);
+    }
+
+    static void AnyKeyPrompt (void)
+    {
+        DisplayPrompt (&quot;Press any key to continue&quot;);
+    }
+
+(copied from dbg.c).
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Dec  3 17:23:14 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7651.html" title="Next message in the list">Mark J. Reed: "[cc65] Dumb C128 question"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7649.html" title="Previous message in the list">Shawn Jefferson: "[cc65] RODATA strings"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7649.html" title="Message to which this message replies">Shawn Jefferson: "[cc65] RODATA strings"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7658.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] RODATA strings"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7650" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7650" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7650" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-12-03 17:23:18 CET
+</em></small></p>
+</body>
+</html>

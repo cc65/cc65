@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] wrong colors in conio</title>
+<meta name="Author" content="Greg King (gngking_at_erols.com)">
+<meta name="Subject" content="Re: [cc65] wrong colors in conio">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] wrong colors in conio</h1>
+<!-- received="Fri Dec 13 01:16:04 2002" -->
+<!-- isoreceived="20021213001604" -->
+<!-- sent="Thu, 12 Dec 2002 19:13:46 -0500" -->
+<!-- isosent="20021213001346" -->
+<!-- name="Greg King" -->
+<!-- email="gngking_at_erols.com" -->
+<!-- subject="Re: [cc65] wrong colors in conio" -->
+<!-- id="003401c2a23c$ee7556c0$202b2c42@palace" -->
+<!-- inreplyto="[cc65] wrong colors in conio" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Greg King (<a href="mailto:gngking_at_erols.com?Subject=Re:%20[cc65]%20wrong%20colors%20in%20conio"><em>gngking_at_erols.com</em></a>)<br>
+<strong>Date:</strong> 2002-12-13 01:13:46
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2035.html">Groepaz: "Re: [cc65] C question"</a>
+<li><strong>Maybe in reply to:</strong> <a href="1903.html">Groepaz: "[cc65] wrong colors in conio"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2041.html">Ullrich von Bassewitz: "Re: [cc65] wrong colors in conio"</a>
+<li><strong>Next in thread:</strong> <a href="1881.html">MagerValp: "Re: [cc65] Think I found a cc65 bug"</a>
+<li><strong>Reply:</strong> <a href="2041.html">Ullrich von Bassewitz: "Re: [cc65] wrong colors in conio"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+-----Original Message-----
+From: Christian Groessler
+Date: Tuesday, December 10, 2002 07:47 PM
+&gt;
+&gt; On 12/11/2002 01:33:39 AM CET, Ullrich von Bassewitz wrote:
+&gt; &gt;
+&gt; &gt; Conio supports two color models:  color and monochrome. So, a multi-platform
+&gt; &gt; program will always have to cope with these two models.  If the Atari
+&gt; &gt; supports the monochrome model, it is not necessary to add specific #ifdefs
+&gt; &gt; for the Atari, because these #ifdefs are already in place for the other
+&gt; &gt; monochrome machines.  If we don't make textcolor() empty,
+&gt; &gt; we need Atari-specific code.
+&gt; &gt;
+&gt; &gt; But, I'm open to other suggestions.  If you find a way to make colors work
+&gt; &gt; in a way that needs no Atari-specific code in an application, and keeps
+&gt; &gt; functions consistent across platforms, I have no problem with it.
+&gt; &gt; I've outlined the most obvious solution above [making bgcolor() empty,
+&gt; &gt; as well], but this must not be the only solution.
+&gt;
+&gt; I think I will make the Atari conio monochrome [empty bgcolor()], and
+&gt; add some platform-specific atari_bgcolor() and atari_textcolor() which
+&gt; behave like the current Atari bgcolor() and textcolor().
+
+Conio has three models:  zero color, one color, and many colors.
+
+The PET has &quot;zero&quot; colors -- we can't choose the colors.
+The Atari has one color -- all text has the same settable color.
+The 64 has many colors -- text can have a rainbow of colors, at the same time.
+
+A programmer might want to alert a user to an important event by &quot;flashing&quot; the
+screen's colors.  So, bgcolor() must not be a &quot;null function.&quot;
+
+A good solution to the &quot;Atari problem&quot; is to make that function set BOTH values:
+It would set the background to the argument-value; and, it automatically would
+choose a brightness-level that gives easily readable text, for that particular
+color (light text over a dark screen, and dark text over a light background).
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20wrong%20colors%20in%20conio">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2035.html">Groepaz: "Re: [cc65] C question"</a>
+<li><strong>Maybe in reply to:</strong> <a href="1903.html">Groepaz: "[cc65] wrong colors in conio"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2041.html">Ullrich von Bassewitz: "Re: [cc65] wrong colors in conio"</a>
+<li><strong>Next in thread:</strong> <a href="1881.html">MagerValp: "Re: [cc65] Think I found a cc65 bug"</a>
+<li><strong>Reply:</strong> <a href="2041.html">Ullrich von Bassewitz: "Re: [cc65] wrong colors in conio"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-12-13 01:16:08 CET</em>
+</em>
+</small>
+</body>
+</html>

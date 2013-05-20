@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-2">
+<title>cc65 mailing list archive: Re: [cc65] 65816</title>
+<meta name="Author" content="Maciej Witkowiak (ytm_at_elysium.pl)">
+<meta name="Subject" content="Re: [cc65] 65816">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] 65816</h1>
+<!-- received="Thu Apr 18 21:35:55 2002" -->
+<!-- isoreceived="20020418193555" -->
+<!-- sent="Thu, 18 Apr 2002 19:24:24 +0200" -->
+<!-- isosent="20020418172424" -->
+<!-- name="Maciej Witkowiak" -->
+<!-- email="ytm_at_elysium.pl" -->
+<!-- subject="Re: [cc65] 65816" -->
+<!-- id="20020418192424.A2443@bossstation.localdomain" -->
+<!-- charset="iso-8859-2" -->
+<!-- inreplyto="20020417130615.A32483@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Maciej Witkowiak (<a href="mailto:ytm_at_elysium.pl?Subject=Re:%20[cc65]%2065816"><em>ytm_at_elysium.pl</em></a>)<br>
+<strong>Date:</strong> 2002-04-18 19:24:24
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1283.html">Ullrich von Bassewitz: "Re: [cc65] 65816"</a>
+<li><strong>In reply to:</strong> <a href="1277.html">Ullrich von Bassewitz: "Re: [cc65] 65816"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1285.html">Ullrich von Bassewitz: "[cc65] cc65 runtime module loader (was: 65816)"</a>
+<li><strong>Next in thread:</strong> <a href="1278.html">Ullrich von Bassewitz: "Re: [cc65] 65816"</a>
+<li><strong>Reply:</strong> <a href="1285.html">Ullrich von Bassewitz: "[cc65] cc65 runtime module loader (was: 65816)"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Ullrich von Bassewitz dnia 17 kwi 2002 o 13:06 +0200 napisał:
+&gt; This brings up an idea: Now that o65 support in the linker is complete and
+&gt; tested to some degree, it would also be possible to add a framework for
+&gt; loadable modules for cc65 generated programs. The o65 format is designed so
+&gt; that the loader/relocator is rather small. Adding such a loader would mean
+&gt; that programs can load support routines for memory management at runtime
+&gt; depending on the hardware found in the system. Such a runtime loader/overlay
+&gt; system would be helpful in several other cases, for example to load hardware
+&gt; specific mouse or graphic routines.
+&gt; 
+&gt; The only unfortunate thing is that I usually have a lot more ideas than I can
+&gt; handle:-) I'm still working on the simulator thing we discussed lately, and it
+&gt; will need a lot more work to become usable.
+&gt; 
+&gt; Maciej, can you tell me how big the o65 loader is, you wrote for Lunix? For
+&gt; the sake of portability, I would suggest to use the standard C file routines
+&gt; for the actual loading, so having a number without the file I/O stuff would be
+&gt; great.
+
+My o65 loader for LUnix is ~500 lines long and after compiling it is ~900 bytes.
+It is rewritten o65 relocator from original Andre Fachat's OS/A code. My
+version is simplified - o65 headers and flags are mostly ignored, only system
+type is checked, zero page relocation is ignored too, only pagewise relocation
+is allowed.
+It doesn't handle importing and exporting symbols (only one symbol for LUnix
+virtual jumptable can be imported), OS/A relocator has it.
+
+It doesn't have many external dependencies. It needs only equivalents of
+fopen, fclose, fgetc, fread (which can be written as a loop with fgetc), and
+something similar to malloc, which takes number of needed memory pages and
+returns address of first page of continuous memory.
+
+Most of code is devoted to calculating offsets and base addresses for each
+segment. 
+
+ytm
+
+-- 
+We strategize our object-oriented deliverables and content.
+
+Mr. Derek D Stone
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%2065816">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1283.html">Ullrich von Bassewitz: "Re: [cc65] 65816"</a>
+<li><strong>In reply to:</strong> <a href="1277.html">Ullrich von Bassewitz: "Re: [cc65] 65816"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1285.html">Ullrich von Bassewitz: "[cc65] cc65 runtime module loader (was: 65816)"</a>
+<li><strong>Next in thread:</strong> <a href="1278.html">Ullrich von Bassewitz: "Re: [cc65] 65816"</a>
+<li><strong>Reply:</strong> <a href="1285.html">Ullrich von Bassewitz: "[cc65] cc65 runtime module loader (was: 65816)"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-04-18 21:37:01 CEST</em>
+</em>
+</small>
+</body>
+</html>

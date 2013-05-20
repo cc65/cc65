@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: RE: [cc65] dio_query_sectcount() on A</title>
+<meta name="Author" content="Shawn Jefferson (sjefferson1shaw.ca)" />
+<meta name="Subject" content="RE: [cc65] dio_query_sectcount() on Atari ?" />
+<meta name="Date" content="2012-10-19" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>RE: [cc65] dio_query_sectcount() on Atari ?</h1>
+<!-- received="Fri Oct 19 02:30:33 2012" -->
+<!-- isoreceived="20121019003033" -->
+<!-- sent="Thu, 18 Oct 2012 17:30:11 -0700" -->
+<!-- isosent="20121019003011" -->
+<!-- name="Shawn Jefferson" -->
+<!-- email="sjefferson1shaw.ca" -->
+<!-- subject="RE: [cc65] dio_query_sectcount() on Atari ?" -->
+<!-- id="550F28036F6F44698B345234CB5D4A4D@ORANGE2" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="CACT=u72NTG&ndash;&ndash;K6bkWm+ACHmc1w7K7hX1N533nPp0z4D_wTe6xg&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10934.html" title="Oliver Schmidt: &quot;Re: [cc65] dio_query_sectcount() on Atari ?&quot;">Next message</a> ]
+[ <a href="10932.html" title="Oliver Schmidt: &quot;[cc65] Goodbye _curunit, Hello chdir()&quot;">Previous message</a> ]
+[ <a href="10930.html" title="Oliver Schmidt: &quot;Re: [cc65] dio_query_sectcount() on Atari ?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10934.html" title="Oliver Schmidt: &quot;Re: [cc65] dio_query_sectcount() on Atari ?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Shawn Jefferson &lt;<a href="mailto:sjefferson1shaw.ca?Subject=RE:%20[cc65]%20dio_query_sectcount()%20on%20Atari%20?">sjefferson1shaw.ca</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-10-19 02:30:11</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt; From: owner-cc65&#64;musoftware&#46;<!--nospam-->de [mailto:owner-cc65&#64;musoftware&#46;<!--nospam-->de] On Behalf
+&gt;
+&gt; &gt; I can only think of one way that would work across all DOSes, and all
+&gt; types
+&gt; &gt; of disks (after all, you may want to have a disk copy routine that
+&gt; copies a
+&gt; &gt; boot disk, or oddly sized ATR file).  The only way I can think of is to
+&gt; just
+&gt; &gt; try and read sectors until you find the last one-not the greatest
+&gt; method.
+&gt; 
+&gt; I'd strongly suggest to not implementit that way it's absolutely not
+&gt; conformant to expectations. Imagine the disc copy scenario basically
+&gt; reading the whole disk twice.
+
+I was thinking of a binary search read like Marc suggested, but yes, I agree
+it might not be what a user would expect (but the programmer might if it's
+documented.)
+ 
+&gt; If there should be no way to do it with a reasonable amount of
+&gt; overhead then it should rather not be implemented at all. Then a disck
+&gt; copy program can still just call dio_read() until that returns with an
+&gt; errror...
+
+That's what I did in one of the tools I implemented that uses DIO to copy
+disks... there's no telling exactly if your disk will have 720 sectors, 1040
+sectors, or some other number depending on strange emulator-based disk
+formats (Atari disks can go up to 65535 sectors with some popular DOSes.)  I
+just read until I get an error (after three retries) and then call that the
+end of the disk copy.
+ 
+&gt; Does it probably make sense to define a &quot;&gt; 80% of the drives&quot; and/or a
+&gt; &quot;&gt; 80% of the DOSes&quot; case in which a simple solution works and just
+&gt; live with the fact that the 20% left will return an error (aka zero
+&gt; sectors)?
+
+Personally, I'd prefer to see a routine that works 100% of the time,
+regardless of disk format so that the function returns what the programmer
+thinks it will return: the number of sectors on the disk.  If the programmer
+doesn't like the standard way this is done, they can always write their own
+routine and accept the incompatibility and special cases such a custom
+routine would entail.
+
+Well, this is likely why Christian didn't implement this function on the
+Atari.  There's no good method to quickly determine the number of sectors on
+a disk. :)
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Oct 19 02:30:33 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10934.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] dio_query_sectcount() on Atari ?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10932.html" title="Previous message in the list">Oliver Schmidt: "[cc65] Goodbye _curunit, Hello chdir()"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10930.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] dio_query_sectcount() on Atari ?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10934.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] dio_query_sectcount() on Atari ?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10934.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] dio_query_sectcount() on Atari ?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10973.html" title="Message sent in reply to this message">Fatih Aygün: "Re: [cc65] dio_query_sectcount() on Atari ?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10974.html" title="Message sent in reply to this message">Fatih Aygün: "Re: [cc65] dio_query_sectcount() on Atari ?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10933" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10933" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10933" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-10-19 02:30:37 CEST
+</em></small></p>
+</body>
+</html>

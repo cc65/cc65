@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Macros in inline assembler</title>
+<meta name="Author" content="Andreas Rückert (a_rueckert1gmx.net)" />
+<meta name="Subject" content="Re: [cc65] Macros in inline assembler" />
+<meta name="Date" content="2012-01-19" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Macros in inline assembler</h1>
+<!-- received="Thu Jan 19 17:34:00 2012" -->
+<!-- isoreceived="20120119163400" -->
+<!-- sent="Thu, 19 Jan 2012 17:33:47 +0100" -->
+<!-- isosent="20120119163347" -->
+<!-- name="Andreas Rückert" -->
+<!-- email="a_rueckert1gmx.net" -->
+<!-- subject="Re: [cc65] Macros in inline assembler" -->
+<!-- id="20120119163347.43640@gmx.net" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="CACT=u71isvG41U_ENCp1xj4XRgFBsWGpweN3gx8J6tPzf1yr2g&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9905.html" title="Oliver Schmidt: &quot;Re: [cc65] Macros in inline assembler&quot;">Next message</a> ]
+[ <a href="9903.html" title="Gábor Lénárt: &quot;Re: [cc65] linking to o65&quot;">Previous message</a> ]
+[ <a href="9902.html" title="Oliver Schmidt: &quot;Re: [cc65] Macros in inline assembler&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9905.html" title="Oliver Schmidt: &quot;Re: [cc65] Macros in inline assembler&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Andreas Rückert &lt;<a href="mailto:a_rueckert1gmx.net?Subject=Re:%20[cc65]%20Macros%20in%20inline%20assembler">a_rueckert1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-01-19 17:33:47</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+-------- Original-Nachricht --------
+&gt; Datum: Thu, 19 Jan 2012 16:55:40 +0100
+&gt; Von: Oliver Schmidt &lt;ol.sc&#64;web&#46;<!--nospam-->de&gt;
+&gt; An: cc65&#64;musoftware&#46;<!--nospam-->de
+&gt; Betreff: Re: [cc65] Macros in inline assembler
+
+&gt; Hi Andreas,
+&gt; 
+&gt; Maybe no usefull question, but is there as specific reason for using
+&gt; inline assembler and not the &quot;ordinary&quot; macro assembler ca65?
+
+That's a good question...
+
+&gt; The only good reason I could imagine for the inline assembler would be
+&gt; to really mix C and asm inside a single function to avoid any
+&gt; subroutine overhead.
+
+That's exactly the case...
+
+&gt; However to work with the inline assembler you
+&gt; have to turn off the C compiler optimizations which in all usecases I
+&gt; can imagine conteracts to what you want to archieve so that at least
+&gt; in my experience there's basically no good reason at all for using the
+&gt; inline assembler.
+
+All the optimizations are on of course, since the c64 is quite slow
+anyway. And since I want to compute 256-bit hashes I need all
+the computing power I can get from the little breadbox... :-)
+I checked the generated assembler code, and I could not find any
+inline assembler, that was optimized away so far, so maybe I'm just
+lucky at the moment...
+
+We are talking about a modified version of this code:
+
+<a href="http://www.koders.com/c/fid0D6D481A7D85CEB963C3F4258F30CF903DA541F3.aspx">http://www.koders.com/c/fid0D6D481A7D85CEB963C3F4258F30CF903DA541F3.aspx</a>
+
+or precisely about the unpacking starting in line 103. 
+I want to run this code on several platforms, including PCs with
+optional GPUs, so rewriting everything in assembler is not really
+an option. Maybe some part with conditional compilation. But the
+later sha256 rounds are too complex to unloop them by hand. So I'll
+keep them as C for now.
+
+Just to give you an idea about the current performance: 
+the c64 as emulated in vice checks 100 nonces in 261 seconds. That
+includes 2 rounds of sha256 and a context comparison for each
+nonce. So we are talking about 1 sha256 computation per second, or so.
+
+But it's very interesting to learn about potential optimizations and
+such, so I think the c64 version is worth the work.
+
+Ciao,
+Andreas
+
+-- 
+Empfehlen Sie GMX DSL Ihren Freunden und Bekannten und wir
+belohnen Sie mit bis zu 50,- Euro! <a href="https://freundschaftswerbung.gmx.de">https://freundschaftswerbung.gmx.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Jan 19 17:34:00 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9905.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Macros in inline assembler"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9903.html" title="Previous message in the list">Gábor Lénárt: "Re: [cc65] linking to o65"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9902.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] Macros in inline assembler"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9905.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Macros in inline assembler"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9905.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Macros in inline assembler"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9908.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Macros in inline assembler"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9904" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9904" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9904" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-01-19 17:34:03 CET
+</em></small></p>
+</body>
+</html>

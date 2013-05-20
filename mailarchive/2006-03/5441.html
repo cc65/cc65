@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] CC65, lcc &amp; 65816?</title>
+<meta name="Author" content="cdoty1rastersoft.net (cdoty1rastersoft.net)" />
+<meta name="Subject" content="[cc65] CC65, lcc &amp; 65816?" />
+<meta name="Date" content="2006-03-22" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] CC65, lcc &amp; 65816?</h1>
+<!-- received="Wed Mar 22 05:34:12 2006" -->
+<!-- isoreceived="20060322043412" -->
+<!-- sent="Tue, 21 Mar 2006 22:34:03 -0600" -->
+<!-- isosent="20060322043403" -->
+<!-- name="cdoty1rastersoft.net" -->
+<!-- email="cdoty1rastersoft.net" -->
+<!-- subject="[cc65] CC65, lcc &amp; 65816?" -->
+<!-- id="004001c64d69$da90b7e0$6600a8c0@AATest" -->
+<!-- charset="iso-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5442.html" title="Jonathan Graham Harston: &quot;[cc65] Re: Mouse API&quot;">Next message</a> ]
+[ <a href="5440.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Mouse API&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:cdoty1rastersoft.net?Subject=Re:%20[cc65]%20CC65,%20lcc%20&amp;amp;%2065816?">cdoty1rastersoft.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2006-03-22 05:34:03</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I've recently became interested in using the lcc 65816 (and ca65/ld65) 
+backend posted in the archives (by Groepez)..
+
+I've been able to get it to the point that it will compile and successfully 
+run a roms for the SNES, but it has a problem with passing parameters into a 
+function. Here's a link to the rom I got working: 
+<a href="http://www.rastersoft.net/SNESFrog.zip">http://www.rastersoft.net/SNESFrog.zip</a> (A selects an option. up and down 
+move.)
+Once 1 or 2 player is selected, any movement of the frog causes it to jump 
+to the upper left. This is the first function called with a parameter.
+
+This seems to be related to the PRO macro and RZ/LZ.  I would like to fully 
+implement the enclosed macros under ca65. Any ideas on this?
+
+This is pretty close to functioning, minus the above issue. It does limit 
+the code size to 32k (on the SNES), but that can be worked (hacked) around 
+fairly easily in lcc5ca65/ja2ca65.
+
+Here's the macro:
+ .mac PRO
+ .(
+ phd
+-stack = \1
+ .while !(stack &amp; 1) &amp;&amp; stack&lt;5 &amp;&amp; stack
+ pha
+stack = stack - 2
+ .wend
+ tsc
+ .if stack
+ sec
+ sbc #stack
+ tcs
+ .endif
+ tcd
+ .)
+ .mend
+
+ .mac POST
+ !POP \1
+ pld
+ .mend
+
+Here's the other macro:
+ .macro POP arg1
+ .scope
+;-stack = arg1
+; .while !(stack &amp; 1) &amp;&amp; stack&lt;9 &amp;&amp; stack
+; pla
+;stack = stack - 2
+; .wend
+
+; .if (arg1 != 0)
+ tsc
+ clc
+ adc #arg1
+ tcs
+; .endif
+
+ .endscope
+ .endmacro
+
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Mar 22 05:34:12 2006</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5442.html" title="Next message in the list">Jonathan Graham Harston: "[cc65] Re: Mouse API"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5440.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Mouse API"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5441" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5441" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5441" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2006-03-22 05:34:15 CET
+</em></small></p>
+</body>
+</html>

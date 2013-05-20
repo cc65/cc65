@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] unresolved externals in curren</title>
+<meta name="Author" content="Christian Groessler (chris1groessler.org)" />
+<meta name="Subject" content="[cc65] unresolved externals in current SVN version" />
+<meta name="Date" content="2010-06-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] unresolved externals in current SVN version</h1>
+<!-- received="Fri Jun 25 23:31:29 2010" -->
+<!-- isoreceived="20100625213129" -->
+<!-- sent="Fri, 25 Jun 2010 23:36:44 +0200 (CEST)" -->
+<!-- isosent="20100625213644" -->
+<!-- name="Christian Groessler" -->
+<!-- email="chris1groessler.org" -->
+<!-- subject="[cc65] unresolved externals in current SVN version" -->
+<!-- id="alpine.BSO.1.10.1006252327390.13899@vigilia.groessler.org" -->
+<!-- charset="US-ASCII" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8479.html" title="Christian Groessler: &quot;Re: [cc65] unresolved externals in current SVN version&quot;">Next message</a> ]
+[ <a href="8477.html" title="Lars Haugseth: &quot;Re: [cc65] Can ca65 be told to accept multiple instructions on the same line?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8479.html" title="Christian Groessler: &quot;Re: [cc65] unresolved externals in current SVN version&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Christian Groessler &lt;<a href="mailto:chris1groessler.org?Subject=Re:%20[cc65]%20unresolved%20externals%20in%20current%20SVN%20version">chris1groessler.org</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-06-25 23:36:44</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+I compile a simple program
+
+--------
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+int main(void)
+{
+#ifdef MALLOC
+        void *p = malloc(123);
+#endif
+        printf(&quot;Hello World\n&quot;);
+        return 0;
+}
+--------
+
+for the Atari and I get
+
+--------
+$ cl65 -t atari -o hello.com hello.c 
+Unresolved external `_printf' referenced in:
+  hello.s(13)
+Unresolved external `zerobss' referenced in:
+  crt0.s(14)
+ld65: Error: 2 unresolved external(s) found - cannot create output file
+$
+--------
+
+I seem to remember there were some changes with regard to the compiler 
+installation directory. I looked at the mailing list archives but I didn't 
+find the discussion about it. (Hint: A search capability on the ml 
+archives would be nice :-))
+
+I have an &quot;installation&quot; as I always had: I have a local svn sandbox where 
+I build from source and then set PATH, CC65_INC, LD65_LIB, and LD65_OBJ 
+accordingly.
+
+It seems it still finds atari.lib (it has a reference to crt0.s) but 
+somehow it misses the externals.
+
+regards,
+chris
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Jun 25 23:31:29 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8479.html" title="Next message in the list">Christian Groessler: "Re: [cc65] unresolved externals in current SVN version"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8477.html" title="Previous message in the list">Lars Haugseth: "Re: [cc65] Can ca65 be told to accept multiple instructions on the same line?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8479.html" title="Next message in this discussion thread">Christian Groessler: "Re: [cc65] unresolved externals in current SVN version"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8479.html" title="Message sent in reply to this message">Christian Groessler: "Re: [cc65] unresolved externals in current SVN version"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8478" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8478" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8478" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-06-25 23:31:33 CEST
+</em></small></p>
+</body>
+</html>

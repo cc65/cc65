@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Overlay Demo: C64 Port ?</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] Overlay Demo: C64 Port ?" />
+<meta name="Date" content="2009-10-01" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Overlay Demo: C64 Port ?</h1>
+<!-- received="Thu Oct  1 23:29:25 2009" -->
+<!-- isoreceived="20091001212925" -->
+<!-- sent="Thu, 1 Oct 2009 23:29:18 +0200" -->
+<!-- isosent="20091001212918" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] Overlay Demo: C64 Port ?" -->
+<!-- id="f97798c20910011429q172fd902v32d29c387410c574@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7112.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Overlay Demo: C64 Port ?&quot;">Next message</a> ]
+[ <a href="7110.html" title="Ullrich von Bassewitz: &quot;[cc65] Second release candidate available&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7112.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Overlay Demo: C64 Port ?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Overlay%20Demo:%20C64%20Port%20?">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-10-01 23:29:18</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+Several times cc65 users asked about overlay support in cc65. In order
+to react on that interest I created an small overlay demo that I'd
+like to add to the samples coming with the cc65 doc package.
+
+Such a demo makes especially sense because users tend to think in the
+direction of cc65 loadable modules when it comes to overlays, although
+the &quot;single link to multiple output files&quot; approach is way better
+suited to overlays. Right now the demo only works on Apple2 machines
+but I'd really like to see it run at least on the C64 too. Therefore I
+ask for your help...
+
+The question is basically where to place the overlays in memory
+whithout the need to modify/replace any part of the C-library. The
+goal is to get along with just a custom linker config. On the Apple2
+the start address of programs is variable so one can simply move the
+start address upwards and place the overlays below the program...
+
+Please find below the (hopfully portable) source code and Apple2 linker config.
+
+Thanks in advance, Oliver
+
+#include &lt;stdio.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;unistd.h&gt;
+
+extern void _OVL1CODE_LOAD__, _OVL1CODE_SIZE__;
+extern void _OVL2CODE_LOAD__, _OVL2CODE_SIZE__;
+extern void _OVL3CODE_LOAD__, _OVL3CODE_SIZE__;
+
+void log(char *msg)
+{
+  printf(&quot;Log: %s\n&quot;, msg);
+}
+
+#pragma codeseg(push, &quot;OVL1CODE&quot;);
+void foo(void)
+{
+  log(&quot;Calling main from overlay 1&quot;);
+}
+#pragma codeseg(pop);
+
+#pragma codeseg(push, &quot;OVL2CODE&quot;);
+void bar(void)
+{
+  log(&quot;Calling main from overlay 2&quot;);
+}
+#pragma codeseg(pop);
+
+#pragma codeseg(push, &quot;OVL3CODE&quot;);
+void foobar(void)
+{
+  log(&quot;Calling main from overlay 3&quot;);
+}
+#pragma codeseg(pop);
+
+void loadfile(char *name, void *addr, void *size)
+{
+  int file = open(name, O_RDONLY);
+  read(file, addr, (unsigned)size);
+  close(file);
+}
+
+void main(void)
+{
+  log(&quot;Calling overlay 1 from main&quot;);
+  loadfile(&quot;overlaydemo.1&quot;, &amp;_OVL1CODE_LOAD__, &amp;_OVL1CODE_SIZE__);
+  foo();
+
+  log(&quot;Calling overlay 2 from main&quot;);
+  loadfile(&quot;overlaydemo.2&quot;, &amp;_OVL2CODE_LOAD__, &amp;_OVL2CODE_SIZE__);
+  bar();
+
+  log(&quot;Calling overlay 3 from main&quot;);
+  loadfile(&quot;overlaydemo.3&quot;, &amp;_OVL3CODE_LOAD__, &amp;_OVL3CODE_SIZE__);
+  foobar();
+
+  log(&quot;Press any key&quot;);
+  getchar();
+}
+
+MEMORY {
+    ZP:     start = $0080, size = $001A,            define = yes;
+    HEADER: start = $0000, size = $0004, file = &quot;&quot;;
+    OVLAY1: start = $0800, size = $1800, file = &quot;overlaydemo.1&quot;; # Added
+    OVLAY2: start = $0800, size = $1800, file = &quot;overlaydemo.2&quot;; # Added
+    OVLAY3: start = $0800, size = $1800, file = &quot;overlaydemo.3&quot;; # Added
+    RAM:    start = $2000, size = $9F00, file = %O, define = yes;
+    MOVE:   start = $0000, size = $FFFF, file = %O, define = yes;
+    LC:     start = $D400, size = $0C00,            define = yes;
+}
+SEGMENTS {
+    ZEROPAGE: load = ZP,              type = zp;
+    EXEHDR:   load = HEADER,          type = ro;
+    STARTUP:  load = RAM,             type = ro;
+    LOWCODE:  load = RAM,             type = ro;
+    CODE:     load = RAM,             type = ro;
+    OVL1CODE: load = OVLAY1,          type = ro, define   = yes; # Added
+    OVL2CODE: load = OVLAY2,          type = ro, define   = yes; # Added
+    OVL3CODE: load = OVLAY3,          type = ro, define   = yes; # Added
+    RODATA:   load = RAM,             type = ro;
+    DATA:     load = RAM,             type = rw;
+    ZPSAVE:   load = RAM,             type = bss, define   = yes;
+    BSS:      load = RAM,             type = bss, define   = yes;
+    INIT:     load = MOVE, run = RAM, type = ro,  define   = yes;
+    HIGHCODE: load = MOVE, run = LC,  type = ro,  optional = yes;
+}
+FEATURES {
+    CONDES: segment = INIT,
+            type    = constructor,
+            label   = __CONSTRUCTOR_TABLE__,
+            count   = __CONSTRUCTOR_COUNT__;
+    CONDES: segment = RODATA,
+            type    = destructor,
+            label   = __DESTRUCTOR_TABLE__,
+            count   = __DESTRUCTOR_COUNT__;
+    CONDES: type    = interruptor,
+            segment = RODATA,
+            label   = __INTERRUPTOR_TABLE__,
+            count   = __INTERRUPTOR_COUNT__;
+}
+SYMBOLS {
+    __STACKSIZE__: value = $0800, weak = yes; # 2k stack
+}
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Oct  1 23:29:25 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7112.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Overlay Demo: C64 Port ?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7110.html" title="Previous message in the list">Ullrich von Bassewitz: "[cc65] Second release candidate available"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7112.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Overlay Demo: C64 Port ?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7112.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Overlay Demo: C64 Port ?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7111" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7111" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7111" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-10-01 23:29:28 CEST
+</em></small></p>
+</body>
+</html>

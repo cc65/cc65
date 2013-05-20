@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Atari fopen()</title>
+<meta name="Author" content="Greg King (greg.king41verizon.net)" />
+<meta name="Subject" content="Re: [cc65] Atari fopen()" />
+<meta name="Date" content="2009-03-14" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Atari fopen()</h1>
+<!-- received="Sat Mar 14 11:12:09 2009" -->
+<!-- isoreceived="20090314101209" -->
+<!-- sent="Sat, 14 Mar 2009 06:11:57 -0400" -->
+<!-- isosent="20090314101157" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king41verizon.net" -->
+<!-- subject="Re: [cc65] Atari fopen()" -->
+<!-- id="00c101c9a48d$5180a860$443efea9@monarch" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="7b4bbp$2g0err&#64;dmzms99802.na.baesystems.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6553.html" title="Tobias Pflug: &quot;[cc65] function style macro usage&quot;">Next message</a> ]
+[ <a href="6551.html" title="Winslow, Dan D (US SSA): &quot;[cc65] static modifier on functions&quot;">Previous message</a> ]
+[ <a href="6547.html" title="Winslow, Dan D (US SSA): &quot;[cc65] Atari fopen()&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king41verizon.net?Subject=Re:%20[cc65]%20Atari%20fopen()">greg.king41verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-03-14 11:11:57</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: &quot;Winslow, Dan D&quot;; on Thursday, March 12, 2009; at 11:33 AM -0400
+&gt;
+&gt; Do the stdio functions work on Atari?  The following code doesn't seem to
+&gt; be able to open the file:
+&gt; ------------------------------------------------------
+&gt; void load_bank(unsigned char bank, char *name)
+&gt; {
+&gt;   FILE *handle;
+&gt;   int  size;
+&gt;
+&gt;   page=0x4000;
+&gt;   handle=fopen(bank,&quot;r&quot;);
+&gt;   printf(&quot;handle %i errno %i%c&quot;,handle,errno,155);
+&gt;   if ( handle )
+&gt;   {
+&gt;     printf(&quot;open OK%c&quot;,155);
+&gt;     while(1)
+&gt;     {
+&gt;       size=fread(page,256,1,handle);
+&gt;       printf(&quot;read %i bytes%c&quot;,size,155);
+&gt;       page+=size;
+&gt;       if ( size &lt; 256 ) break;
+
+Also, a successfull fread() returns the third argument, not the second one.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Mar 14 11:12:09 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6553.html" title="Next message in the list">Tobias Pflug: "[cc65] function style macro usage"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6551.html" title="Previous message in the list">Winslow, Dan D (US SSA): "[cc65] static modifier on functions"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6547.html" title="Message to which this message replies">Winslow, Dan D (US SSA): "[cc65] Atari fopen()"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6552" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6552" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6552" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-03-14 11:12:12 CET
+</em></small></p>
+</body>
+</html>

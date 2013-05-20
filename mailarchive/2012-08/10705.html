@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Uniform mass storage devic</title>
+<meta name="Author" content="Karri Kaksonen (karri1sipo.fi)" />
+<meta name="Subject" content="Re: [cc65] Uniform mass storage device discovery and file locations" />
+<meta name="Date" content="2012-08-16" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Uniform mass storage device discovery and file locations</h1>
+<!-- received="Thu Aug 16 13:37:25 2012" -->
+<!-- isoreceived="20120816113725" -->
+<!-- sent="Thu, 16 Aug 2012 14:36:59 +0300" -->
+<!-- isosent="20120816113659" -->
+<!-- name="Karri Kaksonen" -->
+<!-- email="karri1sipo.fi" -->
+<!-- subject="Re: [cc65] Uniform mass storage device discovery and file locations" -->
+<!-- id="502CDB5B.3050409@sipo.fi" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="CACT=u72pFmdTRW0vtAA3XnXO175f0=3KwVour9-hMqvzjBnxBQ&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10706.html" title="Oliver Schmidt: &quot;Re: [cc65] Uniform mass storage device discovery and file locations&quot;">Next message</a> ]
+[ <a href="10704.html" title="Oliver Schmidt: &quot;Re: [cc65] Uniform mass storage device discovery and file locations&quot;">Previous message</a> ]
+[ <a href="10704.html" title="Oliver Schmidt: &quot;Re: [cc65] Uniform mass storage device discovery and file locations&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10706.html" title="Oliver Schmidt: &quot;Re: [cc65] Uniform mass storage device discovery and file locations&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Karri Kaksonen &lt;<a href="mailto:karri1sipo.fi?Subject=Re:%20[cc65]%20Uniform%20mass%20storage%20device%20discovery%20and%20file%20locations">karri1sipo.fi</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-08-16 13:36:59</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Oliver,
+
+So in my case I would end up with something like:
+
+#define ROM0 0
+#define ROM1 1
+#define EEPROM 2
+
+if (rootdir(EEPROM)) {
+   // EEPROM exists
+   char *currentdrive = getcwd();
+   chdir(rootdir(EEPROM));
+   fd = open(&quot;0&quot;, O_RDONLY);
+   read(fd, &amp;highscoretable, sizeof(highscoretable));
+   //close(fd);
+   chdir(currentdrive);
+}
+
+Not bad. It's readable.
+
+The Lynx does not have DMA or a separate controller so there is no need 
+for locking operations.
+
+--
+Karri
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Aug 16 13:37:25 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10706.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Uniform mass storage device discovery and file locations"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10704.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Uniform mass storage device discovery and file locations"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10704.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] Uniform mass storage device discovery and file locations"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10706.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Uniform mass storage device discovery and file locations"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10706.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Uniform mass storage device discovery and file locations"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10705" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10705" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10705" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-08-16 13:37:29 CEST
+</em></small></p>
+</body>
+</html>

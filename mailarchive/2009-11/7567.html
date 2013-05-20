@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] TGI preview</title>
+<meta name="Author" content="Fatih Aygün (cyco1301yahoo.com)" />
+<meta name="Subject" content="Re: [cc65] TGI preview" />
+<meta name="Date" content="2009-11-13" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] TGI preview</h1>
+<!-- received="Fri Nov 13 09:11:00 2009" -->
+<!-- isoreceived="20091113081100" -->
+<!-- sent="Fri, 13 Nov 2009 00:10:46 -0800 (PST)" -->
+<!-- isosent="20091113081046" -->
+<!-- name="Fatih Aygün" -->
+<!-- email="cyco1301yahoo.com" -->
+<!-- subject="Re: [cc65] TGI preview" -->
+<!-- id="437880.67975.qm@web56505.mail.re3.yahoo.com" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="20091113001021.GA32500&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7568.html" title="Fatih Aygün: &quot;Re: [cc65] link in own crt0.s&quot;">Next message</a> ]
+[ <a href="7566.html" title="Shawn Jefferson: &quot;[cc65] Zeropage Addressing?&quot;">Previous message</a> ]
+[ <a href="7564.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] TGI preview&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7569.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] TGI preview&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Fatih Aygün &lt;<a href="mailto:cyco1301yahoo.com?Subject=Re:%20[cc65]%20TGI%20preview">cyco1301yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-11-13 09:10:46</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+
+Ullrich von Bassewitz wrote:
+&gt; I will change tgi_load_vectorfont to return the new error code so this will be
+
+&gt; easier to detect. And the library _is_ currently a lot bigger than necessary.
+&gt; It can be optimized for size when it works.
+
+Turns out that I was reusing a makefile intended to to test the 2-page modes
+which reserved more than twice the amount of memory than necessary. I can 
+load 2 fonts at a time now and I'm only ~1K short now.
+
+&gt; Since the three fonts aren't used together, you can also change the code to
+&gt; load scri.tch for Screen0(), litt.tch for all but the last screen and goth.tch
+&gt; for Screen9(). Fonts can be free'd using tgi_free_vectorfont.
+
+Yes, I figured it out :) It seems that tgi_load_vectorfont doesn't clear the tgi_error
+status even if it succeeds. That apart, unloading litt.tch and scri.tch and loading 
+goth.tch before screen9 did the trick. Everything works fine now :)
+
+Btw, me and my brother (who's not into 6502 at all) were using the Borland stuff
+back in the days. He immediately recognized the fonts and was motivated enough
+to port a mandelbrodt program he wrote for some cell phone to cc65, without knowing 
+anything about 6502. It works but it needs a little more work, I'll share it when it's done.
+
+This is one of the finest examples of what I call &quot;technology recycling&quot;, stuff like &quot;the
+snake game&quot; being the most popular game again during the early 2000s :)
+
+Regards,
+Fatih.
+
+ps: Why so low in 2007? :)
+
+
+      
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Nov 13 09:11:00 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7568.html" title="Next message in the list">Fatih Aygün: "Re: [cc65] link in own crt0.s"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7566.html" title="Previous message in the list">Shawn Jefferson: "[cc65] Zeropage Addressing?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7564.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] TGI preview"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7569.html" title="Next message in this discussion thread">silverdr1wfmh.org.pl: "Re: [cc65] TGI preview"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7569.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] TGI preview"</a></li>
+<li><dfn>Reply</dfn>:  <a href="7574.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] TGI preview"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7567" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7567" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7567" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-11-13 09:11:02 CET
+</em></small></p>
+</body>
+</html>

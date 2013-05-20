@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] DIO.H on CBM</title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="Re: [cc65] DIO.H on CBM" />
+<meta name="Date" content="2011-01-15" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] DIO.H on CBM</h1>
+<!-- received="Sat Jan 15 15:44:07 2011" -->
+<!-- isoreceived="20110115144407" -->
+<!-- sent="Sat, 15 Jan 2011 15:43:40 +0100" -->
+<!-- isosent="20110115144340" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="Re: [cc65] DIO.H on CBM" -->
+<!-- id="201101151543.41358.groepaz@gmx.net" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="AANLkTinUA_MqB02zZ=KiMBZGr6QsjNjYe9MPbBDrnQNm&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9161.html" title="Oliver Schmidt: &quot;Re: [cc65] DIO.H on CBM&quot;">Next message</a> ]
+[ <a href="9159.html" title="Oliver Schmidt: &quot;Re: [cc65] DIO.H on CBM&quot;">Previous message</a> ]
+[ <a href="9159.html" title="Oliver Schmidt: &quot;Re: [cc65] DIO.H on CBM&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9161.html" title="Oliver Schmidt: &quot;Re: [cc65] DIO.H on CBM&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20DIO.H%20on%20CBM">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-01-15 15:43:40</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Samstag 15 Januar 2011, you wrote:
+&gt; &gt; lseek is quite hard to do on cbm drives (without writing an entire custom
+&gt; &gt; dos)
+&gt; 
+&gt; That's exactly what I was trying to express above - sorry if I wasn't
+&gt; clear enough.
+
+that said, a *working* lseek isnt hard (skip forward by reading until desired 
+position, skip backwards by reopening the file and seeking forward) is not the 
+problem - &quot;only&quot; an efficient one is :)
+
+&gt; Are you saying you posted code for opendir() - or are you saying you
+&gt; posted that it is (too) hard to implement? The last thing I know about
+&gt; the topic was this result:
+&gt; <a href="http://www.cc65.org/mailarchive/2010-10/8694.html">http://www.cc65.org/mailarchive/2010-10/8694.html</a>
+
+<a href="http://hitmen.c02.at/files/cc65/dirtest.c">http://hitmen.c02.at/files/cc65/dirtest.c</a> ... i posted that back in 2003 :) 
+here: <a href="http://hitmen.c02.at/temp/directory.c">http://hitmen.c02.at/temp/directory.c</a> is the one i am currently using, 
+it still needs a bit of rework perhaps to work in the lib under all conditions 
+(notice that i only ever tested it with my &quot;os&quot; kernel, not the regular cc65 
+runtime) :)
+
+&gt; Do you happen to know if dio code for the CBMs was already provided?
+
+no idea. looks easy enough to implement though (a first version could be 
+knocked up in C by using cbm_ drive functions)
+
+-- 
+
+<a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    <a href="http://magicdisk.untergrund.net">http://magicdisk.untergrund.net</a>
+<a href="http://www.pokefinder.org">http://www.pokefinder.org</a>        <a href="http://ftp.pokefinder.org">http://ftp.pokefinder.org</a>
+
+warning: madenmann is the stalking pervert of the scene. if you post on pouet, 
+he floods you with your own irclogs and slengpung pictures.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Jan 15 15:44:07 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9161.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] DIO.H on CBM"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9159.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] DIO.H on CBM"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9159.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] DIO.H on CBM"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9161.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] DIO.H on CBM"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9161.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] DIO.H on CBM"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9160" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9160" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9160" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-01-15 15:44:09 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] printf for ca65</title>
+<meta name="Author" content="MagerValp (MagerValp1cling.gu.se)" />
+<meta name="Subject" content="Re: [cc65] printf for ca65" />
+<meta name="Date" content="2005-03-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] printf for ca65</h1>
+<!-- received="Wed Mar 23 11:27:58 2005" -->
+<!-- isoreceived="20050323102758" -->
+<!-- sent="Wed, 23 Mar 2005 11:27:56 +0100" -->
+<!-- isosent="20050323102756" -->
+<!-- name="MagerValp" -->
+<!-- email="MagerValp1cling.gu.se" -->
+<!-- subject="Re: [cc65] printf for ca65" -->
+<!-- id="16961.17580.166047.997515@panini.cling.gu.se" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="20050322194923.GB14313&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4830.html" title="Shawn Jefferson: &quot;[cc65] Atari executables w/ AtariMax flashcart&quot;">Next message</a> ]
+[ <a href="4828.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] printf for ca65&quot;">Previous message</a> ]
+[ <a href="4828.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] printf for ca65&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4831.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] printf for ca65&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: MagerValp &lt;<a href="mailto:MagerValp1cling.gu.se?Subject=Re:%20[cc65]%20printf%20for%20ca65">MagerValp1cling.gu.se</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-03-23 11:27:56</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt;&gt;&gt;&gt;&gt; &quot;UvB&quot; == Ullrich von Bassewitz &lt;uz&#64;musoftware&#46;<!--nospam-->de&gt; writes:
+
+UvB&gt; I broke it when I changed the scanner to return different tokens
+UvB&gt; for normal and cheap local identifiers. Here is the necessary
+UvB&gt; patch:
+
+Thanks! I don't suppose 2.10.2 or 2.11 is on the horizon?
+
+UvB&gt; This is interesting and stimulates my play instinct:-) A cool
+UvB&gt; extension would be to preparse the format string in the macro
+UvB&gt; itself saving some code in the console_printf subroutine. I'm not
+UvB&gt; sure if this is possible, or even useful, but it would be fun.
+
+Glad you like it :)
+
+UvB&gt; Thinking twice about it, variables would be needed, so it's
+UvB&gt; probably impossible without more features in the assembler. What
+UvB&gt; a pity:-)
+
+What about using .define:s? Or can't they be redefined inside macros?
+
+
+I also got an idea right now for something one could call equivalent
+labels. That is, I end up with a bunch of labels looking like this:
+
+  &#64;error:
+	sec
+	rts
+
+With branches being limited to 7-bit, the error routine isn't always
+within reach in long routines. The longbranch macpack solves the
+problem, but more often than not an &#64;error from the previous or
+following subroutine is in reach, but can't be addressed due to label
+scoping. Like so:
+
+  checkgeom:
+	lda io_buf + $0b	; make sure sector size is 512
+	bne &#64;error
+	lda io_buf + $0c
+	cmp #2
+	bne &#64;error
+
+	lda io_buf + $10	; make sure there are 2 FATs
+	cmp #2
+	bne &#64;error
+
+	lda io_buf + $0d	; number of sectors per cluster
+	sta vol_secperclus
+	clc
+	rts
+
+  &#64;error:
+	sec
+	rts
+
+  findrootdir:
+	lda vol_fatsize
+	cmp #32
+	beq &#64;findroot32
+
+  &#64;findroot16:
+	asl io_buf + $16	; multiply fatsize by two
+	rol io_buf + $17	; possible overflow?
+	bcs &#64;error
+
+That last bcs &#64;error is out of range of the error routine in
+findrootdir, but could be redirected to the error routine in checkgeom
+instead. There are a number of solutions for this (longbranch, change
+&#64;error to the non-local checkgeomerror, and so on), but some way of
+saying &quot;any &#64;error, I don't care which one&quot; (%error? #error? :) would
+make the source prettier, and generate shorter code.
+
+Crazy idea?
+
+-- 
+    ___          .     .  .         .       . +  .         .      o   
+  _|___|_   +   .  +     .     +         .  Per Olofsson, arkadspelare
+    o-o    .      .     .   o         +          MagerValp&#64;cling&#46;<!--nospam-->gu.se
+     -       +            +    .     <a href="http://www.cling.gu.se/~cl3polof/">http://www.cling.gu.se/~cl3polof/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Mar 23 11:27:58 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4830.html" title="Next message in the list">Shawn Jefferson: "[cc65] Atari executables w/ AtariMax flashcart"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4828.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] printf for ca65"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4828.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] printf for ca65"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4831.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] printf for ca65"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4831.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] printf for ca65"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4829" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4829" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4829" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-03-23 11:28:04 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="WINDOWS-1252"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=WINDOWS-1252" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] - object oriented style</title>
+<meta name="Author" content="Chiron Bramberger (chiron1bramberger.com)" />
+<meta name="Subject" content="[cc65] - object oriented style" />
+<meta name="Date" content="2010-05-06" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] - object oriented style</h1>
+<!-- received="Thu May  6 09:10:10 2010" -->
+<!-- isoreceived="20100506071010" -->
+<!-- sent="Thu, 6 May 2010 03:09:58 -0400" -->
+<!-- isosent="20100506070958" -->
+<!-- name="Chiron Bramberger" -->
+<!-- email="chiron1bramberger.com" -->
+<!-- subject="[cc65] - object oriented style" -->
+<!-- id="BF64F69A-7CA4-4A68-B1BD-F8A5310E1BF9@bramberger.com" -->
+<!-- charset="WINDOWS-1252" -->
+<!-- inreplyto="w2s1adf4c761005041546j5f8b9984w1fbfb849cd1ab0b0&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8360.html" title="Chiron Bramberger: &quot;Re: [cc65] C128 Bank Switching and cc65&quot;">Next message</a> ]
+[ <a href="8358.html" title="Daniel Pralle: &quot;Re: [cc65] C128 Bank Switching and cc65&quot;">Previous message</a> ]
+[ <a href="8342.html" title="Payton Byrd: &quot;Re: [cc65] Need some help with a memory leak&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8363.html" title="Mark J. Reed: &quot;Re: [cc65] - object oriented style&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Chiron Bramberger &lt;<a href="mailto:chiron1bramberger.com?Subject=Re:%20[cc65]%20-%20object%20oriented%20style">chiron1bramberger.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-05-06 09:09:58</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi there, sorry this is so long! I've already done a bunch of working  
+coding, but I've got a high level, sky view type question, and I'd  
+love to hear what you all think! Again, only if you find music making  
+programs on 6502 machines interesting!
+
+I've been rewriting PetSynth from scratch so that it's modular. I've  
+completed the functions for the following modules (if anyone is  
+interested)
+
+- non-machine specific note handling routines
+- machine specific PET keyboard to system note format (based on MIDI  
+note values) (this also lets me support a lower level of keyboard  
+scanning the PET, so I can have sound play as long as a key is held  
+down)
+- non-machine specific LFO routines (low frequency oscillators -  
+based on system timers)
+- machine specific PET timer routines (using the 3 bytes of jiffy  
+data in memory)
+- machine specific note value to PET oscillator routines (values for  
+the VIA chip)
+- non-machine specific functions for setting and oscillator to a  
+specific note, or no sound (off or 0)
+- non-machine specific functions for effects, which call the above  
+functions,
+- part of the above is setup such that it's easy for a programmer to  
+edit the big list of keyboard to note values in one function, which  
+describe where middle C note is on a qwerty keyboard, and another big  
+list that turns note values (midi based) into oscillator values, so  
+it's easy for me to manually tune by hear each note just by editing  
+one list of values
+---------&gt; VIBRATO: in this case, I've got an LFO setup as a single  
+oscillating bit, which trigger at the nearest 10 jiffies since the  
+last read of the system jiffies, which then causes the program to  
+read the currently held down note, and re-write the current  
+oscillator up on the 1's of the LFO and reset the current note to the  
+current_note value in global variables, which has the value of the  
+note that's currently being pressed down.
+
+So, now that these is out of the way, what I've got a collection of  
+functions that manage keyboard data, note data, LFO timers, and  
+specific effects, in such a way that I'll be able to re-write only a  
+handful of function when I port it to other CBM system. In most  
+cases, I'll be re-writting very little, just the memory locations of  
+low level keyboard stuff, and times, and addresses for
+
+My last version, as it ran on the pet, would allow me to play the  
+keyboard, and the notes only made sound as long as I held them down.  
+I have have a vibrato effect, which is enabled when I hold SHIFT  
+while playing.
+
+So it all works right now, but I realize there's certain benefits to  
+doing this in a more object oriented way.
+
+Now that you know why I'm wondering this, my questions is:
+---&gt; Is there some way of doing some of ideas in object oriented  
+programming in plain C using cc65 specifically, such that I'm not  
+creating code that might be okay for the Linux kernel, but not really  
+good for the specifics of cc65.
+
+For example, what I want to do is just create a simple struct object,  
+that holds pointers to functions, so that all my functions are nicely  
+organized. So that's really just a collection of tools.
+
+But what I want to know is, if I wanted an class, such as an LFO  
+class, so that I could create LFO objects. I could create an LFO  
+object that's tied to the fastest jiffy byte and then have it work  
+with sine table creating a sine wave oscilator. Or I could create  
+another object, but this one is slower, and has a square wave output  
+instead.
+
+In this case, object oriented means more than just putting together a  
+nice little function collection.
+
+Does this makes sense? Probably not!
+
+Anyway, there are lots of ways of applying object oriented ideas to  
+C, and I can read those. My question to the group, and only if  
+someone finds it interesting enough to answer, is what's the object  
+oriented ideas that would have the best qualities to this  
+applications, that don't put too much of a demand on cc65 and the 8- 
+bit machines they target, and what are the ideas to avoid since they  
+would just make things more complicated, bloated, slow, and take up  
+too much RAM.
+
+A great example was what I just read here from Shawn about Ullrich's  
+optimizations:
+&quot;although I was thinking recently that with the optimizations that  
+Ullrich has done for string storage, that it makes more sense to put  
+everything into one big file, as the string optimization doesn’t work  
+across object files.&quot;
+
+It's little things like that , that would help me figure out a game  
+plan before my program gets out of hand! I mean, I'll try, but I'll  
+probably just paint a great big random messy modern art deco of a  
+source code regardless!
+
+I'm fine with abandoning the idea of being object oriented on this  
+project, and hard coding a few good LFO's with good old fashioned  
+copy-paste-modify style programming too :)
+
+Thanks for any insights, hints, links, tips or tricks!!
+-Chiron
+
+----------
+
+www.PetSynth.org
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu May  6 09:10:10 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8360.html" title="Next message in the list">Chiron Bramberger: "Re: [cc65] C128 Bank Switching and cc65"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8358.html" title="Previous message in the list">Daniel Pralle: "Re: [cc65] C128 Bank Switching and cc65"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8342.html" title="Message to which this message replies">Payton Byrd: "Re: [cc65] Need some help with a memory leak"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8363.html" title="Next message in this discussion thread">Mark J. Reed: "Re: [cc65] - object oriented style"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8363.html" title="Message sent in reply to this message">Mark J. Reed: "Re: [cc65] - object oriented style"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8359" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8359" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8359" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-05-06 09:10:12 CEST
+</em></small></p>
+</body>
+</html>

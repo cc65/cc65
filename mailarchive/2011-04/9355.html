@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] TGI colors revisited</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] TGI colors revisited" />
+<meta name="Date" content="2011-04-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] TGI colors revisited</h1>
+<!-- received="Sat Apr 23 20:32:21 2011" -->
+<!-- isoreceived="20110423183221" -->
+<!-- sent="Sat, 23 Apr 2011 20:30:56 +0200" -->
+<!-- isosent="20110423183056" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] TGI colors revisited" -->
+<!-- id="BANLkTiki7WtjU0Dcw65LJrKVQY86EDY8xQ@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9356.html" title="Oliver Schmidt: &quot;Re: [cc65] A Bad Change to &quot;tgi.h&quot;&quot;">Next message</a> ]
+[ <a href="9354.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Relocating RODATA&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9363.html" title="Oliver Schmidt: &quot;[cc65] Re: TGI colors revisited&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20TGI%20colors%20revisited">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-04-23 20:30:56</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+If you're maintaining a cc65 TGI driver please read on...
+
+Quite some months ago we were discussing here improvements for the TGI
+color handling. We reached some good results - however most of them
+were not actually implemented. Therefore I revisited the topic.
+
+First let me briefly summarize our results:
+
+1. We aggreed on that there is no benefit in using the same color
+macros (i.e. COLOR_RED) for both conio and TGI. On the other hand
+there might be targets that benefit from having different color values
+for conio and TGI. Therefore we aggreed to introduce additional color
+macros for TGI (i.e. TGI_COLOR_RED). The documentation is already
+adjusted but there no TGI_COLOR_... macros whatsoever in the target
+header files!
+
+2. We aggreed that we live with the somewhat inconsistent usage of the
+TGI_COLOR_... macros in the TGI API. As long as one doesn't modify the
+default palette the macros can be used in the calls
+tgi_setcolor/tgi_getcolor/tgi_getpixel just as expected. When is comes
+however to palette manipulation the macros rather mean the palette
+index of the color in question. For example after a tgi_getpalette one
+can replace red with a different color with
+mypalette[TGI_COLOR_RED]=... This means that the values of the macros
+_MUST_ be in the range of 0..tgi_getmaxcolor. And this especially
+means that the values for monochrome graphics must be 0 and 1 as those
+have two palette entries.
+
+3. We aggreed that the TGI_COLOR_... macros are defined in the target
+header files thus allowing the targets to define them differently
+(just like the COLOR_... macros for conio). However _ALL_ TGI drivers
+for a single target need to share the TGI_COLOR... macros. This
+requirement might very well mean that TGI drivers are required to
+convert color values at runtime. Here's a hypothetical example:
+
+A certain target has two TGI drivers. One for a monochrome mode and
+one for a 16-color mode. Because of the usage of the TGI_COLOR_...
+macros as palette indices it is obligaroty to have
+#define TGI_COLOR_BLACK 0
+#define TGI_COLOR_WHITE 1
+for the monochrome mode (see 2. above). But the 16-color mode needs
+white to have the value $0F. Then the 16-color mode TGI driver needs
+to convert (remap) the color values in order to allow TGI_COLOR_WHITE
+to be used. This conversion is not only necessary for
+tgi_setcolor/tgi_getcolor/tgi_getpixel but _ALSO_ for
+tgi_setpalette/tgi_getpalette/tgi_getdefpalette where the second index
+needs to be the one that shows as white in the default palette.
+
+4. According to my records/memory we didn't discuss the actual palette
+values. However the overall goal of cc65 TGI is to allow for
+target-independent graphics programming and from that perspective i is
+obligatory that the TGI_COLOR_... macros can be used as palette values
+too. This means that a TGI_COLOR_... macro can serve three (!)
+purposes:
+- A &quot;simple&quot; color for tgi_setcolor/tgi_getcolor/tgi_getpixel
+- A palette index corresponding to that color in the default palette
+- A palette value
+
+Only if we follow these rules one can write things like:
+mypalette = {TGI_COLOR_RED, TGI_COLOR_BLUE};
+mypalette[TGI_COLOR_WHITE] = TGI_COLOR_GREEN;
+
+One implication of the these rules is btw. that _ALL_ default palettes
+consist the ascending values in the range of 0..tgi_getmaxcolor.
+
+So far so good - I've been looking through the cc65 source code in
+order to see what needs to be done to actually realize the above:
+
+- All targets without any TGI drivers don't need any TGI_COLOR_...
+macros - a no-brainer.
+
+- 'c64' has only a monochrome mode driver. So the (black/white = 0/1)
+rules above apply. It has a palette so additional color macros are
+useful. As far as I understand the values are identical to the conio
+values so I defined the TGI_COLOR_... macros to be identical to the
+TGI_COLOR_... macros. Please speak up if this is wrong and needs to be
+changed!
+
+- 'c128' has only monochrome mode drivers. So the (black/white = 0/1)
+rules above apply. They have palettes so additional color macros are
+useful. As far as I understand the values are identical to the conio
+values so I defined the TGI_COLOR_... macros to be identical to the
+TGI_COLOR_... macros. Please speak up if this is wrong and needs to be
+changed! However the default palette contains as second value $0F (not
+1) so there is some work in the drivers necessary - which I can't do.
+
+- 'lynx' has only a 16-color mode driver. So the (black/white = 0/1)
+rules do _NOT_ above apply. In fact white has the value $0F so this
+target benefits from the target-specific TGI_COLOR_... macros. I
+defined the 16 macros to be identical to the TGI_COLOR_... macros.
+Please speak up if this is wrong and needs to be changed! However the
+default palette has totally different values than the TGI_COLOR_...
+macros - they even seem to be 16-bit values so there is some work in
+the drivers necessary - which I can't do.
+
+- 'atmos' has only a monochrome mode driver. So the (black/white =
+0/1) rules above apply. It has a palette so addional color macros are
+useful. However currently white has the value 7 (not 1). So here a
+runtime conversion/mapping is necessary - which I can't do.
+
+- 'atari' has 5 monochrome mode drivers. So the (black/white = 0/1)
+rules above apply. Given the generic driver architecture I don't
+understand it but I'm pretty sure that most TGI drivers do need
+conversion/mapping. As there not only monochrome and 16-color drivers
+but addionally 4-color and 9-color drivers the conversion/mapping has
+to take those into account as well. The colors used by the 4-color
+drivers have to be in the range 0..3 and the 9-color driver colors
+have to be 0..8 - which I can't do.
+
+- 'apple2[enh]' has an 8-color and 16-color mode driver. So the
+(black/white = 0/1) rules do _NOT_ above apply. However the 16-color
+mode driver needs does need conversion/mapping to use the same color
+values the 8-color driver uses. I'll take care of that.
+
+As Uz already pointed out today the TGI kernel needs the value of
+TGI_COLOR_WHITE as it sets the current color to white on tgi_init().
+Therefore every target has to provide the TGI kernel with that value.
+Uz provided my with the concept of doing so and I'll take care of that
+pretty soon.
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Apr 23 20:32:21 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9356.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] A Bad Change to &quot;tgi.h&quot;"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9354.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Relocating RODATA"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9363.html" title="Next message in this discussion thread">Oliver Schmidt: "[cc65] Re: TGI colors revisited"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9363.html" title="Message sent in reply to this message">Oliver Schmidt: "[cc65] Re: TGI colors revisited"</a></li>
+<li><dfn>Reply</dfn>:  <a href="../2011-05/9379.html" title="Message sent in reply to this message">Oliver Schmidt: "[cc65] Re: TGI colors revisited"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9355" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9355" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9355" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-04-23 20:32:25 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] macro woes</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] macro woes" />
+<meta name="Date" content="2005-03-16" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] macro woes</h1>
+<!-- received="Wed Mar 16 18:43:48 2005" -->
+<!-- isoreceived="20050316174348" -->
+<!-- sent="Wed, 16 Mar 2005 18:43:44 +0100" -->
+<!-- isosent="20050316174344" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] macro woes" -->
+<!-- id="20050316174344.GA20367@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="16952.27086.390939.690262&#64;panini.cling.gu.se" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4823.html" title="MagerValp: &quot;Re: [cc65] macro woes&quot;">Next message</a> ]
+[ <a href="4821.html" title="MagerValp: &quot;[cc65] macro woes&quot;">Previous message</a> ]
+[ <a href="4821.html" title="MagerValp: &quot;[cc65] macro woes&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4823.html" title="MagerValp: &quot;Re: [cc65] macro woes&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20macro%20woes">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-03-16 18:43:44</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Wed, Mar 16, 2005 at 06:15:58PM +0100, MagerValp wrote:
+&gt; ca65 macros just don't like me. How do I check if an argument is a
+&gt; string?
+
+Using .match, as you did.
+
+&gt; '&quot;' never matches, &quot; and \&quot; gives me syntax errors instead. In
+&gt; printfargs I have the same problem when I try to match '$'...
+
+You're thinking too complicated:-) The following checks if str is a string
+token:
+
+        .if (.match(str, &quot;&quot;))
+
+If str is a string and &quot;&quot; is a string, the pseudo function will return true.
+Since &quot;&quot; is obviously a string, the only condition to meet is that str is also
+a string. .match doesn't care for the contents of the strings. The content of
+a string is it's attribute (similar as the value for a number token). So if
+you need to check for the string &quot;foobar&quot; you can use the .xmatch function,
+which will do the same as .match, but will also compare token attributes:
+
+        .if (.xmatch(str, &quot;foobar&quot;))
+
+If you don't plan to pass an argument consisting of multiple tokens (like
+
+        label + 3
+
+), there's no need to extract the first one using .left. If you want to allow
+mutiple tokens, the expression is
+
+        .if (.match(.left (1, str), &quot;&quot;))
+
+In your case, I would say that you don't need .left, because if str is not a
+single string token, the 
+
+        .addr   str
+
+code will be assembled, and the assembler will reject things like
+
+        &quot;foo&quot; + 3
+
+or similar.
+
+&gt; Also, would it be possible for ca65 to spit out the expanded macro
+&gt; when an error occurs inside it? It would also help if listings had the
+&gt; expanded macro code.
+
+I see your point, but macros aren't stored as a textual representation. It
+would be possible to translate them back, but they won't look identical and
+therefore it is not possible to pinpoint the error in the original code
+location. Maybe I can come up with something clever, but currently I have no
+real idea how to do it (without anyone complaining about the result, that
+is:-).
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Mar 16 18:43:48 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4823.html" title="Next message in the list">MagerValp: "Re: [cc65] macro woes"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4821.html" title="Previous message in the list">MagerValp: "[cc65] macro woes"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4821.html" title="Message to which this message replies">MagerValp: "[cc65] macro woes"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4823.html" title="Next message in this discussion thread">MagerValp: "Re: [cc65] macro woes"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4823.html" title="Message sent in reply to this message">MagerValp: "Re: [cc65] macro woes"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4822" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4822" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4822" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-03-16 18:43:54 CET
+</em></small></p>
+</body>
+</html>

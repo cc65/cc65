@@ -1,0 +1,170 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] ca65 syntax problems</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] ca65 syntax problems">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] ca65 syntax problems</h1>
+<!-- received="Mon Nov  5 17:42:11 2001" -->
+<!-- isoreceived="20011105164211" -->
+<!-- sent="Mon, 5 Nov 2001 17:42:16 +0100" -->
+<!-- isosent="20011105164216" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] ca65 syntax problems" -->
+<!-- id="20011105174216.A21599@trixie.musoftware.de" -->
+<!-- inreplyto="15714307705.20011104134912@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20ca65%20syntax%20problems"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2001-11-05 17:42:16
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0917.html">MagerValp: "Re: [cc65] Serial port API"</a>
+<li><strong>Previous message:</strong> <a href="0915.html">Adam Dunkels: "Re: Re[2]: [cc65] Serial port API"</a>
+<li><strong>In reply to:</strong> <a href="0910.html">groepaz: "Re[2]: [cc65] ca65 syntax problems"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0920.html">groepaz: "Re[2]: [cc65] ca65 syntax problems"</a>
+<li><strong>Reply:</strong> <a href="0920.html">groepaz: "Re[2]: [cc65] ca65 syntax problems"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Sun, Nov 04, 2001 at 01:49:12PM +0100, groepaz wrote:
+&gt; yes and no ;=) that is, for big projects having relocatable code and
+&gt; such is a real bonus..... but for most other stuff (that would be
+&gt; mostly everything except the one or two bigger things everyone does
+&gt; once in a while) having to tinker with a linkerscript where &quot;.org
+&gt; xxxx&quot; could have been enough is kindof overkill. (and no, simply using
+&gt; another assembler in that case isnt the type of solution i'd accept
+&gt; ;=P)
+
+Using &quot;-t none&quot; for the linker, one may specify the start address by using &quot;-S
+addr&quot; which means that no linker config is needed.
+
+&gt; i guess the main issue with that is that people cant see a reason why
+&gt; stuff that worked fine for 15years has to work entire differently all
+&gt; of a sudden ;=) (i know for myself atleast that it took me some time
+&gt; to adapt to the &quot;big&quot; compiler/assembler/linker toolsets)
+
+You are right in some way. I've had to learn that many Commodore people seem
+to be rather old fashioned, maybe this is why they are still using the old
+machines.
+
+&gt; UvB&gt; Using
+&gt; UvB&gt;         .feature pc_assignment, dollar_is_pc
+&gt; UvB&gt; things like
+&gt; UvB&gt;         $ = $200
+&gt; UvB&gt; are completely legal.
+&gt;
+&gt; uhhh, that means i could write code like:
+[...]
+
+Not exactly like this, because .org (or assignment to PC which is the same as
+far as the assembler is concerned) does not fill the gap between the two code
+pieces. Here is a complete example that works with PC assignment and without a
+linker script:
+
+---------------------------------------------------------------------------
+        .word   start           ; Load address for disk file
+
+        * = $1000
+
+start:  lda     #&lt;irq
+        ldx     #&gt;irq
+        sei
+        sta     $0314
+        stx     $315
+        cli
+        jmp     *
+
+        .res    $1100-*
+
+irq:    inc     $d020
+        jmp     $ea31
+---------------------------------------------------------------------------
+
+Translate this via
+
+        ca65 --feature pc_assignment foo.s
+	ld65 -t none -S \$1000 -o foo foo.o
+
+Load and execute by using
+
+        LOAD &quot;foo&quot;,8,1
+	SYS 4096
+
+&gt; btw why the dollar-sign and not the asterix (*) (tasm uses that one
+&gt; for eg, seen that in other assemblers aswell)
+
+There are assemblers that use the dollar sign. The feature &quot;dollar_is_pc&quot;
+allows the dollar sign as designator for the current location. With just
+&quot;pc_assignment&quot; enabled, the star is used instead (the normal ca65 behaviour).
+
+&gt; 115200bps actually work pretty fine even using polling operation only
+&gt; (didnt bother writing an irq-based driver yet)
+
+Polling is not a good idea because you may loose characters when doing things
+like outputing a &quot;\n&quot; which makes the screen scroll. The current driver (which
+is based on sources written by Craig Bruce) uses interrupts for receiving and
+polls for sending. And even this means that when sending, the driver may not
+reach the full baud rate, so it's one of the &quot;change as soon as possible&quot;
+things.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20ca65%20syntax%20problems">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20ca65%20syntax%20problems">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0917.html">MagerValp: "Re: [cc65] Serial port API"</a>
+<li><strong>Previous message:</strong> <a href="0915.html">Adam Dunkels: "Re: Re[2]: [cc65] Serial port API"</a>
+<li><strong>In reply to:</strong> <a href="0910.html">groepaz: "Re[2]: [cc65] ca65 syntax problems"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0920.html">groepaz: "Re[2]: [cc65] ca65 syntax problems"</a>
+<li><strong>Reply:</strong> <a href="0920.html">groepaz: "Re[2]: [cc65] ca65 syntax problems"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:43 CET</em>
+</em>
+</small>
+</body>
+</html>

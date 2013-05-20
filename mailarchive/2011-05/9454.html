@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] TGI palettes (was: TGI col</title>
+<meta name="Author" content="Greg King (greg.king41verizon.net)" />
+<meta name="Subject" content="Re: [cc65] TGI palettes (was: TGI colors revisited)" />
+<meta name="Date" content="2011-05-24" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] TGI palettes (was: TGI colors revisited)</h1>
+<!-- received="Tue May 24 15:48:50 2011" -->
+<!-- isoreceived="20110524134850" -->
+<!-- sent="Tue, 24 May 2011 08:02:59 -0400" -->
+<!-- isosent="20110524120259" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king41verizon.net" -->
+<!-- subject="Re: [cc65] TGI palettes (was: TGI colors revisited)" -->
+<!-- id="007701cc1a10$cb1bd6e0$443efea9@monarch" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="20110523154220.GC25729&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9455.html" title="Greg King: &quot;Re: [cc65] TGI palettes&quot;">Next message</a> ]
+[ <a href="9453.html" title="Greg King: &quot;Re: [cc65] TGI palettes (was: TGI colors revisited)&quot;">Previous message</a> ]
+[ <a href="9449.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] TGI palettes (was: TGI colors revisited)&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9458.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] TGI palettes (was: TGI colors revisited)&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king41verizon.net?Subject=Re:%20[cc65]%20TGI%20palettes%20(was:%20TGI%20colors%20revisited)">greg.king41verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-05-24 14:02:59</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: &quot;Ullrich von Bassewitz&quot;; on Mon, May 23, 2011; at 11:42 AM -0400
+&gt;
+&gt; What I currently fear is that we're changing the TGI API to be more
+&gt; logical and portable, but far harder to grasp. I easily can think of
+&gt; several people who will have problems if you tell them that they must
+&gt; allocate colors before being able to use them. And, that TGI_COLOR_RED
+&gt; is not meant to be passed to tgi_setcolor(); but, must be fed into
+&gt; tgi_alloccolor() first, which might generate an error. If not, the
+&gt; result then may be passed to tgi_setcolor().
+
+A physical analogy might make it easier for people to understand what
+they must do:
+
+TGI_COLOR_RED and friends are like cans of paint.  tgi_alloccolor() dips
+several (clean) brushes into those cans (and, gives those brushes those
+colors).  tgi_setcolor() picks up _one_ of those brushes.  The other
+functions paint the wall (the screen) with that brush.  When we want to
+use another color, we pick up a different brush (which already has the
+desired color on it).
+
+Anybody who has painted things knows that it is a bad idea to dip a
+brush into a can of one color; and then, dip that same brush into
+another color's can.  Instead, we do either of two things:
+
+1) We thoroughly clean the brush before we put it into the second can.
+That is the same as freeing a color -- which TGI won't support.
+
+2) We use more than one brush.  That is the same as calling
+tgi_alloccolor() again and again, with each of the colors that the
+program plans to use.
+
+
+P.S. Hmm, I just had a thought.  Maybe, those two functions could be
+renamed tgi_getbrush() and tgi_usebrush().  That might avoid confusion.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue May 24 15:48:50 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9455.html" title="Next message in the list">Greg King: "Re: [cc65] TGI palettes"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9453.html" title="Previous message in the list">Greg King: "Re: [cc65] TGI palettes (was: TGI colors revisited)"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9449.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] TGI palettes (was: TGI colors revisited)"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9458.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] TGI palettes (was: TGI colors revisited)"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9458.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] TGI palettes (was: TGI colors revisited)"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9454" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9454" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9454" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-05-24 15:48:52 CEST
+</em></small></p>
+</body>
+</html>

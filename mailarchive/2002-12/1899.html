@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] 65tris 0.0.1</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] 65tris 0.0.1">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] 65tris 0.0.1</h1>
+<!-- received="Fri Dec  6 09:35:18 2002" -->
+<!-- isoreceived="20021206083518" -->
+<!-- sent="Fri, 6 Dec 2002 10:58:45 +0100" -->
+<!-- isosent="20021206095845" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] 65tris 0.0.1" -->
+<!-- id="200212061058.45187.groepaz@gmx.net" -->
+<!-- inreplyto="20021205122102.GB15331@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%2065tris%200.0.1"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2002-12-06 10:58:45
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1898.html">Groepaz: "Re: [cc65] 65tris 0.0.1"</a>
+<li><strong>In reply to:</strong> <a href="1896.html">Ullrich von Bassewitz: "Re: [cc65] 65tris 0.0.1"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1900.html">Groepaz: "[cc65] preprocessor again..."</a>
+<li><strong>Next in thread:</strong> <a href="1897.html">Ullrich von Bassewitz: "Re: [cc65] 65tris 0.0.1"</a>
+<li><strong>Reply:</strong> <a href="1900.html">Groepaz: "[cc65] preprocessor again..."</a>
+<li><strong>Reply:</strong> <a href="1905.html">Ullrich von Bassewitz: "[cc65] 65tris / extended memory drivers"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Thursday 05 December 2002 13:21, Ullrich von Bassewitz wrote:
+&gt; For all others: It's a really nice tetris clone for up to 4
+&gt; players 
+
+the number of players is variable and adjusts to the screen size actually....
+ie, one tetris playfield is 10 chars wide and as many of them fit on the 
+screen will be used! (meaning 2 players on the vic20, 4 on most others, and 8 
+players on the PET! yes! :o))
+
+btw never mind the bug that a line sometimes doesnt get cleared immediatly :o) 
+i am wondering myself that this works after i slammed it in from memory (did 
+sth like that on gbc before :o)) hehe
+
+&gt; written in C and completely conio based (so it should also run on
+&gt; the Atari, but as far as I can see this hasn't been tested [hint,
+&gt; hint:-)]). You can find it in groepaz' directory:
+
+i gotta say that i personally checked on every (emulated) machine that is 
+handled by VICE, so it should run allthrough the cbm-family.... i wouldnt 
+doubt that any other target could run it though, nothing fancy in there :)
+
+btw the vic20 conio-library seems to have serious problems with colors and/or 
+revers characters..... something seems to be screwed here, couldnt get it to 
+work properly with colors (without fixing the lib that is, which i didnt :o)) 
+
+so who is responsible for that part (uz? :=P) and could give me some pointers 
+where to look..... and since i know rather nothing about vic20 (it got 
+simelar case as c64, less memory, awful sound... now thats it ;=P) i wouldnt 
+mind some basic memory map, kernal disassembly etc (the usual crap :o)) 
+either, maybe someone hot that laying around....saves me from surfing the web 
+and dig through stuff myself :o)
+
+&gt; If supporting 4 joysticks does not need much more code than what is
+&gt; currently used, it's ok with me. Otherwise there are always loadable
+&gt; modules (this seems to become my standard answer #1:-)
+
+mmh well, both the protovision and my own (dxs&amp;hit) 4-player adapter need some 
+more code than usual joysticks do.... however since including all the code 
+for all the adapters (there are some more even more obscure ones, including 
+the crazy 16-joystick adapater from oliver stiller :o)) i guess those 
+loadable modules are the only reasonable solution (we wouldnt want to end up 
+with kilobytes of unused joystick-driver code eh? :0))
+
+&gt; BTW: Until now, I've added the following extended memory drivers (==
+&gt; loadable modules)
+&gt;
+&gt;   * C64 + GeoRAM
+&gt;   * C64 + REU
+&gt;   * C64 hidden RAM under kernal and I/O
+&gt;   * C128 + GeoRAM
+&gt;   * C128 + REU
+&gt;   * C128 memory in bank #1
+
+mmmmh using VDC mem in c64 mode would be major cool.... that would finally be 
+a reason to use that one and only acceptable c64 emulator :o))))))))
+
+&gt; Most of the code is not optimized for speed (for example the C128 driver
+&gt; for bank #1 calls the FETCH and STASH routines for each byte), but it's
+&gt; still reasonably fast, and should be quite useful for sprites, images and
+&gt; other stuff. Any feedback is welcome.
+
+copying byte-per-byte should be fast enough for many applications anyway.... 
+ie, the action/retroreplay rom does that in many places aswell and you rarely 
+notice it. (in monitor disassemble  0-1000 and notice the different speed in 
+0400- and 0800- area :o))
+
+-- 
+          ___ ___ .___________________ .___________ _______.
+    c=64 /   |   \|   \__    ___/     \ \_   _____/ \      \ [groepaz]
+     gb /    '    \   | |    | /  \ /  \ |    __)_  /   |   \ gp32
+    cgb \    .    /   | |    |/    '    \|        \/    |    \ psx
+     gba \___|_  /|___| |____|\____|__  /_______  /\____|__  / dc
+          -----\/-----'---------------\/--------\/---------\/
+       <a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    Hitmen WWW Headquarters
+       <a href="http://fly.to/hitmen-groepaz">http://fly.to/hitmen-groepaz</a>     my personal playground
+       <a href="http://rr.c64.org/silversurfer">http://rr.c64.org/silversurfer</a>   home of the RR debugger
+       ftp.musoftware.de/pub/groepaz    cc65 dump site
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%2065tris%200.0.1">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1898.html">Groepaz: "Re: [cc65] 65tris 0.0.1"</a>
+<li><strong>In reply to:</strong> <a href="1896.html">Ullrich von Bassewitz: "Re: [cc65] 65tris 0.0.1"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1900.html">Groepaz: "[cc65] preprocessor again..."</a>
+<li><strong>Next in thread:</strong> <a href="1897.html">Ullrich von Bassewitz: "Re: [cc65] 65tris 0.0.1"</a>
+<li><strong>Reply:</strong> <a href="1900.html">Groepaz: "[cc65] preprocessor again..."</a>
+<li><strong>Reply:</strong> <a href="1905.html">Ullrich von Bassewitz: "[cc65] 65tris / extended memory drivers"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-12-06 09:35:20 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] cc65 and VICE</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] cc65 and VICE">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] cc65 and VICE</h1>
+<!-- received="Thu Jan 20 16:19:46 2000" -->
+<!-- isoreceived="20000120151946" -->
+<!-- sent="Thu, 20 Jan 2000 16:19:26 +0100 (CET)" -->
+<!-- isosent="20000120151926" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] cc65 and VICE" -->
+<!-- id="200001201519.QAA06054@trixie.musoftware.de" -->
+<!-- inreplyto="005a01bf634b$d5908ae0$0171a8c0@bonn" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%20and%20VICE"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2000-01-20 16:19:26
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0019.html">Spiro Trikaliotis: "Re: [cc65] cc65 and VICE"</a>
+<li><strong>Previous message:</strong> <a href="0017.html">Spiro Trikaliotis: "[cc65] cc65 and VICE"</a>
+<li><strong>In reply to:</strong> <a href="0017.html">Spiro Trikaliotis: "[cc65] cc65 and VICE"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0019.html">Spiro Trikaliotis: "Re: [cc65] cc65 and VICE"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+&gt; I encountered a problem: VICE (Version 1.2) under Win32 complains
+&gt; about an unexpected token at the end of each line of the token file.
+&gt; It's CR/LF sequency which VICE does not like, since VICE always uses
+&gt; Unix style line terminator (LF); so, currently, the label file is not
+&gt; usable at all unless the file can be converted to unix style (which I
+&gt; did for testing purposes with the help of Linux, and it worked well).
+
+I would say that this is a VICE problem, not a ld65 one. The label file
+and all other macro like files in VICE *are* text files, so VICE should
+treat them as such and expect the correct line termination for the
+operating system it runs on. If VICE expects a simple LF, it is not
+possible to generate a macro or label file using a text editor under
+Windows, something that would be useful.
+
+The VICE people may of course have a different view of the problem:-) I
+will send them a mail, they are usually very responsive.
+
+&gt; Is there an option I did not find or is it even planned to generate
+&gt; further debugging information, i.e., a mapping of code lines to
+&gt; memory addresses, so that there would be the option of doing something
+&gt; like a source level debugging? (Yes, I know, VICE lacks the functio-
+&gt; nality 'til now, but I want to know of cc65 itself does something like
+&gt; this)?
+
+Here is what I have currently in mind (this does mean that I have put some
+thoughts into it - it does not mean that the features will be in one of
+the next versions):
+
+  * I will add a type for the generated symbols. This will allow a
+    debugger to distinguish between memory labels, zero page locations and
+    other constants. Currently all debug symbols are equal, and VICE uses
+    the first symbol it finds to display memory reference - this often
+    wrong.
+
+  * Symbols will have an associated range, that says for which code
+    addresses the symbol is valid. Currently local symbols are placed in
+    the global address space and are visible from eyerywhere. This leads
+    to a symbol table pollution.
+
+Both things are possible with the current compiler, but they are not
+supported by VICE. So, to make them usable, I will have to propose an
+extension to the VICE monitor.
+
+  * Write a debugger that resides on the PC, has knowledge about all
+    debugging information and connects to the real machine via a serial
+    link using a small cc65 module that has to be linked to the
+    application.
+    This would mean that it is possible to develop the debugger
+    independent of VICE, and that it is possible to support all platforms,
+    not only the platforms that are emulated by VICE (the Plus/4 comes to
+    mind, since it already has a 6551 UART).
+    If have put some work into serial support lately to lay the ground for
+    such a debugger, but it is a lot of work, so don't expect this to come
+    soon. Currently it's just an idea.
+
+A source level debugger (as suggested by you) will not be possible with
+the current compiler, since the RD parser does not generate an abstract
+intermediate code. This means there is no chance to keep the debug/line
+information intact while the optimizer works on the generated assembler
+code.
+
+&gt; I hope I will enjoy cc65.
+
+I hope that, too:-)
+
+Regards
+
+
+	Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%20and%20VICE">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20cc65%20and%20VICE">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0019.html">Spiro Trikaliotis: "Re: [cc65] cc65 and VICE"</a>
+<li><strong>Previous message:</strong> <a href="0017.html">Spiro Trikaliotis: "[cc65] cc65 and VICE"</a>
+<li><strong>In reply to:</strong> <a href="0017.html">Spiro Trikaliotis: "[cc65] cc65 and VICE"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0019.html">Spiro Trikaliotis: "Re: [cc65] cc65 and VICE"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:35 CET</em>
+</em>
+</small>
+</body>
+</html>

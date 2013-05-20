@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Graphics library</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Graphics library">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Graphics library</h1>
+<!-- received="Fri Aug 17 10:59:56 2001" -->
+<!-- isoreceived="20010817085956" -->
+<!-- sent="Fri, 17 Aug 2001 10:59:59 +0200" -->
+<!-- isosent="20010817085959" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Graphics library" -->
+<!-- id="20010817105959.D28839@trixie.musoftware.de" -->
+<!-- inreplyto="1502266998.20010815234600@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Graphics%20library"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2001-08-17 10:59:59
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0671.html">groepaz: "Re[2]: [cc65] Graphics library"</a>
+<li><strong>Previous message:</strong> <a href="0669.html">Ullrich von Bassewitz: "Re: [cc65] Source code library for programs written for cc65?"</a>
+<li><strong>In reply to:</strong> <a href="0665.html">groepaz: "Re[6]: [cc65] Graphics library"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0671.html">groepaz: "Re[2]: [cc65] Graphics library"</a>
+<li><strong>Reply:</strong> <a href="0671.html">groepaz: "Re[2]: [cc65] Graphics library"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Wed, Aug 15, 2001 at 11:46:00PM +0200, groepaz wrote:
+&gt; yes, i am thinking about converting those case-constructs to
+&gt; jump-via-function-pointers aswell... BUT what i am asking is, would
+&gt; the linker be able to fill out that jumptable at link-time? or would
+&gt; an init-function that checks the modules included and sets up the
+&gt; jumptable accordingly ALWAYS be needed anyway (thats what i'd like to
+&gt; get off without).
+
+The assembler has a feature named module constructors and destructors. It
+works as follows: Labels in one module may be marked as constructors or
+destructors. The linker is able to generate tables containing all of these
+routines from all modules that are part of the executable. Currently this
+feature is used to call initialization routines in the startup code.
+
+An example is the heap code: If a program uses the heap, it must be
+initialized. For programs that don't use the heap, the initialization is dead
+code which is actually never used. So the heap initialization code is a
+constructor. If any program references the heap routines, the linker will know
+that, and will add the heap initialization routineto the constructor table, so
+it will be called on startup. This way, the code is only included if it is
+actually used.
+
+This feature may be used for the graphics stuff as well, however, it is only
+available on the assembler level, not on the C level. But this shouldn't be a
+problem, since most of the graphics stuff will be written in assembler anyway.
+
+The documentation has some more information on this.
+
+Regards
+
+
+        Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Graphics%20library">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Graphics%20library">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0671.html">groepaz: "Re[2]: [cc65] Graphics library"</a>
+<li><strong>Previous message:</strong> <a href="0669.html">Ullrich von Bassewitz: "Re: [cc65] Source code library for programs written for cc65?"</a>
+<li><strong>In reply to:</strong> <a href="0665.html">groepaz: "Re[6]: [cc65] Graphics library"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0671.html">groepaz: "Re[2]: [cc65] Graphics library"</a>
+<li><strong>Reply:</strong> <a href="0671.html">groepaz: "Re[2]: [cc65] Graphics library"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:41 CET</em>
+</em>
+</small>
+</body>
+</html>

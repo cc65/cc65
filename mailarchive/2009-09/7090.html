@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] First release candidate availa</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="[cc65] First release candidate available" />
+<meta name="Date" content="2009-09-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] First release candidate available</h1>
+<!-- received="Tue Sep 29 16:22:14 2009" -->
+<!-- isoreceived="20090929142214" -->
+<!-- sent="Tue, 29 Sep 2009 16:20:17 +0200" -->
+<!-- isosent="20090929142017" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="[cc65] First release candidate available" -->
+<!-- id="20090929142017.GA26721@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7091.html" title="Per Olofsson: &quot;Re: [cc65] First release candidate available&quot;">Next message</a> ]
+[ <a href="7089.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] cbm_readdir&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7091.html" title="Per Olofsson: &quot;Re: [cc65] First release candidate available&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20First%20release%20candidate%20available">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-09-29 16:20:17</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Thanks to all your help, the first release candidate of cc65 v2.13.0 is now
+available in the snapshot directory on the FTP server:
+
+        <a href="ftp://ftp.musoftware.de/pub/uz/cc65/snapshot/">ftp://ftp.musoftware.de/pub/uz/cc65/snapshot/</a>
+
+Please give it a try and report any problems. Provided that there are no
+problems, this will become version 2.13.0 in a few days.
+
+I've disabled nightly snapshots until 2.13.0 is out, so this directory will
+contain release candidates for now.
+
+The subversion branch for 2.13 and related tags are located at
+
+        svn://svn.cc65.org/cc65/branches/version-2.13/
+
+Below is the preliminary announcement file. Let me know if I forgot something.
+
+-------------------------------------------------------------------------------
+
+This is the first release candidate of cc65 version 2.13.0. Please report any
+problems, you might find.
+
+cc65 is a complete cross development package for 65(C)02 systems, including a
+powerful macro assembler, a C compiler, linker, librarian and several other
+tools.
+
+cc65 has C and runtime library support for many of the old 6502 machines,
+including
+
+  - The Commodore VIC20, C16/C116, C64, C128, C116, Plus/4, 510 (aka P500),
+    the 600/700 family and newer PET machines (not 2001).
+
+  - The Apple ][ and successors.
+
+  - The Atari 8 bit machines.
+
+  - GEOS for the C64 and C128.
+
+  - The Nintendo Entertainment System (NES).
+
+  - The Supervision console.
+
+  - The Oric Atmos.
+
+  - The Lynx Console.
+
+The libraries are fairly portable, so creating a version for other 6502s
+shouldn't be too much work.
+
+This version has many improvement over version 2.12. To name a few:
+
+  - Support for bit-fields.
+
+  - Improved standards compliance. Several missing functions and headers
+    have been added.
+
+  - Improved compatibility with very old (K&amp;R) sources.
+
+  - Additional warnings in case of dubious code.
+
+  - The startup code went into the library. This simplifies linker usage.
+
+  - Several improvements in the libraries. Functions were changed for
+    more speed or smaller size.
+
+  - Improved code generation. The code generated by the compiler is faster
+    than before, usually without much increase in code size.
+
+
+Precompiled binaries are available for the most common platforms. On most
+other host platforms, the sources compile out of the box, so you're able to
+create your own binaries.
+
+For RedHat Enterprise Linux 5, ready made RPM packages are available. These
+packages may also install on other Linux systems. Please note that there are
+separate RPMs for the compiler proper, the docs, and the target specific
+libraries. To develop for one of the predefined target systems you need the
+compiler RPM package *and* one of the target machine packages. Be sure to
+download the documentation package if you're new to cc65.
+
+For windows users, there's a user friendly installer package (the one with the
+.exe extension). All subpackages are selectable from within the installer
+dialogue. The installer will also setup the necessary environment variables
+and start menu entries. It is recommended that you choose this package instead
+of the .ZIP files.
+
+Precompiled binaries for DOS, OS/2 and Windows are available in ZIP archives.
+As with the RPM packages, you need the package for the development system
+(Windows or whatever.) *and* one or more of the target machine packages, plus
+optionally the doc package.
+
+All packages are available from the MU software FTP server:
+
+        <a href="ftp://ftp.musoftware.de/pub/uz/cc65/">ftp://ftp.musoftware.de/pub/uz/cc65/</a>
+
+More information on cc65 can be found on the cc65 web page at
+
+     	<a href="http://www.cc65.org/">http://www.cc65.org/</a>
+
+There is also a mailing list for discussing cc65 related issues (programming,
+suggestions, bugs, ...). See
+
+        <a href="http://www.cc65.org/#List">http://www.cc65.org/#List</a>
+
+for information on how to subscribe to this list.
+
+While I'm the main developer of cc65, it is actually a joint effort. I would
+like to thank the target library developers, all the people on the cc65
+mailing list, all those sending suggestions and feedback, and even those
+bugging me for a new stable release:-) The CREDITS file is probably
+incomplete, but you know who you are.
+
+Thank you!
+
+
+       	Uz
+
+
+-------------------------------------------------------------------------------
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Sep 29 16:22:14 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7091.html" title="Next message in the list">Per Olofsson: "Re: [cc65] First release candidate available"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7089.html" title="Previous message in the list">silverdr1wfmh.org.pl: "Re: [cc65] cbm_readdir"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7091.html" title="Next message in this discussion thread">Per Olofsson: "Re: [cc65] First release candidate available"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7091.html" title="Message sent in reply to this message">Per Olofsson: "Re: [cc65] First release candidate available"</a></li>
+<li><dfn>Reply</dfn>:  <a href="7102.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] First release candidate available"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7090" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7090" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7090" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-09-29 16:22:16 CEST
+</em></small></p>
+</body>
+</html>

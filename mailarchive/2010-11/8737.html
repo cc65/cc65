@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] ca65 for stand-alone asm p</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] ca65 for stand-alone asm projects" />
+<meta name="Date" content="2010-11-02" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] ca65 for stand-alone asm projects</h1>
+<!-- received="Tue Nov  2 12:19:17 2010" -->
+<!-- isoreceived="20101102111917" -->
+<!-- sent="Tue, 2 Nov 2010 12:19:11 +0100" -->
+<!-- isosent="20101102111911" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] ca65 for stand-alone asm projects" -->
+<!-- id="AANLkTimyUxHgz17=UAeLqsewo2S4=mQhmTzj5OrE1Z9c@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="AANLkTiksr2kCib8jm9PZnUr=A__KAq=LiAkNKukO2gyT&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8738.html" title="Marc 'BlackJack' Rintsch: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">Next message</a> ]
+[ <a href="8736.html" title="Agent Friday: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">Previous message</a> ]
+[ <a href="8736.html" title="Agent Friday: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8741.html" title="Agent Friday: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20ca65%20for%20stand-alone%20asm%20projects">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-11-02 12:19:11</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt; So, I see in source\libsrc\c64\crt0.s that the BASIC stub is placed
+&gt; in segment &quot;EXEHDR&quot;, but I don't see anything in the way you invoke
+&gt; ld65 or anything in the .cfg file that would cause that segment to
+&gt; be linked.
+
+Maybe the crt0.s and the .cfg you are looking at just don't match. If
+you are seeing a EXEHDR in the C64 crt0.s then you are looking at a
+recent snapshot. If you don't find EXEHDR in the ld65 built-in C64
+.cfg then you are most likely looking at the last release. The .cfg of
+the current snapshot contains this:
+
+MEMORY {
+...
+    HEADER: file = %O,               start = $07FF, size = $000E;
+...
+}
+SEGMENTS {
+    EXEHDR:   load = HEADER, type = ro;
+...
+}
+
+&gt; Perhaps the &quot;one symbol is referenced&quot; rule means is
+&gt; forcing the entire crt0 module to be linked;
+
+That's in fact how it works.
+
+&gt; but in my recent
+&gt; experience, putting code into a segment that is not listed in the
+&gt; SEGMENTS statement of the config file normally causes an error (or
+&gt; at least a warning) when I try to build/link it.
+
+That's in fact true.
+
+&gt; But this is not
+&gt; what we see when compiling for a C64 target.
+
+See my guess above.
+
+&gt; So I'm left to guess that the linker is performing some amount of
+&gt; hidden &quot;magic&quot; to make it work, although I don't see why it couldn't
+&gt; just as well be accomplished explicitly.  For example, if I wanted
+&gt; to replicate this behavior on my own &quot;target&quot;, would it be sufficient
+&gt; to place an &quot;EXEHDR&quot; entry (or other name I've chosen for the stub)
+&gt; as the the first item in the segments clause?
+
+Yes.
+
+There is however one piece of magic you might want to know about:
+
+All .o file mentioned on the ld65 cmdline are always linked. So if you
+put the stub in a .o file you mention on the cmdline the stub is
+there. If you however place the .o file with the stub in a library and
+don't reference anything from the .o file, it won't be linked - so the
+stub will be missing. To circumvent this, the crt0.s file (which *IS*
+placed in a library) contains the line
+
+        .export         __STARTUP__ : absolute = 1      ; Mark as startup
+
+This __STARTUP__ symbol is &quot;implicitly&quot; referenced, so the .o file
+containing it is linked causing the stub to be there.
+
+&gt; Which leads me to the next question...  Are the segments linked into
+&gt; the final binary in the same order they are listed in the .cfg file?
+
+Yes.
+
+&gt; I'd like to help improve the documentation in this respect...
+
+Seems a great idea to me - which unfortunately about nobody has who -
+correctly - points out weaknesses in the cc65 documentation!
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Nov  2 12:19:17 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8738.html" title="Next message in the list">Marc 'BlackJack' Rintsch: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8736.html" title="Previous message in the list">Agent Friday: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8736.html" title="Message to which this message replies">Agent Friday: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8741.html" title="Next message in this discussion thread">Agent Friday: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8741.html" title="Message sent in reply to this message">Agent Friday: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8737" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8737" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8737" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-11-02 12:19:19 CET
+</em></small></p>
+</body>
+</html>

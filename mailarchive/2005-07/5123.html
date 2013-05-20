@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Problems with Atari zeropa</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Problems with Atari zeropage variables" />
+<meta name="Date" content="2005-07-24" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Problems with Atari zeropage variables</h1>
+<!-- received="Sun Jul 24 15:58:44 2005" -->
+<!-- isoreceived="20050724135844" -->
+<!-- sent="Sun, 24 Jul 2005 15:58:33 +0200" -->
+<!-- isosent="20050724135833" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Problems with Atari zeropage variables" -->
+<!-- id="20050724135833.GE2364@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="000801c58ef3$7eddf640$bd6d2c42&#64;palace" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5124.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] To Atari platform coordinator&quot;">Next message</a> ]
+[ <a href="5122.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] To Atari platform coordinator&quot;">Previous message</a> ]
+[ <a href="5111.html" title="Greg King: &quot;Re: [cc65] Problems with Atari zeropage variables&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+[ <a href="5117.html" title="Greg King: &quot;Re: [cc65] Problems with Atari zeropage variables&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Problems%20with%20Atari%20zeropage%20variables">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-07-24 15:58:33</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Fri, Jul 22, 2005 at 03:26:28PM -0400, Greg King wrote:
+&gt; I think that it's backwards!  I think that the compiler's pseudo-registers
+&gt; should be the objects that are put into a specially named segment
+&gt; (.segment &quot;CC65ZP&quot;:zp).  Then, .zeropage can be used for whatever other
+&gt; zero-page variables a programmer wants to put into a library or program --
+&gt; &quot;.zeropage&quot; is easier for us to remember than the spelling of some special
+&gt; name.
+
+It is common practice, that a compiler uses standard names, and programmers
+who want to interface with C code have to live with it. cc65 is no exception.
+The name of the standard text segment used by compilers is usually &quot;code&quot; or
+&quot;text&quot; - not &quot;gcc-code&quot; or &quot;CC65-CODE&quot; or similar. So what cc65 does is not
+unusual. 
+
+Of course the read() routine for the Atari should be fixed, but using another
+name for the zeropage segment would not have prevented this error! The problem
+is that *only* the standard cc65 variables should go into this segment,
+regardless of how it is named.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Jul 24 15:58:44 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5124.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] To Atari platform coordinator"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5122.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] To Atari platform coordinator"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5111.html" title="Message to which this message replies">Greg King: "Re: [cc65] Problems with Atari zeropage variables"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5117.html" title="Next message in this discussion thread">Greg King: "Re: [cc65] Problems with Atari zeropage variables"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5123" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5123" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5123" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-07-24 15:58:46 CEST
+</em></small></p>
+</body>
+</html>

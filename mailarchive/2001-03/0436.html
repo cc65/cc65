@@ -1,0 +1,175 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] c64 question</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] c64 question">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] c64 question</h1>
+<!-- received="Tue Mar  6 15:58:06 2001" -->
+<!-- isoreceived="20010306145806" -->
+<!-- sent="Tue, 6 Mar 2001 15:58:05 +0100" -->
+<!-- isosent="20010306145805" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] c64 question" -->
+<!-- id="20010306155805.A15346@trixie.musoftware.de" -->
+<!-- inreplyto="200103061017.LAA24895@mail.umu.se" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20c64%20question"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2001-03-06 15:58:05
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0437.html">Arvid Norberg: "Re: [cc65] c64 question"</a>
+<li><strong>Previous message:</strong> <a href="0435.html">Michael Pfeiffer: "Re: [cc65] c64 question"</a>
+<li><strong>In reply to:</strong> <a href="0432.html">Arvid Norberg: "[cc65] c64 question"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0437.html">Arvid Norberg: "Re: [cc65] c64 question"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Tue, Mar 06, 2001 at 11:17:25AM +0000, Arvid Norberg wrote:
+&gt; My questions are:
+&gt;
+&gt; What am I missing? why doesn't it work the way I want it to?
+&gt; If I want to make a function that ends with an &quot;rti&quot; instead of &quot;rts&quot;,
+&gt; is there a keyword/modifier in cc65 that does that to a function?
+&gt; in some compilers you can to write:
+[...]
+
+There is no such declaration for cc65, because the compiler does not have
+enough information to generate the necessary code. Here is why:
+
+An interrupt may not execute C code, without some helper code written in
+assembler, because several routines may not interrupted and then called
+recursively. This is not the fault of cc65, it's a problem of the 6502,
+because it is not able to manipulate 16 bit values in one atomic transaction.
+
+Assume for example the subroutine that is used to push an int parameter onto
+the stack:
+
+	pushax:	ldy	sp
+		beq	@L1
+		dey
+		beq	@L2
+		dey
+	@L0:	sty	sp
+		ldy	#0    		; get index
+		sta	(sp),y		; store lo byte
+		iny	      		; bump idx
+		pha	      		; save it
+		txa	      		; get hi byte
+		sta	(sp),y		; store hi byte
+		pla	    		; get A back
+		rts	    		; done
+
+	@L1:	dey
+	@L2:	dey
+		dec	sp+1
+		jmp	@L0
+
+If this routine is interrupted while the overflow from low to high byte of the
+stack pointer is not corrected, any C routine using the stack (and most do)
+that is called in an interrupt will overwrite parts of the stack that are not
+owned by the function. The same is true for all other functions manipulating
+the stack pointer.
+
+So one condition for calling C code in an interrupt would be a separate stack.
+This stack switching cannot be done by the compiler, because the second stack
+has to be allocated somewhere, and the compiler has no knowledge how to do
+that. This is the main reason that just using an additional keyword for
+declaring interrupt handlers is not enough.
+
+Another problem is that there are &quot;registers&quot; in the zeropage that may be
+trashed by the code executed in the interrupt.
+
+So, the second condition for calling C code in an interrupt handler would be
+that the zero page locations needed by the compiler must be saved before
+calling C code and restored afterwards.
+
+A third problem may be performance: C code is slower than assembler code. How
+much it is slower, and if this is a problem depends on your application. If in
+doubt, check the generated assembler code.
+
+A full solution would be to supply a library module that installs a short
+wrapper, sets up a new stack, saves the zero pages registers and calls a C
+routine via a pointer. On exit, the zeropage locations used by the compiler
+and the old stack have to be restored before the rti.
+
+In fact, the necessary routines exist, but not as part of a separate module.
+They are part of the debug module, because the debugger faces the same
+problems, if C code is interrupted by a BRK instruction. Just have a look into
+
+	libsrc/dbg/dbgsupp.s
+and	libsrc/c64/break.s
+
+It would probably be worth extracting these routines, change them to handle
+the interrupt instead of break, and place them into a new module. This way,
+interrupt handler written in C could be supported. Having an interface similar
+to the one for the BREAK stuff (see the debugger) would be nice. If someone
+wants to do that, I would be happy to include this module in an upcoming cc65
+release.
+
+Apart from that, it is better to use a &quot;void&quot; parameter list for functions
+that don't take any parameters. If the compiler knows that there are no
+parameters, it is able to generate better code. An empty parameter list means
+in C: &quot;This function may take any number of arguments&quot;, which means that the
+compiler has to generate code to remember the number of parameters passed.
+
+Regards
+
+
+	Uz
+
+
+--
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20c64%20question">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20c64%20question">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0437.html">Arvid Norberg: "Re: [cc65] c64 question"</a>
+<li><strong>Previous message:</strong> <a href="0435.html">Michael Pfeiffer: "Re: [cc65] c64 question"</a>
+<li><strong>In reply to:</strong> <a href="0432.html">Arvid Norberg: "[cc65] c64 question"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0437.html">Arvid Norberg: "Re: [cc65] c64 question"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:39 CET</em>
+</em>
+</small>
+</body>
+</html>

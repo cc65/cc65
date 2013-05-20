@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Re: cc65/C questions</title>
+<meta name="Author" content="Jonathan Graham Harston (jgh1arcade.demon.co.uk)" />
+<meta name="Subject" content="[cc65] Re: cc65/C questions" />
+<meta name="Date" content="2006-09-14" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Re: cc65/C questions</h1>
+<!-- received="Thu Sep 14 01:00:32 2006" -->
+<!-- isoreceived="20060913230032" -->
+<!-- sent="13 Sep 2006 23:10:57 +0100" -->
+<!-- isosent="20060913221057" -->
+<!-- name="Jonathan Graham Harston" -->
+<!-- email="jgh1arcade.demon.co.uk" -->
+<!-- subject="[cc65] Re: cc65/C questions" -->
+<!-- id="060913235508@arcade.demon.co.uk" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5578.html" title="Adam Thornton: &quot;Re: [cc65] Re: cc65/C questions&quot;">Next message</a> ]
+[ <a href="5576.html" title="MagerValp: &quot;Re: [cc65] da65 improvements&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5578.html" title="Adam Thornton: &quot;Re: [cc65] Re: cc65/C questions&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Jonathan Graham Harston &lt;<a href="mailto:jgh1arcade.demon.co.uk?Subject=Re:%20[cc65]%20Re:%20cc65/C%20questions">jgh1arcade.demon.co.uk</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2006-09-14 00:10:57</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt;Message-ID: &lt;20060909144856.GB28453&#64;trixie&#46;<!--nospam-->musoftware.de&gt;
+ 
+On Thu, Sep 07, 2006 at 10:00:17AM -0600, Tom Watt wrote:
+&gt; 1. Is there a function that will separate a string into an array of strings
+&gt; based on spaces?
+ 
+If the string is in writable memory:
+ 
+/* string is the string, eg &quot;one two three&quot;,00 */
+ 
+p=string;                  /* point to string start             */
+n=0;                       /* 0th argument                      */
+while (*p) {               /* while not pointing to terminator  */
+  arg[n++]=p               /* point this arg[] to here          */
+  while (*p &gt; ' ') p++;    /* skip until space or ctrl char     */
+  if (*p == ' ') {         /* if space, replace with terminator */
+    *p=0;                  /* and step past to next string      */
+    p++;
+    }
+  }
+ 
+On input, if s=&gt;&quot;one two three&quot;,00.
+On exit,  s=&gt;&quot;one&quot;,00,&quot;two&quot;,00,&quot;three&quot;,00 and
+       arg[0]-^ arg[1]-^ arg[2]-^
+       and n=2
+ 
+so arg[0]=&gt;&quot;one&quot;,00 arg[1]=&quot;two&quot;,00 arg[2]=&quot;three&quot;,00
+ 
+No range checking, can be improved, tramples on the source string,
+multiple spaces give null string arguments, etc. etc. etc.
+ 
+-- 
+J.G.Harston - jgh&#64;arcade&#46;<!--nospam-->demon.co.uk - mdfs.net/User/JGH
+Jet Set Willy Resources - <a href="http://mdfs.net/Software/JSW">http://mdfs.net/Software/JSW</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Sep 14 01:00:32 2006</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5578.html" title="Next message in the list">Adam Thornton: "Re: [cc65] Re: cc65/C questions"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5576.html" title="Previous message in the list">MagerValp: "Re: [cc65] da65 improvements"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5578.html" title="Next message in this discussion thread">Adam Thornton: "Re: [cc65] Re: cc65/C questions"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5578.html" title="Message sent in reply to this message">Adam Thornton: "Re: [cc65] Re: cc65/C questions"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5577" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5577" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5577" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2006-09-14 01:00:36 CEST
+</em></small></p>
+</body>
+</html>

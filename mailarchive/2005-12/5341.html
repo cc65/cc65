@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] ca65: Finding out which li</title>
+<meta name="Author" content="Spiro Trikaliotis (ml-cc651trikaliotis.net)" />
+<meta name="Subject" content="Re: [cc65] ca65: Finding out which lines assembled into which addresses" />
+<meta name="Date" content="2005-12-08" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] ca65: Finding out which lines assembled into which addresses</h1>
+<!-- received="Thu Dec  8 20:47:33 2005" -->
+<!-- isoreceived="20051208194733" -->
+<!-- sent="Thu, 8 Dec 2005 20:47:15 +0100" -->
+<!-- isosent="20051208194715" -->
+<!-- name="Spiro Trikaliotis" -->
+<!-- email="ml-cc651trikaliotis.net" -->
+<!-- subject="Re: [cc65] ca65: Finding out which lines assembled into which addresses" -->
+<!-- id="20051208194715.GA28424@trikaliotis.net" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="20051208120037.GB13966&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5342.html" title="Jørgen Aaris Henningsen: &quot;[cc65] simple linker question&quot;">Next message</a> ]
+[ <a href="5340.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65: Finding out which lines assembled into which addresses&quot;">Previous message</a> ]
+[ <a href="5340.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65: Finding out which lines assembled into which addresses&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Spiro Trikaliotis &lt;<a href="mailto:ml-cc651trikaliotis.net?Subject=Re:%20[cc65]%20ca65:%20Finding%20out%20which%20lines%20assembled%20into%20which%20addresses">ml-cc651trikaliotis.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-12-08 20:47:15</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello Uz,
+
+* On Thu, Dec 08, 2005 at 01:00:37PM +0100 Ullrich von Bassewitz wrote:
+ 
+&gt; &gt; I believe this information must already reside somewhere in ca65.
+&gt; 
+&gt; The problem is not getting the information, but making it available without
+&gt; making the listing file hard to read.
+
+Now, I use a quick 'n' dirty approach: Instead of putting this info in
+the listing file, I just output it onto stdout. This way, the listing
+file is not cluttered.
+ 
+&gt; You need to add a new field to the ListLine struct in listing.h.
+
+This was exactly the hint I needed. Now, I got it all working as I hoped
+it would work.
+
+Thank you,
+   Spiro.
+
+-- 
+Spiro R. Trikaliotis
+<a href="http://www.trikaliotis.net/">http://www.trikaliotis.net/</a>
+<a href="http://cbm4win.sf.net/">http://cbm4win.sf.net/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Dec  8 20:47:33 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5342.html" title="Next message in the list">Jørgen Aaris Henningsen: "[cc65] simple linker question"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5340.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] ca65: Finding out which lines assembled into which addresses"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5340.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] ca65: Finding out which lines assembled into which addresses"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5341" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5341" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5341" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-12-08 20:47:37 CET
+</em></small></p>
+</body>
+</html>

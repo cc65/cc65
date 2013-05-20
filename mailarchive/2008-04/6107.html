@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Windows installer</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Windows installer" />
+<meta name="Date" content="2008-04-20" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Windows installer</h1>
+<!-- received="Sun Apr 20 17:50:59 2008" -->
+<!-- isoreceived="20080420155059" -->
+<!-- sent="Sun, 20 Apr 2008 17:50:52 +0200" -->
+<!-- isosent="20080420155052" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Windows installer" -->
+<!-- id="20080420155051.GB13758@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="f97798c20804200634m1a9603e4g5e5dfc0334f840b4&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6108.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Windows installer&quot;">Next message</a> ]
+[ <a href="6106.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Windows installer&quot;">Previous message</a> ]
+[ <a href="6105.html" title="Oliver Schmidt: &quot;Re: [cc65] Windows installer&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6108.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Windows installer&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Windows%20installer">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2008-04-20 17:50:52</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Sun, Apr 20, 2008 at 03:34:52PM +0200, Oliver Schmidt wrote:
+&gt; &#64;Uz: First of all thanks for caring so much about Windows users
+&gt; although it is - at least as far as I know - far from being your
+&gt; favorite host platform :-)
+
+As long as I can do the necessary tasks on Linux I have no problems with
+windows:-) The discussion in c.s.a.p caused me to have a second look at
+windows installers and I found Inno Setup which is exactly what I was missing.
+I'm generating the installer script from within my shell build script, and
+then call the command line setup builder via WINE. Apart from having a quick
+look the first time, I didn't use the graphical &quot;IDE&quot;.
+
+&gt; I'm happy to read that you changed your opinion because it's now the
+&gt; same as mine :-)
+&gt;
+&gt; However I'd like to add a comment:
+&gt;
+&gt; Obviously it doesn't make sense to call any of the cc65 tools from the
+&gt; explorer. Rather they need to be called from a command line. In that
+&gt; scenario I've seen several tool packages that do _NOT_ add their path
+&gt; to the System and/or User PATH variable. Instead they add a link to
+&gt; the start menu that opens a command prompt. They make sure that all
+&gt; environment variables needed are set for this command prompt with a
+&gt; simple batch file.
+
+I've already considered this and decided against it. It may be added as an
+option later. The reasons are purely egoistic:-) When I'm working on windows
+systems, I'm using a tweaked console window, which opens in a special
+directory, has a special font, covers the whole screen, has the scroll bar
+removed and so on. I don't like to be thrown into the default console window.
+So I prefer adding the bin directory to PATH. I've already made this optional,
+so if required, it can be disabled.
+
+&gt; Maybe that approach makes sense for cc65 as well? It's less invasive
+&gt; and could make it easier to get to a non-admin user compatible install
+
+The non-admin install is no technical problem, but one of testing.
+
+The whole discussion was very helpful to get things clear in my mind. This is
+what I've decided:
+
+  * The windows installer version is an addition to what is offered now.
+
+  * Building the windows version with installer support is integrated into the
+    nightly build script, so there will also be installer versions of the
+    snapshot.
+
+  * Only admin installs for now. It is not difficult to expand this to normal
+    user install later, but this - at least - doubles the number of possible
+    scenarios that have to be tested, and the new version should be out soon.
+
+  * No support for the DOS based versions of Windows (Win 95, 98 and ME). This
+    is only slightly more difficult (to change the environment, AUTOEXEC.BAT
+    has to be changed) but see comment about testing above. Could be added
+    later if required.
+
+  * Adding the bin directory to the path and CC65_INC/CC65_LIB to the
+    environment is optional and may be skipped.
+
+  * Adding a start menu entry for a console with the correct environment set
+    up may be added later. Not really difficult but must be tested (see
+    above).
+
+  * No support for multiple versions. Installing either the snapshot or the
+    stable release will delete whatever was installed before. What will
+    probably come is to separate the snapshot, so one snapshot version may be
+    installed along the stable version. The default is not to change the
+    environment in case of the snapshot, so making it work is up to the user.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Apr 20 17:50:59 2008</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6108.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Windows installer"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6106.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Windows installer"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6105.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] Windows installer"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6108.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Windows installer"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6108.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Windows installer"</a></li>
+<li><dfn>Reply</dfn>:  <a href="6109.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Windows installer"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6107" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6107" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6107" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2008-04-20 17:51:01 CEST
+</em></small></p>
+</body>
+</html>

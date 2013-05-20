@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re[2]: [cc65] C64 high res color RAM</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re[2]: [cc65] C64 high res color RAM">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re[2]: [cc65] C64 high res color RAM</h1>
+<!-- received="Tue May 28 19:49:12 2002" -->
+<!-- isoreceived="20020528174912" -->
+<!-- sent="Tue, 28 May 2002 19:51:09 +0200" -->
+<!-- isosent="20020528175109" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re[2]: [cc65] C64 high res color RAM" -->
+<!-- id="5129085424.20020528195109@gmx.net" -->
+<!-- inreplyto="20020528193847.A23227@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20C64%20high%20res%20color%20RAM"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2002-05-28 19:51:09
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1414.html">Ullrich von Bassewitz: "Re: [cc65] C64 high res color RAM"</a>
+<li><strong>In reply to:</strong> <a href="1414.html">Ullrich von Bassewitz: "Re: [cc65] C64 high res color RAM"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1416.html">Stephan Lesch: "Re: [cc65] C64 high res color RAM"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Ullrich,
+
+Tuesday, May 28, 2002, 7:38:47 PM, you wrote:
+
+
+UvB&gt; Hi!
+
+UvB&gt; On Tue, May 28, 2002 at 07:31:41PM +0200, groepaz wrote:
+&gt;&gt; 1) when you place both bitmaps in one bank, where do you put the
+&gt;&gt; videoram ? :o)
+
+UvB&gt; One hires screen = 8K, color RAM = 1k. Both together fit nicely into one bank.
+
+err yes ONE bitmap+videoram, ofcoz that works - my own gfx routines do
+just that. but i tought you were talking about TWO bitmaps screens
+(for double buffering).
+
+UvB&gt; I don't think this would be a problem. While setting the color RAM, interrupts
+UvB&gt; can be disabled.
+
+well yes ofocz.... but that will ruin even the simpliest timing
+dependend things, like playing music in irq. (it will start to stutter
+everytime the screen is updated)
+
+thats totally a non-issue incase you are planning to support 2 colors
+(or 4 for multicolor) only ofcoz, since you would access the videoram
+only once when clearing/initializing the screen
+
+UvB&gt; What I'm planing are not graphics capabilities that allow writing demos in C.
+UvB&gt; My assumption is that most people have a need for something like the old
+UvB&gt; Borland graphics interface: A simple, reasonable fast interface. No fancy
+UvB&gt; stuff, but a solid API that allow business applications, simple games (text
+UvB&gt; adventures like &quot;Hobbit&quot;) and the like. Demo authors will have to search
+UvB&gt; elsewhere:-)
+
+hey, i am planning to do one (demo in C) actually :O) just for the
+heck of it though, since most algorithms are much easier to read for
+other ppl when they are written in C.... i expect these to run pretty
+slowish obviously :o) (rotating vector cube runs ~ 2fps or sth ;=D)
+
+&gt;&gt; there were certain other little obscure things i think.... thats why
+&gt;&gt; most ppl dont use the ram under vic for any gfx stuff
+
+UvB&gt; So in principle it should be doable, right?
+
+yes ofcoz it is.... my &quot;demoish&quot; cc65 memory setup is like
+
+     &lt;$0400 almost untouched, might drop in fastloader here
+$0400-$0800 textscreen
+$0800-$1000 charset
+$1000-$2400 music (most will use up to $2000 only though)
+$2400-$d000 code
+$d000-$dc00 ramdisc-style temp. storage
+$dc00-$e000 videoram
+$e000-$ffff bitmap
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re[2]:%20[cc65]%20C64%20high%20res%20color%20RAM">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re[2]:%20[cc65]%20C64%20high%20res%20color%20RAM">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1414.html">Ullrich von Bassewitz: "Re: [cc65] C64 high res color RAM"</a>
+<li><strong>In reply to:</strong> <a href="1414.html">Ullrich von Bassewitz: "Re: [cc65] C64 high res color RAM"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1416.html">Stephan Lesch: "Re: [cc65] C64 high res color RAM"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-05-28 19:49:16 CEST</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-2">
+<title>cc65 mailing list archive: Re: [cc65] Newer win32 installer</title>
+<meta name="Author" content="Rafal (rafalszyja_at_poczta.onet.pl)">
+<meta name="Subject" content="Re: [cc65] Newer win32 installer">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Newer win32 installer</h1>
+<!-- received="Tue Aug 12 10:16:14 2003" -->
+<!-- isoreceived="20030812081614" -->
+<!-- sent="Tue, 12 Aug 2003 10:16:31 +0200" -->
+<!-- isosent="20030812081631" -->
+<!-- name="Rafal" -->
+<!-- email="rafalszyja_at_poczta.onet.pl" -->
+<!-- subject="Re: [cc65] Newer win32 installer" -->
+<!-- id="002501c360aa$0ab5cfa0$0100a8c0@1" -->
+<!-- charset="iso-8859-2" -->
+<!-- inreplyto="000a01c36075$12e5dc40$af682c42@palace" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Rafal (<a href="mailto:rafalszyja_at_poczta.onet.pl?Subject=Re:%20[cc65]%20Newer%20win32%20installer"><em>rafalszyja_at_poczta.onet.pl</em></a>)<br>
+<strong>Date:</strong> 2003-08-12 10:16:31
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3215.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<li><strong>In reply to:</strong> <a href="3214.html">Greg King: "Re: [cc65] Newer win32 installer"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3217.html">Rafal: "Re: [cc65] Newer win32 installer"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+Many thanks!
+
+you can expect better fixed package soon :)
+
+I hope that except these small bugs all worked ok...
+
+&gt; I installed the package on Windows XP (in all three types of accounts
+&gt; [guest, limitted, and administrative]):
+&gt; 
+&gt; * The installer failed to convert the batch files to DOS format.
+&gt;   It says,
+&gt;   &quot;Execute: utod.exe run.bat
+&gt;    Execute: utod.exe nt.bat&quot;.
+&gt;   But, those files still have the Unix format.
+
+huh... Impossible ? 
+ I tested it on 9x - works , 
+on XP worked also!
+
+&gt; * You should convert &quot;announce.txt,&quot; also.
+
+ok... but this is the original format by the way :)
+
+&gt; 
+&gt; * You need only one batch file, &quot;CC65.BAT&quot;:
+&gt; -----------------------------------------------------------------
+&gt; path %path%;&lt;cc65-path&gt;\bin
+&gt; 
+&gt; set CC65_INC=&lt;cc65-path&gt;\include
+&gt; set CC65_LIB=&lt;cc65-path&gt;\lib
+&gt; 
+&gt; set RM=del /f
+&gt; set CC=cl65
+&gt; set AS=ca65
+&gt; 
+&gt; %COMSPEC%
+&gt; -----------------------------------------------------------------
+&gt; That one file will work for all flavors of Windows!
+&gt; 
+&gt; * Two of the makefiles (in &quot;samples&quot; and &quot;samples\geos\ca65-vlir&quot;)
+&gt;   need changes:
+
+
+Yeah... I know that something was wrong but I'm not makefile
+master so I made a workaround outputting demos to *.PRG
+
+&gt; 
+&gt; 1. MS-DOS does not have the &quot;basename&quot; and &quot;rm&quot; commands.
+&gt; So, the cleaning rules must use &quot;$(RM)&quot;.
+&gt; And, these suffix-rules must be rewritten as:
+&gt; 
+&gt; .c.o:
+&gt;         @echo $&lt;
+&gt;         @$(CC) -Oirs -T --codesize 500 -g -t $(SYS) -I../include $&lt;
+&gt;         @$(AS) $*.s
+&gt; 
+&gt; .s.o:
+&gt;         @echo $&lt;
+&gt;         @$(AS) -g -I ../asminc $&lt;
+&gt; 
+&gt; 2. The Unix and DOS versions of the &quot;for&quot; command are written differently
+&gt; in scripts.  That problem can be avoided by rewriting the disk-image rule
+&gt; as:
+&gt; 
+&gt; samples.d64: $(EXELIST) ../tgi/$(SYS)-*.tgi
+&gt;         $(C1541) -format samples,cc d64 $@
+&gt;         $(C1541) $@ $(+:%=-write %)
+
+
+Thanks for answering , all will be fixed soon 
+Raf
+
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Newer%20win32%20installer">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3215.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<li><strong>In reply to:</strong> <a href="3214.html">Greg King: "Re: [cc65] Newer win32 installer"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3217.html">Rafal: "Re: [cc65] Newer win32 installer"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-08-12 10:16:18 CEST</em>
+</em>
+</small>
+</body>
+</html>

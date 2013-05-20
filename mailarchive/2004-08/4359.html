@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Apple2 file io - here: mem</title>
+<meta name="Author" content="jim (jsymolon011comcast.net)" />
+<meta name="Subject" content="Re: [cc65] Apple2 file io - here: memory management questions" />
+<meta name="Date" content="2004-08-02" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Apple2 file io - here: memory management questions</h1>
+<!-- received="Mon Aug  2 02:21:52 2004" -->
+<!-- isoreceived="20040802002152" -->
+<!-- sent="Sun, 01 Aug 2004 20:20:49 -0400" -->
+<!-- isosent="20040802002049" -->
+<!-- name="jim" -->
+<!-- email="jsymolon011comcast.net" -->
+<!-- subject="Re: [cc65] Apple2 file io - here: memory management questions" -->
+<!-- id="410D88E1.8050400@comcast.net" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="20040731170146.GA3061&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4360.html" title="Oliver Schmidt: &quot;Re: [cc65] Apple2 file io - here: memory management questions&quot;">Next message</a> ]
+[ <a href="../2004-07/4358.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Apple2 file io - here: memory management questions&quot;">Previous message</a> ]
+[ <a href="../2004-07/4358.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Apple2 file io - here: memory management questions&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4360.html" title="Oliver Schmidt: &quot;Re: [cc65] Apple2 file io - here: memory management questions&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: jim &lt;<a href="mailto:jsymolon011comcast.net?Subject=Re:%20[cc65]%20Apple2%20file%20io%20-%20here:%20memory%20management%20questions">jsymolon011comcast.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-08-02 02:20:49</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Ullrich von Bassewitz wrote:
+&gt; Hi,
+&gt; This is of course possible but I think it will complicate things in early
+&gt; stages, because currently there is no such linker support. Adding directories
+&gt; and possibly mutliple libraries to the apple2 target now needs additional
+&gt; makefiles.
+
+I've taken an initial stab at setting up sub-directories and creating 
+the makefiles.  The top makefile has a couple of &quot;../..&quot; which doesn't 
+work once you get to 3 levels of directories.
+
+&gt; 
+&gt; My suggestion is still to add file i/o support for a selected disk operating
+&gt; without bells and whistles, but keeping in mind the discussion and what you
+&gt; said about the different scenarios. Once this is done, file i/o can be used
+&gt; and remaining design/code problems resolved. Such problems could be memory
+&gt; issues, buffer allocation or whatever.
+&gt; 
+
+I agree.
+
+&gt; The next step would be to add the necessary hooks of the disk operating system
+&gt; dependent routines where these hooks have not been supplied before. This step
+&gt; would also include moving stuff to subdirectories to separate stuff that
+&gt; depends on one disk i/o system from the common code.
+&gt; 
+&gt; The final step would be to add code for a second disk operating system and
+&gt; polish the API in this process.
+&gt; 
+&gt; Please note however, that this is just the way, I would tackle the problem,
+&gt; because I have learned that trying to solve too many problems at once will
+&gt; often not work for me. If someone goes ahead, ignores all my talk and
+&gt; implements all things at once, I will be happy about it. Different people have
+&gt; different ways of achieving something, and doing it step by step is mine.
+&gt; 
+&gt; Regards
+&gt; 
+&gt; 
+&gt;         Uz
+&gt; 
+&gt; 
+
+I've been working for about 13 years in software and I've also found 
+that release early and often does work better than other methods, 
+however, I do like to see most of the functionality implemented.
+
+Everyone has been wonderful in commenting on what's been done and what 
+should be done which is good in uncovering assumptions that I've made 
+which may not be suitable for others.
+
+My goal is to have something and explore further.  I want to avoid 
+painting myself into a corner or doing so much work and having it 
+rejected because it was an unsuitable direction.
+
+I would suggest that the IIGS be offered as another &quot;type&quot;.  The biggest 
+reason is that the GS is truly a different machine which just happens to 
+have a emulation mode for the II line.
+
+Anyway - my current direction is to complete the test suite.  I've 
+reduced the number of ProDOS buffers to 5, which is 8 file handles in 
+total, which I think is good as it reduces the memory footprint yet 
+keeps the guarantee(?) that the code makes with the FOPEN_MAX.  I've 
+also implemented the oserror functions which again keeps the platform in 
+sync with the others.
+
+The test suite is going to:
+   1. open a non-existing file &amp; close.
+	Goal: test file creation &amp; mode options.  Functionality is part of open.
+   2. open an existing file, write x bytes and close.
+	Goal: test file writing
+   3. open file used in 2 and read bytes.
+	Goal: test reading
+
+2 &amp; 3 will also need to be tested with the mode parameter on open.
+
+   4. open file used in 2, seek to eof+n, write x bytes and close.
+      open file &amp; read
+	Goal: test current seek
+      also part of mode test (w+ or a)
+   5. open file used in 2, seek beyond eof, write x bytes, seek to 
+begining and read x bytes.
+	Goal: test absolute seek &amp; file extension.
+   6. rename file
+	Goal: test rename function
+   7. destroy file
+	Goal: test remove function.
+   8. Open file, change volume and write.
+	Goal: test error functions.  Changing volumes will throw an error and 
+such error should prevent a write.
+	- this functionality needs to be coded as an open does not store the 
+current volume yet.
+
+
+Once this passes - I believe that the library can be released.  At this 
+point I will have to upgrade to the current development effort &amp; 
+stabilize against the new code.
+
+So,  what have I missed ?
+
+Thanks
+Jim
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Aug  2 02:21:52 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4360.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Apple2 file io - here: memory management questions"</a></li>
+<li><dfn>Previous message</dfn>: <a href="../2004-07/4358.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Apple2 file io - here: memory management questions"</a></li>
+<li><dfn>In reply to</dfn>: <a href="../2004-07/4358.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Apple2 file io - here: memory management questions"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4360.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Apple2 file io - here: memory management questions"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4360.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Apple2 file io - here: memory management questions"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4359" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4359" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4359" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-08-02 02:22:01 CEST
+</em></small></p>
+</body>
+</html>

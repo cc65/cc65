@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] gettimeofday()</title>
+<meta name="Author" content="Karri Kaksonen (karri1sipo.fi)" />
+<meta name="Subject" content="Re: [cc65] gettimeofday()" />
+<meta name="Date" content="2012-01-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] gettimeofday()</h1>
+<!-- received="Mon Jan 23 07:38:51 2012" -->
+<!-- isoreceived="20120123063851" -->
+<!-- sent="Mon, 23 Jan 2012 08:38:38 +0200" -->
+<!-- isosent="20120123063838" -->
+<!-- name="Karri Kaksonen" -->
+<!-- email="karri1sipo.fi" -->
+<!-- subject="Re: [cc65] gettimeofday()" -->
+<!-- id="4F1D006E.8020905@sipo.fi" -->
+<!-- charset="UTF-8" -->
+<!-- inreplyto="20120119191537.GA20987&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9957.html" title="Marc 'BlackJack' Rintsch: &quot;Re: [cc65] gettimeofday()&quot;">Next message</a> ]
+[ <a href="9955.html" title="Oliver Schmidt: &quot;Re: [cc65] Overlays and cbm_load()&quot;">Previous message</a> ]
+[ <a href="9912.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] gettimeofday()&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9957.html" title="Marc 'BlackJack' Rintsch: &quot;Re: [cc65] gettimeofday()&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Karri Kaksonen &lt;<a href="mailto:karri1sipo.fi?Subject=Re:%20[cc65]%20gettimeofday()">karri1sipo.fi</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-01-23 07:38:38</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 01/19/2012 09:15 PM, Ullrich von Bassewitz wrote:
+&gt; On Thu, Jan 19, 2012 at 07:04:58AM +0200, Karri Kaksonen wrote:
+&gt;&gt; On 01/18/2012 10:25 PM, Ullrich von Bassewitz wrote:
+&gt;&gt;
+&gt;&gt;      struct currenttime {
+&gt;&gt;          unsigned    sec;
+&gt;&gt;          unsigned    msec;
+&gt;&gt;      };
+&gt;&gt;
+&gt;&gt;      struct currenttime getcurrenttime (void);
+&gt;&gt;
+&gt;&gt;
+&gt;&gt;
+&gt;&gt; I like this approach.
+&gt;      unsigned long getticker (void);
+&gt;      /* Return the number of milliseconds since some undefined point
+&gt;       * in the past
+&gt;       */
+&gt;
+
+&gt;      /* Read the clock */
+&gt;      clock_t Ticks = clock();
+&gt;
+&gt;      /* Calculate the time used */
+&gt;      Ticks = clock() - Ticks;
+&gt;      Sec = (unsigned) (Ticks / CLOCKS_PER_SEC);
+&gt;      Milli = ((Ticks % CLOCKS_PER_SEC) * 1000) / CLOCKS_PER_SEC;
+&gt;
+
+The most practical would be to have an unsigned long that is incremented 
+at every IRQ and use CLOCKS_PER_SEC for converting it to milliseconds or 
+seconds.
+
+But I assume that clock() is only available in C++.
+
+Machine generated music is also interested in a steady ticker so it 
+could build on top of clock() easily without a need for conversions to 
+seconds and milliseconds.
+
+What about implementing
+
+typedef clock_t unsigned long;
+
+clock_t clockCounter = 0;
+
+clock_t clock()
+{
+     return clockCounter;
+}
+
+And in the machine dependent library we can then define CLOCKS_PER_SEC 
+and the interruptor to increment clockCounter.
+
+This would have a very low overhead and 32 bits would allow us to track 
+time for almost two years for the Lynx 75 Hz display rate. Certainly 
+enough for any game.
+
+So I would go for implementing clock() and CLOCKS_PER_SEC.
+
+In reality you always need to do some calculations for displaying the 
+time so I don't mind doing the conversions from clock() time.
+--
+Karri
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Jan 23 07:38:51 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9957.html" title="Next message in the list">Marc 'BlackJack' Rintsch: "Re: [cc65] gettimeofday()"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9955.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Overlays and cbm_load()"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9912.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] gettimeofday()"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9957.html" title="Next message in this discussion thread">Marc 'BlackJack' Rintsch: "Re: [cc65] gettimeofday()"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9957.html" title="Message sent in reply to this message">Marc 'BlackJack' Rintsch: "Re: [cc65] gettimeofday()"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9958.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] gettimeofday()"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9956" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9956" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9956" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-01-23 07:38:57 CET
+</em></small></p>
+</body>
+</html>

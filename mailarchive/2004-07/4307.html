@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Apple2 Libraries - Current</title>
+<meta name="Author" content="jim (jsymolon011comcast.net)" />
+<meta name="Subject" content="Re: [cc65] Apple2 Libraries - Current status of file io ?" />
+<meta name="Date" content="2004-07-28" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Apple2 Libraries - Current status of file io ?</h1>
+<!-- received="Wed Jul 28 16:23:29 2004" -->
+<!-- isoreceived="20040728142329" -->
+<!-- sent="Wed, 28 Jul 2004 10:23:08 -0400" -->
+<!-- isosent="20040728142308" -->
+<!-- name="jim" -->
+<!-- email="jsymolon011comcast.net" -->
+<!-- subject="Re: [cc65] Apple2 Libraries - Current status of file io ?" -->
+<!-- id="4107B6CC.7080105@comcast.net" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20040728081522.GA24496&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4308.html" title="Oliver Schmidt: &quot;Re: [cc65] Apple2 Libraries - Current status of file io ?&quot;">Next message</a> ]
+[ <a href="4306.html" title="Payton Byrd: &quot;Re: [cc65] Apple2 Libraries - Current status of file io ?&quot;">Previous message</a> ]
+[ <a href="4304.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Apple2 Libraries - Current status of file io ?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4310.html" title="Oliver Schmidt: &quot;Re: [cc65] Apple2 Libraries - Current status of file io ?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: jim &lt;<a href="mailto:jsymolon011comcast.net?Subject=Re:%20[cc65]%20Apple2%20Libraries%20-%20Current%20status%20of%20file%20io%20?">jsymolon011comcast.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-07-28 16:23:08</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Ullrich von Bassewitz wrote:
+
+&gt;Hi!
+&gt;
+&gt;On Tue, Jul 27, 2004 at 09:37:01AM -0400, jim wrote:
+&gt;  
+&gt;
+&gt;&gt; int fstat(int fd, struct stat *buf);  /* standard POSIX call */
+&gt;&gt; int dio_get_file_info(int fd, struct a2_stat *buf);  /* apple namespace */
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;I haven't looked further into the issue, but it's probably not a good idea to
+&gt;add the latter to the dio api. dio was made to allow low level (not file
+&gt;oriented) disk i/o. The function could be made apple2 specific, however.
+&gt;
+&gt;  
+&gt;
+I only suggested the dio namespace as apple has 2 functions that 
+read/write a block of data.
+
+&gt;&gt;I am looking for a status of what's been done and if we're even
+&gt;&gt;compatible.  Oliver might be working on ProDOS 16 implementation where
+&gt;&gt;I'm working in ProDOS 8.
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;Does this mean there are several different file I/O libraries needed for the
+&gt;Apple? If so, would it be possible to find a common denominator for all of
+&gt;them?
+&gt;  
+&gt;
+A little history (as I understand it)- you can skip if you heard it.
+
+1st &quot;dos&quot; on apple was a 13-sector solution that was called DOS 3.2. A 
+firmware upgrade converted the 13-sector encoding into 16-sectors which 
+is known as DOS 3.3.  Apple rewrote DOS to provide support for hard 
+drives and called it ProDOS, which is known as ProDOS 8 as it can run on 
+most Apple II hardware.  The IIGS which is an extentsion of the line 
+used the 65816 processor and ProDOS 16.  The GS also has GS/OS which is 
+very MAC like.
+
+I have a GS but I never got into the GS/OS stuff, so I don't know it 
+well at all - I am assuming that most people will want either a DOS 3.3 
+or ProDOS 8 library as those two options will cover 80% of the machines 
+(??).
+
+ProDOS 8 interface is real easy to work with, set up a structure with 
+the info and call the main routine.  DOS 3.3 is harder - you have to 
+fill in objects inside DOS and call a couple of routines.
+
+Long story short - there is not too much that is common - most of the 
+code is setting up the function call.
+
+&gt;  
+&gt;
+&gt;&gt;I'm not too sure what you mean by this.  Functionally ? Internal
+&gt;&gt;structure ? Syntax ?
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;I'm trying to keep the overall design consistent. This extends into several
+&gt;areas, internal structure is one of them. Portability is another: Anything
+&gt;that could be done in a portable way, shouldn't have a platform specific
+&gt;solution. If it is not possible to make something completely portable, it is
+&gt;often possible to split it into a platform independent part and a platform
+&gt;dependent one. I'm trying to make the platform independent part as large as
+&gt;possible (share as much code among the platforms as possible), because this is
+&gt;easier to test and to maintain.
+&gt;
+&gt;  
+&gt;
+&gt;&gt;For example: I've coded the Apple libraries to correspond with the POSIX
+&gt;&gt;calls
+&gt;&gt;int chdir(const char* path);
+&gt;&gt;int __fastcall__ close(int fd);
+&gt;&gt;int creat(const char *name, mode_t mode);
+&gt;&gt;int flush (int fd);
+&gt;&gt; ... and so on ...
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;Good approach, this is how it should be! However, there's at least one
+&gt;problem: The library does already have a chdir function in the common
+&gt;(platform independent) part. It calls a platform specific function named
+&gt;__syschdir which must return a platform specific error code in A (similar to
+&gt;remove(), which calls __sysremove).
+&gt;
+&gt;As you can see from the above, I'm trying to get overall structure right, so
+&gt;the parts and platform code fit together nicely.
+&gt;
+&gt;  
+&gt;
+Ah !  I get it.  I didn't see the __sysremove call.
+
+&gt;&gt;The hacks in the write and read functions have been worked with so that
+&gt;&gt;using the STDIO consts work.
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;Great! This is how it should work. Does reopening these streams also work?
+&gt;
+&gt;        freopen (stdout, &quot;w&quot;, &quot;output.txt&quot;);
+&gt;
+&gt;A perfect solution would even allow to close and reopen the low level file
+&gt;descriptors (STDIN_FILENO, STDOUT_FILENO and STDERR_FILENO), and reopen them
+&gt;pointing to a file. This is difficult on some platforms, and not implemented
+&gt;everywhere, so don't bother if you have hardcoded checks for the standard file
+&gt;descriptors (which means that reassigning them will not work).
+&gt;
+&gt;  
+&gt;
+I don't allow the STDIO to be remapped - it's possible.  How should the 
+tty be represented ?
+&quot;/dev/tty&quot; ?  I don't want to make a Apple II Unix with dev inodes and 
+such on the disk -  the disks are too small for standard Apple II's.  I 
+can see using /dev/tty and /dev/stty0, ...
+Cygwin uses &quot;CONIN$&quot; &quot;CONOUT$&quot;
+
+There has to be some way to allow the code to select the &quot;right&quot; device 
+on reading or writing.  Which leads to a device table.
+devices:
+console (r/w)
+serial (r/w)
+parallel (r/w)
+disk(r/w)
+joystick(r)
+clock ?
+
+Would it be possible to implement the new loadable driver idea with the 
+disk ?  The console routines would be an easy extension - the functions 
+would always point to ROM or library functions.
+
+
+Thanks
+Jim
+
+&gt;If you're doing larger changes/additions, I would suggest to check back with
+&gt;me early. It is frustrating if you have spent several weekends to code the
+&gt;ultimate cc65 addition, just to have me reject it for some reasons you didn't
+&gt;know when you started. Or, request large changes. And, believe me, having to
+&gt;do this is also very frustrating for me!
+&gt;
+&gt;I'm glad about every cc65 contribution. But I do also want to keep cc65 clean
+&gt;and consistent. It wouldn't be helpful to accept contributions just to be
+&gt;polite, even if they do not fit into the overall concept or if there are some
+&gt;other reasons, they shouldn't go into the main distribution. This would
+&gt;ultimately make cc65 a mess. Checking back with me early helps to resolve any
+&gt;problems that might arise with a contribution and therefore reduce the
+&gt;frustration for both of us.
+&gt;
+&gt;Regards
+&gt;
+&gt;
+&gt;        Uz
+&gt;
+&gt;
+&gt;  
+&gt;
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Jul 28 16:23:29 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4308.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4306.html" title="Previous message in the list">Payton Byrd: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4304.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4310.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4310.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="4317.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4307" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4307" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4307" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-07-28 16:23:37 CEST
+</em></small></p>
+</body>
+</html>

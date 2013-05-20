@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Performance of Swiftlink r</title>
+<meta name="Author" content="Daniel Serpell (daniel.serpell1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] Performance of Swiftlink routines" />
+<meta name="Date" content="2009-12-31" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Performance of Swiftlink routines</h1>
+<!-- received="Thu Dec 31 12:37:47 2009" -->
+<!-- isoreceived="20091231113747" -->
+<!-- sent="Thu, 31 Dec 2009 08:37:40 -0300" -->
+<!-- isosent="20091231113740" -->
+<!-- name="Daniel Serpell" -->
+<!-- email="daniel.serpell1gmail.com" -->
+<!-- subject="Re: [cc65] Performance of Swiftlink routines" -->
+<!-- id="f0796bb70912310337h3ab28029p56cb6fac7d9bcc29@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="fdb431ea0912301941j47ff8cc3g7793f95d17380a3c&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="../2010-01/7724.html" title="Ullrich von Bassewitz: &quot;[cc65] cc65 version 2.13.1 is available&quot;">Next message</a> ]
+[ <a href="7722.html" title="Groepaz: &quot;Re: [cc65] Performance of Swiftlink routines&quot;">Previous message</a> ]
+[ <a href="7721.html" title="Tom Watt: &quot;[cc65] Performance of Swiftlink routines&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="../2010-01/7746.html" title="Greg King: &quot;Re: [cc65] Performance of Swiftlink routines&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Daniel Serpell &lt;<a href="mailto:daniel.serpell1gmail.com?Subject=Re:%20[cc65]%20Performance%20of%20Swiftlink%20routines">daniel.serpell1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-12-31 12:37:40</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Thu, Dec 31, 2009 at 12:41 AM, Tom Watt &lt;tom719co&#64;gmail&#46;<!--nospam-->com&gt; wrote:
+&gt; Hello,
+&gt;
+&gt; I've been working on a test terminal program to see if cc65 will work
+&gt; for me.  I think the terminal I wrote has &quot;acceptable&quot; speed, but I
+&gt; chose C because I honestly believed that C would be a faster
+&gt; alternative then a BASIC/ML combination approach.
+&gt;
+[...]
+&gt;        if (status==SER_ERR_OK) printf(&quot;%c&quot;,key);
+
+Printf is slow, you should use putchar(key) directly, or use the conio
+function &quot;cputc&quot;, that should be faster still, as uses direct screen I/O.
+
+[...]
+&gt;        /* clear screen, set colors */
+&gt;        printf(&quot;%c%c&quot;,147,5);
+&gt;        POKE(53280,0);
+&gt;        POKE(53281,0);
+
+Use &quot;clrscr()&quot; to make your program faster, smaller and portable at the
+same time :-) .
+
+&gt;
+&gt;                /* Load SL driver */
+&gt;        err=ser_load_driver(&quot;c64-swlink.ser&quot;);
+&gt;        if (err!=SER_ERR_OK) printf(&quot;Error loading driver!\n&quot;);
+
+You could use &quot;puts&quot; instead of &quot;printf&quot;...
+
+    Daniel.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Dec 31 12:37:47 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="../2010-01/7724.html" title="Next message in the list">Ullrich von Bassewitz: "[cc65] cc65 version 2.13.1 is available"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7722.html" title="Previous message in the list">Groepaz: "Re: [cc65] Performance of Swiftlink routines"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7721.html" title="Message to which this message replies">Tom Watt: "[cc65] Performance of Swiftlink routines"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="../2010-01/7746.html" title="Next message in this discussion thread">Greg King: "Re: [cc65] Performance of Swiftlink routines"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="../2010-01/7746.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] Performance of Swiftlink routines"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7723" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7723" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7723" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-12-31 12:37:50 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,34 @@
+# HG changeset patch
+# User Daniel Serpell <daniel.serpell@gmail.com>
+# Date 1259200395 10800
+# Branch trunk
+# Node ID 6a9ba841516ee26395eca94b88be63d13b29b5fe
+# Parent  a50c00a395bd11ec46b896169e679661ce058a6c
+Allocate _defdev buffer in BSS.
+
+diff --git a/libsrc/atari/getdefdev.s b/libsrc/atari/getdefdev.s
+--- a/libsrc/atari/getdefdev.s
++++ b/libsrc/atari/getdefdev.s
+@@ -27,9 +27,13 @@
+ __getdefdev:
+ 
+ .ifdef	DEFAULT_DEVICE
++	lda	#'D'
++	sta	__defdev
+ 	lda	#'0'+DEFAULT_DEVICE
+ 	sta	__defdev+1
+ .endif
++	lda	#':'
++	sta	__defdev+2
+ 	lda	__dos_type	; which DOS?
+ 	cmp	#ATARIDOS
+ 	beq	finish
+@@ -85,6 +89,7 @@
+ 
+ ; Default device
+ 
++	.bss
+ __defdev:
+-	.byte	"D1:", 0
++	.res	4
+ 

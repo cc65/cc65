@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] ca65: .sizeof() doesn't re</title>
+<meta name="Author" content="Yutaka Amanai (yasai-itame19421jade.plala.or.jp)" />
+<meta name="Subject" content="Re: [cc65] ca65: .sizeof() doesn't return correct values?" />
+<meta name="Date" content="2011-05-08" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] ca65: .sizeof() doesn't return correct values?</h1>
+<!-- received="Sun May  8 20:59:00 2011" -->
+<!-- isoreceived="20110508185900" -->
+<!-- sent="Mon, 09 May 2011 03:58:35 +0900" -->
+<!-- isosent="20110508185835" -->
+<!-- name="Yutaka Amanai" -->
+<!-- email="yasai-itame19421jade.plala.or.jp" -->
+<!-- subject="Re: [cc65] ca65: .sizeof() doesn't return correct values?" -->
+<!-- id="4DC6E7DB.40301@jade.plala.or.jp" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="4DC6DA46.9010203&#64;jade.plala.or.jp" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9404.html" title="Marc 'BlackJack' Rintsch: &quot;Re: [cc65] ca65: .sizeof() doesn't return correct values?&quot;">Next message</a> ]
+[ <a href="9402.html" title="Yutaka Amanai: &quot;Re: [cc65] ca65: .sizeof() doesn't return correct values?&quot;">Previous message</a> ]
+[ <a href="9402.html" title="Yutaka Amanai: &quot;Re: [cc65] ca65: .sizeof() doesn't return correct values?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9404.html" title="Marc 'BlackJack' Rintsch: &quot;Re: [cc65] ca65: .sizeof() doesn't return correct values?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Yutaka Amanai &lt;<a href="mailto:yasai-itame19421jade.plala.or.jp?Subject=Re:%20[cc65]%20ca65:%20.sizeof()%20doesn't%20return%20correct%20values?">yasai-itame19421jade.plala.or.jp</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-05-08 20:58:35</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>2011/05/09 3:00 Yutaka Amanai wrote:
+&gt; But if this behavior is valid, I think it is troublesome to write data
+&gt; on a line if the data is large. And, your &quot;#BAR-FOO&quot; method certainly
+&gt; works, but generally &quot;FOO&quot; is not always relevant to &quot;BAR&quot;, so it is
+&gt; annoying that I have to be concerned with &quot;BAR&quot; when I want only to get
+&gt; the size of &quot;FOO&quot;. Is there a good way to get the size of large data
+&gt; written on multiple lines?
+
+Probably I found a solution by myself. For .proc labels, .sizeof() seems 
+to return the size of the whole content (until .endproc). So, I can 
+define large data on multiple lines enclosing it with .proc and 
+.endproc. It is data, not &quot;procedure&quot;, but the method seems ok for my 
+purpose.
+
+But still there is a strange behavior. I wrote a test code:
+
+   STR:    .byte   &quot;str&quot;
+   .proc   myproc
+           lda     STR,x
+           lda     #.sizeof(STR)
+   .endproc
+
+Giving ca65 this code, it causes error: &quot;Size of `STR' is unknown&quot;. If 
+you comment out the line &quot;lda STR,x&quot;, ca65 doesn't cause any error and 
+.sizeof() returns 3. And, it seems that there are some ways to suppress 
+this error:
+   * removing the lines &quot;.proc&quot; and &quot;.endproc&quot;
+   * explicitly specify STR as &quot;::STR&quot; (global label)
+Is it related to scope?
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun May  8 20:59:00 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9404.html" title="Next message in the list">Marc 'BlackJack' Rintsch: "Re: [cc65] ca65: .sizeof() doesn't return correct values?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9402.html" title="Previous message in the list">Yutaka Amanai: "Re: [cc65] ca65: .sizeof() doesn't return correct values?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9402.html" title="Message to which this message replies">Yutaka Amanai: "Re: [cc65] ca65: .sizeof() doesn't return correct values?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9404.html" title="Next message in this discussion thread">Marc 'BlackJack' Rintsch: "Re: [cc65] ca65: .sizeof() doesn't return correct values?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9404.html" title="Message sent in reply to this message">Marc 'BlackJack' Rintsch: "Re: [cc65] ca65: .sizeof() doesn't return correct values?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="9406.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] ca65: .sizeof() doesn't return correct values?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9403" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9403" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9403" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-05-08 20:59:03 CEST
+</em></small></p>
+</body>
+</html>

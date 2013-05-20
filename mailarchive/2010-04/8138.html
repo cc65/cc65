@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] --create-dep for ca65?</title>
+<meta name="Author" content="silverdr1wfmh.org.pl (silverdr1wfmh.org.pl)" />
+<meta name="Subject" content="Re: [cc65] --create-dep for ca65?" />
+<meta name="Date" content="2010-04-23" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] --create-dep for ca65?</h1>
+<!-- received="Fri Apr 23 23:52:29 2010" -->
+<!-- isoreceived="20100423215229" -->
+<!-- sent="Fri, 23 Apr 2010 23:52:29 +0200" -->
+<!-- isosent="20100423215229" -->
+<!-- name="silverdr1wfmh.org.pl" -->
+<!-- email="silverdr1wfmh.org.pl" -->
+<!-- subject="Re: [cc65] &ndash;&ndash;create&ndash;dep for ca65?" -->
+<!-- id="0B53C855-7AA4-4D9F-8A80-F3BC9AC4CC64@wfmh.org.pl" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="20100423184100.GA495&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8139.html" title="Payton Byrd: &quot;[cc65] OT: Where to get some help?&quot;">Next message</a> ]
+[ <a href="8137.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Please critique this makefile&quot;">Previous message</a> ]
+[ <a href="8135.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] --create-dep for ca65?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8143.html" title="Greg King: &quot;Re: [cc65] --create-dep for ca65?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: &lt;<a href="mailto:silverdr1wfmh.org.pl?Subject=Re:%20[cc65]%20--create-dep%20for%20ca65?">silverdr1wfmh.org.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-04-23 23:52:29</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On 2010-04-23, at 20:41, Ullrich von Bassewitz &lt;uz&#64;musoftware&#46;<!--nospam-->de&gt; wrote:
+
+&gt;
+&gt; On Fri, Apr 23, 2010 at 03:17:20PM +0200, silverdr&#64;wfmh&#46;<!--nospam-->org.pl wrote:
+&gt;&gt; Would that be possible to add this option to ca65? My uneducated
+&gt;&gt; guess is that most of the code from cc65 could be reused there..
+&gt;
+&gt; That's not true, but not a problem, since it is not much code, and  
+&gt; the list of
+&gt; files is kept for other purposes already (they're written to the  
+&gt; object files).
+&gt;
+&gt; A more serious question is how to handle --create-dep on the cl65  
+&gt; level?
+
+Without deeper thinking - the first what comes to my mind is that -- 
+create-deps should generate them for both C and ASM files, which are  
+not compiled C files. Thus the only smartness would be required to  
+distinguish between &quot;native&quot; and &quot;compiled&quot; asm, which - I guess -  
+shouldn't be too difficult.
+
+&gt; The
+&gt; simplest way would be to add something like --asm-create-dep, which is
+&gt; explicitly passed to the assembler. But what if --create-dep is  
+&gt; specified when
+&gt; assembling files with cl65? On the other side, cl65 could try to be  
+&gt; smart
+&gt; (in fact, I could try to teach cl65 how to be smart :-), but often,  
+&gt; trying to
+&gt; be smart doesn't work as expected :-)
+&gt;
+
+I think I know what you mean ;-)
+
+-- 
+SD!
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Apr 23 23:52:29 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8139.html" title="Next message in the list">Payton Byrd: "[cc65] OT: Where to get some help?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8137.html" title="Previous message in the list">silverdr1wfmh.org.pl: "Re: [cc65] Please critique this makefile"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8135.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] --create-dep for ca65?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8143.html" title="Next message in this discussion thread">Greg King: "Re: [cc65] --create-dep for ca65?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8143.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] --create-dep for ca65?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8138" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8138" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8138" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-04-23 23:52:31 CEST
+</em></small></p>
+</body>
+</html>

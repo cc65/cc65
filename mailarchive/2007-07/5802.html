@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] makefile problems</title>
+<meta name="Author" content="stefan (stefan-physik1gmx.net)" />
+<meta name="Subject" content="[cc65] makefile problems" />
+<meta name="Date" content="2007-07-18" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] makefile problems</h1>
+<!-- received="Wed Jul 18 08:41:15 2007" -->
+<!-- isoreceived="20070718064115" -->
+<!-- sent="Wed, 18 Jul 2007 08:43:04 +0200" -->
+<!-- isosent="20070718064304" -->
+<!-- name="stefan" -->
+<!-- email="stefan-physik1gmx.net" -->
+<!-- subject="[cc65] makefile problems" -->
+<!-- id="469DB678.3020903@gmx.net" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5803.html" title="Dan: &quot;[cc65] cc65 patch&quot;">Next message</a> ]
+[ <a href="5801.html" title="Groepaz: &quot;Re: [cc65] minicast (avoiding bit rot part 2)&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+[ <a href="../2004-10/4633.html" title="Greg King: &quot;Re: [cc65] makefile problems&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: stefan &lt;<a href="mailto:stefan-physik1gmx.net?Subject=Re:%20[cc65]%20makefile%20problems">stefan-physik1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-07-18 08:43:04</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I don't know, if this is a general problem with makefiles or if it is 
+cc65 related,
+so this question may be a little off-topic, but anyway it's for 
+proceeding with a c64 production.
+
+When compiling my project using make of gcc for win32 i sometimes get 
+this error message without any appearant reason.
+The lines works when i copy it out of the makefile and instead copy it 
+directly into the terminal window and execute it.
+This is really annoying, as i have spend some time to write the complete 
+makefile(this is only one line of it) and the error makes the 
+compilation procedure stop. My idea about this is, that make sometimes 
+gets confused with lines &gt; 80 chars.
+Theres also a statement written in the doc of cl65, that cl65 should not 
+be used with more than one file and the -o parameter. That was the 
+reason, why i packed all object files into the paralax.lib and then used 
+only the minimum of two files parmain.c and paralax.lib to be linked 
+together.
+
+cl65 -C paralax.cfg -Oirs -g -Ln labels -I. -I .\kickborder -I 
+.\datafiles -D DEBUG=0 parmain.c paralax.lib -o paralax.run
+make.exe: *** [paralax.run] Error -1
+
+The command in the makefile looks like this:
+
+paralax.run: paralax.lib  parmain.c
+    cl65 $(cflags) $(inc) -D $(debug)  paralax.lib  parmain.c  -o  $%
+ 
+Can anybody help me to get around this problem? The project is nearly 
+finished and all other lines of the makefile are processed without 
+complains.
+
+
+
+
+******* Diese Email wurde gesendet von der ********
+Laser- und Medizin-Technologie GmbH, Berlin
+                  (gemeinnuetzig nach §52 AO)
+     Fabeckstr. 60 - 62, 14195 Berlin
+     Telefon:  +49 (0)30 8449 23 - 0
+     Fax:      +49 (0)30 8449 23 - 99
+     Handelsregister:    Berlin 97 HRB 23 655
+     Homepage: www.LMTB.de
+     Vorsitzender des Aufsichtsrats: Dr. Frank Frank
+     Geschaeftsfuehrung: Dr. H. Albrecht
+                       Prof. Dr.-Ing. H. J. Eichler
+*************************************************** 
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Jul 18 08:41:15 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5803.html" title="Next message in the list">Dan: "[cc65] cc65 patch"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5801.html" title="Previous message in the list">Groepaz: "Re: [cc65] minicast (avoiding bit rot part 2)"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="../2004-10/4633.html" title="Next message in this discussion thread">Greg King: "Re: [cc65] makefile problems"</a></li>
+<li><a name="replies" id="replies"></a>
+<dfn>Maybe reply</dfn>: <a href="../2004-10/4633.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] makefile problems"</a></li>
+<li><dfn>Maybe reply</dfn>: <a href="../2004-10/4634.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] makefile problems"</a></li>
+<li><dfn>Maybe reply</dfn>: <a href="../2004-11/4674.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] makefile problems"</a></li>
+<li><dfn>Maybe reply</dfn>: <a href="../2004-11/4675.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] makefile problems"</a></li>
+<li><dfn>Reply</dfn>:  <a href="../2007-08/5817.html" title="Message sent in reply to this message">stefan: "Re: [cc65] optimizations"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5802" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5802" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5802" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-07-18 08:41:19 CEST
+</em></small></p>
+</body>
+</html>

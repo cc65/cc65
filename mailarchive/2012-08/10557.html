@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Putting some cc65 puzzle piece</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] Putting some cc65 puzzle pieces together" />
+<meta name="Date" content="2012-08-09" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Putting some cc65 puzzle pieces together</h1>
+<!-- received="Thu Aug  9 00:20:17 2012" -->
+<!-- isoreceived="20120808222017" -->
+<!-- sent="Thu, 9 Aug 2012 00:20:03 +0200" -->
+<!-- isosent="20120808222003" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] Putting some cc65 puzzle pieces together" -->
+<!-- id="CACT=u70KhVXgmDSOtS_K15nzU1iJThNu=vWu3BpLgcr9egNXEA@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10558.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] C64 POSIX dirent stuff actually working?&quot;">Next message</a> ]
+[ <a href="10556.html" title="Joseph Rose: &quot;[cc65] inline union def.&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10565.html" title="Joseph Rose: &quot;Re: [cc65] Putting some cc65 puzzle pieces together&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Putting%20some%20cc65%20puzzle%20pieces%20together">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-08-09 00:20:03</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+Piece one:
+
+In my opinion the cc65 loadable drivers are somewhat over-engineered
+for most scenarios because most of the time there's only one driver
+possible anyway for one reason or another. However the extended memory
+drivers are an exception. Especially on the C64 they are similar and
+numerous enough to make the benefits of loadable modules tangible.
+Unfortunately cc65 extended memory drivers seem not that popular - at
+least I don't know of any program using them. So I thought it was time
+to create one.
+
+Piece two:
+
+Usually the potential flexibility of loadable modules ends at the
+latest in programs having their names hard-coded in the source code.
+The only exception I know of is Contiki where I introduced a config
+file containing (among other things) the name of the Ethernet driver
+to load. However a program can as well &quot;just&quot; look what driver(s) are
+present and try those. The recent implementation of opendir() and
+friends on the CBM targets allows to do so in a cross-target fashion
+on several targets. At least in general extended memory drivers are
+able to detect if the type of memory extension they are applicable for
+is actually present. Thus a program can try several drivers it finds
+one after the other until one loads successfully.
+
+Piece three:
+
+In order to really leverage the flexibility of loadable extended
+memory drivers a program shouldn't rely on a certain amount of
+extended memory - or extended memory being present at all. The ideal
+scenario is therefore one where the extended memory serves as some
+sort of optional cache. Given the typical CBM disk access performance
+a disk cache is the obvious candidate. So we're looking for a scenario
+that requires loading the same files from disk several times...
+Overlays!
+
+Putting the pieces together:
+
+The new sample program 'samples/multidemo.c' looks for extended memory
+drivers. If it finds one that loads successfully it uses it to load
+its overlays from disk into extended memory as long as there's enough
+memory left. Then it actually uses its overlays: The ones loaded into
+extended memory are loaded from there. The rest is loaded straight
+from disk.
+
+The source code looks pretty much what one would expect with possibly
+one exception:
+
+====================
+
+        while (size) {
+            void *buf;
+
+            /* In general one could as well use em_copyto() to copy a fully
+             * loaded overlay into extended memory in one step. However the
+             * &quot;streaming&quot; of an overlay from disk to extended memory shown
+             * here has two advantages:
+             * - It can be done from another overlay (like done here).
+             * - It avoids unnecessary double buffering with emdrivers that
+             *   provide a hardware memory window.
+             */
+            buf = em_use (page++);
+            size -= read (file, buf, EM_PAGE_SIZE);
+            em_commit ();
+        }
+
+====================
+
+I personally like the way multiple (hence the name 'multidemo') cc65
+features work together here nicely. And as a side effect everybody
+looking for a (relatively) easy way to have cc65 programs make use of
+memory extensions has a starting point :-)
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Aug  9 00:20:17 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10558.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] C64 POSIX dirent stuff actually working?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10556.html" title="Previous message in the list">Joseph Rose: "[cc65] inline union def."</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10565.html" title="Next message in this discussion thread">Joseph Rose: "Re: [cc65] Putting some cc65 puzzle pieces together"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10565.html" title="Message sent in reply to this message">Joseph Rose: "Re: [cc65] Putting some cc65 puzzle pieces together"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10557" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10557" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10557" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-08-09 00:20:23 CEST
+</em></small></p>
+</body>
+</html>

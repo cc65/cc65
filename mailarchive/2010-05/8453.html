@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] VDC GUI (TUI) library for </title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] VDC GUI (TUI) library for CC65" />
+<meta name="Date" content="2010-05-31" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] VDC GUI (TUI) library for CC65</h1>
+<!-- received="Mon May 31 10:34:08 2010" -->
+<!-- isoreceived="20100531083408" -->
+<!-- sent="Mon, 31 May 2010 10:33:59 +0200" -->
+<!-- isosent="20100531083359" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] VDC GUI (TUI) library for CC65" -->
+<!-- id="AANLkTinzZ-EgMuy95QLkcG2V11HrbtgxLf23jpQtwAns@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="AANLkTinCLEk0wjKwMzDTBrY1vrOtRqhgOqCYEcHY8nVE&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8454.html" title="Payton Byrd: &quot;Re: [cc65] VDC GUI (TUI) library for CC65&quot;">Next message</a> ]
+[ <a href="8452.html" title="Scott Hutter: &quot;[cc65] VDC GUI (TUI) library for CC65&quot;">Previous message</a> ]
+[ <a href="8452.html" title="Scott Hutter: &quot;[cc65] VDC GUI (TUI) library for CC65&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8454.html" title="Payton Byrd: &quot;Re: [cc65] VDC GUI (TUI) library for CC65&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20VDC%20GUI%20(TUI)%20library%20for%20CC65">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-05-31 10:33:59</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Scott,
+
+&gt; <a href="http://sourceforge.net/projects/c128guilib/">http://sourceforge.net/projects/c128guilib/</a>
+&gt;
+&gt; Also, this is a Visual Studio 2008 project, and maybe can be an example of
+&gt; how to use Visual Studio to build CC65 projects.
+
+Hm, in order to serve as an example for using VS 2008 with cc65 I'd
+recommend at least the following changes:
+
+- Remove the .suo file
+- Remove the .ncb file
+- Remove the .vcproj.&lt;name&gt;.user file
+- Remove the Debug subdirectory if there's no Debug vs. Release build
+- Remove absolute paths (e:\Development\...) from .vsproj and .bat files
+- Replace .bat files with a Makefile
+- Remove 'WIN32;_DEBUG;NDEBUG' preprocessor macros
+- Add 'fastcall' preprocessor macro (as discussed here recently)
+- Rename configuration to somewhat more usefull than 'Debug|Win32'
+- Use VS variables instead of hardcoded 'Test.exe' output file
+- Use more reasonable output file name
+- Actually use output file name as parameter to Makefile
+- ...
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon May 31 10:34:08 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8454.html" title="Next message in the list">Payton Byrd: "Re: [cc65] VDC GUI (TUI) library for CC65"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8452.html" title="Previous message in the list">Scott Hutter: "[cc65] VDC GUI (TUI) library for CC65"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8452.html" title="Message to which this message replies">Scott Hutter: "[cc65] VDC GUI (TUI) library for CC65"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8454.html" title="Next message in this discussion thread">Payton Byrd: "Re: [cc65] VDC GUI (TUI) library for CC65"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8453" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8453" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8453" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-05-31 10:34:10 CEST
+</em></small></p>
+</body>
+</html>

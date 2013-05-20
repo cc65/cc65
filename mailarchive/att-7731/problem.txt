@@ -1,0 +1,60 @@
+000358r 1               ; image_table_cyl = (myide_config.cylinders + 1 - 256 * myide_config.imagesize_cyl) / myide_config.imagesize_cyl;   // calculate number of image slots
+000358r 1               ;
+000358r 1  A5 rr        L0168:	lda     _myide_config
+00035Ar 1  A6 rr        	ldx     _myide_config+1
+00035Cr 1  18           	clc
+00035Dr 1  69 01        	adc     #$01
+00035Fr 1  90 01        	bcc     L017D
+000361r 1  E8           	inx
+000362r 1  20 rr rr     L017D:	jsr     pushax
+000365r 1  A2 01        	ldx     #$01
+000367r 1  A9 00        	lda     #$00
+000369r 1  20 rr rr     	jsr     pushax
+00036Cr 1  A5 rr        	lda     _myide_config+7
+00036Er 1  20 rr rr     	jsr     tosumula0
+000371r 1  20 rr rr     	jsr     tossubax
+000374r 1  20 rr rr     	jsr     pushax
+000377r 1  A5 rr        	lda     _myide_config+7
+000379r 1  20 rr rr     	jsr     tosudiva0
+00037Cr 1  85 rr        	sta     _image_table_cyl
+00037Er 1  86 rr        	stx     _image_table_cyl+1
+000380r 1               ;
+000380r 1               ; image_table_cyl = (image_table_cyl - 1) * myide_config.imagesize_cyl + 256 * myide_config.imagesize_cyl;          // get cylinder of last image slot
+000380r 1               ;
+000380r 1  38           	sec
+000381r 1  E9 01        	sbc     #$01
+000383r 1  B0 01        	bcs     L0181
+000385r 1  CA           	dex
+000386r 1  20 rr rr     L0181:	jsr     pushax
+000389r 1  A5 rr        	lda     _myide_config+7
+00038Br 1  20 rr rr     	jsr     tosumula0
+00038Er 1  20 rr rr     	jsr     pushax
+000391r 1  A2 01        	ldx     #$01
+000393r 1  A9 00        	lda     #$00
+000395r 1  20 rr rr     	jsr     pushax
+000398r 1  A5 rr        	lda     _myide_config+7
+00039Ar 1  20 rr rr     	jsr     tosumula0
+00039Dr 1  20 rr rr     	jsr     tosaddax
+0003A0r 1  85 rr        	sta     _image_table_cyl
+0003A2r 1  86 rr        	stx     _image_table_cyl+1
+0003A4r 1               ;
+0003A4r 1               ; max_images = (image_table_cyl - (myide_config.imagecyl_hi * 256));
+0003A4r 1               ;
+0003A4r 1  A2 00        	ldx     #$00
+0003A6r 1  38           	sec
+0003A7r 1  E9 00        	sbc     #$00
+0003A9r 1  48           	pha
+0003AAr 1  8A           	txa
+0003ABr 1  E5 rr        	sbc     _myide_config+6
+0003ADr 1  AA           	tax
+0003AEr 1  68           	pla
+0003AFr 1  85 rr        	sta     _max_images
+0003B1r 1  86 rr        	stx     _max_images+1
+0003B3r 1               ;
+0003B3r 1               ; max_images = max_images / myide_config.imagesize_cyl;
+0003B3r 1               ;
+0003B3r 1  20 rr rr     	jsr     pushax
+0003B6r 1  A5 rr        	lda     _myide_config+7
+0003B8r 1  20 rr rr     	jsr     tosudiva0
+0003BBr 1  85 rr        	sta     _max_images
+0003BDr 1  86 rr        	stx     _max_images+1

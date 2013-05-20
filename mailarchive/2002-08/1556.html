@@ -1,0 +1,153 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Other uses of BRK, stack</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] Other uses of BRK, stack snooping">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Other uses of BRK, stack snooping</h1>
+<!-- received="Tue Aug 13 14:45:42 2002" -->
+<!-- isoreceived="20020813124542" -->
+<!-- sent="Tue, 13 Aug 2002 14:45:31 +0200" -->
+<!-- isosent="20020813124531" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] Other uses of BRK, stack snooping" -->
+<!-- id="1095447756.20020813144531@gmx.net" -->
+<!-- inreplyto="04ce01c24259$76e97890$6902a8c0@magnesium" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Other%20uses%20of%20BRK,%20stack%20snooping"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2002-08-13 14:45:31
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1555.html">groepaz: "Re[2]: [cc65] glitch in &quot;assert.h&quot; ?"</a>
+<li><strong>In reply to:</strong> <a href="1553.html">David Holz: "[cc65] Other uses of BRK, stack snooping"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1558.html">David Holz: "Re: [cc65] Other uses of BRK, stack snooping"</a>
+<li><strong>Next in thread:</strong> <a href="1557.html">Piotr Fusik: "Re: [cc65] Other uses of BRK, stack snooping"</a>
+<li><strong>Reply:</strong> <a href="1558.html">David Holz: "Re: [cc65] Other uses of BRK, stack snooping"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello David,
+
+Tuesday, August 13, 2002, 1:39:13 AM, you wrote:
+
+DH&gt; Hi, I had an idea.  I don't know if you guys have thought of it before, but
+DH&gt; using BRK followed by data bytes is a great way to save space in user code.
+
+thought about this before aswell, guess others also did :o) to make it
+straigt, most ppl i know came to the conclusion that its not worth the
+trouble for little benefit.
+
+DH&gt; It mimics system calls in larger CPUs (kinda like INT in x86 world).
+
+ehrm *cough* ... BRK _is_ a &quot;systemcall&quot; (aka software interupt). its
+just one of the least known features of the cpu :)
+
+DH&gt; Say that we want to push a 16-bit literal to the stack:
+
+DH&gt; lda #lo
+DH&gt; ldx #hi
+DH&gt; jsr pushax
+
+DH&gt; That's 7 bytes.  If system call $00 was &quot;push immediate 16-bit to stack&quot;,
+DH&gt; the compiler could generate
+
+DH&gt; brk
+DH&gt; .byte $00
+DH&gt; .word $hilo
+
+DH&gt; which is only 4 bytes, almost half the size.  The BRK handler would snoop
+DH&gt; the $0100 stack for the return address, dispatch on the next byte, and
+DH&gt; adjust the return address to return to the next instruction.  Obviously,
+DH&gt; JSRing straight into the utility code with preloaded registers is faster, so
+DH&gt; it definitely would fall into a speed-vs-memory tradeoff option, and
+DH&gt; practical only when calling built-in routines with compile-time-known
+DH&gt; parameters.
+
+yep, that might actually look useful.... BUT, now think of the fact
+that not all calls can be done this way (like you said) and still
+these calls must call routines that must be callable with standard
+calling-conventions (preloaded registers and jsr).
+
+in other words, we would end up with 2 kinds of totally different
+calling conventions which would make code-generation tricky, and
+writing libraries very messy (each common function would need 2
+entrypoints, one for each calling-method - resulting in massive
+codesize bloat ;=P)
+
+DH&gt; I think Lunix or the C128 kernal or somebody did this kind of trick with
+DH&gt; outputting strings, which is where I got the idea from:
+
+DH&gt; jsr stroutThingy
+DH&gt; .word message
+DH&gt; ...
+DH&gt; message: .text &quot;I'm a little teapot&quot;
+
+this is/was a very common technique in 8bit-asm actually, not THAT
+common in terms of c64 though :o)
+
+DH&gt; I see that there's support for setting up the BRK vector from C now; do you
+DH&gt; think that it's used much, because it'd need a bit of work to make it
+DH&gt; interoperate with this (something like making 'brk $ff' the user BRK
+DH&gt; handler).
+
+i've personally never used BRK at all - except in debug-handlers and
+in that case one cannot rely on the byte after BRK anyway.
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Other%20uses%20of%20BRK,%20stack%20snooping">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Other%20uses%20of%20BRK,%20stack%20snooping">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1555.html">groepaz: "Re[2]: [cc65] glitch in &quot;assert.h&quot; ?"</a>
+<li><strong>In reply to:</strong> <a href="1553.html">David Holz: "[cc65] Other uses of BRK, stack snooping"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1558.html">David Holz: "Re: [cc65] Other uses of BRK, stack snooping"</a>
+<li><strong>Next in thread:</strong> <a href="1557.html">Piotr Fusik: "Re: [cc65] Other uses of BRK, stack snooping"</a>
+<li><strong>Reply:</strong> <a href="1558.html">David Holz: "Re: [cc65] Other uses of BRK, stack snooping"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-08-13 14:46:06 CEST</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,37 @@
+# HG changeset patch
+# User Daniel Serpell <daniel.serpell@gmail.com>
+# Date 1258942435 10800
+# Branch trunk
+# Node ID 768944c3d33626e5274e42794b1a078b5fdea258
+# Parent  f8e96219b5a880f02aecc8a27a39292dc26f0f18
+One byte less in crt0.s routine.
+Proposed by Ullrich von Bassewitz.
+
+diff --git a/libsrc/atari/crt0.s b/libsrc/atari/crt0.s
+--- a/libsrc/atari/crt0.s
++++ b/libsrc/atari/crt0.s
+@@ -80,19 +80,19 @@
+ 
+ 	lda	LMARGN
+ 	sta	old_lmargin
+-	lda	#0
+-	sta	LMARGN
++	ldy	#0
++	sty	LMARGN
+ 
+ ; set keyb to upper/lowercase mode
+ 
+ 	ldx	SHFLOK
+ 	stx	old_shflok
+-	sta	SHFLOK
++	sty	SHFLOK
+ 
+ ; Initialize conio stuff
+ 
+-	lda	#$FF
+-	sta	CH
++	dey                             ; Set X to $FF
++	sty	CH
+ 
+ ; Push arguments and call main
+ 

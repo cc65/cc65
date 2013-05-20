@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Compile problem</title>
+<meta name="Author" content="Marko Mäkelä (msmakela_at_cc.hut.fi)">
+<meta name="Subject" content="Re: [cc65] Compile problem">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Compile problem</h1>
+<!-- received="Wed Dec 12 07:53:42 2001" -->
+<!-- isoreceived="20011212065342" -->
+<!-- sent="Wed, 12 Dec 2001 08:54:02 +0200 (EET)" -->
+<!-- isosent="20011212065402" -->
+<!-- name="Marko Mäkelä" -->
+<!-- email="msmakela_at_cc.hut.fi" -->
+<!-- subject="Re: [cc65] Compile problem" -->
+<!-- id="Pine.OSF.4.10.10112120840250.7963-100000@meripihka.hut.fi" -->
+<!-- inreplyto="49491957.20011211204001@gmx.net" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Marko Mäkelä (<a href="mailto:msmakela_at_cc.hut.fi?Subject=Re:%20[cc65]%20Compile%20problem"><em>msmakela_at_cc.hut.fi</em></a>)<br>
+<strong>Date:</strong> 2001-12-12 07:54:02
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0972.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<li><strong>Previous message:</strong> <a href="0970.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<li><strong>In reply to:</strong> <a href="0970.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0972.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<li><strong>Reply:</strong> <a href="0972.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Tue, 11 Dec 2001, groepaz wrote:
+
+&gt; i think that might even work in a portable way (getcwd/setcwd should
+&gt; be available everywhere no?)
+
+POSIX defines chdir(const char* path) and fchdir(int fd), but in Unix,
+there's no system call or even a library call for determining the current
+working directory.  As far as I know, the pwd(3) program guesses the
+current working directory by following the &quot;../../..&quot; chain and doing
+something like opendir/readdir/stat to find out a matching subdirectory of
+the &quot;..&quot; directory, and to find out when &quot;..&quot; is the same as &quot;.&quot; (in the
+root directory, it is).  BTW, at least on Sun Solaris 7, the pwd(3)
+program fails if one of the parent directories doesn't have read
+permissions.
+
+&gt; - well except a &quot;collapsepath&quot; functionality would be needed for
+&gt; &quot;OSes&quot; like ms-dos...
+
+Potentially, the maximum path name length can be a problem on any system
+when you have very long directory hierarchies.  I guess you're referring
+to removing &quot;./&quot; or &quot;somedir/..&quot; parts from the path names.  My Perl
+script that generates the index.html navigation files for
+<a href="http://www.funet.fi/pub/cbm/">http://www.funet.fi/pub/cbm/</a> does that when it resolves symbolic links.
+
+&gt; just an idea that came to my mind (well you know you always think
+&gt; about totally unrelated things when supposed to do boring
+&gt; work...writing docfiles....*sigh* ;=))
+
+Or writing &quot;doctor files&quot; (PhD thesis). :-)
+
+To get back on the topic, I agree with Ullrich and would rather keep
+platform-specific stuff out of the compiler.  There are tools like GNU
+autoconf and automake that allow the creation of &quot;portable Makefiles&quot;.
+Maybe you should have a look at them.  Perhaps you don't want to use these
+tools as such, but you could get some ideas.  The source files (in a broad
+sense; including C files and Makefiles) do not need to be exactly
+identical on all platform; the main thing is that you can eliminate the
+need for manually editing them.
+
+Also, you could perhaps use a set of platform-specific Makefiles, like
+Makefile.`uname` where `uname` is replaced by Linux, OSF1, SunOS, etc.
+These files would include a common Makefile that'd contain the
+platform-independent rules.  I used this approach for a large C++ program
+I've written.  (GNU autoconf and automake ease the porting of C programs
+to various compilers, but for C++ there are very few compilers that would 
+compile the code.  I've only found two.)
+
+	Marko
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Compile%20problem">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0972.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<li><strong>Previous message:</strong> <a href="0970.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<li><strong>In reply to:</strong> <a href="0970.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0972.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<li><strong>Reply:</strong> <a href="0972.html">groepaz: "Re[2]: [cc65] Compile problem"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:44 CET</em>
+</em>
+</small>
+</body>
+</html>

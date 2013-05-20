@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] struct union [2]</title>
+<meta name="Author" content="Stefan (vorsichtphysiker1gmx.net)" />
+<meta name="Subject" content="[cc65] struct union [2]" />
+<meta name="Date" content="2013-02-01" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] struct union [2]</h1>
+<!-- received="Fri Feb  1 21:59:36 2013" -->
+<!-- isoreceived="20130201205936" -->
+<!-- sent="Fri, 01 Feb 2013 21:59:26 +0100" -->
+<!-- isosent="20130201205926" -->
+<!-- name="Stefan" -->
+<!-- email="vorsichtphysiker1gmx.net" -->
+<!-- subject="[cc65] struct union [2]" -->
+<!-- id="20130201205926.60860@gmx.net" -->
+<!-- charset="utf-8" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11170.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Struct union&quot;">Next message</a> ]
+[ <a href="11168.html" title="Stefan: &quot;[cc65] Struct union&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Stefan &lt;<a href="mailto:vorsichtphysiker1gmx.net?Subject=Re:%20[cc65]%20struct%20union%20[2]">vorsichtphysiker1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2013-02-01 21:59:26</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Sorry, copy and paste alert: 
+
+struct a
+{
+    int x;
+    int y;
+};
+
+union b
+{
+    int x;
+    int y;
+};
+
+appears only one time at the beginning of the code!
+
+I now also tried gcc with the same code and got following output
+
+&gt; Executing: C:\Program Files (x86)\ConTEXT\ConExec.exe &quot;gcc&quot; &quot;C:\Users\Stefan\Documents\C64\Coding\25years\BorderSquare4x4frac\Scrolling\struniontest.c&quot; -ostruniontest
+
+C:\Users\Stefan\Documents\C64\Coding\25years\BorderSquare4x4frac\Scrolling\struniontest.c: In function 'main':
+C:\Users\Stefan\Documents\C64\Coding\25years\BorderSquare4x4frac\Scrolling\struniontest.c:16:8: error: 'a' defined as wrong kind of tag
+C:\Users\Stefan\Documents\C64\Coding\25years\BorderSquare4x4frac\Scrolling\struniontest.c:16:10: error: storage size of 'd' isn't known
+C:\Users\Stefan\Documents\C64\Coding\25years\BorderSquare4x4frac\Scrolling\struniontest.c:17:9: error: 'b' defined as wrong kind of tag
+C:\Users\Stefan\Documents\C64\Coding\25years\BorderSquare4x4frac\Scrolling\struniontest.c:17:11: error: storage size of 'e' isn't known
+C:\Users\Stefan\Documents\C64\Coding\25years\BorderSquare4x4frac\Scrolling\struniontest.c:18:8: error: 'b' defined as wrong kind of tag
+C:\Users\Stefan\Documents\C64\Coding\25years\BorderSquare4x4frac\Scrolling\struniontest.c:18:10: error: storage size of 'f' isn't known
+&gt; Execution finished.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Feb  1 21:59:36 2013</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11170.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Struct union"</a></li>
+<li><dfn>Previous message</dfn>: <a href="11168.html" title="Previous message in the list">Stefan: "[cc65] Struct union"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#11169" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#11169" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#11169" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2013-02-01 21:59:39 CET
+</em></small></p>
+</body>
+</html>

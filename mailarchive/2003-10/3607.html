@@ -1,0 +1,222 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+<title>cc65 mailing list archive: Re: [cc65] [very OT] KVM</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] [very OT] KVM">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] [very OT] KVM</h1>
+<!-- received="Fri Oct 10 05:08:43 2003" -->
+<!-- isoreceived="20031010030843" -->
+<!-- sent="Fri, 10 Oct 2003 05:03:09 +0200" -->
+<!-- isosent="20031010030309" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] [very OT] KVM" -->
+<!-- id="200310100503.09927.groepaz@gmx.net" -->
+<!-- charset="iso-8859-15" -->
+<!-- inreplyto="20031009202314.GC7924@trikaliotis.hn.org" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20[very%20OT]%20KVM"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2003-10-10 05:03:09
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3606.html">Adam Thornton: "Re: [cc65] [very OT] KVM"</a>
+<li><strong>In reply to:</strong> <a href="3600.html">Spiro Trikaliotis: "Re: [cc65] [very OT] KVM"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="../2003-09/3514.html">Keates, Mark: "RE: [cc65] [very OT] KVM"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Thursday 09 October 2003 22:23, Spiro Trikaliotis wrote:
+
+&gt; If it is not fixed immediately, it does not mean it will never be fixed.
+
+no, but having a non working feature for *years* and beeing told &quot;noone cares&quot;
+pretty much implies it never will be fixed :) having it simply commented out
+in the source would make things so much less annoying (for you, the developers,
+i wouldnt be complaining :=P).
+
+&gt; If you would be on the ML, you would see that these visual improvements are
+&gt; in fact the most wanted features, yes!
+
+i know that this is the case, and thats also one of the reasons why i am not on
+this list (i have my &quot;spys&quot; though ;=)). like i said, i understand why you (the
+developers) are focussing on these things - but that doesnt mean i have to 
+like it.
+
+&gt; This means: We should have dropped every architecture which did not support
+&gt; all features? This means, after 1.13, every non-windows architecture
+&gt; would've been dropped.
+
+nonsence. no problem if a certain feature gets introduced in one port first and
+then gets ported to others over time - however such things should be consistant;
+looking at the rs232 again, that wasnt the case for years. thats what i mean
+with ppl creating different versions of the same software...ppl start implementing
+new stuff in one version, before they have completed porting other stuff from
+another version. doesnt make maintaining the source exactly easier either i
+suppose.
+
+&gt; &gt; open source is not an excuse for releasing crap, thats another common
+&gt; &gt; misbelief :=)
+&gt;
+&gt; Thanks. It's crap?
+
+i wouldnt say that for the entire emulator package, infact i wouldnt say
+that for most of the things in it - but i would lie if i'd say there is
+nothing in it that i consider &quot;crap&quot;. things like features that are present
+in the gui, but arent functionable are &quot;crap&quot; (they basically shouldnt 
+show up anywhere except the development version imho). oh well :)
+
+&gt; &gt; x64 -autostart bla.d81
+&gt; &gt;
+&gt; &gt; the problem is that the drive doesnt get initialized correctly under
+&gt; &gt; certain conditions.
+&gt; &gt; the fix is to use load&quot;:*&quot;,8,1 instead of load&quot;*&quot;,8,1
+&gt;
+&gt; How do you issue a load command if you do an autostart?
+
+1) i mean the load command that vice issues if you are using the autostart
+feature. this needs to be changed to load&quot;:*&quot;,8,1 so it doesnt rely on the
+precondition of a correctly resetted drive. (this isnt exactly a vice
+problem, you get simelar behaviour on a real c64 too - load&quot;*&quot;,8,1 always
+loads the *last loaded program* and not the *first program on disc* so 
+this may fail if the drive isnt in a proper state. load&quot;:*&quot;,8,1 in turn
+will indeed always load the first program on disc, regardles of the 
+previous drive status. (note: i think there was another special case on
+the dual floppy drives, i dont remember what it was though :P)
+
+2) this is what i use as a workaround:
+
+x64 -8 testsuite.d81 -keybuf &quot;Lo\\22:*\\22,8,1\\0dRu\\0d&quot; 
+
+&gt; &quot;under certain conditions&quot;... Do you have these conditions in a more
+&gt; specific way? This would help a lot.
+
+i can only say that it does sometimes work, but most of the time doesnt :)
+(various settings may be relevant there, even the rom image used for the
+drive)
+however, its irrelevant to know - the above fix solves the problem 
+alltogether :) like i said, it may not even really be a problem in vice,
+since you may get into simelar trouble with a real c64/drive :) (note: on
+a real c64 its more unlikely though, since most of the time the drive
+will be resetted properly together with the c64)
+
+&gt; &gt; NMI generated by rs232 freezes the emulator...frequently hitting
+&gt; &gt; &quot;restore&quot; will make the program go on like it should. this bug appeared
+&gt; &gt; after certain other nmi code was &quot;fixed&quot; :=P (not that it was broken
+&gt; &gt; before)
+&gt;
+&gt; Do you have a working demo?
+
+uhm... the contiki rs232 version :=P thats what i last tested it with :) i 
+think i have tried novaterm too with simelar results. (you can prolly
+hack a small testprog with cc65 easily :=P). if i remember right it even
+was enough to enable rs232 in vice, enable nmi from swithlink, and then
+send some data to the emu (the first nmi would make vice halt).
+
+&gt; Despite of hearsay, that's a bug report every developer likes!
+
+*G* i know :O) (i wasnt really writing this as a bug report - all these
+should be known)
+
+however the bug is that in &quot;attach disc image dialog&quot; (maybe others aswell)
+the TAB key will put literal (control-)characters into the textentry fields 
+and not jump to next widget as one would expect. (very useful if you have
+misplaced your wireless mouse again :=P)
+
+&gt; Where do you find better GUIs?
+
+1) i'm almost under the impression that &quot;any other non *nix system&quot; is the
+only answer to that, seen too much *nix programs that would probably be much
+more useful if they wouldnt be &quot;gui&quot; programs. (that doesnt mean there arent
+any good guis even for *nix, just many programmers seem to have a talent for
+choosing the widget library that is most annoying for the user :=) - or, like
+adam suggested, they basically hate the term &quot;user&quot; by itself and want them
+to suffer while using the program as much as they did while coding it :))
+[note: whoever is responsible for placing the &quot;crop to selection&quot; feature in
+gimp to where it is should be shot]
+
+2) i personally like the userinterface of ccs64 much more, i dont need a gui 
+at all. however if there *is* a gui, it shouldnt be one of those that require
+reading a book to be useful. (give yourself a try on using vice without a
+mouse once - and dont tell me gui programs dont need to be useable with a
+keyboard only :))
+
+&gt; If the reports are as specific as the one above, I understand why they
+&gt; don't listen. :-p
+[...]
+&gt; If the bug report is of this big &quot;quality&quot;, why should anyone forward it?
+&gt; There's almost no chance the bug will be even reproducible.
+
+we've been talking to andreas boose for half an hour or so, i'm pretty 
+sure that was enough to make clear what exactly the problem is :)
+
+&gt; Please remember that everyone is doing VICE as a hobby. 
+
+ofcourse, however, thats not an excuse either. quit your job, stay up
+late - satisfying someone used to scene standards requires more than
+just passion. (now dont get me wrong again will ya? :))
+
+&gt; Furthermore, think of some of your own comments on some mailing lists, 
+&gt; they are not always polite either.
+
+no, i'm not a big friend of beeing polite for the simple sake of not
+making anyone upset. if i think something sucks, i say exactly that.
+
+no offence really, thats just me :)
+
+gpz
+
+ps: as the others....anything further probably better in private mail :)
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20[very%20OT]%20KVM">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3606.html">Adam Thornton: "Re: [cc65] [very OT] KVM"</a>
+<li><strong>In reply to:</strong> <a href="3600.html">Spiro Trikaliotis: "Re: [cc65] [very OT] KVM"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="../2003-09/3514.html">Keates, Mark: "RE: [cc65] [very OT] KVM"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-10-10 05:09:08 CEST</em>
+</em>
+</small>
+</body>
+</html>

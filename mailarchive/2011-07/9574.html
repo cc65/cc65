@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Interrupt &lt;-&gt;  C run</title>
+<meta name="Author" content="Greg King (greg.king41verizon.net)" />
+<meta name="Subject" content="Re: [cc65] Interrupt &lt;-&gt;  C runtime environment" />
+<meta name="Date" content="2011-07-12" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Interrupt &lt;-&gt;  C runtime environment</h1>
+<!-- received="Tue Jul 12 19:55:39 2011" -->
+<!-- isoreceived="20110712175539" -->
+<!-- sent="Tue, 12 Jul 2011 12:44:15 -0400" -->
+<!-- isosent="20110712164415" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king41verizon.net" -->
+<!-- subject="Re: [cc65] Interrupt &lt;-&gt;  C runtime environment" -->
+<!-- id="000001cc40b4$71fd0500$443efea9@monarch" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="4E1A8406.4020903&#64;chello.at" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9575.html" title="Karri Kaksonen: &quot;Re: [cc65] TGI bitmap fnts revisited&quot;">Next message</a> ]
+[ <a href="9573.html" title="Greg King: &quot;Re: [cc65] Interrupt &lt;-&gt;  C runtime environment&quot;">Previous message</a> ]
+[ <a href="9558.html" title="marcas: &quot;Re: [cc65] Interrupt &lt;-&gt;  C runtime environment&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king41verizon.net?Subject=Re:%20[cc65]%20Interrupt%20&amp;lt;-&amp;gt;%20%20C%20runtime%20environment">greg.king41verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-07-12 18:44:15</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: &quot;marcas&quot;; on Monday, July 11, 2011; at 01:03 AM -0400
+&gt;
+&gt; My current ISR is able to handle small C code (e.g., uint8_t++ works;
+&gt; uint16_t++ works; uint32_t++ does not work, and results in weird
+&gt; behaviour).
+
+The CC65 package has a document called &quot;internal.txt&quot;.  It has knowledge
+that is useful to you.
+
+But, it doesn't describe 32-bit numbers!
+The 32-bit accumulator has two parts:  The lower 16 bits are stored in
+the CPU registers X and A; the upper 16 bits are stored in two bytes in
+the zero-page RAM.  That is another reason why your ISR must save and
+restore the ZEROPAGE segment.
+
+cc65's optimizer doesn't recognize &quot;(void) post-counting&quot;.  It generates
+code to preserve the variable's original value even when the statement
+doesn't use that value.  Therefore, you should do
+pre-increments/-decrements, instead of post-increments/-decrements,
+where-ever possible (e.g., ++uint8_t, ++uint16_t, and ++uint32_t).
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Jul 12 19:55:39 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9575.html" title="Next message in the list">Karri Kaksonen: "Re: [cc65] TGI bitmap fnts revisited"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9573.html" title="Previous message in the list">Greg King: "Re: [cc65] Interrupt &lt;-&gt;  C runtime environment"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9558.html" title="Message to which this message replies">marcas: "Re: [cc65] Interrupt &lt;-&gt;  C runtime environment"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9574" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9574" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9574" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-07-12 19:56:12 CEST
+</em></small></p>
+</body>
+</html>

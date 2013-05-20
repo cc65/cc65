@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] bank switching/retro repla</title>
+<meta name="Author" content="Thomas Giesel (skoe1directbox.com)" />
+<meta name="Subject" content="Re: [cc65] bank switching/retro replay?" />
+<meta name="Date" content="2009-11-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] bank switching/retro replay?</h1>
+<!-- received="Tue Nov 10 13:55:01 2009" -->
+<!-- isoreceived="20091110125501" -->
+<!-- sent="Tue, 10 Nov 2009 13:54:54" -->
+<!-- isosent="20091110125454" -->
+<!-- name="Thomas Giesel" -->
+<!-- email="skoe1directbox.com" -->
+<!-- subject="Re: [cc65] bank switching/retro replay?" -->
+<!-- id="172807D90B0A0C363612@directbox.com" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="[cc65] bank switching/retro replay?" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7528.html" title="Ullrich von Bassewitz: &quot;Re: Re: [cc65] bank switching/retro replay?&quot;">Next message</a> ]
+[ <a href="7526.html" title="Thomas Giesel: &quot;Re: Re: [cc65] bank switching/retro replay?&quot;">Previous message</a> ]
+[ <a href="7511.html" title="Johan Kotlinski: &quot;[cc65] bank switching/retro replay?&quot;">Maybe in reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7530.html" title="Fatih Aygün: &quot;[cc65] Overlaying segments?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Thomas Giesel &lt;<a href="mailto:skoe1directbox.com?Subject=Re:%20[cc65]%20bank%20switching/retro%20replay?">skoe1directbox.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-11-10 13:54:54</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Forgot something: It may be useful to have the bank history on stack to make 
+sure the function return works when banked functions call each other.
+So the trampoline code could restore the previous bank on return of the banked 
+function.
+
+-------- directBOX Reply ---------------
+From: skoe&#64;directbox&#46;<!--nospam-->com
+To  : cc65&#64;musoftware&#46;<!--nospam-->de
+Date: 10.11.2009 13:51:41
+
+
+Uz,
+
+Good idea, so the updated mechanism would be:
+
+1. Put (all) arguments on stack
+2. Load bank number into Y
+3. Load function address into AX
+4. Call generic trampoline function
+
+Sounds faster :)
+
+/ Thomas
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Nov 10 13:55:01 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7528.html" title="Next message in the list">Ullrich von Bassewitz: "Re: Re: [cc65] bank switching/retro replay?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7526.html" title="Previous message in the list">Thomas Giesel: "Re: Re: [cc65] bank switching/retro replay?"</a></li>
+<li><dfn>Maybe in reply to</dfn>: <a href="7511.html" title="Message to which this message replies">Johan Kotlinski: "[cc65] bank switching/retro replay?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7530.html" title="Next message in this discussion thread">Fatih Aygün: "[cc65] Overlaying segments?"</a></li>
+<li><a name="replies" id="replies"></a>
+<dfn>Maybe reply</dfn>: <a href="7523.html" title="Message sent in reply to this message">Thomas Giesel: "Re: Re: [cc65] bank switching/retro replay?"</a></li>
+<li><dfn>Maybe reply</dfn>: <a href="7526.html" title="Message sent in reply to this message">Thomas Giesel: "Re: Re: [cc65] bank switching/retro replay?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="7530.html" title="Message sent in reply to this message">Fatih Aygün: "[cc65] Overlaying segments?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7527" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7527" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7527" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-11-10 13:55:04 CET
+</em></small></p>
+</body>
+</html>

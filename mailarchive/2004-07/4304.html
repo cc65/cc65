@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Apple2 Libraries - Current</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Apple2 Libraries - Current status of file io ?" />
+<meta name="Date" content="2004-07-28" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Apple2 Libraries - Current status of file io ?</h1>
+<!-- received="Wed Jul 28 10:15:26 2004" -->
+<!-- isoreceived="20040728081526" -->
+<!-- sent="Wed, 28 Jul 2004 10:15:22 +0200" -->
+<!-- isosent="20040728081522" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Apple2 Libraries - Current status of file io ?" -->
+<!-- id="20040728081522.GA24496@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="41065A7D.7080504&#64;comcast.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4305.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Apple2 Libraries - Current status of file io ?&quot;">Next message</a> ]
+[ <a href="4303.html" title="iAN CooG: &quot;Re: [cc65] Newbie-Question&quot;">Previous message</a> ]
+[ <a href="4301.html" title="jim: &quot;Re: [cc65] Apple2 Libraries - Current status of file io ?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4307.html" title="jim: &quot;Re: [cc65] Apple2 Libraries - Current status of file io ?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Apple2%20Libraries%20-%20Current%20status%20of%20file%20io%20?">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-07-28 10:15:22</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Tue, Jul 27, 2004 at 09:37:01AM -0400, jim wrote:
+&gt;  int fstat(int fd, struct stat *buf);  /* standard POSIX call */
+&gt;  int dio_get_file_info(int fd, struct a2_stat *buf);  /* apple namespace */
+
+I haven't looked further into the issue, but it's probably not a good idea to
+add the latter to the dio api. dio was made to allow low level (not file
+oriented) disk i/o. The function could be made apple2 specific, however.
+
+&gt; I am looking for a status of what's been done and if we're even
+&gt; compatible.  Oliver might be working on ProDOS 16 implementation where
+&gt; I'm working in ProDOS 8.
+
+Does this mean there are several different file I/O libraries needed for the
+Apple? If so, would it be possible to find a common denominator for all of
+them?
+
+&gt; I'm not too sure what you mean by this.  Functionally ? Internal
+&gt; structure ? Syntax ?
+
+I'm trying to keep the overall design consistent. This extends into several
+areas, internal structure is one of them. Portability is another: Anything
+that could be done in a portable way, shouldn't have a platform specific
+solution. If it is not possible to make something completely portable, it is
+often possible to split it into a platform independent part and a platform
+dependent one. I'm trying to make the platform independent part as large as
+possible (share as much code among the platforms as possible), because this is
+easier to test and to maintain.
+
+&gt; For example: I've coded the Apple libraries to correspond with the POSIX
+&gt; calls
+&gt; int chdir(const char* path);
+&gt; int __fastcall__ close(int fd);
+&gt; int creat(const char *name, mode_t mode);
+&gt; int flush (int fd);
+&gt;  ... and so on ...
+
+Good approach, this is how it should be! However, there's at least one
+problem: The library does already have a chdir function in the common
+(platform independent) part. It calls a platform specific function named
+__syschdir which must return a platform specific error code in A (similar to
+remove(), which calls __sysremove).
+
+As you can see from the above, I'm trying to get overall structure right, so
+the parts and platform code fit together nicely.
+
+&gt; The hacks in the write and read functions have been worked with so that
+&gt; using the STDIO consts work.
+
+Great! This is how it should work. Does reopening these streams also work?
+
+        freopen (stdout, &quot;w&quot;, &quot;output.txt&quot;);
+
+A perfect solution would even allow to close and reopen the low level file
+descriptors (STDIN_FILENO, STDOUT_FILENO and STDERR_FILENO), and reopen them
+pointing to a file. This is difficult on some platforms, and not implemented
+everywhere, so don't bother if you have hardcoded checks for the standard file
+descriptors (which means that reassigning them will not work).
+
+If you're doing larger changes/additions, I would suggest to check back with
+me early. It is frustrating if you have spent several weekends to code the
+ultimate cc65 addition, just to have me reject it for some reasons you didn't
+know when you started. Or, request large changes. And, believe me, having to
+do this is also very frustrating for me!
+
+I'm glad about every cc65 contribution. But I do also want to keep cc65 clean
+and consistent. It wouldn't be helpful to accept contributions just to be
+polite, even if they do not fit into the overall concept or if there are some
+other reasons, they shouldn't go into the main distribution. This would
+ultimately make cc65 a mess. Checking back with me early helps to resolve any
+problems that might arise with a contribution and therefore reduce the
+frustration for both of us.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Jul 28 10:15:26 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4305.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4303.html" title="Previous message in the list">iAN CooG: "Re: [cc65] Newbie-Question"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4301.html" title="Message to which this message replies">jim: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4307.html" title="Next message in this discussion thread">jim: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4307.html" title="Message sent in reply to this message">jim: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="4309.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4304" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4304" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4304" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-07-28 10:15:35 CEST
+</em></small></p>
+</body>
+</html>

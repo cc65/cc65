@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Common macros for dirent.d</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Common macros for dirent.d_type" />
+<meta name="Date" content="2012-06-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Common macros for dirent.d_type</h1>
+<!-- received="Mon Jun 25 20:42:56 2012" -->
+<!-- isoreceived="20120625184256" -->
+<!-- sent="Mon, 25 Jun 2012 20:42:40 +0200" -->
+<!-- isosent="20120625184240" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Common macros for dirent.d_type" -->
+<!-- id="20120625184240.GA12876@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="CACT=u70CBTXU-XnAKOhz611VuUTUeH=BCvLtzEwop+g1VD0+7A&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10404.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Common macros for dirent.d_type&quot;">Next message</a> ]
+[ <a href="10402.html" title="Payton Byrd: &quot;[cc65] C64 Userport Serial Driver&quot;">Previous message</a> ]
+[ <a href="10401.html" title="Oliver Schmidt: &quot;Re: [cc65] Common macros for dirent.d_type&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10406.html" title="Groepaz: &quot;Re: [cc65] Common macros for dirent.d_type&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Common%20macros%20for%20dirent.d_type">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-06-25 20:42:40</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Mon, Jun 25, 2012 at 06:23:10PM +0200, Oliver Schmidt wrote:
+&gt; &gt;&gt; Maybe I get you wrong but the macros in question are taking the d_type
+&gt; &gt;&gt; field as parameter. So if there's no d_type at all you'd get a
+&gt; &gt;&gt; compiler error.
+&gt; &gt;
+&gt; &gt; #define _DE_ISREG(t)    0
+&gt; &gt;
+&gt; &gt; how does that result in a compiler error? code that is written the &quot;typical&quot;
+&gt; &gt; way using these macros might even work correctly without change =P
+&gt;
+&gt; A misunderstanding. Now I see your point. I'll add those...
+
+Sorry, but I don't get it. I'm opposed to using #ifdef as well, but what help
+would it be defining the macros for platforms that don't have d_type?
+
+If one has _DE_ISREG() for platforms that have d_type, one would code
+
+    unsigned char regular_file;
+    ...
+    #ifdef _DE_ISREG
+        regular_file = _DE_ISREG(e.d_type);
+    #else
+        regular_file = 1;
+    #endif
+
+catching all possible cases. The code above is compatible with all current and
+future platforms. If _DE_ISREG is defined as in Groepaz example, there is
+nothing one can use to detect a platform that doesn't have d_type. Using
+something like
+
+    #if defined(__ATARI__)
+        regular_file = 1;
+    #else
+        regular_file = _DE_ISREG(e.d_type);
+    #endif
+
+would be the result. Where's the advantage? Code would have to be fixed for
+each and every upcoming platform and maybe even for new compiler releases.
+
+What I could think of would be to make the d_type field a requirement *AND*
+use dummy #defines for _DE_ISxxx. This is similar as the Lynx does. It would
+waste a single byte for platforms that don't have it now, but would remove the
+need for #if checks alltogether.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Jun 25 20:42:56 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10404.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10402.html" title="Previous message in the list">Payton Byrd: "[cc65] C64 Userport Serial Driver"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10401.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10406.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10406.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10412.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10403" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10403" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10403" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-06-25 20:42:59 CEST
+</em></small></p>
+</body>
+</html>

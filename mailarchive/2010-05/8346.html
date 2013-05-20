@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] C128 Bank Switching and cc65</title>
+<meta name="Author" content="Payton Byrd (plbyrd1gmail.com)" />
+<meta name="Subject" content="[cc65] C128 Bank Switching and cc65" />
+<meta name="Date" content="2010-05-05" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] C128 Bank Switching and cc65</h1>
+<!-- received="Wed May  5 02:31:19 2010" -->
+<!-- isoreceived="20100505003119" -->
+<!-- sent="Tue, 4 May 2010 19:30:52 -0500" -->
+<!-- isosent="20100505003052" -->
+<!-- name="Payton Byrd" -->
+<!-- email="plbyrd1gmail.com" -->
+<!-- subject="[cc65] C128 Bank Switching and cc65" -->
+<!-- id="l2s1adf4c761005041730o5462cbcas9fd0339ce4616329@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8347.html" title="Mark J. Reed: &quot;Re: [cc65] Need some help with a memory leak&quot;">Next message</a> ]
+[ <a href="8345.html" title="Greg King: &quot;Re: [cc65] Need some help with a memory leak&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8350.html" title="Payton Byrd: &quot;[cc65] Re: C128 Bank Switching and cc65&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Payton Byrd &lt;<a href="mailto:plbyrd1gmail.com?Subject=Re:%20[cc65]%20C128%20Bank%20Switching%20and%20cc65">plbyrd1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-05-05 02:30:52</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>OK, I'm at the point where the 128 version of my program is simply running
+out of RAM and is incapable of storing large directories any longer.  The
+executable code is around 17.3K and I don't know how to tell the running
+size, but I can tell you that another 2000 bytes are consumed by the VIC
+screen buffers.  I'm looking for suggestions on how to free up some RAM or
+how to use banking intelligently with cc65.
+
+I see from the C128 PRG that it's possible to setup 16K of RAM that is
+&quot;shared&quot; between both 64K banks of RAM; in other words a write to the
+&quot;shared&quot; memory results in the same data being available when using either
+bank 0 or bank 1 of RAM within the &quot;shared&quot; memory areas.  I'm wondering if
+the linker can be configured to write specific segments of C code into the
+shared memory which would allow me to  have two 48K blocks to work with for
+data instead of a single 48K block (which has to include VIC, IO blocks and
+the kernel).
+
+Another question I have is whether or not the default C128 memory setup used
+by ld65 disables the BASIC ROM and frees that memory up for RAM.  the BASIC
+ROM for the 128 is HUGE compared to the 64 and I don't need it!  Likewise,
+does the default C64 memory setup used by ld65 disable the BASIC ROM?
+
+Finally, and this has nothing to do with banking, is it possible to have a
+specific array be allocated to a specific memory location?  I would like to
+be able to memcopy the VIC's screen from one page in the 16K allocated to
+the VIC to another page in the 16K allocated to the VIC.  This would free up
+1000 bytes of main memory for me.  If I could also do this with the color
+map then that would free up another 1000 bytes of main memory for me.
+
+Thanks again to everyone for the their help the last couple of weeks.  This
+project would not be anywhere near the state it's in without your help.
+-- 
+Payton Byrd
+&lt;<a href="http://www.paytonbyrd.com">http://www.paytonbyrd.com</a>&gt;
+&lt;<a href="http://it.toolbox.com/blogs/paytonbyrd">http://it.toolbox.com/blogs/paytonbyrd</a>&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed May  5 02:31:19 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8347.html" title="Next message in the list">Mark J. Reed: "Re: [cc65] Need some help with a memory leak"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8345.html" title="Previous message in the list">Greg King: "Re: [cc65] Need some help with a memory leak"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8350.html" title="Next message in this discussion thread">Payton Byrd: "[cc65] Re: C128 Bank Switching and cc65"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8350.html" title="Message sent in reply to this message">Payton Byrd: "[cc65] Re: C128 Bank Switching and cc65"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8354.html" title="Message sent in reply to this message">Daniel Pralle: "Re: [cc65] C128 Bank Switching and cc65"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8360.html" title="Message sent in reply to this message">Chiron Bramberger: "Re: [cc65] C128 Bank Switching and cc65"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8346" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8346" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8346" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-05-05 02:31:22 CEST
+</em></small></p>
+</body>
+</html>

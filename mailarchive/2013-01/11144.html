@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Why does sizeof(string) genera</title>
+<meta name="Author" content="Stefan (vorsichtphysiker1gmx.net)" />
+<meta name="Subject" content="[cc65] Why does sizeof(string) generates data?" />
+<meta name="Date" content="2013-01-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Why does sizeof(string) generates data?</h1>
+<!-- received="Fri Jan 25 20:22:01 2013" -->
+<!-- isoreceived="20130125192201" -->
+<!-- sent="Fri, 25 Jan 2013 20:21:52 +0100" -->
+<!-- isosent="20130125192152" -->
+<!-- name="Stefan" -->
+<!-- email="vorsichtphysiker1gmx.net" -->
+<!-- subject="[cc65] Why does sizeof(string) generates data?" -->
+<!-- id="20130125192152.237520@gmx.net" -->
+<!-- charset="utf-8" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11145.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Why does sizeof(string) generates data?&quot;">Next message</a> ]
+[ <a href="11143.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] linker config Q&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="11145.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Why does sizeof(string) generates data?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Stefan &lt;<a href="mailto:vorsichtphysiker1gmx.net?Subject=Re:%20[cc65]%20Why%20does%20sizeof(string)%20generates%20data?">vorsichtphysiker1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2013-01-25 20:21:52</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Is there a reason why this code needs data in the executable?
+
+#define STRING &quot;test1234&quot;
+
+static char len = sizeof(STRING);	
+void main(void)
+{
+
+}
+
+translates into (cc65)
+
+000000r 1               _len:
+000000r 1  09           	.byte	$09
+000001r 1               
+000001r 1               .segment	&quot;RODATA&quot;
+000000r 1               
+000000r 1               L0002:
+000000r 1  54 45 53 54  	.byte	$54,$45,$53,$54,$31,$32,$33,$34,$00
+000004r 1  31 32 33 34  
+000008r 1  00           
+000009r 1               
+000009r 1               ; ---------------------------------------------------------------
+000009r 1               ; void __near__ main (void)
+000009r 1               ; ---------------------------------------------------------------
+000009r 1               
+000009r 1               .segment	&quot;CODE&quot;
+000000r 1               
+000000r 1               .proc	_main: near
+000000r 1               
+000000r 1               .segment	&quot;CODE&quot;
+000000r 1               
+000000r 1  60           	rts
+000001r 1               
+000001r 1               .endproc
+000001r 1               
+000001r 1       
+
+while gcc translates it into:
+
+	.file	&quot;stringmacrotest.c&quot;
+	.data
+_len:
+	.byte	9
+	.def	___main;	.scl	2;	.type	32;	.endef
+	.text
+	.globl	_main
+	.def	_main;	.scl	2;	.type	32;	.endef
+_main:
+LFB0:
+	.cfi_startproc
+	pushl	%ebp
+	.cfi_def_cfa_offset 8
+	.cfi_offset 5, -8
+	movl	%esp, %ebp
+	.cfi_def_cfa_register 5
+	andl	$-16, %esp
+	call	___main
+	leave
+	.cfi_restore 5
+	.cfi_def_cfa 4, 4
+	ret
+	.cfi_endproc
+LFE0:
+
+where there is no sign of string data in the end file.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Jan 25 20:22:01 2013</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11145.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Why does sizeof(string) generates data?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="11143.html" title="Previous message in the list">silverdr1wfmh.org.pl: "Re: [cc65] linker config Q"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="11145.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Why does sizeof(string) generates data?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="11145.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Why does sizeof(string) generates data?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#11144" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#11144" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#11144" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2013-01-25 20:22:05 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Compile error</title>
+<meta name="Author" content="Mario Fetka (mario-fetka1gmx.at)" />
+<meta name="Subject" content="Re: [cc65] Compile error" />
+<meta name="Date" content="2007-05-12" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Compile error</h1>
+<!-- received="Sat May 12 20:32:36 2007" -->
+<!-- isoreceived="20070512183236" -->
+<!-- sent="Sat, 12 May 2007 20:32:06 +0200" -->
+<!-- isosent="20070512183206" -->
+<!-- name="Mario Fetka" -->
+<!-- email="mario-fetka1gmx.at" -->
+<!-- subject="Re: [cc65] Compile error" -->
+<!-- id="200705122032.11902.mario-fetka@gmx.at" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="20070512181143.GA14435&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5677.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Compile error&quot;">Next message</a> ]
+[ <a href="5675.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Compile error&quot;">Previous message</a> ]
+[ <a href="5675.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Compile error&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5677.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Compile error&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Mario Fetka &lt;<a href="mailto:mario-fetka1gmx.at?Subject=Re:%20[cc65]%20Compile%20error">mario-fetka1gmx.at</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-05-12 20:32:06</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Am Samstag, 12. Mai 2007 20:11:43 schrieb Ullrich von Bassewitz:
+&gt; Hi!
+&gt;
+&gt; On Sat, May 12, 2007 at 02:57:15PM +0200, Mario Fetka wrote:
+&gt; &gt; i am creating a gentoo ebuild for cc65
+&gt; &gt;
+&gt; &gt; but it stops compiling on make -C libsrc
+&gt;
+&gt; Are the compiler &amp; tools executables built without errors? For example,
+&gt; does src/cc65/cc65 exist after &quot;make -C src -f make/gcc.mak&quot;?
+&gt;
+&gt; Regards
+&gt;
+&gt;
+&gt;         Uz
+
+Yes they all exist and
+
+thats the cracy thing
+
+make: Entering directory 
+`/var/tmp/portage/dev-embedded/cc65-2.11.9.20070329/work/cc65-snapshot-2.11.9.20070329/libsrc'
+for tgt in apple2 apple2enh atari atmos c16 c128 c64 cbm510 cbm610 geos lynx 
+nes pet plus4 supervision vic20; do                \
+            make clean &quot;$tgt&quot;lib || exit 1;     \
+        done
+make[1]: Entering directory 
+`/var/tmp/portage/dev-embedded/cc65-2.11.9.20070329/work/cc65-snapshot-2.11.9.20070329/libsrc'
+for i in apple2 common runtime conio dbg em joystick mouse serial tgi zlib; do 
+\
+            make SYS=apple2 -C $i || exit 1; \
+            ../src/ar65/ar65 a apple2.lib $i/*.o;\
+        done
+make[2]: Entering directory 
+`/var/tmp/portage/dev-embedded/cc65-2.11.9.20070329/work/cc65-snapshot-2.11.9.20070329/libsrc/cbm'
+make[2]: Entering directory 
+`/var/tmp/portage/dev-embedded/cc65-2.11.9.20070329/work/cc65-snapshot-2.11.9.20070329/libsrc/apple2'
+make[2]: Leaving directory 
+`/var/tmp/portage/dev-embedded/cc65-2.11.9.20070329/work/cc65-snapshot-2.11.9.20070329/libsrc/cbm'
+make[2]: Entering directory 
+`/var/tmp/portage/dev-embedded/cc65-2.11.9.20070329/work/cc65-snapshot-2.11.9.20070329/libsrc/common'
+make[2]: Leaving directory 
+`/var/tmp/portage/dev-embedded/cc65-2.11.9.20070329/work/cc65-snapshot-2.11.9.20070329/libsrc/common'
+make[2]: Entering directory 
+`/var/tmp/portage/dev-embedded/cc65-2.11.9.20070329/work/cc65-snapshot-2.11.9.20070329/libsrc/conio'
+make[2]: Leaving directory 
+`/var/tmp/portage/dev-embedded/cc65-2.11.9.20070329/work/cc65-snapshot-2.11.9.20070329/libsrc/conio'
+make -C ../runtime/ zeropage.o
+make[3]: Entering directory 
+`/var/tmp/portage/dev-embedded/cc65-2.11.9.20070329/work/cc65-snapshot-2.11.9.20070329/libsrc/runtime'
+make[3]: Leaving directory 
+`/var/tmp/portage/dev-embedded/cc65-2.11.9.20070329/work/cc65-snapshot-2.11.9.20070329/libsrc/runtime'
+rm apple2-ssc.o apple2-auxmem.o apple2-280-192-6.o apple2-stdmou.o 
+apple2-stdjoy.o apple2-40-40-16.o apple2-lc.o
+make[2]: Leaving directory 
+`/var/tmp/portage/dev-embedded/cc65-2.11.9.20070329/work/cc65-snapshot-2.11.9.20070329/libsrc/apple2'
+ar65: Warning: Library `apple2.lib' not found - will be created                                    
+make[2]: Entering directory 
+`/var/tmp/portage/dev-embedded/cc65-2.11.9.20070329/work/cc65-snapshot-2.11.9.20070329/libsrc/dbg'
+make[2]: Leaving directory 
+`/var/tmp/portage/dev-embedded/cc65-2.11.9.20070329/work/cc65-snapshot-2.11.9.20070329/libsrc/dbg'
+make[2]: Entering directory 
+`/var/tmp/portage/dev-embedded/cc65-2.11.9.20070329/work/cc65-snapshot-2.11.9.20070329/libsrc/em'
+make[2]: Leaving directory 
+`/var/tmp/portage/dev-embedded/cc65-2.11.9.20070329/work/cc65-snapshot-2.11.9.20070329/libsrc/em'
+make[2]: Entering directory 
+`/var/tmp/portage/dev-embedded/cc65-2.11.9.20070329/work/cc65-snapshot-2.11.9.20070329/libsrc/joystick'
+make[2]: Leaving directory 
+`/var/tmp/portage/dev-embedded/cc65-2.11.9.20070329/work/cc65-snapshot-2.11.9.20070329/libsrc/joystick'
+make[2]: Entering directory 
+`/var/tmp/portage/dev-embedded/cc65-2.11.9.20070329/work/cc65-snapshot-2.11.9.20070329/libsrc/mouse'
+make[2]: Leaving directory 
+`/var/tmp/portage/dev-embedded/cc65-2.11.9.20070329/work/cc65-snapshot-2.11.9.20070329/libsrc/mouse'
+make[2]: Entering directory 
+`/var/tmp/portage/dev-embedded/cc65-2.11.9.20070329/work/cc65-snapshot-2.11.9.20070329/libsrc/runtime'
+make[2]: Leaving directory 
+`/var/tmp/portage/dev-embedded/cc65-2.11.9.20070329/work/cc65-snapshot-2.11.9.20070329/libsrc/runtime'
+
+
+
+wfg
+Mario
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<div>
+<ul>
+<li>application/pgp-signature attachment: <a href="../att-5676/signature.asc_">This is a digitally signed message part.</a></li>
+</ul>
+<!-- attachment="signature.asc_" -->
+</div>
+<span id="received"><dfn>Received on</dfn> Sat May 12 20:32:36 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5677.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Compile error"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5675.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Compile error"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5675.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Compile error"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5677.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Compile error"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5677.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Compile error"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5676" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5676" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5676" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-05-12 20:32:39 CEST
+</em></small></p>
+</body>
+</html>

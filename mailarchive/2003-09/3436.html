@@ -1,0 +1,165 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Supervision support</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] Supervision support">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Supervision support</h1>
+<!-- received="Tue Sep 23 11:04:35 2003" -->
+<!-- isoreceived="20030923090435" -->
+<!-- sent="Tue, 23 Sep 2003 11:04:32 +0200" -->
+<!-- isosent="20030923090432" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] Supervision support" -->
+<!-- id="20030923090432.GA25740@trixie.musoftware.de" -->
+<!-- inreplyto="3F6EC94F.2010701@utanet.at" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Supervision%20support"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-09-23 11:04:32
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3435.html">MagerValp: "Re: [cc65] CRC-32"</a>
+<li><strong>In reply to:</strong> <a href="3427.html">Peter Trauner: "[cc65] Supervision support"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3473.html">Peter Trauner: "Re: [cc65] Supervision support"</a>
+<li><strong>Reply:</strong> <a href="3473.html">Peter Trauner: "Re: [cc65] Supervision support"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Mon, Sep 22, 2003 at 12:05:03PM +0200, Peter Trauner wrote:
+&gt; Since this is a console and the program is in ROM, how do I
+&gt; initialize/handle
+&gt; non const global variables?
+
+You must use different LOAD and RUN addresses and copy the variables from ROM
+into the RAM. For a standard DATA segment, there's a routine named copydata in
+the library which does exactly this - you will have to call it in your startup
+file.
+
+&gt; Is it possible to prevent read only accesses from write only io ports?
+
+No, if the hardware doesn't have this feature, you cannot prevent it by
+software.
+
+&gt; Is it safe to call c functions from irq, nmi?
+
+In general: no. The reason is decribed here:
+
+        <a href="http://www.cc65.org/faq.php#IntHandlers">http://www.cc65.org/faq.php#IntHandlers</a>
+
+&gt; I have 4 linker configuration files for 16, 32, 64, 128kbyte cartridges
+&gt; (64, 128kbyte are bankswitched).
+&gt; Is it allowed to support several supervision targets?
+
+I would prefer not to have more than one builtin config per platform, so you
+will have to choose the most common one. It is not more difficult for a user
+to say &quot;-C sv128.cfg&quot; on the command line instead of &quot;-t sv-128&quot;. The reason
+for the builtin configurations is not to save the user the trouble to use
+configuration files at all.
+
+&gt; PS: I attached my work files
+&gt; (how must I deliver/integrate supervision support in cc65?)
+&gt; (some remarks about my first cc65 usage?)
+
+[Next time, please place the files somewhere onto a web or ftp server and just
+post a link.]
+
+As far as I can see, there are several smaller issues with the files, but
+nothing serious:
+
+  1. Assembler files are named xxx.s, not xxx.asm
+
+  2. All upper case names are used for #defines, structs shouldn't use it.
+
+  3. Some stuff is already available in the library and should be reused (like
+     hex2asc).
+
+  4. I prefer not to have code commented out. If it is not needed, remove it,
+     if it is needed, enable it. Especially .if/.ifdef is ugly and problematic
+     to maintain, because some code path is not executed and tested when
+     making changes.
+
+  5. Some stuff is targeted for the 2.9 versions and should be adapted to work
+     with the head branch.
+
+  6. Not sure about the functions in common.asm: I don't like the idea to have
+     functions that are similar to the ones from conio but with other names
+     and prototypes.
+
+  7. I prefer not to have unneeded types and defines like &quot;byte&quot; and &quot;word&quot;
+     defined in some header file, because this may collide with identifiers
+     used by a program. This is especially true for &quot;true&quot; and &quot;false&quot; because
+     for C99 these are even in the standard. In general: Since you are on the
+     &quot;other side&quot; of the code (you are writing an implementation, not a
+     program), please try to be as careful as possible when introducing new
+     types and names: Someone may have a program that does already use the
+     types/names in question.
+
+  8. A few structural changes to the headers to make them similar to the
+     existing ones would be nice.
+
+Anything mentioned above assumes inclusion into the main cc65 package - if
+you're planing to distribute your files separately, only 5. and maybe 7. is of
+relevance.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Supervision%20support">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Supervision%20support">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3435.html">MagerValp: "Re: [cc65] CRC-32"</a>
+<li><strong>In reply to:</strong> <a href="3427.html">Peter Trauner: "[cc65] Supervision support"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3473.html">Peter Trauner: "Re: [cc65] Supervision support"</a>
+<li><strong>Reply:</strong> <a href="3473.html">Peter Trauner: "Re: [cc65] Supervision support"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-09-23 11:08:05 CEST</em>
+</em>
+</small>
+</body>
+</html>

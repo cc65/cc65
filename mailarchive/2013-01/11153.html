@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] ld65 does not accept external </title>
+<meta name="Author" content="Gábor Lénárt (lgb1lgb.hu)" />
+<meta name="Subject" content="[cc65] ld65 does not accept external cfg file for o65 output?" />
+<meta name="Date" content="2013-01-27" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] ld65 does not accept external cfg file for o65 output?</h1>
+<!-- received="Sun Jan 27 22:59:35 2013" -->
+<!-- isoreceived="20130127215935" -->
+<!-- sent="Sun, 27 Jan 2013 22:53:48 +0100" -->
+<!-- isosent="20130127215348" -->
+<!-- name="Gábor Lénárt" -->
+<!-- email="lgb1lgb.hu" -->
+<!-- subject="[cc65] ld65 does not accept external cfg file for o65 output?" -->
+<!-- id="20130127215348.GA13945@vega.lgb.hu" -->
+<!-- charset="iso-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="11154.html" title="Gábor Lénárt: &quot;Re: [cc65] ld65 does not accept external cfg file for o65 output?&quot;">Next message</a> ]
+[ <a href="11152.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Why does sizeof(string) generates data?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="11154.html" title="Gábor Lénárt: &quot;Re: [cc65] ld65 does not accept external cfg file for o65 output?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Gábor Lénárt &lt;<a href="mailto:lgb1lgb.hu?Subject=Re:%20[cc65]%20ld65%20does%20not%20accept%20external%20cfg%20file%20for%20o65%20output?">lgb1lgb.hu</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2013-01-27 22:53:48</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+$ ld65 --dump-config lunix &gt; lunix.cfg
+
+Ok, now I have dumped the configuration for lunix.
+
+If I try to use it:
+
+$ ld65 --cfg-path lunix.cfg test.o
+ld65: Error: Memory configuration missing
+
+But if I try the built-in cfg:
+
+$ ld65 -t lunix test.o
+ld65: Warning: [builtin config](8): Segment `STARTUP' does not exist
+ld65: Error: Unresolved export: `main'
+
+(the actual error is OK here, since it's only a test without anything
+in the test.asm, test.o was compiled from)
+
+Now I am not sure I understand this: if --dump-config dumps exactly the
+internal configuration used by '-t ...' why can't I use that without
+'Memory configuration missing' when it works with the '-t' what is dumped
+for the first test?
+
+The original problem that I wanted to create my own ld config file with o65 as
+output and I always got 'Memory configuration missing' by ld65, whatever I
+tried, so I checked out an already existing configuration using the o65
+format, but it seems the issue remains: even with builtin (so treated as &quot;it
+must be OK&quot;) ld65 refuses to work with it.
+
+$ ld65 --version
+ld65 V2.13.3 - (C) Copyright 1998-2009, Ullrich von Bassewitz
+
+I'm sure I was the one who missed something, but I can't figure out what ...
+
+Thanks!
+
+- Gábor
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Jan 27 22:59:35 2013</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="11154.html" title="Next message in the list">Gábor Lénárt: "Re: [cc65] ld65 does not accept external cfg file for o65 output?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="11152.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Why does sizeof(string) generates data?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="11154.html" title="Next message in this discussion thread">Gábor Lénárt: "Re: [cc65] ld65 does not accept external cfg file for o65 output?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="11154.html" title="Message sent in reply to this message">Gábor Lénárt: "Re: [cc65] ld65 does not accept external cfg file for o65 output?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#11153" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#11153" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#11153" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2013-01-27 22:59:40 CET
+</em></small></p>
+</body>
+</html>

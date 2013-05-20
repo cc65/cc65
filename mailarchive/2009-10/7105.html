@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Building with custom CC an</title>
+<meta name="Author" content="Per Olofsson (magervalp1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] Building with custom CC and CFLAGS" />
+<meta name="Date" content="2009-10-01" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Building with custom CC and CFLAGS</h1>
+<!-- received="Thu Oct  1 08:24:53 2009" -->
+<!-- isoreceived="20091001062453" -->
+<!-- sent="Thu, 1 Oct 2009 08:24:48 +0200" -->
+<!-- isosent="20091001062448" -->
+<!-- name="Per Olofsson" -->
+<!-- email="magervalp1gmail.com" -->
+<!-- subject="Re: [cc65] Building with custom CC and CFLAGS" -->
+<!-- id="1b8385e00909302324k4f9f44f4vb51804f37bb12419@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="002301ca41b1$c9816e00$640fbf47&#64;monarch" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7106.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] optimization bug in rc1&quot;">Next message</a> ]
+[ <a href="7104.html" title="Johan Kotlinski: &quot;[cc65] optimization bug in rc1&quot;">Previous message</a> ]
+[ <a href="../2009-09/7101.html" title="Greg King: &quot;Re: [cc65] Building with custom CC and CFLAGS&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7107.html" title="Greg King: &quot;Re: [cc65] Building with custom CC and CFLAGS&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Per Olofsson &lt;<a href="mailto:magervalp1gmail.com?Subject=Re:%20[cc65]%20Building%20with%20custom%20CC%20and%20CFLAGS">magervalp1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-10-01 08:24:48</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Wed, Sep 30, 2009 at 11:38 AM, Greg King &lt;greg.king4&#64;verizon&#46;<!--nospam-->net&gt; wrote:
+&gt; From: &quot;Per Olofsson&quot;; on Monday, Sept. 28, 2009; at 09:54 AM -0400
+&gt;&gt; On Mon, Sep 28, 2009 at 2:17 PM, Greg King wrote:
+&gt;&gt; &gt; You just will have to settle for two commands:
+&gt;&gt; &gt;
+&gt;&gt; &gt; make -f make/gcc.mak bins docs CC=clang CFLAGS=-O4
+&gt;&gt;
+&gt;&gt; That doesn't work, because gcc.mak, itself, calls make,
+&gt;&gt; without CC and CFLAGS.
+&gt;
+&gt; Try it again.  I &quot;tore down&quot; a fence that used to block those assignments.
+
+I did, and sent you a patch that fixes it in a nicer way, since it
+also solves problem 2:
+
+&gt; make bins docs CC=clang CFLAGS=-O4
+&gt; make libs
+&gt;
+&gt; Hmm, I just had a thought:  maybe, I can ask Gnu make about the origin of
+&gt; CC.  When it does not come from the command line, the make-file can run the
+&gt; &quot;libs&quot; rule.  I'll check the docs...
+
+With my changes you can build with a single make command, and specify
+CC and CFLAGS inside the makefile. Much cleaner:
+
+--- cc65-2.13/make/gcc.mak	2009-10-01 08:23:45.000000000 +0200
++++ cc65/make/gcc.mak	2009-09-29 15:08:48.000000000 +0200
+&#64;&#64; -14,6 +14,10 &#64;&#64;
+ #MAKEOVERRIDES=
+ # (That trick has been disabled.)
+
++# To compile with custom make options, set them here, for example:
++MAKEOPTS = CC=clang CFLAGS=-O4 -j 2
++#MAKEOPTS =
++
+ # The install prefix and directories
+ prefix		= /usr/local
+ exec_prefix	= $(prefix)
+&#64;&#64; -58,7 +62,7 &#64;&#64;
+ all:	bins libs docs $(SYS:%=samples tests)
+
+ bins:
+-	&#64;$(MAKE) -C src -f make/gcc&#46;<!--nospam-->mak CA65_INC=\\\&quot;${CA65_INC}/\\\&quot; \
++	&#64;$(MAKE) $(MAKEOPTS) -C src -f make/gcc&#46;<!--nospam-->mak CA65_INC=\\\&quot;${CA65_INC}/\\\&quot; \
+ 	  CC65_INC=\\\&quot;${CC65_INC}/\\\&quot; LD65_CFG=\\\&quot;${LD65_CFG}/\\\&quot; \
+ 	  LD65_LIB=\\\&quot;${LD65_LIB}/\\\&quot; LD65_OBJ=\\\&quot;${LD65_OBJ}/\\\&quot;
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Oct  1 08:24:53 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7106.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] optimization bug in rc1"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7104.html" title="Previous message in the list">Johan Kotlinski: "[cc65] optimization bug in rc1"</a></li>
+<li><dfn>In reply to</dfn>: <a href="../2009-09/7101.html" title="Message to which this message replies">Greg King: "Re: [cc65] Building with custom CC and CFLAGS"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7107.html" title="Next message in this discussion thread">Greg King: "Re: [cc65] Building with custom CC and CFLAGS"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7107.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] Building with custom CC and CFLAGS"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7105" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7105" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7105" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-10-01 08:24:56 CEST
+</em></small></p>
+</body>
+</html>

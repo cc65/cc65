@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-7">
+<title>cc65 mailing list archive: [cc65] Strange problem</title>
+<meta name="Author" content="Shawn Jefferson (sjefferson_at_sd62.bc.ca)">
+<meta name="Subject" content="[cc65] Strange problem">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] Strange problem</h1>
+<!-- received="Thu Feb  6 01:11:16 2003" -->
+<!-- isoreceived="20030206001116" -->
+<!-- sent="Wed, 05 Feb 2003 16:10:33 -0800" -->
+<!-- isosent="20030206001033" -->
+<!-- name="Shawn Jefferson" -->
+<!-- email="sjefferson_at_sd62.bc.ca" -->
+<!-- subject="[cc65] Strange problem" -->
+<!-- id="se4137a1.095@gwmail.sd62.bc.ca" -->
+<!-- charset="ISO-8859-7" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Shawn Jefferson (<a href="mailto:sjefferson_at_sd62.bc.ca?Subject=Re:%20[cc65]%20Strange%20problem"><em>sjefferson_at_sd62.bc.ca</em></a>)<br>
+<strong>Date:</strong> 2003-02-06 01:10:33
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2416.html">Groepaz: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="../2002-07/1495.html">cbmnut_at_hushmail.com: "Re: [cc65] Strange problem"</a>
+<li><strong>Maybe reply:</strong> <a href="../2002-07/1495.html">cbmnut_at_hushmail.com: "Re: [cc65] Strange problem"</a>
+<li><strong>Maybe reply:</strong> <a href="../2002-07/1500.html">Christian Groessler: "Re: [cc65] Strange problem"</a>
+<li><strong>Maybe reply:</strong> <a href="../2002-07/1501.html">Shawn Jefferson: "Re: [cc65] Strange problem"</a>
+<li><strong>Maybe reply:</strong> <a href="../2002-07/1502.html">Shawn Jefferson: "Re: [cc65] Strange problem"</a>
+<li><strong>Maybe reply:</strong> <a href="../2002-07/1517.html">Christian Groessler: "Re: [cc65] Strange problem"</a>
+<li><strong>Maybe reply:</strong> <a href="../2002-07/1519.html">Shawn Jefferson: "Re: [cc65] Strange problem"</a>
+<li><strong>Reply:</strong> <a href="2418.html">Christian Kruger: "Re: [cc65] Strange problem"</a>
+<li><strong>Reply:</strong> <a href="2419.html">Ullrich von Bassewitz: "Re: [cc65] Strange problem"</a>
+<li><strong>Reply:</strong> <a href="2420.html">Shawn Jefferson: "Re: [cc65] Strange problem"</a>
+<li><strong>Reply:</strong> <a href="2447.html">Shawn Jefferson: "Re: [cc65] Strange problem"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+I'm having a strange problem with some code. I wasn't getting the results I expected, so I was dumping all values to a memory location and then using the Monitor in Atari800Win to view the contents as the function executed.  I assumed it was something to do with the automatic type casting that I always have trouble with.  I was getting strange numbers in the memory locations too, so I decided to look at an assembly listing of the function.
+
+Am I correct in saying that local variables are put on the stack?  It appears that for some reason cc65 is grabbing a value from the stack incorrectly for some computations.  The weird thing is that if I take this out of my program and put into a small test file it works!
+
+Would there be any case where the compiler would grab stuff from the stack beyond the local variables?
+
+―
+Shawn Jefferson
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Strange%20problem">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2416.html">Groepaz: "Re: [cc65] Another wish: Unsized Arrays in Structures"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="../2002-07/1495.html">cbmnut_at_hushmail.com: "Re: [cc65] Strange problem"</a>
+<li><strong>Maybe reply:</strong> <a href="../2002-07/1495.html">cbmnut_at_hushmail.com: "Re: [cc65] Strange problem"</a>
+<li><strong>Maybe reply:</strong> <a href="../2002-07/1500.html">Christian Groessler: "Re: [cc65] Strange problem"</a>
+<li><strong>Maybe reply:</strong> <a href="../2002-07/1501.html">Shawn Jefferson: "Re: [cc65] Strange problem"</a>
+<li><strong>Maybe reply:</strong> <a href="../2002-07/1502.html">Shawn Jefferson: "Re: [cc65] Strange problem"</a>
+<li><strong>Maybe reply:</strong> <a href="../2002-07/1517.html">Christian Groessler: "Re: [cc65] Strange problem"</a>
+<li><strong>Maybe reply:</strong> <a href="../2002-07/1519.html">Shawn Jefferson: "Re: [cc65] Strange problem"</a>
+<li><strong>Reply:</strong> <a href="2418.html">Christian Kruger: "Re: [cc65] Strange problem"</a>
+<li><strong>Reply:</strong> <a href="2419.html">Ullrich von Bassewitz: "Re: [cc65] Strange problem"</a>
+<li><strong>Reply:</strong> <a href="2420.html">Shawn Jefferson: "Re: [cc65] Strange problem"</a>
+<li><strong>Reply:</strong> <a href="2447.html">Shawn Jefferson: "Re: [cc65] Strange problem"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-02-06 01:13:12 CET</em>
+</em>
+</small>
+</body>
+</html>

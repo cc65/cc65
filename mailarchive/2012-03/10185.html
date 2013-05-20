@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Possible bug in cc65</title>
+<meta name="Author" content="Joseph Rose (rose.joseph121yahoo.com)" />
+<meta name="Subject" content="[cc65] Possible bug in cc65" />
+<meta name="Date" content="2012-03-26" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Possible bug in cc65</h1>
+<!-- received="Mon Mar 26 18:20:54 2012" -->
+<!-- isoreceived="20120326162054" -->
+<!-- sent="Mon, 26 Mar 2012 09:20:45 -0700 (PDT)" -->
+<!-- isosent="20120326162045" -->
+<!-- name="Joseph Rose" -->
+<!-- email="rose.joseph121yahoo.com" -->
+<!-- subject="[cc65] Possible bug in cc65" -->
+<!-- id="1332778845.77443.YahooMailNeo@web120606.mail.ne1.yahoo.com" -->
+<!-- charset="iso-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10186.html" title="Christopher Pow: &quot;Re: [cc65] VICE file formats&quot;">Next message</a> ]
+[ <a href="10184.html" title="Spiro Trikaliotis: &quot;Re: [cc65] VICE file formats&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10187.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Possible bug in cc65&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Joseph Rose &lt;<a href="mailto:rose.joseph121yahoo.com?Subject=Re:%20[cc65]%20Possible%20bug%20in%20cc65">rose.joseph121yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-03-26 18:20:45</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I've been working on a cartridge libary for cc65's C64 platform and have been encountering problems with one of the demos.  I converted a part of the demo to run outside the demo (i.e. in the normal configuration) and found the same two bugs; 1. cputsxy() displays garbage text and; 2. the output for rand() is too regular.  I have the code here:
+ 
+----------------------
+blot.c
+----------------------
+static const unsigned char blotc [4]={0,1,2,5};
+void blot ()
+{
+ static unsigned i;
+ _randomize ();
+ bordercolor (3); bgcolor(1); textcolor (0);
+ clrscr ();
+ for (i=0; i&lt;20*40; ++i) {revers (rand()&amp;1); cputc(' ');}
+ revers(0);
+ cputcxy (0,24,&quot;Press any key to continue...&quot;);
+ //gotoxy (0,24); cputs (&quot;Press any key to continue...&quot;);
+ while (!kbhit());
+ cgetc();
+}
+void colorblot ()
+{
+ static unsigned i;
+ _randomize ();
+ bordercolor (3); bgcolor(1); textcolor (0);
+ clrscr (); revers(1);
+ for (i=0; i&lt;20*40; ++i) {textcolor (blotc[rand()&amp;3]); cputc(' ');}
+ revers(0);
+ textcolor (0);
+ gotoxy (0,23);
+ puts (&quot;Press any key to continue...&quot;);
+ while (!kbhit());
+ cgetc();
+}
+----------------------
+main.c
+----------------------
+void blot ();
+void colorblot ();
+void main()
+{
+ bgcolor (1); bordercolor (2); textcolor (5);
+ clrscr();
+ blot(); colorblot();
+}
+----------------------
+I used cc65 v. 2.13.3, SVN 5495 to compile the code.
+----------------------
+Joseph Rose, a.k.a. Harry Potter
+Working magic in the computer community
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Mar 26 18:20:54 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10186.html" title="Next message in the list">Christopher Pow: "Re: [cc65] VICE file formats"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10184.html" title="Previous message in the list">Spiro Trikaliotis: "Re: [cc65] VICE file formats"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10187.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Possible bug in cc65"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10187.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Possible bug in cc65"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10188.html" title="Message sent in reply to this message">Johan Kotlinski: "Re: [cc65] Possible bug in cc65"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10198.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] Possible bug in cc65"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10185" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10185" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10185" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-03-26 18:20:57 CEST
+</em></small></p>
+</body>
+</html>

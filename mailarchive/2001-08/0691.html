@@ -1,0 +1,146 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Probleme mit File-IO ( di</title>
+<meta name="Author" content="Marc 'BlackJack' Rintsch (marc_at_rintsch.de)">
+<meta name="Subject" content="Re: [cc65] Probleme mit File-IO ( die 2te )">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Probleme mit File-IO ( die 2te )</h1>
+<!-- received="Fri Aug 24 18:02:56 2001" -->
+<!-- isoreceived="20010824160256" -->
+<!-- sent="Fri, 24 Aug 2001 13:10:07 +0200" -->
+<!-- isosent="20010824111007" -->
+<!-- name="Marc 'BlackJack' Rintsch" -->
+<!-- email="marc_at_rintsch.de" -->
+<!-- subject="Re: [cc65] Probleme mit File-IO ( die 2te )" -->
+<!-- id="m15aJQ1-00OKGNC@Mail.ZEDAT.FU-Berlin.DE" -->
+<!-- inreplyto="000701c12c07$1280aae0$0100a8c0@a800" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Marc 'BlackJack' Rintsch (<a href="mailto:marc_at_rintsch.de?Subject=Re:%20[cc65]%20Probleme%20mit%20File-IO%20(%20die%202te%20)"><em>marc_at_rintsch.de</em></a>)<br>
+<strong>Date:</strong> 2001-08-24 13:10:07
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0692.html">udo klasmeier: "Re: [cc65] Probleme mit File-IO ( die 2te )"</a>
+<li><strong>Previous message:</strong> <a href="0690.html">Ullrich von Bassewitz: "Re: [cc65] Problems with file I/O (second try)"</a>
+<li><strong>In reply to:</strong> <a href="0689.html">udo klasmeier: "[cc65] Probleme mit File-IO ( die 2te )"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0692.html">udo klasmeier: "Re: [cc65] Probleme mit File-IO ( die 2te )"</a>
+<li><strong>Reply:</strong> <a href="0692.html">udo klasmeier: "Re: [cc65] Probleme mit File-IO ( die 2te )"</a>
+<li><strong>Reply:</strong> <a href="0693.html">groepaz: "Re[2]: [cc65] Probleme mit File-IO ( die 2te )"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi udo,
+
+&gt; i still have problems with file-io, although i think i followed the
+&gt; rules. here is a a small piece of code.
+&gt;
+&gt; [code snipped]
+&gt;
+&gt; the open returns rc=5
+&gt; sometimes a rc=2
+
+I wasn't able to reproduce rc=5 (= device not present) but I get rc=2 
+(= file open).
+
+The Problem is with cbm_open() which doesn't give an error when you try 
+to open a non-existent file for reading. You open the adressbook file 
+which is not present and then you try to read the number of adresses 
+from it. This fails but you don't close the file in your error check. 
+That's why you get &quot;file open&quot; errors if you try to open it again.
+
+Adding a 'cbm_close' to your error check in 'loadAdr' should be a 
+workaround:
+
+if(rc&lt;2){
+    DispError(&quot;Lese-Fehler&quot;);
+    anz_adr=0;
+    cbm_close(A_FNR);
+    return;
+}
+
+BTW why are you checking rc&lt;2 ? Every value except 0 is an error.
+
+The same problem you have in BASIC with the status variable ST.
+
+10 OPEN2,8,2,&quot;XYZ,S,R&quot;
+20 PRINT ST
+30 GET#2,A$
+40 PRINT ST
+
+Assuming that a sequential file named &quot;XYZ&quot; doesn't exist: First output 
+of ST is 0 and only after really trying to read something from the file 
+sets it to an error value.
+
+I haven't found an easy way to check this just on the computer side, 
+you have to read the error channel to get this error. That's the next 
+item on my TODO list but I was very lazy when it comes to working on 
+that functions.
+
+
+While looking at your code I noticed that you could spare the 64 bytes 
+of the local variable 'cmd' and the sprintf function call in 
+Open(Input|Output) if you use the secondary adress as a selector for 
+read and write:
+
+cbm_open(2,8,1,&quot;name,s&quot;) opens a file for writing and 
+cbm_open(2,8,0,&quot;name,s&quot;) opens it for reading. In both cases you could 
+use the same filename. I think I'm gonna add constants for the 
+secondary address to cbm.h
+
+Ciao,
+	Marc 'BlackJack' Rintsch
+-- 
+Who is General Failure and why is he reading my hard disk?
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Probleme%20mit%20File-IO%20(%20die%202te%20)">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0692.html">udo klasmeier: "Re: [cc65] Probleme mit File-IO ( die 2te )"</a>
+<li><strong>Previous message:</strong> <a href="0690.html">Ullrich von Bassewitz: "Re: [cc65] Problems with file I/O (second try)"</a>
+<li><strong>In reply to:</strong> <a href="0689.html">udo klasmeier: "[cc65] Probleme mit File-IO ( die 2te )"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0692.html">udo klasmeier: "Re: [cc65] Probleme mit File-IO ( die 2te )"</a>
+<li><strong>Reply:</strong> <a href="0692.html">udo klasmeier: "Re: [cc65] Probleme mit File-IO ( die 2te )"</a>
+<li><strong>Reply:</strong> <a href="0693.html">groepaz: "Re[2]: [cc65] Probleme mit File-IO ( die 2te )"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:41 CET</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,215 @@
+diff --git a/libsrc/Makefile b/libsrc/Makefile
+--- a/libsrc/Makefile
++++ b/libsrc/Makefile
+@@ -16,6 +16,7 @@
+ ALLTARGETS =   	apple2 		\
+ 		apple2enh	\
+ 	       	atari  		\
++	       	atari-asm	\
+ 	       	atmos  		\
+                 c16    		\
+ 	       	c128   		\
+@@ -104,6 +105,9 @@
+ 	cp atari/atari-9.tgi atari9.tgi
+ 	cp atari/atari-9p2.tgi atr9p2.tgi
+ 
++atari-asmlib:
++	$(MAKE) SYS=atari -C atari-asm
++	$(AR) a atari-asm.lib atari-asm/*.o
+ 
+ #-----------------------------------------------------------------------------
+ # Oric Atmos
+diff --git a/libsrc/atari-asm/Makefile b/libsrc/atari-asm/Makefile
+new file mode 100644
+--- /dev/null
++++ b/libsrc/atari-asm/Makefile
+@@ -0,0 +1,48 @@
++#
++# Makefile for the zlib subdirectory of the cc65 runtime library
++#
++
++.SUFFIXES: .o .s .c
++
++#--------------------------------------------------------------------------
++# Programs and flags
++
++SYS	= none
++
++AS	= ../../src/ca65/ca65
++CC	= ../../src/cc65/cc65
++LD	= ../../src/ld65/ld65
++
++AFLAGS	= -t $(SYS) --forget-inc-paths -I../../asminc
++CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
++
++#--------------------------------------------------------------------------
++# Rules
++
++%.o:   	%.c
++	@$(CC) $(CFLAGS) $<
++	@$(AS) -g -o $@ $(AFLAGS) $(*).s
++
++%.o:	%.s
++	@$(AS) -g -o $@ $(AFLAGS) $<
++
++#--------------------------------------------------------------------------
++# Object files
++
++S_OBJS =       	header.o
++
++#--------------------------------------------------------------------------
++# Targets
++
++.PHONY:	all clean zap
++
++all:  	$(S_OBJS)
++
++clean:
++	@rm -f *~
++	@rm -f $(C_OBJS:.o=.s)
++	@rm -f $(C_OBJS)
++	@rm -f $(S_OBJS)
++
++zap:	clean
++
+diff --git a/libsrc/atari-asm/header.s b/libsrc/atari-asm/header.s
+new file mode 100644
+--- /dev/null
++++ b/libsrc/atari-asm/header.s
+@@ -0,0 +1,18 @@
++; ------------------------------------------------------------------------
++; EXE header and trailer or minimal asm support
++;
++        .import __CODE_LOAD__, __BSS_LOAD__
++        .import _start
++        .export _header ; Import this from the main file.
++
++        .segment "EXEHDR"
++_header:
++        .word   $FFFF
++        .word   __CODE_LOAD__
++        .word   __BSS_LOAD__ - 1
++
++        .segment "AUTOSTRT"
++        .word   $02E0
++        .word   $02E1
++        .word   _start
++
+diff --git a/src/ca65/main.c b/src/ca65/main.c
+--- a/src/ca65/main.c
++++ b/src/ca65/main.c
+@@ -200,6 +200,7 @@
+             break;
+ 
+ 	case TGT_ATARI:
++	case TGT_ATARI_ASM:
+     	    NewSymbol ("__ATARI__", 1);
+ 	    break;
+ 
+diff --git a/src/common/target.c b/src/common/target.c
+--- a/src/common/target.c
++++ b/src/common/target.c
+@@ -55,6 +55,7 @@
+     "none",
+     "module",
+     "atari",
++    "atari-asm",
+     "vic20",
+     "c16",
+     "c64",
+@@ -81,6 +82,7 @@
+     CPU_6502,           /* none */
+     CPU_6502,           /* module */
+     CPU_6502,           /* atari */
++    CPU_6502,           /* atari-asm */
+     CPU_6502,           /* vic20 */
+     CPU_6502,           /* c16 */
+     CPU_6502,           /* c64 */
+diff --git a/src/common/target.h b/src/common/target.h
+--- a/src/common/target.h
++++ b/src/common/target.h
+@@ -55,6 +55,7 @@
+     TGT_NONE,
+     TGT_MODULE,
+     TGT_ATARI,
++    TGT_ATARI_ASM,
+     TGT_VIC20,
+     TGT_C16,
+     TGT_C64,
+diff --git a/src/common/tgttrans.c b/src/common/tgttrans.c
+--- a/src/common/tgttrans.c
++++ b/src/common/tgttrans.c
+@@ -144,6 +144,7 @@
+        	case TGT_NONE: 	       	memcpy (Tab, CTNone, sizeof (Tab));  	break;
+        	case TGT_MODULE:       	memcpy (Tab, CTNone, sizeof (Tab));  	break;
+ 	case TGT_ATARI:		memcpy (Tab, CTAtari, sizeof (Tab)); 	break;
++	case TGT_ATARI_ASM:	memcpy (Tab, CTAtari, sizeof (Tab)); 	break;
+ 	case TGT_VIC20:		memcpy (Tab, CTPET, sizeof (Tab)); 	break;
+        	case TGT_C16:		memcpy (Tab, CTPET, sizeof (Tab)); 	break;
+ 	case TGT_C64:		memcpy (Tab, CTPET, sizeof (Tab)); 	break;
+diff --git a/src/ld65/cfg/atari-asm.cfg b/src/ld65/cfg/atari-asm.cfg
+new file mode 100644
+--- /dev/null
++++ b/src/ld65/cfg/atari-asm.cfg
+@@ -0,0 +1,21 @@
++# Atari file format, without initializations.
++#
++FEATURES {
++    STARTADDRESS: default = $2E00;
++}
++MEMORY {
++    ZP:      start = $0082, size = $007E, type = rw, define = yes;
++    HEADER:  start = $0000, size = $0006, file = %O;
++    RAM:     start = %S,    size = $BC20 - %S, file = %O;
++    TRAILER: start = $0000, size = $0006, file = %O;
++}
++SEGMENTS {
++    EXEHDR:   load = HEADER,  type = ro;
++    CODE:     load = RAM,     type = ro, define = yes;
++    RODATA:   load = RAM,     type = ro;
++    DATA:     load = RAM,     type = rw;
++    BSS:      load = RAM,     type = bss, define = yes;
++    ZEROPAGE: load = ZP,      type = zp;
++    AUTOSTRT: load = TRAILER, type = ro;
++}
++
+diff --git a/src/ld65/make/gcc.mak b/src/ld65/make/gcc.mak
+--- a/src/ld65/make/gcc.mak
++++ b/src/ld65/make/gcc.mak
+@@ -65,6 +65,7 @@
+ INCS =	apple2.inc	\
+ 	apple2enh.inc	\
+ 	atari.inc	\
++	atari-asm.inc   \
+ 	atmos.inc       \
+ 	bbc.inc		\
+ 	c128.inc	\
+@@ -131,6 +132,9 @@
+ atari.inc:     	cfg/atari.cfg
+ 	@$(CVT) $< $@ CfgAtari
+ 
++atari-asm.inc:     	cfg/atari-asm.cfg
++	@$(CVT) $< $@ CfgAtariAsm
++
+ atmos.inc:     	cfg/atmos.cfg
+ 	@$(CVT) $< $@ CfgAtmos
+ 
+diff --git a/src/ld65/tgtcfg.c b/src/ld65/tgtcfg.c
+--- a/src/ld65/tgtcfg.c
++++ b/src/ld65/tgtcfg.c
+@@ -52,6 +52,7 @@
+ #include "apple2.inc"
+ #include "apple2enh.inc"
+ #include "atari.inc"
++#include "atari-asm.inc"
+ #include "atmos.inc"
+ #include "bbc.inc"
+ #include "c128.inc"
+@@ -83,6 +84,7 @@
+     {  	BINFMT_BINARY,  CfgNone         },
+     {  	BINFMT_O65,     CfgModule       },
+     {  	BINFMT_BINARY,	CfgAtari        },
++    {  	BINFMT_BINARY,	CfgAtariAsm     },
+     {	BINFMT_BINARY,	CfgVic20	},
+     {   BINFMT_BINARY,  CfgC16          },
+     {  	BINFMT_BINARY,	CfgC64          },

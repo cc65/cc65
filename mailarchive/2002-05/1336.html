@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Space efficiency?</title>
+<meta name="Author" content="groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] Space efficiency?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Space efficiency?</h1>
+<!-- received="Fri May 17 15:52:45 2002" -->
+<!-- isoreceived="20020517135245" -->
+<!-- sent="Fri, 17 May 2002 15:54:25 +0200" -->
+<!-- isosent="20020517135425" -->
+<!-- name="groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] Space efficiency?" -->
+<!-- id="14514336991.20020517155425@gmx.net" -->
+<!-- inreplyto="200205171337.g4HDbWB72971@xcip2.studcs.uni-sb.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Space%20efficiency?"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2002-05-17 15:54:25
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1335.html">Stephan Lesch: "[cc65] Space efficiency?"</a>
+<li><strong>In reply to:</strong> <a href="1335.html">Stephan Lesch: "[cc65] Space efficiency?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1343.html">Stephan Lesch: "Re: [cc65] Space efficiency?"</a>
+<li><strong>Next in thread:</strong> <a href="1337.html">Ullrich von Bassewitz: "Re: [cc65] Space efficiency?"</a>
+<li><strong>Reply:</strong> <a href="1343.html">Stephan Lesch: "Re: [cc65] Space efficiency?"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hello Stephan,
+
+SL&gt; What do you think, can I assume that the size of a compiled C program
+SL&gt; (modulo silly programming :)) will be about 1 to 1.5 times that of a 
+SL&gt; hand-written assembly program for the same purpose, plus ca 3 K for the 
+SL&gt; library?
+
+it depends on the actual size of your program.... the larger your
+program will be, the less &quot;overhead&quot; (in terms of size) you will have.
+
+SL&gt; Generally, those who already have realized larger projects under cc65,
+SL&gt; particularly on the c64 and including interfaces to binary parts like musics
+SL&gt; and IRQ loaders, could you tell how well it went, and what experiences
+SL&gt; you made? Does it actually become easier to write a program like a game
+SL&gt; in C, compared to assembly, and can you write the major parts in C, or
+SL&gt; do you end up with a frame program in C, and the rest mostly written in
+SL&gt; assembly?
+
+biggest problems/pitfals are probably with interfacing to &quot;foreign&quot;
+assembly....that is code that is tied to a fixed memory location (eg
+lotta music tied to $1000) and you dont have sources for it either so
+you can recompile - my suggestion for that would be, use a
+musicroutine and an irq-loader that you have sources of and convert
+those to ca65 syntax....this way they will integrate into the rest of
+your project nicely.
+
+second thing is working with interupts themselves - you will most
+likely end up in coding all your interupt-services in assembler (it
+could be done in C with some hacking but its in no way reasonable)
+
+generally, i'd say write your &quot;main loop&quot; in C, and put everything
+else in a tiny dedicated library (which you are ofcoz supposed to
+release for everyone to use...etc ;=P hehe) .... that is, combine the
+best of both worlds, start writing stuff in C, debug it and then
+convert the logic to assembler (maybe based on the compiler output).
+
+-- 
+Best regards,
+ groepaz                            mailto:<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Space%20efficiency?">groepaz_at_gmx.net</a>
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Space%20efficiency?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1335.html">Stephan Lesch: "[cc65] Space efficiency?"</a>
+<li><strong>In reply to:</strong> <a href="1335.html">Stephan Lesch: "[cc65] Space efficiency?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1343.html">Stephan Lesch: "Re: [cc65] Space efficiency?"</a>
+<li><strong>Next in thread:</strong> <a href="1337.html">Ullrich von Bassewitz: "Re: [cc65] Space efficiency?"</a>
+<li><strong>Reply:</strong> <a href="1343.html">Stephan Lesch: "Re: [cc65] Space efficiency?"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-05-17 15:52:48 CEST</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] 80 column support on the</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] 80 column support on the C128">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] 80 column support on the C128</h1>
+<!-- received="Thu Dec 19 22:34:00 2002" -->
+<!-- isoreceived="20021219213400" -->
+<!-- sent="Thu, 19 Dec 2002 22:33:58 +0100" -->
+<!-- isosent="20021219213358" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] 80 column support on the C128" -->
+<!-- id="20021219213358.GA16677@trixie.musoftware.de" -->
+<!-- inreplyto="15874.1268.330730.669630@panini.cling.gu.se" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%2080%20column%20support%20on%20the%20C128"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2002-12-19 22:33:58
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2104.html">Ullrich von Bassewitz: "Re: [cc65] 65tris on ATARI"</a>
+<li><strong>In reply to:</strong> <a href="2103.html">MagerValp: "[cc65] 80 column support on the C128"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2106.html">MagerValp: "Re: [cc65] 80 column support on the C128"</a>
+<li><strong>Reply:</strong> <a href="2106.html">MagerValp: "Re: [cc65] 80 column support on the C128"</a>
+<li><strong>Reply:</strong> <a href="2112.html">Groepaz: "Re: [cc65] 80 column support on the C128"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Thu, Dec 19, 2002 at 06:42:12PM +0100, MagerValp wrote:
+&gt; I've been hacking away at the 80 column mode of the C128, and I have
+&gt; an experimantal patch available at
+[...]
+
+Hey, this is great! I've downloaded your patch, applied most of it with a few
+changes and fixed/added a few other things:
+
+  * GEOS has its own implementation of revers, no need to add one.
+
+  * The CBM-II series also has a RVS flag which can be used.
+
+  * The lower case mode is stored in the CHARCOLOR variable together with
+    some other attributes, so it was the textcolor() function that didn't
+    allow the lower case character set to work.
+
+  * The &quot;disable scroll&quot; flag must be set, otherwise the screen scrolls when
+    writing to the character in the lower right corner.
+
+I don't have the problem of revers mode being enabled on exit. There may be
+some other incompatibilities however, since the output routine will now accept
+escape sequences and the like, but I think we can live with that, especially
+since the new code is smaller than the old one, because it uses the ROM
+routines.
+
+There are a few problems remaining: bgcolor/bordercolor don't work any longer,
+and hardcoded screen sizes don't work either.
+
+I've created a new snapshot that contains all the changes if someone is
+interested. Unfortunately I have problems with my DSL connection, it was flaky
+since noon and now down for most of the last 5 hours. I hope this gets fixed
+until tomorrow.
+
+Thanks a lot for this great patch! It will give groepaz more work for his
+tetris clone:-)
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%2080%20column%20support%20on%20the%20C128">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%2080%20column%20support%20on%20the%20C128">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2104.html">Ullrich von Bassewitz: "Re: [cc65] 65tris on ATARI"</a>
+<li><strong>In reply to:</strong> <a href="2103.html">MagerValp: "[cc65] 80 column support on the C128"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2106.html">MagerValp: "Re: [cc65] 80 column support on the C128"</a>
+<li><strong>Reply:</strong> <a href="2106.html">MagerValp: "Re: [cc65] 80 column support on the C128"</a>
+<li><strong>Reply:</strong> <a href="2112.html">Groepaz: "Re: [cc65] 80 column support on the C128"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-12-19 22:35:05 CET</em>
+</em>
+</small>
+</body>
+</html>

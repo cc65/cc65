@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Relative paths during comp</title>
+<meta name="Author" content="Thomas Giesel (skoe1directbox.com)" />
+<meta name="Subject" content="Re: [cc65] Relative paths during compilation" />
+<meta name="Date" content="2010-01-18" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Relative paths during compilation</h1>
+<!-- received="Mon Jan 18 20:06:56 2010" -->
+<!-- isoreceived="20100118190656" -->
+<!-- sent="Mon, 18 Jan 2010 20:06:48 +0100" -->
+<!-- isosent="20100118190648" -->
+<!-- name="Thomas Giesel" -->
+<!-- email="skoe1directbox.com" -->
+<!-- subject="Re: [cc65] Relative paths during compilation" -->
+<!-- id="20100118200648.317af271@akoya" -->
+<!-- charset="UTF-8" -->
+<!-- inreplyto="20100116132954.GA8466&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7756.html" title="Shawn Jefferson: &quot;[cc65] 16x16 multiply routine overflow detection&quot;">Next message</a> ]
+[ <a href="7754.html" title="Markus Stehr: &quot;Re: [cc65] Think i have triggered a bug with -Oirs&quot;">Previous message</a> ]
+[ <a href="7752.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Relative paths during compilation&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="../2010-05/8286.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Relative paths during compilation&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Thomas Giesel &lt;<a href="mailto:skoe1directbox.com?Subject=Re:%20[cc65]%20Relative%20paths%20during%20compilation">skoe1directbox.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-01-18 20:06:48</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>All,
+
+&gt;&gt; Shouldnt it be that #include &quot;foo.h&quot; is from the current directoy and
+&gt;&gt; #include &lt;bar.h&gt; is from &quot;$COMPILER_DIR/include&quot; (or /usr/include in
+&gt;&gt; gcc's case...)?
+&gt;
+&gt; That is a common implementation, but not defined anywhere in the
+&gt; standard.
+
+That's true, but the exact wording of C99 (porbably older standards,
+too) &quot;sounds&quot; like a suggestion for the way many compilers (see below)
+do it:
+
+&quot;A preprocessing directive of the form
+   # include &lt;h-char-sequence&gt; new-line
+searches a sequence of implementation-deﬁned places for a header
+identiﬁed uniquely by the speciﬁed sequence between the &lt; and &gt;
+delimiters&quot; 
+[...]
+&quot;A preprocessing directive of the form
+   # include &quot;q-char-sequence&quot; new-line
+causes the replacement of that directive by the entire contents of the 
+source ﬁle identiﬁed by the speciﬁed sequence between the &quot; delimiters.&quot;
+
+&quot;Example:&quot;
+&quot;The most common uses of #include preprocessing directives are as in
+the following:
+ #include &lt;stdio.h&gt;
+ #include &quot;myprog.h&quot;
+&quot;
+
+However, both of these &quot;places&quot; and &quot;search&quot; are implementation defined.
+As Uz wrote already, many widely used compilers define the 
+&quot;sequence of implementation-defined places&quot; as system include paths,
+these (and paths from command line) are searched first when &lt;&gt; ist
+used. On the other hand &quot;&quot;-files are searched in the same directory as
+the current file. More details about special cases can be found in their
+manuals, for example:
+
+<a href="http://gcc.gnu.org/onlinedocs/gcc-4.4.2/cpp/Include-Syntax.html#Include-Syntax">http://gcc.gnu.org/onlinedocs/gcc-4.4.2/cpp/Include-Syntax.html#Include-Syntax</a>
+<a href="http://msdn.microsoft.com/en-us/library/aa273929(VS.60">http://msdn.microsoft.com/en-us/library/aa273929(VS.60</a>).aspx
+<a href="http://www.openwatcom.org/ftp/manuals/current/cguide.pdf">http://www.openwatcom.org/ftp/manuals/current/cguide.pdf</a> (Chapter 3.7)
+
+&gt; But the actual question was, how &quot;current directory&quot; is defined. Is
+&gt; it the current directory where the compiler was started? Or the
+&gt; directory where the file lives, that contains the include statement?
+
+AFAIR the latter is how GCC does it. It's also sane in my opinion,
+because 
+a) the source code contains the semantic, not the Makefile
+b) directory structures like $project/src $project/include are quite
+common
+
+Spriro wrote:
+&gt; In the case for the ISO standard, there is no mentioning of it. The
+&gt; standard does not even know about directories.
+
+It's called &quot;places&quot; there, this also allows e.g. in-memory header
+files.
+
+Slightly OT:
+
+&gt; Hopefully, not in the &quot;C-Tutorial&quot; on F-64 that does not teach C, but
+&gt; something different that has just some similarity to C? ;)
+
+I feel like you refer to my tutorial
+<a href="http://skoe.de/wiki/doku.php?id=sidebar">http://skoe.de/wiki/doku.php?id=sidebar</a> If this is true, you are
+welcome to tell me about the thing's you don't like. Maybe better not
+in this list, because it's OT.
+
+_Several_ experienced (15+ years) C programmers reviewed that
+tutorial and improved it. When being in doubt we tried to stick as
+close as possible to ISO. And we tried to keep it simple for beginners
+while avoiding incorrect simplifications where possible.
+
+So if you can improve it or at least tell what is wrong in your eyes,
+feel free to tell it. Otherwise don't make fun of other peoples' work,
+because that's just &quot;something different&quot; than criticism from an
+educated person.
+
+Thomas
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Jan 18 20:06:56 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7756.html" title="Next message in the list">Shawn Jefferson: "[cc65] 16x16 multiply routine overflow detection"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7754.html" title="Previous message in the list">Markus Stehr: "Re: [cc65] Think i have triggered a bug with -Oirs"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7752.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Relative paths during compilation"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="../2010-05/8286.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Relative paths during compilation"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7755" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7755" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7755" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-01-18 20:06:59 CET
+</em></small></p>
+</body>
+</html>

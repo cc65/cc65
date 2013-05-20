@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+<title>cc65 mailing list archive: [cc65] LUnix</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="[cc65] LUnix">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] LUnix</h1>
+<!-- received="Thu Jan  2 22:46:24 2003" -->
+<!-- isoreceived="20030102214624" -->
+<!-- sent="Thu, 2 Jan 2003 22:46:22 +0100" -->
+<!-- isosent="20030102214622" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="[cc65] LUnix" -->
+<!-- id="200301022246.22814.groepaz@gmx.net" -->
+<!-- charset="iso-8859-15" -->
+<!-- inreplyto="200301022102.h02L2tX03553@localhost.localdomain" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20LUnix"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2003-01-02 22:46:22
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2193.html">Ullrich von Bassewitz: "[cc65] Function returns (was: ATARI Multijoy Joystickdriver)"</a>
+<li><strong>In reply to:</strong> <a href="2189.html">Debrune Jérôme: "[cc65] [CC65] Regbank"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2195.html">Ullrich von Bassewitz: "Re: [cc65] LUnix"</a>
+<li><strong>Reply:</strong> <a href="2195.html">Ullrich von Bassewitz: "Re: [cc65] LUnix"</a>
+<li><strong>Reply:</strong> <a href="2216.html">Greg King: "Re: [cc65] LUnix"</a>
+<li><strong>Reply:</strong> <a href="2217.html">Greg King: "Re: [cc65] LUnix"</a>
+<li><strong>Reply:</strong> <a href="2218.html">Greg King: "Re: [cc65] LUnix"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+I've been playing a bit with LUnix (ie, hacked the fifo driver for use with 
+the silversurfer ;=)) and i am wondering whats the deal to compile code for 
+it..... ofcoz, i know that there is currently no library support whatsoever 
+(i would hack some basic i/o stuff then), but thats not my problem.... thing 
+is, i cant even compile an empty main() that does nothing. i created a simple 
+crt0.s, and also compiled the machine-independent parts of the 
+(runtime-)library... now when i link all this together i get a &quot;Error: 
+Unresolved export: `main'&quot;. out of curiosity, if i use &quot;-t c64&quot; instead of 
+&quot;-C lunix.cfg&quot; the error disappears (producing a useless output ofcoz).
+
+any ideas? is that due to not yet finished o65 support or sth? or am i missing 
+something? :o)
+
+oh and related to that... maybe there should be a skeleton crt0.o and a 
+machine-independent none.lib... its a bit odd that right now not even the 
+runtime-library (which is kindof required to use the c-compiler :=P) gets 
+linked when you compile a program for the &quot;none&quot; target..... i would expect 
+the compiler to produce a working, plain raw &quot;linear&quot; binary when no specific 
+memory config (and startup) is given.... well, atleast it shouldnt be 
+necessary to compile the runtime-lib yourself to compile anything at all :) 
+
+
+-- 
+          ___ ___ .___________________ .___________ _______.
+    c=64 /   |   \|   \__    ___/     \ \_   _____/ \      \ [groepaz]
+     gb /    '    \   | |    | /  \ /  \ |    __)_  /   |   \ gp32
+    cgb \    .    /   | |    |/    '    \|        \/    |    \ psx
+     gba \___|_  /|___| |____|\____|__  /_______  /\____|__  / dc
+          -----\/-----'---------------\/--------\/---------\/
+       <a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    Hitmen WWW Headquarters
+       <a href="http://fly.to/hitmen-groepaz">http://fly.to/hitmen-groepaz</a>     my personal playground
+       <a href="http://rr.c64.org/silversurfer">http://rr.c64.org/silversurfer</a>   home of the RR debugger
+       ftp.musoftware.de/pub/groepaz    cc65 dump site
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20LUnix">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2193.html">Ullrich von Bassewitz: "[cc65] Function returns (was: ATARI Multijoy Joystickdriver)"</a>
+<li><strong>In reply to:</strong> <a href="2189.html">Debrune Jérôme: "[cc65] [CC65] Regbank"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2195.html">Ullrich von Bassewitz: "Re: [cc65] LUnix"</a>
+<li><strong>Reply:</strong> <a href="2195.html">Ullrich von Bassewitz: "Re: [cc65] LUnix"</a>
+<li><strong>Reply:</strong> <a href="2216.html">Greg King: "Re: [cc65] LUnix"</a>
+<li><strong>Reply:</strong> <a href="2217.html">Greg King: "Re: [cc65] LUnix"</a>
+<li><strong>Reply:</strong> <a href="2218.html">Greg King: "Re: [cc65] LUnix"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-01-02 22:46:27 CET</em>
+</em>
+</small>
+</body>
+</html>

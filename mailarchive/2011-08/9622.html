@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] New version of debug info </title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] New version of debug info available" />
+<meta name="Date" content="2011-08-19" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] New version of debug info available</h1>
+<!-- received="Fri Aug 19 16:51:53 2011" -->
+<!-- isoreceived="20110819145153" -->
+<!-- sent="Fri, 19 Aug 2011 16:51:47 +0200" -->
+<!-- isosent="20110819145147" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] New version of debug info available" -->
+<!-- id="20110819145147.GA28824@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="CA+eVkH6-KkPsVg7s5ZkabuQ5MZnXDSQipDj21h0tC_2SUQehqA&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9623.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] New version of debug info available&quot;">Next message</a> ]
+[ <a href="9621.html" title="thefox xofeht: &quot;Re: [cc65] New version of debug info available&quot;">Previous message</a> ]
+[ <a href="9620.html" title="thefox xofeht: &quot;Re: [cc65] New version of debug info available&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+[ <a href="9621.html" title="thefox xofeht: &quot;Re: [cc65] New version of debug info available&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20New%20version%20of%20debug%20info%20available">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-08-19 16:51:47</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Fri, Aug 19, 2011 at 05:13:25PM +0300, thefox xofeht wrote:
+&gt; &gt; I've now reached a milestone, where things are still somewhat incomplete, but
+&gt; &gt; the new code is useful enough to be shown to and tested by a wider audience.
+&gt;
+&gt; Seems pretty nice!
+&gt;
+&gt; I didn't dig very deeply into it yet, but where did
+&gt; cc65_lineinfo_byaddr() go? How can I get a line id from an address?
+
+This information is now kept in something called a &quot;Span&quot;, which is a part of
+a segment with a start offset and a size. This was necessary, because there
+are now other items that have spans attached (like scopes).
+
+But you're right, I forgot to add a function to retrieve lines for a span. The
+information is already there internally, so 've already added cc65_line_byspan
+and cc65_scope_byspan. 
+
+You will now need to call cc65_span_byaddr, and for spans where line_count is
+greater than zero, call cc65_line_byspan. Ignoring line_count does no harm but
+checking it saves you an API call and an allocation. 
+
+I will build a new snapshot but can also offer to send the changed files by
+private mail.
+
+Thanks for the feedback!
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Aug 19 16:51:53 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9623.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] New version of debug info available"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9621.html" title="Previous message in the list">thefox xofeht: "Re: [cc65] New version of debug info available"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9620.html" title="Message to which this message replies">thefox xofeht: "Re: [cc65] New version of debug info available"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9621.html" title="Next message in this discussion thread">thefox xofeht: "Re: [cc65] New version of debug info available"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9622" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9622" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9622" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-08-19 16:51:56 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] CBM gets() echoing</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] CBM gets() echoing" />
+<meta name="Date" content="2010-02-11" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] CBM gets() echoing</h1>
+<!-- received="Thu Feb 11 11:49:56 2010" -->
+<!-- isoreceived="20100211104956" -->
+<!-- sent="Thu, 11 Feb 2010 11:49:48 +0100" -->
+<!-- isosent="20100211104948" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] CBM gets() echoing" -->
+<!-- id="f97798c21002110249x4c43059di41a49d6ff5f8a6fa@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7877.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] CBM gets() echoing&quot;">Next message</a> ]
+[ <a href="7875.html" title="Oliver Schmidt: &quot;Re: [cc65] Re: CBM POSIX I/O w/o O_TRUNC ?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7877.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] CBM gets() echoing&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20CBM%20gets()%20echoing">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-02-11 11:49:48</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+I just wrote a program containing a sequence like this:
+
+printf(&quot;Source:&quot;);
+gets(source);
+printf(&quot;Target:&quot;);
+gets(target);
+printf(&quot;Starting...\n&quot;);
+
+Please note that the first two printf's don't contain a '\n'. In all
+environments (cc65 and non-cc65) I tested the program the three printf
+string appeared on three lines. This is because the chars entered are
+echoed - incl. the Enter key being echoed as '\n'.
+
+On the C64 however all three printf strings appear on the same line
+because the Enter key seems to be echoed as ' '.
+
+The obvious workaround is to have '\n's in the printf's and live with
+the blank lines inserted in other environments. Nevertheless I'd like
+to know if the &quot;CBM maintainers&quot; consider this behaviour as an issue
+to be fixed. From looking at the source code I'd think this might
+become difficult/ugly.
+
+I haven't found any standards document describing the gets() echoing
+at all. However the current status is suboptimal from the platform
+independence perspective.
+
+Best, Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Feb 11 11:49:56 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7877.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] CBM gets() echoing"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7875.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Re: CBM POSIX I/O w/o O_TRUNC ?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7877.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] CBM gets() echoing"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7877.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] CBM gets() echoing"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7876" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7876" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7876" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-02-11 11:49:59 CET
+</em></small></p>
+</body>
+</html>

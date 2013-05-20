@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] &quot;software&quot; stack?</title>
+<meta name="Author" content="Gábor Lénárt (lgb1lgb.hu)" />
+<meta name="Subject" content="[cc65] &quot;software&quot; stack?" />
+<meta name="Date" content="2010-10-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] &quot;software&quot; stack?</h1>
+<!-- received="Fri Oct 29 18:07:45 2010" -->
+<!-- isoreceived="20101029160745" -->
+<!-- sent="Fri, 29 Oct 2010 18:07:39 +0200" -->
+<!-- isosent="20101029160739" -->
+<!-- name="Gábor Lénárt" -->
+<!-- email="lgb1lgb.hu" -->
+<!-- subject="[cc65] &quot;software&quot; stack?" -->
+<!-- id="20101029160739.GG26523@vega.lgb.hu" -->
+<!-- charset="iso-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8726.html" title="Oliver Schmidt: &quot;Re: [cc65] &quot;software&quot; stack?&quot;">Next message</a> ]
+[ <a href="8724.html" title="PÃ¤r Moberg: &quot;Re: [cc65] emulation jumping (65816)&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8726.html" title="Oliver Schmidt: &quot;Re: [cc65] &quot;software&quot; stack?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Gábor Lénárt &lt;<a href="mailto:lgb1lgb.hu?Subject=Re:%20[cc65]%20&amp;quot;software&amp;quot;%20stack?">lgb1lgb.hu</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-10-29 18:07:39</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+Maybe my question is already answered somewhere (or even at a quite trivial
+place) in this case just send me for some RTFM :)
+
+My question is about the limited stack space of 6502. If that space is not
+so enough, is it possible to use an &quot;emulated&quot; stack, that is not using
+JSR, RTS, PHA etc, but &quot;emulate&quot; the stack at an arbitrary memory address
+with arbitrary (well of course the total memory space is limited to 64K
+anyway) size?
+
+I guess the hard part that you can only link object files/libraries if all
+of those are compiled with only the same &quot;stack model&quot; (real or &quot;emulated&quot;).
+
+My project would be some primitive multi-tasking OS (for special purpose)
+where 256 bytes long stack is not enough, also it's a bit problematic if I
+have to copy/restore page 1 all the time on context switching to have the
+feeling of one page long stack for all of the tasks (and also it's possible
+that 256bytes are not enough even for a single task).
+
+Thanks for the answer in advance and sorry for my possible off-topic or
+already answered/documented question.
+
+- Gábor
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Oct 29 18:07:45 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8726.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] &quot;software&quot; stack?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8724.html" title="Previous message in the list">PÃ¤r Moberg: "Re: [cc65] emulation jumping (65816)"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8726.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] &quot;software&quot; stack?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8726.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] &quot;software&quot; stack?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8725" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8725" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8725" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-10-29 18:07:50 CEST
+</em></small></p>
+</body>
+</html>

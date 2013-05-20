@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Atari executables w/ Atari</title>
+<meta name="Author" content="Shawn Jefferson (jefferson_shawn_a8bit1yahoo.com)" />
+<meta name="Subject" content="Re: [cc65] Atari executables w/ AtariMax flashcart" />
+<meta name="Date" content="2005-03-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Atari executables w/ AtariMax flashcart</h1>
+<!-- received="Tue Mar 29 18:29:05 2005" -->
+<!-- isoreceived="20050329162905" -->
+<!-- sent="Tue, 29 Mar 2005 08:29:00 -0800 (PST)" -->
+<!-- isosent="20050329162900" -->
+<!-- name="Shawn Jefferson" -->
+<!-- email="jefferson_shawn_a8bit1yahoo.com" -->
+<!-- subject="Re: [cc65] Atari executables w/ AtariMax flashcart" -->
+<!-- id="20050329162900.65874.qmail@web52202.mail.yahoo.com" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4849.html" title="Kolja Nikolaus Sträter: &quot;[cc65] Target &quot;BBC&quot;&quot;">Next message</a> ]
+[ <a href="4847.html" title="Carsten Strotmann (Carsten Strotmann private Mail): &quot;Re: [cc65] Atari executables w/ AtariMax flashcart&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4850.html" title="Christian Groessler: &quot;Re: [cc65] Atari executables w/ AtariMax flashcart&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Shawn Jefferson &lt;<a href="mailto:jefferson_shawn_a8bit1yahoo.com?Subject=Re:%20[cc65]%20Atari%20executables%20w/%20AtariMax%20flashcart">jefferson_shawn_a8bit1yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-03-29 18:29:00</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>--- &quot;Carsten Strotmann (Carsten Strotmann private
+Mail)&quot; &lt;carsten&#64;strotmann&#46;<!--nospam-->de&gt; wrote:
+&gt; I would vote against a change of the Atari runtime
+&gt; lib. The runtime lob
+&gt; can assume the channel E: is open (or even better,
+&gt; channel (IOCB) 0
+&gt; being open, so a DOS can redirect screen output to
+&gt; any other device).
+
+Yes, I see your point Carsten.  I think a change to
+the startup code of the Atari library wouldn't be the
+best option.  Christian was going to add a routine to
+the library possibly though, and this wouldn't be
+linked in, UNLESS you called it.
+ 
+&gt; IMHO this is a problem (or bug) of the AtariMax
+&gt; Cart. As I see the
+&gt; problem the channel 0 to E: is still open, but the
+&gt; AtariMax Menu will
+&gt; switch the DisplayList to a custom one and will not
+&gt; switch back. This
+&gt; can easily solved in the AtariMax sources, which are
+&gt; OpenSource. It we
+&gt; send a patch back to Steve Tucker (AtariMax Author)
+&gt; I'm sure he will
+&gt; release a new, fixed version of the AtariMax
+&gt; Software (we should also
+&gt; send a patch to use ca65 Assembler instead of TASM).
+
+Is that the issue?  E: isn't initialized until after
+the cartridge is run (according to De Re Atari), so as
+far as I can tell, E: never gets initialized at all
+with ANY cartridge.  Which doesn't seem like a bug to
+me, but just the way the Atari OS works.
+
+&gt; I don't have much time these days, but if needed, I
+&gt; prepare such patch
+&gt; for Steve.
+
+I'm looking to solve a specific problem, so I may just
+make this change to the source code for this
+particular cartridge type (not the 1Mb or 8Mb
+cartridges, but a new maxflash cartridge that I have a
+prototype of.)
+
+--
+Shawn Jefferson
+
+
+		
+__________________________________ 
+Do you Yahoo!? 
+Yahoo! Mail - Find what you need with new enhanced search. 
+<a href="http://info.mail.yahoo.com/mail_250">http://info.mail.yahoo.com/mail_250</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Mar 29 18:29:05 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4849.html" title="Next message in the list">Kolja Nikolaus Sträter: "[cc65] Target &quot;BBC&quot;"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4847.html" title="Previous message in the list">Carsten Strotmann (Carsten Strotmann private Mail): "Re: [cc65] Atari executables w/ AtariMax flashcart"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4850.html" title="Next message in this discussion thread">Christian Groessler: "Re: [cc65] Atari executables w/ AtariMax flashcart"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4848" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4848" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4848" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-03-29 18:29:12 CEST
+</em></small></p>
+</body>
+</html>

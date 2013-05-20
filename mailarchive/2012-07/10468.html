@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Common macros for dirent.d</title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="Re: [cc65] Common macros for dirent.d_type" />
+<meta name="Date" content="2012-07-06" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Common macros for dirent.d_type</h1>
+<!-- received="Fri Jul  6 18:42:30 2012" -->
+<!-- isoreceived="20120706164230" -->
+<!-- sent="Fri, 6 Jul 2012 18:42:45 +0200" -->
+<!-- isosent="20120706164245" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="Re: [cc65] Common macros for dirent.d_type" -->
+<!-- id="201207061842.45118.groepaz@gmx.net" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="-1235639618949069130&#64;unknownmsgid" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10469.html" title="Groepaz: &quot;Re: [cc65] Common macros for dirent.d_type&quot;">Next message</a> ]
+[ <a href="10467.html" title="Oliver Schmidt: &quot;Re: [cc65] Common macros for dirent.d_type&quot;">Previous message</a> ]
+[ <a href="10465.html" title="Oliver Schmidt: &quot;Re: [cc65] Common macros for dirent.d_type&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10470.html" title="Oliver Schmidt: &quot;Re: [cc65] Common macros for dirent.d_type&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20Common%20macros%20for%20dirent.d_type">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-07-06 18:42:45</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Friday 06 July 2012, you wrote:
+&gt; I'd like to learn some more...
+&gt; 
+&gt; I think I understood that LOAD is the only Kernal call doing a &quot;mass
+&gt; transfer&quot; of data from disk - in contrast to the &quot;other&quot; single byte
+&gt; calls - correct?
+
+load and save, yes.
+ 
+&gt; And according to the discussion here LOAD is only applicable to PRG
+&gt; files - correct?
+
+actually, no - it only works on prg files by default :) you can also load an 
+SEQ file (by appending ,s,r to the filename) - however, then the first two 
+bytes of the SEQ file must be a valid load address.
+
+&gt; I believe that &quot;usually&quot; a PRG file starts with A two btye load addr.
+
+thats just needed if you actually want to use load on them :) but most 
+probably have one, yes.
+
+&gt; I seem to remember that we talked about this here already. I sort of
+&gt; remember that those first two bytes can't be read by LOAD so one would
+&gt; need to &quot;read&quot; them in the &quot;usual&quot; way and then LOAD the rest. Or one
+&gt; would need to add two dummy bytes to the file in order to be able to
+&gt; LOAD the actual content. As far as I understand all this has to be
+&gt; taken care of by the programmer - the cc65 C library doesn't do so.
+&gt; 
+&gt; So it seems to me that in order to actually benefit from PRG files so
+&gt; much has to be done manually that setting the cc65 filetype to 'p'
+&gt; seems only a very minor additional step.
+
+sure, small thing :=)
+
+&gt; But if a programmer doesn't want to use LOAD but probably even stay
+&gt; with the POSIX stuff then he won't benefit from PRG and thus SEQ seems
+&gt; the better default - keeping CBM-specific stuff from the source code.
+
+how is PRG cbm specific? and why would SEQ be better? they are *exactly the 
+same* - except for that one byte in the directory that makes it SEQ or PRG
+
+&gt; Maybe I'm missing an important point but from the arguments I
+&gt; understand so far the decision seem easy to me.
+
+point: PRG is used in most cases. there is no backdraw in using prg.
+
+did someone already add to the confusion that SEQ files usually are expected 
+to contain petscii text, not arbitrary dats? =P
+
+-- 
+
+<a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    <a href="http://magicdisk.untergrund.net">http://magicdisk.untergrund.net</a>
+<a href="http://www.pokefinder.org">http://www.pokefinder.org</a>        <a href="http://ftp.pokefinder.org">http://ftp.pokefinder.org</a>
+
+Der Journalist der davon überzeugt ist, daß ihn seine Erfahrung und sein 
+Spürsinn davor bewahren falsche Neuigkeiten zu verbreiten oder Ihnen 
+aufzusitzen, sollte Gärtner werden.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Jul  6 18:42:30 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10469.html" title="Next message in the list">Groepaz: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10467.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10465.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10470.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10470.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10476.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] Common macros for dirent.d_type"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10468" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10468" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10468" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-07-06 18:42:33 CEST
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] ca65 Z80 support</title>
+<meta name="Author" content="Gábor Lénárt (lgb1lgb.hu)" />
+<meta name="Subject" content="[cc65] ca65 Z80 support" />
+<meta name="Date" content="2005-12-04" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] ca65 Z80 support</h1>
+<!-- received="Sun Dec  4 14:40:35 2005" -->
+<!-- isoreceived="20051204134035" -->
+<!-- sent="Sun, 4 Dec 2005 14:40:16 +0100" -->
+<!-- isosent="20051204134016" -->
+<!-- name="Gábor Lénárt" -->
+<!-- email="lgb1lgb.hu" -->
+<!-- subject="[cc65] ca65 Z80 support" -->
+<!-- id="20051204134016.GC21518@lgb.hu" -->
+<!-- charset="iso-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5326.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65 Z80 support&quot;">Next message</a> ]
+[ <a href="../2005-11/5324.html" title="Groepaz: &quot;Re: [cc65] minicast&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5326.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65 Z80 support&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Gábor Lénárt &lt;<a href="mailto:lgb1lgb.hu?Subject=Re:%20[cc65]%20ca65%20Z80%20support">lgb1lgb.hu</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-12-04 14:40:16</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hello,
+
+I've started to write support for the Z80 CPU into ca65 as I had spoken about
+before. However I've got some problem because I have not full overview of the
+internals of ca65. So it was trivial to add a new CPU type, and a new
+instruction table, also one byte length opcodes are quite easy, after some
+minutes it could assemble Z80 sources if you've commented out other opcodes.
+However the problem is here. Let's see for example the following Z80 ops:
+
+	RET
+	RET Z
+	JR label
+	JR Z,label
+	CALL label
+	CALL Z,label
+
+Ones with 'Z' are conditioned opcodes (Z is the condition here, other one
+can stay here as well). At the level of CPU opcodes there are simply another
+opcodes. Now how can I parse the source? I guess I should work with
+scanner.c or such to have token for reserved words like Z, NZ, C, NC ...
+(conditions) or Z80 registers itself, and I should not use tokenizer for
+65xx specific ones, like A, X or Y. But I don't want to mess up the whole
+source without asking first the &quot;best&quot; solution for the problem of support
+of a totally different CPU from the already-well-supported 65xx ones int
+ca65. Since Z80 differs from these CPUs a lot, I guess I've got quite big
+change in tokenizer and such, and I don't want it, if you won't accept my
+code because of its uglyness.
+
+Thanks in advance,
+
+-- 
+- Gábor
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Dec  4 14:40:35 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5326.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] ca65 Z80 support"</a></li>
+<li><dfn>Previous message</dfn>: <a href="../2005-11/5324.html" title="Previous message in the list">Groepaz: "Re: [cc65] minicast"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5326.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] ca65 Z80 support"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5326.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] ca65 Z80 support"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5325" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5325" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5325" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-12-04 14:40:38 CET
+</em></small></p>
+</body>
+</html>

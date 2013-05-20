@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Please critique this makef</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Please critique this makefile" />
+<meta name="Date" content="2010-04-21" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Please critique this makefile</h1>
+<!-- received="Wed Apr 21 16:28:26 2010" -->
+<!-- isoreceived="20100421142826" -->
+<!-- sent="Wed, 21 Apr 2010 16:28:21 +0200" -->
+<!-- isosent="20100421142821" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Please critique this makefile" -->
+<!-- id="k2v1002edb71004210728g3efb2c5csc39fc2da15b805c9@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="2A99DBE6-6A5F-48BC-A7B0-2EE1A836A922&#64;wfmh.org.pl" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8085.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Please critique this makefile&quot;">Next message</a> ]
+[ <a href="8083.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Please critique this makefile&quot;">Previous message</a> ]
+[ <a href="8083.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Please critique this makefile&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8085.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Please critique this makefile&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Please%20critique%20this%20makefile">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-04-21 16:28:21</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+&gt;&gt; <a href="http://www.cc65.org/doc/make.html">http://www.cc65.org/doc/make.html</a>
+
+&gt; Would you be able to create a Makefile that would allow building from a
+&gt; sources directory containing arbitrary number of mixed (C and ASM) source
+&gt; files?
+&gt;
+&gt; I mean the location of the directory is the parameter, not each and every
+&gt; source file...
+
+I'm not really sure what you want to express. Could you please elaborate?
+
+&gt; AFAIR due to the fact that C files are compiled into asm, which
+&gt; only then gets assembled into object files. Now I don't remember exactly the
+&gt; reason but I think it was due to the fact that both dependent and
+&gt; non-dependent asm files were to be taken into account, which is not a very
+&gt; typical situation with other compilers.
+
+Two solutions to this problem (if I understand you right) come into my
+mind first:
+
+1. AFAIK coming from the GCC world is the idea to distinguish between
+'.S' for source assembler files and '.s' for intermediate assembler
+files. Doing so will work even on a Windows filesystem.
+
+2. Keep GNU make from knowing about the intermediate assembler files
+by compiling and assembling C sources in a single make recipe and
+deleting the intermediate assembler file right away.
+
+&gt; This sort of &quot;universal&quot; Makefile would be really highly appreciated!
+
+If I clearly understand what you're looking for I'm rather optimistic
+that I can provide a solution. With &quot;universal&quot; you are refering to
+&quot;both C and assembler sources&quot; ?
+
+Regards, Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Apr 21 16:28:26 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8085.html" title="Next message in the list">silverdr1wfmh.org.pl: "Re: [cc65] Please critique this makefile"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8083.html" title="Previous message in the list">silverdr1wfmh.org.pl: "Re: [cc65] Please critique this makefile"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8083.html" title="Message to which this message replies">silverdr1wfmh.org.pl: "Re: [cc65] Please critique this makefile"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8085.html" title="Next message in this discussion thread">silverdr1wfmh.org.pl: "Re: [cc65] Please critique this makefile"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8085.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] Please critique this makefile"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8084" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8084" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8084" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-04-21 16:28:28 CEST
+</em></small></p>
+</body>
+</html>

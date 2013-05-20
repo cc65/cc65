@@ -1,0 +1,460 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] rebuilding libraries - genera</title>
+<meta name="Author" content="jimsymolon (jsymolon01_at_attbi.com)">
+<meta name="Subject" content="[cc65] rebuilding libraries - generated program crashes">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] rebuilding libraries - generated program crashes</h1>
+<!-- received="Thu May 29 12:39:32 2003" -->
+<!-- isoreceived="20030529103932" -->
+<!-- sent="Thu, 29 May 2003 06:28:53 -0400" -->
+<!-- isosent="20030529102853" -->
+<!-- name="jimsymolon" -->
+<!-- email="jsymolon01_at_attbi.com" -->
+<!-- subject="[cc65] rebuilding libraries - generated program crashes" -->
+<!-- id="3ED5E0E5.5010303@attbi.com" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> jimsymolon (<a href="mailto:jsymolon01_at_attbi.com?Subject=Re:%20[cc65]%20rebuilding%20libraries%20-%20generated%20program%20crashes"><em>jsymolon01_at_attbi.com</em></a>)<br>
+<strong>Date:</strong> 2003-05-29 12:28:53
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3039.html">Ullrich von Bassewitz: "Re: [cc65] library search path"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3041.html">Ullrich von Bassewitz: "Re: [cc65] rebuilding libraries - generated program crashes"</a>
+<li><strong>Reply:</strong> <a href="3041.html">Ullrich von Bassewitz: "Re: [cc65] rebuilding libraries - generated program crashes"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+I've compiled the helloworld source code and linked using the windows 
+tools.  I've loaded the generated code into a DOS 3.3 disk image and 
+executed on applewin.  This is ok - I get the &quot;hello world&quot; printout on 
+screen.
+
+My build system is Linux 2.4.19 (Mandrake 9.0), gcc 3.2 libc-2.2.5
+I've rebuild the tools on this system.
+
+I've been working on ProDOS file IO and when I re-compile the library 
+and the helloworld program the executable crashes.  The image is 
+different - it has the EXEHDR and the original doesnt.
+
+The emulator bombs on the EXEHDR and I start the program after it.  Then 
+it bombs on the zerobss call as it points to something - it isn't the 
+zerobss function.  I'm thinking it's the linker.
+
+800 = start
+80b: ca             dex
+80c: 10 f8         bpl 806
+80e:20 eb 0e   jsr  eeb
+
+eeb:ae b2 11   ldx $11b2
+eee:60              rts
+
+This is my compile script
+
+u:\cc65\bin\cc65 -I u:\cc65\include -t apple2 $1
+
+This is the linker script
+
+ld65 -t apple2 -o $1 apple2.o $2 $3 apple2.lib
+
+
+
+Right now I don't know where to start.  It is the CFG file for the 
+linker ?  It is one of the programs not getting the right parameters ?
+
+Here is the map file:
+
+&gt;Modules list:
+&gt;-------------
+&gt;apple2.o:
+&gt;    BSS               Offs = 000000   Size = 000001
+&gt;    DATA              Offs = 000000   Size = 00001A
+&gt;    EXEHDR            Offs = 000000   Size = 000004
+&gt;    STARTUP           Offs = 000000   Size = 000043
+&gt;hello.o:
+&gt;    CODE              Offs = 000000   Size = 0000BF
+&gt;    RODATA            Offs = 000000   Size = 000010
+&gt;text.o:
+&gt;    CODE              Offs = 0000BF   Size = 00000D
+&gt;apple2.lib(cgetc.o):
+&gt;    CODE              Offs = 0000CC   Size = 000012
+&gt;apple2.lib(chline.o):
+&gt;    CODE              Offs = 0000DE   Size = 000018
+&gt;apple2.lib(clrscr.o):
+&gt;apple2.lib(color.o):
+&gt;apple2.lib(cputc.o):
+&gt;    CODE              Offs = 0000F6   Size = 000061
+&gt;apple2.lib(ctype.o):
+&gt;    RODATA            Offs = 000010   Size = 000100
+&gt;apple2.lib(cvline.o):
+&gt;    CODE              Offs = 000157   Size = 00001B
+&gt;apple2.lib(_scrsize.o):
+&gt;    RODATA            Offs = 000110   Size = 000002
+&gt;apple2.lib(cprintf.o):
+&gt;    CODE              Offs = 000172   Size = 00002A
+&gt;    BSS               Offs = 000001   Size = 000001
+&gt;apple2.lib(_hextab.o):
+&gt;    RODATA            Offs = 000112   Size = 000010
+&gt;apple2.lib(ltoa.o):
+&gt;    CODE              Offs = 00019C   Size = 0000AF
+&gt;    RODATA            Offs = 000122   Size = 00000C
+&gt;apple2.lib(_printf.o):
+&gt;    CODE              Offs = 00024B   Size = 0003A1
+&gt;    BSS               Offs = 000002   Size = 00002B
+&gt;    DATA              Offs = 00001A   Size = 000003
+&gt;apple2.lib(strlen.o):
+&gt;    CODE              Offs = 0005EC   Size = 000016
+&gt;apple2.lib(strlower.o):
+&gt;    CODE              Offs = 000602   Size = 000028
+&gt;apple2.lib(vcprintf.o):
+&gt;    CODE              Offs = 00062A   Size = 00007E
+&gt;    DATA              Offs = 00001D   Size = 000008
+&gt;apple2.lib(zerobss.o):
+&gt;    CODE              Offs = 0006A8   Size = 000023
+&gt;apple2.lib(addysp.o):
+&gt;    CODE              Offs = 0006CB   Size = 00000E
+&gt;apple2.lib(axlong.o):
+&gt;    CODE              Offs = 0006D9   Size = 000012
+&gt;apple2.lib(condes.o):
+&gt;    CODE              Offs = 0006EB   Size = 000038
+&gt;    BSS               Offs = 00002D   Size = 000001
+&gt;    DATA              Offs = 000025   Size = 000007
+&gt;apple2.lib(decax1.o):
+&gt;    CODE              Offs = 000723   Size = 000007
+&gt;apple2.lib(decax2.o):
+&gt;    CODE              Offs = 00072A   Size = 000007
+&gt;apple2.lib(decsp2.o):
+&gt;    CODE              Offs = 000731   Size = 00000D
+&gt;apple2.lib(decsp4.o):
+&gt;    CODE              Offs = 00073E   Size = 00000D
+&gt;apple2.lib(decsp6.o):
+&gt;    CODE              Offs = 00074B   Size = 00000D
+&gt;apple2.lib(incsp2.o):
+&gt;    CODE              Offs = 000758   Size = 000019
+&gt;apple2.lib(leasp.o):
+&gt;    CODE              Offs = 000771   Size = 000009
+&gt;apple2.lib(lpush.o):
+&gt;    CODE              Offs = 00077A   Size = 00001E
+&gt;apple2.lib(popa.o):
+&gt;    CODE              Offs = 000798   Size = 00000C
+&gt;apple2.lib(push1.o):
+&gt;    CODE              Offs = 0007A4   Size = 000005
+&gt;apple2.lib(pusha.o):
+&gt;    CODE              Offs = 0007A9   Size = 000016
+&gt;apple2.lib(pushax.o):
+&gt;    CODE              Offs = 0007BF   Size = 00001A
+&gt;apple2.lib(pushc0.o):
+&gt;    CODE              Offs = 0007D9   Size = 000005
+&gt;apple2.lib(pushc1.o):
+&gt;    CODE              Offs = 0007DE   Size = 000005
+&gt;apple2.lib(return0.o):
+&gt;    CODE              Offs = 0007E3   Size = 000004
+&gt;apple2.lib(return1.o):
+&gt;    CODE              Offs = 0007E7   Size = 000005
+&gt;apple2.lib(sub.o):
+&gt;    CODE              Offs = 0007EC   Size = 000015
+&gt;apple2.lib(zeropage.o):
+&gt;    ZEROPAGE          Offs = 000000   Size = 00001A
+&gt;apple2.lib(_cursor.o):
+&gt;    BSS               Offs = 00002E   Size = 000001
+&gt;apple2.lib(cursor.o):
+&gt;    CODE              Offs = 000801   Size = 00000A
+&gt;apple2.lib(scrsize.o):
+&gt;    CODE              Offs = 00080B   Size = 000018
+&gt;
+&gt;
+&gt;Segment list:
+&gt;-------------
+&gt;Name                  Start   End     Size
+&gt;--------------------------------------------
+&gt;EXEHDR                000000  000003  000004
+&gt;ZEROPAGE              000000  000019  00001A
+&gt;STARTUP               000800  000842  000043
+&gt;CODE                  000843  001065  000823
+&gt;RODATA                001066  001193  00012E
+&gt;DATA                  001194  0011BF  00002C
+&gt;BSS                   0011C0  0011EE  00002F
+&gt;
+&gt;
+&gt;Exports list:
+&gt;-------------
+&gt;__BSS_LOAD__              0011C0 RL     __BSS_RUN__               0011C0 RL     
+&gt;__BSS_SIZE__              00002F RE     __CONSTRUCTOR_COUNT__     000000 RE     
+&gt;__CONSTRUCTOR_TABLE__     001194 RL     __DESTRUCTOR_COUNT__      000000 RE     
+&gt;__DESTRUCTOR_TABLE__      001194 RL     __STARTUP_LOAD__          000800 RL     
+&gt;__ctype                   001076 RL     __hextab                  001178 RL     
+&gt;__printf                  000B81 RL     _bgcolor                  001026 RE     
+&gt;_bordercolor              001026 RE     _cgetc                    00090F RL     
+&gt;_chline                   000929 RL     _clrscr                   00FC58 RE     
+&gt;_cprintf                  0009B5 RL     _cputc                    000941 RL     
+&gt;_cursor                   001044 RL     _cvlinexy                 00099A RL     
+&gt;_gotoxy                   00098F RL     _ltoa                     0009FB RL     
+&gt;_main                     000843 RL     _screensize               00104E RL     
+&gt;_strlen                   000E2F RL     _strlower                 000E45 RL     
+&gt;_textcolor                00102A RE     _ultoa                    000A52 RL     
+&gt;_vcprintf                 000EBB RL     addysp                    000F0F RL     
+&gt;addysp1                   000F0E RL     axlong                    000F23 RL     
+&gt;axulong                   000F1C RL     cputdirect                00094E RL     
+&gt;cursor                    0011EE RL     decax1                    000F66 RL     
+&gt;decax2                    000F6D RL     decsp2                    000F74 RL     
+&gt;decsp4                    000F81 RL     decsp6                    000F8E RL     
+&gt;donelib                   000F37 RL     incsp2                    000FA3 RL     
+&gt;initlib                   000F2E RL     leaasp                    000FB4 RL     
+&gt;newline                   000979 RL     popa                      000FDB RL     
+&gt;popax                     000F9B RL     ptr1                      000008 RLZ    
+&gt;ptr2                      00000A RLZ    ptr3                      00000C RLZ    
+&gt;push0                     001002 RL     push1                     000FE7 RL     
+&gt;pusha                     000FF0 RL     pusha0                    001004 RL     
+&gt;pushax                    001006 RL     pushc0                    00101C RL     
+&gt;pushc1                    001021 RL     pusheax                   000FC3 RL     
+&gt;putchar                   00095E RL     regbank                   000014 RLZ    
+&gt;return0                   001026 RL     return1                   00102A RL     
+&gt;sp                        000000 RLZ    sreg                      000002 RLZ    
+&gt;tmp1                      000010 RLZ    tossubax                  001031 RL     
+&gt;xsize                     001176 RL     ysize                     001177 RL     
+&gt;zerobss                   000EEB RL     
+&gt;
+&gt;
+&gt;Imports list:
+&gt;-------------
+&gt;__BSS_LOAD__ ([linker generated]):
+&gt;    apple2.o                  crt0.s(10)
+&gt;__BSS_RUN__ ([linker generated]):
+&gt;    zerobss.o                 zerobss.s(8)
+&gt;__BSS_SIZE__ ([linker generated]):
+&gt;    zerobss.o                 zerobss.s(8)
+&gt;__CONSTRUCTOR_COUNT__ ([linker generated]):
+&gt;    condes.o                  condes.s(23)
+&gt;__CONSTRUCTOR_TABLE__ ([linker generated]):
+&gt;    condes.o                  condes.s(23)
+&gt;__DESTRUCTOR_COUNT__ ([linker generated]):
+&gt;    condes.o                  condes.s(24)
+&gt;__DESTRUCTOR_TABLE__ ([linker generated]):
+&gt;    condes.o                  condes.s(24)
+&gt;__STARTUP_LOAD__ ([linker generated]):
+&gt;    apple2.o                  crt0.s(10)
+&gt;__ctype (ctype.o):
+&gt;    strlower.o                strlower.s(12)
+&gt;__hextab (_hextab.o):
+&gt;    ltoa.o                    ltoa.s(10)
+&gt;__printf (_printf.o):
+&gt;    vcprintf.o                vcprintf.s(9)
+&gt;_bgcolor (color.o):
+&gt;    hello.o                   hello.s(18)
+&gt;_bordercolor (color.o):
+&gt;    hello.o                   hello.s(19)
+&gt;_cgetc (cgetc.o):
+&gt;    hello.o                   hello.s(15)
+&gt;_chline (chline.o):
+&gt;    hello.o                   hello.s(20)
+&gt;_clrscr (clrscr.o):
+&gt;    hello.o                   hello.s(11)
+&gt;_cprintf (cprintf.o):
+&gt;    hello.o                   hello.s(14)
+&gt;_cputc (cputc.o):
+&gt;    vcprintf.o                vcprintf.s(9)
+&gt;    hello.o                   hello.s(13)
+&gt;_cursor (cursor.o):
+&gt;    hello.o                   hello.s(16)
+&gt;_cvlinexy (cvline.o):
+&gt;    hello.o                   hello.s(21)
+&gt;_gotoxy (cputc.o):
+&gt;    cvline.o                  cvline.s(9)
+&gt;    chline.o                  chline.s(9)
+&gt;    hello.o                   hello.s(12)
+&gt;_ltoa (ltoa.o):
+&gt;    _printf.o                 _printf.s(11)
+&gt;_main (hello.o):
+&gt;    apple2.o                  crt0.s(11)
+&gt;_screensize (scrsize.o):
+&gt;    hello.o                   hello.s(22)
+&gt;_strlen (strlen.o):
+&gt;    _printf.o                 _printf.s(12)
+&gt;    hello.o                   hello.s(10)
+&gt;_strlower (strlower.o):
+&gt;    _printf.o                 _printf.s(12)
+&gt;_textcolor (color.o):
+&gt;    hello.o                   hello.s(17)
+&gt;_ultoa (ltoa.o):
+&gt;    _printf.o                 _printf.s(11)
+&gt;_vcprintf (vcprintf.o):
+&gt;    cprintf.o                 cprintf.s(8)
+&gt;addysp (addysp.o):
+&gt;    cprintf.o                 cprintf.s(8)
+&gt;addysp1 (addysp.o):
+&gt;    sub.o                     sub.s(8)
+&gt;axlong (axlong.o):
+&gt;    _printf.o                 _printf.s(9)
+&gt;axulong (axlong.o):
+&gt;    _printf.o                 _printf.s(9)
+&gt;cputdirect (cputc.o):
+&gt;    chline.o                  chline.s(9)
+&gt;cursor (_cursor.o):
+&gt;    cursor.o                  cursor.s(8)
+&gt;decax1 (decax1.o):
+&gt;    hello.o                   hello.s(86)
+&gt;decax2 (decax2.o):
+&gt;    hello.o                   hello.s(63)
+&gt;decsp2 (decsp2.o):
+&gt;    hello.o                   hello.s(42)
+&gt;decsp4 (decsp4.o):
+&gt;    lpush.o                   lpush.s(11)
+&gt;decsp6 (decsp6.o):
+&gt;    _printf.o                 _printf.s(9)
+&gt;donelib (condes.o):
+&gt;    apple2.o                  crt0.s(8)
+&gt;incsp2 (incsp2.o):
+&gt;    hello.o                   hello.s(119)
+&gt;initlib (condes.o):
+&gt;    apple2.o                  crt0.s(8)
+&gt;leaasp (leasp.o):
+&gt;    hello.o                   hello.s(53)
+&gt;newline (cputc.o):
+&gt;    cvline.o                  cvline.s(9)
+&gt;popa (popa.o):
+&gt;    cvline.o                  cvline.s(9)
+&gt;    cputc.o                   cputc.s(12)
+&gt;    chline.o                  chline.s(9)
+&gt;popax (incsp2.o):
+&gt;    ltoa.o                    ltoa.s(9)
+&gt;    _printf.o                 _printf.s(9)
+&gt;    scrsize.o                 scrsize.s(9)
+&gt;    vcprintf.o                vcprintf.s(8)
+&gt;ptr1 (zeropage.o):
+&gt;    ltoa.o                    ltoa.s(11)
+&gt;    strlower.o                strlower.s(13)
+&gt;    _printf.o                 _printf.s(13)
+&gt;    scrsize.o                 scrsize.s(11)
+&gt;    zerobss.o                 zerobss.s(9)
+&gt;    vcprintf.o                vcprintf.s(10)
+&gt;    strlen.o                  strlen.s(8)
+&gt;    cprintf.o                 cprintf.s(9)
+&gt;ptr2 (zeropage.o):
+&gt;    ltoa.o                    ltoa.s(11)
+&gt;    strlower.o                strlower.s(13)
+&gt;    _printf.o                 _printf.s(13)
+&gt;    scrsize.o                 scrsize.s(11)
+&gt;    vcprintf.o                vcprintf.s(10)
+&gt;ptr3 (zeropage.o):
+&gt;    ltoa.o                    ltoa.s(11)
+&gt;    vcprintf.o                vcprintf.s(10)
+&gt;push0 (pushax.o):
+&gt;    apple2.o                  crt0.s(9)
+&gt;push1 (push1.o):
+&gt;    _printf.o                 _printf.s(9)
+&gt;pusha (pusha.o):
+&gt;    pushc1.o                  pushc1.s(8)
+&gt;    pushc0.o                  pushc0.s(8)
+&gt;    hello.o                   hello.s(87)
+&gt;pusha0 (pushax.o):
+&gt;    push1.o                   push1.s(8)
+&gt;    hello.o                   hello.s(96)
+&gt;pushax (pushax.o):
+&gt;    _printf.o                 _printf.s(9)
+&gt;    vcprintf.o                vcprintf.s(8)
+&gt;    cprintf.o                 cprintf.s(8)
+&gt;    hello.o                   hello.s(54)
+&gt;pushc0 (pushc0.o):
+&gt;    hello.o                   hello.s(67)
+&gt;pushc1 (pushc1.o):
+&gt;    hello.o                   hello.s(68)
+&gt;pusheax (lpush.o):
+&gt;    _printf.o                 _printf.s(9)
+&gt;putchar (cputc.o):
+&gt;    cvline.o                  cvline.s(9)
+&gt;regbank (zeropage.o):
+&gt;    _printf.o                 _printf.s(13)
+&gt;return0 (return0.o):
+&gt;    color.o                   color.s(10)
+&gt;return1 (return1.o):
+&gt;    color.o                   color.s(10)
+&gt;sp (zeropage.o):
+&gt;    decsp4.o                  decsp4.s(8)
+&gt;    lpush.o                   lpush.s(12)
+&gt;    decsp6.o                  decsp6.s(8)
+&gt;    _printf.o                 _printf.s(13)
+&gt;    sub.o                     sub.s(9)
+&gt;    pushax.o                  pushax.s(8)
+&gt;    pusha.o                   pusha.s(8)
+&gt;    popa.o                    popa.s(8)
+&gt;    leasp.o                   leasp.s(8)
+&gt;    incsp2.o                  incsp2.s(8)
+&gt;    decsp2.o                  decsp2.s(8)
+&gt;    addysp.o                  addysp.s(8)
+&gt;    vcprintf.o                vcprintf.s(10)
+&gt;    cprintf.o                 cprintf.s(9)
+&gt;    hello.o                   hello.s(8)
+&gt;    apple2.o                  zeropage.inc(11)
+&gt;sreg (zeropage.o):
+&gt;    ltoa.o                    ltoa.s(11)
+&gt;    lpush.o                   lpush.s(12)
+&gt;    axlong.o                  axlong.s(8)
+&gt;    _printf.o                 _printf.s(13)
+&gt;tmp1 (zeropage.o):
+&gt;    ltoa.o                    ltoa.s(11)
+&gt;    _printf.o                 _printf.s(13)
+&gt;    vcprintf.o                vcprintf.s(10)
+&gt;    cvline.o                  cvline.s(10)
+&gt;    chline.o                  chline.s(10)
+&gt;tossubax (sub.o):
+&gt;    hello.o                   hello.s(100)
+&gt;xsize (_scrsize.o):
+&gt;    scrsize.o                 scrsize.s(10)
+&gt;ysize (_scrsize.o):
+&gt;    scrsize.o                 scrsize.s(10)
+&gt;zerobss (zerobss.o):
+&gt;    apple2.o                  crt0.s(9)
+&gt;
+&gt;  
+&gt;
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20rebuilding%20libraries%20-%20generated%20program%20crashes">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3039.html">Ullrich von Bassewitz: "Re: [cc65] library search path"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3041.html">Ullrich von Bassewitz: "Re: [cc65] rebuilding libraries - generated program crashes"</a>
+<li><strong>Reply:</strong> <a href="3041.html">Ullrich von Bassewitz: "Re: [cc65] rebuilding libraries - generated program crashes"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-05-29 12:40:34 CEST</em>
+</em>
+</small>
+</body>
+</html>

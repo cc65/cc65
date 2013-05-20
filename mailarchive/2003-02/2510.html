@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-7">
+<title>cc65 mailing list archive: Re: [cc65] Lynx target</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] Lynx target">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Lynx target</h1>
+<!-- received="Wed Feb 26 01:53:59 2003" -->
+<!-- isoreceived="20030226005359" -->
+<!-- sent="Wed, 26 Feb 2003 01:59:14 +0100" -->
+<!-- isosent="20030226005914" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] Lynx target" -->
+<!-- id="200302260159.14430.groepaz@gmx.net" -->
+<!-- charset="iso-8859-7" -->
+<!-- inreplyto="se5b99e8.084@gwmail.sd62.bc.ca" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Lynx%20target"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2003-02-26 01:59:14
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2509.html">Groepaz: "[cc65] assembler problem..."</a>
+<li><strong>In reply to:</strong> <a href="2508.html">Shawn Jefferson: "Re: [cc65] Lynx target"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2516.html">Ullrich von Bassewitz: "Re: [cc65] Lynx target"</a>
+<li><strong>Next in thread:</strong> <a href="2515.html">Ullrich von Bassewitz: "Re: [cc65] Lynx target"</a>
+<li><strong>Reply:</strong> <a href="2516.html">Ullrich von Bassewitz: "Re: [cc65] Lynx target"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Wednesday 26 February 2003 01:29, Shawn Jefferson wrote:
+&gt; I'll have to do some more testing, but since you stated that no one has
+&gt; tested the 65C02 code generation... it may be that something is not
+&gt; generating properly.  I have saved three assembly listings from my programs
+&gt; compiled in different ways (one with -O, one with --cpu 65C02 and one
+&gt; without, but haven't looked at them yet.)  Most likely this stems from
+&gt; errors on my part, but I'll let you know if it's not.
+
+mmmmh both my NES and my PCE port are currently compiled with --cpu 65C02 
+-Ori. i link those files to a &quot;none.lib&quot; which i have compiled --cpu 65C02 
+and C-file(s) also compile --cpu 65C02.
+
+works great so far :=P
+
+what kind of problems do you have btw? you should for example take great care 
+with setting up the sections, copying them to ram accordingly, setting up the 
+stack and heap etc pp.... the linker seems to behave incorrectly (well 
+atleast, unexpected :=P) under certain circumstances so be sure to verify 
+manully that all that works right...
+
+&gt; I would have expected the compiler to complain at the #include for the
+&gt; struct and #define if there were something wrong with it, but it only
+&gt; complains when I try to use the struct.
+
+it wont complain for a &quot;wrong&quot; #define...you can 
+
+#define whatthehellisthis(_bla,_blub) tschingderessabumtaetaerae!!!!! // 
+carneval tv must die!
+
+just fine, but whenever you use
+
+whatthehellisthis(y,x);
+
+in your code, you will get an error at this line, NOT at the line of the 
+define. this is a bad thing with macros actually (and one reason not to 
+overuse them &quot;just because&quot;). it would actually be a smart move of the 
+compiler to tell the line of the macro aswell :=P *hint* :=DD
+
+&gt; test.c(27): Error: Identifier expected
+&gt; test.c(27): Error: Illegal function call
+&gt; test.c(27): Error: Integer expression expected
+&gt; test.c(27): Error: `;' expected
+&gt; test.c(27): Error: Expression expected
+&gt; test.c(27): Error: `;' expected
+&gt; test.c(27): Error: Expression expected
+&gt; test.c(27): Error: `;' expected
+&gt; test.c(27): Error: Expression expected
+&gt; test.c(27): Error: `;' expected
+&gt; test.c(27): Error: Expression expected
+&gt; test.c(27): Fatal: Too many errors
+&gt;
+&gt; That's my error message above when trying to use the struct.
+
+maybe give us the code that generates this error (and related lines) aswell? 
+:O)
+
+gpz
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Lynx%20target">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2509.html">Groepaz: "[cc65] assembler problem..."</a>
+<li><strong>In reply to:</strong> <a href="2508.html">Shawn Jefferson: "Re: [cc65] Lynx target"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2516.html">Ullrich von Bassewitz: "Re: [cc65] Lynx target"</a>
+<li><strong>Next in thread:</strong> <a href="2515.html">Ullrich von Bassewitz: "Re: [cc65] Lynx target"</a>
+<li><strong>Reply:</strong> <a href="2516.html">Ullrich von Bassewitz: "Re: [cc65] Lynx target"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-02-26 01:55:04 CET</em>
+</em>
+</small>
+</body>
+</html>

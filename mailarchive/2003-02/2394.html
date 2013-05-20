@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] My personal pointer hell,</title>
+<meta name="Author" content="cas_at_strotmann.de (cas_at_strotmann.de)">
+<meta name="Subject" content="Re: [cc65] My personal pointer hell, need some help please">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] My personal pointer hell, need some help please</h1>
+<!-- received="Mon Feb  3 00:08:56 2003" -->
+<!-- isoreceived="20030202230856" -->
+<!-- sent="Mon, 3 Feb 2003 00:08:49 +0100 (CET)" -->
+<!-- isosent="20030202230849" -->
+<!-- name="cas_at_strotmann.de" -->
+<!-- email="cas_at_strotmann.de" -->
+<!-- subject="Re: [cc65] My personal pointer hell, need some help please" -->
+<!-- id="Pine.BSO.4.44.0302030006440.20831-100000@csgate2.strotmann.de" -->
+<!-- inreplyto="20030202212131.GA1062@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> <a href="mailto:cas_at_strotmann.de?Subject=Re:%20[cc65]%20My%20personal%20pointer%20hell,%20need%20some%20help%20please"><em>cas_at_strotmann.de</em></a><br>
+<strong>Date:</strong> 2003-02-03 00:08:49
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2393.html">Ullrich von Bassewitz: "Re: [cc65] My personal pointer hell, need some help please"</a>
+<li><strong>In reply to:</strong> <a href="2393.html">Ullrich von Bassewitz: "Re: [cc65] My personal pointer hell, need some help please"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2396.html">Groepaz: "Re: [cc65] My personal pointer hell, need some help please"</a>
+<li><strong>Next in thread:</strong> <a href="2395.html">Groepaz: "Re: [cc65] My personal pointer hell, need some help please"</a>
+<li><strong>Reply:</strong> <a href="2396.html">Groepaz: "Re: [cc65] My personal pointer hell, need some help please"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hallo Ullrich,
+
+danke fr die schnelle Antwort. Sorry das ich die Known-Bugs nicht
+gruendlich gelesen habe.
+
+Bzgl. meiner Mails, mein System ist ein wenig ungewoehnlich:
+
+Ich benutzer KMail (Linux KDE Mail), speichere die Mail als Draft,
+verschiebe die Mail in den &quot;Outbox&quot; Ordner meines IMAP-Servers, welcher
+die Mail dann an den lokalen Postfix weiterleitet. Ich habe leider keinen
+sicheren SMTP Zugang zu meinem Mailserver, und durch diese ungewoehnliche
+Art Mails zu versenden knnte das von Dir beschriebene Problem entstehen.
+Ich werde das mal untersuchen. Habe bisher noch keine hnlichen
+Fehlerberichte bekommen.
+
+Diese Mail ist direkt per PINE auf dem Mailserver geschrieben und dann
+lokal ueber Postfix gesendet. Tritt das Problem auch bei dieser Mail auf?
+
+Beste Gruesse
+
+Carsten Strotmann
+
+
+ On Sun, 2 Feb 2003, Ullrich von Bassewitz wrote:
+
+&gt;
+&gt; Hi!
+&gt;
+&gt; On Sun, Feb 02, 2003 at 09:13:38PM +0100, Carsten Strotmann wrote:
+&gt; &gt; On compile with cc65 2.9.0 I get
+&gt; &gt;
+&gt; &gt; rainbow.c(46): Internal compiler error:
+&gt; &gt; oursp != savsp (-2 != 0)
+&gt; &gt; Line:  }
+&gt; &gt; cl65: Subprocess `cc65' aborted by signal 6
+&gt; &gt;
+&gt; &gt; Can anyone see what is wrong?
+&gt; &gt; Or is this a compiler problem?
+&gt;
+&gt; &quot;Internal compiler error&quot; means it's a compiler problem. I've used this
+&gt; message because it sounds more staid than &quot;Uz has fucked things up&quot; :-)
+&gt;
+&gt; For a fix, replace line 2158 of expr.c which reads
+&gt;
+&gt;         flags = typeadjust (lval, &amp;lval2, 0);
+&gt;
+&gt; by
+&gt;
+&gt;         flags = typeadjust (lval, &amp;lval2, 0) &amp; ~CF_CONST;
+&gt;
+&gt; or download the patch from the known bugs page. The solution is somewhat ugly
+&gt; (it fixes the symptoms instead of the cause), but it's the best I can do at
+&gt; the moment.
+&gt;
+&gt; As a workaround, you may use the += operator.
+&gt;
+&gt; Thanks for the bug report!
+&gt;
+&gt; Regards
+&gt;
+&gt;
+&gt;         Uz
+&gt;
+&gt;
+&gt;
+&gt; P.S.: There seems to be something weird with your mails to the list. I do
+&gt; always get them with the 'New' flag reset and korn does not notify me when new
+&gt; mail arrives. I never had this problem before and the first few times it
+&gt; happened I thought it was my error, but it happens with each mail from you.
+&gt;
+&gt; --
+&gt; Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20My%20personal%20pointer%20hell,%20need%20some%20help%20please">uz_at_musoftware.de</a>
+&gt; ----------------------------------------------------------------------
+&gt; To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20My%20personal%20pointer%20hell,%20need%20some%20help%20please">majordomo_at_musoftware.de</a> with
+&gt; the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20My%20personal%20pointer%20hell,%20need%20some%20help%20please">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2393.html">Ullrich von Bassewitz: "Re: [cc65] My personal pointer hell, need some help please"</a>
+<li><strong>In reply to:</strong> <a href="2393.html">Ullrich von Bassewitz: "Re: [cc65] My personal pointer hell, need some help please"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2396.html">Groepaz: "Re: [cc65] My personal pointer hell, need some help please"</a>
+<li><strong>Next in thread:</strong> <a href="2395.html">Groepaz: "Re: [cc65] My personal pointer hell, need some help please"</a>
+<li><strong>Reply:</strong> <a href="2396.html">Groepaz: "Re: [cc65] My personal pointer hell, need some help please"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-02-03 00:09:39 CET</em>
+</em>
+</small>
+</body>
+</html>

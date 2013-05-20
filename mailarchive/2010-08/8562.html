@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Strange behaviour of a simple </title>
+<meta name="Author" content="Carlos (shangri-la1teleline.es)" />
+<meta name="Subject" content="[cc65] Strange behaviour of a simple code" />
+<meta name="Date" content="2010-08-09" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Strange behaviour of a simple code</h1>
+<!-- received="Mon Aug  9 10:52:40 2010" -->
+<!-- isoreceived="20100809085240" -->
+<!-- sent="Mon, 9 Aug 2010 10:51:56 +0200" -->
+<!-- isosent="20100809085156" -->
+<!-- name="Carlos" -->
+<!-- email="shangri-la1teleline.es" -->
+<!-- subject="[cc65] Strange behaviour of a simple code" -->
+<!-- id="9BEA1915764041599DD422F2904BEA47@caixanova.gz" -->
+<!-- charset="utf-8" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8563.html" title="Johan Kotlinski: &quot;Re: [cc65] Strange behaviour of a simple code&quot;">Next message</a> ]
+[ <a href="8561.html" title="Payton Byrd: &quot;RE: [cc65] Debug info usage&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8563.html" title="Johan Kotlinski: &quot;Re: [cc65] Strange behaviour of a simple code&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Carlos &lt;<a href="mailto:shangri-la1teleline.es?Subject=Re:%20[cc65]%20Strange%20behaviour%20of%20a%20simple%20code">shangri-la1teleline.es</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-08-09 10:51:56</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>In these last days i'm really puzzled with a strange behaviour with a cc65 simple program, don't know if is some kind of bug or a bad code from my part but can't find where the problem can be.
+
+The result of the main code is not right:
+
+1.  FROM:  17600
+1.  TO:  30719
+3.  FROM:  17473
+3.  TO:  30209
+
+but if uncomment the two commented printf lines then the result is the expected:
+
+1.  FROM:  17600
+1.  TO:  30719
+2.  FROM:  17600
+2.  TO:  30336
+3.  FROM:  17728
+3.  TO:  30464
+
+
+why is the behaviour changed only for the printf lines? Any ideas?
+
+
+test.c
+------
+
+#include &lt;stdio.h&gt;
+
+void inc_test(void);
+
+unsigned int from, to;
+
+
+// MAIN
+void main(void)
+{
+ from = 17600;
+ to = 30719;
+ 
+ printf(&quot;1. FROM: %u\n&quot;, from);
+ printf(&quot;1. TO: %u\n&quot;, to);
+ 
+ if (to &gt;= 0x7740)   // 30528
+ {
+  to = 0x7680;  // 30336
+ }
+ else
+ {
+  to = 0x7740;
+ }
+ 
+ //printf(&quot;2. FROM: %u\n&quot;, from);
+ //printf(&quot;2. TO: %u\n&quot;, to);
+ 
+ inc_test();
+ ++from;
+ ++to;
+ 
+ inc_test();
+ ++from;
+ ++to;
+
+ printf(&quot;3. FROM: %u\n&quot;, from);
+ printf(&quot;3. TO: %u\n&quot;, to);
+}
+
+
+
+inctest.s
+---------
+
+.export _inc_test
+
+.import _from
+.import _to
+
+
+.CODE
+
+; ---------------------------------------------------------------
+; _inc_test
+; ---------------------------------------------------------------
+_inc_test:
+
+ ldx #$15
+
+&#64;LGO: 
+
+ lda _from
+ adc #$03
+ sta _from
+ lda _to
+ adc #$03
+ sta _to
+
+ dex
+ bne &#64;LGO
+
+ rts
+
+
+
+- - - AVISO  - - -
+Este correo electrónico contiene información privada y confidencial. Si usted no es el destinatario del mensaje no está autorizado a leerlo, copiarlo o difundirlo. Si lo ha recibido por error, por favor contacte con el remitente y destruya su contenido. Cualquier uso adicional de este correo está estrictamente prohibido.
+
+- - - NOTICE - - -
+Privileged/confidential information may be contained in this e-mail. Any reading, copying o dissemination of this communication by persons or entities other than its intended recipient is prohibited. If you received this in error, please contact the sender and delete it. Any further use of this e-mail by you is strictly prohibited.
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Aug  9 10:52:40 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8563.html" title="Next message in the list">Johan Kotlinski: "Re: [cc65] Strange behaviour of a simple code"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8561.html" title="Previous message in the list">Payton Byrd: "RE: [cc65] Debug info usage"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8563.html" title="Next message in this discussion thread">Johan Kotlinski: "Re: [cc65] Strange behaviour of a simple code"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8563.html" title="Message sent in reply to this message">Johan Kotlinski: "Re: [cc65] Strange behaviour of a simple code"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8564.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Strange behaviour of a simple code"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8562" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8562" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8562" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-08-09 10:52:44 CEST
+</em></small></p>
+</body>
+</html>

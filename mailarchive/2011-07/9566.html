@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Repeated string in struct </title>
+<meta name="Author" content="Joseph Rose (rose.joseph121yahoo.com)" />
+<meta name="Subject" content="Re: [cc65] Repeated string in struct array" />
+<meta name="Date" content="2011-07-11" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Repeated string in struct array</h1>
+<!-- received="Mon Jul 11 18:11:07 2011" -->
+<!-- isoreceived="20110711161107" -->
+<!-- sent="Mon, 11 Jul 2011 09:10:51 -0700 (PDT)" -->
+<!-- isosent="20110711161051" -->
+<!-- name="Joseph Rose" -->
+<!-- email="rose.joseph121yahoo.com" -->
+<!-- subject="Re: [cc65] Repeated string in struct array" -->
+<!-- id="1310400651.13472.YahooMailNeo@web120613.mail.ne1.yahoo.com" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="20110711142306.GA5305&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9567.html" title="marcas: &quot;Re: [cc65] Interrupt &lt;-&gt;  C runtime environment&quot;">Next message</a> ]
+[ <a href="9565.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] cbm_printf()/cbm_scanf()?&quot;">Previous message</a> ]
+[ <a href="9563.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Repeated string in struct array&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Joseph Rose &lt;<a href="mailto:rose.joseph121yahoo.com?Subject=Re:%20[cc65]%20Repeated%20string%20in%20struct%20array">rose.joseph121yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-07-11 18:10:51</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I am compiling a text adventure for the c64 using the June 2011 snapshot and the -Or optimization.  I may use Hidden64.  If I use Hidden64, I may want to put some strings in normal RAM and some in hidden RAM.  For now, I don't have to.  The issue is that I want to give two or more rooms the same name but use a pointer in the second's name to the first's name.  BTW, I didn't check the output.  I understand that cc65 only writes a repeated string only once, but I'd still like to write the name once myself.  :)
+
+From: Ullrich von Bassewitz &lt;uz&#64;musoftware&#46;<!--nospam-->de&gt;
+To: cc65&#64;musoftware&#46;<!--nospam-->de
+Sent: Monday, July 11, 2011 10:23 AM
+Subject: Re: [cc65] Repeated string in struct array
+
+
+On Mon, Jul 11, 2011 at 06:29:11AM -0700, Joseph Rose wrote:
+&gt;    I want to use a pointer in room[1].location to room[0].location instead of
+&gt;    using the default mechanism to concatenate strings. 
+
+Which compiler version and which compilation flags are you using? Did you
+check the generated code?
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Jul 11 18:11:07 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9567.html" title="Next message in the list">marcas: "Re: [cc65] Interrupt &lt;-&gt;  C runtime environment"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9565.html" title="Previous message in the list">silverdr1wfmh.org.pl: "Re: [cc65] cbm_printf()/cbm_scanf()?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9563.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Repeated string in struct array"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9566" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9566" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9566" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-07-11 18:11:10 CEST
+</em></small></p>
+</body>
+</html>

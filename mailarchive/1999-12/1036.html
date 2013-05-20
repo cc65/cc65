@@ -1,0 +1,169 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] sid-player.</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] sid-player.">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] sid-player.</h1>
+<!-- received="Wed Dec  1 07:48:50 1999" -->
+<!-- isoreceived="19991201064850" -->
+<!-- sent="Wed, 01 Dec 1999 07:48:25 +0100" -->
+<!-- isosent="19991201064825" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] sid-player." -->
+<!-- id="3844C4B9.B331DF2B@gmx.net" -->
+<!-- inreplyto="12EA519C.2A59@online.no" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20sid-player."><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 1999-12-01 07:48:25
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="1037.html">Ullrich von Bassewitz: "Re: [cc65] sid-player."</a>
+<li><strong>Previous message:</strong> <a href="../1980-01/1035.html">Eivind Schjerven: "Re: [cc65] sid-player."</a>
+<li><strong>In reply to:</strong> <a href="../1980-01/1035.html">Eivind Schjerven: "Re: [cc65] sid-player."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1037.html">Ullrich von Bassewitz: "Re: [cc65] sid-player."</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+sei
+lda#$01
+sta$d01a
+lda#$7f
+sta$dc0d
+lda#&gt;irq
+sta$0315
+lda#&lt;irq
+sta$0314
+lda#$1b
+sta$d011
+lda#$32
+sta$d012
+cli
+
+jsr musicinit
+
+jmp *
+
+irq jsr musicplay
+    inc $d019
+    jmp $febc
+
+geeez..... this is not even worth to be called 'code' at all 8=)
+
+btw, the MAJOR problem of playing .sid files on the real c64 is that
+tunes that contain samples must be patched to work on sidplay! (so,
+they will NO more work on the real c64) .... all the rest aint a
+problem... NOONE cares about ntsc/pal difference (you probably already
+heard a whole LOT of tunes that play at wrong speed because of that)
+.... and if you cut off the header, you have more or less the 
+original file.
+
+RTFM! 8=)
+
+Eivind Schjerven wrote:
+&gt; 
+&gt; Ullrich von Bassewitz wrote:
+&gt; &gt;
+&gt; &gt; Hi!
+&gt; &gt;
+&gt; &gt; &gt; I wounderd if anyone has done a normal pretty stripped sid-player for
+&gt; &gt; &gt; the cc65 ? If so, is the source code available somewhere? or documents
+&gt; &gt; &gt; on the subject ?
+&gt; &gt;
+&gt; &gt; The SID file format is in fact executable code with a small header. One
+&gt; &gt; problem is, that the load address of the executable code within the SID file
+&gt; &gt; may be already occupied by the SID player code. Another problem is that the
+&gt; &gt; real machine is not switcheable between NTSC and PAL, so you can only play
+&gt; &gt; part of the available SIDs.
+&gt; &gt;
+&gt; &gt; Apart from that it should not too much work.
+&gt; &gt;
+&gt; Okey, but i heard I had to make a irq player or something to make the
+&gt; sid file run/play. tell me more please :)
+&gt; 
+&gt; Cpix.
+&gt; ----------------------------------------------------------------------
+&gt; To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20sid-player.">majordomo_at_musoftware.de</a> with
+&gt; the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+
+-- 
+........................................................
+
+		            /^\
+                            \ /  
+      ASCII RIBBON CAMPAIGN  X  AGAINST HTML MAIL
+                            / \  
+
+........................................................
+
+             .--.--.--.----..--.--.--.-----.----.
+   C=64     /  /  /  /  .  /  .  .  /  .  /  .  /\
+           /  /  /__/  /__/  /  /  /  /  /  /  / /
+   PC     /     /  /  /\_/  /  /  /  __ /  /  / /
+         /  /  /  /  / //  /  /  /  /  /  /  / /
+   PSX  /  /  /  /  / //  /  /  /  /  /  /  / /
+       /__/__/__/__/ //__/__/__/_____/__/__/ / 
+       \__\__\__\__\/ \__\__\__\_____\__\__\/  Groepaz
+
+........................................................
+.. <a href="http://fly.to/hitmen-c64">http://fly.to/hitmen-c64</a> ............................
+..... the hitmen c64 home page .........................
+.. <a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a> .......................
+..... hitmen psx section ...............................
+.. <a href="http://start.at/hitnav64">http://start.at/hitnav64</a> ............................
+..... biggest c64 link collection around ...............
+.. <a href="http://fly.to/hitmen-groepaz">http://fly.to/hitmen-groepaz</a> ........................
+..... my little personal page ..........................
+........................................................
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20sid-player.">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="1037.html">Ullrich von Bassewitz: "Re: [cc65] sid-player."</a>
+<li><strong>Previous message:</strong> <a href="../1980-01/1035.html">Eivind Schjerven: "Re: [cc65] sid-player."</a>
+<li><strong>In reply to:</strong> <a href="../1980-01/1035.html">Eivind Schjerven: "Re: [cc65] sid-player."</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1037.html">Ullrich von Bassewitz: "Re: [cc65] sid-player."</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:45 CET</em>
+</em>
+</small>
+</body>
+</html>

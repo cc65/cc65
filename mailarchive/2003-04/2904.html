@@ -1,0 +1,183 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] Announcement: cc65 version 2.</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="[cc65] Announcement: cc65 version 2.9.1 released">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] Announcement: cc65 version 2.9.1 released</h1>
+<!-- received="Sun Apr 27 12:16:12 2003" -->
+<!-- isoreceived="20030427101612" -->
+<!-- sent="Sun, 27 Apr 2003 12:16:09 +0200" -->
+<!-- isosent="20030427101609" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="[cc65] Announcement: cc65 version 2.9.1 released" -->
+<!-- id="20030427101609.GA18017@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Announcement:%20cc65%20version%202.9.1%20released"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-04-27 12:16:09
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2903.html">Shawn Jefferson: "Re: [cc65] loading and running another program on Atari"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+I had some free time and used it to prepare a new cc65 release. Please note
+that this is primarily a bugfix release, a few exceptions are listed below.
+The official announcement is attached below. Have fun!
+
+Regards
+
+
+        Uz
+
+
+---------------------------------------------------------------------------
+
+I'm proud to announce version 2.9.1 of CC65, a C crosscompiler /
+crossassembler combo for 6502 systems.
+
+CC65 has C and runtime library support for many of the old 6502 machines,
+including
+
+  - The Commodore VIC20 (contributed by Steve Schmidtke
+    &lt;<a href="mailto:steve_schmidtke_at_hotmail.com?Subject=Re:%20[cc65]%20Announcement:%20cc65%20version%202.9.1%20released">steve_schmidtke_at_hotmail.com</a>&gt;).
+
+  - The Commodore C64 and C128.
+
+  - The Commodore C16, C116 and Plus/4.
+
+  - The CBM 510 (aka P500), a quite rare Commodore machine (programs
+    run in bank 0).
+
+  - The CBM 600/700 family (programs run in bank 1).
+
+  - Newer PET machines (not 2001)
+
+  - The Apple ][ (library support by Kevin Ruland &lt;<a href="mailto:kevin_at_rodin.wustl.edu?Subject=Re:%20[cc65]%20Announcement:%20cc65%20version%202.9.1%20released">kevin_at_rodin.wustl.edu</a>&gt;)
+
+  - The Atari 8 bit machines (thanks to the Atari team: Christian Groessler
+    &lt;<a href="mailto:cpg_at_aladdin.de?Subject=Re:%20[cc65]%20Announcement:%20cc65%20version%202.9.1%20released">cpg_at_aladdin.de</a>&gt;, Mark Keates &lt;<a href="mailto:markk_at_dendrite.co.uk?Subject=Re:%20[cc65]%20Announcement:%20cc65%20version%202.9.1%20released">markk_at_dendrite.co.uk</a>&gt;, Freddy Offenga
+    &lt;<a href="mailto:taf_offenga_at_yahoo.com?Subject=Re:%20[cc65]%20Announcement:%20cc65%20version%202.9.1%20released">taf_offenga_at_yahoo.com</a>&gt; and David Lloyd, &lt;<a href="mailto:dmlloyd_at_atari-central.com?Subject=Re:%20[cc65]%20Announcement:%20cc65%20version%202.9.1%20released">dmlloyd_at_atari-central.com</a>&gt;).
+
+  - GEOS for the C64 and C128 (GEOSLib by Maciej Witkowiak &lt;<a href="mailto:ytm_at_elysium.pl?Subject=Re:%20[cc65]%20Announcement:%20cc65%20version%202.9.1%20released">ytm_at_elysium.pl</a>&gt;)
+
+  - The Oric Atmos (this one is BETA!).
+
+The libraries are fairly portable, so creating a version for other 6502s
+shouldn't be too much work.
+
+
+This release contains bug fixes (see <a href="http://www.cc65.org/bugs.php">http://www.cc65.org/bugs.php</a> for a list
+of bugs that are fixed in this release), plus the following small additions:
+
+  * As a contribution to the Contiki project, the _heapmemavail and
+    _heapmaxavail functions have been added from the head branch.
+
+  * The BETA library for the Oric Atmos has been added from the head branch,
+    so I can get some more feedback.
+
+
+There is still no support for the following features:
+
+  * Floats and bit fields.
+
+  * stdio file routines on some systems.
+
+  * The 80 column mode on the C128 is not supported by the conio library (this
+    will come with the next major release, thanks to the initial work of
+    MagerValp &lt;<a href="mailto:MagerValp_at_cling.gu.se?Subject=Re:%20[cc65]%20Announcement:%20cc65%20version%202.9.1%20released">MagerValp_at_cling.gu.se</a>&gt;).
+
+
+Available packages:
+
+As usual I will provide the complete sources and several binary packages,
+including RPMs for RedHat Linux. Linux is the primary development
+platform, so the sources do compile out of the box on Linux machines.
+
+Please note that there are separate RPMs for the compiler proper and the
+target specific libraries. To develop for one of the predefined target
+systems you need the compiler RPM package *and* one of the target machine
+packages.
+
+Binaries for DOS and and Windows will follow or may already be available
+at the time you read this. OS/2 packages will again be available, but
+since there are almost no downloads for OS/2, so the host platform may
+get dropped in the near future (again). As with the RPM packages, you
+need the package for the development system (Windows, etc.) *and* one or
+more of the target machine packages.
+
+
+Download:
+
+For more information and a download link, please visit the cc65 web page at
+
+     	<a href="http://www.cc65.org/">http://www.cc65.org/</a>
+
+
+Mailing list:
+
+There is a mailing list for discussing cc65 related issues (programming,
+suggestions, bugs, ...). See
+
+        <a href="http://www.cc65.org/#List">http://www.cc65.org/#List</a>
+
+for information on how to subscribe to this list.
+
+-----------
+
+Thanks to all who sent feedback and suggestions, and of course to anyone who
+helped developing cc65!
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20Announcement:%20cc65%20version%202.9.1%20released">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Announcement:%20cc65%20version%202.9.1%20released">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2903.html">Shawn Jefferson: "Re: [cc65] loading and running another program on Atari"</a>
+<!-- nextthread="start" -->
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-04-27 12:17:18 CEST</em>
+</em>
+</small>
+</body>
+</html>

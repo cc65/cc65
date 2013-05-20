@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Fwd: Reading / writing userpor</title>
+<meta name="Author" content="Scott Hutter (scott.hutter1gmail.com)" />
+<meta name="Subject" content="[cc65] Fwd: Reading / writing userport on C128?" />
+<meta name="Date" content="2009-08-02" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Fwd: Reading / writing userport on C128?</h1>
+<!-- received="Sun Aug  2 17:27:54 2009" -->
+<!-- isoreceived="20090802152754" -->
+<!-- sent="Sun, 2 Aug 2009 10:27:46 -0500" -->
+<!-- isosent="20090802152746" -->
+<!-- name="Scott Hutter" -->
+<!-- email="scott.hutter1gmail.com" -->
+<!-- subject="[cc65] Fwd: Reading / writing userport on C128?" -->
+<!-- id="aec6e65a0908020827k49bcfcc4r8e24d6d866536b6e@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="aec6e65a0908020825o556adfe4mcb61bbc86c9db47a&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6640.html" title="Groepaz: &quot;Re: [cc65] Fwd: Reading / writing userport on C128?&quot;">Next message</a> ]
+[ <a href="6638.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Startup magic&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6640.html" title="Groepaz: &quot;Re: [cc65] Fwd: Reading / writing userport on C128?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Scott Hutter &lt;<a href="mailto:scott.hutter1gmail.com?Subject=Re:%20[cc65]%20Fwd:%20Reading%20/%20writing%20userport%20on%20C128?">scott.hutter1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-08-02 17:27:46</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hey guys, Im having trouble reading/writing to the userport on a C128.  Im
+writing a simple terminal using the cbm functions since I didnt see a
+userport rs232 driver.  I can write to the userport/modem just fine, but
+reading seems to hang.  Any help would be appreciated. (Or alternate
+approaches)
+
+Here's the code I have:
+
+#include &lt;c128.h&gt;
+#include &lt;conio.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+
+int main(void)
+{
+    unsigned char* inbuffer;
+    unsigned char* outbuffer;
+    unsigned char name[6];
+    unsigned char c;
+
+    name[0]=6;
+    name[1]=0;
+    name[2]=0;
+
+    inbuffer = (unsigned char *) malloc (1);
+    outbuffer = (unsigned char *) malloc (1);
+
+    fast();
+
+   if(!cbm_open(2,2,0,name))
+        puts(&quot;Unable to open modem.&quot;);
+
+    do
+    {
+        if(cbm_read(2, inbuffer, 1) &gt; 0)    /* this function seems to hang
+*/
+             putchar(*inbuffer);
+
+        c = getchar();
+
+        if (c)
+        {
+            putchar(c);
+            *outbuffer = c;
+            cbm_write(2, outbuffer,1);
+        }
+
+    } while(c != '.');
+
+    cbm_close(2);
+
+}
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Aug  2 17:27:54 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6640.html" title="Next message in the list">Groepaz: "Re: [cc65] Fwd: Reading / writing userport on C128?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6638.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Startup magic"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6640.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] Fwd: Reading / writing userport on C128?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6640.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] Fwd: Reading / writing userport on C128?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6639" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6639" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6639" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-08-02 17:27:57 CEST
+</em></small></p>
+</body>
+</html>

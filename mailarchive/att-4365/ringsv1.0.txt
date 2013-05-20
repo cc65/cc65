@@ -1,0 +1,18 @@
+This program calculates rings with equal radius.
+The method is the following:
+
+You can calculate the squares of x or y.
+You can compare the sum to a squaretable, so 
+you that you know if the radius must be increased.
+
+Compiled with cc65-2.10.1 and should be compatible to
+all (cbm)machines with conio support.
+
+Change the #ifdef at the beginning of the program
+to #ifndef, and you see a small difference in the listing.
+
+V1.0
+
+Greetings Carlos
+
+

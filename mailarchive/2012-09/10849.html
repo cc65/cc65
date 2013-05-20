@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] [ld65] Overwriting fillval</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] [ld65] Overwriting fillval for one segment only?" />
+<meta name="Date" content="2012-09-14" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] [ld65] Overwriting fillval for one segment only?</h1>
+<!-- received="Fri Sep 14 14:12:24 2012" -->
+<!-- isoreceived="20120914121224" -->
+<!-- sent="Fri, 14 Sep 2012 14:12:12 +0200" -->
+<!-- isosent="20120914121212" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] [ld65] Overwriting fillval for one segment only?" -->
+<!-- id="20120914121212.GC18125@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="20120913191225.GD12722&#64;trikaliotis.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10850.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Re: readdir bug&quot;">Next message</a> ]
+[ <a href="10848.html" title="Ullrich von Bassewitz: &quot;[cc65] Re: readdir bug&quot;">Previous message</a> ]
+[ <a href="10846.html" title="Spiro Trikaliotis: &quot;Re: [cc65] [ld65] Overwriting fillval for one segment only?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10858.html" title="Spiro Trikaliotis: &quot;Re: [cc65] [ld65] Overwriting fillval for one segment only?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20[ld65]%20Overwriting%20fillval%20for%20one%20segment%20only?">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-09-14 14:12:12</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Thu, Sep 13, 2012 at 09:12:26PM +0200, Spiro Trikaliotis wrote:
+&gt; Yes, this was the intepretation.
+&gt;
+&gt; The reason to do it so was to make sure the whole memory area can be
+&gt; controlled by the segments. Otherwise, we happen to have &quot;whole&quot; where
+&gt; the filler bytes cannot be controlled by the segment to override the
+&gt; memory section value.
+
+I don't know if this requirement is necessary. Why do you think anything
+should be controlled by the attributes in the segments?
+
+&gt; Yes, my specification was meant for exactly this:
+&gt; I wanted to make the filler bytes before the next segment to count for
+&gt; the current one - and, likewise, the filler bytes at the end of a memory
+&gt; section to count for the last segment.
+
+This leads to the situation where changing attributes for one segment will
+change the length of another segment. Which I think is highly unintuitive.
+
+&gt; An alternative would have been to make the filler bytes before a
+&gt; segment to count for that one. Unfortunately, with this approach, there
+&gt; would still be filler bytes at the end of the memory segment that could
+&gt; not be overwritten by a section.
+
+So what is the problem if that cannot be done? Having the space between the
+segments not assigned to a segment, but just being &quot;something else&quot; that is
+part of the memory area seems more logical to me.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Sep 14 14:12:24 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10850.html" title="Next message in the list">Spiro Trikaliotis: "Re: [cc65] Re: readdir bug"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10848.html" title="Previous message in the list">Ullrich von Bassewitz: "[cc65] Re: readdir bug"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10846.html" title="Message to which this message replies">Spiro Trikaliotis: "Re: [cc65] [ld65] Overwriting fillval for one segment only?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10858.html" title="Next message in this discussion thread">Spiro Trikaliotis: "Re: [cc65] [ld65] Overwriting fillval for one segment only?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10858.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Re: [cc65] [ld65] Overwriting fillval for one segment only?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10849" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10849" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10849" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-09-14 14:12:27 CEST
+</em></small></p>
+</body>
+</html>

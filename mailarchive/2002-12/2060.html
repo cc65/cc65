@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] 65tris on ATARI</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] 65tris on ATARI">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] 65tris on ATARI</h1>
+<!-- received="Sun Dec 15 23:00:46 2002" -->
+<!-- isoreceived="20021215220046" -->
+<!-- sent="Sun, 15 Dec 2002 22:52:37 +0100" -->
+<!-- isosent="20021215215237" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] 65tris on ATARI" -->
+<!-- id="200212152252.37205.groepaz@gmx.net" -->
+<!-- inreplyto="20021214233136.GA15809@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%2065tris%20on%20ATARI"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2002-12-15 22:52:37
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="2059.html">Groepaz: "Re: [cc65] 65tris on ATARI"</a>
+<li><strong>In reply to:</strong> <a href="2058.html">Ullrich von Bassewitz: "Re: [cc65] 65tris on ATARI"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2062.html">Ullrich von Bassewitz: "Re: [cc65] 65tris on ATARI"</a>
+<li><strong>Next in thread:</strong> <a href="2059.html">Groepaz: "Re: [cc65] 65tris on ATARI"</a>
+<li><strong>Reply:</strong> <a href="2062.html">Ullrich von Bassewitz: "Re: [cc65] 65tris on ATARI"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Sunday 15 December 2002 00:31, Ullrich von Bassewitz wrote:
+&gt; Thanks! Someone already posted this here, which led to a fierce discussion
+&gt; about colors in the Atari text mode:-) As far as I know, groepaz is working
+&gt; hard on a new, enhanced release, but I don't know how far he has come.
+
+i'll upload it soon, probably in some days.... i have fixed some bugs from the 
+previous release (like before only one line would be cleared, no matter how 
+many you completed) and its overall playable, yet not fully complete. 
+(hiscore list is missing, no winner displayed at game over etc) i have also 
+added support for joysticks, i'd like to replace this by modules though :=)
+
+only serious problem left right now is that we need some kind of timer-api 
+that can be used for synchronization. (right now, the thing will run faster 
+on faster machines, which is for sure not what we'd want :=))
+
+right now the thing works for all targets supported by cc65 (minus those 
+without conio, but i have still prepared some stuff for these). i am unsure 
+about the apple2 here, coz' i couldnt get it to work in emulator :=P (maybe 
+someone can tell me how to create a working diskimage from the binary using 
+the tools that come with the emus :o))
+
+i will also include the 26x25 characters conio for the vic20, plus a 80x25 
+conio for the c64 i knocked up years ago for a terminal program that i never 
+wrote :=P the latter does work suprisingly well with cc65 (well ofcoz i have 
+to say that *G*), it uses the $d000-$ffe8 area for bitmap and data, supports 
+colors - and is way faster than the geos-conio for that matter :=) tetris is 
+quite playable here hehe :)
+
+actually i am also tinkering with writing a 40x25 conio for the vic20, and 
+whatever i can come up with for the NES (provided i can get some damned 
+emulator working hehe ;=P)...chances are atleast the one for vic20 will also 
+be in the next release (and ofcoz, in the future i will seperate those 
+conio-things from 65tris....its just a nice testing ground :=))
+
+&gt; Thanks for the offer! The problem is that some of the I/O stuff will get
+&gt; redesigned to use loadable modules, and I don't know if joystick drivers
+&gt; will be part of that. If joystick drivers get moved to loadable modules,
+&gt; adding something like the 8 joystick adapter is not a problem. If this
+&gt; stays in the statically linked library, it means that programs will have to
+&gt; include it at link time, so they will grow bigger by including all the
+&gt; different drivers - something that would speak against an additional driver
+&gt; that is rarely used.
+
+i would really vote for loadable modules here aswell.... i have code for the 2 
+most popular 4-player adapters on the c64 ready (needs to be converted to 
+loadable module form however) and i would definetly want to be able to use 
+them :)
+
+(as a sidenote, i wrote another &quot;driver&quot; for normal joysticks + keyboard 
+aswell when i patched bmx-simulator.... that is, conio cant really be used 
+for input in a game, since it doesnt support multiple keys pressed at once - 
+and additionally on the c64 the keyboard conflicts with the joysticks so you 
+have to be smart with choosing the keys and design the keyboard-scanner 
+different from the kernal one)
+
+
+-- 
+          ___ ___ .___________________ .___________ _______.
+    c=64 /   |   \|   \__    ___/     \ \_   _____/ \      \ [groepaz]
+     gb /    '    \   | |    | /  \ /  \ |    __)_  /   |   \ gp32
+    cgb \    .    /   | |    |/    '    \|        \/    |    \ psx
+     gba \___|_  /|___| |____|\____|__  /_______  /\____|__  / dc
+          -----\/-----'---------------\/--------\/---------\/
+       <a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    Hitmen WWW Headquarters
+       <a href="http://fly.to/hitmen-groepaz">http://fly.to/hitmen-groepaz</a>     my personal playground
+       <a href="http://rr.c64.org/silversurfer">http://rr.c64.org/silversurfer</a>   home of the RR debugger
+       ftp.musoftware.de/pub/groepaz    cc65 dump site
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%2065tris%20on%20ATARI">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="2059.html">Groepaz: "Re: [cc65] 65tris on ATARI"</a>
+<li><strong>In reply to:</strong> <a href="2058.html">Ullrich von Bassewitz: "Re: [cc65] 65tris on ATARI"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="2062.html">Ullrich von Bassewitz: "Re: [cc65] 65tris on ATARI"</a>
+<li><strong>Next in thread:</strong> <a href="2059.html">Groepaz: "Re: [cc65] 65tris on ATARI"</a>
+<li><strong>Reply:</strong> <a href="2062.html">Ullrich von Bassewitz: "Re: [cc65] 65tris on ATARI"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-12-15 23:01:00 CET</em>
+</em>
+</small>
+</body>
+</html>

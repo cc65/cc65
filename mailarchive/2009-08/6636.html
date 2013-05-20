@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Startup magic</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Startup magic" />
+<meta name="Date" content="2009-08-01" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Startup magic</h1>
+<!-- received="Sat Aug  1 12:59:55 2009" -->
+<!-- isoreceived="20090801105955" -->
+<!-- sent="Sat, 1 Aug 2009 12:58:30 +0200" -->
+<!-- isosent="20090801105830" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Startup magic" -->
+<!-- id="20090801105830.GA24488@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="f97798c20908010309v687a8a2o644fc0b8a11e43bc&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="6637.html" title="Oliver Schmidt: &quot;Re: [cc65] Startup magic&quot;">Next message</a> ]
+[ <a href="6635.html" title="Oliver Schmidt: &quot;Re: [cc65] Startup magic (was: Segment EXEHDR does not exist - while  using ld65 directly)&quot;">Previous message</a> ]
+[ <a href="6635.html" title="Oliver Schmidt: &quot;Re: [cc65] Startup magic (was: Segment EXEHDR does not exist - while  using ld65 directly)&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="6637.html" title="Oliver Schmidt: &quot;Re: [cc65] Startup magic&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Startup%20magic">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-08-01 12:58:30</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Sat, Aug 01, 2009 at 12:09:37PM +0200, Oliver Schmidt wrote:
+&gt; Hm, until now I thought that placing the startup object file on the
+&gt; linker command line was solely necessary to make sure it get's linked
+&gt; - acting like an anchor that pulls in everything else necessary.
+
+That depends. In the early versions of cc65, the startup file had to be the
+first module in the linker command line (up until yesterday, most startup
+files contained such a note). The first reason was to have it linked in, the
+second was to have the code placed at the start of the executable, which is
+necessary for most platforms.
+
+With the introduction of the STARTUP segment, only the first reason was still
+valid. However, there are still platforms without a STARTUP segment. The Atari
+for example places the startup code in the LOWCODE segment. If there is more
+than one module with code in LOWCODE, linker placement depends on the order of
+modules - so for the Atari, the startup module still had to be the first
+module on the linker command line.
+
+With the latest change, even the second reason is no longer valid, because the
+compiler forces a dependency to a symbol named __STARTUP__ when it encounters
+the main() function. This dependency is satisfyied by an export in the startup
+module, so the linker will get it from the library. But in this case, the
+order of modules in the final executable depends on the internals of the
+linker, and for a specific placement of the startup code segments in
+collaboration with the linker config i necessary.
+
+&gt; But regarding the placement of the startup code at the beginning of
+&gt; the binary I thought this was all the recent years managed in the
+&gt; linker config by declaring the STARTUP segment as the first one going
+&gt; into the RAM memory area.
+
+Not for all platforms. I explicitly mentioned the Atari, which doesn't have
+the STARTUP segment. There are other platforms without it, but as far as I can
+say, they don't need it, because they don't have special placement needs for
+the STARTUP code.
+
+For most projects, the latest change shouldn't have any impacts on code or
+whatever. It just simplifies handling, because there is no longer a separate
+startup module that must be specified when linking with ld65. It does also
+remove the chance to forget it and produce strange linking errors:-)
+
+I hope this clear things up a bit.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Aug  1 12:59:55 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="6637.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] Startup magic"</a></li>
+<li><dfn>Previous message</dfn>: <a href="6635.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Startup magic (was: Segment EXEHDR does not exist - while  using ld65 directly)"</a></li>
+<li><dfn>In reply to</dfn>: <a href="6635.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] Startup magic (was: Segment EXEHDR does not exist - while  using ld65 directly)"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="6637.html" title="Next message in this discussion thread">Oliver Schmidt: "Re: [cc65] Startup magic"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="6637.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Startup magic"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#6636" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#6636" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#6636" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-08-01 12:59:57 CEST
+</em></small></p>
+</body>
+</html>

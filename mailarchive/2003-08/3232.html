@@ -1,0 +1,163 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] linker cfg files</title>
+<meta name="Author" content="Greg King (gngking_at_erols.com)">
+<meta name="Subject" content="Re: [cc65] linker cfg files">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] linker cfg files</h1>
+<!-- received="Sat Aug 16 07:03:52 2003" -->
+<!-- isoreceived="20030816050352" -->
+<!-- sent="Sat, 16 Aug 2003 00:40:14 -0400" -->
+<!-- isosent="20030816044014" -->
+<!-- name="Greg King" -->
+<!-- email="gngking_at_erols.com" -->
+<!-- subject="Re: [cc65] linker cfg files" -->
+<!-- id="000001c363b3$e189b4e0$da672c42@palace" -->
+<!-- inreplyto="[cc65] linker cfg files" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Greg King (<a href="mailto:gngking_at_erols.com?Subject=Re:%20[cc65]%20linker%20cfg%20files"><em>gngking_at_erols.com</em></a>)<br>
+<strong>Date:</strong> 2003-08-16 06:40:14
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3231.html">Rafal: "[cc65] CC65 v2.9.1 r3 win32 package"</a>
+<li><strong>Maybe in reply to:</strong> <a href="../2003-04/2867.html">3843416: "[cc65] linker cfg files"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3234.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<li><strong>Next in thread:</strong> <a href="3233.html">Greg King: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="3234.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+From: Ullrich von Bassewitz; On Date: Monday, August 11, 2003, 04:03 PM
+&gt;
+&gt; I've started to change the heap using your idea with small modifications;
+&gt; but when doing so, I found a few problems.  Maybe you (or someone else)
+&gt; can help me solve them.
+&gt;
+&gt;  1. The suggested solution does not work for configurations where the
+&gt;     start-address is passed via the command-line, using %S in the linker
+&gt;     config.  Configurations that have this problem are:
+&gt;     lunix/osa65 and none.
+
+The LUnix library does not use my idea, anyway.  It is like the GEOS
+library:  it does some things differently, so that it can take advantage
+of OS features.  It gets its stack and heap from LUnix's dynamic memory.
+
+I do not think that none.cfg's problem is &quot;start=%S&quot; -- at least, not
+exactly that.  I think a better description is that the &quot;none&quot; target
+must have an open-ended (very loose) nature.  Its purpose is to avoid, as
+much as possible, putting built-in restrictions on what we can do with a
+program.  But currently, STK's address cannot be set by ld65's
+command-line.
+
+I think that it would be useful to many of the targets if you added
+another address option:  %S, %E (or maybe, more than two).  They could
+be used to change the lower- and upper-bounds of the memory that a program
+normally would use (STARTADDRESS would set the standard locations
+[maybe it should be &quot;ADDRESS: start=$xxxx, end=$xxxx;&quot; ]).
+
+&gt;
+&gt;  2. There are some configurations that do actually cover systems with
+&gt;     different amounts of memory available.  One system is the C16 (which
+&gt;     supports 16 and 32KB of memory) and the PET, which comes with 4, 8,
+&gt;     16 and 32K of memory.  Currently, the startup code determines how
+&gt;     much memory is available and adjusts the stack-pointer accordingly.
+&gt;     With the old heap routines this worked, since they calculated
+&gt;     the heap-end from the stack-pointer.  Using your idea, this does no
+&gt;     longer work.  While the old code was not perfect (the linker would
+&gt;     not detect a program too large to fit into memory),
+&gt;     having 4 different memory configurations just for the PET machines
+&gt;     sounds even worse.
+
+After I sent my EMail [naturally, it's always &quot;after&quot; :-( ], I noticed it
+in the Apple and Atari start-up files.  I didn't notice those others.
+
+[I really must study all of the start-up files much more! :-) ]
+
+Darn!  I had been _very_ proud of my &quot;invention.&quot;  (I guess that I should
+have known -- nothing in life ever truly is perfect.) :-/
+I will study the problem.
+
+(I'm thinking out loud, now) ...
+
+We will need to back away from my idea, a little bit -- to gain a
+compromise.
+
+(I already did it once, in the stack-checker.  Originally, I made the stack
+be an actual, named segment.  And, the low-water mark was built into that
+segment's structure.  The checker did not need a constructor.  But, the
+LUnix library could not use it.  I remembered that you do not like to see
+targets replace common files if they really do not need to do it.  So, I
+returned to a design that constructs the mark.  [I now have learned that I
+must have been psychic. ;-) Those other targets need that constructor,
+too.])
+
+We probably will change __heapend back into a pointer-variable (while
+keeping __heaporg as an immediate address).  Then, the problem becomes:
+Can we write a constructor (or, constructors) that sets heapend's value
+from different sources -- depending on the configuration?  There are two
+environments:  pre-set stack and &quot;run-set&quot; stack.
+
+A first -- very crude -- attempt:  move the original constructor out of the
+common file, and into files in each target directory.  It would compute
+from the stack-pointer, on &quot;run-set&quot; targets.  It would use
+__HEAPEND_RUN__, on pre-set targets.  That plan would be compatible; but,
+the &quot;run-set&quot; configurations would not be flexible.  (The person who
+started this discussion wanted to move the Atari's heap to different
+places.)  So, we would need to find a way to let the scripts choose between
+the stack and the linker-symbol.
+
+[Of course, those musings come from a person who does not know how you
+have changed my original proposal. :-) ]
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20linker%20cfg%20files">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3231.html">Rafal: "[cc65] CC65 v2.9.1 r3 win32 package"</a>
+<li><strong>Maybe in reply to:</strong> <a href="../2003-04/2867.html">3843416: "[cc65] linker cfg files"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3234.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<li><strong>Next in thread:</strong> <a href="3233.html">Greg King: "Re: [cc65] linker cfg files"</a>
+<li><strong>Reply:</strong> <a href="3234.html">Ullrich von Bassewitz: "Re: [cc65] linker cfg files"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-08-16 07:04:47 CEST</em>
+</em>
+</small>
+</body>
+</html>

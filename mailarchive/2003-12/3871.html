@@ -1,0 +1,165 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] CBM disk write problems</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz_at_musoftware.de)">
+<meta name="Subject" content="Re: [cc65] CBM disk write problems">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] CBM disk write problems</h1>
+<!-- received="Wed Dec 17 11:57:37 2003" -->
+<!-- isoreceived="20031217105737" -->
+<!-- sent="Wed, 17 Dec 2003 11:57:38 +0100" -->
+<!-- isosent="20031217105738" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz_at_musoftware.de" -->
+<!-- subject="Re: [cc65] CBM disk write problems" -->
+<!-- id="20031217105738.GA10088@trixie.musoftware.de" -->
+<!-- inreplyto="006401c3c42b$3a7b1ad0$c68864d5@LIFEBOOK" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Ullrich von Bassewitz (<a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20CBM%20disk%20write%20problems"><em>uz_at_musoftware.de</em></a>)<br>
+<strong>Date:</strong> 2003-12-17 11:57:38
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3870.html">Stephan Lesch: "Re: [cc65] CBM disk write problems"</a>
+<li><strong>In reply to:</strong> <a href="3865.html">Johan Kotlinski: "Re: [cc65] CBM disk write problems"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3873.html">Johan Kotlinski: "Re: [cc65] CBM disk write problems"</a>
+<li><strong>Reply:</strong> <a href="3873.html">Johan Kotlinski: "Re: [cc65] CBM disk write problems"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hi!
+
+On Wed, Dec 17, 2003 at 12:20:43AM +0100, Johan Kotlinski wrote:
+&gt; Well, I tried scratching aswell, but the same problem... Then I tried
+&gt; writing it in assembler, and it worked. So this suggests there is a problem
+&gt; with the wrapper after all. If you are interested, here are the two (in my
+&gt; eyes equavilent) routines...
+
+There are several problems with your save routines:
+
+  1. Using '@:' is dangerous with all single drive units. Because of bugs in
+     the ROM code, you may loose all your data on that disk. With
+     &quot;scratching&quot;, I did not mean to use '@:' but 's:', that is, a separate
+     scratch command.
+
+  2. Disabling interrupts for an unknown time is a bad idea and may lead to
+     problems with fast loaders.
+
+  3. The capital letters are probably not accepted by the drive. Use lower
+     case letters for file names.
+
+  4. You are using the command channel (15) as secondary address. This will
+     not work, because the command channel is used to send commands, not data.
+     Since you're also doing this in your assembler code, I'm really wondering
+     how this should have worked.
+
+A still incomplete but working piece of code would look like this:
+
+	void save_highscores()
+	{
+	    /* Scratch */
+	    cbm_open (1, 8, 15, &quot;s:kidgrid.hiscores&quot;);
+	    cbm_close (1);
+
+	    /* Write */
+	    cbm_open (1,8,1,&quot;kidgrid.hiscores&quot;);
+	    cbm_write (1,(char*)0x1190,180);
+	    cbm_close (1);
+	}
+
+While this works better than your code, there are still problems:
+
+  1. You will have to check the return code for the cbm_open calls to see if
+     there were any problems (drive not present or similar).
+
+  2. You will have to open the command channel to the drive and read it after
+     the open, to check if there were drive related any problems.
+
+If you're not doing these two things, errors may go unnoticed. For example
+with your erroneous code (writing to the command channel), reading the command
+channel from the drive would have given &quot;syntax error&quot;. You wrote the
+kidgrid.hiscores data to the command channel, but the drive was not able to
+make any sense from it, when it tried to interpret it as a drive command.
+
+If all this sounds like a lot of work for just a simple task, then there's
+good news for you: If you use C file I/O, the C library will do most of these
+things for you. All you have to do is to check the return codes:
+
+	void save_hiscores ()
+	{
+	    FILE* F = fopen (&quot;kidgrid.hiscores&quot;, &quot;wb&quot;);
+	    if (F == NULL) {
+	   	/* Error */
+	    }
+	    if (fwrite ((const char*)0x1190, 1, 180, F) != 180) {
+	   	/* Error */
+	    }
+	    if (fclose (F) != 0) {
+	   	/* Error */
+	    }
+	}
+
+In fact, for normal file operations, there's usually no reason to use CBM file
+I/O instead of C file I/O. The latter increases program size by a few hundred
+bytes, but this is often negligible. Advantages are: Easier use, since the
+operations are more high level, and easily portable (works also on other
+platforms).
+
+Regards
+
+
+	Uz
+
+
+-- 
+Ullrich von Bassewitz                                  <a href="mailto:uz_at_musoftware.de?Subject=Re:%20[cc65]%20CBM%20disk%20write%20problems">uz_at_musoftware.de</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20CBM%20disk%20write%20problems">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3870.html">Stephan Lesch: "Re: [cc65] CBM disk write problems"</a>
+<li><strong>In reply to:</strong> <a href="3865.html">Johan Kotlinski: "Re: [cc65] CBM disk write problems"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3873.html">Johan Kotlinski: "Re: [cc65] CBM disk write problems"</a>
+<li><strong>Reply:</strong> <a href="3873.html">Johan Kotlinski: "Re: [cc65] CBM disk write problems"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-12-17 11:58:14 CET</em>
+</em>
+</small>
+</body>
+</html>

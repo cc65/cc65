@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: RE: [cc65] bank switching/retro repla</title>
+<meta name="Author" content="Shawn Jefferson (sjefferson1shaw.ca)" />
+<meta name="Subject" content="RE: [cc65] bank switching/retro replay?" />
+<meta name="Date" content="2009-11-08" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>RE: [cc65] bank switching/retro replay?</h1>
+<!-- received="Sun Nov  8 20:25:53 2009" -->
+<!-- isoreceived="20091108192553" -->
+<!-- sent="Sun, 8 Nov 2009 11:25:56 -0800" -->
+<!-- isosent="20091108192556" -->
+<!-- name="Shawn Jefferson" -->
+<!-- email="sjefferson1shaw.ca" -->
+<!-- subject="RE: [cc65] bank switching/retro replay?" -->
+<!-- id="BA6EF6CD7F0149AAA50185CBA210ECFC@ORANGE2" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="f7655a610911080858uf0c0cc5g5460df6f3c0bfb83&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7514.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] bank switching/retro replay?&quot;">Next message</a> ]
+[ <a href="7512.html" title="Marc 'BlackJack Rintsch: &quot;Re: [cc65] bank switching/retro replay?&quot;">Previous message</a> ]
+[ <a href="7511.html" title="Johan Kotlinski: &quot;[cc65] bank switching/retro replay?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7514.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] bank switching/retro replay?&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Shawn Jefferson &lt;<a href="mailto:sjefferson1shaw.ca?Subject=RE:%20[cc65]%20bank%20switching/retro%20replay?">sjefferson1shaw.ca</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-11-08 20:25:56</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>&gt; Sent: Sunday, November 08, 2009 8:58 AM
+&gt; Hi,
+&gt; just writing to check if anyone has developed for cartridges (e.g.
+&gt; Retro Replay) using cc65 and has wisdom to share?
+&gt; If I understand right, there is no in-built support for bank switching
+&gt; in cc65, similar to what's available in sdcc?
+
+I've done it for cartridges on the Atari 8-bit.  Basically all there is to
+it, is to define your linker config file to contain your different banks
+(this is a setup for a 1MB Atari cartridge):
+
+MEMORY {
+	&lt;snip built in stuff&gt;
+
+    CART0:    start = $A000, size = $1FFA, type = ro, fill = yes, fillval =
+$00, file = %O;
+    VECTORS: start = $BFFA, size = 6, type= ro, file = %O;
+    CART1:    start = $A000, size = $2000, type = ro, fill = yes, fillval =
+$11, file = %O;
+    CART2:    start = $A000, size = $2000, type = ro, fill = yes, fillval =
+$22, file = %O;
+    CART3:    start = $A000, size = $2000, type = ro, fill = yes, fillval =
+$33, file = %O;
+    CART4:    start = $A000, size = $2000, type = ro, fill = yes, fillval =
+$44, file = %O;
+    CART5:    start = $A000, size = $2000, type = ro, fill = yes, fillval =
+$55, file = %O;
+    CART6:    start = $A000, size = $2000, type = ro, fill = yes, fillval =
+$66, file = %O;
+    CART7:    start = $A000, size = $2000, type = ro, fill = yes, fillval =
+$77, file = %O;
+    CART8:    start = $A000, size = $2000, type = ro, fill = yes, fillval =
+$88, file = %O;
+    CART9:    start = $A000, size = $2000, type = ro, fill = yes, fillval =
+$99, file = %O;
+    CARTA:    start = $A000, size = $2000, type = ro, fill = yes, fillval =
+$AA, file = %O;
+    CARTB:    start = $A000, size = $2000, type = ro, fill = yes, fillval =
+$BB, file = %O;
+    CARTC:    start = $A000, size = $2000, type = ro, fill = yes, fillval =
+$CC, file = %O;
+    CARTD:    start = $A000, size = $2000, type = ro, fill = yes, fillval =
+$DD, file = %O;
+    CARTE:    start = $A000, size = $2000, type = ro, fill = yes, fillval =
+$EE, file = %O;
+    CARTF:    start = $A000, size = $2000, type = ro, fill = yes, fillval =
+$FF, file = %O;
+}
+SEGMENTS {
+	&lt;snip builtin stuff&gt;
+    BANK0:    load = CART0, run = CART0, type = ro, define = yes;
+    BANK1:    load = CART1, run = CART1, type = ro, define = yes;
+    BANK2:    load = CART2, run = CART2, type = ro, define = yes;
+    BANK3:    load = CART3, run = CART3, type = ro, define = yes;
+    BANK4:    load = CART4, run = CART4, type = ro, define = yes;
+    BANK5:    load = CART5, run = CART5, type = ro, define = yes;
+    BANK6:    load = CART6, run = CART6, type = ro, define = yes;
+    BANK7:    load = CART7, run = CART7, type = ro, define = yes;
+    BANK8:    load = CART8, run = CART8, type = ro, define = yes;
+    BANK9:    load = CART9, run = CART9, type = ro, define = yes;
+    BANKA:    load = CARTA, run = CARTA, type = ro, define = yes;
+    BANKB:    load = CARTB, run = CARTB, type = ro, define = yes;
+    BANKC:    load = CARTC, run = CARTC, type = ro, define = yes;
+    BANKD:    load = CARTD, run = CARTD, type = ro, define = yes;
+    BANKE:    load = CARTE, run = CARTE, type = ro, define = yes;
+    BANKF:    load = CARTF, run = CARTF, type = ro, define = yes;
+    VECTORS:  load = VECTORS, type = ro, define = yes;
+}
+
+Then a custom crt0.s needs be written, and at least the data segment needs
+to be copied to RAM from your cartridge. There is an asm routine in the
+library called copydata that can do this for you.
+
+If you are also going to be calling C code from multiple banks then you need
+to make sure that your C library code is also not being banked out.  In my
+case I moved the CODE, RODATA and DATA into RAM.  All I need to be careful
+of is to make sure that my code banks in the right cartridge bank before
+attempting to call code there-the code to do this should be in RAM and not
+on cartridge.  There are very tricky ways to set this up, this is the basic
+way that works for me!
+
+Shawn
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Nov  8 20:25:53 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7514.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] bank switching/retro replay?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7512.html" title="Previous message in the list">Marc 'BlackJack Rintsch: "Re: [cc65] bank switching/retro replay?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7511.html" title="Message to which this message replies">Johan Kotlinski: "[cc65] bank switching/retro replay?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7514.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] bank switching/retro replay?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7513" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7513" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7513" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-11-08 20:25:55 CET
+</em></small></p>
+</body>
+</html>

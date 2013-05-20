@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Need help with .cfg file on C6</title>
+<meta name="Author" content="Stefan Wessels (swessels1email.com)" />
+<meta name="Subject" content="[cc65] Need help with .cfg file on C64" />
+<meta name="Date" content="2010-12-11" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Need help with .cfg file on C64</h1>
+<!-- received="Sat Dec 11 23:28:10 2010" -->
+<!-- isoreceived="20101211222810" -->
+<!-- sent="Sat, 11 Dec 2010 14:27:58 -0800" -->
+<!-- isosent="20101211222758" -->
+<!-- name="Stefan Wessels" -->
+<!-- email="swessels1email.com" -->
+<!-- subject="[cc65] Need help with .cfg file on C64" -->
+<!-- id="FF6840B2-51CE-44B9-970C-EF6812EE70F8@email.com" -->
+<!-- charset="us-ascii" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9069.html" title="Marc 'BlackJack' Rintsch: &quot;Re: [cc65] Need help with .cfg file on C64&quot;">Next message</a> ]
+[ <a href="9067.html" title="Dave Dribin: &quot;[cc65] Re: Patch for reading a 'volatile' pointer&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="9069.html" title="Marc 'BlackJack' Rintsch: &quot;Re: [cc65] Need help with .cfg file on C64&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Stefan Wessels &lt;<a href="mailto:swessels1email.com?Subject=Re:%20[cc65]%20Need%20help%20with%20.cfg%20file%20on%20C64">swessels1email.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-12-11 23:27:58</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+I am working with a trunk build from 2010/12/05.
+
+I am close to finishing a game for the C64 and it's time to sort out the memory layout.  The game has a custom character set and needs to display sprites from images from an active set of just over 1K.
+
+The segment list, WITHOUT using a cfg file, looks like this (from the map file).
+
+Segment list:
+-------------
+Name                  Start   End     Size
+--------------------------------------------
+ZEROPAGE              000002  00001B  00001A
+LOADADDR              0007FF  000800  000002
+EXEHDR                000801  00080C  00000C
+STARTUP               00080D  00088F  000083
+INIT                  000890  0008BF  000030
+CODE                  0008C0  004D09  00444A
+RODATA                004D0A  005AE1  000DD8
+DATA                  005AE2  0080E3  002602
+ZPSAVE                0080E4  0080FD  00001A
+BSS                   0080FE  008181  000084
+
+The first thing I tried was simply to move RAM way up, to make room for characters and sprites in the default vic bank.  This didn't work.  I tried like this:
+MEMORY {
+    ZP:       file = &quot;&quot;, define = yes, start = $0002, size = $001A;
+    LOADADDR: file = %O,               start = $07FF, size = $0002;
+    HEADER:   file = %O,               start = $0801, size = $000C;
+    RAM:      file = %O, define = yes, start = $2710, size = $a8f0 - __STACKSIZE__;
+}
+The HEADER is generated assuming the code will follow (sys 2061 instead of sys10000).  It didn't look at where CODE ended up or at the start of RAM.  Interestingly, doing an sys10000 also didn't work.
+
+I also tried to move the VIC memory to $8000.  I made the config file like this, splitting the RAM area into two areas:
+MEMORY {
+    ZP:       file = &quot;&quot;, define = yes, start = $0002, size = $001A;
+    LOADADDR: file = %O,               start = $07FF, size = $0002;
+    HEADER:   file = %O,               start = $0801, size = $000C;
+    RAM:      file = %O, define = yes, start = $080d, size = $77f3;
+    RAM2:     file = %O, define = yes, start = $a000, size = $3000 - __STACKSIZE__;
+}
+
+To fit the whole game in the larger RAM area (size $77f3), I had to trim some data, but then it works.  That's all good.  What I thus have to do is move some stuff into the other, smaller RAM2 area (so I can have all my data).  This is where things stop working.  Moving BSS and ZPSAVE into the RAM2 works great.
+Moving DATA - the game appears to run but the data on-screen is all messed up (sprites and characters)
+Moving RODATA - the game sort-of runs.  The startup is quite a bit longer and the rendering is hosed.  Sprites are fine, but the character data is hosed.
+I discovered that, when moving RODATA, changing the stack size to 0x0c00 makes the game not run and 0x0400 makes it work a bit better.  Clearly there's some interaction with stack-size and this RAM2 area that I don't quite understand (I assume the things I place in there go from smallest addresses to larger and the stack grows from the other side?).
+
+Since I don't know what __RAM_START__ and __RAM_SIZE__ in crt0.s refers to (RAM or RAM2 or the set of all RAM areas?), I also tried this - reversing the naming - in case __RAM_START__ etc. is bound to the name RAM:
+MEMORY {
+    ZP:       file = &quot;&quot;, define = yes, start = $0002, size = $001A;
+    LOADADDR: file = %O,               start = $07ff, size = $0002;
+    HEADER:   file = %O,               start = $0801, size = $000C;
+    RAM2:     file = %O, define = yes, start = $080d, size = $77f3;
+    RAM:      file = %O, define = yes, start = $a000, size = $3000 - __STACKSIZE__;
+}
+No change in how things turn out.
+
+In the end, if I use the below and load ,8,1 and use sys10000, I can get the game to work just fine, but that's not at all ideal.
+MEMORY {
+    ZP:       file = &quot;&quot;, define = yes, start = $0002, size = $001A;
+    LOADADDR: file = %O,               start = $2702, size = $0002;
+    HEADER:   file = %O,               start = $2704, size = $000C;
+    RAM:      file = %O, define = yes, start = $2710, size = $a8f0 - __STACKSIZE__;
+}
+
+This is my complete config file for the last option (which works).  I don't change anything in it, except for the memory section and the assigning of names to the areas in the other tests:
+SYMBOLS {
+    __LOADADDR__:  type = import;
+    __EXEHDR__:    type = import;
+    __STACKSIZE__: type = weak,   value = $0800; # 2k stack
+}
+MEMORY {
+    ZP:       file = &quot;&quot;, define = yes, start = $0002, size = $001A;
+    LOADADDR: file = %O,               start = $2702, size = $0002;
+    HEADER:   file = %O,               start = $2704, size = $000C;
+    RAM:      file = %O, define = yes, start = $2710, size = $a8f3 - __STACKSIZE__;
+}
+SEGMENTS {
+    LOADADDR: load = LOADADDR, type = ro;
+    EXEHDR:   load = HEADER,   type = ro;
+    STARTUP:  load = RAM,      type = ro;
+    LOWCODE:  load = RAM,      type = ro,                optional = yes;
+    INIT:     load = RAM,      type = ro,  define = yes, optional = yes;
+    CODE:     load = RAM,      type = ro;
+    RODATA:   load = RAM,     type = ro;
+    DATA:     load = RAM,      type = rw;
+    ZPSAVE:   load = RAM,     type = bss;
+    BSS:      load = RAM,     type = bss, define = yes;
+    ZEROPAGE: load = ZP,       type = zp;
+}
+FEATURES {
+    CONDES: segment = INIT,
+	    type    = constructor,
+	    label   = __CONSTRUCTOR_TABLE__,
+	    count   = __CONSTRUCTOR_COUNT__;
+    CONDES: segment = RODATA,
+	    type    = destructor,
+	    label   = __DESTRUCTOR_TABLE__,
+	    count   = __DESTRUCTOR_COUNT__;
+    CONDES: segment = RODATA,
+	    type    = interruptor,
+	    label   = __INTERRUPTOR_TABLE__,
+	    count   = __INTERRUPTOR_COUNT__;
+}
+
+Putting the VIC at $8000 is probably the desired option, or having the 1st option work (just moving start of RAM to its proper spot) would also probably do but I am guessing the 2061 is included and not calculated?.  
+
+Can someone tell me where I am going wrong?
+
+Thank you
+Stefan
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sat Dec 11 23:28:10 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9069.html" title="Next message in the list">Marc 'BlackJack' Rintsch: "Re: [cc65] Need help with .cfg file on C64"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9067.html" title="Previous message in the list">Dave Dribin: "[cc65] Re: Patch for reading a 'volatile' pointer"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9069.html" title="Next message in this discussion thread">Marc 'BlackJack' Rintsch: "Re: [cc65] Need help with .cfg file on C64"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="9069.html" title="Message sent in reply to this message">Marc 'BlackJack' Rintsch: "Re: [cc65] Need help with .cfg file on C64"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9068" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9068" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9068" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-12-11 23:28:14 CET
+</em></small></p>
+</body>
+</html>

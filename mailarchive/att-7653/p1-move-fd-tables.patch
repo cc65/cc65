@@ -1,0 +1,114 @@
+# HG changeset patch
+# User Daniel Serpell <daniel.serpell@gmail.com>
+# Date 1259294832 10800
+# Branch trunk
+# Node ID ee56a3bc075ad670cbc2d25aabe56e4941b722bb
+# Parent  a014a6b872205f59387730ed9655ccc5f1eb9cf4
+Move fd tables to it's own file, and write them already initialized.
+
+diff --git a/libsrc/atari/Makefile b/libsrc/atari/Makefile
+--- a/libsrc/atari/Makefile
++++ b/libsrc/atari/Makefile
+@@ -79,6 +79,7 @@
+ 	do_oserr.o      \
+ 	dosdetect.o     \
+ 	fdtable.o       \
++	fdtab.o         \
+ 	fdtoiocb.o      \
+ 	getargs.o       \
+ 	getdefdev.o     \
+diff --git a/libsrc/atari/fdtab.s b/libsrc/atari/fdtab.s
+new file mode 100644
+--- /dev/null
++++ b/libsrc/atari/fdtab.s
+@@ -0,0 +1,29 @@
++;
++; Christian Groessler, Oct-2000
++;
++; the fdtable itself is defined here
++;
++
++	.include "fd.inc"
++
++	.export	fd_table,fd_index
++	.export	___fd_table,___fd_index	; for test(debug purposes only
++
++	.data
++
++___fd_index:
++fd_index:	; fd number is index into this table, entry's value specifies the fd_table entry
++	.byte	0,0,0		; at start, three first files are stdin/stdout/stderr.
++	.res	MAX_FD_INDEX-3,$ff
++
++___fd_table:
++fd_table:	; each entry represents an open iocb
++	.byte	3,0,'E',0	; system console, app starts with opened iocb #0 for E:
++	.byte	0,$ff,0,0
++	.byte	0,$ff,0,0
++	.byte	0,$ff,0,0
++	.byte	0,$ff,0,0
++	.byte	0,$ff,0,0
++	.byte	0,$ff,0,0
++	.byte	0,$ff,0,0
++
+diff --git a/libsrc/atari/getfd.s b/libsrc/atari/getfd.s
+--- a/libsrc/atari/getfd.s
++++ b/libsrc/atari/getfd.s
+@@ -2,56 +2,18 @@
+ ; Christian Groessler, Oct-2000
+ ;
+ ; allocates a new fd in the indirection table
+-; the fdtable itself is defined here
+ ;
+ 
+ 	.include "atari.inc"
+ 	.include "fd.inc"
+ 	.include "_file.inc"
+ 	.importzp tmp1
++	.import fd_table, fd_index
+ 
+ 	.export fdt_to_fdi,getfd
+-	.export	fd_table,fd_index
+-	.export	___fd_table,___fd_index	; for test(debug purposes only
+-
+-	.constructor	initfds,24
+-
+-	.data
+-
+-___fd_index:
+-fd_index:	; fd number is index into this table, entry's value specifies the fd_table entry
+-	.res	MAX_FD_INDEX,$ff
+-
+-___fd_table:
+-fd_table:	; each entry represents an open iocb
+-	.byte	0,0,'E',0	; system console, app starts with opened iocb #0 for E:
+-	.byte	0,$ff,0,0
+-	.byte	0,$ff,0,0
+-	.byte	0,$ff,0,0
+-	.byte	0,$ff,0,0
+-	.byte	0,$ff,0,0
+-	.byte	0,$ff,0,0
+-	.byte	0,$ff,0,0
+ 
+ 	.code
+ 
+-; set stdio stream handles
+-
+-.proc 	initfds
+-
+-	lda	#0
+-	jsr	getfd
+-	sta	__filetab + (0 * .sizeof(_FILE)); setup stdin
+-	lda	#0
+-	jsr	getfd
+-	sta	__filetab + (1 * .sizeof(_FILE)); setup stdout
+-	lda	#0
+-	jsr	getfd
+-	sta	__filetab + (2 * .sizeof(_FILE)); setup stderr
+-	rts
+-
+-.endproc
+-
+ ; fdt_to_fdi
+ ; returns a fd_index entry pointing to the given ft_table entry
+ ; get fd_table entry in A

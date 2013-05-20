@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Interrupts howto?</title>
+<meta name="Author" content="Karri Kaksonen (karri1sipo.fi)" />
+<meta name="Subject" content="[cc65] Interrupts howto?" />
+<meta name="Date" content="2005-05-03" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Interrupts howto?</h1>
+<!-- received="Tue May  3 11:34:08 2005" -->
+<!-- isoreceived="20050503093408" -->
+<!-- sent="Tue, 03 May 2005 12:31:31 +0300" -->
+<!-- isosent="20050503093131" -->
+<!-- name="Karri Kaksonen" -->
+<!-- email="karri1sipo.fi" -->
+<!-- subject="[cc65] Interrupts howto?" -->
+<!-- id="427744F3.1050907@sipo.fi" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4945.html" title="Tony Harris: &quot;[cc65] CC65 and 65816&quot;">Next message</a> ]
+[ <a href="../2005-04/4943.html" title="Oliver Schmidt: &quot;Re: [cc65] Changed semantics of callirq and interruptors&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4947.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Interrupts howto?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Karri Kaksonen &lt;<a href="mailto:karri1sipo.fi?Subject=Re:%20[cc65]%20Interrupts%20howto?">karri1sipo.fi</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-05-03 11:31:31</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+I have tried to understand how callirq and condes should go together
+but it would be really helpful to get a small description of how I should
+do this.
+
+The way I used to do this was to do something like:
+
+_InitIRQ:
+  sets the address of __IRQ to 0xfffe
+  rts
+
+_install_irq:
+  adds a vector to the _irqvecs table
+  rts
+
+__IRQ:
+  save registers
+  clear interrupts
+  set X to index to an interrupt table
+  jsr __IRQ5
+  restore registers
+  rti
+__IRQ5: jmp (_irqvecs),x
+
+If I understand correctly I can use CONDES to put my addresses into
+the _irqvecs table during the linking phase somehow.
+
+--
+Thanks for any help,
+
+Karri
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue May  3 11:34:08 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4945.html" title="Next message in the list">Tony Harris: "[cc65] CC65 and 65816"</a></li>
+<li><dfn>Previous message</dfn>: <a href="../2005-04/4943.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Changed semantics of callirq and interruptors"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4947.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Interrupts howto?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4947.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Interrupts howto?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4944" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4944" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4944" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-05-03 11:34:11 CEST
+</em></small></p>
+</body>
+</html>

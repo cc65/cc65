@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] ca65 for stand-alone asm p</title>
+<meta name="Author" content="Agent Friday (64subnet1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] ca65 for stand-alone asm projects" />
+<meta name="Date" content="2010-11-05" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] ca65 for stand-alone asm projects</h1>
+<!-- received="Fri Nov  5 21:59:35 2010" -->
+<!-- isoreceived="20101105205935" -->
+<!-- sent="Fri, 5 Nov 2010 13:59:27 -0700" -->
+<!-- isosent="20101105205927" -->
+<!-- name="Agent Friday" -->
+<!-- email="64subnet1gmail.com" -->
+<!-- subject="Re: [cc65] ca65 for stand-alone asm projects" -->
+<!-- id="AANLkTindnWmwcreRM-qxjM7vXPW06ytkVPjefeTAiM_Q@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20101105124213.GB23275&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8773.html" title="Agent Friday: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">Next message</a> ]
+[ <a href="8771.html" title="Oliver Schmidt: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">Previous message</a> ]
+[ <a href="8766.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8775.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] ca65 for stand-alone asm projects&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Agent Friday &lt;<a href="mailto:64subnet1gmail.com?Subject=Re:%20[cc65]%20ca65%20for%20stand-alone%20asm%20projects">64subnet1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-11-05 21:59:27</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Fri, Nov 5, 2010 at 5:42 AM, Ullrich von Bassewitz wrote:
+&gt; . . . what people expect is not so much formed by what does make sense
+&gt; or what is possible on other platforms, but what they're used to . . .
+&gt; . . this is why people get so upset: They're used so much to having [the
+&gt; load address] supplied automatically, that they don't even think about
+&gt; it any more.  As a consequence, ca65 is bad - not because it really is,
+&gt; but because it doesn't live up to the expectations.
+
+As I see it, providing the load address really is about making
+sense as well.  The proper file format for a PRG type file on the
+Commodores machines--a loadable, executable file-- *always* includes
+a load address.  Without it, you can't really do anything with a
+machine language program file.  BASIC probrams do not rely on this
+address, but if at least _some_ addres in the first two bytes, even
+tose files become unusable.
+
+It would be really handy if compiled code were not tied to a
+particular address and you could load and execute them at any
+address on the C64, but that's a different file format altogether
+(called o65 :).  Too bad there's no loader to let you take advantage
+of it... but that's something I hope to change.
+
+&gt; So I do also expect that adding a BASIC header by default, so people
+&gt; could start asm programs with RUN, would make them upset. Not so much
+&gt; because it isn't useful, but because they aren't used to it.
+
+Binding complete applications to a BASIC stub is quite useful.  But
+for machine code utilities that work along with BASIC and other
+loaded tools, it just isn't workable.
+
+So, do we CBM types really come across all whiny and ungrateful?
+
+// Agent Friday
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Nov  5 21:59:35 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8773.html" title="Next message in the list">Agent Friday: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8771.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8766.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8775.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8775.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] ca65 for stand-alone asm projects"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8772" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8772" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8772" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-11-05 21:59:37 CET
+</em></small></p>
+</body>
+</html>

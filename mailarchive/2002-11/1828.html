@@ -1,0 +1,137 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] Fwd: RR-Devel:ca65 in 21 days</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="[cc65] Fwd: RR-Devel:ca65 in 21 days">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] Fwd: RR-Devel:ca65 in 21 days</h1>
+<!-- received="Thu Nov 28 01:01:31 2002" -->
+<!-- isoreceived="20021128000131" -->
+<!-- sent="Thu, 28 Nov 2002 02:26:47 +0100" -->
+<!-- isosent="20021128012647" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="[cc65] Fwd: RR-Devel:ca65 in 21 days" -->
+<!-- id="200211280226.47025.groepaz@gmx.net" -->
+<!-- inreplyto="20021127151457.GB438@freenet.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Fwd:%20RR-Devel:ca65%20in%2021%20days"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2002-11-28 02:26:47
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1827.html">Mats Andrén: "Re: [cc65] Inserting Assembly Routines"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1831.html">Ullrich von Bassewitz: "Re: [cc65] Fwd: RR-Devel:ca65 in 21 days"</a>
+<li><strong>Reply:</strong> <a href="1831.html">Ullrich von Bassewitz: "Re: [cc65] Fwd: RR-Devel:ca65 in 21 days"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Am Mittwoch, 27. November 2002 16:14 schrieb Doc Bacardi:
+
+i have forwarded this to the cc65 list (you guys should subscribe there too i 
+guess :o)) .... cant answer this offhand, never used macros that way myself 
+:=P (you gotta explain the enum thing mentioned at the end :=)))
+
+mayb UZ can tell us....
+
+&gt; I need a macro with one parameter - lets say 'name' for now. It should:
+&gt;
+&gt; - assign '*' to the lable 'name'
+&gt;     ok, that's no problem
+&gt;
+&gt; - write Lo/Hi byte of * and the label __THIS_BANK__ to 3 seperate segments
+&gt;     works fine too
+&gt;
+&gt; - the 3 segments are used to generate 3 tables. I need the index of the
+&gt;   entry this macro generated in a label with a name similar to the
+&gt;   parameter, e.g. 'I_name'
+&gt;     Here starts the trouble! I tried to generate the new labelname with
+&gt;       .concat(&quot;B_&quot;,.string(name)) = 123
+&gt;     but ca65 didn't like it.
+&gt;     I'm also wondering why '.reloc' is needed to switch * after a
+&gt; '.segment' to the current adress there.
+&gt;
+&gt; - I switched the segment, but at the end of the macro the old value should
+&gt;   be restored. But how do I read the name of the current segment?
+&gt;     Should be like:
+&gt;       temp_var = .current_segment
+&gt;       ...switch segments around...
+&gt;       .segment temp_var  or maybe   .segment .string(temp_var)
+&gt;
+&gt; That's my pseudo macro so far:
+&gt; (AdrLoTable_start is the start adress of Segment LongJump_AdrLoTable)
+&gt;
+&gt; ;*** Macro 'BANK' Start ***
+&gt; ;Parameter: &quot;Routine3&quot;
+&gt; 	;.local Routine3_temp
+&gt; 	Routine3 = *
+&gt; 	.reloc
+&gt; 	.segment &quot;LongJump_AdrLoTable&quot;
+&gt; Routine3_temp:
+&gt; 	.byte &lt;Routine3
+&gt; 	.segment &quot;LongJump_AdrHiTable&quot;
+&gt; 	.byte &gt;Routine3
+&gt; 	.segment &quot;LongJump_BankTable&quot;
+&gt; 	.byte __THIS_BANK__
+&gt; 	.segment &quot;RomCode0_l&quot;
+&gt; 	.org Routine3
+&gt; 	I_Routine3 = Routine3_temp-AdrLoTable_start
+&gt; 	.global I_Routine3
+&gt; ;*** Macro 'BANK' End ***
+&gt;
+&gt;
+&gt; And another problem: I'm using label redefinition for a enum replacement or
+&gt; passing args between two macros ( e.g. End_Blah need a value defined in
+&gt; Start_Blah). How can I do this with ca65?
+&gt;
+&gt; Thanks a lot for your help!
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Fwd:%20RR-Devel:ca65%20in%2021%20days">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1827.html">Mats Andrén: "Re: [cc65] Inserting Assembly Routines"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1831.html">Ullrich von Bassewitz: "Re: [cc65] Fwd: RR-Devel:ca65 in 21 days"</a>
+<li><strong>Reply:</strong> <a href="1831.html">Ullrich von Bassewitz: "Re: [cc65] Fwd: RR-Devel:ca65 in 21 days"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-11-28 01:01:33 CET</em>
+</em>
+</small>
+</body>
+</html>

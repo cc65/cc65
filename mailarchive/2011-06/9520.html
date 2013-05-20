@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Additional pages with C64-</title>
+<meta name="Author" content="Greg King (greg.king41verizon.net)" />
+<meta name="Subject" content="Re: [cc65] Additional pages with C64-HI.TGI" />
+<meta name="Date" content="2011-06-09" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Additional pages with C64-HI.TGI</h1>
+<!-- received="Thu, 09 Jun 2011 11:42:16 -0400" -->
+<!-- isoreceived="20110609154216" -->
+<!-- sent="Thu, 09 Jun 2011 11:42:16 -0400" -->
+<!-- isosent="20110609154216" -->
+<!-- name="Greg King" -->
+<!-- email="greg.king41verizon.net" -->
+<!-- subject="Re: [cc65] Additional pages with C64-HI.TGI" -->
+<!-- id="000401cc26be$83e3fc20$443efea9@monarch" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="4DEE3E19.1040803&#64;chello.at" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9521.html" title="Joseph Rose: &quot;Re: [cc65] Input string routine for a line of data?&quot;">Next message</a> ]
+[ <a href="9519.html" title="Greg King: &quot;Re: [cc65] Additional pages with C64-HI.TGI&quot;">Previous message</a> ]
+[ <a href="9507.html" title="marcas: &quot;Re: [cc65] Additional pages with C64-HI.TGI&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+[ <a href="9509.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Additional pages with C64-HI.TGI&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Greg King &lt;<a href="mailto:greg.king41verizon.net?Subject=Re:%20[cc65]%20Additional%20pages%20with%20C64-HI.TGI">greg.king41verizon.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-06-09 17:42:16</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>From: &quot;marcas&quot;; on Tuesday, June 07, 2011; at 11:04 AM -0400
+&gt;
+&gt; As I wrote my last post, I also had in mind that CC65 is not a large
+&gt; project (large in meaning of lines of source code).
+&gt; Thus. I thought just in the video modes of C64 (hires, multicolor,
+&gt; FLI, multicolor hires, and so on).
+&gt;
+&gt; Indeed, a developer can name the source file as he wants to name it.
+
+We have &quot;fallen&quot; into some unwritten rules about the file-names of
+drivers:
+
+1. They start with the name of the target system and a hyphen.
+2. TGI driver names end with the resolution of the driver (horizontal,
+   vertical, and the number of conditions into which a pixel can be set
+   [it isn't quite the same as the number of colors]).
+3. Those names are long; but, the file-systems on the various 6502
+   platforms have severe limits on the lengths of their names.
+   Therefore, we often give shorter names to the final binary files.
+   That renaming is done by this make-file: &quot;libsrc/Makefile&quot;.
+----------------------
+
+From time to time, I have thought about some low-resolution drivers for
+Commodore computers.  They would use PetSCII graphics characters.  They
+could work through the CONIO interface.  The same driver could run on
+any Commodore model.  Some possible resolutions are:
+
+80 by 50 by 16
+160 by 50 by 16
+
+Bar graphs:
+320 by 25 by 16
+640 by 25 by 16
+200 by 40 by 16
+200 by 80 by 16
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu, 09 Jun 2011 11:42:16 -0400</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9521.html" title="Next message in the list">Joseph Rose: "Re: [cc65] Input string routine for a line of data?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9519.html" title="Previous message in the list">Greg King: "Re: [cc65] Additional pages with C64-HI.TGI"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9507.html" title="Message to which this message replies">marcas: "Re: [cc65] Additional pages with C64-HI.TGI"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="9509.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Additional pages with C64-HI.TGI"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9520" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9520" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9520" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-06-09 18:01:45 CEST
+</em></small></p>
+</body>
+</html>

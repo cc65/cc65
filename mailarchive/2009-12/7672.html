@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] executing program under GS</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] executing program under GSOS on Apple II GS (file type)" />
+<meta name="Date" content="2009-12-09" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] executing program under GSOS on Apple II GS (file type)</h1>
+<!-- received="Wed Dec  9 15:57:44 2009" -->
+<!-- isoreceived="20091209145744" -->
+<!-- sent="Wed, 9 Dec 2009 15:57:36 +0100" -->
+<!-- isosent="20091209145736" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] executing program under GSOS on Apple II GS (file type)" -->
+<!-- id="f97798c20912090657m60ff1f68w65c70cf2a3ccf6cd@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="619F87D0-493B-47BA-904E-CD3B9979EF77&#64;me.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7673.html" title="Spiro Trikaliotis: &quot;Re: [cc65] CLRCH necessary for the CBMs?&quot;">Next message</a> ]
+[ <a href="7671.html" title="Douglas Goodall: &quot;[cc65] executing program under GSOS on Apple II GS (file type)&quot;">Previous message</a> ]
+[ <a href="7671.html" title="Douglas Goodall: &quot;[cc65] executing program under GSOS on Apple II GS (file type)&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20executing%20program%20under%20GSOS%20on%20Apple%20II%20GS%20(file%20type)">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-12-09 15:57:36</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Douglas,
+
+&gt; I am cross compiling on my Mac, then moving the
+&gt; executable to my hard disk volume on the Apple GS.
+&gt; When it gets there it is type BINARY and does not
+&gt; want to execute. What changes the file type in the
+&gt; directory making it executable with BRUN?
+
+If you CATALOG the file you'll see that (afaik) the start address is
+zero. The ProDOS &quot;inside&quot; GSOS needs to know the correct start
+address. Therefore by default the cc65 linker generates a header with
+that information when generating Apple2 programs. This is described
+in:
+<a href="http://www.cc65.org/snapshot-doc/apple2enh-2.html">http://www.cc65.org/snapshot-doc/apple2enh-2.html</a>
+
+So if you don't want to use AppleCommander to transfer the program to
+a GSOS/ProDOS volume then you'll need to
+a) get rid of the cc65 header by using a custom linker configuration file
+b) add the correct start address to the BINARY file (or always use
+BRUN,A$xxxx to start it)
+
+However I could imagine very well that a SYSTEM file would be a
+preferable approach for you:
+a) A system file can be started right from the GSOS finder.
+b) You don't need to deal with the start address.
+c) You don't need to deal with the cc65 header.
+You &quot;just&quot; need to change the filetype from BINARY to SYSTEM on your
+GSOS/ProDOS volume (afaik there are filetype changers available to do
+that).
+
+To create a SYSTEM file instead of a BINARY file with cc65 use the
+ld65 option &quot;-C apple2enh-system.cfg&quot;:
+<a href="http://www.cc65.org/snapshot-doc/apple2enh-4.html#ss4.3">http://www.cc65.org/snapshot-doc/apple2enh-4.html#ss4.3</a>
+
+&gt; Also should I be using &quot;-t apple2&quot; or &quot;-t apple2enh&quot;
+&gt; when the target is to run on GSOS 6.0.1?
+
+Use &quot;-t apple2enh&quot; for the Apple IIgs.
+
+If you use cl65 to compile and link in one step then provide both &quot;-t
+apple2enh -C apple2enh-system.cfg&quot; for a SYSTEM file:
+<a href="http://www.cc65.org/snapshot-doc/cl65-2.html">http://www.cc65.org/snapshot-doc/cl65-2.html</a>
+
+Best, Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Dec  9 15:57:44 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7673.html" title="Next message in the list">Spiro Trikaliotis: "Re: [cc65] CLRCH necessary for the CBMs?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7671.html" title="Previous message in the list">Douglas Goodall: "[cc65] executing program under GSOS on Apple II GS (file type)"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7671.html" title="Message to which this message replies">Douglas Goodall: "[cc65] executing program under GSOS on Apple II GS (file type)"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7672" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7672" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7672" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-12-09 15:57:46 CET
+</em></small></p>
+</body>
+</html>

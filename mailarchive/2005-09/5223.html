@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] cc65 and BASIC GET?</title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="Re: [cc65] cc65 and BASIC GET?" />
+<meta name="Date" content="2005-09-26" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] cc65 and BASIC GET?</h1>
+<!-- received="Mon Sep 26 23:31:30 2005" -->
+<!-- isoreceived="20050926213130" -->
+<!-- sent="Mon, 26 Sep 2005 23:31:19 +0200" -->
+<!-- isosent="20050926213119" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="Re: [cc65] cc65 and BASIC GET?" -->
+<!-- id="200509262331.19305.groepaz@gmx.net" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="20050926212403.9B845BB7B&#64;mail.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5224.html" title="Karri Kaksonen: &quot;[cc65] Number of object files the linker can handle?&quot;">Next message</a> ]
+[ <a href="5222.html" title="Raj Wurttemberg: &quot;[cc65] cc65 and BASIC GET?&quot;">Previous message</a> ]
+[ <a href="5222.html" title="Raj Wurttemberg: &quot;[cc65] cc65 and BASIC GET?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20cc65%20and%20BASIC%20GET?">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-09-26 23:31:19</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Monday 26 September 2005 23:21, Raj Wurttemberg wrote:
+&gt; I'm making a simple menu in my program to get a single key and I would like
+&gt; to make sure I am using C properly to emulate the BASIC GET statement.
+&gt;
+&gt; [Note: I'm learning C as I write this program]
+&gt;
+&gt; I read about the &quot;getchar()&quot; statement (macro?) and saw that it wasn't ANSI
+&gt; C so I was not surprised to see that it was not in cc65 and I don't know
+&gt; enough about macros yet. Going through the sample programs included with
+&gt; cc65 I found &quot;cgetc (void)&quot; used in hello.c to get a key. It works, but is
+&gt; this the proper way to use it?
+&gt;
+&gt; 	unsigned char menusel;
+&gt; 	fflush (stdout);
+&gt; 	menusel = cgetc();
+&gt;
+&gt; 	// Debug output
+&gt; 	printf(&quot;key pressed: %c&quot;, menusel);
+
+you probably want something like this
+
+	cprintf(&quot;press a key:&quot;);
+	cursor(1);	// enable the cursor
+	while(!kbhit())
+	{
+		// do something until key pressed
+	}
+	c=cgetc(); // get the key
+	
+you should not mix regular standard i/o (which stdout and printf belongs to) 
+and the conio library, since that will lead to all sorts of &quot;interisting&quot; 
+results :=P
+
+-- 
+
+<a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>
+<a href="http://www.gc-linux.org/docs/yagcd.html">http://www.gc-linux.org/docs/yagcd.html</a>
+<a href="http://www.pokefinder.org">http://www.pokefinder.org</a>
+<a href="http://ftp.pokefinder.org">http://ftp.pokefinder.org</a>
+
+The question of whether a computer can think is no more interesting than the 
+question of whether a submarine can swim. 
+&lt;Edsgar W. Dijkstra&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Sep 26 23:31:30 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5224.html" title="Next message in the list">Karri Kaksonen: "[cc65] Number of object files the linker can handle?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5222.html" title="Previous message in the list">Raj Wurttemberg: "[cc65] cc65 and BASIC GET?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5222.html" title="Message to which this message replies">Raj Wurttemberg: "[cc65] cc65 and BASIC GET?"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5223" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5223" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5223" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-09-26 23:31:33 CEST
+</em></small></p>
+</body>
+</html>

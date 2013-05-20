@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Need some help with a memo</title>
+<meta name="Author" content="Payton Byrd (plbyrd1gmail.com)" />
+<meta name="Subject" content="Re: [cc65] Need some help with a memory leak" />
+<meta name="Date" content="2010-05-04" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Need some help with a memory leak</h1>
+<!-- received="Tue May  4 22:32:28 2010" -->
+<!-- isoreceived="20100504203228" -->
+<!-- sent="Tue, 4 May 2010 15:32:00 -0500" -->
+<!-- isosent="20100504203200" -->
+<!-- name="Payton Byrd" -->
+<!-- email="plbyrd1gmail.com" -->
+<!-- subject="Re: [cc65] Need some help with a memory leak" -->
+<!-- id="z2k1adf4c761005041332s42d44293yc323dc707b5c22d@mail.gmail.com" -->
+<!-- charset="windows-1252" -->
+<!-- inreplyto="201005042223.01810.marc&#64;rintsch.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8339.html" title="Oliver Schmidt: &quot;Re: [cc65] --create-dep for ca65?&quot;">Next message</a> ]
+[ <a href="8337.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] --create-dep for ca65?&quot;">Previous message</a> ]
+[ <a href="8336.html" title="Marc 'BlackJack Rintsch: &quot;Re: [cc65] Need some help with a memory leak&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8342.html" title="Payton Byrd: &quot;Re: [cc65] Need some help with a memory leak&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Payton Byrd &lt;<a href="mailto:plbyrd1gmail.com?Subject=Re:%20[cc65]%20Need%20some%20help%20with%20a%20memory%20leak">plbyrd1gmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-05-04 22:32:00</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Tue, May 4, 2010 at 3:22 PM, Marc 'BlackJack Rintsch &lt;marc&#64;rintsch&#46;<!--nospam-->de&gt;wrote:
+
+&gt; On Tuesday 04 May 2010, Payton Byrd wrote:
+&gt; &gt; I'm stumped trying to track down a memory leak and I'm hoping someone
+&gt; &gt; here can spend a little time to help me out.  The only place in my
+&gt; &gt; app where I'm dynamically allocating memory is creating the linked
+&gt; &gt; list that holds the directory information for a drive, so I know it's
+&gt; &gt; gotta be in there somewhere.  However, I believe I've been very
+&gt; &gt; thorough in my cleanup code, but I could be wrong.
+&gt; &gt;
+&gt; &gt; All of the code for this bug can be found at these URLs:
+&gt; &gt;
+&gt; &gt; drives.h -
+&gt; &gt; <a href="http://cbmcommand.codeplex.com/SourceControl/changeset/view/43431#834">http://cbmcommand.codeplex.com/SourceControl/changeset/view/43431#834</a>
+&gt; &gt;475
+&gt; &gt; &lt;<a href="http://cbmcommand.codeplex.com/SourceControl/changeset/view/43431#83">http://cbmcommand.codeplex.com/SourceControl/changeset/view/43431#83</a>
+&gt; &gt;4475&gt;drives.c -
+&gt; &gt; <a href="http://cbmcommand.codeplex.com/SourceControl/changeset/view/43431#834">http://cbmcommand.codeplex.com/SourceControl/changeset/view/43431#834</a>
+&gt; &gt;476
+&gt; &gt;
+&gt; &gt; &lt;<a href="http://cbmcommand.codeplex.com/SourceControl/changeset/view/43431#83">http://cbmcommand.codeplex.com/SourceControl/changeset/view/43431#83</a>
+&gt; &gt;4476&gt;The problem appears in the getDirectory method.  This is the only
+&gt; &gt; place where memory is dynamically allocated and freed.  Help is
+&gt; &gt; GREATLY appreciated.
+&gt;
+&gt; IMHO it's quite obvious in that first ``while`` construct.  Just grab
+&gt; pencil and paper and &quot;step through&quot; the code with two entries.
+&gt;
+&gt; 1. Current is the second one.  The loop body will be entered but the
+&gt; `next` pointer is null so the current pointer will be set to the first
+&gt; entry.
+
+2. Now the loop body won't get executed because of the second condition:
+&gt; `prev` of the first entry is null.
+&gt; 3. The first entry will be freed after the loop.
+&gt;
+&gt; The second entry is still allocated at this point.
+&gt;
+&gt;
+First off, THANK YOU for taking a look at this.  I appreciate it greatly.
+ Maybe I'm wrong, but here's how I interpret the code.
+
+currentNode = drive-&gt;tail;
+ while(currentNode != NULL &amp;&amp; currentNode-&gt;prev != NULL)
+{
+ if(currentNode-&gt;next != NULL)
+free(currentNode-&gt;next);
+
+ currentNode = currentNode-&gt;prev;
+}
+if(currentNode != NULL)
+ free(currentNode);
+
+First step sets currentNode to the tail of the list.
+Next, we loop until currentNode is NULL or currentNode-&gt;prev is NULL.  In a
+directory of any files this will be false at least once.
+Next, we look at currentNode-&gt;next and if it's not null we free it.
+Next, we move to one node to the left.
+Once we complete the loop, currentNode should have both prev = NULL, and the
+pointer for next should be freed, leaving us free to free currentNode.
+
+
+
+&gt; Ciao,
+&gt;        Marc 'BlackJack' Rintsch
+&gt; --
+&gt; “Programmers should be paid by the amount of code
+&gt;  that they avoid writing.”  -- Michael P. Soulier
+&gt;
+
+
+
+-- 
+Payton Byrd
+&lt;<a href="http://www.paytonbyrd.com">http://www.paytonbyrd.com</a>&gt;
+&lt;<a href="http://it.toolbox.com/blogs/paytonbyrd">http://it.toolbox.com/blogs/paytonbyrd</a>&gt;
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue May  4 22:32:28 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8339.html" title="Next message in the list">Oliver Schmidt: "Re: [cc65] --create-dep for ca65?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8337.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] --create-dep for ca65?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="8336.html" title="Message to which this message replies">Marc 'BlackJack Rintsch: "Re: [cc65] Need some help with a memory leak"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8342.html" title="Next message in this discussion thread">Payton Byrd: "Re: [cc65] Need some help with a memory leak"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8342.html" title="Message sent in reply to this message">Payton Byrd: "Re: [cc65] Need some help with a memory leak"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8345.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] Need some help with a memory leak"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8338" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8338" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8338" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-05-04 22:32:30 CEST
+</em></small></p>
+</body>
+</html>

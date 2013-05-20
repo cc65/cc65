@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Hidden64 update: problem w</title>
+<meta name="Author" content="Joseph Rose (rose.joseph121yahoo.com)" />
+<meta name="Subject" content="Re: [cc65] Hidden64 update: problem with updating" />
+<meta name="Date" content="2011-12-07" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Hidden64 update: problem with updating</h1>
+<!-- received="Wed Dec  7 15:29:47 2011" -->
+<!-- isoreceived="20111207142947" -->
+<!-- sent="Wed, 7 Dec 2011 06:29:29 -0800 (PST)" -->
+<!-- isosent="20111207142929" -->
+<!-- name="Joseph Rose" -->
+<!-- email="rose.joseph121yahoo.com" -->
+<!-- subject="Re: [cc65] Hidden64 update: problem with updating" -->
+<!-- id="1323268169.35241.YahooMailNeo@web120606.mail.ne1.yahoo.com" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="1323187250.23917.YahooMailNeo&#64;web120605.mail.ne1.yahoo.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="9762.html" title="BjÃ¶rn Spruck: &quot;Re: [cc65] Macros in ca65&quot;">Next message</a> ]
+[ <a href="9760.html" title="Markus Stehr: &quot;Re: [cc65] Macros in ca65&quot;">Previous message</a> ]
+[ <a href="9755.html" title="Joseph Rose: &quot;[cc65] Hidden64 update: problem with updating&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Joseph Rose &lt;<a href="mailto:rose.joseph121yahoo.com?Subject=Re:%20[cc65]%20Hidden64%20update:%20problem%20with%20updating">rose.joseph121yahoo.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2011-12-07 15:29:29</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Escuse me; I just discovered my error: I disabled the segments no longer used but forgot to change the startup segment address.  Silly me! :(
+
+
+
+________________________________
+From: Joseph Rose &lt;rose.joseph12&#64;yahoo&#46;<!--nospam-->com&gt;
+To: cc65 mailing list &lt;cc65&#64;musoftware&#46;<!--nospam-->de&gt; 
+Sent: Tuesday, December 6, 2011 11:00 AM
+Subject: [cc65] Hidden64 update: problem with updating
+
+
+Recently, I downloaded the latest version of cc65 and discovered that Hidden64 is no longer compatible with it.  I tried to change the library code around for the new style and got to the point where it compiles.  However, when I run it under WinVice, WinVice complains about a HLT instruction.  I started the monitor and foun that, in the start-up code, the number string '2061,' along with the neighboring bytes, are repeated.  I am using the default crt0.s file in the c64 library.  What can cause the repeat?
+----------------
+Joseph Rose, a.k.a. Harry Potter
+Working magic in the computer community
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Dec  7 15:29:47 2011</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="9762.html" title="Next message in the list">BjÃ¶rn Spruck: "Re: [cc65] Macros in ca65"</a></li>
+<li><dfn>Previous message</dfn>: <a href="9760.html" title="Previous message in the list">Markus Stehr: "Re: [cc65] Macros in ca65"</a></li>
+<li><dfn>In reply to</dfn>: <a href="9755.html" title="Message to which this message replies">Joseph Rose: "[cc65] Hidden64 update: problem with updating"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#9761" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#9761" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#9761" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2011-12-07 15:29:50 CET
+</em></small></p>
+</body>
+</html>

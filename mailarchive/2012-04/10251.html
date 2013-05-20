@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] AppleCommander with Apple GEOS</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] AppleCommander with Apple GEOS support" />
+<meta name="Date" content="2012-04-18" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] AppleCommander with Apple GEOS support</h1>
+<!-- received="Wed Apr 18 12:47:47 2012" -->
+<!-- isoreceived="20120418104747" -->
+<!-- sent="Wed, 18 Apr 2012 12:45:52 +0200" -->
+<!-- isosent="20120418104552" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] AppleCommander with Apple GEOS support" -->
+<!-- id="CACT=u70BGt2GpL8cwDaUZgWuNe2s3o_Bd1vtJvzGRd4XKCxmVA@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10252.html" title="Christopher Pow: &quot;[cc65] NESICIDE + VICE for Linux&quot;">Next message</a> ]
+[ <a href="10250.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] sizeof error&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20AppleCommander%20with%20Apple%20GEOS%20support">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-04-18 12:45:52</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+Just like GEOS 64/128 files aren't standard CBM files Apple GEOS
+aren't standard ProDOS 8 files.
+
+I've done some reverse-engineering on Apple GEOS files and have
+documented my findings here:
+<a href="http://wiki.cc65.org/doku.php?id=cc65:apple2:geosfileformats">http://wiki.cc65.org/doku.php?id=cc65:apple2:geosfileformats</a>
+
+Just like GEOS 64/128 files need to be CONVERTed in order to be
+handled with standard CBM file tools Apple GEOS files need to be
+CONVERTed to be handled with standard ProDOS 8 file tools.
+
+However in contrast to GEOS 64/128 there was no CONVERT format defined
+so far for Apple GEOS. Therefore I defined one here:
+<a href="http://wiki.cc65.org/doku.php?id=cc65:apple2:geosconvertformat">http://wiki.cc65.org/doku.php?id=cc65:apple2:geosconvertformat</a>
+
+Just like the GEOS 64/128 CONVERT format it is designed to allow for
+easy in-place conversion of Apple GEOS files.
+
+Just like 'ld65 -t geos-cbm' produces a GEOS64/128 CONVERT file 'ld65
+-t geos-apple' produces an Apple GEOS CONVERT file:
+<a href="http://www.cc65.org/snapshot-doc/grc65-4.html#building-seq">http://www.cc65.org/snapshot-doc/grc65-4.html#building-seq</a>
+
+However in contrast to GEOS 64/128 there was no CONVERT program
+available so far for Apple GEOS. Therefore I implemented one - at
+least for un-conversion - which is part of cc65's Apple GEOS support.
+
+But when programming for GEOS with cc65 it is desirable to be able to
+place an ld65-generated CONVERT file in an emulator disk image and
+have the un-conversion take place on-the-fly. This greatly speeds up
+turnaround times as there's no need to run the CONVERT program
+anymore. For GEOS 64/128 this can be accomplished with the Star
+Commander: <a href="http://sta.c64.org/sc.html">http://sta.c64.org/sc.html</a>
+
+I'm happy that to announce that David Schmidt (Thanks !) made the same
+possible for Apple GEOS with the latest release of AppleCommander:
+<a href="http://sites.google.com/site/drjohnbmatthews/applecommander">http://sites.google.com/site/drjohnbmatthews/applecommander</a>
+
+Regards,
+Oliver
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Wed Apr 18 12:47:47 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10252.html" title="Next message in the list">Christopher Pow: "[cc65] NESICIDE + VICE for Linux"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10250.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] sizeof error"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10251" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10251" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10251" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-04-18 12:47:51 CEST
+</em></small></p>
+</body>
+</html>

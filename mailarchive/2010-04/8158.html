@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Commodore PET keyboard scannin</title>
+<meta name="Author" content="Chiron Bramberger (chiron1bramberger.com)" />
+<meta name="Subject" content="[cc65] Commodore PET keyboard scanning" />
+<meta name="Date" content="2010-04-25" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Commodore PET keyboard scanning</h1>
+<!-- received="Sun Apr 25 07:13:59 2010" -->
+<!-- isoreceived="20100425051359" -->
+<!-- sent="Sun, 25 Apr 2010 01:13:55 -0400" -->
+<!-- isosent="20100425051355" -->
+<!-- name="Chiron Bramberger" -->
+<!-- email="chiron1bramberger.com" -->
+<!-- subject="[cc65] Commodore PET keyboard scanning" -->
+<!-- id="4BD3CF93.8050905@bramberger.com" -->
+<!-- charset="UTF-8" -->
+<!-- inreplyto="20100126103712.GB23729&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8159.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] OT: Where to get some help?&quot;">Next message</a> ]
+[ <a href="8157.html" title="Payton Byrd: &quot;[cc65] How to prototype an assembler function?&quot;">Previous message</a> ]
+[ <a href="../2010-01/7773.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Support for runtime / libs with self-modifying-code?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8160.html" title="Groepaz: &quot;Re: [cc65] Commodore PET keyboard scanning&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Chiron Bramberger &lt;<a href="mailto:chiron1bramberger.com?Subject=Re:%20[cc65]%20Commodore%20PET%20keyboard%20scanning">chiron1bramberger.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-04-25 07:13:55</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+I'm a total newbie, but I used cc65 to make PetSynth for the CBM PET. -&gt;
+<a href="http://www.petsynth.org/">http://www.petsynth.org/</a>
+
+Anyway, the PET's KERNAL (or KERNEL???) has a simple keyboard scanner.
+It doesn't detect holding keys down. So at some point for my next
+version PetSynth I was going to write a keyboard matrix scanner.
+(technically it detects it when you hold down the cursor or spacebar and
+maybe a few other keys, but not most of them. weird???)
+
+So, if it isn't horrible, I'm happy to release a PET keyboard matrix
+scanner to cc65, if in this particular case it might be within the scope
+of cc65 (if only because the PET's keyboard scanner is overly simple at
+best) and since this particular computer seems to be the only Commodore
+machine to have such a simple scanner.
+
+Unless of course I'm wrong and there already is a Commodore PET keyboard
+routine in cc65. If so, please let me know, I wasn't able to find
+anything in the docs. Right now I just use kbhit() which is okay, but
+requires me to set a note length instead of scanning for a key_release
+style event.
+
+FYI - PET games like Breakout or Space Invaders used their own assembler
+keyboard routines and not the built in ones.
+
+Anyway, love cc65 - it rocks! Thanks UvB / everyone!!!
+-Chiron
+
+also, this is my first mailing list post - let me know if I've somehow
+not following mailing list etiquette or protocol.
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Apr 25 07:13:59 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8159.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] OT: Where to get some help?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8157.html" title="Previous message in the list">Payton Byrd: "[cc65] How to prototype an assembler function?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="../2010-01/7773.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Support for runtime / libs with self-modifying-code?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8160.html" title="Next message in this discussion thread">Groepaz: "Re: [cc65] Commodore PET keyboard scanning"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8160.html" title="Message sent in reply to this message">Groepaz: "Re: [cc65] Commodore PET keyboard scanning"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8167.html" title="Message sent in reply to this message">Steve Davison: "Re: [cc65] Commodore PET keyboard scanning"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8209.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Commodore PET keyboard scanning"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8158" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8158" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8158" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-04-25 07:14:03 CEST
+</em></small></p>
+</body>
+</html>

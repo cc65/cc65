@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Overlay Demo: C64 Port ?</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="Re: [cc65] Overlay Demo: C64 Port ?" />
+<meta name="Date" content="2009-10-02" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Overlay Demo: C64 Port ?</h1>
+<!-- received="Fri Oct  2 21:31:14 2009" -->
+<!-- isoreceived="20091002193114" -->
+<!-- sent="Fri, 2 Oct 2009 21:31:06 +0200" -->
+<!-- isosent="20091002193106" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="Re: [cc65] Overlay Demo: C64 Port ?" -->
+<!-- id="f97798c20910021231k54cc35d7t376e6b9199f3e287@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="20091002141949.GB30989&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7119.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Overlay Demo: C64 Port ?&quot;">Next message</a> ]
+[ <a href="7117.html" title="Ullrich von Bassewitz: &quot;[cc65] Fourth release candidate available&quot;">Previous message</a> ]
+[ <a href="7112.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Overlay Demo: C64 Port ?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7119.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Overlay Demo: C64 Port ?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Overlay%20Demo:%20C64%20Port%20?">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-10-02 21:31:06</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Uz,
+
+First of all thanks for your detailed information (incl. the ASCII art
+memory map) :-)
+
+&gt; I cannot really see a problem, but this may be my fault:-)
+
+I checked out the C64 crt0.s and found the following lines:
+
+	lda    	#&lt;(__RAM_START__ + __RAM_SIZE__)
+	sta	sp
+	lda	#&gt;(__RAM_START__ + __RAM_SIZE__)
+       	sta	sp+1   		; Set argument stack ptr
+
+So now I see why you see no problem. One can directly control the
+stack position from the linker config so there's in fact no problem on
+the C64 :-)
+
+&gt; It should even be possible to define a symbol like &quot;OVERLAY_SIZE&quot; and use this
+&gt; to determine the boundary between regular and and overlay memory are in the
+&gt; linker config. If you make this symbol &quot;weak&quot;, it can be specified on the
+&gt; command line.
+
+I'll check that out.
+
+&gt; Similar linker scripts should also work for the other platforms.
+
+Certainly not all. The Apple2 crt0.s contains the code below, so
+there's no way to change the stack position from the linker config...
+
+Again thanks, Oliver
+
+        ; Check ProDOS system bit map
+        lda     $BF6F           ; protection for pages $B8 - $BF
+        cmp     #%00000001      ; exactly system global page is protected
+        bne     basic
+
+        ; No BASIC.SYSTEM so use addr of ProDOS system global page
+        lda     #&lt;$BF00
+        ldx     #&gt;$BF00
+        bne     :+              ; Branch always
+
+        ; Get highest available mem addr from BASIC interpreter
+basic:  lda     HIMEM
+        ldx     HIMEM+1
+
+        ; Setup the C stack
+:       sta     sp
+        stx     sp+1
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Oct  2 21:31:14 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7119.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Overlay Demo: C64 Port ?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7117.html" title="Previous message in the list">Ullrich von Bassewitz: "[cc65] Fourth release candidate available"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7112.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] Overlay Demo: C64 Port ?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7119.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Overlay Demo: C64 Port ?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7119.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Overlay Demo: C64 Port ?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7118" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7118" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7118" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-10-02 21:31:16 CEST
+</em></small></p>
+</body>
+</html>

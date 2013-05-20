@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Apple2 Libraries - Current</title>
+<meta name="Author" content="jim (jsymolon011comcast.net)" />
+<meta name="Subject" content="Re: [cc65] Apple2 Libraries - Current status of file io ?" />
+<meta name="Date" content="2004-07-29" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Apple2 Libraries - Current status of file io ?</h1>
+<!-- received="Thu Jul 29 12:46:24 2004" -->
+<!-- isoreceived="20040729104624" -->
+<!-- sent="Thu, 29 Jul 2004 06:45:49 -0400" -->
+<!-- isosent="20040729104549" -->
+<!-- name="jim" -->
+<!-- email="jsymolon011comcast.net" -->
+<!-- subject="Re: [cc65] Apple2 Libraries - Current status of file io ?" -->
+<!-- id="4108D55D.3040205@comcast.net" -->
+<!-- charset="ISO-8859-1" -->
+<!-- inreplyto="000c01c4751d$c034be80$94682c42&#64;palace" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4331.html" title="jim: &quot;Re: [cc65] Apple2 Libraries - Current status of file io ?&quot;">Next message</a> ]
+[ <a href="4329.html" title="Groepaz: &quot;Re: [cc65] Anther &quot;compile contiki&quot; problem&quot;">Previous message</a> ]
+[ <a href="4314.html" title="Greg King: &quot;Re: [cc65] Apple2 Libraries - Current status of file io ?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4332.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Apple2 Libraries - Current status of file io ?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: jim &lt;<a href="mailto:jsymolon011comcast.net?Subject=Re:%20[cc65]%20Apple2%20Libraries%20-%20Current%20status%20of%20file%20io%20?">jsymolon011comcast.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-07-29 12:45:49</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Greg King wrote:
+
+&gt;From: jim; on Date: Monday, July 26, 2004, at 06:10 PM -0400
+&gt;  
+&gt;
+&gt;&gt;I've also added a few CONST items to the &quot;errno.inc&quot; and &quot;fcntl.inc&quot;
+&gt;&gt;files.
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;It might be better to create _osmaperrno(), and map ProDOS's error-codes
+&gt;onto the already-existing errno codes.  (Read the &quot;cc65/libsrc/*/oserr*.s&quot;
+&gt;files, to see how it's done by other platforms.)
+&gt;  
+&gt;
+Thanks, I'll look into how that's done, however, that's not what I've 
+added to those .inc files.
+
+errno.inc - additions:
+ENOTDIR        =    20    ; A component is not a directory
+EROFS        =    21    ; Read only file system &amp; write requested
+EBADF        =    22    ; fd not a valid file descp or not open for writing
+
+fcntl.inc - additions:
+; File seek
+SEEK_SET    = $01
+SEEK_CUR    = $02
+SEEK_END    = $04
+
+I've checked the 2.10 version and seen that the SEEK codes are already 
+there so that change doesn't need to be done.
+
+I do have a conversion routine from ProDOS codes to errno codes.
+
+Please keep in mind that I've only been adding to the &quot;common&quot; files 
+POSIX type items and only with great reluctance - I know that the merge 
+is going to be painful.  First I have to catch up to the 2.10 version.  
+I want to have everything working at 2.9 then upgrade to 2.10.  I've 
+tried the 2.10, but my linux box (Mandrake 9) fails some dependancies 
+and the linker produces bad code.  (the jsr's &amp; jmp's are off).
+
+Uz,  do you have any documentation on the new loadable modules and how 
+it's supposed to work ?  Without such functionality I was thinking of 
+having two Apple DOS libraries, however, with loadable modules it is 
+possible to load just what is wanted from a developer point of view.
+
+For those who are not familiar with the Apple II's - the enhanced II's 
+and GS have paged memory which can top out at 8 Meg.
+
+Thanks for the input - I'll have to make some changes to follow the 
+design better.
+
+Thanks
+Jim
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Thu Jul 29 12:46:24 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4331.html" title="Next message in the list">jim: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4329.html" title="Previous message in the list">Groepaz: "Re: [cc65] Anther &quot;compile contiki&quot; problem"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4314.html" title="Message to which this message replies">Greg King: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4332.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4332.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Apple2 Libraries - Current status of file io ?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4330" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4330" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4330" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-07-29 12:46:33 CEST
+</em></small></p>
+</body>
+</html>

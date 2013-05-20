@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] makefile problems</title>
+<meta name="Author" content="Groepaz (groepaz1gmx.net)" />
+<meta name="Subject" content="Re: [cc65] makefile problems" />
+<meta name="Date" content="2004-10-18" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] makefile problems</h1>
+<!-- received="Mon Oct 18 23:04:44 2004" -->
+<!-- isoreceived="20041018210444" -->
+<!-- sent="Mon, 18 Oct 2004 23:03:16 +0200" -->
+<!-- isosent="20041018210316" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz1gmx.net" -->
+<!-- subject="Re: [cc65] makefile problems" -->
+<!-- id="200410182303.16962.groepaz@gmx.net" -->
+<!-- charset="iso-8859-1" -->
+<!-- inreplyto="Pine.LNX.4.58.0410180948010.26635&#64;kosh.sipo.fi" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="4633.html" title="Greg King: &quot;Re: [cc65] makefile problems&quot;">Next message</a> ]
+[ <a href="4631.html" title="Karri Kaksonen: &quot;Re: [cc65] makefile problems&quot;">Previous message</a> ]
+[ <a href="4631.html" title="Karri Kaksonen: &quot;Re: [cc65] makefile problems&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="4644.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] makefile problems&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Groepaz &lt;<a href="mailto:groepaz1gmx.net?Subject=Re:%20[cc65]%20makefile%20problems">groepaz1gmx.net</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2004-10-18 23:03:16</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Monday 18 October 2004 09:00, Karri Kaksonen wrote:
+&gt; I like the idea of making the building more like other packages. It took
+&gt; me a while to figure out how to build it in the first place and for some
+&gt; reason even a small modification to the source keeps the build going on
+&gt; for 15 minutes or so.
+&gt; 
+&gt; What I expect is to be able to
+&gt;   cd libsrc/lynx
+&gt;   make
+&gt; 
+&gt; and when that compiles well I do a
+&gt;   sudo make install
+&gt; at the top level
+&gt; 
+&gt; There may be a way to do that already, but I have not found it yet.
+&gt; Currently I do a
+&gt;   sudo make -f make/gcc.mak install
+&gt; at top level and get a cup of something while I am waiting.
+
+i'm working on it.... i'll fix the makefile for the examples (so they build
+cleanly when they are installed outside the sourcetree) and also add some
+additional targets to the toplevel makefile (which -for some odd reason-
+isnt in top level, but who cares :=P). so you can do 
+
+sudo -f make/gcc.mak install_libs
+
+and it will only build and install the libs, not the compiler binaries and
+everything. the &quot;problem&quot; you describe is because the &quot;install&quot; target of
+the toplevel makefile (correctly) depends on the executeables and all libs
+beeing build previously...and somehow everything is rebuild all the time. i
+will check this too, maybe the &quot;depend&quot; targets of other makefiles need to
+be executed or something.
+
+gpz
+
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Oct 18 23:04:44 2004</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="4633.html" title="Next message in the list">Greg King: "Re: [cc65] makefile problems"</a></li>
+<li><dfn>Previous message</dfn>: <a href="4631.html" title="Previous message in the list">Karri Kaksonen: "Re: [cc65] makefile problems"</a></li>
+<li><dfn>In reply to</dfn>: <a href="4631.html" title="Message to which this message replies">Karri Kaksonen: "Re: [cc65] makefile problems"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="4644.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] makefile problems"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="4644.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] makefile problems"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#4632" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#4632" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#4632" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2004-10-18 23:04:54 CEST
+</em></small></p>
+</body>
+</html>

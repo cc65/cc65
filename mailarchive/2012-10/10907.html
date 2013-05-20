@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Specific Memory Addresses </title>
+<meta name="Author" content="Marc 'BlackJack' Rintsch (marc1rintsch.de)" />
+<meta name="Subject" content="Re: [cc65] Specific Memory Addresses at Compilation" />
+<meta name="Date" content="2012-10-14" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Specific Memory Addresses at Compilation</h1>
+<!-- received="Sun Oct 14 13:00:41 2012" -->
+<!-- isoreceived="20121014110041" -->
+<!-- sent="Sun, 14 Oct 2012 12:44:14 +0200" -->
+<!-- isosent="20121014104414" -->
+<!-- name="Marc 'BlackJack' Rintsch" -->
+<!-- email="marc1rintsch.de" -->
+<!-- subject="Re: [cc65] Specific Memory Addresses at Compilation" -->
+<!-- id="201210141244.16097.marc@rintsch.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="CAHsKwE-A7hqim9QZQRJ3m=sAvJY-wqOm3H_8bfhVVnHqkmKhxg&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10908.html" title="Andreas R¸ckert: &quot;Re: [cc65] Specific Memory Addresses at Compilation&quot;">Next message</a> ]
+[ <a href="10906.html" title="Zen Tom: &quot;[cc65] Specific Memory Addresses at Compilation&quot;">Previous message</a> ]
+[ <a href="10906.html" title="Zen Tom: &quot;[cc65] Specific Memory Addresses at Compilation&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10908.html" title="Andreas R¸ckert: &quot;Re: [cc65] Specific Memory Addresses at Compilation&quot;">Next in thread</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Marc 'BlackJack' Rintsch &lt;<a href="mailto:marc1rintsch.de?Subject=Re:%20[cc65]%20Specific%20Memory%20Addresses%20at%20Compilation">marc1rintsch.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-10-14 12:44:14</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi Tom,
+
+&gt; I have a whole bunch of graphics data (charmaps and sprites) that I
+&gt; need to load into very specific data-locations in graphics bank 1
+&gt; between $4000 and $8000.
+&gt; Previously, I've just loaded that data directly into my machine code
+&gt; monitor as a single operation, and then loaded my compiled program
+&gt; into memory.
+&gt; Now my program is getting larger, it's starting to eat into my
+&gt; reserved memory area.
+&gt; How do I avoid this?
+&gt; I can either move my graphics data into code and get cc65 to include
+&gt; it at compile time - perhaps by genarating a large flat array - but
+&gt; I need to put it at a specific memory location for that to work. How
+&gt; do I do that? Alternately, is there a way to get the linker to
+&gt; recognise a particular file - perhaps even of &quot;raw&quot; data and to load
+&gt; it into memory at a specific address?
+&gt; Presumably this is a common scenario - how have people dealt with it
+&gt; in the past?
+
+I would write a custom linker config.  At least to make sure $4000‚Äî$8000 
+is safe from being used by code, data, and stack of the C program.
+
+You could set up segments for the various graphic data in the linker 
+config and use simple assembler files with ``.segment`` and ``.incbin`` 
+to create object files that can be linked in by cc65 and produce one 
+final binary.
+
+The course of action also depends a little bit on what ‚Äûstarting to eat 
+into my reserved memory area‚Äù exactly means.  Is code + initialized data 
+crossing the $4000 address, or is dynamically allocated memory or the 
+(software) stack trashing the graphic data?
+
+If it is the dynamically memory then leave a gap for the graphic in the 
+linker config.  Maybe moving initialized data behind that gap to have a 
+little more space for just code before it.
+
+If it is the code itself getting too large you could move the whole C 
+program behind $8000.  Then you have 20 KiB for code + initialized data 
++ dynamically allocated memory + stack.
+
+If shuffling the existing segments before and after the gap is not 
+enough you have to start breaking up the code into different segments by 
+defining at least one segment after the gap for code and using 
+appropriate ``.segment`` statements in assembler sources and 
+``#pragma``\s in C sources to place some of the code there.
+
+Ciao,
+	Marc 'BlackJack' Rintsch
+-- 
+‚ÄúXML combines all the inefficiency of text-based formats
+ with most of the unreadability of binary formats :-)‚Äù
+                             -- Oren Tirosh, c.l.p, 2002
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Oct 14 13:00:41 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10908.html" title="Next message in the list">Andreas R¸ckert: "Re: [cc65] Specific Memory Addresses at Compilation"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10906.html" title="Previous message in the list">Zen Tom: "[cc65] Specific Memory Addresses at Compilation"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10906.html" title="Message to which this message replies">Zen Tom: "[cc65] Specific Memory Addresses at Compilation"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10908.html" title="Next message in this discussion thread">Andreas R¸ckert: "Re: [cc65] Specific Memory Addresses at Compilation"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10907" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10907" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10907" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-10-14 13:00:44 CEST
+</em></small></p>
+</body>
+</html>

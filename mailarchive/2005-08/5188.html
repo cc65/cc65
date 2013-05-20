@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] compile problem of current</title>
+<meta name="Author" content="MagerValp (MagerValp1cling.gu.se)" />
+<meta name="Subject" content="Re: [cc65] compile problem of current snapshot" />
+<meta name="Date" content="2005-08-26" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] compile problem of current snapshot</h1>
+<!-- received="Fri Aug 26 09:08:10 2005" -->
+<!-- isoreceived="20050826070810" -->
+<!-- sent="Fri, 26 Aug 2005 09:08:04 +0200" -->
+<!-- isosent="20050826070804" -->
+<!-- name="MagerValp" -->
+<!-- email="MagerValp1cling.gu.se" -->
+<!-- subject="Re: [cc65] compile problem of current snapshot" -->
+<!-- id="17166.49108.83851.978017@panini.cling.gu.se" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="20050825160339.GA26812&#64;trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5189.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] compile problem of current snapshot&quot;">Next message</a> ]
+[ <a href="5187.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] compile problem of current snapshot&quot;">Previous message</a> ]
+[ <a href="5187.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] compile problem of current snapshot&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="5189.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] compile problem of current snapshot&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: MagerValp &lt;<a href="mailto:MagerValp1cling.gu.se?Subject=Re:%20[cc65]%20compile%20problem%20of%20current%20snapshot">MagerValp1cling.gu.se</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-08-26 09:08:04</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>I just tested the latest snapshot (with gcc 3.4.4 on Cygwin), and:
+
+  install-test that checks for root privilieges is unnecessary. On
+  Cygwin it just doesn't work (there is no root user), and on many
+  unix systems it's not necessary to be root to install things -
+  especially if you change the prefix.
+
+  install does not depend on all. Maybe this is by design though? I
+  guess it avoids the old problem of libraries being built twice if
+  you do make all &amp;&amp; make install.
+
+  inttypes.h generates a type conflict for intmax_t. I have stdint.h,
+  but GCC doesn't define __STDC_VERSION__, as I guess it defaults to
+  C89 with GNU extensions. To enable C99, you have to add -std=c99 or
+  -std=gnu99 to the commandline, but since every makefile in the src
+  directory explicitly sets CFLAGS, there's no way of doing this. Some
+  way of inheriting CFLAGS from the main makefile would be good (and
+  ditto for CC).
+
+  A small check for smgl2html would make the makefile terminate with a
+  nicer message on systems without SGML-Tools:
+
+    docs:
+      -&#64;sgml2html &gt; /dev/null 2&gt;&amp;1 &amp;&amp; $(MAKE) -C doc html || echo \
+      'SGML-Tools not installed, skipping docs'
+
+-- 
+    ___          .     .  .         .       . +  .         .      o   
+  _|___|_   +   .  +     .     +         .  Per Olofsson, arkadspelare
+    o-o    .      .     .   o         +          MagerValp&#64;cling&#46;<!--nospam-->gu.se
+     -       +            +    .     <a href="http://www.cling.gu.se/~cl3polof/">http://www.cling.gu.se/~cl3polof/</a>
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Aug 26 09:08:10 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5189.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] compile problem of current snapshot"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5187.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] compile problem of current snapshot"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5187.html" title="Message to which this message replies">Ullrich von Bassewitz: "Re: [cc65] compile problem of current snapshot"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="5189.html" title="Next message in this discussion thread">Ullrich von Bassewitz: "Re: [cc65] compile problem of current snapshot"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="5189.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] compile problem of current snapshot"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5188" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5188" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5188" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-08-26 09:08:13 CEST
+</em></small></p>
+</body>
+</html>

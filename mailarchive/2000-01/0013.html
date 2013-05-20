@@ -1,0 +1,217 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] Back on Track</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="[cc65] Back on Track">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] Back on Track</h1>
+<!-- received="Wed Jan 19 21:34:19 2000" -->
+<!-- isoreceived="20000119203419" -->
+<!-- sent="Wed, 19 Jan 2000 21:33:49 +0100" -->
+<!-- isosent="20000119203349" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="[cc65] Back on Track" -->
+<!-- id="38861FAD.7E657808@gmx.net" -->
+<!-- inreplyto="200001071054.LAA13180@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20Back%20on%20Track"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2000-01-19 21:33:49
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0014.html">Martin Ancher Holm - Bankdata: "Sv: [cc65] Back on Track"</a>
+<li><strong>Previous message:</strong> <a href="0012.html">Ullrich von Bassewitz: "[cc65] Version 2.4.0 is out"</a>
+<li><strong>In reply to:</strong> <a href="0004.html">Ullrich von Bassewitz: "[cc65] test suite"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0015.html">Ullrich von Bassewitz: "Re: [cc65] Back on Track"</a>
+<li><strong>Reply:</strong> <a href="0015.html">Ullrich von Bassewitz: "Re: [cc65] Back on Track"</a>
+<li><strong>Maybe reply:</strong> <a href="0023.html">Spiro Trikaliotis: "Re: [cc65] Back on Track"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Hyho out there... new versions seem to be coming out faster than i could check
+them out lately =) cool work!
+
+I have spent quite some time on using cc65 lately and i have to say that it is
+a *really* nice tool! 
+
+&gt;Support for some features is still missing. To name a few:
+&gt;
+&gt;  * No file routines. Actually, most stdio routines are there, but the
+&gt;    low level file I/O is missing, so you get linker errors if you try to
+&gt;    use them with files.
+
+However... maybe someone remembers that i talked about writing a filesystem some
+(long) time ago, and actually it IS happening! I have already written a lot of
+'lowlevel' drive routines (basically wrapper functions to kernal routines) and
+i have built a file-system on it, that is already quite comfortable as long as
+you
+stick with commodore limitations (only one file at a time, no seeking)...
+
+the filesystem is designed to work with different 'sub-systems' (call them
+device-
+drivers) so native-1541 drivers with fastload,seeking&amp;buffering will be
+possible, just as doing a REU driver or supporting some other i/o device.
+
+right now, the aim is to finish the 'driver' for the cbm kernal routines and
+some
+&quot;stress test&quot; program for the filesystem itself. Once this proved to work the 
+kernal 'driver' will be a good template for writing native drivers for whatever
+drive.
+
+current things supported are like: (typing this off-hand so some may missing)
+
+init:    fs_init();			 - obvious =)
+         fs_mount();                     - mount a subsystem 
+
+stdio:   open();close();read();write();
+         eof();
+turbo-c: findfirst();findnext();         - directory access
+         dosexterr();                    - get extended error info
+         getdisk();			 - get current working drive number
+non-std: get();                          - get one byte from file (to be called
+from fgetc)
+         doscommand();			 - send cbm-style dos command
+
++ a lot low level device-i/o routines (they'll work all the same, regardless
+what
+device they are mapped to)
++ a handful wrapper functions to kernal-calls. if you are familiar with these,
+they
+might come in handy aswell ;=)
+
+some other (already working or in-the-making) features are:
+
+- true iso-style path/filenames like
+
+  8:\myfile.txt		(you can alternativly use letters instead of numbers for the
+drive)
+
+  - both having several drives and also subdirectories are handled
+
+- decent error handling
+
+long-run planned things:
+
+- support for c64&lt;=&gt;pc link via pc64 cable (i have coded such a thing already
+and i think
+it'll just come in handy to mount the pc-hd via a link and use it just like any
+other 
+drive on the c64 =)
+
+mmmmh.... however, if someone of you might have some 1581/1571/CMD specific info
+of any kind, let me know.... most of what i am doing in that direction is based
+on guesswork ;=P
+
+oh... one other question is, that i looked at the RTL and couldnt find the point
+where lseek() would kick in the i/o routines... also, would my open() have to
+deal with eg stdout as a parameter?!
+
+talking of standard out.... your printf() should ALWAYS print to screen, no
+matter
+a file is open or not ;=) took me some time to figure out that some printf sent
+garbage to the drive instead of printing info on the screen 8=)) (dont use
+$ffd2! :P)
+
+&gt; &gt; Some kind of test suit would be nice, wouldn't it?
+&gt; 
+&gt; Yes, but writing a test suite is only one part of the game. The other is, that
+&gt; translating and transfering the test suite to the real machines is complex,
+&gt; and even using an emulator prohibits the use of batch file or other utilities
+&gt; that may help in verifying the program results.
+&gt; 
+&gt; What I'm currently doing is to use the programs I have written as test
+&gt; programs, in the hope, the code will cover most instructions. This assumption
+&gt; seems to be wrong, however...
+
+mmmh... actually i have written a little command-line interpreter for testing my
+file routines... soon i will have added some kind of 'batchfile' capability as
+well and then it will only be a matter of running 2 C-programs at different
+memory locations ... i need to dig a bit deeper into the RTL and the compiler 
+though (what about that o65 fileformat? would that be a good solution?)
+
+so long.....
+
+gpz
+
+oh...don't ask for the code yet,its a mess,you dont want to have it like this
+;=P
+as soon as its cleaned up and all standarized, i will post it.
+
+-- 
+........................................................
+
+		            /^\
+                            \ /  
+      ASCII RIBBON CAMPAIGN  X  AGAINST HTML MAIL
+                            / \  
+
+........................................................
+
+             .--.--.--.----..--.--.--.-----.----.
+   C=64     /  /  /  /  .  /  .  .  /  .  /  .  /\
+           /  /  /__/  /__/  /  /  /  /  /  /  / /
+   PC     /     /  /  /\_/  /  /  /  __ /  /  / /
+         /  /  /  /  / //  /  /  /  /  /  /  / /
+   PSX  /  /  /  /  / //  /  /  /  /  /  /  / /
+       /__/__/__/__/ //__/__/__/_____/__/__/ / 
+       \__\__\__\__\/ \__\__\__\_____\__\__\/  Groepaz
+
+........................................................
+.. <a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a> .......................
+..... hitmen psx section ...............................
+.. <a href="http://fly.to/hitmen-groepaz">http://fly.to/hitmen-groepaz</a> ........................
+..... my little personal page ..........................
+........................................................
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Back%20on%20Track">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0014.html">Martin Ancher Holm - Bankdata: "Sv: [cc65] Back on Track"</a>
+<li><strong>Previous message:</strong> <a href="0012.html">Ullrich von Bassewitz: "[cc65] Version 2.4.0 is out"</a>
+<li><strong>In reply to:</strong> <a href="0004.html">Ullrich von Bassewitz: "[cc65] test suite"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0015.html">Ullrich von Bassewitz: "Re: [cc65] Back on Track"</a>
+<li><strong>Reply:</strong> <a href="0015.html">Ullrich von Bassewitz: "Re: [cc65] Back on Track"</a>
+<li><strong>Maybe reply:</strong> <a href="0023.html">Spiro Trikaliotis: "Re: [cc65] Back on Track"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:35 CET</em>
+</em>
+</small>
+</body>
+</html>

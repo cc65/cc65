@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Alignment</title>
+<meta name="Author" content="Greg King (gngking_at_erols.com)">
+<meta name="Subject" content="Re: [cc65] Alignment">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Alignment</h1>
+<!-- received="Thu Jul 25 21:11:20 2002" -->
+<!-- isoreceived="20020725191120" -->
+<!-- sent="Thu, 25 Jul 2002 14:33:24 -0400" -->
+<!-- isosent="20020725183324" -->
+<!-- name="Greg King" -->
+<!-- email="gngking_at_erols.com" -->
+<!-- subject="Re: [cc65] Alignment" -->
+<!-- id="000201c2340f$16cd43e0$fb312c42@palace" -->
+<!-- inreplyto="[cc65] Alignment" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Greg King (<a href="mailto:gngking_at_erols.com?Subject=Re:%20[cc65]%20Alignment"><em>gngking_at_erols.com</em></a>)<br>
+<strong>Date:</strong> 2002-07-25 20:33:24
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="1535.html">Greg King: "Re: [cc65] raw disk access (was: cr/lf translation?)"</a>
+<li><strong>Maybe in reply to:</strong> <a href="1505.html">Ullrich von Bassewitz: "[cc65] Alignment"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1537.html">groepaz: "[cc65] preprocessor hazzle..."</a>
+<li><strong>Next in thread:</strong> <a href="1506.html">Shawn Jefferson: "Re: Re: [cc65] Strange problem"</a>
+<li><strong>Reply:</strong> <a href="1537.html">groepaz: "[cc65] preprocessor hazzle..."</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+-----Original Message-----
+From:  <a href="mailto:cbmnut_at_hushmail.com?Subject=Re:%20[cc65]%20Alignment">cbmnut_at_hushmail.com</a>
+Date:  Tuesday, July 16, 2002 07:39 PM
+&gt;
+&gt; OMG, there's no working .align??  I need that to do some libraries,
+&gt; in the future.  I will need page-alignment, to get some code working with
+&gt; large tables.  And for speed, staying within a page-boundary is good.
+&gt;
+&gt; I.e.:
+&gt;
+&gt; readtable: lda sqrtable,y
+&gt;         ...
+&gt;            .align page
+&gt; sqrtable:  .byte $00,$01,$02,$04, ...
+
+&quot;.align&quot; works well enough for what you want -- if you are willing to use
+a custom linker-configure-script.  Add a line to the script (between &quot;DATA:&quot; and
+&quot;BSS:&quot;) that looks like this:
+
+TABLES: load = RAM, type = ro, align = $100;
+
+Then, write your ca65 assembly-code, in this style:
+
+readtable: lda sqrtable,y
+        ...
+        ...
+        ...
+           .segment &quot;TABLES&quot;
+           .align $100
+sqrtable:  .byte 0,1,4,9, ...
+        ...
+        ...
+        ...
+           .code
+           lda cubetable,y
+        ...
+        ...
+        ...
+           .segment &quot;TABLES&quot;
+           .align $100
+cubetable: .byte 0,1,8,27, ...
+        ...
+        ...
+        ...
+           .rodata
+        ...
+
+My first example interweaves code and data, in the source-file; but, ca65 would
+separate them, and join together the pieces of each segment.  You can arrange
+the pieces any way that you wish; what is important is how &quot;.segment&quot; and
+&quot;.align&quot; are used:
+
+readtable: lda sqrtable,y
+        ...
+           lda cubetable,y
+        ...
+           .bss
+        ...
+           .segment &quot;TABLES&quot;
+           .align $100
+sqrtable:  .byte 0,1,4,9, ...
+        ...
+           .align $100
+cubetable: .byte 0,1,8,27, ...
+        ...
+
+That stuff is documented in &quot;ca65.html&quot; (section 6.4)
+and &quot;ld65.html&quot; (section 4.6).
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Alignment">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="1535.html">Greg King: "Re: [cc65] raw disk access (was: cr/lf translation?)"</a>
+<li><strong>Maybe in reply to:</strong> <a href="1505.html">Ullrich von Bassewitz: "[cc65] Alignment"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="1537.html">groepaz: "[cc65] preprocessor hazzle..."</a>
+<li><strong>Next in thread:</strong> <a href="1506.html">Shawn Jefferson: "Re: Re: [cc65] Strange problem"</a>
+<li><strong>Reply:</strong> <a href="1537.html">groepaz: "[cc65] preprocessor hazzle..."</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2002-07-25 21:12:14 CEST</em>
+</em>
+</small>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Optimizations of structures</title>
+<meta name="Author" content="Jakub (debski.jakub1wp.pl)" />
+<meta name="Subject" content="[cc65] Optimizations of structures" />
+<meta name="Date" content="2010-09-10" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Optimizations of structures</h1>
+<!-- received="Fri Sep 10 13:58:53 2010" -->
+<!-- isoreceived="20100910115853" -->
+<!-- sent="Fri, 10 Sep 2010 13:58:46 +0200" -->
+<!-- isosent="20100910115846" -->
+<!-- name="Jakub" -->
+<!-- email="debski.jakub1wp.pl" -->
+<!-- subject="[cc65] Optimizations of structures" -->
+<!-- id="F8194CB7C2B34750A6741C38984660F9@hq.eset.com" -->
+<!-- charset="UTF-8" -->
+<!-- inreplyto="AANLkTiknafYb_r5+jQrNYsQTDuSSktqEsaD-tCWKWPej&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8594.html" title="Marc 'BlackJack' Rintsch: &quot;Re: [cc65] Optimizations of structures&quot;">Next message</a> ]
+[ <a href="../2010-08/8592.html" title="Oliver Schmidt: &quot;Re: [cc65] Tutorial to begin C64 programming with CC65 [ES]&quot;">Previous message</a> ]
+[ <a href="../2010-08/8591.html" title="Jose Zanni: &quot;[cc65] Tutorial to begin C64 programming with CC65 [ES]&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8594.html" title="Marc 'BlackJack' Rintsch: &quot;Re: [cc65] Optimizations of structures&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Jakub &lt;<a href="mailto:debski.jakub1wp.pl?Subject=Re:%20[cc65]%20Optimizations%20of%20structures">debski.jakub1wp.pl</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-09-10 13:58:46</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+1. Would it be possible to optimize placement of structures' data in the 
+memory by special compiler switch?
+For example:
+
+// cc65 -Cl -T -Osir --cpu 6502 -t atari main.c
+#define OFFSET 10
+#define XSPACE 20
+#define YSPACE 20
+
+struct pos {
+  unsigned char x;
+  unsigned char y;
+};
+
+struct pos p[64];
+unsigned char idx,line,row,x,y;
+
+void main(void)
+{
+  for (line=0;line&lt;8;++line)
+  {
+    ++x;
+    for (row=0;row&lt;8;++row)
+    {
+      p[idx].y=y;
+      p[idx].x=x;
+      ++idx;
+      x+=XSPACE;
+    }
+    y+=YSPACE;
+  }
+}
+
+
+This code generates very slow access to the structure fields:
+
+;
+; p[idx].y=y;
+;
+ ldx     #$00
+ lda     _idx
+ asl     a
+ bcc     L0022
+ inx
+ clc
+L0022: adc     #&lt;(_p)
+ sta     ptr1
+ txa
+ adc     #&gt;(_p)
+ sta     ptr1+1
+ lda     _y
+ ldy     #$01
+ sta     (ptr1),y
+;
+; p[idx].x=x;
+;
+ ldx     #$00
+ lda     _idx
+ asl     a
+ bcc     L0023
+ inx
+ clc
+L0023: adc     #&lt;(_p)
+ sta     ptr1
+ txa
+ adc     #&gt;(_p)
+ sta     ptr1+1
+ lda     _x
+ dey
+ sta     (ptr1),y
+
+With a simple replace of structures with arrays we get much faster and 
+compact code:
+
+// cc65 -Cl -T -Osir --cpu 6502 -t atari main.c
+#define OFFSET 10
+#define XSPACE 20
+#define YSPACE 20
+
+unsigned char px[64];
+unsigned char py[64];
+
+void main(void)
+{
+  unsigned char idx,line,row,x,y;
+  for (line=0;line&lt;8;++line)
+  {
+    x=0;
+    if (line%2!=0)
+      x=OFFSET;
+    for (row=0;row&lt;8;++row)
+    {
+      py[idx]=y;
+      px[idx]=x;
+      ++idx;
+      x+=XSPACE;
+    }
+    y+=YSPACE;
+  }
+}
+
+Which gives:
+
+;
+; py[idx]=y;
+;
+ ldy     L0005
+ lda     L0009
+ sta     _py,y
+;
+; px[idx]=x;
+;
+ ldy     L0005
+ lda     L0008
+ sta     _px,y
+
+(it still could be optimized: y register is loaded twice)
+
+Is it possible to add a compiler switch to reorganize structures fields to 
+be lineary placed in the memory?
+I know it won't work well for all the cases (f.e. nested structures).
+
+regards,
+Jakub 
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Fri Sep 10 13:58:53 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8594.html" title="Next message in the list">Marc 'BlackJack' Rintsch: "Re: [cc65] Optimizations of structures"</a></li>
+<li><dfn>Previous message</dfn>: <a href="../2010-08/8592.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Tutorial to begin C64 programming with CC65 [ES]"</a></li>
+<li><dfn>In reply to</dfn>: <a href="../2010-08/8591.html" title="Message to which this message replies">Jose Zanni: "[cc65] Tutorial to begin C64 programming with CC65 [ES]"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8594.html" title="Next message in this discussion thread">Marc 'BlackJack' Rintsch: "Re: [cc65] Optimizations of structures"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8594.html" title="Message sent in reply to this message">Marc 'BlackJack' Rintsch: "Re: [cc65] Optimizations of structures"</a></li>
+<li><dfn>Reply</dfn>:  <a href="8595.html" title="Message sent in reply to this message">Ullrich von Bassewitz: "Re: [cc65] Optimizations of structures"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8593" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8593" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8593" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-09-10 13:58:56 CEST
+</em></small></p>
+</body>
+</html>

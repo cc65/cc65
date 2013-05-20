@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Atari __RESERVED_MEMORY__</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Atari __RESERVED_MEMORY__" />
+<meta name="Date" content="2009-10-27" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Atari __RESERVED_MEMORY__</h1>
+<!-- received="Tue Oct 27 19:13:22 2009" -->
+<!-- isoreceived="20091027181322" -->
+<!-- sent="Tue, 27 Oct 2009 19:04:58 +0100" -->
+<!-- isosent="20091027180458" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Atari __RESERVED_MEMORY__" -->
+<!-- id="20091027180458.GA12087@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="f0796bb70910261744n53a08a41x9d996ee54f8a53e2&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7350.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Atari __RESERVED_MEMORY__&quot;">Next message</a> ]
+[ <a href="7348.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Colormania (was: TGI summary)&quot;">Previous message</a> ]
+[ <a href="7338.html" title="Daniel Serpell: &quot;Re: [cc65] Atari __RESERVED_MEMORY__&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7351.html" title="Karri Kaksonen: &quot;[cc65] Tgi circle and font size magnification&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Atari%20__RESERVED_MEMORY__">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-10-27 19:04:58</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Mon, Oct 26, 2009 at 09:44:00PM -0300, Daniel Serpell wrote:
+&gt; There is another solution: the graphics function wrapper could reserve
+&gt; the memory
+&gt; needed from the heap, adjusting RAMTOP (ZP $6A) to just bellow the stack
+&gt; and APPMHI to the current top of the heap.
+[...]
+&gt; Of course, a better alternative still is using a malloced buffer and setting the
+&gt; graphics mode in the TGI code. This allows keeping the text mode screen
+&gt; unchanged when in graphics mode, all the conio functions would work to this
+&gt; &quot;virtual&quot; screen, but then all the graphics function should set and restore
+&gt; SAVMSC before calling ROM functions.
+
+There's no platform specific code in the tgi library, all platform code is in
+the driver. And the driver has no access to the heap ...
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Oct 27 19:13:22 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7350.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Atari __RESERVED_MEMORY__"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7348.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Colormania (was: TGI summary)"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7338.html" title="Message to which this message replies">Daniel Serpell: "Re: [cc65] Atari __RESERVED_MEMORY__"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7351.html" title="Next message in this discussion thread">Karri Kaksonen: "[cc65] Tgi circle and font size magnification"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7351.html" title="Message sent in reply to this message">Karri Kaksonen: "[cc65] Tgi circle and font size magnification"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7349" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7349" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7349" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-10-27 19:13:24 CET
+</em></small></p>
+</body>
+</html>

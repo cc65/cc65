@@ -1,0 +1,159 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: [cc65] da65 adventures</title>
+<meta name="Author" content="Robin Harbron (macbeth_at_tbaytel.net)">
+<meta name="Subject" content="[cc65] da65 adventures">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>[cc65] da65 adventures</h1>
+<!-- received="Mon Nov  3 05:46:08 2003" -->
+<!-- isoreceived="20031103044608" -->
+<!-- sent="Sun, 02 Nov 2003 23:59:42 -0500" -->
+<!-- isosent="20031103045942" -->
+<!-- name="Robin Harbron" -->
+<!-- email="macbeth_at_tbaytel.net" -->
+<!-- subject="[cc65] da65 adventures" -->
+<!-- id="3FA5E0BE.3000506@tbaytel.net" -->
+<!-- inreplyto="16287.64881.917947.496283@panini.cling.gu.se" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Robin Harbron (<a href="mailto:macbeth_at_tbaytel.net?Subject=Re:%20[cc65]%20da65%20adventures"><em>macbeth_at_tbaytel.net</em></a>)<br>
+<strong>Date:</strong> 2003-11-03 05:59:42
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3709.html">Ullrich von Bassewitz: "[cc65] cc65 snapshot"</a>
+<li><strong>In reply to:</strong> <a href="../2003-10/3687.html">MagerValp: "[cc65] c64 autostart code"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3711.html">Willi Kusche: "Re: [cc65] da65 adventures"</a>
+<li><strong>Reply:</strong> <a href="3711.html">Willi Kusche: "Re: [cc65] da65 adventures"</a>
+<li><strong>Reply:</strong> <a href="3712.html">Ullrich von Bassewitz: "Re: [cc65] da65 adventures"</a>
+<li><strong>Reply:</strong> <a href="3715.html">Keates, Mark: "RE: [cc65] da65 adventures"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+I'm attempting to use da65 to disassemble M.U.L.E.
+
+You can grab the binary and info file here if
+you want to play along at home:
+<a href="http://my.tbaytel.net/macbeth/mule.zip">http://my.tbaytel.net/macbeth/mule.zip</a>
+
+So, I'd like to use da65 to generate source code that I
+can then assemble with ca65 - so I did this:
+
+    da65 -o mule.s mule.o     (this was fine)
+    ca65 mule.s
+
+And got many errors (here's a sampling):
+
+mule.s(18261): Error #42: Symbol `pei' is already defined
+mule.s(18261): Error #12: `:' expected
+mule.s(18261): Error #11: Too many characters
+
+It appears that the 65816's instruction &quot;pei&quot; is getting
+disassembled instead of just being put in a .byte, as
+an illegal opcode would be.  Maybe I'm just confused?
+
+Anyway, I then created an info file to block most of the
+large not-code areas into byte tables (info.txt is
+included in the .zip above) and that got rid of those
+errors (and yeah, I should have been doing this anyway):
+
+    da65 -i info.txt -o mule.s
+    ca65 mule.s
+
+But added these errors:
+
+mule.s(6): Error #10: Control statement expected
+mule.s(6): Error #11: Too many characters
+
+Line 6 in mule.s is:
+
+    .setcpu &quot;6502&quot;
+
+Which doesn't appear to be a valid control statement, but
+that's what da65 seems to be automatically inserting.
+
+Anyway, I delete that line, and try again:
+
+    ca65 mule.s
+
+errors:
+mule.s(3489): Error #43: Undefined symbol `L47D9'
+mule.s(3484): Error #43: Undefined symbol `L47D2'
+mule.s(2702): Error #43: Undefined symbol `L56AD'
+mule.s(2701): Error #43: Undefined symbol `L567C'
+mule.s(1925): Error #43: Undefined symbol `L4A72'
+mule.s(1898): Error #43: Undefined symbol `L4A44'
+
+It appears that da65 can't handle situations that often happen
+in self-modifying code, such as:
+
+selfmod   lda #$ff
+           lda #$00
+           sta selfmod+1
+
+Where the label refers to one or two bytes past the opcode
+byte.
+
+Now, I know I can work around this by just editing the output
+from da65, or slightly better, adding to my info.txt file to
+treat these areas as byte tables, but both seem sort of ugly,
+and partially defeat the purpose of the info file, which is
+a very cool idea, btw, Uz.
+
+Anyway, thanks for any advice any of you can give.
+-- 
+Robin Harbron - <a href="mailto:macbeth_at_tbaytel.net?Subject=Re:%20[cc65]%20da65%20adventures">macbeth_at_tbaytel.net</a>
+    <a href="http://my.tbaytel.net/macbeth">http://my.tbaytel.net/macbeth</a>
+         <a href="http://www.psw.ca/">http://www.psw.ca/</a>
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20da65%20adventures">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3709.html">Ullrich von Bassewitz: "[cc65] cc65 snapshot"</a>
+<li><strong>In reply to:</strong> <a href="../2003-10/3687.html">MagerValp: "[cc65] c64 autostart code"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3711.html">Willi Kusche: "Re: [cc65] da65 adventures"</a>
+<li><strong>Reply:</strong> <a href="3711.html">Willi Kusche: "Re: [cc65] da65 adventures"</a>
+<li><strong>Reply:</strong> <a href="3712.html">Ullrich von Bassewitz: "Re: [cc65] da65 adventures"</a>
+<li><strong>Reply:</strong> <a href="3715.html">Keates, Mark: "RE: [cc65] da65 adventures"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-11-03 05:46:35 CET</em>
+</em>
+</small>
+</body>
+</html>

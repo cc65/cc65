@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] FAR handling?</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] FAR handling?" />
+<meta name="Date" content="2005-11-01" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] FAR handling?</h1>
+<!-- received="Tue Nov  1 19:52:46 2005" -->
+<!-- isoreceived="20051101185246" -->
+<!-- sent="Tue, 1 Nov 2005 19:52:34 +0100" -->
+<!-- isosent="20051101185234" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] FAR handling?" -->
+<!-- id="20051101185234.GA31625@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="591DCD8541C90341AA83C77E4311629BCE2255&#64;diukwsrex1.eu.drte.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5250.html" title="Spiro Trikaliotis: &quot;[cc65] &quot;--feature labels_without_colons&quot; not always working with 2.11.0?&quot;">Next message</a> ]
+[ <a href="5248.html" title="Keates, Mark: &quot;[cc65] FAR handling?&quot;">Previous message</a> ]
+[ <a href="5248.html" title="Keates, Mark: &quot;[cc65] FAR handling?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20FAR%20handling?">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2005-11-01 19:52:34</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi!
+
+On Tue, Nov 01, 2005 at 12:31:05PM -0000, Keates, Mark wrote:
+&gt; What is the current state of 24 bit address handling in CC65?
+&gt; Is it just some thing that can be utilized at an assembler level?
+
+Yes. And even at the assembler level, support is weak. That doesn't mean that
+you can't write 24 bit code - of course you can. It means that there is no
+automatic support by the assembler/compiler.
+
+&gt; I'm wondering how, in a 'C' source file, to declare an external
+&gt; function. Should there be a wrapper to indicate the segment?
+
+As said above, there is no implementation. But the basic idea is: For a 24 bit
+symbol, you don't need to specify a segment, because it's the address contains
+all necessary information. Determining the segment when using near pointers in
+a far memory model is more difficult. The compiler has to make some
+assumptions that may be overriden by the programmer. Remember the
+
+        char _cs* foo;
+
+syntax in the borland compilers? There has to be something similar for cc65.
+
+&gt; Would the import (from the example below) be expected to look
+&gt; something like:
+&gt;
+&gt; 	.import		_far_func: far
+&gt;
+&gt; The docs begin to go into subjects like 'choosing the memory model'
+&gt; but this doesn't appear complete?
+
+The 65816 is similar to the 8086 in this respect, and the plan was to add
+support in a similar way: Symbols can be declared as &quot;far&quot; or &quot;near&quot;. The
+assembler will adjust jmp/jsr/rts accordingly. And the compiler will generate
+matching code.
+
+Please remember that 24 bit support is a long way to go: There must be support
+for a 24 bit data type in the runtime library. Push, pop, inc, dec must be
+implemented, and all helper routines that take 16 bit addresses must be
+duplicated using 24 bit addresses. This alone is quite some work. Then, the
+compiler must be extended to support 24 bit addresses, 16 bit addresses with
+attributes, conversion between these types and so on. And finally, most of the
+C runtime has to be rewritten for the 816.
+
+&gt; I think this would be a good area to push development against as
+&gt; many of the targets (e.g. Atari, Lynx, NES) are using bank switching
+&gt; models for cartridge development and this could aid us immensely.
+
+There's a difference between real 24 bit support and banked memory. I don't
+think that it is possible to implement full support in the compiler for the
+latter, because platforms differ a lot in this respect, and it is quite
+difficult for the compiler to figure out, what to do, if a function is banked
+out.
+
+But since the linker is rather smart and allows you to place more than one
+block with code at the same address, you can write code for banked
+environments today. Of course this is somewhat more complex than using linear
+memory, but this is not the fault of the compiler. Just use wrappers for your
+C functions that enable the memory bank, where the code lives, call the real
+function, and on return switch back to the original bank. Such a wrapper could
+look like this:
+
+.proc   _foo
+
+        lda     current_bank            ; Only if not __fastcall__
+        pha                             ; Save old bank
+        lda     #bank_that_contains_foo
+        sta     current_bank            ; Switch to new bank
+        jsr     real_foo
+        pla                             ; Get old bank from stack ...
+        sta     current_bank            ; ... and restore it
+        rts                             ; Return to caller
+
+.endproc
+
+This works without problems since the call stack and the argument stack are
+distinct, so the additional parameters on the call stack won't introduce any
+problems when accessing the parameters in real_foo. The stack overhead can be
+reduced by managing a separate stack for old banks.
+
+Now, if you place all data segments, the segment containing the runtime and C
+library, the segment containing main() and the segment containing the wrappers
+in common memory, writing programs in a banked environment is possible.
+Because of the overhead (stack and memory wise), you may want to keep banked
+routines rather large and self contained.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Tue Nov  1 19:52:46 2005</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5250.html" title="Next message in the list">Spiro Trikaliotis: "[cc65] &quot;--feature labels_without_colons&quot; not always working with 2.11.0?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5248.html" title="Previous message in the list">Keates, Mark: "[cc65] FAR handling?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5248.html" title="Message to which this message replies">Keates, Mark: "[cc65] FAR handling?"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5249" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5249" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5249" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2005-11-01 19:52:50 CET
+</em></small></p>
+</body>
+</html>

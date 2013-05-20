@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Code generation of &quot;j</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Code generation of &quot;jsr enter&quot;" />
+<meta name="Date" content="2007-03-12" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Code generation of &quot;jsr enter&quot;</h1>
+<!-- received="Mon Mar 12 14:55:32 2007" -->
+<!-- isoreceived="20070312135532" -->
+<!-- sent="Mon, 12 Mar 2007 14:55:20 +0100" -->
+<!-- isosent="20070312135520" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Code generation of &quot;jsr enter&quot;" -->
+<!-- id="20070312135520.GA24118@trixie.musoftware.de" -->
+<!-- charset="us-ascii" -->
+<!-- inreplyto="200703120629.50598.atarimike&#64;wavecable.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="5656.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] &quot;Incompatible pointer types&quot; bug&quot;">Next message</a> ]
+[ <a href="5654.html" title="Mike Harris: &quot;[cc65] Code generation of &quot;jsr enter&quot;&quot;">Previous message</a> ]
+[ <a href="5654.html" title="Mike Harris: &quot;[cc65] Code generation of &quot;jsr enter&quot;&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Code%20generation%20of%20&amp;quot;jsr%20enter&amp;quot;">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2007-03-12 14:55:20</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Mon, Mar 12, 2007 at 05:29:50AM -0800, Mike Harris wrote:
+&gt; I'm using cc65 to compile some simple C code, and I'm a bit confused as to
+&gt; some of the assembly it's generating.
+&gt;
+&gt; I see &quot;jsr enter&quot;, &quot;jsr pusha&quot;, and &quot;jsr leavey&quot; in the generated assembly,
+&gt; but I don't see them defined anywhere. This assembles fine though, so I'm not
+&gt; sure whats going on or what those subs do.
+&gt;
+&gt; Can someone shed some light on this?
+
+These functions are part of the runtime library. They're linked in by the -
+you guessed it - linker. There are hundreds of these functions and most of
+them are really short. If you're interested in the details, you may want to
+download the source archive and have a look into the libsrc/runtime/
+directory.
+
+Hint: If your routines call &quot;enter&quot; and &quot;leavey&quot;, they're probably declared
+with an empty parameter list like this:
+
+        void foo ()
+        {
+        }
+
+An empty parameter list means &quot;this function accepts any number of
+parameters&quot;. The compiler inserts special code to make this possible. If what
+you really want is a function that accepts *no* parameters, using
+
+        void foo (void)
+        {
+        }
+
+generates better code.
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Mar 12 14:55:32 2007</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="5656.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] &quot;Incompatible pointer types&quot; bug"</a></li>
+<li><dfn>Previous message</dfn>: <a href="5654.html" title="Previous message in the list">Mike Harris: "[cc65] Code generation of &quot;jsr enter&quot;"</a></li>
+<li><dfn>In reply to</dfn>: <a href="5654.html" title="Message to which this message replies">Mike Harris: "[cc65] Code generation of &quot;jsr enter&quot;"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#5655" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#5655" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#5655" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2007-03-12 14:55:34 CET
+</em></small></p>
+</body>
+</html>

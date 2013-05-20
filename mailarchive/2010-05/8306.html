@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: [cc65] Universal Makefile: Some advan</title>
+<meta name="Author" content="Oliver Schmidt (ol.sc1web.de)" />
+<meta name="Subject" content="[cc65] Universal Makefile: Some advanced magic wanted?" />
+<meta name="Date" content="2010-05-03" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>[cc65] Universal Makefile: Some advanced magic wanted?</h1>
+<!-- received="Mon May  3 10:45:07 2010" -->
+<!-- isoreceived="20100503084507" -->
+<!-- sent="Mon, 3 May 2010 10:45:02 +0200" -->
+<!-- isosent="20100503084502" -->
+<!-- name="Oliver Schmidt" -->
+<!-- email="ol.sc1web.de" -->
+<!-- subject="[cc65] Universal Makefile: Some advanced magic wanted?" -->
+<!-- id="w2v1002edb71005030145nb84cc4a3l1641de96aa92c163@mail.gmail.com" -->
+<!-- charset="ISO-8859-1" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="8307.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Difference between __fastcall and __fastcall__ ?&quot;">Next message</a> ]
+[ <a href="8305.html" title="Payton Byrd: &quot;[cc65] Coding style for apps: One huge header file, or a domain specific  header files?&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+ [ <a href="8319.html" title="silverdr1wfmh.org.pl: &quot;Re: [cc65] Universal Makefile: Some advanced magic wanted?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Oliver Schmidt &lt;<a href="mailto:ol.sc1web.de?Subject=Re:%20[cc65]%20Universal%20Makefile:%20Some%20advanced%20magic%20wanted?">ol.sc1web.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2010-05-03 10:45:02</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>Hi,
+
+Now that the basics are carved out we could bring in some advanced GNU
+Make stuff - like an abstraction layer for toolchain cmdline options:
+
+Call the Makefile below i.e. with
+
+make OPTIONS=optspeed,mapfile
+
+The two primary benefits are:
+- Users don't have to deal with more or less cryptic compiler/linker flags
+- Users can use the same &quot;high level options&quot; for different toolchains
+
+Regards,
+Oliver
+
+-----------------------------------------------
+
+define _optspeed_
+  CFLAGS += -Oris
+endef
+
+define _optsize_
+  CFLAGS += -Or
+endef
+
+define _mapfile_
+  LDFLAGS += -m $&#64;&#46;<!--nospam-->map
+  REMOVES += $(PROGRAM).map
+endef
+
+COMMA := ,
+SPACE := $(N/A) $(N/A)
+$(foreach o,$(subst $(COMMA),$(SPACE),$(OPTIONS)),$(eval $(_$o_)))
+
+$(info CFLAGS =$(CFLAGS))
+$(info LDFLAGS=$(LDFLAGS))
+$(info REMOVES=$(REMOVES))
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon May  3 10:45:07 2010</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="8307.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] Difference between __fastcall and __fastcall__ ?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="8305.html" title="Previous message in the list">Payton Byrd: "[cc65] Coding style for apps: One huge header file, or a domain specific  header files?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="8319.html" title="Next message in this discussion thread">silverdr1wfmh.org.pl: "Re: [cc65] Universal Makefile: Some advanced magic wanted?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="8319.html" title="Message sent in reply to this message">silverdr1wfmh.org.pl: "Re: [cc65] Universal Makefile: Some advanced magic wanted?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#8306" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#8306" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#8306" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2010-05-03 10:45:10 CEST
+</em></small></p>
+</body>
+</html>

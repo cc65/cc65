@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] Atari stack pointer?</title>
+<meta name="Author" content="Christian Groessler (chris_at_groessler.org)">
+<meta name="Subject" content="Re: [cc65] Atari stack pointer?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] Atari stack pointer?</h1>
+<!-- received="Wed Sep 17 23:43:34 2003" -->
+<!-- isoreceived="20030917214334" -->
+<!-- sent="Wed, 17 Sep 2003 23:41:56 +0200 (CEST)" -->
+<!-- isosent="20030917214156" -->
+<!-- name="Christian Groessler" -->
+<!-- email="chris_at_groessler.org" -->
+<!-- subject="Re: [cc65] Atari stack pointer?" -->
+<!-- id="Pine.LNX.4.30.0309172314290.14455-100000@ds9.reckziegel.com" -->
+<!-- inreplyto="1gcemv8iv9fuvqk5qhl2b61imae1dikov7@4ax.com" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Christian Groessler (<a href="mailto:chris_at_groessler.org?Subject=Re:%20[cc65]%20Atari%20stack%20pointer?"><em>chris_at_groessler.org</em></a>)<br>
+<strong>Date:</strong> 2003-09-17 23:41:56
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Previous message:</strong> <a href="3401.html">Ullrich von Bassewitz: "Re: [cc65] code generation"</a>
+<li><strong>In reply to:</strong> <a href="3400.html">Shawn Jefferson: "Re: [cc65] Atari stack pointer?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3403.html">Shawn Jefferson: "Re: [cc65] Atari stack pointer?"</a>
+<li><strong>Reply:</strong> <a href="3403.html">Shawn Jefferson: "Re: [cc65] Atari stack pointer?"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+On Tue, 16 Sep 2003, Shawn Jefferson wrote:
+
+&gt; On Tue, 16 Sep 2003 11:30:18 +0200 (CEST), you wrote:
+&gt;
+&gt; Ah, ok.  You are doing it this way to support the various memory
+&gt; configurations of the Atari computer, and possibly any graphics modes
+&gt; in operation or cartridges (that would have changed MEMTOP.)
+
+Yes. The graphics modes (function &quot;graphics()&quot;, similar to the BASIC
+function) and cartridges eat up memory from the top. I think hardcoding
+the top addresses would be too unflexible. You'd have to use different
+config files for the graphics modes you intend to use, and the presence of
+cartridges is anyway not foreseeable.
+
+&gt; &gt;What do you want to do with the memory? Maybe a malloc() could work too?
+&gt;
+&gt; I'm wanting to reserve various parts of memory like this:
+&gt;
+&gt;  * Memory map:
+&gt;  *
+&gt;  * BFFF +----------
+&gt;  *      | pmeditor dlist (78 bytes)
+&gt;  * BDB8 +----------
+&gt;  *      | options bitmap (336 bytes)
+&gt;  * BC68 +----------
+&gt;  *      | status bitmap (40 bytes)
+&gt;  * BC40 +----------
+&gt;  *      | gr.0 dlist
+&gt;  * BC20 +----------
+&gt;  *      | grid bitmap (2560 bytes)
+&gt;  * B220 +----------
+&gt;  *      | pmarea (2048 bytes)
+&gt;  * AA00 +----------
+&gt;  *      | code/data
+&gt;  * 2E00 +----------
+&gt;
+&gt; So I guess what is happening is that the stack is right in the middle
+&gt; of my grid bitmap.  Maybe I can move it lower down in memory. (How
+&gt; much memory can the stack take up?)
+
+Hmm, I don't think that the stack resides inside your assigned memory
+areas.
+By default, the runtime assumes the largest possible memory use for
+graphics (graphics 9) and adjusts the stack pointer accordingly. So the
+stack pointer would initially be around 8k below MEMTOP.
+
+&gt; I wanted to just assign pointers instead of using malloc since malloc
+&gt; is expensive.  I thought that changing the config file would make cc65
+&gt; only use the amount of RAM that I told it I had and leave the rest
+&gt; alone.  That isn't the case.
+
+No, it's not. We could invent some mechanism to reserve memory from the
+top, but with the different possible configurations the absolute addresses
+which are available aren't guaranteed.
+
+&gt; I guess this problem comes down to whether or not you want the system
+&gt; to automatically size to a different graphics mode or memory
+&gt; configuration, or let the programmer set all that up via the config
+&gt; file.  It would be nice to have some docs for each platform's
+&gt; idiosyncracies wouldn't it?
+
+You're absolutely right. I indended to write some Atari documentation for
+some time, but didn't do it yet :-(
+E.g., you can set the variable &quot;char _graphmode_used = 0&quot; to reclaim the
+default memory reserved for graphics, if you don't intend to use another
+graphics mode.
+
+regards,
+chris
+
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20Atari%20stack%20pointer?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Previous message:</strong> <a href="3401.html">Ullrich von Bassewitz: "Re: [cc65] code generation"</a>
+<li><strong>In reply to:</strong> <a href="3400.html">Shawn Jefferson: "Re: [cc65] Atari stack pointer?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="3403.html">Shawn Jefferson: "Re: [cc65] Atari stack pointer?"</a>
+<li><strong>Reply:</strong> <a href="3403.html">Shawn Jefferson: "Re: [cc65] Atari stack pointer?"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2003-09-17 23:44:39 CEST</em>
+</em>
+</small>
+</body>
+</html>

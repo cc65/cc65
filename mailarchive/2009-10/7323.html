@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Re: cc65-2.13.0 DEBs avail</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Re: cc65-2.13.0 DEBs available" />
+<meta name="Date" content="2009-10-26" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Re: cc65-2.13.0 DEBs available</h1>
+<!-- received="Mon Oct 26 10:30:25 2009" -->
+<!-- isoreceived="20091026093025" -->
+<!-- sent="Mon, 26 Oct 2009 10:26:53 +0100" -->
+<!-- isosent="20091026092653" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Re: cc65-2.13.0 DEBs available" -->
+<!-- id="20091026092653.GB30788@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="20091025190649.GQ32752&#64;trikaliotis.net" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="7324.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] .global vs .export vs what i really need :)&quot;">Next message</a> ]
+[ <a href="7322.html" title="Ullrich von Bassewitz: &quot;Re: [cc65] Re: cc65-2.13.0 DEBs available&quot;">Previous message</a> ]
+[ <a href="7312.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Re: cc65-2.13.0 DEBs available&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="7328.html" title="Spiro Trikaliotis: &quot;Re: [cc65] Re: cc65-2.13.0 DEBs available&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Re:%20cc65-2.13.0%20DEBs%20available">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2009-10-26 10:26:53</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Sun, Oct 25, 2009 at 08:06:49PM +0100, Spiro Trikaliotis wrote:
+&gt; Yes. I do not own a 64 bit machine, nor do I know how I could
+&gt; cross-build an AMD64 package. I am sorry for this.
+
+No problem. Others may be glad about 32-bit packages.
+
+&gt; &gt; Is there a way to check
+&gt; &gt; which packages are available without going through all the apt hassle? A
+&gt; &gt; simple directory listing with download facility would have saved me 15 minutes
+&gt; &gt; of work.
+&gt;
+&gt; Well, <a href="http://debian.trikaliotis.net/dists/stable/Release">http://debian.trikaliotis.net/dists/stable/Release</a> shows that I
+&gt; only have i386 architecture.
+&gt;
+&gt; This is also backed up by
+&gt; <a href="http://debian.trikaliotis.net/dists/stable/contrib/">http://debian.trikaliotis.net/dists/stable/contrib/</a>, which only shows a
+&gt; binary-i386 directory.
+
+Knowing of and checking these files needs intimate knowledge about the
+structure of .debs and .deb repositories, which I currently don't have. So I
+hoped for something more obvious. This is my &quot;use Spiros repository&quot; story:
+
+  * Add the repo line to the package manager. Which complained, because the
+    repo wasn't trusted.
+
+  * So I tried to add the signature. Found that gnupg does no longer work,
+    because the new version on Ubuntu goes via the proxy, which isn't allowed
+    port 11357 (PGP keyfetch) outbound.
+
+  * Tried to change the firewall setup using fwbuilder from my old Centos
+    installation. Which did not work, because a chrooted environment cannot
+    access the X display.
+
+  * Installed fwbuilder on the new Ubuntu machine.
+
+  * Tried to load the old config. Fwbuilder version is now 3.0 instead of 2.x,
+    which means I have to upgrade my firewall config. I hope, nothing went
+    wrong.
+
+  * Just to be sure, I tried the old config checking &quot;use as temporary but
+    don't store&quot;, so if something goes wrong, I'm back to the old config with
+    a reboot. But uploading won't work, because fwbuilder tries to write to
+    /etc/tmp on the firewall, which does not exist and cannot be easily
+    created, because /etc is a readonly file system on flash.
+
+  * After some fiddling, I find that the problem persists only if &quot;use as
+    temporary but don't store&quot; is checked, so I try the old config without and
+    it works.
+
+  * Added a firewall rule allowing the proxy port 11357 outbound for PGP key
+    fetch. Compiled and installed the new firewall rules.
+
+  * Trying to read key 2AF47E44 as root as described on Spiros page does not
+    work, because root doesn't have a PGP setup.
+
+  * Checking PGP as normal user, it says, key 2AF47E44 cannot be found on
+    wwwkeys.ch.pgp.net. So I'm trying a few other key servers. Found the key
+    on wwwkeys.pgp.net.
+
+  * Loaded the key and exported it into a text file.
+
+  * Imported the key as root into apt.
+
+  * Restarted the package manager. This time I was able to download the
+    package list from the repo.
+
+  * Checked &quot;cc65&quot; and tried to install.
+
+You may imagine that I was a little bit frustrated that after all this hassle
+the repo didn't have the packages I wanted. Having an easily accessible list
+of packages, or the PGP key as a downloadable file would have saved me quite
+some trouble. Of course none of the stuff described above was useless. Being
+able to edit the firewall config or download PGP keys is necessary, but I
+didn't expect having to do it now.
+
+Just out of curiosity: Sites like rpmforge offer RPM files both for browsing
+and download and as a repository that can be added to yum. Isn't that possible
+with .deb repositories?
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Mon Oct 26 10:30:25 2009</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="7324.html" title="Next message in the list">Ullrich von Bassewitz: "Re: [cc65] .global vs .export vs what i really need :)"</a></li>
+<li><dfn>Previous message</dfn>: <a href="7322.html" title="Previous message in the list">Ullrich von Bassewitz: "Re: [cc65] Re: cc65-2.13.0 DEBs available"</a></li>
+<li><dfn>In reply to</dfn>: <a href="7312.html" title="Message to which this message replies">Spiro Trikaliotis: "Re: [cc65] Re: cc65-2.13.0 DEBs available"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="7328.html" title="Next message in this discussion thread">Spiro Trikaliotis: "Re: [cc65] Re: cc65-2.13.0 DEBs available"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="7328.html" title="Message sent in reply to this message">Spiro Trikaliotis: "Re: [cc65] Re: cc65-2.13.0 DEBs available"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#7323" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#7323" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#7323" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2009-10-26 10:30:27 CET
+</em></small></p>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="hypermail 2.1.8, see http://www.hypermail.org/" />
+<title>cc65 mailing list archive: Re: [cc65] Specifying segment for lib</title>
+<meta name="Author" content="Ullrich von Bassewitz (uz1musoftware.de)" />
+<meta name="Subject" content="Re: [cc65] Specifying segment for library code?" />
+<meta name="Date" content="2012-06-03" />
+<style type="text/css">
+/*<![CDATA[*/
+/* To be incorporated in the main stylesheet, don't code it in hypermail! */
+body {color: black; background: #ffffff}
+dfn {font-weight: bold;}
+pre { background-color:inherit;}
+.head { border-bottom:1px solid black;}
+.foot { border-top:1px solid black;}
+th {font-style:italic;}
+table { margin-left:2em;}map ul {list-style:none;}
+#mid { font-size:0.9em;}
+#received { float:right;}
+address { font-style:inherit ;}
+/*]]>*/
+.quotelev1 {color : #990099}
+.quotelev2 {color : #ff7700}
+.quotelev3 {color : #007799}
+.quotelev4 {color : #95c500}
+</style>
+</head>
+<body>
+<div class="head">
+<h1>Re: [cc65] Specifying segment for library code?</h1>
+<!-- received="Sun Jun  3 13:09:24 2012" -->
+<!-- isoreceived="20120603110924" -->
+<!-- sent="Sun, 3 Jun 2012 13:08:22 +0200" -->
+<!-- isosent="20120603110822" -->
+<!-- name="Ullrich von Bassewitz" -->
+<!-- email="uz1musoftware.de" -->
+<!-- subject="Re: [cc65] Specifying segment for library code?" -->
+<!-- id="20120603110821.GA23346@trixie.musoftware.de" -->
+<!-- charset="utf-8" -->
+<!-- inreplyto="CACT=u73dZS3YJzmAoZvR-7eWmxiaiGFaVkHA0nbUwV2tPmkvNw&#64;mail.gmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="10348.html" title="Greg King: &quot;Re: [cc65] Specifying segment for library code?&quot;">Next message</a> ]
+[ <a href="10346.html" title="Oliver Schmidt: &quot;Re: [cc65] Specifying segment for library code?&quot;">Previous message</a> ]
+[ <a href="10346.html" title="Oliver Schmidt: &quot;Re: [cc65] Specifying segment for library code?&quot;">In reply to</a> ]
+<!-- unextthread="start" -->
+ [ <a href="10348.html" title="Greg King: &quot;Re: [cc65] Specifying segment for library code?&quot;">Next in thread</a> ]
+ [ <a href="#replies">Replies</a> ]
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Ullrich von Bassewitz &lt;<a href="mailto:uz1musoftware.de?Subject=Re:%20[cc65]%20Specifying%20segment%20for%20library%20code?">uz1musoftware.de</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: 2012-06-03 13:08:22</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>On Sun, Jun 03, 2012 at 01:15:46AM +0200, Oliver Schmidt wrote:
+&gt; Okay, the original question was:
+&gt;
+&gt; &quot;For example,  if I have an overlay that uses strncmp, but the main
+&gt; program doesn't, it would be nice to be able to tell the linker to
+&gt; link strncmp to the overlay and not to the main program.&quot;
+&gt;
+&gt; Why does one need any special &quot;magic&quot; to do that? I don't see so. Just
+&gt; linking the overlay against the C library.
+
+If one understands the question literally, then you're right. But then the
+answer doesn't really help anybody. If you know in advance that your main
+program doesn't contain strncmp but the overlay needs it, then just linking
+both against the library will do what you want.
+
+But in real life, you want the overlay to use *all* library functions from the
+main program, if they are already there. And you want all others to be linked
+to the overlay. And finally, you want to make this process automatic: If the
+code of the main program changes, and - as an example - two additional library
+functions are now in main, while a third one has been removed, then you want
+your overlays to use the two library functions in main and have the third one
+linked to the overlays if needed instead.
+
+Linking all binaries separately will duplicate library functions. Linking them
+in one step - as in your suggestion - will include library functions only
+once, regardless of the actual output target. Which means that code in one
+overlay will try to call the instance of strncmp() that lives in another
+overlay. Which in turn will make your program crash. So what you need is a way
+to have the overlays call code in main, but not in each other. And this is
+accomplished by the solution I described in my email.
+
+&gt; Because you added the &quot;%o.ovl&quot; feature to the linker I asked you for
+&gt; and I commited to create generic overlay linker configs for the CBMs,
+&gt; Apple and Atatri using it instead of the &quot;fixed&quot; example. But I didn't
+&gt; do so by now :-(
+
+Ok, thanks. I feared that it would be a problem on my side, and I'm really
+relieved now :-)
+
+Regards
+
+
+        Uz
+
+
+-- 
+Ullrich von Bassewitz                                  uz&#64;musoftware&#46;<!--nospam-->de
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to majordomo&#64;musoftware&#46;<!--nospam-->de with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<span id="received"><dfn>Received on</dfn> Sun Jun  3 13:09:24 2012</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="10348.html" title="Next message in the list">Greg King: "Re: [cc65] Specifying segment for library code?"</a></li>
+<li><dfn>Previous message</dfn>: <a href="10346.html" title="Previous message in the list">Oliver Schmidt: "Re: [cc65] Specifying segment for library code?"</a></li>
+<li><dfn>In reply to</dfn>: <a href="10346.html" title="Message to which this message replies">Oliver Schmidt: "Re: [cc65] Specifying segment for library code?"</a></li>
+<!-- lnextthread="start" -->
+<li><dfn>Next in thread</dfn>: <a href="10348.html" title="Next message in this discussion thread">Greg King: "Re: [cc65] Specifying segment for library code?"</a></li>
+<li><a name="replies" id="replies"></a><dfn>Reply</dfn>:  <a href="10348.html" title="Message sent in reply to this message">Greg King: "Re: [cc65] Specifying segment for library code?"</a></li>
+<li><dfn>Reply</dfn>:  <a href="10349.html" title="Message sent in reply to this message">Oliver Schmidt: "Re: [cc65] Specifying segment for library code?"</a></li>
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Contemporary messages sorted</dfn>: [ <a href="date.html#10347" title="Contemporary messages by date">By Date</a> ] [ <a href="index.html#10347" title="Contemporary discussion threads">By Thread</a> ] [ <a href="subject.html#10347" title="Contemporary messages by subject">By Subject</a> ]</ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.8</a> 
+: 2012-06-03 13:09:28 CEST
+</em></small></p>
+</body>
+</html>

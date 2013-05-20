@@ -1,0 +1,313 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>cc65 mailing list archive: Re: [cc65] bug?</title>
+<meta name="Author" content="Groepaz (groepaz_at_gmx.net)">
+<meta name="Subject" content="Re: [cc65] bug?">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1>Re: [cc65] bug?</h1>
+<!-- received="Mon Dec 11 23:08:12 2000" -->
+<!-- isoreceived="20001211220812" -->
+<!-- sent="Mon, 11 Dec 2000 23:07:46 +0100" -->
+<!-- isosent="20001211220746" -->
+<!-- name="Groepaz" -->
+<!-- email="groepaz_at_gmx.net" -->
+<!-- subject="Re: [cc65] bug?" -->
+<!-- id="3A355032.8E06807E@gmx.net" -->
+<!-- inreplyto="20001209134849.B23480@trixie.musoftware.de" -->
+<!-- expires="-1" -->
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<p>
+<strong>From:</strong> Groepaz (<a href="mailto:groepaz_at_gmx.net?Subject=Re:%20[cc65]%20bug?"><em>groepaz_at_gmx.net</em></a>)<br>
+<strong>Date:</strong> 2000-12-11 23:07:46
+<p>
+<!-- next="start" -->
+<ul>
+<li><strong>Next message:</strong> <a href="0208.html">Ullrich von Bassewitz: "Re: [cc65] bug?"</a>
+<li><strong>Previous message:</strong> <a href="0206.html">Ullrich von Bassewitz: "Re: [cc65] bug?"</a>
+<li><strong>In reply to:</strong> <a href="0206.html">Ullrich von Bassewitz: "Re: [cc65] bug?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0208.html">Ullrich von Bassewitz: "Re: [cc65] bug?"</a>
+<li><strong>Reply:</strong> <a href="0208.html">Ullrich von Bassewitz: "Re: [cc65] bug?"</a>
+<!-- reply="end" -->
+</ul>
+<hr noshade><p>
+<!-- body="start" -->
+<pre>
+Ullrich von Bassewitz wrote:
+
+&gt; Yes, this is a known problem, and there may even be a comment in the docs
+&gt; about it. 
+
+mmmh, didnt see any (i have to admit i didnt read every single bit of the docs
+either ;=D)
+
+&gt; The parser works with one token lookahead, so the decision about the
+&gt; addressing mode is made by the first token of the operand.
+
+yeah, thats what i thought aswell.
+ 
+&gt; There are other assemblers that use brackets instead of parenthesis to avoid
+&gt; this problem. Another way would be to use more lookahead tokens. I don't like
+&gt; any of these solutions, so I just ignored the problem:-) I don't think there
+&gt; is an urgent need to fix this, since the problem happens very rarely (you are
+&gt; the first one complaining:-), and there is an easy workaround. Anyway, I will
+&gt; put it on the todo list, maybe I find a third and cleaner solution.
+
+mmmh the brackets thing SUX (RGBASM - a gameboy/z80 assembler used to be like 
+that and its _very_ disturbing)... it's mostly a 'cosmetic' thing for me aswell,
+but still a decent scanner shouldnt fail at such an easy task ;)
+
+other than that, i think there might be a pretty easy fix actually, provided 
+you could 'overload' one of the builtin mnemonics with a 'traditional' macro.
+
+like
+
+.macro lda arg,reg
+
+	&lt;add stuff for different adr.modes here&gt;
+
+	...
+
+	lda(0+arg),y
+
+	...
+
+.endmacro
+
+... or 
+
+.define lda(x) lda(0+x)
+
+again, this was also possible in rgbasm, and i fixed/worked around a whole
+lot of simelar problems using macros this way....
+ 
+&gt; &gt; #define AREA(x) =COUNT;COUNT+=x;
+&gt; [...]
+&gt; &gt; so far i couldnt reproduce this behaviour in ca65, and it looks to me like
+&gt; &gt; allowing multiple lines in c-style macros would be the way to go ;)
+&gt; 
+&gt; The syntax itself may be reproduced with &quot;old fashioned&quot; macros and some V2.6
+&gt; features:
+&gt; 
+&gt;         .macro  AREA    Arg
+&gt; 
+&gt;                 .if .not .match (.left (1, Arg), ()
+&gt;                 .error &quot;Argument needs parens&quot;
+&gt;                 .endif
+&gt; 
+&gt;                 ...
+&gt;         .endmacro
+
+well, uhm.... no this would NOT work.... look at my example again ... i am
+gonna write it down like i would have expected it to work in ca65:
+
+.define AREA(x) =COUNT \ COUNT+=x \
+
+foo AREA(100)
+
+... with the c-style macro, this would expand to:
+
+foo =COUNT
+COUNT+=100
+
+now with the traditional macro:
+
+.macro AREA x
+	=COUNT
+	COUNT+=x
+.endmacro
+
+foo AREA(100)
+
+...expands to:
+
+foo 				; error &quot;: expected&quot;
+=COUNT
+COUNT+=100
+
+(if at all ;=D)
+
+...ayeah btw, macro-params that have one character length only don't work
+either.... i dont mind ;=D
+ 
+&gt; The bigger problem is that you are not allowed to modify constants, which
+&gt; means that COUNT+=x will not work. So, even having line terminators as part of
+&gt; a C style macro does not help here.
+&gt;
+&gt; Maybe you can tell me somewhat more detailed what the author of the code is
+&gt; trying to do, so I can decide if there is a way to do this with ca65, or (if
+&gt; there is no such way, and the feature seems reasonable), I can add something
+&gt; to make it work.
+
+well since 'the author' is ME, no problem ;=D 
+
+i will however try to explain what i wanna do (or did before in tasm), not
+what the resulting code/tables could be used for - this may fill another
+acrticle in some other mag ;=D
+
+i see several little problems here, which as a whole really ruin the possible
+power of a macro-processor IMHO.
+
+a) like you said, one isnt allow to modify constants (which generally is a good
+thing ofcoz ;=D) - the bad thing is, that as a consequence, there's no other 
+kind of symbol whose value can be controlled (as in 'modified') at compile-
+time. that fact makes a lot of stuff impossible, that's used frequently in
+code written for eg. turbo-asm. 
+if you dont have some kind of these symbols, you also take most of the power
+away from the .rept thing you wanna introduce ;/
+
+b) c-style macros cannot have multiple statements/lines - this is one thing
+were i just ask myself 'WHY THE HELL?!' - since a lot of useful stuff can
+be done in a very convinient way using c-macros that have multiple lines. 
+(and yes, many of them can't be done using traditional macros) 
+
+c) with conditional assembly, there is neither a way to jump around in the
+code using some kind of labels (the c64 tasm-way, i don't like it either ;=D)
+nor any other way to built some loops. using recoursive macros is a pain
+in the ass if you ask me, and once you got a bunch of nested loops you
+end up in a good amount of newly introduced bugs aswell ;)
+i understand that .rept will be added in the next release so thats probably
+no more a problem then
+
+d) c-style macros aren't exactly operating at 'scanner level'... again the
+rgbasm handles this very nicely. i would expect them to really work as
+&quot;find and replace&quot; - since this would again allow some nice stuff....
+
+.define .db .byte
+
+OR, if you dont want directives in c-style macros 
+
+.define db byte
+
+should still work exactly the same (due to the find-and-replace behaviour)
+
+e) traditional macros can't take strings as arguments - this again makes 
+various stuff impossible, for eg i wanted to create a macro that takes a
+string and which would convert the argument (string) byte-per-byte to
+eg petsci format. - right now i can do that for a single byte like intended,
+but once you got more that a few words of text, you want real strings aswell ;=)
+
+f) if you enclose a block using .proc / .endproc, other global symbols
+become invisible to this block ?!? HU?! ;=D should i include my global header
+files in each of these blocks ?!? nononono this can only be a bug ;)
+
+some more stuff.... (more like nice things i've seen elsewhere....) ;=D
+
+- extend the .incbin directive to work like
+
+	.incbin &quot;filename&quot;,start,end,step
+
+	(includes &quot;filename&quot; starting from pos. start to pos. end 
+         taking every step'th byte)
+
+- add a simelar directive for use in macros, that works like
+
+	.readbin &quot;filename&quot;,pos
+
+	(returns pos'th byte in &quot;filename&quot;)
+
+ this is a VERY powerful feature, since you can do all sorts of convertion
+ and code-generating jobs using external data-files. 
+
+- introduce &quot;compiler variables&quot; as a new kind of symbols. these could live
+in their own seperated namespace, or even coexist with other global symbols 
+in the top-level namespace. compiler variables may be 16bit integers (wether
+signed or unsigned may depend on how the user works with them) that can be
+modified at any time and multiple times at compile time.
+
+	.var foo = *
+label=$0400
+	.var count = 1
+
+	.rept $10
+
+	.var foo += label+count
+	lda foo
+	.var bla += label+count
+	sta bla
+
+	count+=1
+	
+	.endrept
+
+- make some basic math/trig functions available ... democoders will
+  love you for ever ;=D
+
+	...
+c:	ldx #$00
+	.var count = 0
+	.rept $28
+		.var pos = .sin(count*$20)
+		lda # .readbin(&quot;themap.bin&quot;,pos)
+		sta $0400+count,x
+	count+=1
+	.endrept
+	inc c+1
+	...
+
+ehrm.......enough for now ;=) hehe, better do some c64 code *G*
+
+gpz
+
+-- 
+----------------------------------------------------------------------
+                                 /^\
+                                 \ /
+          ASCII RIBBON CAMPAIGN   X   AGAINST HTML JUNK MAIL
+                                 / \
+----------------------------------------------------------------------
+          ___ ___ .___________________ .___________ _______.
+  c=64   /   |   \|   \__    ___/     \ \_   _____/ \      \ groepaz
+   cgb  /    '    \   | |    | /  \ /  \ |    __)_  /   |   \
+    psx \    .    /   | |    |/    '    \|        \/    |    \
+     dc  \___|_  /|___| |____|\____|__  /_______  /\____|__  /
+               \/     '               \/        \/         \/
+       <a href="http://www.hitmen-console.org">http://www.hitmen-console.org</a>    Hitmen WWW Headquarters
+       <a href="http://fly.to/hitmen-groepaz">http://fly.to/hitmen-groepaz</a>     my personal playground
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+To unsubscribe from the list send mail to <a href="mailto:majordomo_at_musoftware.de?Subject=Re:%20[cc65]%20bug?">majordomo_at_musoftware.de</a> with
+the string &quot;unsubscribe cc65&quot; in the body(!) of the mail.
+</pre>
+<p><!-- body="end" -->
+<hr noshade>
+<ul>
+<!-- next="start" -->
+<li><strong>Next message:</strong> <a href="0208.html">Ullrich von Bassewitz: "Re: [cc65] bug?"</a>
+<li><strong>Previous message:</strong> <a href="0206.html">Ullrich von Bassewitz: "Re: [cc65] bug?"</a>
+<li><strong>In reply to:</strong> <a href="0206.html">Ullrich von Bassewitz: "Re: [cc65] bug?"</a>
+<!-- nextthread="start" -->
+<li><strong>Next in thread:</strong> <a href="0208.html">Ullrich von Bassewitz: "Re: [cc65] bug?"</a>
+<li><strong>Reply:</strong> <a href="0208.html">Ullrich von Bassewitz: "Re: [cc65] bug?"</a>
+<!-- reply="end" -->
+</ul>
+<div align="center">
+<table border="2" width="100%">
+<tr>
+<th><a href="date.html">Date view</a></th>
+<th><a href="index.html">Thread view</a></th>
+<th><a href="subject.html">Subject view</a></th>
+</tr>
+</table>
+</div>
+<!-- trailer="footer" -->
+<p>
+<small>
+<em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail 2.1.3</a> 
+: <em>2001-12-14 22:05:37 CET</em>
+</em>
+</small>
+</body>
+</html>

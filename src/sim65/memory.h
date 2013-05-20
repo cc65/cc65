@@ -39,20 +39,6 @@
 
 
 /*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
-
-
-
-/* Forwards */
-struct ChipInstance;
-
-/* Memory size of the CPU */
-extern unsigned MemSize;
-
-
-
-/*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
@@ -72,12 +58,6 @@ unsigned MemReadZPWord (unsigned char Addr);
  * the read will always be in the zero page, even in case of an address
  * overflow.
  */
-
-void MemAssignChip (const struct ChipInstance* CI, unsigned Addr, unsigned Range);
-/* Assign a chip instance to memory locations */
-
-const struct ChipInstance* MemGetChip (unsigned Addr);
-/* Get the chip that is located at the given address (may return NULL). */
 
 void MemInit (void);
 /* Initialize the memory subsystem */

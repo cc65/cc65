@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                   cputype.h                               */
+/*                                paravirt.h                                 */
 /*                                                                           */
-/*                           CPU type definitions                            */
+/*                Paravirtualization for the sim65 6502 simulator            */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/* (C) 2013-2013 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -33,18 +33,22 @@
 
 
 
-#include "cputype.h"
+#ifndef PARAVIRT_H
+#define PARAVIRT_H
 
 
 
 /*****************************************************************************/
-/*                                   Data                                    */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
 
-/* Current CPU */
-CPUType CPU = CPU_6502;
+void ParaVirtualization (CPURegs* Regs);
+/* Potentially execute paravirtualization hook */
 
 
 
+/* End of paravirt.h */
+
+#endif

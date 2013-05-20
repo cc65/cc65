@@ -9,6 +9,7 @@ PROGS = ar65  \
         grc65 \
         ld65  \
         od65  \
+        sim65 \
         sp65
 
 CA65_INC := $(abspath ../asminc)

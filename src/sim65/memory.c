@@ -33,18 +33,8 @@
 
 
 
-#include <stdio.h>
 #include <string.h>
-#include <errno.h>
 
-/* common */
-#include "coll.h"
-#include "xmalloc.h"
-
-/* sim65 */
-#include "chip.h"
-#include "cputype.h"
-#include "error.h"
 #include "memory.h"
 
 
@@ -55,9 +45,8 @@
 
 
 
-/* Pointer to our memory */
-static const ChipInstance** MemData = 0;
-unsigned MemSize                    = 0;
+/* THE memory */
+static unsigned char Mem[0x10000];
 
 
 
@@ -70,15 +59,7 @@ unsigned MemSize                    = 0;
 void MemWriteByte (unsigned Addr, unsigned char Val)
 /* Write a byte to a memory location */
 {
-    /* Get the instance of the chip at this address */
-    const ChipInstance* CI = MemData[Addr];
-
-    /* Check if the memory is mapped */
-    if (CI == 0) {
-        Warning ("Writing to unassigned memory at $%06X", Addr);
-    } else {
-        CI->C->Data->Write (CI->Data, Addr - CI->Addr, Val);
-    }
+    Mem[Addr] = Val;
 }
 
 
@@ -86,16 +67,7 @@ void MemWriteByte (unsigned Addr, unsigned char Val)
 unsigned char MemReadByte (unsigned Addr)
 /* Read a byte from a memory location */
 {
-    /* Get the instance of the chip at this address */
-    const ChipInstance* CI = MemData[Addr];
-
-    /* Check if the memory is mapped */
-    if (CI == 0) {
-        Warning ("Reading from unassigned memory at $%06X", Addr);
-        return 0xFF;
-    } else {
-        return CI->C->Data->Read (CI->Data, Addr - CI->Addr);
-    }
+    return Mem[Addr];
 }
 
 
@@ -121,54 +93,13 @@ unsigned MemReadZPWord (unsigned char Addr)
 
 
 
-void MemAssignChip (const ChipInstance* CI, unsigned Addr, unsigned Range)
-/* Assign a chip instance to memory locations */
-{
-    /* Make sure, the addresses are in a valid range */
-    PRECONDITION (Addr + Range <= MemSize);
-
-    /* Assign the chip instance */
-    while (Range--) {
-        CHECK (MemData[Addr] == 0);
-        MemData[Addr++] = CI;
-    }
-}
-
-
-
-const struct ChipInstance* MemGetChip (unsigned Addr)
-/* Get the chip that is located at the given address (may return NULL). */
-{
-    /* Make sure, the address is valid */
-    PRECONDITION (Addr < MemSize);
-
-    /* Return the chip instance */
-    return MemData[Addr];
-}
-
-
-
 void MemInit (void)
 /* Initialize the memory subsystem */
 {
-    unsigned I;
+    /* Fill momory with illegal opcode */
+    memset (Mem, 0xFF, sizeof (Mem));
 
-    /* Allocate memory depending on the CPU type */
-    switch (CPU) {
-        case CPU_6502:
-        case CPU_65C02:
-            MemSize = 0x10000;
-            break;
-        default:
-            Internal ("Unexpected CPU type: %d", CPU);
-    }
-    MemData = xmalloc (MemSize * sizeof (ChipInstance*));
-
-    /* Clear the memory */
-    for (I = 0; I < MemSize; ++I) {
-        MemData[I] = 0;
-    }
+    /* Set RESET vector to 0x0200 */
+    Mem[0xFFFC] = 0x00;
+    Mem[0xFFFD] = 0x02;
 }
-
-
-

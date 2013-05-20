@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                callback.h                                 */
+/*                                  6502.h                                   */
 /*                                                                           */
-/*                              Chip callbacks                               */
+/*                           CPU core for the 6502                           */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2012, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,8 +33,8 @@
 
 
 
-#ifndef CALLBACK_H
-#define CALLBACK_H
+#ifndef _6502_H
+#define _6502_H
 
 
 
@@ -44,11 +44,35 @@
 
 
 
-/* Type of a callback function */
-typedef void (*CallbackFunc) (int TickOffs, void* UserData);
+/* Supported CPUs */
+typedef enum CPUType {
+    CPU_6502,
+    CPU_65C02
+} CPUType;
 
-/* Forward */
-typedef struct Callback Callback;
+/* Current CPU */
+extern CPUType CPU;
+
+/* 6502 CPU registers */
+typedef struct CPURegs CPURegs;
+struct CPURegs {
+    unsigned    AC;             /* Accumulator */
+    unsigned    XR;             /* X register */
+    unsigned    YR;             /* Y register */
+    unsigned    ZR;             /* Z register */
+    unsigned    SR;             /* Status register */
+    unsigned    SP;             /* Stackpointer */
+    unsigned    PC;             /* Program counter */
+};
+
+/* Status register bits */
+#define CF      0x01            /* Carry flag */
+#define ZF      0x02            /* Zero flag */
+#define IF      0x04            /* Interrupt flag */
+#define DF      0x08            /* Decimal flag */
+#define BF      0x10            /* Break flag */
+#define OF      0x40            /* Overflow flag */
+#define SF      0x80            /* Sign flag */
 
 
 
@@ -58,20 +82,25 @@ typedef struct Callback Callback;
 
 
 
-Callback* NewCallback (unsigned Ticks, CallbackFunc Func, void* Data);
-/* Create a callback for function F to be called in Ticks ticks. */
+void Reset (void);
+/* Generate a CPU RESET */
 
-void FreeCallback (Callback* C);
-/* Delete a callback (remove from the queue) */
+void IRQRequest (void);
+/* Generate an IRQ */
 
-void HandleCallbacks (unsigned TicksSinceLastCall);                            
-/* Handle the callback queue */
+void NMIRequest (void);
+/* Generate an NMI */
+
+unsigned ExecuteInsn (void);
+/* Execute one CPU instruction. Return the number of clock cycles for the
+ * executed instruction.
+ */
+
+unsigned long GetCycles (void);
+/* Return the total number of clock cycles executed */
 
 
 
-/* End of callback.h */
+/* End of 6502.h */
 
 #endif
-
-
-

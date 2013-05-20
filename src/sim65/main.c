@@ -33,31 +33,31 @@
 
 
 
-#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <dirent.h>
-#include <unistd.h>
 
 /* common */
 #include "abend.h"
 #include "cmdline.h"
-#include "filestat.h"
 #include "print.h"
 #include "version.h"
-#include "xmalloc.h"
 
 /* sim65 */
-#include "chip.h"
-#include "chippath.h"
-#include "config.h"
-#include "cpucore.h"
-#include "cputype.h"
+#include "6502.h"
 #include "error.h"
-#include "global.h"
 #include "memory.h"
-#include "scanner.h"
+
+
+
+/*****************************************************************************/
+/*                                   Data                                    */
+/*****************************************************************************/
+
+
+
+/* Name of program file */
+const char* ProgramFile;
 
 
 
@@ -71,114 +71,15 @@ static void Usage (void)
 {
     printf ("Usage: %s [options] file\n"
             "Short options:\n"
-            "  -C name\t\tUse simulator config file\n"
-            "  -L dir\t\tSet a chip directory search path\n"
-            "  -V\t\t\tPrint the simulator version number\n"
-            "  -d\t\t\tDebug mode\n"
             "  -h\t\t\tHelp (this text)\n"
             "  -v\t\t\tIncrease verbosity\n"
+            "  -V\t\t\tPrint the simulator version number\n"
             "\n"
             "Long options:\n"
-            "  --chipdir dir\t\tSet a chip directory search path\n"
-            "  --config name\t\tUse simulator config file\n"
-            "  --cpu type\t\tSet cpu type\n"
-            "  --debug\t\tDebug mode\n"
             "  --help\t\tHelp (this text)\n"
             "  --verbose\t\tIncrease verbosity\n"
             "  --version\t\tPrint the simulator version number\n",
             ProgName);
-}
-
-
-
-static void OptChipDir (const char* Opt attribute ((unused)), const char* Arg)
-/* Handle the --chipdir option */
-{
-    struct dirent* E;
-
-    /* Get the length of the directory name */
-    unsigned DirLen = strlen (Arg);
-
-    /* Open the directory */
-    DIR* D = opendir (Arg);
-    if (D == 0) {
-        AbEnd ("Cannot read directory `%s': %s", Arg, strerror (errno));
-    }
-
-    /* Read in all files and treat them as libraries */
-    while ((E = readdir (D)) != 0) {
-
-        char*  Name;
-        struct stat S;
-
-        /* ### Ignore anything but *.so files */
-        unsigned NameLen = strlen (E->d_name);
-        if (NameLen <= 3) {
-            continue;
-        }
-        if (strcmp (E->d_name + NameLen - 3, ".so") != 0) {
-            continue;
-        }
-
-        /* Create the full file name */
-        Name = xmalloc (DirLen + 1 + NameLen + 1);
-        strcpy (Name, Arg);
-        strcpy (Name + DirLen, "/");
-        strcpy (Name + DirLen + 1, E->d_name);
-
-        /* Stat the file */
-        if (FileStat (Name, &S) != 0) {
-            Warning ("Cannot stat `%s': %s", Name, strerror (errno));
-            xfree (Name);
-            continue;
-        }
-
-        /* Check if this is a regular file */
-        if (S_ISREG (S.st_mode)) {
-            /* Treat it as a library */
-            LoadChipLibrary (Name);
-        }
-
-        /* Free the name */
-        xfree (Name);
-    }
-
-    /* Close the directory */
-    closedir (D);
-}
-
-
-
-static void OptCPU (const char* Opt, const char* Arg)
-/* Handle the --cpu option */
-{
-    if (strcmp (Arg, "6502") == 0) {
-        CPU = CPU_6502;
-    } else if (strcmp (Arg, "65C02") == 0) {
-        CPU = CPU_65C02;
-    } else {
-        AbEnd ("Invalid argument for %s: `%s'", Opt, Arg);
-    }
-}
-
-
-
-static void OptConfig (const char* Opt attribute ((unused)), const char* Arg)
-/* Define the config file */
-{
-    if (CfgAvail ()) {
-        Error ("Cannot use -C twice");
-    }                             
-    CfgSetName (Arg);
-}
-
-
-
-static void OptDebug (const char* Opt attribute ((unused)),
-                      const char* Arg attribute ((unused)))
-/* Simulator debug mode */
-{
-    Debug = 1;
 }
 
 
@@ -204,9 +105,50 @@ static void OptVerbose (const char* Opt attribute ((unused)),
 
 static void OptVersion (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
-/* Print the assembler version */
+/* Print the simulator version */
 {
     fprintf (stderr, "sim65 V%s\n", GetVersionAsString ());
+}
+
+
+
+static void ReadProgramFile (void)
+/* Load program into memory */
+{
+    int Val;
+    unsigned Addr = 0x0200;
+
+    /* Open the file */
+    FILE* F = fopen (ProgramFile, "rb");
+    if (F == 0) {
+        Error ("Cannot open `%s': %s", ProgramFile, strerror (errno));
+    }
+
+    /* Get the CPU type from the file header */
+    if ((Val = fgetc(F)) != EOF) {
+        if (Val != CPU_6502 && Val != CPU_65C02) {
+            Error ("`%s': Invalid CPU type", ProgramFile);
+        }
+        CPU = Val;
+    }
+
+    /* Read the file body into memory */
+    while ((Val = fgetc(F)) != EOF) {
+        if (Addr == 0xFF00) {
+            Error ("`%s': To large to fit into $0200-$FFF0", ProgramFile);
+        }
+        MemWriteByte (Addr++, (unsigned char) Val);
+    }
+
+    /* Check for errors */
+    if (ferror (F)) {
+        Error ("Error reading from `%s': %s", ProgramFile, strerror (errno));
+    }
+
+    /* Close the file */
+    fclose (F);
+
+    Print (stdout, 1, "Loaded `%s' at $0200-$%04X\n", ProgramFile, Addr - 1);
 }
 
 
@@ -215,10 +157,6 @@ int main (int argc, char* argv[])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
-        { "--chipdir",          1,      OptChipDir              },
-        { "--config",           1,      OptConfig               },
-        { "--cpu",              1,      OptCPU                  },
-        { "--debug",            0,      OptDebug                },
         { "--help",             0,      OptHelp                 },
         { "--verbose",          0,      OptVerbose              },
         { "--version",          0,      OptVersion              },
@@ -226,14 +164,8 @@ int main (int argc, char* argv[])
 
     unsigned I;
 
-    /* Initialize the output file name */
-    const char* InputFile  = 0;
-
     /* Initialize the cmdline module */
     InitCmdLine (&argc, &argv, "sim65");
-
-    /* Initialize the chip library search paths */
-    InitChipPaths ();
 
     /* Parse the command line */
     I = 1;
@@ -251,10 +183,6 @@ int main (int argc, char* argv[])
                     LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
                     break;
 
-                case 'd':
-                    OptDebug (Arg, 0);
-                    break;
-
                 case 'h':
                 case '?':
                     OptHelp (Arg, 0);
@@ -262,14 +190,6 @@ int main (int argc, char* argv[])
 
                 case 'v':
                     OptVerbose (Arg, 0);
-                    break;
-
-                case 'C':
-                    OptConfig (Arg, GetArg (&I, 2));
-                    break;
-
-                case 'L':
-                    OptChipDir (Arg, GetArg (&I, 2));
                     break;
 
                 case 'V':
@@ -281,10 +201,11 @@ int main (int argc, char* argv[])
                     break;
             }
         } else {
-            if (InputFile) {
-                fprintf (stderr, "additional file specs ignored\n");
+            /* Filename. Check if we already had one */
+            if (ProgramFile) {
+                AbEnd ("Don't know what to do with `%s'", Arg);
             } else {
-                InputFile = Arg;
+                ProgramFile = Arg;
             }
         }
 
@@ -292,29 +213,21 @@ int main (int argc, char* argv[])
         ++I;
     }
 
-    /* Sort the already loaded chips */
-    SortChips ();
-
-    /* Check if we have a valid configuration */
-    if (!CfgAvail ()) {
-        Error ("Simulator configuration missing");
+    /* Do we have a program file? */
+    if (ProgramFile == 0) {
+        AbEnd ("No program file");
     }
 
-    /* Initialize the simulated CPU memory */
     MemInit ();
 
-    /* Read the config file */
-    CfgRead ();
+    ReadProgramFile ();
 
-    CPUInit ();
+    Reset ();
 
     while (1) {
-        CPURun ();
+        ExecuteInsn ();
     }
 
     /* Return an apropriate exit code */
     return EXIT_SUCCESS;
 }
-
-
-

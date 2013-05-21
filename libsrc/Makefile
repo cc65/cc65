@@ -205,7 +205,7 @@ LD := $(if $(wildcard ../bin/ld65*),../bin/ld65,ld65)
 
 define ASSEMBLE_recipe
 
-@echo $(TARGET) - $<
+$(if $(TRAVIS),,@echo $(TARGET) - $<)
 @$(CA) -t $(TARGET) $(AFLAGS) --create-dep $(@:.o=.d) -o $@ $<
 
 endef
@@ -214,7 +214,7 @@ endef
 
 define COMPILE_recipe
 
-@echo $(TARGET) - $<
+$(if $(TRAVIS),,@echo $(TARGET) - $<)
 @$(CC) -t $(TARGET) $(CFLAGS) --create-dep $(@:.o=.d) --dep-target $@ -o $(@:.o=.s) $<
 @$(CA) -t $(TARGET) -o $@ $(@:.o=.s)
 
@@ -229,7 +229,7 @@ endef
 	$(COMPILE_recipe)
 
 $(EXTRA_OBJPAT): $(EXTRA_SRCPAT) | ../lib
-	@echo $(TARGET) - $<
+	@echo $(TARGET) - $(@F)
 	@$(CA) -t $(TARGET) $(AFLAGS) -o $@ $<
 
 ../lib/$(TARGET).lib: $(OBJS) | ../lib

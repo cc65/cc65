@@ -312,7 +312,7 @@ static unsigned HaveIRQRequest;
             SET_CF (res <= 0xFF);                               \
             SET_OF (((old^rhs) & (old^res) & 0x80));            \
         } else {                                                \
-            Regs.AC -= rhs - (!GET_CF ());                      \
+            Regs.AC -= rhs + (!GET_CF ());                      \
             TEST_ZF (Regs.AC);                                  \
             TEST_SF (Regs.AC);                                  \
             SET_CF (Regs.AC <= 0xFF);                           \

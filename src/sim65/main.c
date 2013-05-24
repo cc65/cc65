@@ -70,7 +70,7 @@ const char* ProgramFile;
 
 static void Usage (void)
 {
-    printf ("Usage: %s [options] file\n"
+    printf ("Usage: %s [options] file [arguments]\n"
             "Short options:\n"
             "  -h\t\t\tHelp (this text)\n"
             "  -v\t\t\tIncrease verbosity\n"

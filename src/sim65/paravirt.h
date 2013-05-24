@@ -44,8 +44,11 @@
 
 
 
-void ParaVirtualization (CPURegs* Regs);
-/* Potentially execute paravirtualization hook */
+void ParaVirtInit (unsigned aArgStart);
+/* Initialize the paravirtualization subsystem */
+
+void ParaVirtHooks (CPURegs* Regs);
+/* Potentially execute paravirtualization hooks */
 
 
 

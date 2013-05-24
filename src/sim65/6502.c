@@ -537,7 +537,7 @@ static void OPC_6502_20 (void)
     PUSH (PCL);
     Regs.PC = Addr;
 
-    ParaVirtualization (&Regs);
+    ParaVirtHooks (&Regs);
 }
 
 
@@ -819,7 +819,7 @@ static void OPC_6502_4C (void)
     Cycles = 3;
     Regs.PC = MemReadWord (Regs.PC+1);
 
-    ParaVirtualization (&Regs);
+    ParaVirtHooks (&Regs);
 }
 
 

@@ -47,6 +47,7 @@
 #include "6502.h"
 #include "error.h"
 #include "memory.h"
+#include "paravirt.h"
 
 
 
@@ -201,12 +202,8 @@ int main (int argc, char* argv[])
                     break;
             }
         } else {
-            /* Filename. Check if we already had one */
-            if (ProgramFile) {
-                AbEnd ("Don't know what to do with `%s'", Arg);
-            } else {
-                ProgramFile = Arg;
-            }
+            ProgramFile = Arg;
+            break;
         }
 
         /* Next argument */
@@ -217,6 +214,8 @@ int main (int argc, char* argv[])
     if (ProgramFile == 0) {
         AbEnd ("No program file");
     }
+
+    ParaVirtInit (I);
 
     MemInit ();
 

@@ -33,6 +33,7 @@
 
 
 
+#include <string.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #if defined(_MSC_VER)
@@ -47,6 +48,7 @@
 #endif
 
 /* common */
+#include "cmdline.h"
 #include "print.h"
 #include "xmalloc.h"
 
@@ -65,11 +67,38 @@
 
 typedef void (*PVFunc) (CPURegs* Regs);
 
+static unsigned ArgStart;
+
 
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
+
+
+
+static unsigned GetAX (CPURegs* Regs)
+{
+    return Regs->AC + (Regs->XR << 8);
+}
+
+
+
+static void SetAX (CPURegs* Regs, unsigned Val)
+{
+    Regs->AC = Val & 0xFF;
+    Val >>= 8;
+    Regs->XR = Val;
+}
+
+
+
+static void MemWriteWord (unsigned Addr, unsigned Val)
+{
+    MemWriteByte (Addr, Val);
+    Val >>= 8;
+    MemWriteByte (Addr + 1, Val);
+}
 
 
 
@@ -84,11 +113,40 @@ static unsigned PopParam (unsigned char Incr)
 {
     unsigned SP = MemReadZPWord (0x00);
     unsigned Val = MemReadWord (SP);
-    SP += Incr;
-    MemWriteByte (0x00, SP);
-    SP >>= 8;
-    MemWriteByte (0x01, SP);
+    MemWriteWord (0x0000, SP + Incr);
     return Val;
+}
+
+
+
+static void PVArgs (CPURegs* Regs)
+{
+    unsigned ArgC = ArgCount - ArgStart;
+    unsigned ArgV = GetAX (Regs);
+    unsigned SP   = MemReadZPWord (0x00);
+    unsigned Args = SP - (ArgC + 1) * 2;
+
+    Print (stdout, 2, "PVArgs ($%04X)\n", ArgV);
+
+    MemWriteWord (ArgV, Args);
+
+    SP = Args;
+    while (ArgStart < ArgCount) {
+        unsigned I = 0;
+        const char* Arg = ArgVec[ArgStart++];
+        SP -= strlen (Arg) + 1;
+        do {
+            MemWriteByte (SP + I, Arg[I]);
+        }
+        while (Arg[I++]);
+
+        MemWriteWord (Args, SP);
+        Args += 2;
+    }
+    MemWriteWord (Args, 0x0000);
+
+    MemWriteWord (0x0000, SP);
+    SetAX (Regs, ArgC);
 }
 
 
@@ -148,9 +206,7 @@ static void PVOpen (CPURegs* Regs)
 
     RetVal = open (Path, OFlag);
 
-    Regs->AC = RetVal & 0xFF;
-    RetVal >>= 8;
-    Regs->XR = RetVal & 0xFF;
+    SetAX (Regs, RetVal);
 }
 
 
@@ -159,15 +215,13 @@ static void PVClose (CPURegs* Regs)
 {
     unsigned RetVal;
 
-    unsigned FD = Regs->AC + (Regs->XR << 8);
+    unsigned FD = GetAX (Regs);
 
     Print (stdout, 2, "PVClose ($%04X)\n", FD);
 
     RetVal = close (FD);
 
-    Regs->AC = RetVal & 0xFF;
-    RetVal >>= 8;
-    Regs->XR = RetVal & 0xFF;
+    SetAX (Regs, RetVal);
 }
 
 
@@ -177,7 +231,7 @@ static void PVRead (CPURegs* Regs)
     unsigned char* Data;
     unsigned RetVal, I = 0;
 
-    unsigned Count = Regs->AC + (Regs->XR << 8);
+    unsigned Count = GetAX (Regs);
     unsigned Buf   = PopParam (2);
     unsigned FD    = PopParam (2);
 
@@ -194,9 +248,7 @@ static void PVRead (CPURegs* Regs)
     }
     xfree (Data);
 
-    Regs->AC = RetVal & 0xFF;
-    RetVal >>= 8;
-    Regs->XR = RetVal & 0xFF;
+    SetAX (Regs, RetVal);
 }
 
 
@@ -206,7 +258,7 @@ static void PVWrite (CPURegs* Regs)
     unsigned char* Data;
     unsigned RetVal, I = 0;
 
-    unsigned Count = Regs->AC + (Regs->XR << 8);
+    unsigned Count = GetAX (Regs);
     unsigned Buf   = PopParam (2);
     unsigned FD    = PopParam (2);
 
@@ -221,14 +273,13 @@ static void PVWrite (CPURegs* Regs)
 
     xfree (Data);
 
-    Regs->AC = RetVal & 0xFF;
-    RetVal >>= 8;
-    Regs->XR = RetVal & 0xFF;
+    SetAX (Regs, RetVal);
 }
 
 
 
 static const PVFunc Hooks[] = {
+    PVArgs,
     PVExit,
     PVOpen,
     PVClose,
@@ -238,8 +289,16 @@ static const PVFunc Hooks[] = {
 
 
 
-void ParaVirtualization (CPURegs* Regs)
-/* Potentially execute paravirtualization hook */
+void ParaVirtInit (unsigned aArgStart)
+/* Initialize the paravirtualization subsystem */
+{
+    ArgStart = aArgStart;
+};
+
+
+
+void ParaVirtHooks (CPURegs* Regs)
+/* Potentially execute paravirtualization hooks */
 {
     /* Check for paravirtualization address range */
     if (Regs->PC <  0xFFF0 ||

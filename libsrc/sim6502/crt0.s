@@ -29,4 +29,4 @@
 _exit:  pha
         jsr     donelib
         pla
-        jsr     exit
+        jmp     exit

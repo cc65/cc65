@@ -153,7 +153,7 @@ extern char *_getdefdev(void);          /* get default floppy device */
 extern unsigned char _dos_type;         /* the DOS flavour */
 extern void atr130_emd[];
 extern void atrstd_joy[];               /* referred to by joy_static_stddrv[] */
-extern void atrm8_joy[];
+extern void atrmj8_joy[];
 extern void atr3_tgi[];
 extern void atr4_tgi[];
 extern void atr5_tgi[];

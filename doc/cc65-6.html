@@ -25,8 +25,10 @@
 <P>This macro is defined if the target is the enhanced Apple //e (-t apple2enh).</P>
 
 <DT><B><CODE>__ATARI__</CODE></B><DD>
-<P>This macro is defined if the target is one of the Atari computers
-(400/800/130XL/800XL).</P>
+<P>This macro is defined if the target is the Atari 400/800 (-t atari).</P>
+
+<DT><B><CODE>__ATARIXL__</CODE></B><DD>
+<P>This macro is defined if the target is the Atari 800XL/130XE (-t atarixl).</P>
 
 <DT><B><CODE>__ATMOS__</CODE></B><DD>
 <P>This macro is defined if the target is the Oric Atmos (-t atmos).</P>
@@ -73,7 +75,13 @@ translation unit in the form "Mmm dd yyyy".</P>
 <P>This macro expands to a string containing the name of the C source file.</P>
 
 <DT><B><CODE>__GEOS__</CODE></B><DD>
-<P>This macro is defined if you are compiling for the GEOS system (-t geos).</P>
+<P>This macro is defined if you are compiling for one of the GEOS systems.</P>
+
+<DT><B><CODE>__GEOS_APPLE__</CODE></B><DD>
+<P>This macro is defined if you are compiling for the Apple GEOS system (-t geos-apple).</P>
+
+<DT><B><CODE>__GEOS_CBM__</CODE></B><DD>
+<P>This macro is defined if you are compiling for the GEOS 64/128 system (-t geos-cbm).</P>
 
 <DT><B><CODE>__LINE__</CODE></B><DD>
 <P>This macro expands to the current line number.</P>
@@ -107,6 +115,12 @@ translation unit in the form "Mmm dd yyyy".</P>
 
 <DT><B><CODE>__STDC_HOSTED__</CODE></B><DD>
 <P>This macro is expands to the integer constant 1.</P>
+
+<DT><B><CODE>__SIM6502__</CODE></B><DD>
+<P>This macro is defined if the target is sim65 in 6502 mode (-t sim6502).</P>
+
+<DT><B><CODE>__SIM65C02__</CODE></B><DD>
+<P>This macro is defined if the target is sim65 in 65C02 mode (-t sim65c02).</P>
 
 <DT><B><CODE>__SUPERVISION__</CODE></B><DD>
 <P>This macro is defined if the target is the supervision (-t supervision).</P>

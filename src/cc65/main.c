@@ -164,6 +164,10 @@ static void SetSys (const char* Sys)
             DefineNumericMacro ("__ATARI__", 1);
             break;
 
+        case TGT_ATARIXL:
+            DefineNumericMacro ("__ATARIXL__", 1);
+            break;
+
         case TGT_C16:
             cbmsys ("__C16__");
             break;

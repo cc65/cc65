@@ -16,11 +16,8 @@ int main(void)
   printf("clocks per second: %d\n", CLOCKS_PER_SEC);
   printf("current clock: %ld\n", clock());
 
-#ifdef __ATARI__
-  /* Atari DOS 2.x clears the screen after program termination, so wait... */
   printf("hit <return> to exit...");
   cgetc();
-#endif
   printf("\n");
   return(0);
 }

@@ -1,10 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#ifdef __ATARI__
-#include <atari.h>
 #include <conio.h>
-#endif
 
 static int do_test(const char *s1, const char *s2, size_t n)
 {
@@ -70,11 +67,6 @@ int main(void)
     else
         printf("OK (%d)\n", ret);
 
-#ifdef __ATARI__
-    if (_dos_type != 1) {
-        cgetc();
-    }
-#endif
-
+    cgetc();
     return 0;
 }

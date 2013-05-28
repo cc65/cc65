@@ -78,7 +78,7 @@ struct dirent {
 #define _DE_ISLBL(t)  (0)
 #define _DE_ISLNK(t)  (0)
 
-#elif defined(__ATARI__)
+#elif defined(__ATARI__) || defined(__ATARIXL__)
 
 struct dirent {
     char          d_name[13];  /* 8.3 + trailing 0 */

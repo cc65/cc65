@@ -13,6 +13,7 @@ GEOS = geos-apple \
 TARGETS = apple2    \
           apple2enh \
           atari     \
+          atarixl   \
           atmos     \
           $(CBMS)   \
           $(GEOS)   \
@@ -93,9 +94,13 @@ GEOSDIRS = common      \
            system
 
 ifeq ($(TARGET),apple2enh)
+  SRCDIR = apple2
   OBJPFX = a2
   DRVPFX = a2e
-  SRCDIR = apple2
+else ifeq ($(TARGET),atarixl)
+  SRCDIR = atari
+  OBJPFX = atr
+  DRVPFX = atrx
 else ifeq ($(TARGET),sim65c02)
   SRCDIR = sim6502
 else

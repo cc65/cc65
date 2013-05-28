@@ -208,6 +208,10 @@ static void SetSys (const char* Sys)
             NewSymbol ("__ATARI__", 1);
             break;
 
+        case TGT_ATARIXL:
+            NewSymbol ("__ATARIXL__", 1);
+            break;
+
         case TGT_C16:
             CBMSystem ("__C16__");
             break;

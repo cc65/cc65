@@ -43,7 +43,7 @@ BUFSIZ          = 256
 EOF             = -1
 .if .defined(__APPLE2__) .or .defined(__APPLE2ENH__)
 FILENAME_MAX    = 64+1
-.elseif .defined(__ATARI__)
+.elseif .defined(__ATARI__) .or .defined(__ATARIXL__)
 FILENAME_MAX    = 12+1
 .elseif .defined(__LUNIX__)
 FILENAME_MAX    = 80+1

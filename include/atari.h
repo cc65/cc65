@@ -38,7 +38,7 @@
 
 
 /* Check for errors */
-#if !defined(__ATARI__)
+#if !defined(__ATARI__) && !defined(__ATARIXL__)
 #  error This module may only be used when compiling for the Atari!
 #endif
 

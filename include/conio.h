@@ -63,7 +63,7 @@
 #  include <apple2.h>
 #elif defined(__APPLE2ENH__)
 #  include <apple2enh.h>
-#elif defined(__ATARI__)
+#elif defined(__ATARI__) || defined(__ATARIXL__)
 #  include <atari.h>
 #elif defined(__ATMOS__)
 #  include <atmos.h>

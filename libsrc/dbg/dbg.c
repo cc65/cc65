@@ -93,7 +93,7 @@ static char GetKeyUpdate (void);
 #  define MAX_X         80
 #  define MAX_Y         25
 #  define DUMP_BYTES    16
-#elif defined(__APPLE2__) || defined(__APPLE2ENH__) || defined(__ATARI__)
+#elif defined(__APPLE2__) || defined(__APPLE2ENH__) || defined(__ATARI__) || defined(__ATARIXL__)
 #  define MAX_X         40
 #  define MAX_Y         24
 #  define DUMP_BYTES     8

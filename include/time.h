@@ -76,7 +76,7 @@ extern struct _timezone {
 
 
 
-#if defined(__ATARI__)
+#if defined(__ATARI__) || defined(__ATARIXL__)
 /* The clock depends on the video standard, so read it at runtime */
 unsigned _clocks_per_sec (void);
 #  define CLK_TCK               _clocks_per_sec()

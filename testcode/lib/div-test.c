@@ -31,10 +31,8 @@ int main(void) {
                 test(-40, -3);
         if (t)
                 printf("\nThe div() function made a wrong result!\n");
-#ifdef __ATARI__
-        /* Atari DOS 2 clears the screen after program-termination, so wait. */
+
         printf("\nTap a key, to exit. ");
         getchar();
-#endif
         return (int)t;
         }

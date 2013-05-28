@@ -9,8 +9,12 @@
 
 #include <stdio.h>
 #include <conio.h>
+#ifndef __CBM__
 #include <fcntl.h>
 #include <unistd.h>
+#else
+#include <device.h>
+#endif
 
 
 extern void _OVERLAY1_LOAD__[], _OVERLAY1_SIZE__[];
@@ -69,14 +73,26 @@ void foobar (void)
 
 unsigned char loadfile (char *name, void *addr, void *size)
 {
+#ifndef __CBM__
+
     int file = open (name, O_RDONLY);
     if (file == -1) {
         log ("Opening overlay file failed");
         return 0;
     }
-
     read (file, addr, (unsigned) size);
     close (file);
+
+#else
+
+    /* Avoid compiler warnings about unused parameters. */
+    (void) addr; (void) size;
+    if (cbm_load (name, getcurrentdevice (), NULL) == 0) {
+        log ("Loading overlay file failed");
+        return 0;
+    }
+
+#endif
     return 1;
 }
 

@@ -10,4 +10,4 @@
 
 .rodata
 
-_joy_stddrv:    .asciiz "ataristd.joy"
+_joy_stddrv:    .asciiz "atrstd.joy"

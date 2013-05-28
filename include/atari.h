@@ -150,25 +150,25 @@ extern void _rest_vecs(void);           /* restore system vectors */
 extern char *_getdefdev(void);          /* get default floppy device */
 
 /* global variables */
-extern unsigned char _dos_type;        /* the DOS flavour */
-extern void atr130xe_emd[];
-extern void ataristd_joy[];            /* referred to by joy_static_stddrv[] */
-extern void atarim8_joy[];
-extern void atari10_tgi[];
-extern void atr10p2_tgi[];
-extern void atari11_tgi[];
-extern void atari14_tgi[];
-extern void atari15_tgi[];
-extern void atr15p2_tgi[];
-extern void atari3_tgi[];
-extern void atari4_tgi[];
-extern void atari5_tgi[];
-extern void atari6_tgi[];
-extern void atari7_tgi[];
-extern void atari8_tgi[];              /* referred to by tgi_static_stddrv[] */
+extern unsigned char _dos_type;         /* the DOS flavour */
+extern void atr130_emd[];
+extern void atrstd_joy[];               /* referred to by joy_static_stddrv[] */
+extern void atrm8_joy[];
+extern void atr3_tgi[];
+extern void atr4_tgi[];
+extern void atr5_tgi[];
+extern void atr6_tgi[];
+extern void atr7_tgi[];
+extern void atr8_tgi[];                 /* referred to by tgi_static_stddrv[] */
 extern void atr8p2_tgi[];
-extern void atari9_tgi[];
+extern void atr9_tgi[];
 extern void atr9p2_tgi[];
+extern void atr10_tgi[];
+extern void atr10p2_tgi[];
+extern void atr11_tgi[];
+extern void atr14_tgi[];
+extern void atr15_tgi[];
+extern void atr15p2_tgi[];
 
 /* provide old names for backwards compatibility */
 #ifdef ATARI_COMPAT_PRE_2_11

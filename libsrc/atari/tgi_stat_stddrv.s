@@ -7,8 +7,8 @@
 ;
 
         .export _tgi_static_stddrv
-        .import _atari8_tgi
+        .import _atr8_tgi
 
 .rodata
 
-_tgi_static_stddrv := _atari8_tgi
+_tgi_static_stddrv := _atr8_tgi

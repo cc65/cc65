@@ -18,6 +18,7 @@
 
         .include        "zeropage.inc"
         .include        "atari.inc"
+	.include	"save_area.inc"
 
 ; ------------------------------------------------------------------------
 ; EXE header
@@ -25,6 +26,11 @@
 .segment        "EXEHDR"
 
         .word   $FFFF
+
+.if .defined(__ATARIXL__)
+.segment	"MAINHDR"
+.endif
+
         .word   __STARTUP_LOAD__
         .word   __ZPSAVE_LOAD__ - 1
 
@@ -57,6 +63,8 @@ L1:     lda     sp,x
         tsx
         stx     spsave
 
+.if .not .defined(__ATARIXL__)
+
 ; Report memory usage
 
         lda     APPMHI
@@ -73,6 +81,16 @@ L1:     lda     sp,x
         sbc     #>__RESERVED_MEMORY__
         sta     APPMHI+1
         sta     sp+1                    ; setup runtime stack part 2
+
+.else
+
+	; for now... needs to use value from linker script later
+        lda     MEMTOP
+        sta     sp
+        lda     MEMTOP+1
+        sta     sp+1
+
+.endif
 
 ; Call module constructors
 
@@ -119,12 +137,31 @@ _exit:  jsr     donelib         ; Run module destructors
         lda     old_shflok
         sta     SHFLOK
 
+.if .not .defined(__ATARIXL__)
+
 ; Restore APPMHI
 
         lda     appmsav
         sta     APPMHI
         lda     appmsav+1
         sta     APPMHI+1
+
+.else
+
+; Atari XL target stuff...
+
+	lda	PORTB_save
+	sta	PORTB
+	lda	MEMTOP_save
+	sta	MEMTOP
+	lda	MEMTOP_save+1
+	sta	MEMTOP+1
+	lda	APPMHI_save
+	sta	APPMHI
+	lda	APPMHI_save+1
+	sta	APPMHI+1
+.endif
+
 
 ; Copy back the zero page stuff
 

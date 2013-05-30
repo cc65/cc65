@@ -40,6 +40,10 @@
 
         .export         _get_ostype
 
+.if .defined(__ATARIXL__)
+.warning "fix me!"
+.endif
+
 .proc   _get_ostype
 
         lda     $fcd8

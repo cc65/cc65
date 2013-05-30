@@ -17,11 +17,17 @@
 	lda	PORTB
 	and	#$fe
 	sta	PORTB
+	lda	#>__CHARGEN_START__
+	sta	CHBAS
+	sta	CHBASE
 .endmacro
 .macro	enable_rom
 	lda	PORTB
 	ora	#1
 	sta	PORTB
+	lda	#$E0
+	sta	CHBAS
+	sta	CHBASE
 .endmacro
 
 .segment "INIT"
@@ -35,6 +41,7 @@ sram_init:
 	ldx	#0
 	stx	NMIEN		; disable NMI
 
+; disable ROMs
 	disable_rom
 
 ; setup interrupt vectors
@@ -66,11 +73,6 @@ sram_init:
 	sta	SIOV+1
 	lda	#>my_SIOV
 	sta	SIOV+2
-
-; set new chargen
-	lda	#>__CHARGEN_START__
-	sta	CHBAS
-	sta	CHBASE
 
 ; enable interrupts
 	lda	#$40
@@ -146,30 +148,5 @@ kret:	pha
 	disable_rom
 	pla
 	rts
-
-.if 0
-	.import	KEYBDV_wrapper
-        .import cursor,mul40
-
-_cgetc:
-        jsr     setcursor
-.if .not .defined(__ATARIXL__)
-        jsr     @1
-.else
-	jsr	KEYBDV_wrapper
-.endif
-        ldx     #0
-        rts
-
-.if .not .defined(__ATARIXL__)
-@1:     lda     KEYBDV+5
-        pha
-        lda     KEYBDV+4
-        pha
-        lda     #12
-        sta     ICAX1Z          ; fix problems with direct call to KEYBDV
-        rts
-.endif
-.endif
 
 .endif	; .if .defined(__ATARIXL__)

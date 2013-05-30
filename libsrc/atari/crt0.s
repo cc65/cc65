@@ -13,8 +13,12 @@
 
         .import         initlib, donelib
         .import         callmain, zerobss
-        .import         __STARTUP_LOAD__, __ZPSAVE_LOAD__
+        .import         __STARTUP_LOAD__, __ZPSAVE_LOAD__, __BSS_LOAD__
         .import         __RESERVED_MEMORY__
+	.import		__RAM_START__, __RAM_SIZE__
+	.import		zpsave
+	.import		sram_init
+
 
         .include        "zeropage.inc"
         .include        "atari.inc"
@@ -32,7 +36,11 @@
 .endif
 
         .word   __STARTUP_LOAD__
+.if .defined(__ATARIXL__)
+        .word   __BSS_LOAD__ - 1
+.else
         .word   __ZPSAVE_LOAD__ - 1
+.endif
 
 ; ------------------------------------------------------------------------
 ; Actual code
@@ -46,6 +54,8 @@
 
 ; Real entry point:
 
+.if .not .defined(__ATARIXL__)		; already done in previous load chunk
+
 ; Save the zero page locations we need
 
         ldx     #zpspace-1
@@ -53,6 +63,12 @@ L1:     lda     sp,x
         sta     zpsave,x
         dex
         bpl     L1
+
+.else
+
+	jsr	sram_init
+
+.endif
 
 ; Clear the BSS data
 
@@ -84,15 +100,16 @@ L1:     lda     sp,x
 
 .else
 
-	; for now... needs to use value from linker script later
-        lda     MEMTOP
-        sta     sp
-        lda     MEMTOP+1
-        sta     sp+1
+	lda	#<(__RAM_START__ + __RAM_SIZE__ - 1)
+	sta	sp
+	lda	#>(__RAM_START__ + __RAM_SIZE__ - 1)
+	sta	sp+1
 
 .endif
 
 ; Call module constructors
+
+;	brk
 
         jsr     initlib
 
@@ -181,12 +198,6 @@ L2:     lda     zpsave,x
         rts
 
 ; *** end of main startup code
-
-; ------------------------------------------------------------------------
-
-.segment        "ZPSAVE"
-
-zpsave: .res    zpspace
 
 ; ------------------------------------------------------------------------
 

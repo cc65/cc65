@@ -956,8 +956,15 @@ CASETV  = $E440         ;cassette handler vector table
 
 DISKIV  = $E450         ;vector to initialize DIO
 DSKINV  = $E453         ;vector to DIO
+.if .defined(__ATARIXL__)
+CIOV	= $C0
+SIOV	= $C3
+CIOV_org    = $E456         ;vector to CIO
+SIOV_org    = $E459         ;vector to SIO
+.else
 CIOV    = $E456         ;vector to CIO
 SIOV    = $E459         ;vector to SIO
+.endif
 SETVBV  = $E45C         ;vector to set VBLANK parameters
 SYSVBV  = $E45F         ;vector to process immediate VBLANK
 XITVBV  = $E462         ;vector to process deferred VBLANK

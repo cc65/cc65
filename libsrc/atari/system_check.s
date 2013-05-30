@@ -36,7 +36,7 @@ cont:	ldx	#0		; channel 0
 	sta	ICBLH,x
 	lda	#PUTCHR
 	sta	ICCOM,x
-	jsr	CIOV
+	jsr	CIOV_org
 .endmacro
 .macro print_string2 addr, len
 
@@ -51,7 +51,7 @@ cont:	ldx	#0		; channel 0
 	sta	ICBLH,x
 	lda	#PUTCHR
 	sta	ICCOM,x
-	jsr	CIOV
+	jsr	CIOV_org
 
 .endmacro
 

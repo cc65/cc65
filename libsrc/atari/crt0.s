@@ -109,8 +109,6 @@ L1:     lda     sp,x
 
 ; Call module constructors
 
-;	brk
-
         jsr     initlib
 
 ; Set left margin to 0

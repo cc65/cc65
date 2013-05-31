@@ -56,6 +56,7 @@
 .struct MOUSE_HDR
         ID              .byte   3       ; Contains 0x6D, 0x6F, 0x75 ("mou")
         VERSION         .byte   1       ; Interface version
+        LIBREF          .addr           ; Library reference
         JUMPTAB         .struct
             INSTALL     .addr
             UNINSTALL   .addr
@@ -96,7 +97,7 @@
 ;------------------------------------------------------------------------------
 ; The mouse API version, stored in MOUSE_HDR::VERSION
 
-MOUSE_API_VERSION       = $02
+MOUSE_API_VERSION       = $03
 
 ;------------------------------------------------------------------------------
 ; Bitmapped mouse driver flags, stored in MOUSE_HDR::FLAGS.

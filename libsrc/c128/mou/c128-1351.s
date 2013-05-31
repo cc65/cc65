@@ -23,7 +23,11 @@ HEADER:
         .byte   $6d, $6f, $75           ; "mou"
         .byte   MOUSE_API_VERSION       ; Mouse driver API version number
 
-; Jump table.
+; Library reference
+
+        .addr   $0000
+
+; Jump table
 
         .addr   INSTALL
         .addr   UNINSTALL

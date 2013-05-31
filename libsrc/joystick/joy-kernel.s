@@ -4,6 +4,7 @@
 ; Common functions of the joystick API.
 ;
 
+        .import         joy_libref
         .importzp       ptr1
         .interruptor    joy_irq         ; Export as IRQ handler
 
@@ -54,6 +55,15 @@ _joy_install:
         bne     inv_drv
         dey
         bpl     @L0
+
+; Set the library reference
+
+        ldy     #JOY_HDR::LIBREF
+        lda     #<joy_libref
+        sta     (ptr1),y
+        iny
+        lda     #>joy_libref
+        sta     (ptr1),y
 
 ; Copy the mask array
 

@@ -42,20 +42,21 @@
 .struct JOY_HDR
         ID      .byte   3       ; $6A, $6F, $79 ("joy")
         VERSION .byte   1       ; Interface version
+        LIBREF  .addr           ; Library reference
         MASKS   .byte   8       ; Joystick state mask array
         JUMPTAB .struct
-            INSTALL     .word   ; INSTALL routine
-            UNINSTALL   .word   ; UNINSTALL routine
-            COUNT       .word   ; COUNT routine
-            READ        .word   ; READ routine
-            IRQ         .word   ; IRQ routine
+            INSTALL     .addr   ; INSTALL routine
+            UNINSTALL   .addr   ; UNINSTALL routine
+            COUNT       .addr   ; COUNT routine
+            READ        .addr   ; READ routine
+            IRQ         .addr   ; IRQ routine
         .endstruct
 .endstruct
 
 ;------------------------------------------------------------------------------
 ; The JOY API version, stored in JOY_HDR::VERSION
 
-JOY_API_VERSION         = $01
+JOY_API_VERSION         = $02
 
 ;------------------------------------------------------------------------------
 ; Variables
@@ -82,4 +83,3 @@ JOY_API_VERSION         = $01
         .global _joy_read
 
         .global _joy_clear_ptr
-

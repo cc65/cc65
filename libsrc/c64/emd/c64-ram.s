@@ -24,16 +24,20 @@
         .byte   $65, $6d, $64           ; "emd"
         .byte   EMD_API_VERSION         ; EM API version number
 
-; Jump table.
+; Library reference
 
-        .word   INSTALL
-        .word   UNINSTALL
-        .word   PAGECOUNT
-        .word   MAP
-        .word   USE
-        .word   COMMIT
-        .word   COPYFROM
-        .word   COPYTO
+        .addr   $0000
+
+; Jump table
+
+        .addr   INSTALL
+        .addr   UNINSTALL
+        .addr   PAGECOUNT
+        .addr   MAP
+        .addr   USE
+        .addr   COMMIT
+        .addr   COPYFROM
+        .addr   COPYTO
 
 ; ------------------------------------------------------------------------
 ; Constants

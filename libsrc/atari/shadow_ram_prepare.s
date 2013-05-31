@@ -47,7 +47,7 @@ cont:	ldx	#0		; channel 0
 .segment        "SRPREPHDR"
 
         .word   __SRPREP_LOAD__
-        .word   __SRPREP_LOAD__ + __SRPREP_SIZE__ - 1
+        .word   __SRPREP_LOAD__ + __SRPREP_SIZE__ + __SHADOW_RAM_SIZE__ - 1
 
 ; ------------------------------------------------------------------------
 ; Actual code
@@ -176,9 +176,9 @@ L1:     lda     sp,x
 
 ; copy chargen to low memory
 
-	lda	#>(__SRPREP_LOAD__ + __SRPREP_SIZE__)
+	lda	#>(__SRPREP_LOAD__ + __SRPREP_SIZE__ + __SHADOW_RAM_SIZE__)
 	sta	ptr3+1
-	lda	#<(__SRPREP_LOAD__ + __SRPREP_SIZE__)
+	lda	#<(__SRPREP_LOAD__ + __SRPREP_SIZE__ + __SHADOW_RAM_SIZE__)
 	sta	ptr3
 	beq	cg_addr_ok
 
@@ -250,7 +250,7 @@ no_copy:
 	lda	#>__CHARGEN_SIZE__
 	sta	tmp2
 	lda	#<__CHARGEN_SIZE__
-	sta	tmp2+1
+	sta	tmp1
 	jsr	memcopy
 
 ; re-enable ROM

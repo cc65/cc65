@@ -26,6 +26,7 @@ YSIZE   =       8                       ; System font height
 
         .byte   $74, $67, $69           ; "tgi"
         .byte   TGI_API_VERSION         ; TGI API version number
+        .addr   $0000                   ; Library reference
         .word   240                     ; X resolution
         .word   200                     ; Y resolution
         .byte   2                       ; Number of drawing colors

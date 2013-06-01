@@ -26,13 +26,14 @@
 
         .byte   $74, $67, $69           ; "tgi"
         .byte   TGI_API_VERSION         ; TGI API version number
+        .addr   $0000                   ; Library reference
 xres:   .word   charsperline*2          ; Max X resolution
 yres:   .word   56                      ; Max Y resolution
         .byte   2                       ; Number of drawing colors
         .byte   1                       ; Number of screens available
         .byte   2                       ; System font X size
         .byte   2                       ; System font Y size
-        .word   $100                    ; Aspect ratio
+        .word   $0100                   ; Aspect ratio
         .byte   0                       ; TGI driver flags
 
 ; Next comes the jump table. Currently all entries must be valid and may point

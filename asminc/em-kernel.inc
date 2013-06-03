@@ -39,28 +39,29 @@
 .struct EMD_HDR
         ID      .byte   3       ; Contains 0x65, 0x6d, 0x64 ("emd")
         VERSION .byte   1       ; Interface version
+        LIBREF  .addr           ; Library reference
         JUMPTAB .struct
-            INSTALL     .word   ; INSTALL routine
-            UNINSTALL   .word   ; UNINSTALL routine
-            PAGECOUNT   .word   ; PAGECOUNT routine
-            MAP .word   ; MAP routine
-            USE .word   ; USE routine
-            MAPCLEAN    .word   ; MAPCLEAN routine
-            COPYFROM    .word   ; COPYFROM routine
-            COPYTO      .word   ; COPYTO routine
+            INSTALL     .addr   ; INSTALL routine
+            UNINSTALL   .addr   ; UNINSTALL routine
+            PAGECOUNT   .addr   ; PAGECOUNT routine
+            MAP         .addr   ; MAP routine
+            USE         .addr   ; USE routine
+            MAPCLEAN    .addr   ; MAPCLEAN routine
+            COPYFROM    .addr   ; COPYFROM routine
+            COPYTO      .addr   ; COPYTO routine
         .endstruct
 .endstruct
 
 ;------------------------------------------------------------------------------
 ; The EMD API version, stored in EMD_HDR::VERSION
 
-EMD_API_VERSION         = $00
+EMD_API_VERSION         = $01
 
 ;------------------------------------------------------------------------------
 ; The asm equivalent to the C em_copy structure
 
 .struct EM_COPY
-        BUF     .word           ; Memory buffer to copy from or to
+        BUF     .addr           ; Memory buffer to copy from or to
         OFFS    .byte           ; Offset into page
         PAGE    .word           ; Starting page to copy from or to
         COUNT   .word           ; Number of bytes to copy

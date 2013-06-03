@@ -4,7 +4,7 @@
 ; Common functions of the extended memory API.
 ;
 
-        .import         return0
+        .import         return0, em_libref
         .importzp       ptr1
 
         .include        "em-kernel.inc"
@@ -54,6 +54,15 @@ _em_install:
         bne     inv_drv
         dey
         bpl     @L0
+
+; Set the library reference
+
+        ldy     #EMD_HDR::LIBREF
+        lda     #<em_libref
+        sta     (ptr1),y
+        iny
+        lda     #>em_libref
+        sta     (ptr1),y
 
 ; Copy the jump vectors
 

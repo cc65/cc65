@@ -22,6 +22,10 @@
         .byte $6A, $6F, $79     ; "joy"
         .byte JOY_API_VERSION   ; Driver API version number
 
+; Library reference
+
+        .addr   $0000
+
 ; Button state masks (8 values)
 
         .byte $01               ; JOY_UP

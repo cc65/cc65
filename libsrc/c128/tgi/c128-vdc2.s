@@ -56,6 +56,7 @@ VDC_DATA          = 31
 
         .byte   $74, $67, $69           ; "tgi"
         .byte   TGI_API_VERSION         ; TGI API version number
+        .addr   $0000                   ; Library reference
 xres:   .word   640                     ; X resolution
 yres:   .word   480                     ; Y resolution
         .byte   2                       ; Number of drawing colors

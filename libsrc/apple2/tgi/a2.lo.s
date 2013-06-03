@@ -47,6 +47,7 @@ Y2      :=      ptr4
 
         .byte   $74, $67, $69   ; "tgi"
         .byte   TGI_API_VERSION ; TGI API version number
+        .addr   $0000           ; Library reference
         .word   40              ; X resolution
         .word   48              ; Y resolution
         .byte   16              ; Number of drawing colors

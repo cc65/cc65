@@ -39,6 +39,7 @@
 .struct TGI_HDR
         ID                  .byte   3   ; Contains 0x74, 0x67, 0x69 ("tgi")
         VERSION             .byte   1   ; Interface version
+        LIBREF              .addr       ; Library reference
         VARS                .struct
             XRES            .word   1   ; X resolution
             YRES            .word   1   ; Y resolution

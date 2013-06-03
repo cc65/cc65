@@ -34,7 +34,10 @@ status          := $0778
         .byte   $6D, $6F, $75           ; "mou"
         .byte   MOUSE_API_VERSION       ; Mouse driver API version number
 
-        ; Jump table.
+        ; Library reference
+        .addr   $0000
+
+        ; Jump table
         .addr   INSTALL
         .addr   UNINSTALL
         .addr   HIDE

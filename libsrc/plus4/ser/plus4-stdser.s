@@ -37,7 +37,11 @@
         .byte   $73, $65, $72           ; "ser"
         .byte   SER_API_VERSION         ; Serial API version number
 
-; Jump table.
+; Library reference
+
+        .addr   $0000
+
+; Jump table
 
         .word   INSTALL
         .word   UNINSTALL

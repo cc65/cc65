@@ -1,7 +1,7 @@
 ;
 ; Driver for the Inkwell Systems 170-C and 184-C lightpens.
 ;
-; 2013-05-18, Greg King
+; 2013-06-03, Greg King
 ;
 
         .include        "zeropage.inc"
@@ -22,6 +22,10 @@ HEADER:
 
         .byte   $6d, $6f, $75           ; ASCII "mou"
         .byte   MOUSE_API_VERSION       ; Mouse driver API version number
+
+; Library reference
+
+        .addr   $0000
 
 ; Jump table
 

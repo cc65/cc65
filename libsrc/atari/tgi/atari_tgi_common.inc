@@ -18,6 +18,7 @@
 
         .byte   $74, $67, $69           ; "tgi"
         .byte   TGI_API_VERSION         ; TGI API version number
+        .addr   $0000                   ; Library reference
         .word   x_res                   ; X resolution
         .word   y_res                   ; Y resolution
         .byte   colors                  ; Number of drawing colors

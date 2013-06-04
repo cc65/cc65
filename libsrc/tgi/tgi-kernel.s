@@ -4,11 +4,12 @@
 ; Common functions of the tgi graphics kernel.
 ;
 
-        .include        "tgi-kernel.inc"
-        .include        "tgi-error.inc"
-
+        .import         tgi_libref
         .importzp       ptr1
         .interruptor    tgi_irq         ; Export as IRQ handler
+
+        .include        "tgi-kernel.inc"
+        .include        "tgi-error.inc"
 
 
 ;----------------------------------------------------------------------------
@@ -107,6 +108,15 @@ _tgi_install:
         bne     tgi_inv_drv
         dey
         bpl     @L0
+
+; Set the library reference
+
+        ldy     #TGI_HDR::LIBREF
+        lda     #<tgi_libref
+        sta     (ptr1),y
+        iny
+        lda     #>tgi_libref
+        sta     (ptr1),y
 
 ; Copy the jump vectors
 

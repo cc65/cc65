@@ -4,7 +4,7 @@
 ; Common functions of the mouse driver API.
 ;
 
-        .import         return0, popsreg, incsp2
+        .import         return0, popsreg, incsp2, mouse_libref
         .importzp       sreg, ptr1, tmp1, tmp2
         .interruptor    mouse_irq               ; Export as IRQ handler
 
@@ -63,6 +63,15 @@ _mouse_install:
         bne     inv_drv
         dey
         bpl     @L0
+
+; Set the library reference
+
+        ldy     #MOUSE_HDR::LIBREF
+        lda     #<mouse_libref
+        sta     (ptr1),y
+        iny
+        lda     #>mouse_libref
+        sta     (ptr1),y
 
 ; Reset flags
 

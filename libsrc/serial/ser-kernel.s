@@ -4,7 +4,7 @@
 ; Common functions of the serial drivers
 ;
 
-        .import         return0
+        .import         return0, ser_libref
         .importzp       ptr1
         .interruptor    ser_irq, 29     ; Export as high priority IRQ handler
 
@@ -57,6 +57,15 @@ _ser_install:
         bne     inv_drv
         dey
         bpl     @L0
+
+; Set the library reference
+
+        ldy     #SER_HDR::LIBREF
+        lda     #<ser_libref
+        sta     (ptr1),y
+        iny
+        lda     #>ser_libref
+        sta     (ptr1),y
 
 ; Copy the jump vectors
 

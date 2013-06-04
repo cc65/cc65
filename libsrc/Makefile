@@ -206,6 +206,8 @@ CC := $(if $(wildcard ../bin/cc65*),../bin/cc65,cc65)
 CO := $(if $(wildcard ../bin/co65*),../bin/co65,co65)
 LD := $(if $(wildcard ../bin/ld65*),../bin/ld65,ld65)
 
+export CC65_HOME := $(abspath ..)
+
 ##########
 
 define ASSEMBLE_recipe

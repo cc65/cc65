@@ -39,16 +39,17 @@
 .struct SER_HDR
         ID      .byte   3       ; Contains 0x73, 0x65, 0x72 ("ser")
         VERSION .byte   1       ; Interface version
+        LIBREF  .addr           ; Library reference
         JUMPTAB .struct
-            INSTALL     .word   ; INSTALL routine
-            UNINSTALL   .word   ; UNINSTALL routine
-            OPEN        .word   ; OPEN routine
-            CLOSE       .word   ; CLOSE routine
-            GET         .word   ; GET routine
-            PUT         .word   ; PUT routine
-            STATUS      .word   ; STATUS routine
-            IOCTL       .word   ; IOCTL routine
-            IRQ         .word   ; IRQ routine
+            INSTALL     .addr   ; INSTALL routine
+            UNINSTALL   .addr   ; UNINSTALL routine
+            OPEN        .addr   ; OPEN routine
+            CLOSE       .addr   ; CLOSE routine
+            GET         .addr   ; GET routine
+            PUT         .addr   ; PUT routine
+            STATUS      .addr   ; STATUS routine
+            IOCTL       .addr   ; IOCTL routine
+            IRQ         .addr   ; IRQ routine
         .endstruct
 .endstruct
 
@@ -56,7 +57,7 @@
 ;------------------------------------------------------------------------------
 ; The SER API version, stored SER_HDR::VERSION
 
-SER_API_VERSION         = $00
+SER_API_VERSION         = $01
 
 ;------------------------------------------------------------------------------
 ; ser_params

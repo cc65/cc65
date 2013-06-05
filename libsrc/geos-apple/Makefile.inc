@@ -1,1 +1,1 @@
-AFLAGS += -I geos-apple -I geos-common
+CA65FLAGS += -I geos-apple -I geos-common

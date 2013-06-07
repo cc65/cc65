@@ -52,13 +52,13 @@ LOCKFL  = $23           ;lock file (set to read-only)
 UNLOCK  = $24           ;unlock file
 POINT   = $25           ;point sector
 NOTE    = $26           ;note sector
-GETFL	= $27		;get file length
-CHDIR_MYDOS	= $29	;change directory (MyDOS)
-MKDIR	= $2A		;make directory (MyDOS/SpartaDOS)
-CHDIR_SPDOS	= $2C	;change directory (SpartaDOS)
+GETFL   = $27           ;get file length
+CHDIR_MYDOS     = $29   ;change directory (MyDOS)
+MKDIR   = $2A           ;make directory (MyDOS/SpartaDOS)
+CHDIR_SPDOS     = $2C   ;change directory (SpartaDOS)
 FORMAT  = $FE           ;format
 
-GETCWD	= $30		;get current directory (MyDOS/SpartaDOS)
+GETCWD  = $30           ;get current directory (MyDOS/SpartaDOS)
 
 ; Special Entry Command Equates
 ; DOS Commands

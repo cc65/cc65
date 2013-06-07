@@ -44,9 +44,34 @@ CLOSE   = $0C           ;close
 STATIS  = $0D           ;status
 SPECIL  = $0E           ;special
 
-; Special Entry Command Equates
+; DOS IOCB command codes
 
-; Screen Commands
+RENAME  = $20           ;rename disk file
+DELETE  = $21           ;delete disk file
+LOCKFL  = $23           ;lock file (set to read-only)
+UNLOCK  = $24           ;unlock file
+POINT   = $25           ;point sector
+NOTE    = $26           ;note sector
+GETFL	= $27		;get file length
+CHDIR_MYDOS	= $29	;change directory (MyDOS)
+MKDIR	= $2A		;make directory (MyDOS/SpartaDOS)
+CHDIR_SPDOS	= $2C	;change directory (SpartaDOS)
+FORMAT  = $FE           ;format
+
+GETCWD	= $30		;get current directory (MyDOS/SpartaDOS)
+
+; Special Entry Command Equates
+; DOS Commands
+; Command line table, Index values for (DOSVEC),Y -- COMTAB
+; Compatible with OS/A+, DOS XL and SpartaDOS
+
+COMTAB  = 0             ;DOS entry jump vector
+ZCRNAME = 3             ;file name crunch routine jump vector
+BUFOFF  = 10            ;next parameter buffer offset
+COMFNAM = 33            ;destination buffer for crunch routine
+LBUF    = 63            ;command line input buffer
+
+; Screen IOCB Commands
 
 DRAWLN  = $11           ;draw line
 FILLIN  = $12           ;draw line with right fill
@@ -710,6 +735,9 @@ FPSCR1  = $05EC         ;6-byte floating point temporary
 
 ;LBFEND = $05FF         ;##old## END OF LBUFF
 
+
+DOS     = $0700
+
 ;-------------------------------------------------------------------------
 ; Cartridge Address Equates
 ;-------------------------------------------------------------------------
@@ -1028,29 +1056,6 @@ BMEMTOP = $90           ;2-byte top of memory pointer
 STOPLN  = $BA           ;2-byte stopped line number
 ERRSAVE = $C3           ;1-byte error code
 PTABW   = $C9           ;1-byte tab width
-
-;-------------------------------------------------------------------------
-; DOS
-;-------------------------------------------------------------------------
-
-DOS     = $0700
-
-RENAME  = $20           ;RENAME DISK FILE
-DELETE  = $21           ;DELETE DISK FILE
-LOCKFL  = $23           ;LOCK FILE TO READ ONLY
-UNLOCK  = $24           ;UNLOCK LOCKED FILE
-POINT   = $25           ;POINT SECTOR
-NOTE    = $26           ;NOTE SECTOR
-FORMAT  = $FE           ;FORMAT
-
-; Command line table, Index values for (DOSVEC),Y -- COMTAB
-; Compatible with OS/A+, DOS XL and SpartaDOS
-
-COMTAB  = 0             ;DOS entry jump vector
-ZCRNAME = 3             ;file name crunch routine jump vector
-BUFOFF  = 10            ;next parameter buffer offset
-COMFNAM = 33            ;destination buffer for crunch routine
-LBUF    = 63            ;command line input buffer
 
 ;-------------------------------------------------------------------------
 ; ATASCII CHARACTER DEFS

@@ -61,7 +61,7 @@ ucok1:
         sta     ICBAH,y
         tya
         tax
-        lda     #42
+        lda     #MKDIR
         sta     ICCOM,x
         lda     #8
         sta     ICAX1,x

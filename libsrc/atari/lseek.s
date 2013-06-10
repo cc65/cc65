@@ -68,7 +68,7 @@ iocberr:jsr     incsp6
 
 ; SEEK_CUR
 cur:    ldx     tmp3
-        lda     #38             ; NOTE
+        lda     #NOTE
         sta     ICCOM,x
         jsr     CIOV            ; read it
         bmi     xxerr
@@ -84,7 +84,7 @@ l01:    lda     ICAX3,x         ; low byte of position
 
 ; SEEK_END
 end:    ldx     tmp3
-        lda     #39             ; get file size
+        lda     #GETFL
         sta     ICCOM,x
         jsr     CIOV
         bpl     l01
@@ -126,7 +126,7 @@ ret:    jsr     incsp6
 .if 0
         ; return exactly the position DOS has
         ldx     tmp3
-        lda     #38             ; NOTE
+        lda     #NOTE
         sta     ICCOM,x
         jsr     CIOV            ; read it
         bmi     xxerr
@@ -168,7 +168,7 @@ seek:   jsr     ldax0sp         ; get lower word of new offset
         sta     ICAX4,x
         lda     ptr4
         sta     ICAX5,x
-        lda     #37             ;POINT
+        lda     #POINT
         sta     ICCOM,x
         jsr     CIOV
         bpl     ret
@@ -201,7 +201,7 @@ chk_supp:
         cmp     #$40
         bcs     supp1           ; SD-X (ver 4.xx) supports seeking on all disks
         ldx     tmp3            ; iocb to use
-        lda     #39             ; get file size
+        lda     #GETFL
         sta     ICCOM,x
         jsr     CIOV
         bmi     notsupp         ; error code ? should be 168 (invalid command)

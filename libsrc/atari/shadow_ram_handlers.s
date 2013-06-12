@@ -94,7 +94,7 @@ sram_init:
 .segment        "EXTZP" : zeropage
 
 zpptr1:	.res	2
-zpptr2:	.res	2
+;zpptr2:	.res	2
 
 
 .segment "LOWBUFS"
@@ -195,17 +195,6 @@ CIOV_call:
 	rts
 
 
-
-
-CIO_write:
-	lda	ICBLL,x
-	ora	ICBLH,x
-	beq	CIO_call_a		; special I/O through A register in case buffer length is 0
-
-	;...
-	bne	CIO_call_a
-
-
 ; CIO handler
 ; We have buffer pointer and length entries in the IOCB, but their
 ; usage depends on the function.
@@ -220,9 +209,6 @@ CIO_write:
 
 my_CIOV:
 
-	;jmp	CIOV_call
-	;brk
-
 ; @@@ TODO: check X for valid IOCB index ((X < $80) and ((X & $F) == 0))
 
 	sta	CIO_a
@@ -235,7 +221,7 @@ my_CIOV:
 	cmp	#PUTREC
 	bcc	CIO_read		; input (GETREC or GETCHR)
 	cmp	#CLOSE
-	bcc	CIO_write		; output (PUTREC or PUTCHR)
+	bcc	CIO_write_jmp		; output (PUTREC or PUTCHR)
 	beq	CIO_call_a		; pass through, buffer not used
 	cmp	#RENAME			; 2 filenames as input parameters in buffer, length not used
 	beq	CIO_filename2
@@ -245,11 +231,19 @@ my_CIOV:
 	bcs	CIO_call_a		; other commands: assume no buffer
 ; not reached
 
+CIO_write_jmp:
+	jmp	CIO_write
+
+
+; READ handler
+; ------------
 
 CIO_read:
 	lda	ICBLL,x
 	ora	ICBLH,x
 	beq	CIO_call_a		; special I/O through A register in case buffer length is 0
+
+; @@@ TODO: check if bounce buffer is really needed because buffer is in ROM area
 
 ; If the data length is larger than our bounce buffer, we have to split the request into smaller ones.
 ; Otherwise we can get away with one call and a copy to the final destination afterwards.
@@ -267,16 +261,16 @@ CIO_read:
 	jsr	ciobuf_to_iocb
 	jsr	CIO_call_a		; call CIO
 	php
-	bpl	no_err
+	bpl	@no_err
 	cpy	#EOFERR
-	beq	no_err
+	beq	@no_err
 	pha
 	jsr	restore_icba
 	pla
 	plp
 	rts				; return with error
 
-no_err:
+@no_err:
 	sta	CIO_a
 	sty	CIO_y
 
@@ -356,6 +350,7 @@ br_no_err:
 	bne	br_done
 
 ; update user buffer pointer (zpptr1)
+	clc
 	lda	zpptr1
 	adc	ICBLL,x
 	sta	zpptr1
@@ -394,6 +389,149 @@ br_done:
 
 
 
+CIO_call_a_jmp:
+	jmp	CIO_call_a
+
+
+
+; WRITE handler
+; -------------
+
+
+CIO_write:
+	lda	ICBLL,x
+	ora	ICBLH,x
+	beq	CIO_call_a_jmp		; special I/O through A register in case buffer length is 0
+
+; @@@ TODO: check if bounce buffer is really needed because buffer is in ROM area
+
+; If the data length is larger than our bounce buffer, we have to split the request into smaller ones.
+; Otherwise we can get away with a copy to the bounce buffer and the call.
+
+	lda	ICBLH,x			; get high byte of length
+	bne	big_write		; not zero -> data too large for our buffers
+					; CHANGE HERE TO SUPPORT BOUNCE BUFFERS > 255 BYTES
+	lda	#<BUFSZ_CIO
+	cmp	ICBLL,x
+	bcc	big_write
+
+
+; Data size fits into bounce buffer
+
+	jsr	setup_zpptr1
+	jsr	ciobuf_to_iocb
+	jsr	copy_from_user
+	ldy	CIO_y
+	jsr	CIO_call_a
+	php
+	pha
+	jsr	restore_icba
+	pla
+	plp
+	rts				; return to application
+
+
+; Data size does not fit into bounce buffer
+
+big_write:
+	lda	#0
+	sta	retlen			; initialize return length
+	sta	retlen+1
+	jsr	iocblen_to_orig_len
+	jsr	iocbptr_to_orig_ptr
+	jsr	setup_zpptr1
+	jsr	ciobuf_to_iocb		; let ICBAL/ICBAH point to bounce buffer
+
+bw_loop:
+	jsr	cmp_orig_len_cio_bufsz	; is transfer length > bounce buffer size?
+	bcs	bw_last			; no, last transfer, use remaining size
+
+	lda	#>BUFSZ_CIO
+	sta	ICBLH,x			; set data length
+	lda	#<BUFSZ_CIO
+	sta	ICBLL,x
+	bne	bw_cont
+
+bw_last:
+	lda	orig_len+1
+	sta	ICBLH,x			; set data length
+	lda	orig_len
+	sta	ICBLL,x
+
+bw_cont:
+	sta	req_len			; remember length of this request
+	lda	ICBLH,x
+	sta	req_len+1
+	jsr	copy_from_user
+	jsr	CIO_call_a		; do the request
+	php
+	bpl	bw_no_err
+
+	plp
+	rts				; error return
+
+bw_no_err:
+	sta	CIO_a
+	sty	CIO_y
+	pla
+	sta	CIO_p
+
+; update retlen
+	clc
+	lda	retlen
+	adc	ICBLL,x
+	sta	retlen
+	lda	retlen+1
+	adc	#0
+	sta	retlen+1
+
+; if the request wrote less bytes than requested, we're done
+	lda	ICBLL,x
+	cmp	req_len
+	bne	bw_done
+	lda	ICBLH,x
+	cmp	req_len+1
+	bne	bw_done
+
+; update user buffer pointer (zpptr1)
+	clc
+	lda	zpptr1
+	adc	ICBLL,x
+	sta	zpptr1
+	lda	zpptr1+1
+	adc	#0
+	sta	zpptr1+1
+
+; update remaining length
+	sec
+	lda	orig_len
+	sbc	ICBLL,x
+	sta	orig_len
+	lda	orig_len+1
+	sbc	#0
+	sta	orig_len+1
+
+; still something left to do (remaining length != 0)?
+	lda	orig_len
+	ora	orig_len+1
+	beq	bw_done
+	jmp	bw_loop
+
+bw_done:
+	lda	retlen
+	sta	ICBLL,x
+	lda	retlen+1
+	sta	ICBLH,x
+	jsr	orig_ptr_to_iocbptr
+	lda	CIO_p
+	pha
+	lda	CIO_a
+	ldy	CIO_y
+	plp
+	rts				; return with success
+
+
+
 ; check if length is larger than bounce buffer size
 ; input:   orig_len - length
 ; output:         A - destroyed
@@ -414,13 +552,30 @@ cmp_orig_len_cio_bufsz:
 ;	   Y - 0
 copy_to_user:
 	ldy	ICBLL,x			; get # of bytes read (CHANGE HERE TO SUPPORT BOUNCE BUFFERS > 255 BYTES)
-	beq	copy_done
-copy:	dey
+	beq	@copy_done
+@copy:	dey
 	lda	CIO_buffer,y
 	sta	(zpptr1),y
 	cpy	#0
-	bne	copy
-copy_done:
+	bne	@copy
+@copy_done:
+	rts
+
+
+; copy data from user buffer into bounce buffer
+; input:   X - IOCB index
+;     zpptr1 - pointer to user buffer
+; output:  A - destroyed
+;	   Y - 0
+copy_from_user:
+	ldy	ICBLL,x			; get # of bytes to write (CHANGE HERE TO SUPPORT BOUNCE BUFFERS > 255 BYTES)
+	beq	@copy_done
+@copy:	dey
+	lda	(zpptr1),y
+	sta	CIO_buffer,y
+	cpy	#0
+	bne	@copy
+@copy_done:
 	rts
 
 

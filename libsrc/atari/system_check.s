@@ -11,6 +11,8 @@
 ; Christian Groessler, chris@groessler.org, 2013
 ;
 
+DEBUG	=	1
+
 .if .defined(__ATARIXL__)
 
 	.export		syschk
@@ -118,6 +120,10 @@ sys_ok:	lda	#<__SAVEAREA_LOAD__
 
 ; all is well(tm), launch the application
 memlo_ok:
+.ifdef DEBUG
+	print_string "Stage #1 OK"
+	jsr	delay
+.endif
 	rts
 
 

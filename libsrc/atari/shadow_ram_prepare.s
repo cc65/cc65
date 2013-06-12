@@ -9,6 +9,8 @@
 ; Christian Groessler, chris@groessler.org, 2013
 ;
 
+DEBUG	=	1
+
 .if .defined(__ATARIXL__)
 
 	.export		sramprep
@@ -162,8 +164,10 @@ okoko:
         sta     ICCOM,x
         jsr     CIOV_org
 
-	print_string "GR 0 OKOKO"
+.ifdef DEBUG
+	print_string "Stage #2 OK"
 	jsr	delay
+.endif
 
 
 ; Save the zero page locations we need

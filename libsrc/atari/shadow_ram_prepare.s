@@ -148,7 +148,7 @@ sys_ok:	lda	#<__SAVEAREA_LOAD__
         jsr     CIOV_org
 	bpl	okoko
 
-	print_string "GR 0 FAILED"
+	print_string "Internal error, aborting..."
 	jsr	delay
 	jsr	delay
 	jsr	delay

@@ -9,6 +9,7 @@
 
         .include        "atari.inc"
 	.include	"save_area.inc"
+        .include        "zeropage.inc"
 	.import		__CHARGEN_START__
 
 	.export		sram_init
@@ -19,19 +20,14 @@ BUFSZ_CIO	=	BUFSZ
 BUFSZ_SIO	=	BUFSZ
 
 .macro	disable_rom
-	.local	cont
-	;dec	enable_count
-	;bne	cont
 	lda	PORTB
 	and	#$fe
 	sta	PORTB
 	lda	#>__CHARGEN_START__
 	sta	CHBAS
 	sta	CHBASE
-cont:
 .endmacro
 .macro	enable_rom
-	;inc	enable_count
 	lda	PORTB
 	ora	#1
 	sta	PORTB
@@ -42,7 +38,7 @@ cont:
 
 .segment "INIT"
 
-enable_count:	.res	1
+;enable_count:	.res	1
 
 ; Turn off ROMs, install system and interrupt wrappers, set new chargen pointer
 
@@ -55,7 +51,7 @@ sram_init:
 
 ; disable ROMs
 	;inx
-	stx	enable_count
+	;stx	enable_count
 	disable_rom
 
 ; setup interrupt vectors
@@ -95,15 +91,21 @@ sram_init:
 
 	rts
 
+.segment        "EXTZP" : zeropage
+
+zpptr1:	.res	2
+zpptr2:	.res	2
+
 
 .segment "LOWBUFS"
 
 ; bounce buffers for CIO and SIO calls
-CIOV_buffer:	.res	BUFSZ_CIO
-SIOV_buffer:	.res	BUFSZ_SIO
+CIO_buffer:	.res	BUFSZ_CIO
+SIO_buffer:	.res	BUFSZ_SIO
 
 
 .segment "LOWCODE"
+
 
 ; Interrupt handlers
 ; ------------------
@@ -142,95 +144,40 @@ my_RESET_han:
 ; System request handlers
 ; -----------------------
 
-; CIO handler
-; We have buffer pointer and length entries in the IOCB, but their
-; usage depends on the function.
-; Some functions don't care about both (pointer and length), and some
-; only use the pointer (like e.g. OPEN), and some use both.
-; So we need function specific handlers to correctly deal with
-; buffers which are overlapping with the ROM area.
-; All input and output registers need to be preserved (I'm not 100%
-; sure about Y, but let's preserve it for now.)
-;
-; FIXME: Currently only the requests used by the runtime lib are handled.
 
-my_CIOV:
+; for filenames we assume they will fit into our bounce buffer
 
-; @@@ TODO: check X for valid IOCB index ((X < $80) and ((X & $F) == 0))
+; one filename, terminated by "invalid character", located at ICBAL/ICBAH
 
-	sta	CIO_a
-	sty	CIO_y
-	stx	CIO_x
-
-	lda	ICCOM,x			; get function
-	cmp	#OPEN
-	beq	CIO_filename		; filename as input parameter in buffer, length not used
-	cmp	#PUTREC
-	bcc	CIO_read		; input (GETREC or GETCHR)
-	cmp	#CLOSE
-	bcc	CIO_write		; output (PUTREC or PUTCHR)
-	beq	CIO_pass		; pass through, buffer not used
-	cmp	#RENAME			; 2 filenames as input parameters in buffer, length not used
-	beq	CIO_filename2
-	cmp	GETCWD
-	bcc	CIO_filename		; filename as parameter in buffer, length not used
-	beq	CIO_read		; input
-	bcs	CIO_pass		; other command: assume no buffers
-
-
-
-.if 0		; all crap
-; check if buffer is potentially used (buffer length != 0)
-
+CIO_filename:
+	jsr	setup_zpptr1_y0
+	jsr	copy_filename
+CIO_fn_cont:
+	jsr	ciobuf_to_iocb
+	ldy	CIO_y
+	jsr	CIO_call_a		; call CIO (maybe A isn't needed, then we could call CIO_call)
+	php
 	pha
-	lda	ICBLL,x
-	ora	ICBLH,x
-	bne	could_be
+;@@@ check if X is preserved over CIO call
+	jsr	restore_icba		; restore original ICBAL/ICBAH
 	pla
-	jmp	CIOV_call
+	plp
+	rts				; back to application
 
-; buffer might be used by the request
 
-could_be:
+; two filenames, terminated and separated by "invalid character", located at ICBAL/ICBAH
 
-; check if buffer is inside ROM area
-
-	lda	ICBAH,x
-	cmp	#$C0			; if buffer is above $C000, it's definitely inside ROM area
-	bcs	need_work
-
-	lda	ICBAL,x			; low byte of buffer address
-	adc	ICBLL,x			; low byte of buffer length
-	lda	ICBAH,x			; high byte (address)
-	adc	ICBLH,x			; high byte (length)
-	cmp	#$C0
-	bcc	CIOV_call		; no need to use bounce buffers, just forward call to CIO
-
-need_work:
-
-; Check if length is bigger than the size of our bounce buffer.
-; If yes, we need to split the call into multiple calls.
-; @@@ FIXME: currently only supports bounce buffers < 256 bytes
-
-	lda	ICBLH,x			; high byte of length
-	bne	hard_work
-	lda	ICBLL,x			; low byte of length
-	cmp	#<BUFSZ_CIO
-	beq	little_work
-	bcs	hard_work
-
-; Request buffer is smaller or equal to our bounce buffer.
-; Copy the data into the bounce buffer, set bounce buffer address
-; in the IOCB, call CIO, and copy the output data back.
-; @@@ TODO: check for read/write and do only one of the copy operations
-little_work:
+CIO_filename2:
+	jsr	setup_zpptr1_y0
+	jsr	copy_filename
+	iny
+	jsr	copy_filename
+	jmp	CIO_fn_cont
 
 
 
-; Request buffer is larger than our bounce buffer.
-hard_work:
-
-.endif	; crap alert
+CIO_call_a:
+	lda	CIO_a
 
 CIOV_call:
 	pha
@@ -248,6 +195,321 @@ CIOV_call:
 	rts
 
 
+
+
+CIO_write:
+	lda	ICBLL,x
+	ora	ICBLH,x
+	beq	CIO_call_a		; special I/O through A register in case buffer length is 0
+
+	;...
+	bne	CIO_call_a
+
+
+; CIO handler
+; We have buffer pointer and length entries in the IOCB, but their
+; usage depends on the function.
+; Some functions don't care about any of them (pointer and length),
+; and some only use the pointer (like e.g. OPEN), and some use both.
+; So we need function specific handlers to correctly deal with
+; buffers which are overlapping with the ROM area.
+; All input and output registers need to be preserved (I'm not 100%
+; sure about Y as input, but let's preserve it for now.)
+;
+; FIXME: Currently only the requests used by the runtime lib are handled.
+
+my_CIOV:
+
+	;jmp	CIOV_call
+	;brk
+
+; @@@ TODO: check X for valid IOCB index ((X < $80) and ((X & $F) == 0))
+
+	sta	CIO_a
+	sty	CIO_y
+	stx	CIO_x
+
+	lda	ICCOM,x			; get function
+	cmp	#OPEN
+	beq	CIO_filename		; filename as input parameter in buffer, length not used
+	cmp	#PUTREC
+	bcc	CIO_read		; input (GETREC or GETCHR)
+	cmp	#CLOSE
+	bcc	CIO_write		; output (PUTREC or PUTCHR)
+	beq	CIO_call_a		; pass through, buffer not used
+	cmp	#RENAME			; 2 filenames as input parameters in buffer, length not used
+	beq	CIO_filename2
+	cmp	#GETCWD
+	bcc	CIO_filename		; filename as input parameter in buffer, length not used
+	beq	CIO_read		; input
+	bcs	CIO_call_a		; other commands: assume no buffer
+; not reached
+
+
+CIO_read:
+	lda	ICBLL,x
+	ora	ICBLH,x
+	beq	CIO_call_a		; special I/O through A register in case buffer length is 0
+
+; If the data length is larger than our bounce buffer, we have to split the request into smaller ones.
+; Otherwise we can get away with one call and a copy to the final destination afterwards.
+
+	lda	ICBLH,x			; get high byte of length
+	bne	big_read		; not zero -> data too large for our buffers
+					; CHANGE HERE TO SUPPORT BOUNCE BUFFERS > 255 BYTES
+	lda	#<BUFSZ_CIO
+	cmp	ICBLL,x
+	bcc	big_read
+
+; Data size fits into bounce buffer
+
+	jsr	setup_zpptr1
+	jsr	ciobuf_to_iocb
+	jsr	CIO_call_a		; call CIO
+	php
+	bpl	no_err
+	cpy	#EOFERR
+	beq	no_err
+	pha
+	jsr	restore_icba
+	pla
+	plp
+	rts				; return with error
+
+no_err:
+	sta	CIO_a
+	sty	CIO_y
+
+	jsr	copy_to_user		; copy data into user buffer
+	jsr	restore_icba
+
+	lda	CIO_a
+	ldy	CIO_y
+	plp
+	rts				; return with success
+
+; Data size does not fit into bounce buffer
+
+big_read:
+	lda	#0
+	sta	retlen			; initialize return length
+	sta	retlen+1
+	jsr	iocblen_to_orig_len
+	jsr	iocbptr_to_orig_ptr
+	jsr	setup_zpptr1
+	jsr	ciobuf_to_iocb		; let ICBAL/ICBAH point to bounce buffer
+
+br_loop:
+	jsr	cmp_orig_len_cio_bufsz	; is transfer length > bounce buffer size?
+	bcs	br_last			; no, last transfer, use remaining size
+
+	lda	#>BUFSZ_CIO
+	sta	ICBLH,x			; set data length
+	lda	#<BUFSZ_CIO
+	sta	ICBLL,x
+	bne	br_cont
+
+br_last:
+	lda	orig_len+1
+	sta	ICBLH,x			; set data length
+	lda	orig_len
+	sta	ICBLL,x
+
+br_cont:
+	sta	req_len			; remember length of this request
+	lda	ICBLH,x
+	sta	req_len+1
+	jsr	CIO_call_a		; do the request
+	php
+	bpl	br_no_err
+	cpy	#EOFERR
+	beq	br_no_err
+
+	pha
+	jsr	restore_icba
+	pla
+	plp
+	rts				; return with error
+
+br_no_err:
+	sta	CIO_a
+	sty	CIO_y
+	pla
+	sta	CIO_p
+	jsr	copy_to_user
+
+; update retlen
+	clc
+	lda	retlen
+	adc	ICBLL,x
+	sta	retlen
+	lda	retlen+1
+	adc	#0
+	sta	retlen+1
+
+; if the request read less bytes than requested, we're done
+	lda	ICBLL,x
+	cmp	req_len
+	bne	br_done
+	lda	ICBLH,x
+	cmp	req_len+1
+	bne	br_done
+
+; update user buffer pointer (zpptr1)
+	lda	zpptr1
+	adc	ICBLL,x
+	sta	zpptr1
+	lda	zpptr1+1
+	adc	#0
+	sta	zpptr1+1
+
+; update remaining length
+	sec
+	lda	orig_len
+	sbc	ICBLL,x
+	sta	orig_len
+	lda	orig_len+1
+	sbc	#0
+	sta	orig_len+1
+
+; still something left to do (remaining length != 0)?
+	lda	orig_len
+	ora	orig_len+1
+	beq	br_done
+	jmp	br_loop
+
+; done, write original buffer pointer and total transfer length to IOCB and return to application
+br_done:
+	lda	retlen
+	sta	ICBLL,x
+	lda	retlen+1
+	sta	ICBLH,x
+	jsr	orig_ptr_to_iocbptr
+	lda	CIO_p
+	pha
+	lda	CIO_a
+	ldy	CIO_y
+	plp
+	rts				; return with success
+
+
+
+; check if length is larger than bounce buffer size
+; input:   orig_len - length
+; output:         A - destroyed
+;                CF - 0/1 for larger/not larger
+cmp_orig_len_cio_bufsz:
+	sec
+	lda	#<BUFSZ_CIO
+	sbc	orig_len
+	lda	#>BUFSZ_CIO
+	sbc	orig_len+1
+	rts
+
+
+; copy data from bounce buffer into user buffer
+; input:   X - IOCB index
+;     zpptr1 - pointer to user buffer
+; output:  A - destroyed
+;	   Y - 0
+copy_to_user:
+	ldy	ICBLL,x			; get # of bytes read (CHANGE HERE TO SUPPORT BOUNCE BUFFERS > 255 BYTES)
+	beq	copy_done
+copy:	dey
+	lda	CIO_buffer,y
+	sta	(zpptr1),y
+	cpy	#0
+	bne	copy
+copy_done:
+	rts
+
+
+; copy ICBLL/ICBLH to 'orig_len'
+; input:   X - IOCB index
+; output:  A - destroyed
+iocblen_to_orig_len:
+	lda	ICBLL,x
+	sta	orig_len
+	lda	ICBLH,x
+	sta	orig_len+1
+	rts
+
+
+; copy ICBAL/ICBAH to 'orig_ptr'
+; input:   X - IOCB index
+; output:  A - destroyed
+iocbptr_to_orig_ptr:
+	lda	ICBAL,x
+	sta	orig_ptr
+	lda	ICBAH,x
+	sta	orig_ptr+1
+	rts
+
+
+; copy 'orig_ptr' to ICBAL/ICBAH
+; input:   X - IOCB index
+; output:  A - destroyed
+orig_ptr_to_iocbptr:
+	lda	orig_ptr
+	sta	ICBAL,x
+	lda	orig_ptr+1
+	sta	ICBAH,x
+	rts
+
+
+; restore original contents of ICBAL/ICBAH from 'zpptr1'
+; input:   X - IOCB index
+; output:  A - destroyed
+restore_icba:
+	lda	zpptr1
+	sta	ICBAL,x
+	lda	zpptr1+1
+	sta	ICBAH,x
+	rts
+
+
+; put bounce buffer address into ICBAL/ICBAH
+; input:   X - IOCB index
+; output:  A - destroyed
+ciobuf_to_iocb:
+	lda	#<CIO_buffer
+	sta	ICBAL,x
+	lda	#>CIO_buffer
+	sta	ICBAH,x
+	rts
+
+
+; copy file name pointed to by 'zpptr1' to bounce buffer 'CIO_buffer'
+; input:   Y - index into file name buffer and CIO_buffer
+; output:  Y - points to first invalid byte after file name
+;          A - destroyed
+copy_filename:
+	lda	(zpptr1),y
+	sta	CIO_buffer,y
+	beq	copy_fn_done
+	iny
+	cmp	#ATEOL
+	bne	copy_filename
+	dey
+copy_fn_done:
+	rts
+
+
+; write IOCB buffer address into zpptr1
+; input:   X - IOCB index
+; output:  Y - 0 (for setup_zpptr1_y0, else unchanged)
+;          A - destroyed
+setup_zpptr1_y0:
+	ldy	#0
+setup_zpptr1:
+	lda	ICBAL,x			; put buffer address into zp pointer
+	sta	zpptr1
+	lda	ICBAH,x
+	sta	zpptr1+1
+	rts
+
+;---------------------------------------------------------
+
 my_SIOV:
 	pha
 	lda	PORTB
@@ -263,6 +525,7 @@ my_SIOV:
 	plp
 	rts
 
+;---------------------------------------------------------
 
 KEYBDV_wrapper:
 
@@ -284,8 +547,16 @@ kret:	pha
 	pla
 	rts
 
+CIO_a:			.res	1
+CIO_x:			.res	1
+CIO_y:			.res	1
+CIO_p:			.res	1
 cur_CIOV_PORTB:		.res	1
 cur_SIOV_PORTB:		.res	1
 cur_KEYBDV_PORTB:	.res	1
+orig_ptr:		.res	2
+orig_len:		.res	2
+req_len:		.res	2
+retlen:			.res	2
 
 .endif	; .if .defined(__ATARIXL__)

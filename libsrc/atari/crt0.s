@@ -18,7 +18,9 @@
 	.import		__RAM_START__, __RAM_SIZE__
 	.import		zpsave
 	.import		sram_init
-
+.if .defined(__ATARIXL__)
+	.import		scrdev
+.endif
 
         .include        "zeropage.inc"
         .include        "atari.inc"
@@ -167,6 +169,8 @@ _exit:  jsr     donelib         ; Run module destructors
 
 	lda	PORTB_save
 	sta	PORTB
+	lda	RAMTOP_save
+	sta	RAMTOP
 	lda	MEMTOP_save
 	sta	MEMTOP
 	lda	MEMTOP_save+1
@@ -175,6 +179,33 @@ _exit:  jsr     donelib         ; Run module destructors
 	sta	APPMHI
 	lda	APPMHI_save+1
 	sta	APPMHI+1
+
+
+
+; ... issue a GRAPHICS 0 call (copied'n'pasted from TGI drivers)
+
+
+	ldx	#$50		; take any IOCB, hopefully free (@@@ fixme)
+
+        ; Reopen it in Graphics 0
+        lda     #OPEN
+        sta     ICCOM,x
+        lda     #OPNIN | OPNOT
+        sta     ICAX1,x
+        lda     #0
+        sta     ICAX2,x
+        lda     #<scrdev
+        sta     ICBAL,x
+        lda     #>scrdev
+        sta     ICBAH,x
+        lda     #3
+        sta     ICBLL,x
+        lda     #0
+        sta     ICBLH,x
+        jsr     CIOV_org
+
+
+
 .endif
 
 

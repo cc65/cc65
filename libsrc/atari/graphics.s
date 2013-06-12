@@ -15,6 +15,7 @@
         .import clriocb
         .import fdtoiocb
         .import newfd
+	.import	scrdev
         .importzp tmp1,tmp2,tmp3
 
         .include        "atari.inc"
@@ -100,8 +101,3 @@ cioerr: jsr     fddecusage      ; decrement usage counter of fd as open failed
         jmp     __do_oserror
 
 .endproc        ; __graphics
-
-
-        .rodata
-
-scrdev: .byte   "S:", 0

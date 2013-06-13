@@ -219,7 +219,7 @@ INLINE int CE_IsCallTo (const CodeEntry* E, const char* Name)
 #  define CE_IsCallTo(E, Name) ((E)->OPC == OP65_JSR && strcmp ((E)->Arg, (Name)) == 0)
 #endif
 
-int CE_UseLoadFlags (const CodeEntry* E);
+int CE_UseLoadFlags (CodeEntry* E);
 /* Return true if the instruction uses any flags that are set by a load of
  * a register (N and Z).
  */

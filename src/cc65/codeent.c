@@ -412,7 +412,7 @@ int CE_IsKnownImm (const CodeEntry* E, unsigned long Num)
 
 
 
-int CE_UseLoadFlags (const CodeEntry* E)
+int CE_UseLoadFlags (CodeEntry* E)
 /* Return true if the instruction uses any flags that are set by a load of
  * a register (N and Z).
  */
@@ -427,7 +427,7 @@ int CE_UseLoadFlags (const CodeEntry* E)
         while (E->Info & OF_UBRA) {
 
             /* Remember the entry so we can detect loops */
-            CollAppend (&C, (void*) E);
+            CollAppend (&C, E);
 
             /* Check the target */
             if (E->JumpTo == 0 || CollIndex (&C, E->JumpTo->Owner) >= 0) {

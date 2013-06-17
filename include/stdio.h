@@ -69,9 +69,9 @@ extern FILE* stderr;
 #define TMP_MAX         256
 
 /* Standard defines that are platform dependent */
-#if defined(__APPLE2__) || defined(__APPLE2ENH__)
+#if defined(__APPLE2__)
 #  define FILENAME_MAX  (64+1)
-#elif defined(__ATARI__) || defined(__ATARIXL__)
+#elif defined(__ATARI__)
 #  define FILENAME_MAX  (12+1)
 #elif defined(__LUNIX__)
 #  define FILENAME_MAX  (80+1)

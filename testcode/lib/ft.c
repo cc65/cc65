@@ -25,7 +25,7 @@
 extern int getsp(void);  /* is provided in getsp.s */
 
 /* Atari's fd indirection table */
-#if defined(__ATARI__) || defined(__ATARIXL__)
+#ifdef __ATARI__
 extern char __fd_index[];
 struct fd_t {
   char usage;
@@ -74,7 +74,7 @@ int main(int argc,char **argv)
         return(0);
     }
     printf("open success -- handle = $%x, sp = %d\n",fd,csp);
-#if defined(__ATARI__) || defined(__ATARIXL__)
+#ifdef __ATARI__
     printf("fd_index:\n ");
     for (i=0; i<12; i++) printf("%02X ",__fd_index[i]);
     printf("\nfd_table:\n");

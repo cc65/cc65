@@ -57,7 +57,9 @@ cont:	ldx	#0		; channel 0
 .segment        "SRPREP"
 
 sramprep:
+.ifdef DEBUG
 	print_string "in sramprep"
+.endif
 
 ; save values of modified system variables and ports
 

@@ -209,6 +209,7 @@ static void SetSys (const char* Sys)
             break;
 
         case TGT_ATARIXL:
+            NewSymbol ("__ATARI__", 1);
             NewSymbol ("__ATARIXL__", 1);
             break;
 
@@ -253,6 +254,7 @@ static void SetSys (const char* Sys)
             break;
 
         case TGT_APPLE2ENH:
+            NewSymbol ("__APPLE2__", 1);
             NewSymbol ("__APPLE2ENH__", 1);
             break;
 

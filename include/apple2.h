@@ -37,7 +37,7 @@
 
 
 /* Check for errors */
-#if !defined(__APPLE2__) && !defined(__APPLE2ENH__)
+#if !defined(__APPLE2__)
 #  error This module may only be used when compiling for the Apple ][!
 #endif
 
@@ -142,7 +142,7 @@ extern unsigned char _filetype;  /* Default 6 */
 extern unsigned int  _auxtype;   /* Default 0 */
 
 /* The addresses of the static drivers */
-#ifndef __APPLE2ENH__
+#if !defined(__APPLE2ENH__)
 extern void a2_auxmem_emd[];
 extern void a2_stdjoy_joy[];     /* Referred to by joy_static_stddrv[]   */
 extern void a2_stdmou_mou[];     /* Referred to by mouse_static_stddrv[] */

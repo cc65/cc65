@@ -28,7 +28,7 @@
 #define divfp(_a,_b)    ((((signed long)_a)<<fpshift)/(_b))
 
 /* Workaround missing clock stuff */
-#if defined(__APPLE2__) || defined(__APPLE2ENH__)
+#ifdef __APPLE2__
 #  define clock()       0
 #  define CLK_TCK       1
 #endif

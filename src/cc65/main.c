@@ -165,6 +165,7 @@ static void SetSys (const char* Sys)
             break;
 
         case TGT_ATARIXL:
+            DefineNumericMacro ("__ATARI__", 1);
             DefineNumericMacro ("__ATARIXL__", 1);
             break;
 
@@ -209,6 +210,7 @@ static void SetSys (const char* Sys)
             break;
 
         case TGT_APPLE2ENH:
+            DefineNumericMacro ("__APPLE2__", 1);
             DefineNumericMacro ("__APPLE2ENH__", 1);
             break;
 

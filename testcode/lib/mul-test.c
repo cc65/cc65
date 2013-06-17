@@ -18,7 +18,7 @@ static const unsigned char small_bar[8] = {
     ' ', 0xa5, 0xb4, 0xb5, 0xa1, 0xb6, 0xaa, 0xa7
 };
 
-#elif defined(__ATARI__) || defined(__ATARIXL__)
+#elif defined(__ATARI__)
 #endif
 
 /* Screen co-ordinates for the progress meter */
@@ -39,7 +39,7 @@ static void ProgressMeter (unsigned Val)
     revers (revers_bar[Val]);
     cputc (small_bar[Val]);
 
-#elif defined(__ATARI__) || defined(__ATARIXL__)
+#elif defined(__ATARI__)
 #endif
 
     revers (0);

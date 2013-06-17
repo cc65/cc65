@@ -16,10 +16,10 @@
 #define DRIVERNAME      "cbm510-ram.emd"
 #elif defined(__CBM610__)
 #define DRIVERNAME      "cbm610-ram.emd"
-#elif defined(__APPLE2__)
-#define DRIVERNAME      "a2.auxmem.emd"
 #elif defined(__APPLE2ENH__)
 #define DRIVERNAME      "a2e.auxmem.emd"
+#elif defined(__APPLE2__)
+#define DRIVERNAME      "a2.auxmem.emd"
 #else
 #define DRIVERNAME      "unknown"
 #error "Unknown target system"

@@ -59,11 +59,11 @@
 #endif
 
 /* Include the correct machine-specific file */
-#if defined(__APPLE2__)
-#  include <apple2.h>
-#elif defined(__APPLE2ENH__)
+#if defined(__APPLE2ENH__)
 #  include <apple2enh.h>
-#elif defined(__ATARI__) || defined(__ATARIXL__)
+#elif defined(__APPLE2__)
+#  include <apple2.h>
+#elif defined(__ATARI__)
 #  include <atari.h>
 #elif defined(__ATMOS__)
 #  include <atmos.h>

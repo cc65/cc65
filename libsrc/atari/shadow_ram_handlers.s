@@ -4,6 +4,7 @@
 ; Christian Groessler, chris@groessler.org, 2013
 ;
 
+DEBUG	=	1
 
 .if .defined(__ATARIXL__)
 
@@ -132,9 +133,50 @@ ret:	disable_rom
 .endmacro
 
 my_IRQ_han:
+.ifdef DEBUG
+	php
+	pha
+	tya
+	pha
+	ldy	#0
+	lda	(SAVMSC),y
+	clc
+	adc	#1
+	sta	(SAVMSC),y
+	pla
+	tay
+	pla
+	plp
+.endif
 	int_wrap IRQ_save
 
 my_NMI_han:
+.ifdef DEBUG
+	php
+	pha
+	tya
+	pha
+	ldy	#39
+	lda	(SAVMSC),y
+	clc
+	adc	#1
+	sta	(SAVMSC),y
+	pla
+	tay
+	pla
+	plp
+.endif
+; set I bit to interrupted value
+	pha
+	txa
+	pha
+	tsx
+	lda	$103,x
+	pha
+	plp
+	pla
+	tax
+	pla
 	int_wrap NMI_save
 
 my_RESET_han:

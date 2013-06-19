@@ -51,8 +51,6 @@ sram_init:
 	stx	NMIEN		; disable NMI
 
 ; disable ROMs
-	;inx
-	;stx	enable_count
 	disable_rom
 
 ; setup interrupt vectors
@@ -95,7 +93,6 @@ sram_init:
 .segment        "EXTZP" : zeropage
 
 zpptr1:	.res	2
-;zpptr2:	.res	2
 
 
 .segment "LOWBUFS"
@@ -180,7 +177,8 @@ my_NMI_han:
 	int_wrap NMI_save
 
 my_RESET_han:
-	int_wrap RESET_save
+	enable_rom
+	jmp	(RESET_save)
 
 
 ; System request handlers
@@ -200,7 +198,6 @@ CIO_fn_cont:
 	jsr	CIO_call_a		; call CIO (maybe A isn't needed, then we could call CIO_call)
 	php
 	pha
-;@@@ check if X is preserved over CIO call
 	jsr	restore_icba		; restore original ICBAL/ICBAH
 	pla
 	plp

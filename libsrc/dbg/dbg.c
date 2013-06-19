@@ -104,7 +104,7 @@ static char GetKeyUpdate (void);
 #endif
 
 /* Replacement key definitions */
-#if (defined(__APPLE2__) && !defined(__APPLE2ENH__)) || defined(__LYNX__) || defined(__SIM6502__) || defined (__SIM65C02__) || defined(__SUPERVISION__)
+#ifndef CH_DEL
 #  define CH_DEL        ('H' - 'A' + 1)         /* Ctrl+H */
 #endif
 

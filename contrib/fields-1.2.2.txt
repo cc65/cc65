@@ -36,9 +36,18 @@ History:
 	*	Apple 2 cursor now supported.
 	*	Numbers are now signed.
 
+1.2.2:
+	*	Color definitions were moved out of the dialog struct
+	*	Apple2e support now tested
+	*	The byte order of the returned menu value was reversed
+	*	Money fields are now supported
+	*	Selection of 40- and 80-column modes now available on the
+		C128 and Apple2e.
+
 Known bugs:
 	*	Support for pre-C64 CBM computers and Apple 2 non-enhanced 
 		untested.
+	*	Number overflows are not trapped
 
 To Do:
 	*	String compression

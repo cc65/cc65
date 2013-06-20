@@ -90,27 +90,15 @@ is_xl:	lda	RAMSIZ
 fail:	jsr	delay
 	jmp	(DOSVEC)
 
-lowadr:	.res	2		; lowest address we need in order to move screen memory down, depending on start address of program
 
-
-; system is basically supported, check if there is enough space btw. MEMLO and our start address
-; to move screen memory there
-
-CMPVAL = 64+255+992		; you may ask, why these values...   @@@ document
-
-sys_ok:	lda	#<__SAVEAREA_LOAD__
-	sec
-	sbc	#<CMPVAL
-	sta	lowadr
-	lda	#>__SAVEAREA_LOAD__
-	sbc	#>CMPVAL
-	sta	lowadr+1
+sys_ok:
+.include "xlmemchk.inc"
 
 	sec
 	lda	MEMLO
-	sbc	lowadr
+	sbc	tstadr2
 	lda	MEMLO+1
-	sbc	lowadr+1
+	sbc	tstadr2+1
 	bcc	memlo_ok
 
 ; load address was too low

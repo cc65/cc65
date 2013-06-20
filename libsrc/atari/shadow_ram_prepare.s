@@ -107,24 +107,16 @@ sramprep:
 	ora	#2
 	sta	PORTB
 
+.include "xlmemchk.inc"
 
-; ... change system memory variables bla
-
-CMPVAL = 64+255+992		; you may ask, why these values...   @@@ document
-
-sys_ok:	lda	#<__SAVEAREA_LOAD__
-	sec
-	sbc	#<CMPVAL
-	sta	MEMTOP
-	sta	APPMHI
-	lda	#>__SAVEAREA_LOAD__
-	sbc	#>CMPVAL
+	ldx	tstadr2
+	stx	MEMTOP
+	stx	APPMHI
+	lda	tstadr2+1
 	sta	MEMTOP+1
 	sta	APPMHI+1
-
-	lda	#>__SAVEAREA_LOAD__ - 1
+	lda	lowadr+1
 	sta	RAMTOP
-
 
 
 ; ... issue a GRAPHICS 0 call (copied'n'pasted from TGI drivers)

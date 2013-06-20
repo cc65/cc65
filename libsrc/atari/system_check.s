@@ -92,13 +92,13 @@ fail:	jsr	delay
 
 
 sys_ok:
-.include "xlmemchk.inc"
+	.include "xlmemchk.inc"		; calculate lowest address we will use when we move the screen buffer down
 
 	sec
 	lda	MEMLO
-	sbc	tstadr2
+	sbc	lowadr
 	lda	MEMLO+1
-	sbc	tstadr2+1
+	sbc	lowadr+1
 	bcc	memlo_ok
 
 ; load address was too low

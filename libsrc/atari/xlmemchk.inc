@@ -1,12 +1,21 @@
-; ... change system memory variables bla
-
-
-	jmp	cont
-
-lowadr:	.word	__SAVEAREA_LOAD__ & $FF00		; our load address, rounded down to page boundary
-tstadr:	.res	2
-tstadr2:.res	2
-tmp:	.res	1
+;
+; Christian Groessler, Jun-2013
+;
+; This routine is used in preparation to move the screen memory
+; in front of the program.
+;
+; It calculates the value to put into RAMTOP for a subsequent
+; "GRAPHICS 0" call, and the lowest address which will be used
+; by the screen memory afterwards.
+; 
+; inputs:
+;	__SAVEAREA_LOAD__	-	load address of the program
+; outputs:
+;	lodadr			-	(high byte only) value to
+;					write into RAMTOP
+;	lowadr			-	lowest address occupied by
+;					screen data
+;
 
 
 ; When setting a display mode, the ROM takes the RAMTOP value
@@ -16,27 +25,35 @@ tmp:	.res	1
 ; This will become the new display list address.
 ; Screen memory cannot cross 4K boundaries and a display list
 ; cannot cross a 1K boundary.
+;
 ; Work out a sane value for RAMTOP to prevent boundary crossing.
 ; RAMTOP is only one byte, it counts in memory pages.
+;
+; The ROM doesn't do this boundary checking, since it doesn't
+; expect RAMTOP to have (rather) arbitrary values. For a
+; "GRAPHICS 0" call and RAMTOP representing the possible physically
+; available memory, boundary crossing cannot happen.
 
-cont:
 
-_SCRBUFSZ =	(40 * 24)		; size of mode 0 screen buffer
-_DLSZ	=	32			; size of mode 0 display list
+SCRBUFSZ =	(40 * 24)		; size of mode 0 screen buffer
+DLSZ	=	32			; size of mode 0 display list
+
+
+scrmemtst:
 
 ; subtract screen memory size from our load address
 
-	lda	lowadr
+	lda	lodadr
 	sec
-	sbc	#<_SCRBUFSZ
+	sbc	#<SCRBUFSZ
 	sta	tstadr
-	lda	lowadr+1
-	sbc	#>_SCRBUFSZ
+	lda	lodadr+1
+	sbc	#>SCRBUFSZ
 	sta	tstadr+1
 
 ; check if a 4K boundary is crossed
 
-	lda	lowadr+1
+	lda	lodadr+1
 	and	#$f0
 	sta	tmp
 	lda	tstadr+1
@@ -44,48 +61,51 @@ _DLSZ	=	32			; size of mode 0 display list
 	cmp	tmp
 	beq	scrmemok
 
-; 4K boundary will be crossed, take 4K boundary address as lowadr
+; 4K boundary will be crossed, use this 4K boundary address as lodadr
 
-al4k:	lda	lowadr+1
+al4k:	lda	lodadr+1
 	and	#$f0
 	tax
 	dex
-	stx	lowadr+1
-	bne	cont
+	stx	lodadr+1
+	bne	scrmemtst
+; not reached
+
+
+lodadr:	.word	__SAVEAREA_LOAD__ & $FF00		; our program's load address, rounded down to page boundary
+tstadr:	.res	2
+lowadr:	.res	2
+tmp:	.res	1
+
 
 ; subtract display list size from calculated screen address
 
 scrmemok:
 	lda	tstadr
 	sec
-	sbc	#<_DLSZ
-	sta	tstadr2
+	sbc	#<DLSZ
+	sta	lowadr
 	lda	tstadr+1
-	sbc	#>_DLSZ
-	sta	tstadr2+1
+	sbc	#>DLSZ
+	sta	lowadr+1
 
 ; check if a 1K boundary is crossed
 
 	lda	tstadr+1
 	and	#$fc
 	sta	tmp
-	lda	tstadr2+1
+	lda	lowadr+1
 	and	#$fc
 	cmp	tmp
-	bne	al4k		; 1K boundary will be crossed, decrease lowadr
+	bne	al4k		; 1K boundary will be crossed, decrease lodadr
 
 ; address of display list is ok
+; decrease lowadr by two
 
-dlok:
-
-; decrease tstadr2 by two
-
-	lda	tstadr2
+	lda	lowadr
 	sec
 	sbc	#2
-	sta	tstadr2
+	sta	lowadr
 	bcs	dec_cont
-	lda	tstadr2+1
-	sbc	#0
-	sta	tstadr2+1
+	dec	lowadr+1
 dec_cont:

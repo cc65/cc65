@@ -107,15 +107,15 @@ sramprep:
 	ora	#2
 	sta	PORTB
 
-.include "xlmemchk.inc"
+	.include "xlmemchk.inc"	; calculate lowest address used and new value for RAMTOP
 
-	ldx	tstadr2
+	ldx	lowadr
 	stx	MEMTOP
 	stx	APPMHI
-	lda	tstadr2+1
+	lda	lowadr+1
 	sta	MEMTOP+1
 	sta	APPMHI+1
-	lda	lowadr+1
+	lda	lodadr+1
 	sta	RAMTOP
 
 

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003-2011, Ullrich von Bassewitz                                      */
+/* (C) 2003-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -101,6 +101,14 @@ struct mouse_callbacks {
      */
 };
 
+
+
+/*****************************************************************************/
+/*                               Declarations                                */
+/*****************************************************************************/
+
+
+
 /* The default mouse callbacks */
 extern const struct mouse_callbacks mouse_def_callbacks;
 
@@ -109,6 +117,13 @@ extern const char mouse_stddrv[];
 
 /* The address of the static standard mouse driver for a platform */
 extern const void mouse_static_stddrv[];
+
+/* A program optionally can set this pointer to a function that gives
+** a calibration value to a driver.  If this pointer isn't NULL,
+** then a driver that wants a value can call that function.
+** mouse_adjuster must be set before the driver is installed.
+*/
+extern void __fastcall__ (*mouse_adjuster) (unsigned char *pValue);
 
 
 
@@ -127,10 +142,10 @@ unsigned char mouse_unload (void);
 
 unsigned char __fastcall__ mouse_install (const struct mouse_callbacks* c,
                                           void* driver);
-/* Install an already loaded driver. Returns an error code. */
+/* Install an already loaded driver. Return an error code. */
 
 unsigned char mouse_uninstall (void);
-/* Uninstall the currently loaded driver. Returns an error code. */
+/* Uninstall the currently loaded driver. Return an error code. */
 
 const char* __fastcall__ mouse_geterrormsg (unsigned char code);
 /* Get an error message describing the error in code. */
@@ -142,7 +157,7 @@ void mouse_hide (void);
  */
 
 void mouse_show (void);
-/* Show the mouse. See mouse_hide for more information. */
+/* Show the mouse. See mouse_hide() for more information. */
 
 void __fastcall__ mouse_setbox (const struct mouse_box* box);
 /* Set the bounding box for the mouse pointer movement. The mouse X and Y
@@ -176,14 +191,31 @@ unsigned char mouse_buttons (void);
  */
 
 void __fastcall__ mouse_pos (struct mouse_pos* pos);
-/* Return the current mouse position */
+/* Return the current mouse position. */
 
 void __fastcall__ mouse_info (struct mouse_info* info);
-/* Return the state of the mouse buttons and the position of the mouse */
+/* Return the state of the mouse buttons and the position of the mouse. */
 
 unsigned char __fastcall__ mouse_ioctl (unsigned char code, void* data);
-/* Call the driver specific ioctl function. NON PORTABLE! Returns an error
- * code.
+/* Call the driver-specific ioctl function. Return an error code.
+ * NON-PORTABLE!
+ */
+
+void __fastcall__ pen_calibrate (unsigned char *XOffset);
+/* Ask the user to help to calibrate a lightpen.  Changes the screen!
+ * A pointer to this function can be put into mouse_adjuster.
+ */
+
+void __fastcall__ pen_adjust (const char *filename);
+/* Get a lightpen calibration value from a file if it exists.  Otherwise, call
+ * pen_calibrate() to create a value; then, write it into a file, so that it
+ * will be available at the next time that the lightpen is used.
+ * Might change the screen.
+ * pen_adjust() is optional; if you want to use its feature,
+ * then it must be called before a driver is installed.
+ * Note:  This function merely saves the file-name pointer, and sets
+ * the mouse_adjuster pointer.  The file will be read only when a driver
+ * is installed, and only if that driver wants to be calibrated.
  */
 
 

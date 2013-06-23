@@ -1,7 +1,7 @@
 ;
 ; Driver for the Inkwell Systems 170-C and 184-C lightpens.
 ;
-; 2013-06-03, Greg King
+; 2013-06-17, Greg King
 ;
 
         .include        "zeropage.inc"
@@ -9,7 +9,6 @@
         .include        "c64.inc"
 
         .macpack        generic
-        .macpack        cbm
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table.
@@ -25,7 +24,7 @@ HEADER:
 
 ; Library reference
 
-        .addr   $0000
+LIBREF: .addr   $0000
 
 ; Jump table
 
@@ -57,14 +56,8 @@ CMOVEY: jmp     $0000                   ; Move the cursor to Y co-ord.
 ;----------------------------------------------------------------------------
 ; Constants
 
-SCREEN_HEIGHT   = YSIZE * 8
 SCREEN_WIDTH    = XSIZE * 8
-SCREEN_ZONE     = YSIZE / 4 * XSIZE
-
-; This driver is for the standard 40-column screen.
-
-SCREEN          := $0400
-COLOR_RAM       := $D800
+SCREEN_HEIGHT   = YSIZE * 8
 
 
 ;----------------------------------------------------------------------------
@@ -72,29 +65,9 @@ COLOR_RAM       := $D800
 ; written with the least effort in the SETBOX and GETBOX routines; so, don't
 ; re-order them.
 
-.bss
-
-Vars:
-XMin:           .res    2               ; X1 value of bounding box
-YMin:           .res    2               ; Y1 value of bounding box
-XMax:           .res    2               ; X2 value of bounding box
-YMax:           .res    2               ; Y2 value of bounding box
-Buttons:        .res    1               ; Button status bits
-XPos:           .res    2               ; Current lightpen position, X
-YPos:           .res    2               ; Current lightpen position, Y
-
-OldPenX:        .res    1               ; Old HW-counter values
-OldPenY:        .res    1
-
-.data
-
-; Start with an average offset.
-
-XOffset:        .byte   48 / 2          ; Calibration offset, for X position
-
 .rodata
 
-; Default values for above variables
+; Default values for below variables
 ; (We use ".proc" because we want to define both a label and a scope.)
 
 .proc   DefVars
@@ -105,12 +78,31 @@ XOffset:        .byte   48 / 2          ; Calibration offset, for X position
         .byte   %00000000               ; Buttons
 .endproc
 
-.proc   Command1
-        scrcode "Adjust by clicking on line."
-.endproc
-.proc   Command2
-        scrcode "Finish by clicking off box."
-.endproc
+.bss
+
+Vars:
+XMin:           .res    2               ; X1 value of bounding box
+YMin:           .res    2               ; Y1 value of bounding box
+XMax:           .res    2               ; X2 value of bounding box
+YMax:           .res    2               ; Y2 value of bounding box
+Buttons:        .res    1               ; Button status bits
+
+XPos:           .res    2               ; Current lightpen position, X
+YPos:           .res    2               ; Current lightpen position, Y
+
+OldPenX:        .res    1               ; Previous HW-counter values
+OldPenY:        .res    1
+
+.data
+
+; Default Inkwell calibration.
+; The first number is the width of the left border;
+; the second number is the actual calibration value.
+
+XOffset:        .byte   (24 + 24) / 2   ; x-offset
+
+; Jump to a function that puts a new calibration value into XOffset.
+Calibrate:      jmp     $0000
 
 
 .code
@@ -124,7 +116,6 @@ INSTALL:
 
 ; Initiate variables. Just copy the default stuff over.
 
-        sei
         ldx     #.sizeof (DefVars) - 1
 @L0:    lda     DefVars,x
         sta     Vars,x
@@ -135,121 +126,37 @@ INSTALL:
         ldy     VIC_LPEN_Y
         stx     OldPenX
         sty     OldPenY
-        cli
 
-; There is a delay between when the VIC sends its signal, and when the display
-; shows that signal.  There is another delay between the display and when
-; the lightpen says that it saw that signal. Each display and pen is different.
-; Therefore, this driver must be calibrated to them.  A white box is painted on
-; the screen; and, a line is drawn down the middle of it.  When the user clicks
-; on that line, the difference between its position and where the VIC thinks
-; that the pen is pointing becomes an offset that is subtracted from what the
-; VIC sees.
+; Call a calibration function through the library-reference.
 
-        lda     VIC_BG_COLOR0
-        ldx     #6                      ; Blue screen
-        stx     VIC_BG_COLOR0
-        pha
-        jsr     CLRSCR
+        lda     LIBREF
+        ldx     LIBREF+1
+        sta     ptr1                    ; Point to mouse_adjuster
+        stx     ptr1+1
+        ldy     #0
+        lda     (ptr1),y
+        sta     Calibrate+1             ; Point to function
+        iny
+        lda     (ptr1),y
+        sta     Calibrate+2
+        ora     Calibrate+1             ; Don't call pointer if it's NULL
+        bze     @L1
+        lda     #<XOffset               ; Function will set this variable
+        ldx     #>XOffset
+        jsr     Calibrate
 
-        ldy     #.sizeof (Command2) - 1
-@L2:    lda     Command2,y
-        sta     SCREEN + SCREEN_ZONE * 2 + XSIZE * 3 + (XSIZE - .sizeof (Command2)) / 2,y
-        lda     #15                     ; Light gray text
-        sta     COLOR_RAM + SCREEN_ZONE * 2 + XSIZE * 3 + (XSIZE - .sizeof (Command1)) / 2,y
-        dey
-        bpl     @L2
-        ldy     #.sizeof (Command1) - 1
-@L1:    lda     Command1,y
-        sta     SCREEN + SCREEN_ZONE * 2 + XSIZE * 1 + (XSIZE - .sizeof (Command1)) / 2,y
-        lda     #15                     ; Light gray text
-        sta     COLOR_RAM + SCREEN_ZONE * 2 + XSIZE * 1 + (XSIZE - .sizeof (Command1)) / 2,y
-        dey
-        bpl     @L1
-
-        ldx     #SCREEN_ZONE
-@L3:    lda     #$80 | $20              ; Reversed space screen-code
-        sta     SCREEN + SCREEN_ZONE - 1,x
-        lda     #15                     ; Light gray box
-        sta     COLOR_RAM + SCREEN_ZONE - 1,x
-        dex
-        bnz     @L3
-
-        ldy     #$80 | $5d              ; Reversed vertical-bar screen-code
-        .repeat 4, L
-        sty     SCREEN + SCREEN_ZONE + (L + 1) * XSIZE + XSIZE / 2
-        .endrep
-
-        lda     VIC_SPR0_COLOR
-        ldx     #12                     ; Medium gray pointer
-        stx     VIC_SPR0_COLOR
-        pha
-        jsr     SHOW
-
-        lda     #<(SCREEN_HEIGHT / 4 / 2)
-        ldx     #>(SCREEN_HEIGHT / 4 / 2)
-        jsr     PutCursor
-
-; Wait for the main button to be released.
-
-@L4:    lda     Buttons
-        bnz     @L4
-
-; Wait for the main button to be pressed.
-
-@L5:    lda     Buttons
-        bze     @L5
-
-; Find out if the pen is on or off the box.
-
-        ldy     YPos
-        ldx     YPos+1
-        txa
-        cpy     #<(YSIZE / 4 * 1 * 8)
-        sbc     #>(YSIZE / 4 * 1 * 8)
-        bmi     @L6                     ; Above box
-        txa
-        cpy     #<(YSIZE / 4 * 2 * 8)
-        sbc     #>(YSIZE / 4 * 2 * 8)
-        bpl     @L6                     ; Below box
-
-; The pen is on the box; adjust the offset.
-
-        lda     OldPenX
-        sub     #(XSIZE * 8 / 2 + 8/2) / 2
-        sta     XOffset
-        sta     OldPenX                 ; Make IRQ update X co-ordinate
-        jmp     @L4
-
-; Wait for the main button to be released.
-
-@L6:    lda     Buttons
-        bnz     @L6
-
-        lda     XOffset                 ; Tell test program about calibration
-        sta     $3ff
-
-        pla
-        sta     VIC_SPR0_COLOR
-        pla
-        sta     VIC_BG_COLOR0
-        jsr     CLRSCR
-
-; Be sure the lightpen cursor is invisible and at the default location.
+; Be sure that the lightpen cursor is invisible and at the default location.
 ; It needs to be done here because the lightpen interrupt handler doesn't
 ; set the lightpen position if it hasn't changed.
 
-        jsr     HIDE
+@L1:    jsr     CHIDE
 
         lda     #<(SCREEN_HEIGHT / 2)
         ldx     #>(SCREEN_HEIGHT / 2)
-PutCursor:
-        sei
         jsr     MoveY
         lda     #<(SCREEN_WIDTH / 2)
         ldx     #>(SCREEN_WIDTH / 2)
         jsr     MoveX
-        cli
 
 ; Done, return zero.
 
@@ -478,20 +385,20 @@ IRQ:
         beq     @SkipX
         sta     OldPenX
 
-; Adjust the co-ordinate by the calibration offset.
+; Adjust the value by the calibration offset.
 
         sub     XOffset
 
-; Calculate the new X co-ordinate (--> .AY --> .XY).
+; Calculate the new X co-ordinate.
 ; The VIC-II register is eight bits; but, the screen co-ordinate is nine bits.
-; Therefor, the VIC-II number is doubled. Then, it points to every other pixel;
+; Therefore, the VIC-II number is doubled. Then, it points to every other pixel;
 ; but, it can reach across the screen.
 
         asl     a
         tay                             ; Remember low byte
         lda     #>0
         rol     a
-        tax
+        tax                             ; Remember high byte
 
 ; Limit the X co-ordinate to the bounding box.
 

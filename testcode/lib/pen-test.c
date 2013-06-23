@@ -2,7 +2,7 @@
 ** Test program for lightpen drivers. Will work for the C64/C128.
 **
 ** 2001-09-13, Ullrich von Bassewitz
-** 2013-05-24, Greg King
+** 2013-06-21, Greg King
 **
 */
 
@@ -55,7 +55,7 @@
 #  define SPRITE0_PTR   ((unsigned char *)0x07F8)
 #endif
 
-/* The lightpen sprite (an arrow) */
+/* An arrow sprite */
 static const unsigned char PenSprite[64] = {
     0xFF, 0xFF, 0xFF,
     0xFC, 0x00, 0x00,
@@ -113,9 +113,9 @@ static void DoWarning (void)
 static void __fastcall__ ShowState (unsigned char Jailed, unsigned char Invisible)
 /* Display jail and cursor states. */
 {
-    cclearxy (0, 7, 40);
+    cclearxy (0, 7, 32);
     gotoxy (0, 7);
-    cprintf ("Lightpen cursor is %svisible%s.", Invisible? "in" : "", Jailed? " and jailed" : "");
+    cprintf ("Pointer is %svisible%s.", Invisible? "in" : "", Jailed? " and jailed" : "");
 }
 
 
@@ -128,8 +128,8 @@ int main (void)
     unsigned char width, height;
     bool Invisible = false, Done = false, Jailed = false;
 
-    /* Only the VIC-II has a lightpen connection. */
 #ifdef __C128__
+    /* Only the VIC-IIe has a lightpen connection. */
     videomode (VIDEOMODE_40x25);
 #endif
 
@@ -154,10 +154,12 @@ int main (void)
     memcpy (SPRITE0_DATA, PenSprite, sizeof PenSprite);
 
     /* Set the VIC-II sprite pointer. */
-    *SPRITE0_PTR = (unsigned) SPRITE0_DATA / sizeof SPRITE0_DATA;
+    *SPRITE0_PTR = ((unsigned) SPRITE0_DATA & 0x3FFF) / sizeof SPRITE0_DATA;
 
     /* Set the color of sprite 0. */
     VIC.spr0_color = COLOR_BLACK;
+
+    pen_adjust ("inkwell.dat");
 #endif
 
 #if DYN_DRV
@@ -179,19 +181,15 @@ int main (void)
     screensize (&width, &height);
 
 top:
-    /* Print a help line. */
     clrscr ();
-/*    revers (1); */
-    cputs (" d)ebug  h)ide   q)uit   s)how   j)ail   ");
-/*    revers (0); */
+
+    /* Print a help line. */
+    cputs (" d)ebug  h)ide   q)uit   s)how   j)ail");
 
     /* Put a cross at the center of the screen. */
     gotoxy (width / 2 - 3, height / 2 - 1);
     cprintf ("%3u,%3u\r\n%*s\xDB", width / 2 * 8 + 4, height / 2 * 8 + 4,
              width / 2, "");
-
-    /* Custom driver debugging line */
-    cprintf ("\n\r\n Calibration X-offset = %u", (*(unsigned char *)0x3ff) * 2);
 
     /* Expose the arrow. */
     mouse_show ();
@@ -206,8 +204,20 @@ top:
         gotoxy (0, 2);
         cprintf (" X  = %3d\r\n", info.pos.x);
         cprintf (" Y  = %3d\r\n", info.pos.y);
-        cprintf (" B1 = %c\r\n", (info.buttons & MOUSE_BTN_LEFT) ? 0x5F : '^');
-        cprintf (" B2 = %c", (info.buttons & MOUSE_BTN_RIGHT) ? 0x5F : '^');
+        cprintf (" B1 = %c\r\n", (info.buttons & MOUSE_BTN_LEFT) ?
+#ifdef __CBM__
+                 0x5F
+#else
+                 'v'
+#endif
+                 : '^');
+        cprintf (" B2 = %c", (info.buttons & MOUSE_BTN_RIGHT) ?
+#ifdef __CBM__
+                 0x5F
+#else
+                 'v'
+#endif
+                 : '^');
 
         /* Handle user input. */
         if (kbhit ()) {
@@ -277,6 +287,6 @@ top:
 #endif
 
     /* Say goodbye. */
-    cputsxy (0, 16, "Goodbye!");
+    cputsxy (0, height / 2 + 3, "Goodbye!");
     return EXIT_SUCCESS;
 }

@@ -78,7 +78,7 @@ EXELIST	=	ascii		\
 		gunzip65	\
 		hello		\
 		mandelbrot	\
-		mousedemo	\
+		mousetest	\
 		multdemo	\
 		nachtm		\
 		ovrldemo	\
@@ -115,12 +115,12 @@ mandelbrot:	mandelbrot.o
 endif
 endif
 
-# The Apple ][ needs the start address adjusted for the mousedemo
+# The Apple ][ needs the start address adjusted for the mousetest
 ifeq "$(SYS)" "apple2"
-mousedemo:	mousedemo.o
+mousetest:	mousetest.o
 	@$(LD) -t $(SYS) -m $(basename $@).map --start-addr 0x4000 -o $@ $^ $(CLIB)
 else
-mousedemo:	mousedemo.o
+mousetest:	mousetest.o
 endif
 
 multdemo:	multidemo.o

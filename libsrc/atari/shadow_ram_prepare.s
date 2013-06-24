@@ -58,7 +58,7 @@ cont:	ldx	#0		; channel 0
 
 sramprep:
 .ifdef DEBUG
-	print_string "in sramprep"
+	print_string "entering stage #2"
 .endif
 
 ; save values of modified system variables and ports
@@ -158,11 +158,6 @@ okoko:
         sta     ICCOM,x
         jsr     CIOV_org
 
-.ifdef DEBUG
-	print_string "Stage #2 OK"
-	jsr	delay
-.endif
-
 
 ; Save the zero page locations we need
 
@@ -173,6 +168,11 @@ L1:     lda     sp,x
         bpl     L1
 
 ; copy chargen to low memory
+
+.ifdef DEBUG
+	print_string "copy chargen to low memory"
+	print_string "set up high memory"
+.endif
 
 	lda	#>(__SRPREP_LOAD__ + __SRPREP_SIZE__ + __SHADOW_RAM_SIZE__)
 	sta	ptr3+1
@@ -235,7 +235,7 @@ do_copy:lda	#<__SHADOW_RAM_LOAD__
 
 no_copy:
 
-; copy chargen to its new location
+; copy chargen to its new (final) location
 
 	lda	ptr3
 	sta	ptr1
@@ -260,6 +260,10 @@ no_copy:
 	sta	NMIEN			; enable VB again
 	cli				; and enable IRQs
 
+.ifdef DEBUG
+	print_string "Stage #2 OK"
+	jsr	delay
+.endif
         rts
 
 

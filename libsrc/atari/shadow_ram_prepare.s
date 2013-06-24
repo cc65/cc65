@@ -122,7 +122,17 @@ sramprep:
 ; ... issue a GRAPHICS 0 call (copied'n'pasted from TGI drivers)
 
 
-        ldx     #$50            ; take any IOCB, hopefully free (@@@ fixme)
+        jsr     findfreeiocb
+.ifdef DEBUG		; only check in debug version, this shouldn't happen normally(tm)
+        beq     iocbok
+        print_string "Internal error, no free IOCB!"
+        jsr     delay
+        jsr     delay
+        jsr     delay
+        jsr     restore                 ; restore stuff we've changed
+        jmp     (DOSVEC)                ; abort loading
+iocbok:
+.endif
 
         ; Reopen it in Graphics 0
         lda     #OPEN
@@ -140,20 +150,18 @@ sramprep:
         lda     #>screen_device_length
         sta     ICBLH,x
         jsr     CIOV_org
-        bpl     okoko
+        bpl     scrok
 
+; shouldn't happen(tm)
         print_string "Internal error, aborting..."
         jsr     delay
         jsr     delay
         jsr     delay
-
+        jsr     restore                 ; restore stuff we've changed
         jmp     (DOSVEC)                ; abort loading
 
 
-okoko:
-
-
-        ; Now close it again; we don't need it anymore :)
+scrok:  ; now close it again -- we don't need it anymore
         lda     #CLOSE
         sta     ICCOM,x
         jsr     CIOV_org
@@ -266,6 +274,7 @@ no_copy:
 .endif
         rts
 
+.include "findfreeiocb.inc"
 
 ; my 6502 fu is rusty, so I took a routine from the internet (http://www.obelisk.demon.co.uk/6502/algorithms.html)
 
@@ -296,6 +305,21 @@ last:   cpy     tmp1
 done:   rts
 
 .endproc
+
+
+; clean up after a fatal error
+
+restore:lda     RAMTOP_save
+        sta     RAMTOP
+        lda     MEMTOP_save
+        sta     MEMTOP
+        lda     MEMTOP_save+1
+        sta     MEMTOP+1
+        lda     APPMHI_save
+        sta     APPMHI
+        lda     APPMHI_save+1
+        sta     APPMHI+1
+        rts
 
 
 .byte "HERE ****************** HERE ***************>>>>>>"

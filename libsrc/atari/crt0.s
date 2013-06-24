@@ -20,6 +20,7 @@
 	.import		sram_init
 .if .defined(__ATARIXL__)
 	.import		scrdev
+	.import		findfreeiocb
 .endif
 
         .include        "zeropage.inc"
@@ -181,11 +182,9 @@ _exit:  jsr     donelib         ; Run module destructors
 	sta	APPMHI+1
 
 
-
 ; ... issue a GRAPHICS 0 call (copied'n'pasted from TGI drivers)
 
-
-	ldx	#$50		; take any IOCB, hopefully free (@@@ fixme)
+	jsr	findfreeiocb
 
         ; Reopen it in Graphics 0
         lda     #OPEN
@@ -203,8 +202,10 @@ _exit:  jsr     donelib         ; Run module destructors
         lda     #0
         sta     ICBLH,x
         jsr     CIOV_org
-
-
+; add error checking here...
+        lda     #CLOSE
+        sta     ICCOM,x
+        jsr     CIOV_org
 
 .endif
 

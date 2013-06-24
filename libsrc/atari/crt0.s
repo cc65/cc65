@@ -233,9 +233,11 @@ L2:     lda     zpsave,x
 .bss
 
 spsave:         .res    1
-appmsav:        .res    1
 old_shflok:     .res    1
 old_lmargin:    .res    1
+.if .not .defined(__ATARIXL__)
+appmsav:        .res    1
+.endif
 
         .segment "AUTOSTRT"
         .word   RUNAD                   ; defined in atari.h

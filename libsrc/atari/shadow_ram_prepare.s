@@ -9,38 +9,38 @@
 ; Christian Groessler, chris@groessler.org, 2013
 ;
 
-DEBUG	=	1
+DEBUG   =       1
 
 .if .defined(__ATARIXL__)
 
-	.export		sramprep
+        .export         sramprep
         .import         __SRPREP_LOAD__, __SRPREP_SIZE__
-	.import		__SHADOW_RAM_LOAD__, __SHADOW_RAM_SIZE__
-	.import		__SHADOW_RAM_RUN__
-	.import		__CHARGEN_START__, __CHARGEN_SIZE__
-	.import		__SAVEAREA_LOAD__
-	.import		zpsave
+        .import         __SHADOW_RAM_LOAD__, __SHADOW_RAM_SIZE__
+        .import         __SHADOW_RAM_RUN__
+        .import         __CHARGEN_START__, __CHARGEN_SIZE__
+        .import         __SAVEAREA_LOAD__
+        .import         zpsave
 
         .include        "zeropage.inc"
         .include        "atari.inc"
-	.include	"save_area.inc"
+        .include        "save_area.inc"
 
 .macro print_string text
-	.local	start, cont
-	jmp	cont
-start:	.byte	text, ATEOL
-cont:	ldx	#0		; channel 0
-	lda	#<start
-	sta	ICBAL,x		; address
-	lda	#>start
-	sta	ICBAH,x
-	lda	#<(cont - start)
-	sta	ICBLL,x		; length
-	lda	#>(cont - start)
-	sta	ICBLH,x
-	lda	#PUTCHR
-	sta	ICCOM,x
-	jsr	CIOV_org
+        .local  start, cont
+        jmp     cont
+start:  .byte   text, ATEOL
+cont:   ldx     #0              ; channel 0
+        lda     #<start
+        sta     ICBAL,x         ; address
+        lda     #>start
+        sta     ICBAH,x
+        lda     #<(cont - start)
+        sta     ICBLL,x         ; length
+        lda     #>(cont - start)
+        sta     ICBLH,x
+        lda     #PUTCHR
+        sta     ICCOM,x
+        jsr     CIOV_org
 .endmacro
 
 ; ------------------------------------------------------------------------
@@ -58,71 +58,71 @@ cont:	ldx	#0		; channel 0
 
 sramprep:
 .ifdef DEBUG
-	print_string "entering stage #2"
+        print_string "entering stage #2"
 .endif
 
 ; save values of modified system variables and ports
 
-	lda	RAMTOP
-	sta	RAMTOP_save
-	lda	MEMTOP
-	sta	MEMTOP_save
-	lda	MEMTOP+1
-	sta	MEMTOP_save+1
-	lda	APPMHI
-	sta	APPMHI_save
-	lda	APPMHI+1
-	sta	APPMHI_save+1
-	lda	PORTB
-	sta	PORTB_save
-	lda	CIOV		; zero-page wrapper
-	sta	ZP_CIOV_save
-	lda	CIOV+1
-	sta	ZP_CIOV_save+1
-	lda	CIOV+2
-	sta	ZP_CIOV_save+2
-	lda	SIOV		; zero-page wrapper
-	sta	ZP_SIOV_save
-	lda	SIOV+1
-	sta	ZP_SIOV_save+1
-	lda	SIOV+2
-	sta	ZP_SIOV_save+2
+        lda     RAMTOP
+        sta     RAMTOP_save
+        lda     MEMTOP
+        sta     MEMTOP_save
+        lda     MEMTOP+1
+        sta     MEMTOP_save+1
+        lda     APPMHI
+        sta     APPMHI_save
+        lda     APPMHI+1
+        sta     APPMHI_save+1
+        lda     PORTB
+        sta     PORTB_save
+        lda     CIOV            ; zero-page wrapper
+        sta     ZP_CIOV_save
+        lda     CIOV+1
+        sta     ZP_CIOV_save+1
+        lda     CIOV+2
+        sta     ZP_CIOV_save+2
+        lda     SIOV            ; zero-page wrapper
+        sta     ZP_SIOV_save
+        lda     SIOV+1
+        sta     ZP_SIOV_save+1
+        lda     SIOV+2
+        sta     ZP_SIOV_save+2
 
-	lda	$fffe
-	sta	IRQ_save
-	lda	$ffff
-	sta	IRQ_save+1
-	lda	$fffc
-	sta	RESET_save
-	lda	$fffd
-	sta	RESET_save+1
-	lda	$fffa
-	sta	NMI_save
-	lda	$fffb
-	sta	NMI_save+1
+        lda     $fffe
+        sta     IRQ_save
+        lda     $ffff
+        sta     IRQ_save+1
+        lda     $fffc
+        sta     RESET_save
+        lda     $fffd
+        sta     RESET_save+1
+        lda     $fffa
+        sta     NMI_save
+        lda     $fffb
+        sta     NMI_save+1
 
 ; disable BASIC
 
-	lda	PORTB
-	ora	#2
-	sta	PORTB
+        lda     PORTB
+        ora     #2
+        sta     PORTB
 
-	.include "xlmemchk.inc"	; calculate lowest address used and new value for RAMTOP
+        .include "xlmemchk.inc" ; calculate lowest address used and new value for RAMTOP
 
-	ldx	lowadr
-	stx	MEMTOP
-	stx	APPMHI
-	lda	lowadr+1
-	sta	MEMTOP+1
-	sta	APPMHI+1
-	lda	lodadr+1
-	sta	RAMTOP
+        ldx     lowadr
+        stx     MEMTOP
+        stx     APPMHI
+        lda     lowadr+1
+        sta     MEMTOP+1
+        sta     APPMHI+1
+        lda     lodadr+1
+        sta     RAMTOP
 
 
 ; ... issue a GRAPHICS 0 call (copied'n'pasted from TGI drivers)
 
 
-	ldx	#$50		; take any IOCB, hopefully free (@@@ fixme)
+        ldx     #$50            ; take any IOCB, hopefully free (@@@ fixme)
 
         ; Reopen it in Graphics 0
         lda     #OPEN
@@ -140,14 +140,14 @@ sramprep:
         lda     #>screen_device_length
         sta     ICBLH,x
         jsr     CIOV_org
-	bpl	okoko
+        bpl     okoko
 
-	print_string "Internal error, aborting..."
-	jsr	delay
-	jsr	delay
-	jsr	delay
+        print_string "Internal error, aborting..."
+        jsr     delay
+        jsr     delay
+        jsr     delay
 
-	jmp	(DOSVEC)		; abort loading
+        jmp     (DOSVEC)                ; abort loading
 
 
 okoko:
@@ -170,99 +170,99 @@ L1:     lda     sp,x
 ; copy chargen to low memory
 
 .ifdef DEBUG
-	print_string "copy chargen to low memory"
-	print_string "set up high memory"
+        print_string "copy chargen to low memory"
+        print_string "set up high memory"
 .endif
 
-	lda	#>(__SRPREP_LOAD__ + __SRPREP_SIZE__ + __SHADOW_RAM_SIZE__)
-	sta	ptr3+1
-	lda	#<(__SRPREP_LOAD__ + __SRPREP_SIZE__ + __SHADOW_RAM_SIZE__)
-	sta	ptr3
-	beq	cg_addr_ok
+        lda     #>(__SRPREP_LOAD__ + __SRPREP_SIZE__ + __SHADOW_RAM_SIZE__)
+        sta     ptr3+1
+        lda     #<(__SRPREP_LOAD__ + __SRPREP_SIZE__ + __SHADOW_RAM_SIZE__)
+        sta     ptr3
+        beq     cg_addr_ok
 
-	; page align the new chargen address
-	inc	ptr3+1
-	lda	#0
-	sta	ptr3
+        ; page align the new chargen address
+        inc     ptr3+1
+        lda     #0
+        sta     ptr3
 
 cg_addr_ok:
-	lda	#<DCSORG
-	sta	ptr1
-	lda	#>DCSORG
-	sta	ptr1+1
-	lda	ptr3
-	sta	ptr2
-	lda	ptr3+1
-	sta	ptr2+1
-	lda	#>__CHARGEN_SIZE__
-	sta	tmp2
-	lda	#<__CHARGEN_SIZE__
-	sta	tmp2+1
-	jsr	memcopy
+        lda     #<DCSORG
+        sta     ptr1
+        lda     #>DCSORG
+        sta     ptr1+1
+        lda     ptr3
+        sta     ptr2
+        lda     ptr3+1
+        sta     ptr2+1
+        lda     #>__CHARGEN_SIZE__
+        sta     tmp2
+        lda     #<__CHARGEN_SIZE__
+        sta     tmp2+1
+        jsr     memcopy
 
 ; TODO: switch to this temp. chargen
 
 ; disable ROMs
-	sei
-	ldx	#0
-	stx	NMIEN		; disable NMI
-	lda	PORTB
-	and	#$fe
-	sta	PORTB		; now ROM is mapped out
+        sei
+        ldx     #0
+        stx     NMIEN           ; disable NMI
+        lda     PORTB
+        and     #$fe
+        sta     PORTB           ; now ROM is mapped out
 
 ; copy shadow RAM contents to their destination
 
-	lda	#<__SHADOW_RAM_SIZE__
-	bne	do_copy
-	lda	#>__SHADOW_RAM_SIZE__
-	beq	no_copy				; we have no shadow RAM contents
+        lda     #<__SHADOW_RAM_SIZE__
+        bne     do_copy
+        lda     #>__SHADOW_RAM_SIZE__
+        beq     no_copy                         ; we have no shadow RAM contents
 
-	; ptr1 - src; ptr2 - dest; tmp1, tmp2 - len
-do_copy:lda	#<__SHADOW_RAM_LOAD__
-	sta	ptr1
-	lda	#>__SHADOW_RAM_LOAD__
-	sta	ptr1+1
-	lda	#<__SHADOW_RAM_RUN__
-	sta	ptr2
-	lda	#>__SHADOW_RAM_RUN__
-	sta	ptr2+1
-	lda	#<__SHADOW_RAM_SIZE__
-	sta	tmp1
-	lda	#>__SHADOW_RAM_SIZE__
-	sta	tmp2
+        ; ptr1 - src; ptr2 - dest; tmp1, tmp2 - len
+do_copy:lda     #<__SHADOW_RAM_LOAD__
+        sta     ptr1
+        lda     #>__SHADOW_RAM_LOAD__
+        sta     ptr1+1
+        lda     #<__SHADOW_RAM_RUN__
+        sta     ptr2
+        lda     #>__SHADOW_RAM_RUN__
+        sta     ptr2+1
+        lda     #<__SHADOW_RAM_SIZE__
+        sta     tmp1
+        lda     #>__SHADOW_RAM_SIZE__
+        sta     tmp2
 
-	jsr	memcopy
+        jsr     memcopy
 
 no_copy:
 
 ; copy chargen to its new (final) location
 
-	lda	ptr3
-	sta	ptr1
-	lda	ptr3+1
-	sta	ptr1+1
-	lda	#<__CHARGEN_START__
-	sta	ptr2
-	lda	#>__CHARGEN_START__
-	sta	ptr2+1
-	lda	#>__CHARGEN_SIZE__
-	sta	tmp2
-	lda	#<__CHARGEN_SIZE__
-	sta	tmp1
-	jsr	memcopy
+        lda     ptr3
+        sta     ptr1
+        lda     ptr3+1
+        sta     ptr1+1
+        lda     #<__CHARGEN_START__
+        sta     ptr2
+        lda     #>__CHARGEN_START__
+        sta     ptr2+1
+        lda     #>__CHARGEN_SIZE__
+        sta     tmp2
+        lda     #<__CHARGEN_SIZE__
+        sta     tmp1
+        jsr     memcopy
 
 ; re-enable ROM
 
-	lda	PORTB
-	ora	#1
-	sta	PORTB
-	lda	#$40
-	sta	NMIEN			; enable VB again
-	cli				; and enable IRQs
+        lda     PORTB
+        ora     #1
+        sta     PORTB
+        lda     #$40
+        sta     NMIEN                   ; enable VB again
+        cli                             ; and enable IRQs
 
 .ifdef DEBUG
-	print_string "Stage #2 OK"
-	jsr	delay
+        print_string "Stage #2 OK"
+        jsr     delay
 .endif
         rts
 
@@ -274,26 +274,26 @@ no_copy:
 ; ptr2      - destination
 ; tmp2:tmp1 - len
 
-.proc	memcopy
+.proc   memcopy
 
-	ldy	#0
-	ldx	tmp2
-	beq	last
-pagecp:	lda	(ptr1),y
-	sta	(ptr2),y
-	iny
-	bne	pagecp
-	inc	ptr1+1
-	inc	ptr2+1
-	dex
-	bne	pagecp
-last:	cpy	tmp1
-	beq	done
-	lda	(ptr1),y
-	sta	(ptr2),y
-	iny
-	bne	last
-done:	rts
+        ldy     #0
+        ldx     tmp2
+        beq     last
+pagecp: lda     (ptr1),y
+        sta     (ptr2),y
+        iny
+        bne     pagecp
+        inc     ptr1+1
+        inc     ptr2+1
+        dex
+        bne     pagecp
+last:   cpy     tmp1
+        beq     done
+        lda     (ptr1),y
+        sta     (ptr2),y
+        iny
+        bne     last
+done:   rts
 
 .endproc
 
@@ -301,32 +301,32 @@ done:	rts
 .byte "HERE ****************** HERE ***************>>>>>>"
 
 sramsize:
-	.word	__SHADOW_RAM_SIZE__
+        .word   __SHADOW_RAM_SIZE__
 
 ; short delay
-.proc	delay
+.proc   delay
 
-	lda	#10
-l:	jsr	delay1
-	clc
-	sbc	#0
-	bne	l
-	rts
+        lda     #10
+l:      jsr     delay1
+        clc
+        sbc     #0
+        bne     l
+        rts
 
-delay1:	ldx	#0
-	ldy	#0
-loop:	dey
-	bne	loop
-	dex
-	bne	loop
-	rts
+delay1: ldx     #0
+        ldy     #0
+loop:   dey
+        bne     loop
+        dex
+        bne     loop
+        rts
 
 .endproc
 
-screen_device:	.byte "S:",0
+screen_device:  .byte "S:",0
 screen_device_length = * - screen_device
 
-	.byte	" ** srprep ** end-->"
+        .byte   " ** srprep ** end-->"
 
 ; ------------------------------------------------------------------------
 ; Provide an empty SHADOW_RAM segment in order that the linker is happy
@@ -344,4 +344,4 @@ screen_device_length = * - screen_device
         .word   INITAD+1
         .word   __SRPREP_LOAD__
 
-.endif	; .if .defined(__ATARIXL__)
+.endif  ; .if .defined(__ATARIXL__)

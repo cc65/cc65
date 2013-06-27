@@ -230,7 +230,8 @@ static void SetSys (const char* Sys)
             break;
 
         case TGT_PLUS4:
-            CBMSystem ("__PLUS4__");
+            CBMSystem ("__C16__");
+            NewSymbol ("__PLUS4__", 1);
             break;
 
         case TGT_CBM510:

@@ -6,8 +6,6 @@
 
         .export         __EXEHDR__ : absolute = 1       ; Linker referenced
 
-; ------------------------------------------------------------------------
-
         .segment        "EXEHDR"
 
         .byte   .defined(__SIM65C02__)

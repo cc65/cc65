@@ -186,7 +186,8 @@ static void SetSys (const char* Sys)
             break;
 
         case TGT_PLUS4:
-            cbmsys ("__PLUS4__");
+            cbmsys ("__C16__");
+            DefineNumericMacro ("__PLUS4__", 1);
             break;
 
         case TGT_CBM510:

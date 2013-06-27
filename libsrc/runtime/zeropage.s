@@ -22,10 +22,3 @@ tmp2:           .res    1
 tmp3:           .res    1
 tmp4:           .res    1
 regbank:        .res    regbanksize     ; Register bank
-
-; Add an empty EXTZP zeropage segment to avoid linker warnings that this
-; segment does not exist (it does not exist in most builtin linker configs
-; but is used when linking modules).
-
-.segment        "EXTZP" : zeropage
-

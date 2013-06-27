@@ -47,7 +47,7 @@ static char GetKeyUpdate (void);
 
 
 /* Color definitions */
-#if defined(__PLUS4__) || defined(__C16__)
+#if defined(__C16__)
 #  define COLOR_BORDER          (BCOLOR_DARKBLUE | CATTR_LUMA6)
 #  define COLOR_BACKGROUND      COLOR_WHITE
 #  define COLOR_TEXTHIGH        COLOR_BLACK

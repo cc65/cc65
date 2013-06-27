@@ -1,5 +1,5 @@
 ;
-; Atari XL, shared data between 2nd load chunk and main chunk
+; Atari XL, shared data between 2nd load chunk and main chunk, definition file
 ;
 ; Contains old values of modified system variables and ports.
 ;
@@ -8,9 +8,6 @@
 
 .if .defined(__ATARIXL__)
 
-.export		IRQ_save
-.export		NMI_save
-.export		RESET_save
 .export		SAVMSC_save
 .export		MEMTOP_save
 .export		APPMHI_save
@@ -21,9 +18,6 @@
 
 .segment        "SAVEAREA"
 
-IRQ_save:	.res	2
-NMI_save:	.res	2
-RESET_save:	.res	2
 SAVMSC_save:	.res	2
 MEMTOP_save:	.res	2
 APPMHI_save:	.res	2

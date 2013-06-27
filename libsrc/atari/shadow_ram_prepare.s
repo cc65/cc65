@@ -88,19 +88,6 @@ sramprep:
         lda     SIOV+2
         sta     ZP_SIOV_save+2
 
-        lda     $fffe
-        sta     IRQ_save
-        lda     $ffff
-        sta     IRQ_save+1
-        lda     $fffc
-        sta     RESET_save
-        lda     $fffd
-        sta     RESET_save+1
-        lda     $fffa
-        sta     NMI_save
-        lda     $fffb
-        sta     NMI_save+1
-
 ; disable BASIC
 
         lda     PORTB

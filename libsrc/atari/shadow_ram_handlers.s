@@ -145,7 +145,7 @@ my_IRQ_han:
 	pla
 	plp
 .endif
-	int_wrap IRQ_save
+	int_wrap $FFFE
 
 my_NMI_han:
 .ifdef DEBUG
@@ -174,11 +174,11 @@ my_NMI_han:
 	pla
 	tax
 	pla
-	int_wrap NMI_save
+	int_wrap $FFFA
 
 my_RESET_han:
 	enable_rom
-	jmp	(RESET_save)
+	jmp	($FFFC)
 
 
 ; System request handlers

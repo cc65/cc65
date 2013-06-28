@@ -58,7 +58,10 @@
              working directory to 'c:\cc65\cc65-master' and enter
              'c:\cc65\gnu\bin\make'. This builds both the cc65 binaries
              (located in 'c:\cc65\cc65-master\bin') and the cc65 libraries.
-             Now cc65 is fully functional without further steps.
+             Now cc65 is fully functional without further steps.<br/>
+             <u>Note:</u> If you receive an error message complaining about
+             a permission denied then you need to run the Visual Studio
+             Command Prompt as administrator.
          </li>
        </ul>
        <ul class="bullet">
@@ -72,10 +75,18 @@
              current working directory to 'c:\cc65\cc65-master' and enter
              'c:\cc65\gnu\bin\make lib'. This builds the cc65 libraries. Now
              cc65 is fully functional without further steps.<br/>
-             <u>Note:</u> If you receive an error message complaining about
-             'MSVCR100.dll' missing then you need to install the
-             <a href="http://www.microsoft.com/en-us/download/details.aspx?id=8328">
-             Microsoft Visual C++ 2010 SP1 Redistributable Package (x86)</a>.
+             <u>Notes:</u>
+             <ul class="">
+               <li>If you receive an error message complaining about
+                   'MSVCR100.dll' missing then you need to install the
+                   <a href="http://www.microsoft.com/en-us/download/details.aspx?id=8328">
+                   Microsoft Visual C++ 2010 SP1 Redistributable Package (x86)</a>.
+               </li>
+               <li>If you receive an error message saying 'Cannot create temporary
+                   file: Permission denied' then you need to run the Command Prompt
+                   as administrator.
+               </li>
+             </ul>
          </li>
        </ul>
     </p>

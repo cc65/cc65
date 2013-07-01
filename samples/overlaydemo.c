@@ -33,7 +33,7 @@ void log (char *msg)
 
 
 /* In a real-world overlay program one would probably not use a #pragma but
- * rather place the all the code of certain source files into the overlay by
+ * rather place all the code of certain source files into the overlay by
  * compiling them with --code-name OVERLAY1.
  */
 #pragma code-name (push, "OVERLAY1");

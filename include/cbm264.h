@@ -39,7 +39,7 @@
 
 
 /* Check for errors */
-#if !defined(__PLUS4__) && !defined(__C16__)
+#if !defined(__C16__)
 #  error This module may only be used when compiling for the Plus/4 or C16!
 #endif
 

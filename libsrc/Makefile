@@ -67,7 +67,8 @@ clean:
 
 else # TARGET
 
-CFLAGS += -Osir -W error
+CA65FLAGS =
+CC65FLAGS = -Osir -W error
 
 EXTZP = cbm510 \
         cbm610 \
@@ -178,7 +179,7 @@ $$($1_OBJS): | $$($1_OBJDIR)
 
 $$($1_DRVPAT): $$($1_OBJPAT) $$(ZPOBJ) | $$($1_DRVDIR)
 	@echo $$(TARGET) - $$(@F)
-	@$$(LD) -o $$@ -t module $$^
+	@$$(LD65) -o $$@ -t module $$^
 
 $$($1_OBJDIR) $$($1_DRVDIR):
 	@$$(call MKDIR,$$@)
@@ -187,8 +188,8 @@ $(TARGET): $$($1_DRVS)
 
 $$($1_STCPAT): $$($1_DRVPAT)
 	@echo $$(TARGET) - $$(<F)
-	@$$(CO) -o $$(@:.o=.s) --code-label _$$(subst -,_,$$(subst .,_,$$(<F))) $$<
-	@$$(CA) -t $$(TARGET) -o $$@ $$(@:.o=.s)
+	@$$(CO65) -o $$(@:.o=.s) --code-label _$$(subst -,_,$$(subst .,_,$$(<F))) $$<
+	@$$(CA65) -t $$(TARGET) -o $$@ $$(@:.o=.s)
 
 OBJS += $$($1_STCS)
 
@@ -200,11 +201,11 @@ endef
 
 $(foreach drvtype,$(DRVTYPES),$(eval $(call DRVTYPE_template,$(drvtype))))
 
-AR := $(if $(wildcard ../bin/ar65*),../bin/ar65,ar65)
-CA := $(if $(wildcard ../bin/ca65*),../bin/ca65,ca65)
-CC := $(if $(wildcard ../bin/cc65*),../bin/cc65,cc65)
-CO := $(if $(wildcard ../bin/co65*),../bin/co65,co65)
-LD := $(if $(wildcard ../bin/ld65*),../bin/ld65,ld65)
+AR65 := $(if $(wildcard ../bin/ar65*),../bin/ar65,ar65)
+CA65 := $(if $(wildcard ../bin/ca65*),../bin/ca65,ca65)
+CC65 := $(if $(wildcard ../bin/cc65*),../bin/cc65,cc65)
+CO65 := $(if $(wildcard ../bin/co65*),../bin/co65,co65)
+LD65 := $(if $(wildcard ../bin/ld65*),../bin/ld65,ld65)
 
 export CC65_HOME := $(abspath ..)
 
@@ -213,7 +214,7 @@ export CC65_HOME := $(abspath ..)
 define ASSEMBLE_recipe
 
 $(if $(TRAVIS),,@echo $(TARGET) - $<)
-@$(CA) -t $(TARGET) $(AFLAGS) --create-dep $(@:.o=.d) -o $@ $<
+@$(CA65) -t $(TARGET) $(CA65FLAGS) --create-dep $(@:.o=.d) -o $@ $<
 
 endef
 
@@ -222,8 +223,8 @@ endef
 define COMPILE_recipe
 
 $(if $(TRAVIS),,@echo $(TARGET) - $<)
-@$(CC) -t $(TARGET) $(CFLAGS) --create-dep $(@:.o=.d) --dep-target $@ -o $(@:.o=.s) $<
-@$(CA) -t $(TARGET) -o $@ $(@:.o=.s)
+@$(CC65) -t $(TARGET) $(CC65FLAGS) --create-dep $(@:.o=.d) --dep-target $@ -o $(@:.o=.s) $<
+@$(CA65) -t $(TARGET) -o $@ $(@:.o=.s)
 
 endef
 
@@ -237,10 +238,10 @@ endef
 
 $(EXTRA_OBJPAT): $(EXTRA_SRCPAT) | ../lib
 	@echo $(TARGET) - $(@F)
-	@$(CA) -t $(TARGET) $(AFLAGS) -o $@ $<
+	@$(CA65) -t $(TARGET) $(CA65FLAGS) -o $@ $<
 
 ../lib/$(TARGET).lib: $(OBJS) | ../lib
-	$(AR) a $@ $?
+	$(AR65) a $@ $?
 
 ../wrk/$(TARGET) ../lib ../targetutil:
 	@$(call MKDIR,$@)

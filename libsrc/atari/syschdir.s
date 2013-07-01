@@ -58,9 +58,9 @@ ucok1:
         lda     __dos_type
         cmp     #SPARTADOS
         beq     :+
-        lda     #41
+        lda     #CHDIR_MYDOS
         .byte   $2C             ; BIT <abs>
-:       lda     #44
+:       lda     #CHDIR_SPDOS
         sta     ICCOM,x
         lda     #0
         sta     ICAX1,x

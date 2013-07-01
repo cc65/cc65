@@ -47,7 +47,7 @@ static char GetKeyUpdate (void);
 
 
 /* Color definitions */
-#if defined(__PLUS4__) || defined(__C16__)
+#if defined(__C16__)
 #  define COLOR_BORDER          (BCOLOR_DARKBLUE | CATTR_LUMA6)
 #  define COLOR_BACKGROUND      COLOR_WHITE
 #  define COLOR_TEXTHIGH        COLOR_BLACK
@@ -63,7 +63,7 @@ static char GetKeyUpdate (void);
 #    define COLOR_FRAMEHIGH     COLOR_WHITE
 #    define COLOR_FRAMELOW      COLOR_GRAY3
 #  else
-#    if defined(__APPLE2__) || defined(__APPLE2ENH__)
+#    if defined(__APPLE2__)
 #      define COLOR_BORDER      COLOR_BLACK
 #      define COLOR_BACKGROUND  COLOR_BLACK
 #      define COLOR_TEXTHIGH    COLOR_BLACK
@@ -93,7 +93,7 @@ static char GetKeyUpdate (void);
 #  define MAX_X         80
 #  define MAX_Y         25
 #  define DUMP_BYTES    16
-#elif defined(__APPLE2__) || defined(__APPLE2ENH__) || defined(__ATARI__) || defined(__ATARIXL__)
+#elif defined(__APPLE2__) || defined(__ATARI__)
 #  define MAX_X         40
 #  define MAX_Y         24
 #  define DUMP_BYTES     8
@@ -104,7 +104,7 @@ static char GetKeyUpdate (void);
 #endif
 
 /* Replacement key definitions */
-#if defined(__APPLE2__) || defined(__LYNX__) || defined(__SIM6502__) || defined (__SIM65C02__) || defined(__SUPERVISION__)
+#ifndef CH_DEL
 #  define CH_DEL        ('H' - 'A' + 1)         /* Ctrl+H */
 #endif
 

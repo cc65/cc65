@@ -11,7 +11,7 @@
 
         jsr     findfreeiocb
         bne     oserr
-        lda     #48
+        lda     #GETCWD
         sta     ICCOM,x
         lda     #<__cwd
         sta     ICBLL,x

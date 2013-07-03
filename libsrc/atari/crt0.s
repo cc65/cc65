@@ -13,7 +13,7 @@
 
         .import         initlib, donelib
         .import         callmain, zerobss
-        .import         __STARTUP_LOAD__, __ZPSAVE_LOAD__
+        .import         __STARTUP_LOAD__, __BSS_LOAD__
         .import         __RESERVED_MEMORY__
 
         .include        "zeropage.inc"
@@ -26,7 +26,7 @@
 
         .word   $FFFF
         .word   __STARTUP_LOAD__
-        .word   __ZPSAVE_LOAD__ - 1
+        .word   __BSS_LOAD__ - 1
 
 ; ------------------------------------------------------------------------
 ; Actual code
@@ -39,14 +39,6 @@
                 ; We point AUTOSTRT directly after the rts.
 
 ; Real entry point:
-
-; Save the zero page locations we need
-
-        ldx     #zpspace-1
-L1:     lda     sp,x
-        sta     zpsave,x
-        dex
-        bpl     L1
 
 ; Clear the BSS data
 
@@ -126,17 +118,9 @@ _exit:  jsr     donelib         ; Run module destructors
         lda     appmsav+1
         sta     APPMHI+1
 
-; Copy back the zero page stuff
-
-        ldx     #zpspace-1
-L2:     lda     zpsave,x
-        sta     sp,x
-        dex
-        bpl     L2
-
 ; Turn on cursor
 
-        inx
+        ldx     #0
         stx     CRSINH
 
 ; Back to DOS
@@ -147,12 +131,6 @@ L2:     lda     zpsave,x
 
 ; ------------------------------------------------------------------------
 
-.segment        "ZPSAVE"
-
-zpsave: .res    zpspace
-
-; ------------------------------------------------------------------------
-
 .bss
 
 spsave:         .res    1
@@ -160,7 +138,8 @@ appmsav:        .res    1
 old_shflok:     .res    1
 old_lmargin:    .res    1
 
-        .segment "AUTOSTRT"
-        .word   RUNAD                   ; defined in atari.h
+
+.segment "AUTOSTRT"
+        .word   RUNAD                   ; defined in atari.inc
         .word   RUNAD+1
         .word   __STARTUP_LOAD__ + 1

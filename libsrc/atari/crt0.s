@@ -13,19 +13,18 @@
 
         .import         initlib, donelib
         .import         callmain, zerobss
-        .import         __STARTUP_LOAD__, __ZPSAVE_LOAD__, __BSS_LOAD__
+        .import         __STARTUP_LOAD__, __BSS_LOAD__
         .import         __RESERVED_MEMORY__
-	.import		__RAM_START__, __RAM_SIZE__
-	.import		zpsave
-	.import		sram_init
+        .import         __RAM_START__, __RAM_SIZE__
 .if .defined(__ATARIXL__)
-	.import		scrdev
-	.import		findfreeiocb
+        .import         sram_init
+        .import         scrdev
+        .import         findfreeiocb
+        .include        "save_area.inc"
 .endif
 
         .include        "zeropage.inc"
         .include        "atari.inc"
-	.include	"save_area.inc"
 
 ; ------------------------------------------------------------------------
 ; EXE header
@@ -35,15 +34,11 @@
         .word   $FFFF
 
 .if .defined(__ATARIXL__)
-.segment	"MAINHDR"
+.segment        "MAINHDR"
 .endif
 
         .word   __STARTUP_LOAD__
-.if .defined(__ATARIXL__)
         .word   __BSS_LOAD__ - 1
-.else
-        .word   __ZPSAVE_LOAD__ - 1
-.endif
 
 ; ------------------------------------------------------------------------
 ; Actual code
@@ -57,20 +52,8 @@
 
 ; Real entry point:
 
-.if .not .defined(__ATARIXL__)		; already done in previous load chunk
-
-; Save the zero page locations we need
-
-        ldx     #zpspace-1
-L1:     lda     sp,x
-        sta     zpsave,x
-        dex
-        bpl     L1
-
-.else
-
-	jsr	sram_init
-
+.if .defined(__ATARIXL__)
+        jsr     sram_init
 .endif
 
 ; Clear the BSS data
@@ -87,9 +70,9 @@ L1:     lda     sp,x
 ; Report memory usage
 
         lda     APPMHI
-        sta     appmsav                 ; remember old APPMHI value
+        sta     APPMHI_save             ; remember old APPMHI value
         lda     APPMHI+1
-        sta     appmsav+1
+        sta     APPMHI_save+1
 
         sec
         lda     MEMTOP
@@ -103,10 +86,10 @@ L1:     lda     sp,x
 
 .else
 
-	lda	#<(__RAM_START__ + __RAM_SIZE__ - 1)
-	sta	sp
-	lda	#>(__RAM_START__ + __RAM_SIZE__ - 1)
-	sta	sp+1
+        lda     #<(__RAM_START__ + __RAM_SIZE__ - 1)
+        sta     sp
+        lda     #>(__RAM_START__ + __RAM_SIZE__ - 1)
+        sta     sp+1
 
 .endif
 
@@ -155,36 +138,30 @@ _exit:  jsr     donelib         ; Run module destructors
         lda     old_shflok
         sta     SHFLOK
 
-.if .not .defined(__ATARIXL__)
-
 ; Restore APPMHI
 
-        lda     appmsav
+        lda     APPMHI_save
         sta     APPMHI
-        lda     appmsav+1
+        lda     APPMHI_save+1
         sta     APPMHI+1
 
-.else
+.if .defined(__ATARIXL__)
 
 ; Atari XL target stuff...
 
-	lda	PORTB_save
-	sta	PORTB
-	lda	RAMTOP_save
-	sta	RAMTOP
-	lda	MEMTOP_save
-	sta	MEMTOP
-	lda	MEMTOP_save+1
-	sta	MEMTOP+1
-	lda	APPMHI_save
-	sta	APPMHI
-	lda	APPMHI_save+1
-	sta	APPMHI+1
+        lda     PORTB_save
+        sta     PORTB
+        lda     RAMTOP_save
+        sta     RAMTOP
+        lda     MEMTOP_save
+        sta     MEMTOP
+        lda     MEMTOP_save+1
+        sta     MEMTOP+1
 
 
 ; ... issue a GRAPHICS 0 call (copied'n'pasted from TGI drivers)
 
-	jsr	findfreeiocb
+        jsr     findfreeiocb
 
         ; Reopen it in Graphics 0
         lda     #OPEN
@@ -209,18 +186,9 @@ _exit:  jsr     donelib         ; Run module destructors
 
 .endif
 
-
-; Copy back the zero page stuff
-
-        ldx     #zpspace-1
-L2:     lda     zpsave,x
-        sta     sp,x
-        dex
-        bpl     L2
-
 ; Turn on cursor
 
-        inx
+        ldx     #0
         stx     CRSINH
 
 ; Back to DOS
@@ -237,10 +205,11 @@ spsave:         .res    1
 old_shflok:     .res    1
 old_lmargin:    .res    1
 .if .not .defined(__ATARIXL__)
-appmsav:        .res    1
+APPMHI_save:    .res    2
 .endif
 
-        .segment "AUTOSTRT"
-        .word   RUNAD                   ; defined in atari.h
+
+.segment "AUTOSTRT"
+        .word   RUNAD                   ; defined in atari.inc
         .word   RUNAD+1
         .word   __STARTUP_LOAD__ + 1

@@ -19,7 +19,6 @@ DEBUG   =       1
         .import         __SHADOW_RAM_RUN__
         .import         __CHARGEN_START__, __CHARGEN_SIZE__
         .import         __SAVEAREA_LOAD__
-        .import         zpsave
 
         .include        "zeropage.inc"
         .include        "atari.inc"
@@ -153,14 +152,6 @@ scrok:  ; now close it again -- we don't need it anymore
         sta     ICCOM,x
         jsr     CIOV_org
 
-
-; Save the zero page locations we need
-
-        ldx     #zpspace-1
-L1:     lda     sp,x
-        sta     zpsave,x
-        dex
-        bpl     L1
 
 ; copy chargen to low memory
 

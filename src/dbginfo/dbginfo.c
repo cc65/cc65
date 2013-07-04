@@ -2933,7 +2933,7 @@ static void ParseCSym (InputData* D)
     }
 
     /* Symbol only valid if storage class not auto */
-    if (((InfoBits & ibSymId) != 0) != (SC != CC65_CSYM_AUTO)) {
+    if (((InfoBits & ibSymId) != 0) && (SC == CC65_CSYM_AUTO)) {
         ParseError (D, CC65_ERROR, "Only non auto symbols can have a symbol attached");
         goto ErrorExit;
     }

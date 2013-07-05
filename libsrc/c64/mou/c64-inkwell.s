@@ -1,7 +1,7 @@
 ;
 ; Driver for the Inkwell Systems 170-C and 184-C lightpens.
 ;
-; 2013-06-17, Greg King
+; 2013-07-01, Greg King
 ;
 
         .include        "zeropage.inc"
@@ -133,14 +133,13 @@ INSTALL:
         ldx     LIBREF+1
         sta     ptr1                    ; Point to mouse_adjuster
         stx     ptr1+1
-        ldy     #0
+        ldy     #1
         lda     (ptr1),y
-        sta     Calibrate+1             ; Point to function
-        iny
+        bze     @L1                     ; Don't call pointer if it's NULL
+        sta     Calibrate+2             ; Point to function
+        dey
         lda     (ptr1),y
-        sta     Calibrate+2
-        ora     Calibrate+1             ; Don't call pointer if it's NULL
-        bze     @L1
+        sta     Calibrate+1
         lda     #<XOffset               ; Function will set this variable
         ldx     #>XOffset
         jsr     Calibrate
@@ -149,7 +148,8 @@ INSTALL:
 ; It needs to be done here because the lightpen interrupt handler doesn't
 ; set the lightpen position if it hasn't changed.
 
-@L1:    jsr     CHIDE
+@L1:    sei
+        jsr     CHIDE
 
         lda     #<(SCREEN_HEIGHT / 2)
         ldx     #>(SCREEN_HEIGHT / 2)
@@ -157,6 +157,7 @@ INSTALL:
         lda     #<(SCREEN_WIDTH / 2)
         ldx     #>(SCREEN_WIDTH / 2)
         jsr     MoveX
+        cli
 
 ; Done, return zero.
 

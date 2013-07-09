@@ -10,7 +10,7 @@
         .export __graphics
 
         .import findfreeiocb
-        .import __do_oserror,__oserror
+        .import __oserror
         .import fddecusage
         .import clriocb
         .import fdtoiocb
@@ -96,8 +96,13 @@ doopen: txa
         stx     __oserror
         rts
 
-cioerr: jsr     fddecusage      ; decrement usage counter of fd as open failed
-        jmp     __do_oserror
+cioerr: sty     tmp3            ; remember error code
+        lda     #CLOSE
+        sta     ICCOM,x
+        jsr     CIOV            ; close IOCB again since open failed
+        jsr     fddecusage      ; and decrement usage counter of fd
+        lda     tmp3            ; put error code into A
+        jmp     __mappederrno
 
 .endproc        ; __graphics
 

@@ -140,8 +140,12 @@ finish: php
         plp
 
         bpl     ok
-        jsr     fddecusage      ; decrement usage counter of fd as open failed
-        tya                     ; put error code into A
+        sty     tmp3            ; remember error code
+        lda     #CLOSE
+        sta     ICCOM,x
+        jsr     CIOV            ; close IOCB again since open failed
+        jsr     fddecusage      ; and decrement usage counter of fd
+        lda     tmp3            ; put error code into A
         jmp     __mappederrno
 
 ok:     lda     tmp2            ; get fd

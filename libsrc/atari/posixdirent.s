@@ -63,6 +63,9 @@
 .endproc
 
 cioerr:         sty     __oserror
+                lda     #CLOSE
+                sta     ICCOM,x
+                jsr     CIOV            ; close IOCB again since open failed
                 jmp     return0
 
 .proc   _readdir

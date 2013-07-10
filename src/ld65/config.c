@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2012, Ullrich von Bassewitz                                      */
+/* (c) 1998-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -1959,8 +1959,11 @@ unsigned CfgProcess (void)
             /* Calculate the new address */
             Addr += S->Seg->Size;
 
-            /* If this segment goes out to the file, increase the file size */
-            if ((S->Flags & SF_BSS) == 0 && S->Load == M) {
+            /* If this segment will go out to the file, or its place
+             * in the file will be filled, then increase the file size.
+             */
+            if (S->Load == M &&
+                ((S->Flags & SF_BSS) == 0 || (M->Flags & MF_FILL) != 0)) {
                 M->F->Size += Addr - StartAddr;
             }
 

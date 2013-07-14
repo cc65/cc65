@@ -58,6 +58,7 @@ typedef enum {
     TGT_ATARIXL,
     TGT_VIC20,
     TGT_C16,
+	TGT_C1P,
     TGT_C64,
     TGT_C128,
     TGT_PLUS4,

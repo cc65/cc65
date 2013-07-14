@@ -15,6 +15,7 @@ TARGETS = apple2    \
           atari     \
           atarixl   \
           atmos     \
+          c1p       \
           $(CBMS)   \
           $(GEOS)   \
           lynx      \

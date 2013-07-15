@@ -36,10 +36,11 @@ _init:    LDX     #$FF                 ; Initialize stack pointer to $01FF
 
 ; ---------------------------------------------------------------------------
 ; Initialize memory storage
+; copydata seems to be only necessary for special systems
 
-          ; JSR     zerobss              ; Clear BSS segment
-          ; JSR     copydata             ; Initialize DATA segment
-          ; JSR     initlib              ; Run constructors
+          JSR     zerobss              ; Clear BSS segment
+          ; JSR     copydata           ; Initialize DATA segment
+          JSR     initlib              ; Run constructors
 
 ; ---------------------------------------------------------------------------
 ; Call main()

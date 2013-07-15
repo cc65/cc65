@@ -55,6 +55,7 @@ NOTE    = $26           ;note sector
 GETFL   = $27           ;get file length
 CHDIR_MYDOS     = $29   ;change directory (MyDOS)
 MKDIR   = $2A           ;make directory (MyDOS/SpartaDOS)
+RMDIR   = $2B           ;remove directory (SpartaDOS)
 CHDIR_SPDOS     = $2C   ;change directory (SpartaDOS)
 FORMAT  = $FE           ;format
 

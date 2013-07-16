@@ -2,7 +2,7 @@
 ; Graphics driver for the 240x200x2 monochrome mode on the Atmos
 ;
 ; Stefan Haubenthal <polluks@sdf.lonestar.org>
-; 2012-08-11, Greg King <greg.king5@verizon.net>
+; 2013-07-15, Greg King <gregdk@users.sf.net>
 ;
 
         .include        "zeropage.inc"
@@ -66,10 +66,10 @@ YSIZE   =       8                       ; System font height
 ; Variables mapped to the zero page segment variables. Some of these are
 ; used for passing parameters to the driver.
 
-X1              = ptr1
-Y1              = ptr2
-X2              = ptr3
-Y2              = ptr4
+X1              := ptr1
+Y1              := ptr2
+X2              := ptr3
+Y2              := ptr4
 
 ; Absolute variables used in the code
 
@@ -78,19 +78,7 @@ Y2              = ptr4
 ERROR:          .res    1       ; Error code
 MODE:           .res    1       ; Graphics mode
 
-; Constants and tables
-PARAM1          = $2E1
-PARAM2          = $2E3
-PARAM3          = $2E5
-TEXT            = $EC21
-HIRES           = $EC33
-CURSET          = $F0C8
-CURMOV          = $F0FD
-DRAW            = $F110
-CHAR            = $F12D
-POINT           = $F1C8
-PAPER           = $F204
-INK             = $F210
+; Constant table
 
 .rodata
 
@@ -152,7 +140,7 @@ INIT:
 ; Must set an error code: NO
 ;
 
-DONE            = TEXT
+DONE            := TEXT
 
 ; ------------------------------------------------------------------------
 ; GETERROR: Return the error code in A and clear it.
@@ -181,7 +169,7 @@ CONTROL:
 ; Must set an error code: NO
 ;
 
-CLEAR           = HIRES
+CLEAR           := HIRES
 
 ; ------------------------------------------------------------------------
 ; SETVIEWPAGE: Set the visible page. Called with the new page in A (0..n).

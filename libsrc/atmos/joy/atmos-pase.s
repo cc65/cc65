@@ -1,14 +1,15 @@
 ;
 ; P.A.S.E. joystick driver for the Atmos
-; May be used multiple times when linked to the statically application.
+; Can be used multiple times when statically linked to the application.
 ;
-; Stefan Haubenthal, 2009-12-21
-; Based on Ullrich von Bassewitz, 2002-12-20
+; 2002-12-20, Based on Ullrich von Bassewitz's code.
+; 2009-12-21, Stefan Haubenthal
+; 2013-07-15, Greg King
 ;
 
         .include        "joy-kernel.inc"
         .include        "joy-error.inc"
-;       .include        "atmos.inc"
+        .include        "atmos.inc"
 
 
 ; ------------------------------------------------------------------------
@@ -48,10 +49,6 @@
 ; Constants
 
 JOY_COUNT       = 2             ; Number of joysticks we support
-
-PRA             = $0301
-DDRA            = $0303
-PRA2            = $030F
 
 ; ------------------------------------------------------------------------
 ; Data.
@@ -99,24 +96,24 @@ COUNT:
 READ:
         tay
 
-        lda     PRA
+        lda     VIA::PRA
         pha
-        lda     DDRA
+        lda     VIA::DDRA
         pha
         lda     #%11000000
-        sta     DDRA
+        sta     VIA::DDRA
         lda     #%10000000
-        sta     PRA2
-        lda     PRA2
+        sta     VIA::PRA2
+        lda     VIA::PRA2
         sta     temp1
         lda     #%01000000
-        sta     PRA2
-        lda     PRA
+        sta     VIA::PRA2
+        lda     VIA::PRA
         sta     temp2
         pla
-        sta     DDRA
+        sta     VIA::DDRA
         pla
-        sta     PRA2
+        sta     VIA::PRA2
 
         ldx     #0
         tya

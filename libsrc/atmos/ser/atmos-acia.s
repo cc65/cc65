@@ -2,7 +2,8 @@
 ; Serial driver for the Telestrat integrated serial controller and the
 ; Atmos with a serial add-on.
 ;
-; Stefan Haubenthal, 2012-03-05
+; 2012-03-05, Stefan Haubenthal
+; 2013-07-15, Greg King
 ;
 ; The driver is based on the cc65 rs232 module, which in turn is based on
 ; Craig Bruce device driver for the Switftlink/Turbo-232.
@@ -25,6 +26,7 @@
         .include        "zeropage.inc"
         .include        "ser-kernel.inc"
         .include        "ser-error.inc"
+        .include        "atmos.inc"
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
@@ -45,18 +47,9 @@
         .addr   CLOSE
         .addr   GET
         .addr   PUT
-        .addr   STATUS
+        .addr   SER_STATUS
         .addr   IOCTL
         .addr   IRQ
-
-;----------------------------------------------------------------------------
-; I/O definitions
-
-ACIA            = $031C
-ACIA_DATA       = ACIA+0        ; Data register
-ACIA_STATUS     = ACIA+1        ; Status register
-ACIA_CMD        = ACIA+2        ; Command register
-ACIA_CTRL       = ACIA+3        ; Control register
 
 ;----------------------------------------------------------------------------
 ; Global variables
@@ -142,7 +135,7 @@ CLOSE:
 
         ; Deactivate DTR and disable 6551 interrupts
         lda     #%00001010
-        sta     ACIA_CMD,x
+        sta     ACIA::CMD,x
 
         ; Done, return an error code
 :       lda     #<SER_ERR_OK
@@ -194,10 +187,10 @@ OPEN:
         lda     StopTable,y
         ora     tmp1
         ora     #%00010000              ; Receiver clock source = baudrate
-        sta     ACIA_CTRL
+        sta     ACIA::CTRL
 
         ; Set the value for the command register. We remember the base value
-        ; in RtsOff, since we will have to manipulate ACIA_CMD often.
+        ; in RtsOff, since we will have to manipulate ACIA::CMD often.
         ldy     #SER_PARAMS::PARITY     ; Parity
         lda     (ptr1),y
         tay
@@ -205,7 +198,7 @@ OPEN:
         ora     #%00000001              ; DTR active
         sta     RtsOff
         ora     #%00001000              ; Enable receive interrupts
-        sta     ACIA_CMD
+        sta     ACIA::CMD
 
         ; Done
         stx     Index                   ; Mark port as open
@@ -252,7 +245,7 @@ GET:
         sta     Stopped
         lda     RtsOff
         ora     #%00001000
-        sta     ACIA_CMD
+        sta     ACIA::CMD
 
         ; Get byte from buffer
 :       ldy     RecvHead        ; (41)
@@ -296,11 +289,11 @@ PUT:
         rts
 
 ;----------------------------------------------------------------------------
-; STATUS: Return the status in the variable pointed to by ptr1.
+; SER_STATUS: Return the status in the variable pointed to by ptr1.
 ; Must return an SER_ERR_xx code in a/x.
 
-STATUS:
-        lda     ACIA_STATUS
+SER_STATUS:
+        lda     ACIA::STATUS
         ldx     #$00
         sta     (ptr1,x)
         txa                     ; SER_ERR_OK
@@ -325,10 +318,10 @@ IOCTL:
 IRQ:
         ldx     Index           ; Check for open port
         beq     Done
-        lda     ACIA_STATUS,x   ; Check ACIA status for receive interrupt
+        lda     ACIA::STATUS,x  ; Check ACIA status for receive interrupt
         and     #$08
         beq     Done            ; Jump if no ACIA interrupt
-        lda     ACIA_DATA,x     ; Get byte from ACIA
+        lda     ACIA::DATA,x    ; Get byte from ACIA
         ldy     RecvFreeCnt     ; Check if we have free space left
         beq     Flow            ; Jump if no space in receive buffer
         ldy     RecvTail        ; Load buffer pointer
@@ -342,7 +335,7 @@ IRQ:
 
         ; Assert flow control if buffer space too low
 Flow:   lda     RtsOff
-        sta     ACIA_CMD,x
+        sta     ACIA::CMD,x
         sta     Stopped
         sec                     ; Interrupt handled
 Done:   rts
@@ -361,7 +354,7 @@ Again:  lda     SendFreeCnt
         bne     Quit            ; Bail out
 
         ; Check that ACIA is ready to send
-        lda     ACIA_STATUS
+        lda     ACIA::STATUS
         and     #$10
         bne     Send
         bit     tmp1            ; Keep trying if must try hard
@@ -371,7 +364,7 @@ Quit:   rts
         ; Send byte and try again
 Send:   ldy     SendHead
         lda     SendBuf,y
-        sta     ACIA_DATA
+        sta     ACIA::DATA
         inc     SendHead
         inc     SendFreeCnt
         jmp     Again

@@ -1,6 +1,7 @@
 ifeq ($(shell echo),)
 
 PROGS = ar65  \
+        c1p65 \
         ca65  \
         cc65  \
         cl65  \

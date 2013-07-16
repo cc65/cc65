@@ -19,18 +19,18 @@ BASIC_BUF       := $35
 ; ---------------------------------------------------------------------------
 ; Low memory
 
-CAPSLOCK        := $20C
-PATTERN         := $213
-IRQVec          := $245
-CURS_Y          := $268
-CURS_X          := $269
-STATUS          := $26A
-TIMER3          := $276
-CFOUND_NAME     := $293
-KEYBUF          := $2DF
-PARAM1          := $2E1        ; & $2E2
-PARAM2          := $2E3        ; & $2E4
-PARAM3          := $2E5        ; & $2E6
+CAPSLOCK        := $020C
+PATTERN         := $0213
+IRQVec          := $0245
+CURS_Y          := $0268
+CURS_X          := $0269
+STATUS          := $026A
+TIMER3          := $0276
+CFOUND_NAME     := $0293
+KEYBUF          := $02DF
+PARAM1          := $02E1        ; & $02E2
+PARAM2          := $02E3        ; & $02E4
+PARAM3          := $02E5        ; & $02E6
 
 
 ; ---------------------------------------------------------------------------

@@ -15,7 +15,6 @@
         .import         ucase_fn
         .import         findfreeiocb
         .import         addysp
-        .importzp       sreg
         .importzp       tmp3
         .importzp       tmp4
 

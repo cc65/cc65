@@ -8,7 +8,6 @@
 ;
 
         .include        "atari.inc"
-        .include        "errno.inc"
         .export         __sysrmdir
         .import         __sysremove
         .import         __dos_type

@@ -12,12 +12,17 @@
         .export         __sysrmdir
         .import         __sysremove
         .import         __dos_type
-        .import         ucase_fn
         .import         findfreeiocb
+        .importzp       tmp4
+.ifdef  UCASE_FILENAME
+        .import         ucase_fn
         .import         addysp
         .importzp       sreg
         .importzp       tmp3
-        .importzp       tmp4
+.ifdef  DEFAULT_DEVICE
+        .importzp tmp2
+.endif
+.endif
 
 .proc   __sysrmdir
 
@@ -53,6 +58,10 @@ do_sparta:
 
 .ifdef  UCASE_FILENAME
 
+.ifdef  DEFAULT_DEVICE
+        ldy     #$80
+        sty     tmp2            ; set flag for ucase_fn
+.endif
         jsr     ucase_fn
         bcc     ucok1
 

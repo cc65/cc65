@@ -1,0 +1,18 @@
+Port of aclock (http://www.tenox.tc/out/#aclock) by Antoni Sawicki to 6502 GEOS on the Apple II and Commodore 64/128. Ported 2013-07-07 by Peter Godwin <pgodwin@gmail.com>
+
+Included is the source code, the binary builds and sample disk images. 
+
+You'll need cc65 to build the code. This has been tested against the latest code at https://github.com/oliverschmidt/cc65/ (21ef04845e).
+
+Source Files:
+src/aclock-geos.c - the GEOS port
+src/aclockres.grc - the resource file to compile the code as a GEOS application
+
+bin/aclock-geos-apple - GEOS binary of aclock for the Apple II
+bin/aclock-geos-cbm - GEOS binary of aclock for the Commodore 64
+
+img/GEOS-APPLE.DSK - GEOS Boot disk with aclock for the Apple II
+img/GEOS-c64.D64 - GEOS Boot Disk with aclock for the Commodore 64 (see Page 3 of the disk).
+
+Any Questions? contact Peter Godwin <pgodwin@gmail.com>
+

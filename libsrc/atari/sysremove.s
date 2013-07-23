@@ -12,6 +12,9 @@
         .importzp tmp3
         .import addysp
         .import ucase_fn
+.ifdef  DEFAULT_DEVICE
+        .importzp tmp2
+.endif
 .endif
         .export __sysremove
 
@@ -37,6 +40,10 @@ iocbok: stx     tmp4            ; remember IOCB index
 
 .ifdef  UCASE_FILENAME
 
+.ifdef  DEFAULT_DEVICE
+        ldy     #$80
+        sty     tmp2            ; set flag for ucase_fn
+.endif
         jsr     ucase_fn
         bcc     ucok1
 

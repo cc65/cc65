@@ -21,7 +21,7 @@
         .include        "atari.inc"
 
 .ifdef  DEFAULT_DEVICE
-        .importzp tmp2, tmp1
+        .importzp tmp2
         .import __defdev
 .endif
         .importzp tmp3,ptr4,sp

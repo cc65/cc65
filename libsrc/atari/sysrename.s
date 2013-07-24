@@ -164,13 +164,14 @@ copend2:ldx     tmp4
         clc
         adc     sspc
         sta     sp
-        bcc     L2
-        inc     sp+1
-L2:     pla
-        tay
+        lda     sp+1
+        adc     sspc+1
+        sta     sp+1
 
 ; handle status
 
+        pla
+        tay
         bmi     cioerr
         lda     #0
         rts

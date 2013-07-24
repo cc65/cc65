@@ -7,6 +7,8 @@
 ;
 ; Calling parameters:
 ;       AX   - points to filename
+;       tmp2 - 0/$80 for don't/do prepend default device if no device
+;              is present in the passed string (only .ifdef DEFAULT_DEVICE)
 ; Return parameters:
 ;       C    - 0/1 for OK/Error (filename too long)
 ;       AX   - points to uppercased version of the filename on the stack
@@ -38,15 +40,16 @@
         stx     ptr4+1
 
 .ifdef  DEFAULT_DEVICE
+        ; bit #0 of tmp2 is used as a flag whether device name is present in passed string (1 = present, 0 = not present)
         ldy     #1
-        sty     tmp2            ; initialize flag: device present in passed string
+        inc     tmp2            ; initialize flag: device present
         lda     #':'
         cmp     (ptr4),y
         beq     hasdev
         iny
         cmp     (ptr4),y
         beq     hasdev
-        sta     tmp2            ; set flag: no device in passed string
+        dec     tmp2            ; set flag: no device in passed string
 hasdev:
 .endif
 
@@ -54,7 +57,7 @@ hasdev:
         sty     tmp3            ; save size
         jsr     subysp          ; make room on the stack
 
-        ; copy filename to the temp. place on the stack, also uppercasing it
+        ; copy filename to the temp. place on the stack, while uppercasing it
         ldy     #0
 
 loop2:  lda     (ptr4),y
@@ -77,9 +80,10 @@ L1:
 copy_end:
 
 .ifdef  DEFAULT_DEVICE
-        lda     tmp2
-        cmp     #1              ; was device present in passed string?
-        beq     hasdev2         ; yes, don't prepend something
+        lda     #1
+        bit     tmp2
+        bne     hasdev2         ; yes, don't prepend something
+        bpl     hasdev2
 
         ldy     #128+3          ; no, prepend "D:" (or other device)
         sty     tmp3            ; adjust stack size used

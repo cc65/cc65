@@ -3,7 +3,7 @@
 ** Will work for the C64/C128/CBM510/Atari/Apple2.
 **
 ** 2001-09-13, Ullrich von Bassewitz
-** 2013-06-26, Greg King
+** 2013-07-25, Greg King
 **
 */
 
@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <mouse.h>
+#include <pen.h>
 #include <conio.h>
 #include <ctype.h>
 #include <dbg.h>

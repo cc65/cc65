@@ -1,13 +1,14 @@
 /*
 ** Calibrate lightpen drivers to the current video hardware.
 **
-** 2013-06-17, Greg King
+** 2013-07-25, Greg King
 **
 */
 
 
 #include <conio.h>
 #include <mouse.h>
+#include <pen.h>
 
 
 #define COMMAND1 "Adjust by clicking on line."

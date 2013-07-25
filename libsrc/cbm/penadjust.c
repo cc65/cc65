@@ -1,14 +1,14 @@
 /*
 ** Main lightpen driver calibration functions.
 **
-** 2013-06-23, Greg King
+** 2013-07-25, Greg King
 */
 
 
 #include <stddef.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <mouse.h>
+#include <pen.h>
 
 
 static const char *name;
@@ -40,15 +40,15 @@ static void __fastcall__ adjuster (unsigned char *XOffset)
 /* pen_adjust() is optional; if you want to use its feature,
 ** then it must be called before a driver is installed.
 ** Note:  This function merely saves the file-name pointer, and sets
-** the mouse_adjuster pointer.  The file will be read only when a driver
+** the pen_adjuster pointer.  The file will be read only when a driver
 ** is installed, and only if that driver wants to be calibrated.
 */
 void __fastcall__ pen_adjust (const char *filename)
 {
     if (filename != NULL && filename[0] != '\0') {
         name = filename;
-        mouse_adjuster = adjuster;
+        pen_adjuster = adjuster;
     } else {
-        mouse_adjuster = pen_calibrate;
+        pen_adjuster = pen_calibrate;
     }
 }

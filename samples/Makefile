@@ -30,21 +30,14 @@ LD   = ld65
 
 else
 # "samples/" is a part of a complete source tree.
-CA65_INC = ../asminc
-CC65_INC = ../include
-LD65_CFG = ../src/ld65/cfg
-LD65_LIB = ../libsrc
-LD65_OBJ = ../libsrc
-MOUS = ../libsrc/$(SYS)*.mou
-TGI  = ../libsrc/$(SYS)*.tgi
-CLIB = ../libsrc/$(SYS).lib
-CL   = ../src/cl65/cl65
-CC   = ../src/cc65/cc65
-AS   = ../src/ca65/ca65
-LD   = ../src/ld65/ld65
-
-MY_INC = --forget-inc-paths -I . -I $(CC65_INC)
-MY_ASM = --forget-inc-paths -I . -I $(CA65_INC)
+export CC65_HOME := $(abspath ..)
+MOUS = ../mou/$(SYS)*.mou
+TGI  = ../tgi/$(SYS)*.tgi
+CLIB = ../lib/$(SYS).lib
+CL   = ../bin/cl65
+CC   = ../bin/cc65
+AS   = ../bin/ca65
+LD   = ../bin/ld65
 endif
 
 # This one comes with VICE
@@ -54,17 +47,20 @@ C1541	= c1541
 # --------------------------------------------------------------------------
 # Generic rules
 
+%: %.c
+%: %.s
+
 .c.o:
 	@echo $<
-	@$(CC) $(MY_INC) -Oirs --codesize 500 -T -g -t $(SYS) $<
-	@$(AS) $(basename $<).s
+	@$(CC) $(CFLAGS) -Oirs --codesize 500 -T -g -t $(SYS) $<
+	@$(AS) $(<:.c=.s)
 
 .s.o:
 	@echo $<
-	@$(AS) $(MY_ASM) -t $(SYS) $<
+	@$(AS) $(AFLAGS) -t $(SYS) $<
 
 .o:
-	@$(LD) -o $@ -t $(SYS) -m $(basename $@).map $^ $(CLIB)
+	@$(LD) -o $@ -t $(SYS) -m $@.map $^ $(CLIB)
 
 
 # --------------------------------------------------------------------------
@@ -78,7 +74,7 @@ EXELIST	=	ascii		\
 		gunzip65	\
 		hello		\
 		mandelbrot	\
-		mousedemo	\
+		mousetest	\
 		multdemo	\
 		nachtm		\
 		ovrldemo	\
@@ -105,31 +101,31 @@ hello:		hello.o
 # The Apple machines need the start address adjusted for the mandelbrot demo
 ifeq "$(SYS)" "apple2"
 mandelbrot:	mandelbrot.o
-	@$(LD) -t $(SYS) -m $(basename $@).map --start-addr 0x4000 -o $@ $^ $(CLIB)
+	@$(LD) -o $@ -t $(SYS) -m $@.map --start-addr 0x4000 $^ $(CLIB)
 else
 ifeq "$(SYS)" "apple2enh"
 mandelbrot:	mandelbrot.o
-	@$(LD) -t $(SYS) -m $(basename $@).map --start-addr 0x4000 -o $@ $^ $(CLIB)
+	@$(LD) -o $@ -t $(SYS) -m $@.map --start-addr 0x4000 $^ $(CLIB)
 else
 mandelbrot:	mandelbrot.o
 endif
 endif
 
-# The Apple ][ needs the start address adjusted for the mousedemo
+# The Apple ][ needs the start address adjusted for the mousetest
 ifeq "$(SYS)" "apple2"
-mousedemo:	mousedemo.o
-	@$(LD) -t $(SYS) -m $(basename $@).map --start-addr 0x4000 -o $@ $^ $(CLIB)
+mousetest:	mousetest.o
+	@$(LD) -o $@ -t $(SYS) -m $@.map --start-addr 0x4000 $^ $(CLIB)
 else
-mousedemo:	mousedemo.o
+mousetest:	mousetest.o
 endif
 
 multdemo:	multidemo.o
-	@$(LD) -t $(SYS) -m $(basename $@).map -C $(SYS)-overlay.cfg -o $@ $^ $(CLIB)
+	@$(LD) -o $@ -m $@.map -C $(SYS)-overlay.cfg $^ $(CLIB)
 
 nachtm:		nachtm.o
 
 ovrldemo:	overlaydemo.o
-	@$(LD) -t $(SYS) -m $(basename $@).map -C $(SYS)-overlay.cfg -o $@ $^ $(CLIB)
+	@$(LD) -o $@ -m $@.map -C $(SYS)-overlay.cfg $^ $(CLIB)
 
 plasma:		plasma.o
 
@@ -138,11 +134,11 @@ sieve:		sieve.o
 # The Apple machines need the start address adjusted for the tgidemo
 ifeq "$(SYS)" "apple2"
 tgidemo:	tgidemo.o
-	@$(LD) -t $(SYS) -m $(basename $@).map --start-addr 0x4000 -o $@ $^ $(CLIB)
+	@$(LD) -o $@ -t $(SYS) -m $@.map --start-addr 0x4000 $^ $(CLIB)
 else
 ifeq "$(SYS)" "apple2enh"
 tgidemo:	tgidemo.o
-	@$(LD) -t $(SYS) -m $(basename $@).map --start-addr 0x4000 -o $@ $^ $(CLIB)
+	@$(LD) -o $@ -t $(SYS) -m $@.map --start-addr 0x4000 $^ $(CLIB)
 else
 tgidemo:	tgidemo.o
 endif

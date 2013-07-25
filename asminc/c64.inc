@@ -95,6 +95,9 @@ VIC_CTRL2       := $D016
 
 VIC_HLINE       := $D012
 
+VIC_LPEN_X      := $D013
+VIC_LPEN_Y      := $D014
+
 VIC_VIDEO_ADR   := $D018
 
 VIC_IRR         := $D019        ; Interrupt request register
@@ -206,5 +209,4 @@ CASSMOT         = $20           ; Cassette motor on
 TP_FAST         = $80           ; Switch Rossmoeller TurboProcess to fast mode
 
 RAMONLY         = $F8           ; (~(LORAM | HIRAM | IOEN)) & $FF
-
 

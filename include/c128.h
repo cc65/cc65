@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/* (C) 1998-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -131,6 +131,7 @@ extern void c128_ptvjoy_joy[];
 extern void c128_stdjoy_joy[];  /* Referred to by joy_static_stddrv[] */
 extern void c128_1351_mous[];   /* Referred to by mouse_static_stddrv[] */
 extern void c128_joy_mou[];
+extern void c128_inkwell_mou[];
 extern void c128_pot_mou[];
 extern void c128_swlink_ser[];
 extern void c128_vdc_tgi[];     /* Referred to by tgi_static_stddrv[] */

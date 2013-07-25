@@ -2,11 +2,11 @@
 /*                                                                           */
 /*                                   c64.h                                   */
 /*                                                                           */
-/*                      C64 system specific definitions                      */
+/*                      C64 system-specific definitions                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010 Ullrich von Bassewitz                                       */
+/* (C) 1998-2013 Ullrich von Bassewitz                                       */
 /*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -145,6 +145,7 @@ extern void c64_ptvjoy_joy[];
 extern void c64_stdjoy_joy[];           /* Referred to by joy_static_stddrv[] */
 extern void c64_1351_mou[];             /* Referred to by mouse_static_stddrv[] */
 extern void c64_joy_mou[];
+extern void c64_inkwell_mou[];
 extern void c64_pot_mou[];
 extern void c64_swlink_ser[];
 extern void c64_hi_tgi[];               /* Referred to by tgi_static_stddrv[] */

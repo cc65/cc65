@@ -1,32 +1,94 @@
 ;
-; Oric atmos zeropage and ROM definitions
+; Oric Atmos definitions
+; BASIC 1.1 addresses
 ;
+
+
+; ---------------------------------------------------------------------------
+; Constants
+
+SCREEN_XSIZE    = 40            ; screen columns
+SCREEN_YSIZE    = 28            ; screen rows
+
+FUNCTKEY        = $A5
+
+FNAME_LEN       = 16            ; maximum length of file-name
 
 
 ; ---------------------------------------------------------------------------
 ; Zero page
 
+BASIC_BUF       := $35
 
 
 ; ---------------------------------------------------------------------------
 ; Low memory
 
-CAPSLOCK        := $20C
-IRQVec          := $245
-CURS_Y          := $268
-CURS_X          := $269
-STATUS          := $26A
-TIMER3          := $276
-KEYBUF          := $2DF
+MODEKEY         := $0209
+CAPSLOCK        := $020C
+PATTERN         := $0213
+IRQVec          := $0245
+JOINFLAG        := $025A        ; 0 = don't joiu, $4A = join BASIC programs
+VERIFYFLAG      := $025B        ; 0 = load, 1 = verify
+CURS_Y          := $0268
+CURS_X          := $0269
+STATUS          := $026A
+TIMER3          := $0276
+CFILE_NAME      := $027F
+CFOUND_NAME     := $0293
+FILESTART       := $02A9
+FILEEND         := $02AB
+AUTORUN         := $02AD        ; $00 = only load, $C7 = autorun
+LANGFLAG        := $02AE        ; $00 = BASIC, $80 = machine code
+KEYBUF          := $02DF
+PARAM1          := $02E1        ; & $02E2
+PARAM2          := $02E3        ; & $02E4
+PARAM3          := $02E5        ; & $02E6
+
+
+; ---------------------------------------------------------------------------
+; I/O locations
+
+; 6522
+.struct VIA                     ; Versatile Interface Adapter
+        .res    $0300
+PRB     .byte                   ; Port Register B
+PRA     .byte                   ; Port Register A
+DDRB    .byte                   ; Data Direction Register B
+DDRA    .byte                   ; Data Direction Register A
+T1      .word                   ; Timer 1
+T1L     .word                   ; Timer 1 Latch
+T2      .word                   ; Timer 2
+SR      .byte                   ; Shift Register
+ACR     .byte                   ; Auxiliary Control Register
+PCR     .byte                   ; Peripheral Control Register
+IFR     .byte                   ; Interrupt Flags Register
+IER     .byte                   ; Interrupt Enable Register
+PRA2    .byte                   ; Port Register A without handshaking
+.endstruct
+
+; 6551
+.struct ACIA                    ; Asynchronous Communications Interface Adapter
+        .res    $031C
+DATA    .byte
+STATUS  .byte
+CMD     .byte                   ; Command register
+CTRL    .byte                   ; Control register
+.endstruct
+
+SCREEN          := $BB80
 
 
 ; ---------------------------------------------------------------------------
 ; ROM entries
 
+TEXT            := $EC21
+HIRES           := $EC33
+CURSET          := $F0C8
+CURMOV          := $F0FD
+DRAW            := $F110
+CHAR            := $F12D
+POINT           := $F1C8
+PAPER           := $F204
+INK             := $F210
 PRINT           := $F77C
-
-
-; ---------------------------------------------------------------------------
-; I/O
-
-SCREEN          := $BB80

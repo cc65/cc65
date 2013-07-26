@@ -1,5 +1,5 @@
 ;
-; C64 generic definitions. Stolen from Elite128
+; C128 generic definitions. Stolen from Elite128
 ;
 
 
@@ -32,7 +32,7 @@ FETVEC          := $2AA         ; Vector patch location for FETCH
 STASH           := $2AF         ; Stash routine in RAM
 STAVEC          := $2B9         ; Vector patch location for STASH
 PALFLAG         := $A03         ; $FF=PAL, $00=NTSC
-INIT_STATUS     := $A04         ; Flag: Reset/NMI Status
+INIT_STATUS     := $A04         ; Flags: Reset/Restore initiation status
 FKEY_LEN        := $1000        ; Function key lengths
 FKEY_TEXT       := $100A        ; Function key texts
 
@@ -101,6 +101,9 @@ VIC_CTRL1       := $D011
 VIC_CTRL2       := $D016
 
 VIC_HLINE       := $D012
+
+VIC_LPEN_X      := $D013
+VIC_LPEN_Y      := $D014
 
 VIC_VIDEO_ADR   := $D018
 

@@ -1,23 +1,27 @@
-; Stefan Haubenthal, 2012-05-06
-; based on code by Twilighte
+; Based on code by Twilighte.
+; 2012-05-06, Stefan Haubenthal
+; 2013-07-22, Greg King
+;
 ; void __fastcall__ atmos_save(const char* name, const void* start, const void* end);
 
         .export         _atmos_save
         .import         popax, store_filename
 
+        .include        "atmos.inc"
+
 
 .proc   _atmos_save
 
         sei
-        sta     $02ab   ; file end lo
-        stx     $02ac   ; file end hi
+        sta     FILEEND
+        stx     FILEEND+1
         jsr     popax
-        sta     $02a9   ; file start lo
-        stx     $02aa   ; file start hi
+        sta     FILESTART
+        stx     FILESTART+1
         jsr     popax
         jsr     store_filename
         lda     #00
-        sta     $02ad
+        sta     AUTORUN
         jsr     csave_bit
         cli
         rts

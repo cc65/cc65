@@ -1,5 +1,6 @@
 ;
-; Ullrich von Bassewitz, 2003-04-13
+; 2003-04-13, Ullrich von Bassewitz
+; 2013-07-16, Greg King
 ;
 
         .export         _clrscr
@@ -27,7 +28,7 @@
 
 ; Clear full pages. Y is still zero
 
-        ldx     #>(28*40)
+        ldx     #>(SCREEN_YSIZE * SCREEN_XSIZE)
         lda     #' '
 @L1:    sta     (ptr2),y
         iny                     ; Bump low byte of address
@@ -40,7 +41,7 @@
 
 @L2:    sta     (ptr2),y
         iny
-        cpy     #<(28*40)
+        cpy     #<(SCREEN_YSIZE * SCREEN_XSIZE)
         bne     @L2
         rts
 

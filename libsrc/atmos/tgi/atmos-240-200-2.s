@@ -2,7 +2,7 @@
 ; Graphics driver for the 240x200x2 monochrome mode on the Atmos
 ;
 ; Stefan Haubenthal <polluks@sdf.lonestar.org>
-; 2013-07-15, Greg King <gregdk@users.sf.net>
+; 2013-07-16, Greg King <gregdk@users.sf.net>
 ;
 
         .include        "zeropage.inc"
@@ -158,7 +158,7 @@ GETERROR:
 ;
 
 CONTROL:
-        sta     $213
+        sta     PATTERN
         lda     #TGI_ERR_OK
         sta     ERROR
         rts

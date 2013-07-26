@@ -7,6 +7,11 @@
 ; ---------------------------------------------------------------------------
 ; Constants
 
+SCREEN_XSIZE    = 40            ; screen columns
+SCREEN_YSIZE    = 28            ; screen rows
+
+FUNCTKEY        = $A5
+
 FNAME_LEN       = 16            ; maximum length of file-name
 
 
@@ -19,14 +24,22 @@ BASIC_BUF       := $35
 ; ---------------------------------------------------------------------------
 ; Low memory
 
+MODEKEY         := $0209
 CAPSLOCK        := $020C
 PATTERN         := $0213
 IRQVec          := $0245
+JOINFLAG        := $025A        ; 0 = don't joiu, $4A = join BASIC programs
+VERIFYFLAG      := $025B        ; 0 = load, 1 = verify
 CURS_Y          := $0268
 CURS_X          := $0269
 STATUS          := $026A
 TIMER3          := $0276
+CFILE_NAME      := $027F
 CFOUND_NAME     := $0293
+FILESTART       := $02A9
+FILEEND         := $02AB
+AUTORUN         := $02AD        ; $00 = only load, $C7 = autorun
+LANGFLAG        := $02AE        ; $00 = BASIC, $80 = machine code
 KEYBUF          := $02DF
 PARAM1          := $02E1        ; & $02E2
 PARAM2          := $02E3        ; & $02E4

@@ -1,9 +1,13 @@
-; Stefan Haubenthal, 2012-05-06
-; based on code by Twilighte
+; Based on code by Twilighte.
+; 2012-05-06, Stefan Haubenthal
+; 2013-07-22, Greg King
+;
 ; void __fastcall__ atmos_load(const char* name);
 
         .export         _atmos_load
         .import         store_filename
+
+        .include        "atmos.inc"
 
 
 .proc   _atmos_load
@@ -11,10 +15,10 @@
         sei
         jsr     store_filename
         ldx     #$00
-        stx     $02ad
-        stx     $02ae
-        stx     $025a
-        stx     $025b
+        stx     AUTORUN         ; don't try to run the file
+        stx     LANGFLAG        ; BASIC
+        stx     JOINFLAG        ; don't join it to another BASIC program
+        stx     VERIFYFLAG      ; load the file
         jsr     cload_bit
         cli
         rts

@@ -1,5 +1,6 @@
 ;
-; Ullrich von Bassewitz, 2003-04-13
+; 2003-04-13, Ullrich von Bassewitz
+; 2013-07-26, Greg King
 ;
 ; char cgetc (void);
 ;
@@ -9,7 +10,6 @@
         .import         cursor
 
         .include        "atmos.inc"
-
 
 
 ; ------------------------------------------------------------------------
@@ -41,8 +41,8 @@
 
 @L2:    and     #$7F            ; Mask out avail flag
         sta     KEYBUF
-        ldy     $209
-        cpy     #$A5
+        ldy     MODEKEY
+        cpy     #FUNCTKEY
         bne     @L3
         ora     #$80            ; FUNCT pressed
 

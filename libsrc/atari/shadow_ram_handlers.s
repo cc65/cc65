@@ -241,8 +241,6 @@ CIOV_call:
 ; and some only use the pointer (like e.g. OPEN), and some use both.
 ; So we need function specific handlers to correctly deal with
 ; buffers which are overlapping with the ROM area.
-; All input and output registers need to be preserved (I'm not 100%
-; sure about Y as input, but let's preserve it for now.)
 ;
 ; FIXME: Currently only the requests used by the runtime lib are handled.
 
@@ -266,13 +264,17 @@ my_CIOV:
 	beq	CIO_filename2
 	cmp	#GETCWD
 	bcc	CIO_filename		; filename as input parameter in buffer, length not used
-	beq	CIO_read		; input
+	beq	CIO_invalid		; GETCWD not supported yet
 	bcs	CIO_call_a		; other commands: assume no buffer
 ; not reached
 
 CIO_write_jmp:
 	jmp	CIO_write
 
+CIO_invalid:
+	lda	CIO_a
+	ldy	#DINVCM
+	rts
 
 ; READ handler
 ; ------------

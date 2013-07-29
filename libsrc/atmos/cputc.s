@@ -1,5 +1,6 @@
 ;
-; Ullrich von Bassewitz, 2003-04-13
+; 2003-04-13, Ullrich von Bassewitz
+; 2013-07-16, Greg King
 ;
 ; void cputcxy (unsigned char x, unsigned char y, char c);
 ; void cputc (char c);
@@ -41,7 +42,7 @@ output:
 
 advance:
         iny
-        cpy     #40
+        cpy     #SCREEN_XSIZE
         bne     L3
         inc     CURS_Y          ; new line
         ldy     #0              ; + cr
@@ -85,12 +86,12 @@ L3:     sty     CURS_X
 
 .rodata
 ScrTabLo:
-        .repeat 28, Line
-                .byte   <(SCREEN + Line * 40)
+        .repeat SCREEN_YSIZE, Line
+                .byte   <(SCREEN + Line * SCREEN_XSIZE)
         .endrep
 
 ScrTabHi:
-        .repeat 28, Line
-                .byte   >(SCREEN + Line * 40)
+        .repeat SCREEN_YSIZE, Line
+                .byte   >(SCREEN + Line * SCREEN_XSIZE)
         .endrep
 

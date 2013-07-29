@@ -2,7 +2,7 @@
 ; Graphics driver for the 228x200x3 palette mode on the Atmos
 ;
 ; Stefan Haubenthal <polluks@sdf.lonestar.org>
-; 2012-08-11, Greg King <greg.king5@verizon.net>
+; 2013-07-15, Greg King <gregdk@users.sf.net>
 ;
 
         .include        "zeropage.inc"
@@ -79,21 +79,7 @@ ERROR:          .res    1       ; Error code
 MODE:           .res    1       ; Graphics mode
 PALETTE:        .res    2
 
-; Constants and table
-; BASIC 1.1 addresses
-PATTERN :=      $213
-PARAM1  :=      $2E1            ; & $2E2
-PARAM2  :=      $2E3            ; & $2E4
-PARAM3  :=      $2E5            ; & $2E6
-TEXT    :=      $EC21
-HIRES   :=      $EC33
-CURSET  :=      $F0C8
-CURMOV  :=      $F0FD
-DRAW    :=      $F110
-CHAR    :=      $F12D
-POINT   :=      $F1C8
-PAPER   :=      $F204
-INK     :=      $F210
+; Constant table
 
 .rodata
 

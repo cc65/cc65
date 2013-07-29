@@ -1,19 +1,19 @@
 ;
-; Ullrich von Bassewitz, 2003-03-07
-; Stefan Haubenthal, 2011-01-28
+; 2003-03-07, Ullrich von Bassewitz
+; 2011-01-28, Stefan Haubenthal
+; 2013-07-15, Greg King
 ;
 ; Setup arguments for main
 ;
 
         .constructor    initmainargs, 24
         .import         __argc, __argv
+
+        .include        "atmos.inc"
         .macpack        generic
 
 MAXARGS  = 10                   ; Maximum number of arguments allowed
 REM      = $9d                  ; BASIC token-code
-NAME_LEN = 16                   ; maximum length of command-name
-BASIC_BUF = $35
-FNAM     = $293
 
 
 ;---------------------------------------------------------------------------
@@ -29,8 +29,8 @@ FNAM     = $293
 ; Because the buffer, that we're copying into, was zeroed out,
 ; we don't need to add a NUL character.
 ;
-        ldy     #NAME_LEN - 1   ; limit the length
-L0:     lda     FNAM,y
+        ldy     #FNAME_LEN - 1  ; limit the length
+L0:     lda     CFOUND_NAME,y
         sta     name,y
         dey
         bpl     L0
@@ -114,7 +114,7 @@ done:   lda     #<argv
 ;
 .bss
 term:   .res    1
-name:   .res    NAME_LEN + 1
+name:   .res    FNAME_LEN + 1
 
 .data
 argv:   .addr   name

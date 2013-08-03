@@ -139,7 +139,12 @@ extern unsigned char _dos_type;
  * following variables to determine the file type and the aux type to use.
  */
 extern unsigned char _filetype;  /* Default 6 */
-extern unsigned int  _auxtype;   /* Default 0 */
+extern struct {
+    unsigned int aux;
+    unsigned char storage;
+    unsigned int date;
+    unsigned int time;
+} _auxtype;   /* Default 0 */
 
 /* The addresses of the static drivers */
 #if !defined(__APPLE2ENH__)

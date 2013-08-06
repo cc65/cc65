@@ -126,11 +126,35 @@ extern void atmos_240_200_2_tgi[];      /* Referred to by tgi_static_stddrv[] */
 
 
 
+/*****************************************************************************/
+/*                                 Functions                                 */
+/*****************************************************************************/
+
+
+
 void __fastcall__ atmos_load(const char* name);
 /* Load Atmos tape. */
 
 void __fastcall__ atmos_save(const char* name, const void* start, const void* end);
 /* Save Atmos tape. */
+
+void atmos_explode (void);
+/* Bomb sound effect */
+
+void atmos_ping (void);
+/* Bell or ricochet sound effect */
+
+void atmos_shoot (void);
+/* Pistol sound effect */
+
+void atmos_tick (void);
+/* High-pitch click */
+
+void atmos_tock (void);
+/* Low-pitch click */
+
+void atmos_zap (void);
+/* Raygun sound effect */
 
 
 

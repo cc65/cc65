@@ -18,21 +18,26 @@ FNAME_LEN       = 16            ; maximum length of file-name
 ; ---------------------------------------------------------------------------
 ; Zero page
 
+SCRPTR          := $12
 BASIC_BUF       := $35
+CHARGOT         := $E8
+TXTPTR          := $E9
 
 
 ; ---------------------------------------------------------------------------
 ; Low memory
 
 MODEKEY         := $0209
-CAPSLOCK        := $020C
+CAPSLOCK        := $020C        ; $7F = not locked, $FF = locked
 PATTERN         := $0213
-IRQVec          := $0245
+IRQVec          := $0245        ; "fast" interrupt vector
 JOINFLAG        := $025A        ; 0 = don't joiu, $4A = join BASIC programs
 VERIFYFLAG      := $025B        ; 0 = load, 1 = verify
 CURS_Y          := $0268
 CURS_X          := $0269
 STATUS          := $026A
+BACKGRND        := $026B
+FOREGRND        := $026C
 TIMER3          := $0276
 CFILE_NAME      := $027F
 CFOUND_NAME     := $0293
@@ -40,10 +45,13 @@ FILESTART       := $02A9
 FILEEND         := $02AB
 AUTORUN         := $02AD        ; $00 = only load, $C7 = autorun
 LANGFLAG        := $02AE        ; $00 = BASIC, $80 = machine code
+LOADERR         := $02B1
 KEYBUF          := $02DF
+PARMERR         := $02E0
 PARAM1          := $02E1        ; & $02E2
 PARAM2          := $02E3        ; & $02E4
 PARAM3          := $02E5        ; & $02E6
+BANGVEC         := $02F5
 
 
 ; ---------------------------------------------------------------------------
@@ -92,3 +100,11 @@ POINT           := $F1C8
 PAPER           := $F204
 INK             := $F210
 PRINT           := $F77C
+
+; Sound Effects
+PING            := $FA9F
+SHOOT           := $FAB5
+EXPLODE         := $FACB
+ZAP             := $FAE1
+TICK            := $FB14
+TOCK            := $FB2A

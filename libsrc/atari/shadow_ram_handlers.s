@@ -16,9 +16,7 @@ DEBUG	=	1
 	.export		sram_init
 	.export		KEYBDV_wrapper
 
-BUFSZ		=	128
-BUFSZ_CIO	=	BUFSZ
-BUFSZ_SIO	=	BUFSZ
+BUFSZ		=	256		; bounce buffer size
 
 .macro	disable_rom
 	lda	PORTB
@@ -38,8 +36,6 @@ BUFSZ_SIO	=	BUFSZ
 .endmacro
 
 .segment "INIT"
-
-;enable_count:	.res	1
 
 ; Turn off ROMs, install system and interrupt wrappers, set new chargen pointer
 
@@ -98,8 +94,7 @@ zpptr1:	.res	2
 .segment "LOWBUFS"
 
 ; bounce buffers for CIO and SIO calls
-CIO_buffer:	.res	BUFSZ_CIO
-SIO_buffer:	.res	BUFSZ_SIO
+bounce_buffer:	.res	BUFSZ
 
 
 .segment "LOWCODE"
@@ -193,7 +188,7 @@ CIO_filename:
 	jsr	setup_zpptr1_y0
 	jsr	copy_filename
 CIO_fn_cont:
-	jsr	ciobuf_to_iocb
+	jsr	bncbuf_to_iocb
 	ldy	CIO_y
 	jsr	CIO_call_a		; call CIO (maybe A isn't needed, then we could call CIO_call)
 	php
@@ -214,6 +209,7 @@ CIO_filename2:
 	jmp	CIO_fn_cont
 
 
+; enable ROM, call CIO, disable ROM
 
 CIO_call_a:
 	lda	CIO_a
@@ -292,14 +288,14 @@ CIO_read:
 	lda	ICBLH,x			; get high byte of length
 	bne	big_read		; not zero -> data too large for our buffers
 					; CHANGE HERE TO SUPPORT BOUNCE BUFFERS > 255 BYTES
-	lda	#<BUFSZ_CIO
+	lda	#<BUFSZ
 	cmp	ICBLL,x
 	bcc	big_read
 
 ; Data size fits into bounce buffer
 
 	jsr	setup_zpptr1
-	jsr	ciobuf_to_iocb
+	jsr	bncbuf_to_iocb
 	jsr	CIO_call_a		; call CIO
 	php
 	bpl	@no_err
@@ -332,15 +328,15 @@ big_read:
 	jsr	iocblen_to_orig_len
 	jsr	iocbptr_to_orig_ptr
 	jsr	setup_zpptr1
-	jsr	ciobuf_to_iocb		; let ICBAL/ICBAH point to bounce buffer
+	jsr	bncbuf_to_iocb		; let ICBAL/ICBAH point to bounce buffer
 
 br_loop:
-	jsr	cmp_orig_len_cio_bufsz	; is transfer length > bounce buffer size?
+	jsr	cmp_orig_len_bnc_bufsz	; is transfer length > bounce buffer size?
 	bcs	br_last			; no, last transfer, use remaining size
 
-	lda	#>BUFSZ_CIO
+	lda	#>BUFSZ
 	sta	ICBLH,x			; set data length
-	lda	#<BUFSZ_CIO
+	lda	#<BUFSZ
 	sta	ICBLL,x
 	bne	br_cont
 
@@ -452,7 +448,7 @@ CIO_write:
 	lda	ICBLH,x			; get high byte of length
 	bne	big_write		; not zero -> data too large for our buffers
 					; CHANGE HERE TO SUPPORT BOUNCE BUFFERS > 255 BYTES
-	lda	#<BUFSZ_CIO
+	lda	#<BUFSZ
 	cmp	ICBLL,x
 	bcc	big_write
 
@@ -460,7 +456,7 @@ CIO_write:
 ; Data size fits into bounce buffer
 
 	jsr	setup_zpptr1
-	jsr	ciobuf_to_iocb
+	jsr	bncbuf_to_iocb
 	jsr	copy_from_user
 	ldy	CIO_y
 	jsr	CIO_call_a
@@ -481,15 +477,15 @@ big_write:
 	jsr	iocblen_to_orig_len
 	jsr	iocbptr_to_orig_ptr
 	jsr	setup_zpptr1
-	jsr	ciobuf_to_iocb		; let ICBAL/ICBAH point to bounce buffer
+	jsr	bncbuf_to_iocb		; let ICBAL/ICBAH point to bounce buffer
 
 bw_loop:
-	jsr	cmp_orig_len_cio_bufsz	; is transfer length > bounce buffer size?
+	jsr	cmp_orig_len_bnc_bufsz	; is transfer length > bounce buffer size?
 	bcs	bw_last			; no, last transfer, use remaining size
 
-	lda	#>BUFSZ_CIO
+	lda	#>BUFSZ
 	sta	ICBLH,x			; set data length
-	lda	#<BUFSZ_CIO
+	lda	#<BUFSZ
 	sta	ICBLL,x
 	bne	bw_cont
 
@@ -577,11 +573,11 @@ bw_done:
 ; input:   orig_len - length
 ; output:         A - destroyed
 ;                CF - 0/1 for larger/not larger
-cmp_orig_len_cio_bufsz:
+cmp_orig_len_bnc_bufsz:
 	sec
-	lda	#<BUFSZ_CIO
+	lda	#<BUFSZ
 	sbc	orig_len
-	lda	#>BUFSZ_CIO
+	lda	#>BUFSZ
 	sbc	orig_len+1
 	rts
 
@@ -595,7 +591,7 @@ copy_to_user:
 	ldy	ICBLL,x			; get # of bytes read (CHANGE HERE TO SUPPORT BOUNCE BUFFERS > 255 BYTES)
 	beq	@copy_done
 @copy:	dey
-	lda	CIO_buffer,y
+	lda	bounce_buffer,y
 	sta	(zpptr1),y
 	cpy	#0
 	bne	@copy
@@ -613,7 +609,7 @@ copy_from_user:
 	beq	@copy_done
 @copy:	dey
 	lda	(zpptr1),y
-	sta	CIO_buffer,y
+	sta	bounce_buffer,y
 	cpy	#0
 	bne	@copy
 @copy_done:
@@ -667,21 +663,21 @@ restore_icba:
 ; put bounce buffer address into ICBAL/ICBAH
 ; input:   X - IOCB index
 ; output:  A - destroyed
-ciobuf_to_iocb:
-	lda	#<CIO_buffer
+bncbuf_to_iocb:
+	lda	#<bounce_buffer
 	sta	ICBAL,x
-	lda	#>CIO_buffer
+	lda	#>bounce_buffer
 	sta	ICBAH,x
 	rts
 
 
-; copy file name pointed to by 'zpptr1' to bounce buffer 'CIO_buffer'
-; input:   Y - index into file name buffer and CIO_buffer
+; copy file name pointed to by 'zpptr1' to 'bounce_buffer'
+; input:   Y - index into file name buffer and bounce_buffer
 ; output:  Y - points to first invalid byte after file name
 ;          A - destroyed
 copy_filename:
 	lda	(zpptr1),y
-	sta	CIO_buffer,y
+	sta	bounce_buffer,y
 	beq	copy_fn_done
 	iny
 	cmp	#ATEOL
@@ -706,12 +702,35 @@ setup_zpptr1:
 
 ;---------------------------------------------------------
 
+; SIO handler
+; We only handle SIO_STAT, SIO_READ, SIO_WRITE, and SIO_WRITEV.
+; These are the only functions used by the runtime library currently.
+; For other function we return NVALID status code.
+
 my_SIOV:
-	pha
+	lda	DCOMND			; get command
+	cmp	#SIO_STAT
+	beq	SIO_stat
+	cmp	#SIO_READ
+	beq	SIO_read
+	cmp	#SIO_WRITE
+	beq	SIO_write
+	cmp	#SIO_WRITEV
+	beq	SIO_write
+
+	; unhandled command
+	lda	#NVALID
+SIO_err:sta	DSTATS
+	rts
+
+; SIO_STAT is always called with a low buffer (by the runtime)
+SIO_stat:
+	; fall thru
+
+SIO_call:
 	lda	PORTB
 	sta	cur_SIOV_PORTB
 	enable_rom
-	pla
 	jsr	SIOV_org
 	php
 	pha
@@ -720,6 +739,132 @@ my_SIOV:
 	pla
 	plp
 	rts
+
+
+; SIO read handler
+; ----------------
+
+SIO_read:
+
+; @@@ TODO: check if bounce buffer is really needed because buffer is in ROM area
+
+; we only support transfers <= bounce buffer size
+	jsr	cmp_sio_len_bnc_bufsz
+	bcs	sio_read_len_ok
+
+	lda	#DERROR		; don't know a better status code for this
+	bne	SIO_err
+
+sio_read_len_ok:
+	lda	DBUFLO
+	sta	zpptr1		; remember destination buffer address
+	lda	DBUFHI
+	sta	zpptr1+1
+
+	jsr	bncbuf_to_dbuf	; put bounce buffer address to DBUFLO/DBUFHI
+
+	jsr	SIO_call	; do the operation
+	pha
+	lda	DSTATS		; get status
+	bmi	sio_read_ret	; error
+
+	; copy data to user buffer
+sio_read_ok:
+	lda	DBYTHI		; could be 1 for 256 bytes
+	beq	srok1
+	ldy	#0
+	beq	srok2
+srok1:	ldy	DBYTLO
+srok2:	dey
+sio_read_copy:
+	lda	bounce_buffer,y
+	sta	(zpptr1),y
+	dey
+	cpy	#$ff
+	bne	sio_read_copy
+
+sio_read_ret:
+	jsr	orgbuf_to_dbuf
+
+	pla
+	rts			; success return
+
+
+; SIO write handler
+; -----------------
+
+SIO_write:
+
+; @@@ TODO: check if bounce buffer is really needed because buffer is in ROM area
+
+; we only support transfers <= bounce buffer size
+	jsr	cmp_sio_len_bnc_bufsz
+	bcs	sio_write_len_ok
+
+	lda	#DERROR		; don't know a better status code for this
+	bne	SIO_err
+
+sio_write_len_ok:
+	lda	DBUFLO
+	sta	zpptr1		; get source buffer address
+	lda	DBUFHI
+	sta	zpptr1+1
+
+	; copy data from user buffer to bounce buffer
+	lda	DBYTHI		; could be 1 for 256 bytes
+	beq	swok1
+	ldy	#0
+	beq	swok2
+swok1:	ldy	DBYTLO
+swok2:	dey
+sio_write_copy:
+	lda	(zpptr1),y
+	sta	bounce_buffer,y
+	dey
+	cpy	#$ff
+	bne	sio_write_copy
+
+	jsr	bncbuf_to_dbuf	; put bounce buffer address to DBUFLO/DBUFHI
+
+	jsr	SIO_call	; do the operation
+	pha
+	jsr	orgbuf_to_dbuf
+	pla
+	rts
+
+
+; check if SIO length is larger than bounce buffer size
+; input:   orig_len - length
+; output:         A - destroyed
+;                CF - 0/1 for larger/not larger
+cmp_sio_len_bnc_bufsz:
+	sec
+	lda	#<BUFSZ
+	sbc	DBYTLO
+	lda	#>BUFSZ
+	sbc	DBYTHI
+	rts
+
+; put bounce buffer address into DBUFLO/DBUFHI
+; input:   (--)
+; output:  A - destroyed
+bncbuf_to_dbuf:
+	lda	#<bounce_buffer
+	sta	DBUFLO
+	lda	#>bounce_buffer
+	sta	DBUFHI
+	rts
+
+; put original buffer address into DBUFLO/DBUFHI
+; input:   zpptr1 - original pointer
+; output:  A      - destroyed
+orgbuf_to_dbuf:
+	lda	zpptr1
+	sta	DBUFLO
+	lda	zpptr1+1
+	sta	DBUFHI
+	rts
+
 
 ;---------------------------------------------------------
 

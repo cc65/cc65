@@ -5,7 +5,6 @@
 
         .export         em_libref
         .export         joy_libref
-;        .export         mouse_libref
         .export         ser_libref
         .export         tgi_libref
 
@@ -13,6 +12,5 @@
 
 em_libref       := _exit
 joy_libref      := _exit
-;mouse_libref    := _exit
 ser_libref      := _exit
 tgi_libref      := _exit

@@ -3,7 +3,7 @@
 ** Will work for the C64/C128/CBM510/Atari/Apple2.
 **
 ** 2001-09-13, Ullrich von Bassewitz
-** 2013-07-25, Greg King
+** 2013-08-23, Greg King
 **
 */
 
@@ -85,7 +85,12 @@ static const unsigned char MouseSprite[64] = {
 static void __fastcall__ CheckError (const char* S, unsigned char Error)
 {
     if (Error != MOUSE_ERR_OK) {
-        cprintf ("%s: %s(%u)\r\n", S, mouse_geterrormsg (Error), Error);
+        cprintf ("\n%s: %s(%u)\r\n", S, mouse_geterrormsg (Error), Error);
+
+        /* Wait for a key-press, so that some platforms can show the error
+        ** message before they remove the current screen.
+        */
+        cgetc();
         exit (EXIT_FAILURE);
     }
 }
@@ -154,7 +159,7 @@ int main (void)
     cursor (0);
     clrscr ();
 
-    /* The pointer is created before the driver is installed,
+    /* The pointer should be created before the driver is installed,
     ** in case a lightpen driver needs it during calibration.
     */
 
@@ -178,7 +183,7 @@ int main (void)
     ** the value will be put into this file, for the next time.
     ** (Other drivers will ignore this.)
     */
-#ifdef __CBM__
+#if defined(__C64__) || defined(__C128__)
     pen_adjust ("pen.dat");
 #endif
 
@@ -222,8 +227,13 @@ top:
 
     /* Put a cross at the center of the screen. */
     gotoxy (width / 2 - 3, height / 2 - 1);
+#if defined(__CBM__)
     cprintf ("%3u,%3u\r\n%*s\xDB", width / 2 * 8 + 4, height / 2 * 8 + 4,
              width / 2, "");
+#else
+    cprintf ("%3u,%3u\r\n%*s+", width / 2 * 8 + 4, height / 2 * 8 + 4,
+             width / 2, "");
+#endif
 
     /* Test loop */
     ShowState (Jailed, Invisible);

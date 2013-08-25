@@ -9,8 +9,10 @@
 ; ---------------------------------------------------------------------------
 ; Zeropage stuff
 
-ExecReg         = $00
-IndReg          = $01
+ExecReg         := $00
+IndReg          := $01
+
+TXTPTR          := $85          ; Far pointer into BASIC source code
 
 ; ---------------------------------------------------------------------------
 ; Screen size
@@ -29,7 +31,8 @@ YSIZE           = 25
         DATA    .byte
 .endstruct
 
-; I/O  $db00: CIA 6526 Inter Process Communication
+
+; I/O  $db00: CIA 6526, Inter Process Communication
 ;
 ;       IPCcia          =       $db00
 
@@ -66,7 +69,6 @@ YSIZE           = 25
 ; I/O  $dc00: CIA 6526
 ;
 ;       cia             =       $dc00
-
 
 
 ; I/O  $dd00: ACIA 6551
@@ -108,3 +110,7 @@ YSIZE           = 25
 ;       tpi2            =       $df00
 
 
+;-----------------------------------------------------------------------------
+
+BASIC_BUF       := $FA5E        ; Bank 1 location of command-line
+BASIC_BUF_LEN   = 162           ; Maximum length of command-line

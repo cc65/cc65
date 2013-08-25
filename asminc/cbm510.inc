@@ -3,7 +3,8 @@
 ;
 ; Taken from a kernal disassembly done by myself in 2000/2001.
 ;
-; Ullrich von Bassewitz, 13.09.2001
+; 2001-09-13, Ullrich von Bassewitz
+; 2013-08-23, Greg King
 
 
 ;-----------------------------------------------------------------------------
@@ -11,6 +12,8 @@
 
 ExecReg         = $00
 IndReg          = $01
+
+TXTPTR          := $85          ; Far pointer into BASIC source code
 
 ; ---------------------------------------------------------------------------
 ; Screen size
@@ -21,7 +24,7 @@ YSIZE           = 25
 ;-----------------------------------------------------------------------------
 ; I/O Definitions
 
-; I/O  $d800: VIC
+; I/O  $d800: VIC-II
 
 VIC_SPR0_X      = $00
 VIC_SPR0_Y      = $01
@@ -75,7 +78,6 @@ VIC_BG_COLOR2   = $23
 VIC_BG_COLOR3   = $24
 
 
-
 ; I/O  $da00: SID 6581
 
 SID_S1Lo        = $00
@@ -112,7 +114,7 @@ SID_Noise       = $1B
 SID_Read3       = $1C
 
 
-; I/O  $db00: CIA 6526 Inter Process Communication
+; I/O  $db00: CIA 6526, Inter Process Communication
 ; I/O  $dc00: CIA 6526
 
 .struct CIA
@@ -176,7 +178,13 @@ SID_Read3       = $1C
 .endstruct
 
 
-; Out video memory address
+;-----------------------------------------------------------------------------
+; Our video memory address
 
-COLOR_RAM   = $D400                     ; System bank
+COLOR_RAM       := $D400        ; System bank
 
+
+;-----------------------------------------------------------------------------
+
+BASIC_BUF       := $FB5E        ; Bank 0 location of command-line
+BASIC_BUF_LEN   = 162           ; Maximum length of command-line

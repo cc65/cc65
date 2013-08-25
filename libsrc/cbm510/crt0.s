@@ -56,9 +56,9 @@
 
 ;------------------------------------------------------------------------------
 ; A table that contains values that must be transfered from the system zero
-; page into out zero page. Contains pairs of bytes, first one is the address
+; page into our zero page. Contains pairs of bytes; first one is the address
 ; in the system ZP, second one is our ZP address. The table goes into page 2,
-; but is declared here, because it is needed earlier.
+; but is declared here because it is needed earlier.
 
 .SEGMENT        "PAGE2"
 
@@ -67,6 +67,8 @@
         .byte   $9F, DEVNUM
         .byte   $CA, CURS_Y
         .byte   $CB, CURS_X
+        .byte   $E6, CURS_FLAG
+        .byte   $E7, CURS_BLINK
         .byte   $EC, CHARCOLOR
 
 .endproc

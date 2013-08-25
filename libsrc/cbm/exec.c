@@ -7,7 +7,7 @@
 ** It puts the desired program's name and unit number into a LOAD statement.
 ** Then, it points BASIC to that statement, so that the ROM will run that
 ** statement after this program quits.  The ROM will load the next program,
-** and execute it.
+** and will execute it (because the LOAD will be seen in a running program).
 */
 
 #include <fcntl.h>

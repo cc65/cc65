@@ -8,6 +8,7 @@ DEBUG	=	1
 
 .if .defined(__ATARIXL__)
 
+	SHRAM_HANDLERS	= 1
         .include        "atari.inc"
 	.include	"save_area.inc"
         .include        "zeropage.inc"
@@ -15,8 +16,12 @@ DEBUG	=	1
 
 	.export		sram_init
 	.export		KEYBDV_wrapper
+	.export		CIO_handler
+	.export		SIO_handler
+	.export		SETVBV_handler
 
-BUFSZ		=	256		; bounce buffer size
+BUFSZ		=	128		; bounce buffer size
+BUFSZ_SIO	=	256
 
 .macro	disable_rom
 	lda	PORTB
@@ -65,20 +70,6 @@ sram_init:
 	lda	#>my_NMI_han
 	sta	$fffb
 
-; setup pointers to CIOV and SIOV wrappers
-	lda	#$4C		; JMP opcode
-	sta	CIOV
-	lda	#<my_CIOV
-	sta	CIOV+1
-	lda	#>my_CIOV
-	sta	CIOV+2
-	lda	#$4C		; JMP opcode
-	sta	SIOV
-	lda	#<my_SIOV
-	sta	SIOV+1
-	lda	#>my_SIOV
-	sta	SIOV+2
-
 ; enable interrupts
 	lda	#$40
 	sta	NMIEN
@@ -94,7 +85,7 @@ zpptr1:	.res	2
 .segment "LOWBUFS"
 
 ; bounce buffers for CIO and SIO calls
-bounce_buffer:	.res	BUFSZ
+bounce_buffer:	.res	BUFSZ_SIO
 
 
 .segment "LOWCODE"
@@ -240,7 +231,7 @@ CIOV_call:
 ;
 ; FIXME: Currently only the requests used by the runtime lib are handled.
 
-my_CIOV:
+CIO_handler:
 
 ; @@@ TODO: check X for valid IOCB index ((X < $80) and ((X & $F) == 0))
 
@@ -707,7 +698,7 @@ setup_zpptr1:
 ; These are the only functions used by the runtime library currently.
 ; For other function we return NVALID status code.
 
-my_SIOV:
+SIO_handler:
 	lda	DCOMND			; get command
 	cmp	#SIO_STAT
 	beq	SIO_stat
@@ -839,9 +830,9 @@ sio_write_copy:
 ;                CF - 0/1 for larger/not larger
 cmp_sio_len_bnc_bufsz:
 	sec
-	lda	#<BUFSZ
+	lda	#<BUFSZ_SIO
 	sbc	DBYTLO
-	lda	#>BUFSZ
+	lda	#>BUFSZ_SIO
 	sbc	DBYTHI
 	rts
 
@@ -888,6 +879,24 @@ kret:	pha
 	pla
 	rts
 
+;---------------------------------------------------------
+
+SETVBV_handler:
+
+	pha
+	lda	PORTB
+	sta	cur_SETVBV_PORTB
+	enable_rom
+	pla
+	jsr	SETVBV_org
+	php
+	pha
+	lda	cur_SETVBV_PORTB
+	sta	PORTB
+	pla
+	plp
+	rts
+
 CIO_a:			.res	1
 CIO_x:			.res	1
 CIO_y:			.res	1
@@ -895,6 +904,7 @@ CIO_p:			.res	1
 cur_CIOV_PORTB:		.res	1
 cur_SIOV_PORTB:		.res	1
 cur_KEYBDV_PORTB:	.res	1
+cur_SETVBV_PORTB:	.res	1
 orig_ptr:		.res	2
 orig_len:		.res	2
 req_len:		.res	2

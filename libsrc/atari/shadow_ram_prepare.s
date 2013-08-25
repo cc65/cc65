@@ -97,12 +97,19 @@ sramprep:
 
         ldx     lowadr
         stx     MEMTOP
-        stx     APPMHI
         lda     lowadr+1
         sta     MEMTOP+1
-        sta     APPMHI+1
         lda     lodadr+1
         sta     RAMTOP
+
+	; set APPMHI to MEMLO (+ 1 for sanity)
+        lda     MEMLO
+        clc
+        adc     #1
+        sta     APPMHI
+        lda     MEMLO+1
+        adc     #0
+        sta     APPMHI+1
 
 
 ; ... issue a GRAPHICS 0 call (copied'n'pasted from TGI drivers)

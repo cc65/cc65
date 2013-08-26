@@ -41,11 +41,41 @@
         .export         _get_ostype
 
 .if .defined(__ATARIXL__)
-.warning "fix me!"
+
+        .include "atari.inc"
+        .import __CHARGEN_START__
+        .segment "LOWCODE"
+.macro  disable_rom
+        pha
+        lda     PORTB
+        and     #$fe
+        sta     PORTB
+        lda     #>__CHARGEN_START__
+        sta     CHBAS
+        sta     CHBASE
+        pla
+.endmacro
+.macro  enable_rom
+        lda     PORTB
+        ora     #1
+        sta     PORTB
+        lda     #$E0
+        sta     CHBAS
+        sta     CHBASE
+.endmacro
+
+.else   ; above atarixl, below atari
+
+.macro  disable_rom
+.endmacro
+.macro  enable_rom
+.endmacro
+
 .endif
 
 .proc   _get_ostype
 
+        enable_rom
         lda     $fcd8
         cmp     #$a2
         beq     _400800
@@ -67,6 +97,7 @@
         and     #%00111000
         ora     #%11
 _fin:   ldx     #0
+        disable_rom
         rts
 
 ; unknown ROM
@@ -74,6 +105,7 @@ _fin:   ldx     #0
 _unknown:
         lda     #0
         tax
+        disable_rom
         rts
 
 ; 1200XL ROM

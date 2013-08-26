@@ -40,6 +40,7 @@ int main(void)
             printf("is'a a XL/XE, %s, Rev. %d\n",palntsc ? "PAL" : "NTSC",minor);
             break;
     }
-    printf("hit <RETURN> to continure...\n");
+    printf("hit <RETURN> to continue...\n");
     c = getchar();
+    return 0;
 }

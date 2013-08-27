@@ -61,13 +61,17 @@ scrmemtst:
 	cmp	tmp
 	beq	scrmemok
 
+; if lodadr is at an exact 4K boundary, it's still ok
+
+	lda	lodadr+1
+	and	#$0f
+	beq	scrmemok
+
 ; 4K boundary will be crossed, use this 4K boundary address as lodadr
 
 al4k:	lda	lodadr+1
 	and	#$f0
-	tax
-	dex
-	stx	lodadr+1
+	sta	lodadr+1
 	bne	scrmemtst
 ; not reached
 
@@ -89,6 +93,7 @@ scrmemok:
 	sbc	#>DLSZ
 	sta	lowadr+1
 
+.if 0	; this cannot happen
 ; check if a 1K boundary is crossed
 
 	lda	tstadr+1
@@ -98,6 +103,7 @@ scrmemok:
 	and	#$fc
 	cmp	tmp
 	bne	al4k		; 1K boundary will be crossed, decrease lodadr
+.endif
 
 ; address of display list is ok
 ; decrease lowadr by two

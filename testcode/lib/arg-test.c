@@ -9,6 +9,9 @@ int main (int argc, char* argv[])
     for (I = 0; I < argc; ++I) {
         printf ("argv[%2d]: \"%s\"\n", I, argv[I]);
     }
+
+    printf ("\n");
+    getchar ();
     return EXIT_SUCCESS;
 }
 

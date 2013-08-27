@@ -7,6 +7,7 @@
 ; Zero page, Commodore stuff
 
 MEMSIZE         := $34          ; Size of memory installed
+TXTPTR          := $77          ; Pointer into BASIC source code
 TIME            := $8D          ; 60HZ clock
 KEY_COUNT       := $9E          ; Number of keys in input buffer
 RVS             := $9F          ; Reverse flag
@@ -23,6 +24,9 @@ DEVNUM          := $D4          ; Device number
 SCR_LINELEN     := $D5          ; Screen line length
 CURS_Y          := $D8          ; Cursor row
 FNADR           := $DA          ; Pointer to file name
+
+BASIC_BUF       := $200         ; Location of command-line
+BASIC_BUF_LEN   = 81            ; Maximum length of command-line
 
 KEY_BUF         := $26F         ; Keyboard buffer
 

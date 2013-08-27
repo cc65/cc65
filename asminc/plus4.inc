@@ -7,6 +7,7 @@
 ; Zero page, Commodore stuff
 
 TMPPTR          := $22          ; Temporary ptr used by BASIC
+TXTPTR          := $3B          ; Pointer into BASIC source code
 TIME            := $A3          ; 60HZ clock
 FNAM_LEN        := $AB          ; Length of filename
 LFN             := $AC          ; Logical file number

@@ -13,7 +13,6 @@
 MAXARGS  = 10                   ; Maximum number of arguments allowed
 REM      = $8f                  ; BASIC token-code
 NAME_LEN = 16                   ; maximum length of command-name
-BASIC_BUF= $200
 
 
 ;---------------------------------------------------------------------------

@@ -4,14 +4,14 @@
 ; Taken from a kernal disassembly done by myself in 2000/2001.
 ;
 ; 2001-09-13, Ullrich von Bassewitz
-; 2013-08-23, Greg King
+; 2013-08-26, Greg King
 
 
 ;-----------------------------------------------------------------------------
 ; Zeropage stuff
 
-ExecReg         = $00
-IndReg          = $01
+ExecReg         := $00          ; Controls execution memory bank
+IndReg          := $01          ; Controls indirect indexed load-store bank
 
 TXTPTR          := $85          ; Far pointer into BASIC source code
 

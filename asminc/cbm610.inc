@@ -1,16 +1,17 @@
 ;
-; Zeropage and I/O definitions for the CBM 610
+; Zero page variables and I/O definitions for the CBM 610
 ;
 ; Taken from a kernal disassembly done by myself in 1987.
 ;
-; Ullrich von Bassewitz, 28.09.1998
+; 1998-09-28, Ullrich von Bassewitz
+; 2013-08-26, Greg King
 
 
 ; ---------------------------------------------------------------------------
 ; Zeropage stuff
 
-ExecReg         := $00
-IndReg          := $01
+ExecReg         := $00          ; Controls execution memory bank
+IndReg          := $01          ; Controls indirect indexed load-store bank
 
 TXTPTR          := $85          ; Far pointer into BASIC source code
 

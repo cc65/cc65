@@ -7,7 +7,7 @@
 
         .include "atari.inc"
         .export _cgetc,setcursor
-         .import KEYBDV_wrapper
+        .import KEYBDV_handler
         .import cursor,mul40
 
 _cgetc:
@@ -17,17 +17,17 @@ _cgetc:
 .if .not .defined(__ATARIXL__)
         jsr     @1
 .else
-	jsr	KEYBDV_wrapper
+        jsr     KEYBDV_handler
 .endif
         ldx     #0
         rts
 
 .if .not .defined(__ATARIXL__)
-@1:	lda     KEYBDV+5
+@1:     lda     KEYBDV+5
         pha
         lda     KEYBDV+4
         pha
-	rts
+        rts
 .endif
 
 .proc   setcursor

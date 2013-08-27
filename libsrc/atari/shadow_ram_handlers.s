@@ -15,7 +15,7 @@ DEBUG	=	1
 	.import		__CHARGEN_START__
 
 	.export		sram_init
-	.export		KEYBDV_wrapper
+	.export		KEYBDV_handler
 	.export		CIO_handler
 	.export		SIO_handler
 	.export		SETVBV_handler
@@ -859,7 +859,7 @@ orgbuf_to_dbuf:
 
 ;---------------------------------------------------------
 
-KEYBDV_wrapper:
+KEYBDV_handler:
 
 	lda	#>(kret-1)
 	pha

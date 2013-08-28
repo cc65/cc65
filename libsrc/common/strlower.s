@@ -1,8 +1,9 @@
 ;
-; Ullrich von Bassewitz, 02.06.1998
+; 1998-06-02, Ullrich von Bassewitz
+; 2013-08-28, Greg King
 ;
-; char* strlower (char* s);
-; char* strlwr (char* s);
+; char* __fastcall__ strlower (char* s);
+; char* __fastcall__ strlwr (char* s);
 ;
 ; Non-ANSI
 ;
@@ -19,7 +20,7 @@ _strlwr:
         sta     ptr1            ; Save s (working copy)
         stx     ptr1+1
         sta     ptr2
-        sta     ptr2+1          ; save function result
+        stx     ptr2+1          ; save function result
         ldy     #0
 
 loop:   lda     (ptr1),y        ; get character

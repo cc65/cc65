@@ -77,7 +77,7 @@
 ;------------------------------------------------------------------------------
 ; The TGI API version, stored at TGI_HDR_VERSION
 
-TGI_API_VERSION         = $04
+TGI_API_VERSION         = $05
 
 ;------------------------------------------------------------------------------
 ; Bitmapped tgi driver flags, stored in TGI_HDR::VARS::FLAGS.

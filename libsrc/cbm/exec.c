@@ -1,12 +1,18 @@
 /*
 ** Program-chaining function for Commodore platforms.
 **
-** 2013-08-24, Greg King
+** 2013-09-04, Greg King
 **
 ** This function exploits the program-chaining feature in CBM BASIC's ROM.
-** It puts the desired program's name and unit number into a LOAD statement.
-** Then, it points BASIC to that statement, so that the ROM will run that
-** statement after this program quits.  The ROM will load the next program,
+**
+** CC65's CBM programs have a BASIC program stub.  We start those programs by
+** RUNning that stub; it SYSes to the Machine Language code.  Normally, after
+** the ML code exits, the BASIC ROM continues running the stub.  But, it has
+** no more statements; so, the program stops.
+**
+** This function puts the desired program's name and device number into a LOAD
+** statement.  Then, it points BASIC to that statement, so that the ROM will run
+** that statement after this program quits.  The ROM will load the next program,
 ** and will execute it (because the LOAD will be seen in a running program).
 */
 
@@ -23,6 +29,24 @@
 #endif
 
 
+/* The struct below is a line of BASIC code.  It sits in the LOWCODE segment
+** to make sure that it won't be hidden by a ROM when BASIC is re-enabled.
+** The line is:
+**  0 LOAD""+""                    ,01
+** After this function has written into the line, it might look like this:
+**  0 LOAD""+"program name"        ,08
+**
+** When BASIC's LOAD command asks the Kernal to load a file, it gives the
+** Kernal a pointer to a file-name string.  CC65's CBM programs use that
+** pointer to give a copy of the program's name to main()'s argv[0] parameter.
+** But, when BASIC uses a string literal that's in a program, it points
+** directly to that literal -- in the models that don't use banked RAM
+** (Pet/CBM, VIC-20, and 64).  The literal is overwritten by the next program
+** that's loaded.  So, argv[0] would point to machine code.  String operations
+** create a new result string -- even when that operation changes nothing.  The
+** result is put in the string space at the top of BASIC's memory.  So, the ""+
+** in this BASIC line guarantees that argv[0] will get a name from a safe place.
+*/
 #pragma data-name(push, "LOWCODE")
 static struct line {
     const char end_of_line;
@@ -33,13 +57,8 @@ static struct line {
     const char comma;
     char unit[3];
 } basic = {
-    '\0', &basic + 1,           /* high byte must be non-zero */
-    0, 0x93,
-
-    /* This string operation copies the name to high BASIC RAM.
-    ** So, it won't be overwritten when the next program is loaded.
-    */
-    "\"\"", 0xaa, '\"',
+    '\0', &basic + 1,           /* high byte of link must be non-zero */
+    0, 0x93, "\"\"", 0xaa, '\"',
     "\"                    ",   /* format: "123:1234567890123456\"" */
     ',', "01"
 };

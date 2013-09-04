@@ -43,7 +43,7 @@ cont:   ldx     #0              ; channel 0
 .endmacro
 
 ; ------------------------------------------------------------------------
-; Chunk header
+; EXE load chunk header
 
 .segment        "SRPREPHDR"
 
@@ -74,13 +74,13 @@ sramprep:
         sta     APPMHI_save+1
         lda     PORTB
         sta     PORTB_save
-        lda     CIOV            ; zero-page wrapper
+        lda     CIOV                    ; zero-page wrapper
         sta     ZP_CIOV_save
         lda     CIOV+1
         sta     ZP_CIOV_save+1
         lda     CIOV+2
         sta     ZP_CIOV_save+2
-        lda     SIOV            ; zero-page wrapper
+        lda     SIOV                    ; zero-page wrapper
         sta     ZP_SIOV_save
         lda     SIOV+1
         sta     ZP_SIOV_save+1
@@ -112,11 +112,11 @@ sramprep:
         sta     APPMHI+1
 
 
-; ... issue a GRAPHICS 0 call (copied'n'pasted from TGI drivers)
+; issue a GRAPHICS 0 call (copied'n'pasted from TGI drivers) to move screen memory down
 
 
         jsr     findfreeiocb
-.ifdef DEBUG		; only check in debug version, this shouldn't happen normally(tm)
+.ifdef DEBUG		; only check in debug version, this shouldn't really happen(tm)
         beq     iocbok
         print_string "Internal error, no free IOCB!"
         jsr     delay
@@ -164,7 +164,6 @@ scrok:  ; now close it again -- we don't need it anymore
 
 .ifdef DEBUG
         print_string "copy chargen to low memory"
-        print_string "set up high memory"
 .endif
 
         lda     #>(__SRPREP_LOAD__ + __SRPREP_SIZE__ + __SHADOW_RAM_SIZE__)
@@ -179,6 +178,20 @@ scrok:  ; now close it again -- we don't need it anymore
         sta     ptr3
 
 cg_addr_ok:
+
+        lda     ptr3+1
+        and     #3
+        beq     cg_addr_ok2
+
+        ; align to next 1K boundary
+        lda     ptr3+1
+        and     #$fc
+        clc
+        adc     #4
+        sta     ptr3+1
+
+cg_addr_ok2:
+
         lda     #<DCSORG
         sta     ptr1
         lda     #>DCSORG
@@ -186,29 +199,40 @@ cg_addr_ok:
         lda     ptr3
         sta     ptr2
         lda     ptr3+1
+        pha                             ; needed later to set CHBAS/CHBASE
         sta     ptr2+1
         lda     #>__CHARGEN_SIZE__
         sta     tmp2
         lda     #<__CHARGEN_SIZE__
-        sta     tmp2+1
+        sta     tmp1
         jsr     memcopy
 
-; TODO: switch to this temp. chargen
+.ifdef DEBUG
+        print_string "now setting up high memory"
+.endif
 
-; disable ROMs
+; disable ROM
         sei
         ldx     #0
-        stx     NMIEN           ; disable NMI
+        stx     NMIEN                   ; disable NMI
         lda     PORTB
         and     #$fe
-        sta     PORTB           ; now ROM is mapped out
+        tax
+        pla                             ; get temp. chargen address
+        sta     WSYNC                   ; wait for horiz. retrace
+        stx     PORTB                   ; now ROM is mapped out
+
+; switch to temporary chargen
+
+        sta CHBASE
+        sta CHBAS
 
 ; copy shadow RAM contents to their destination
 
         lda     #<__SHADOW_RAM_SIZE__
         bne     do_copy
         lda     #>__SHADOW_RAM_SIZE__
-        beq     no_copy                         ; we have no shadow RAM contents
+        beq     no_copy                 ; we have no shadow RAM contents
 
         ; ptr1 - src; ptr2 - dest; tmp1, tmp2 - len
 do_copy:lda     #<__SHADOW_RAM_LOAD__
@@ -248,21 +272,26 @@ no_copy:
 
         lda     PORTB
         ora     #1
+        ldx     #>DCSORG
+        sta     WSYNC                   ; wait for horiz. retrace
         sta     PORTB
+        stx     CHBASE
+        stx     CHBAS
         lda     #$40
         sta     NMIEN                   ; enable VB again
         cli                             ; and enable IRQs
 
 .ifdef DEBUG
         print_string "Stage #2 OK"
+        print_string "loading main chunk"
         jsr     delay
 .endif
         rts
 
 .include "findfreeiocb.inc"
 
-; my 6502 fu is rusty, so I took a routine from the internet (http://www.obelisk.demon.co.uk/6502/algorithms.html)
-
+; routine taken from http://www.obelisk.demon.co.uk/6502/algorithms.html
+;
 ; copy memory
 ; ptr1      - source
 ; ptr2      - destination
@@ -307,6 +336,8 @@ restore:lda     RAMTOP_save
         rts
 
 
+.ifdef DEBUG
+
 .byte "HERE ****************** HERE ***************>>>>>>"
 
 sramsize:
@@ -332,10 +363,14 @@ loop:   dey
 
 .endproc
 
+.endif          ; .ifdef DEBUG
+
 screen_device:  .byte "S:",0
 screen_device_length = * - screen_device
 
+.ifdef DEBUG
         .byte   " ** srprep ** end-->"
+.endif
 
 ; ------------------------------------------------------------------------
 ; Provide an empty SHADOW_RAM segment in order that the linker is happy
@@ -345,7 +380,7 @@ screen_device_length = * - screen_device
 
 
 ; ------------------------------------------------------------------------
-; Chunk "trailer" - sets INITAD
+; EXE load chunk "trailer" - sets INITAD
 
 .segment        "SRPREPTRL"
 

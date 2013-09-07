@@ -74,18 +74,6 @@ sramprep:
         sta     APPMHI_save+1
         lda     PORTB
         sta     PORTB_save
-        lda     CIOV                    ; zero-page wrapper
-        sta     ZP_CIOV_save
-        lda     CIOV+1
-        sta     ZP_CIOV_save+1
-        lda     CIOV+2
-        sta     ZP_CIOV_save+2
-        lda     SIOV                    ; zero-page wrapper
-        sta     ZP_SIOV_save
-        lda     SIOV+1
-        sta     ZP_SIOV_save+1
-        lda     SIOV+2
-        sta     ZP_SIOV_save+2
 
 ; disable BASIC
 

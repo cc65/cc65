@@ -11,5 +11,3 @@
 .import	APPMHI_save
 .import	RAMTOP_save
 .import	PORTB_save
-.import	ZP_CIOV_save
-.import	ZP_SIOV_save

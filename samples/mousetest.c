@@ -3,7 +3,7 @@
 ** Will work for the C64/C128/CBM510/Atari/Apple2.
 **
 ** 2001-09-13, Ullrich von Bassewitz
-** 2013-08-23, Greg King
+** 2013-09-05, Greg King
 **
 */
 
@@ -183,7 +183,7 @@ int main (void)
     ** the value will be put into this file, for the next time.
     ** (Other drivers will ignore this.)
     */
-#if defined(__C64__) || defined(__C128__)
+#if defined(__C64__) || defined(__C128__) || defined(__CBM510__)
     pen_adjust ("pen.dat");
 #endif
 

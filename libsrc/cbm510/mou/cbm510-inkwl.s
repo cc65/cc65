@@ -1,5 +1,7 @@
 ;
-; Driver for the Inkwell Systems 170-C lightpen.
+; Driver for the Inkwell Systems 170-C and 184-C lightpens.
+;
+; This driver reads only the main button on the 184-C.
 ;
 ; 2013-09-05, Greg King
 ;

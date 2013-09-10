@@ -23,6 +23,9 @@ YSIZE           = 25
 
 ;-----------------------------------------------------------------------------
 ; I/O Definitions
+; Note:  These numbers aren't addresses.  They are offsets from the start of
+; each chip's register set.  They are used in the indirect indexed addressing
+; mode.
 
 ; I/O  $d800: VIC-II
 
@@ -65,6 +68,9 @@ VIC_CTRL1       = $11
 VIC_CTRL2       = $16
 
 VIC_HLINE       = $12
+
+VIC_LPEN_X      = $13
+VIC_LPEN_Y      = $14
 
 VIC_VIDEO_ADR   = $18
 

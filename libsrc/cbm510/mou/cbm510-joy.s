@@ -2,7 +2,7 @@
 ; Driver for a "joystick mouse".
 ;
 ; 2009-09-26, Ullrich von Bassewitz
-; 2013-08-22, Greg King
+; 2013-09-05, Greg King
 ;
 
         .include        "zeropage.inc"
@@ -252,7 +252,7 @@ BUTTONS:
 ; Joystick 1, fire button is in bit 6.
 
         and     #%11000000
-        rol     a                       ; Move bits 7,6 to bits 1,0
+        asl     a                       ; Move bits 7,6 to bits 1,0
         rol     a
         rol     a
         adc     #%00001110              ; Move bit 1 to bit 4

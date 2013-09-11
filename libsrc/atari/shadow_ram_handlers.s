@@ -5,6 +5,7 @@
 ;
 
 DEBUG	=	1
+USEWSYNC=	1
 CHKBUF	=	1	; check if bounce buffering is needed (bounce buffering is always done if set to 0)
 
 .if .defined(__ATARIXL__)
@@ -24,7 +25,22 @@ CHKBUF	=	1	; check if bounce buffering is needed (bounce buffering is always don
 BUFSZ		=	128		; bounce buffer size
 BUFSZ_SIO	=	256
 
+.macro	wsync
+.if USEWSYNC
+	sta	WSYNC
+.endif
+.endmacro
+
 .macro	disable_rom
+	lda	PORTB
+	and	#$fe
+	wsync
+	sta	PORTB
+	lda	#>__CHARGEN_START__
+	sta	CHBAS
+	sta	CHBASE
+.endmacro
+.macro	disable_rom_quick
 	lda	PORTB
 	and	#$fe
 	sta	PORTB
@@ -32,7 +48,25 @@ BUFSZ_SIO	=	256
 	sta	CHBAS
 	sta	CHBASE
 .endmacro
+.macro	disable_rom_val val
+	lda	val
+	wsync
+	sta	PORTB
+	lda	#>__CHARGEN_START__
+	sta	CHBAS
+	sta	CHBASE
+.endmacro
+
 .macro	enable_rom
+	lda	PORTB
+	ora	#1
+	wsync
+	sta	PORTB
+	lda	#$E0
+	sta	CHBAS
+	sta	CHBASE
+.endmacro
+.macro	enable_rom_quick
 	lda	PORTB
 	ora	#1
 	sta	PORTB
@@ -48,9 +82,9 @@ BUFSZ_SIO	=	256
 sram_init:
 
 ; disable all interrupts
-	sei
 	ldx	#0
 	stx	NMIEN		; disable NMI
+	sei
 
 ; disable ROMs
 	disable_rom
@@ -72,9 +106,9 @@ sram_init:
 	sta	$fffb
 
 ; enable interrupts
+	cli
 	lda	#$40
 	sta	NMIEN
-	cli
 
 	rts
 
@@ -104,14 +138,14 @@ bounce_buffer:	.res	BUFSZ_SIO
 .macro	int_wrap orgvec
 	.local	ret
 	pha
-	enable_rom
+	enable_rom_quick
 	lda	#>ret
 	pha
 	lda	#<ret
 	pha
 	php
 	jmp	(orgvec)
-ret:	disable_rom
+ret:	disable_rom_quick
 	pla
 	rti
 .endmacro
@@ -209,26 +243,6 @@ CIO_filename2:
 	jmp	CIO_fn_cont
 
 
-; enable ROM, call CIO, disable ROM
-
-CIO_call_a:
-	lda	CIO_a
-
-CIOV_call:
-	pha
-	lda	PORTB
-	sta	cur_CIOV_PORTB
-	enable_rom
-	pla
-	jsr	CIOV_org
-	php
-	pha
-	lda	cur_CIOV_PORTB
-	sta	PORTB
-	pla
-	plp
-	rts
-
 
 ; CIO handler
 ; We have buffer pointer and length entries in the IOCB, but their
@@ -263,6 +277,28 @@ CIO_handler:
 	beq	CIO_invalid		; GETCWD not supported yet
 	bcs	CIO_call_a		; other commands: assume no buffer
 ; not reached
+
+; enable ROM, call CIO, disable ROM
+
+CIO_call_a:
+	lda	CIO_a
+
+CIOV_call:
+	pha
+	lda	PORTB
+	sta	cur_CIOV_PORTB
+	enable_rom
+	pla
+	jsr	CIOV_org
+	php
+	pha
+	disable_rom_val cur_CIOV_PORTB
+;	lda	cur_CIOV_PORTB
+;	sta	PORTB
+	pla
+	plp
+	rts
+
 
 CIO_write_jmp:
 	jmp	CIO_write
@@ -859,8 +895,9 @@ SIO_call:
 	jsr	SIOV_org
 	php
 	pha
-	lda	cur_SIOV_PORTB
-	sta	PORTB
+	disable_rom_val cur_SIOV_PORTB
+;	lda	cur_SIOV_PORTB
+;	sta	PORTB
 	pla
 	plp
 	rts
@@ -933,7 +970,7 @@ SIO_write:
 	bcs	sio_write_len_ok
 
 	lda	#DERROR		; don't know a better status code for this
-	bne	SIO_err
+	jmp	SIO_err
 
 sio_write_len_ok:
 	lda	DBUFLO
@@ -1080,8 +1117,9 @@ KEYBDV_handler:
         pha
 	rts		; call keyboard handler
 kret:	pha
-	lda	cur_KEYBDV_PORTB
-	sta	PORTB
+	disable_rom_val cur_KEYBDV_PORTB
+;	lda	cur_KEYBDV_PORTB
+;	sta	PORTB
 	pla
 	rts
 
@@ -1097,8 +1135,9 @@ SETVBV_handler:
 	jsr	SETVBV_org
 	php
 	pha
-	lda	cur_SETVBV_PORTB
-	sta	PORTB
+	disable_rom_val cur_SETVBV_PORTB
+;	lda	cur_SETVBV_PORTB
+;	sta	PORTB
 	pla
 	plp
 	rts

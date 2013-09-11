@@ -97,6 +97,23 @@
 
         jsr     initlib
 
+.if 0
+.if .defined(__ATARIXL__)
+        .import __heapadd
+        .import pushax
+        .import __RAM_BELOW_ROM_START__
+        .import __RAM_BELOW_ROM_SIZE__
+        .import __RAM_BELOW_ROM_LAST__
+
+        lda     #<__RAM_BELOW_ROM_LAST__
+        ldx     #>__RAM_BELOW_ROM_LAST__
+        jsr     pushax
+        lda     #<(__RAM_BELOW_ROM_SIZE__ - (__RAM_BELOW_ROM_LAST__ - __RAM_BELOW_ROM_START__))
+        ldx     #>(__RAM_BELOW_ROM_SIZE__ - (__RAM_BELOW_ROM_LAST__ - __RAM_BELOW_ROM_START__))
+        jsr     __heapadd
+.endif
+.endif
+
 ; Set left margin to 0
 
         lda     LMARGN

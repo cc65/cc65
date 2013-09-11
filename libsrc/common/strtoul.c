@@ -97,7 +97,7 @@ unsigned long __fastcall__ strtoul (const char* nptr, char** endptr, int base)
      */
     if (endptr) {
         if (CvtCount > 0) {
-            *endptr = (char*) S - 1;
+            *endptr = (char*) S;
         } else {
             *endptr = (char*) nptr;
         }

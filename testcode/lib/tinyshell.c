@@ -5,11 +5,14 @@
 
 #define VERSION_ASC "0.90"
 
-#define KEYB_BUFSZ 80
-#define PROMPT ">>> "
 #ifdef __ATARI__
 #define UPPERCASE      /* define (e.g. for Atari) to convert filenames etc. to upper case */
 #endif
+
+#define CHECK_SP
+
+#define KEYB_BUFSZ 80
+#define PROMPT ">>> "
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,6 +29,10 @@
 #include <fcntl.h>
 #include <dirent.h>
 
+#ifdef CHECK_SP
+extern unsigned int getsp(void);  /* comes from getsp.s */
+#endif
+
 #define CMD_NOTHING 0
 #define CMD_INVALID 1
 #define CMD_HELP    2
@@ -38,7 +45,10 @@
 #define CMD_RENAME  9
 #define CMD_COPY    10
 #define CMD_PWD     11
+#define CMD_CLS     12
+#define CMD_VERBOSE 13
 
+static unsigned char verbose;
 static unsigned char terminate;
 static unsigned char cmd;
 static unsigned char *cmd_asc, *arg1, *arg2, *arg3;
@@ -68,6 +78,10 @@ struct cmd_table {
     { "mv",    CMD_RENAME },
     { "ren",   CMD_RENAME },
     { "pwd",   CMD_PWD },
+#ifdef __CC65__
+    { "cls",   CMD_CLS },
+#endif
+    { "verbose", CMD_VERBOSE },
     { NULL, 0 }
 };
 
@@ -81,6 +95,22 @@ static void banner(void)
 static void get_command(void)
 {
     unsigned char i = 0;
+
+#ifdef CHECK_SP
+    static char firstcall = 1;
+    static unsigned int good_sp;
+    unsigned int sp;
+    if (firstcall)
+        sp = good_sp = getsp();
+    else
+        sp = getsp();
+
+    if (sp != good_sp) {
+        printf("SP: 0x%04X  ***MISMATCH*** 0x%04X\n", sp, good_sp);
+    }
+    else if (verbose)
+        printf("SP: 0x%04X\n", sp);
+#endif
 
     arg1 = arg2 = arg3 = NULL;
 
@@ -132,6 +162,10 @@ static void cmd_help(void)
     puts("cd, chdir  -  change directory or drive");
     puts("md, mkdir  -  make directory or drive");
     puts("rd, rmdir  -  remove directory or drive");
+#ifdef __CC65__
+    puts("cls        -  clear screen");
+#endif
+    puts("verbose    -  set verbosity level");
     puts("sorry, you cannot start programs here");
 }
 
@@ -173,6 +207,8 @@ static void cmd_ls(void)
     else
         arg = ".";
 
+    if (verbose)
+        printf("Buffer addr: %p\n", arg);
     dir = opendir(arg);
 #ifdef __ATARI__
     if (need_free) free(arg);
@@ -262,6 +298,8 @@ static void cmd_pwd(void)
         printf("malloc %u bytes failed: %s\n", MAXPATHLEN, strerror(errno));
         return;
     }
+    if (verbose)
+        printf("Buffer addr: %p\n", buf);
     if (!getcwd(buf, MAXPATHLEN)) {
         printf("getcwd failed: %s\n", strerror(errno));
         free(buf);
@@ -309,6 +347,8 @@ static void cmd_copy(void)
         printf("malloc %u bytes failed: %s\n", cpbuf_sz, strerror(errno));
         return;
     }
+    if (verbose)
+        printf("Buffer addr: %p\n", buf);
 
     while (1) {
         if (srcfd == -1) {
@@ -349,6 +389,33 @@ static void cmd_copy(void)
     if (dstfd >= 0) close(dstfd);
 }
 
+#ifdef __CC65__
+static void cmd_cls(void)
+{
+    printf("\f");
+}
+#endif
+
+static void cmd_verbose(void)
+{
+    unsigned long verb;
+    char *endptr;
+
+    if (!arg1 || arg2) {
+        puts("usage: verbose <level>");
+        return;
+    }
+
+    verb = strtoul(arg1, &endptr, 10);
+    if (verb > 255 || *endptr) {
+        printf("invalid verbosity level 0x%x\n", *endptr);
+        return;
+    }
+
+    verbose = verb;
+    printf("verbosity level set to %d\n", verbose);
+}
+
 static void run_command(void)
 {
     switch (cmd) {
@@ -365,6 +432,10 @@ static void run_command(void)
         case CMD_PWD: cmd_pwd(); return;
         case CMD_RENAME: cmd_rename(); return;
         case CMD_COPY: cmd_copy(); return;
+#ifdef __CC65__
+        case CMD_CLS: cmd_cls(); return;
+#endif
+        case CMD_VERBOSE: cmd_verbose(); return;
     }
 }
 

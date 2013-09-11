@@ -5,6 +5,7 @@
 ;
 
 DEBUG	=	1
+CHKBUF	=	1	; check if bounce buffering is needed (bounce buffering is always done if set to 0)
 
 .if .defined(__ATARIXL__)
 
@@ -176,6 +177,10 @@ my_RESET_han:
 ; one filename, terminated by "invalid character", located at ICBAL/ICBAH
 
 CIO_filename:
+.if CHKBUF
+	jsr	chk_CIO_buf_fn
+	bcc	CIO_call_a
+.endif
 	jsr	setup_zpptr1_y0
 	jsr	copy_filename
 CIO_fn_cont:
@@ -193,6 +198,10 @@ CIO_fn_cont:
 ; two filenames, terminated and separated by "invalid character", located at ICBAL/ICBAH
 
 CIO_filename2:
+.if CHKBUF
+	jsr	chk_CIO_buf_fn2
+	bcc	CIO_call_a
+.endif
 	jsr	setup_zpptr1_y0
 	jsr	copy_filename
 	iny
@@ -271,7 +280,10 @@ CIO_read:
 	ora	ICBLH,x
 	beq	CIO_call_a		; special I/O through A register in case buffer length is 0
 
-; @@@ TODO: check if bounce buffer is really needed because buffer is in ROM area
+.if CHKBUF
+	jsr	chk_CIO_buf
+	bcc	CIO_call_a
+.endif
 
 ; If the data length is larger than our bounce buffer, we have to split the request into smaller ones.
 ; Otherwise we can get away with one call and a copy to the final destination afterwards.
@@ -431,7 +443,10 @@ CIO_write:
 	ora	ICBLH,x
 	beq	CIO_call_a_jmp		; special I/O through A register in case buffer length is 0
 
-; @@@ TODO: check if bounce buffer is really needed because buffer is in ROM area
+.if CHKBUF
+	jsr	chk_CIO_buf
+	bcc	CIO_call_a_jmp
+.endif
 
 ; If the data length is larger than our bounce buffer, we have to split the request into smaller ones.
 ; Otherwise we can get away with a copy to the bounce buffer and the call.
@@ -691,6 +706,125 @@ setup_zpptr1:
 	sta	zpptr1+1
 	rts
 
+
+.if CHKBUF
+
+; get length of file name pointed to by 'zpptr1'
+; input:   Y - index into file name
+; output:  Y - length
+;          A - destroyed
+get_fn_len:
+	lda	(zpptr1),y
+	beq	@done
+	iny
+	cmp	#ATEOL
+	bne	get_fn_len
+	dey
+@done:
+	rts
+
+
+chk_CIO_buf_fn2:
+	tya
+	pha
+	lda	ICBLL,x
+	pha
+	lda	ICBLH,x
+	pha
+	jsr	setup_zpptr1_y0
+	jsr	get_fn_len
+	iny			; include terminating zero
+	bne	fn_cont
+
+chk_CIO_buf_fn:
+	tya
+	pha
+	lda	ICBLL,x
+	pha
+	lda	ICBLH,x
+	pha
+	jsr	setup_zpptr1_y0
+fn_cont:jsr	get_fn_len
+	iny			; include terminating zero
+	tya
+	sta	ICBLL,x
+	lda	#0
+	sta	ICBLH,x
+	jsr	chk_CIO_buf
+	pla	
+	sta	ICBLH,x
+	pla	
+	sta	ICBLL,x
+	pla
+	tay
+	rts
+
+
+; check if a CIO input/output buffer overlaps with ROM area (>= $C000)
+; input:                      X - IOCB index
+; 	ICBAL/ICBAH/ICBLL/ICBLH - buffer address and length
+; output:                    CF - 1/0 for overlap/no overlap
+;                             A - destroyed
+
+chk_CIO_buf:
+	lda	ICBAH,x
+	cmp	#$c0
+	bcc	@cont
+@ret:	
+.ifdef DEBUG
+	jsr	CIO_buf_noti
+.endif
+	rts
+
+@cont:	lda	ICBAL,x
+	clc
+	adc	ICBLL,x
+	lda	ICBAH,x
+	adc	ICBLH,x
+	bcs	@ret		; ??? wraparound
+	cmp	#$c0
+.ifdef DEBUG
+	jsr	CIO_buf_noti
+.endif
+	rts
+
+.ifdef DEBUG
+; write to screen memory on 2nd line:
+; pos 0: # of accesses without buffering
+; pos 1: # of accesses with buffering
+CIO_buf_noti:
+	php
+	pha
+	tya
+	pha
+	bcc	@nobuf
+
+	inc	CIObnval_dobuf
+	jmp	@cont
+
+@nobuf:	inc	CIObnval_nobuf
+
+@cont:	ldy	#40
+	lda	CIObnval_nobuf
+	sta	(SAVMSC),y
+	ldy	#41
+	lda	CIObnval_dobuf
+	sta	(SAVMSC),y
+
+	pla
+	tay
+	pla
+	plp
+	rts
+
+CIObnval_dobuf:
+	.byte	0
+CIObnval_nobuf:
+	.byte	0
+.endif
+
+.endif	; .if CHKBUF
+
 ;---------------------------------------------------------
 
 ; SIO handler
@@ -737,7 +871,10 @@ SIO_call:
 
 SIO_read:
 
-; @@@ TODO: check if bounce buffer is really needed because buffer is in ROM area
+.if CHKBUF
+	jsr	chk_SIO_buf
+	bcc	SIO_call
+.endif
 
 ; we only support transfers <= bounce buffer size
 	jsr	cmp_sio_len_bnc_bufsz
@@ -786,7 +923,10 @@ sio_read_ret:
 
 SIO_write:
 
-; @@@ TODO: check if bounce buffer is really needed because buffer is in ROM area
+.if CHKBUF
+	jsr	chk_SIO_buf
+	bcc	SIO_call
+.endif
 
 ; we only support transfers <= bounce buffer size
 	jsr	cmp_sio_len_bnc_bufsz
@@ -856,6 +996,72 @@ orgbuf_to_dbuf:
 	sta	DBUFHI
 	rts
 
+
+.if CHKBUF
+
+; check if a SIO input/output buffer overlaps with ROM area (>= $C000)
+; input: DBUFLO/DBUFHI/DBYTLO/DBYTHI - buffer address and length
+; output:                         CF - 1/0 for overlap/no overlap
+;                                  A - destroyed
+
+chk_SIO_buf:
+	lda	DBUFHI
+	cmp	#$c0
+	bcc	@cont
+@ret:
+.ifdef DEBUG
+	jsr	SIO_buf_noti
+.endif
+	rts
+
+@cont:	lda	DBUFLO
+	clc
+	adc	DBYTLO
+	lda	DBUFHI
+	adc	DBYTHI
+	bcs	@ret		; ??? wraparound
+	cmp	#$c0
+.ifdef DEBUG
+	jsr	SIO_buf_noti
+.endif
+	rts
+
+.ifdef DEBUG
+; write to screen memory on 2nd line:
+; pos 38: # of accesses without buffering
+; pos 39: # of accesses with buffering
+SIO_buf_noti:
+	php
+	pha
+	tya
+	pha
+	bcc	@nobuf
+
+	inc	SIObnval_dobuf
+	jmp	@cont
+
+@nobuf:	inc	SIObnval_nobuf
+
+@cont:	ldy	#78
+	lda	SIObnval_nobuf
+	sta	(SAVMSC),y
+	ldy	#79
+	lda	SIObnval_dobuf
+	sta	(SAVMSC),y
+
+	pla
+	tay
+	pla
+	plp
+	rts
+
+SIObnval_dobuf:
+	.byte	0
+SIObnval_nobuf:
+	.byte	0
+.endif
+
+.endif	; .if CHKBUF
 
 ;---------------------------------------------------------
 

@@ -408,7 +408,7 @@ static void cmd_verbose(void)
 
     verb = strtoul(arg1, &endptr, 10);
     if (verb > 255 || *endptr) {
-        printf("invalid verbosity level 0x%x\n", *endptr);
+        puts("invalid verbosity level");
         return;
     }
 

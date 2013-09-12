@@ -7,9 +7,16 @@
 
 #ifdef __ATARI__
 #define UPPERCASE      /* define (e.g. for Atari) to convert filenames etc. to upper case */
+#define HAVE_SUBDIRS
 #endif
 
+#ifdef __APPLE2__
+#define HAVE_SUBDIRS
+#endif
+
+#ifdef __CC65__
 #define CHECK_SP
+#endif
 
 #define KEYB_BUFSZ 80
 #define PROMPT ">>> "
@@ -22,6 +29,7 @@
 #ifndef __CC65__
 #include <sys/stat.h>
 #include <sys/param.h>
+#define HAVE_SUBDIRS
 #else
 #define MAXPATHLEN 64
 #endif
@@ -66,11 +74,13 @@ struct cmd_table {
     { "ls",    CMD_LS },
     { "dir",   CMD_LS },
     { "md",    CMD_MKDIR },
+#ifdef HAVE_SUBDIRS
     { "mkdir", CMD_MKDIR },
     { "rd",    CMD_RMDIR },
     { "rmdir", CMD_RMDIR },
     { "cd",    CMD_CHDIR },
     { "chdir", CMD_CHDIR },
+#endif
     { "rm",    CMD_RM },
     { "del",   CMD_RM },
     { "cp",    CMD_COPY },
@@ -78,7 +88,7 @@ struct cmd_table {
     { "mv",    CMD_RENAME },
     { "ren",   CMD_RENAME },
     { "pwd",   CMD_PWD },
-#ifdef __CC65__
+#ifdef __ATARI__
     { "cls",   CMD_CLS },
 #endif
     { "verbose", CMD_VERBOSE },
@@ -162,7 +172,7 @@ static void cmd_help(void)
     puts("cd, chdir  -  change directory or drive");
     puts("md, mkdir  -  make directory or drive");
     puts("rd, rmdir  -  remove directory or drive");
-#ifdef __CC65__
+#ifdef __ATARI__
     puts("cls        -  clear screen");
 #endif
     puts("verbose    -  set verbosity level");
@@ -239,6 +249,8 @@ static void cmd_rm(void)
         printf("remove failed: %s\n", strerror(errno));
 }
 
+#ifdef HAVE_SUBDIRS
+
 static void cmd_mkdir(void)
 {
     if (!arg1 || arg2) {
@@ -309,6 +321,8 @@ static void cmd_pwd(void)
     puts(buf);
     free(buf);
 }
+
+#endif /* #ifdef HAVE_SUBDIRS */
 
 static void cmd_rename(void)
 {
@@ -389,7 +403,7 @@ static void cmd_copy(void)
     if (dstfd >= 0) close(dstfd);
 }
 
-#ifdef __CC65__
+#ifdef __ATARI__
 static void cmd_cls(void)
 {
     printf("\f");
@@ -426,13 +440,15 @@ static void run_command(void)
         case CMD_QUIT: terminate = 1; return;
         case CMD_LS: cmd_ls(); return;
         case CMD_RM: cmd_rm(); return;
+#ifdef HAVE_SUBDIRS
         case CMD_CHDIR: cmd_chdir(); return;
         case CMD_MKDIR: cmd_mkdir(); return;
         case CMD_RMDIR: cmd_rmdir(); return;
         case CMD_PWD: cmd_pwd(); return;
+#endif
         case CMD_RENAME: cmd_rename(); return;
         case CMD_COPY: cmd_copy(); return;
-#ifdef __CC65__
+#ifdef __ATARI__
         case CMD_CLS: cmd_cls(); return;
 #endif
         case CMD_VERBOSE: cmd_verbose(); return;

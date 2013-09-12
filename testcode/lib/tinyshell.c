@@ -7,8 +7,15 @@
 
 #ifdef __ATARI__
 #define UPPERCASE      /* define (e.g. for Atari) to convert filenames etc. to upper case */
-#define CHECK_SP
 #define HAVE_SUBDIRS
+#endif
+
+#ifdef __APPLE2__
+#define HAVE_SUBDIRS
+#endif
+
+#ifdef __CC65__
+#define CHECK_SP
 #endif
 
 #define KEYB_BUFSZ 80

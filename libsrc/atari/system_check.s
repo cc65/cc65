@@ -17,7 +17,7 @@ DEBUG	=	1
 
 	.export		syschk
         .import         __SYSCHK_LOAD__
-        .import         __SAVEAREA_LOAD__       ; needed by xlmemchk.inc
+        .import         __STARTADDRESS__       ; needed by xlmemchk.inc
 
         .include        "zeropage.inc"
         .include        "atari.inc"
@@ -75,6 +75,7 @@ cont:	ldx	#0		; channel 0
 no_xl:	print_string "This program needs an XL machine."
 	jmp	fail
 
+; entry point
 syschk:
 	lda     $fcd8		; from ostype.s
         cmp     #$a2

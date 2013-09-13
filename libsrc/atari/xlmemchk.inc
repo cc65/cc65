@@ -9,7 +9,7 @@
 ; by the screen memory afterwards.
 ; 
 ; inputs:
-;	__SAVEAREA_LOAD__	-	load address of the program
+;	__STARTADDRESS__	-	load address of the program
 ; outputs:
 ;	lodadr			-	(high byte only) value to
 ;					write into RAMTOP
@@ -75,8 +75,10 @@ al4k:	lda	lodadr+1
 	bne	scrmemtst
 ; not reached
 
-
-lodadr:	.word	__SAVEAREA_LOAD__ & $FF00		; our program's load address, rounded down to page boundary
+.ifdef DEBUG
+.byte "XLMEMCHK:>"
+.endif
+lodadr:	.word	__STARTADDRESS__ & $FF00		; our program's load address, rounded down to page boundary
 tstadr:	.res	2
 lowadr:	.res	2
 tmp:	.res	1

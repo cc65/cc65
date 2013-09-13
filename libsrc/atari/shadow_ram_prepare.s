@@ -18,7 +18,7 @@ DEBUG   =       1
         .import         __SHADOW_RAM_LOAD__, __SHADOW_RAM_SIZE__
         .import         __SHADOW_RAM_RUN__
         .import         __CHARGEN_START__, __CHARGEN_SIZE__
-        .import         __SAVEAREA_LOAD__
+        .import         __STARTADDRESS__       ; needed by xlmemchk.inc
 
         .include        "zeropage.inc"
         .include        "atari.inc"

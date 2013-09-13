@@ -374,6 +374,6 @@ screen_device_length = * - screen_device
 
         .word   INITAD
         .word   INITAD+1
-        .word   __SRPREP_LOAD__
+        .word   sramprep
 
 .endif  ; .if .defined(__ATARIXL__)

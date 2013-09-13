@@ -52,6 +52,8 @@
 
 ; Real entry point:
 
+start:
+
 .if .defined(__ATARIXL__)
         jsr     sram_init
 .endif
@@ -229,4 +231,4 @@ APPMHI_save:    .res    2
 .segment "AUTOSTRT"
         .word   RUNAD                   ; defined in atari.inc
         .word   RUNAD+1
-        .word   __STARTUP_LOAD__ + 1
+        .word   start

@@ -71,17 +71,17 @@ cont:	ldx	#0		; channel 0
 
 .segment        "SYSCHK"
 
+; no XL machine
+no_xl:	print_string "This program needs an XL machine."
+	jmp	fail
+
 syschk:
 	lda     $fcd8		; from ostype.s
         cmp     #$a2
-        bne     is_xl
-
-; no XL machine
-	print_string "This program needs an XL machine."
-	jmp	fail
+        beq     no_xl
 
 ; we have an XL machine, now check memory
-is_xl:	lda	RAMSIZ
+	lda	RAMSIZ
 	cmp	#$80
 	bcs	sys_ok
 
@@ -148,6 +148,6 @@ loop:	dey
 trailer:
         .word   INITAD
         .word   INITAD+1
-        .word   __SYSCHK_LOAD__
+        .word   syschk
 
 .endif	; .if .defined(__ATARIXL__)

@@ -17,7 +17,7 @@ DEBUG	=	1
 
 	.export		syschk
         .import         __SYSCHK_LOAD__
-        .import         __SAVEAREA_LOAD__
+        .import         __SAVEAREA_LOAD__       ; needed by xlmemchk.inc
 
         .include        "zeropage.inc"
         .include        "atari.inc"
@@ -64,7 +64,7 @@ cont:	ldx	#0		; channel 0
 .segment        "SYSCHKHDR"
 
         .word   __SYSCHK_LOAD__
-        .word   trailer - 1
+        .word   end - 1
 
 ; ------------------------------------------------------------------------
 ; Actual code
@@ -142,10 +142,13 @@ loop:	dey
 
 .endproc
 
+end:
+
 ; ------------------------------------------------------------------------
 ; Chunk "trailer" - sets INITAD
 
-trailer:
+.segment        "SYSCHKTRL"
+
         .word   INITAD
         .word   INITAD+1
         .word   syschk

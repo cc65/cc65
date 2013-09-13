@@ -117,7 +117,7 @@ sram_init:
 zpptr1:	.res	2
 
 
-.segment "LOWBUFS"
+.segment "LOWDATA"
 
 ; bounce buffers for CIO and SIO calls
 bounce_buffer:	.res	BUFSZ_SIO

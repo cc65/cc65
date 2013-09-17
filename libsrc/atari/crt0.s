@@ -17,6 +17,7 @@
         .import         __RESERVED_MEMORY__
         .import         __RAM_START__, __RAM_SIZE__
 .if .defined(__ATARIXL__)
+        .import         __STACKSIZE__
         .import         sram_init
         .import         scrdev
         .import         findfreeiocb
@@ -88,9 +89,9 @@ start:
 
 .else
 
-        lda     #<(__RAM_START__ + __RAM_SIZE__ - 1)
+        lda     #<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
         sta     sp
-        lda     #>(__RAM_START__ + __RAM_SIZE__ - 1)
+        lda     #>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
         sta     sp+1
 
 .endif

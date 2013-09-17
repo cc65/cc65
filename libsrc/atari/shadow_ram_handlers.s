@@ -293,8 +293,6 @@ CIOV_call:
 	php
 	pha
 	disable_rom_val cur_CIOV_PORTB
-;	lda	cur_CIOV_PORTB
-;	sta	PORTB
 	pla
 	plp
 	rts
@@ -896,8 +894,6 @@ SIO_call:
 	php
 	pha
 	disable_rom_val cur_SIOV_PORTB
-;	lda	cur_SIOV_PORTB
-;	sta	PORTB
 	pla
 	plp
 	rts
@@ -1118,8 +1114,6 @@ KEYBDV_handler:
 	rts		; call keyboard handler
 kret:	pha
 	disable_rom_val cur_KEYBDV_PORTB
-;	lda	cur_KEYBDV_PORTB
-;	sta	PORTB
 	pla
 	rts
 
@@ -1136,8 +1130,6 @@ SETVBV_handler:
 	php
 	pha
 	disable_rom_val cur_SETVBV_PORTB
-;	lda	cur_SETVBV_PORTB
-;	sta	PORTB
 	pla
 	plp
 	rts

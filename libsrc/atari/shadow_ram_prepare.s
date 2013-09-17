@@ -14,9 +14,9 @@ DEBUG   =       1
 .if .defined(__ATARIXL__)
 
         .export         sramprep
-        .import         __SRPREP_LOAD__, __SRPREP_SIZE__
-        .import         __SHADOW_RAM_LOAD__, __SHADOW_RAM_SIZE__
-        .import         __SHADOW_RAM_RUN__
+        .import         __SRPREP_LOAD__, __SRPREPCHNK_LAST__
+        .import         __SHADOW_RAM_LOAD__, __SHADOW_RAM_SIZE__, __SHADOW_RAM_RUN__
+        .import         __SHADOW_RAM2_LOAD__, __SHADOW_RAM2_SIZE__, __SHADOW_RAM2_RUN__
         .import         __CHARGEN_START__, __CHARGEN_SIZE__
         .import         __STARTADDRESS__       ; needed by xlmemchk.inc
 
@@ -48,7 +48,7 @@ cont:   ldx     #0              ; channel 0
 .segment        "SRPREPHDR"
 
         .word   __SRPREP_LOAD__
-        .word   __SRPREP_LOAD__ + __SRPREP_SIZE__ + __SHADOW_RAM_SIZE__ - 1
+        .word   __SRPREPCHNK_LAST__ - 1
 
 ; ------------------------------------------------------------------------
 ; Actual code
@@ -148,15 +148,15 @@ scrok:  ; now close it again -- we don't need it anymore
         jsr     CIOV_org
 
 
-; copy chargen to low memory
+; copy chargen to low memory, just after the next possible address beyond our loaded chunk data
 
 .ifdef DEBUG
         print_string "copy chargen to low memory"
 .endif
 
-        lda     #>(__SRPREP_LOAD__ + __SRPREP_SIZE__ + __SHADOW_RAM_SIZE__)
+        lda     #>__SRPREPCHNK_LAST__
         sta     ptr3+1
-        lda     #<(__SRPREP_LOAD__ + __SRPREP_SIZE__ + __SHADOW_RAM_SIZE__)
+        lda     #<__SRPREPCHNK_LAST__
         sta     ptr3
         beq     cg_addr_ok
 
@@ -215,7 +215,7 @@ cg_addr_ok2:
         sta CHBASE
         sta CHBAS
 
-; copy shadow RAM contents to their destination
+; copy shadow RAM contents to their destination (segment SHADOW_RAM)
 
         lda     #<__SHADOW_RAM_SIZE__
         bne     do_copy
@@ -239,6 +239,32 @@ do_copy:lda     #<__SHADOW_RAM_LOAD__
         jsr     memcopy
 
 no_copy:
+
+; copy shadow RAM #2 contents to their destination (segment SHADOW_RAM2)
+
+        lda     #<__SHADOW_RAM2_SIZE__
+        bne     do_copy2
+        lda     #>__SHADOW_RAM2_SIZE__
+        beq     no_copy2                ; we have no shadow RAM contents
+
+        ; ptr1 - src; ptr2 - dest; tmp1, tmp2 - len
+do_copy2:
+        lda     #<__SHADOW_RAM2_LOAD__
+        sta     ptr1
+        lda     #>__SHADOW_RAM2_LOAD__
+        sta     ptr1+1
+        lda     #<__SHADOW_RAM2_RUN__
+        sta     ptr2
+        lda     #>__SHADOW_RAM2_RUN__
+        sta     ptr2+1
+        lda     #<__SHADOW_RAM2_SIZE__
+        sta     tmp1
+        lda     #>__SHADOW_RAM2_SIZE__
+        sta     tmp2
+
+        jsr     memcopy
+
+no_copy2:
 
 ; copy chargen to its new (final) location
 
@@ -361,10 +387,11 @@ screen_device_length = * - screen_device
 .endif
 
 ; ------------------------------------------------------------------------
-; Provide an empty SHADOW_RAM segment in order that the linker is happy
-; if the user program doesn't have a SHADOW_RAM segment.
+; Provide empty SHADOW_RAM and SHADOW_RAM2 segments in order that the
+; linker is happy if the user program doesn't have these segments.
 
 .segment        "SHADOW_RAM"
+.segment        "SHADOW_RAM2"
 
 
 ; ------------------------------------------------------------------------

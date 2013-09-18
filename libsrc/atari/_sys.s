@@ -6,7 +6,7 @@
 ;   'atarixl'  doesn't support the _sys() function
 ;
 
-.if .not .defined(__ATARIXL__)
+.ifndef __ATARIXL__
 
 .include "../common/_sys.s"
 

@@ -40,7 +40,7 @@
 
         .export         _get_ostype
 
-.if .defined(__ATARIXL__)
+.ifdef __ATARIXL__
 
         .include "atari.inc"
         .import __CHARGEN_START__

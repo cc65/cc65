@@ -16,7 +16,7 @@
         .import         __STARTUP_LOAD__, __BSS_LOAD__
         .import         __RESERVED_MEMORY__
         .import         __RAM_START__, __RAM_SIZE__
-.if .defined(__ATARIXL__)
+.ifdef __ATARIXL__
         .import         __STACKSIZE__
         .import         sram_init
         .import         scrdev
@@ -34,7 +34,7 @@
 
         .word   $FFFF
 
-.if .defined(__ATARIXL__)
+.ifdef __ATARIXL__
 .segment        "MAINHDR"
 .endif
 
@@ -55,7 +55,7 @@
 
 start:
 
-.if .defined(__ATARIXL__)
+.ifdef __ATARIXL__
         jsr     sram_init
 .endif
 
@@ -68,7 +68,7 @@ start:
         tsx
         stx     spsave
 
-.if .not .defined(__ATARIXL__)
+.ifndef __ATARIXL__
 
 ; Report memory usage
 
@@ -101,7 +101,7 @@ start:
         jsr     initlib
 
 .if 0
-.if .defined(__ATARIXL__)
+.ifdef __ATARIXL__
         .import __heapadd
         .import pushax
         .import __RAM_BELOW_ROM_START__
@@ -165,7 +165,7 @@ _exit:  jsr     donelib         ; Run module destructors
         lda     APPMHI_save+1
         sta     APPMHI+1
 
-.if .defined(__ATARIXL__)
+.ifdef __ATARIXL__
 
 ; Atari XL target stuff...
 
@@ -224,7 +224,7 @@ _exit:  jsr     donelib         ; Run module destructors
 spsave:         .res    1
 old_shflok:     .res    1
 old_lmargin:    .res    1
-.if .not .defined(__ATARIXL__)
+.ifndef __ATARIXL__
 APPMHI_save:    .res    2
 .endif
 

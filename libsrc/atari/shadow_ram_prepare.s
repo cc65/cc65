@@ -11,7 +11,7 @@
 
 DEBUG   =       1
 
-.if .defined(__ATARIXL__)
+.ifdef __ATARIXL__
 
         .export         sramprep
         .import         __SRPREP_LOAD__, __SRPREPCHNK_LAST__
@@ -403,4 +403,4 @@ screen_device_length = * - screen_device
         .word   INITAD+1
         .word   sramprep
 
-.endif  ; .if .defined(__ATARIXL__)
+.endif  ; .ifdef __ATARIXL__

@@ -7,7 +7,7 @@
 
 em_libref       := _exit
 joy_libref      := _exit
-.if .defined(__ATARIXL__)
+.ifdef __ATARIXL__
         .import CIO_handler
 tgi_libref      := CIO_handler
 .else

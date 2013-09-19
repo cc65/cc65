@@ -14,7 +14,7 @@ _cgetc:
         jsr     setcursor
         lda     #12
         sta     ICAX1Z          ; fix problems with direct call to KEYBDV
-.if .not .defined(__ATARIXL__)
+.ifndef __ATARIXL__
         jsr     @1
 .else
         jsr     KEYBDV_handler
@@ -22,7 +22,7 @@ _cgetc:
         ldx     #0
         rts
 
-.if .not .defined(__ATARIXL__)
+.ifndef __ATARIXL__
 @1:     lda     KEYBDV+5
         pha
         lda     KEYBDV+4

@@ -6,7 +6,7 @@
 ; Christian Groessler, chris@groessler.org, 2013
 ;
 
-.if .defined(__ATARIXL__)
+.ifdef __ATARIXL__
 
 .export		SAVMSC_save
 .export		MEMTOP_save

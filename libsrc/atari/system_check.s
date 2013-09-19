@@ -13,7 +13,7 @@
 
 DEBUG	=	1
 
-.if .defined(__ATARIXL__)
+.ifdef __ATARIXL__
 
 	.export		syschk
         .import         __SYSCHK_LOAD__
@@ -154,4 +154,4 @@ end:
         .word   INITAD+1
         .word   syschk
 
-.endif	; .if .defined(__ATARIXL__)
+.endif	; .ifdef __ATARIXL__

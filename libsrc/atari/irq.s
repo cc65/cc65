@@ -39,7 +39,7 @@ doneirq:
 
 IRQStub:
         cld                             ; Just to be sure
-.if .defined(__ATARIXL__)
+.ifdef __ATARIXL__
 	pha
 	lda	PORTB
 	pha
@@ -47,7 +47,7 @@ IRQStub:
 	sta	PORTB			; disable ROM  @@@ TODO: update CHARGEN
 .endif
         jsr     callirq                 ; Call the functions
-.if .defined(__ATARIXL__)
+.ifdef __ATARIXL__
 	pla
 	sta	PORTB
 	pla

@@ -8,7 +8,7 @@ DEBUG	=	1
 USEWSYNC=	1
 CHKBUF	=	1	; check if bounce buffering is needed (bounce buffering is always done if set to 0)
 
-.if .defined(__ATARIXL__)
+.ifdef __ATARIXL__
 
 	SHRAM_HANDLERS	= 1
         .include        "atari.inc"
@@ -1147,4 +1147,4 @@ orig_len:		.res	2
 req_len:		.res	2
 retlen:			.res	2
 
-.endif	; .if .defined(__ATARIXL__)
+.endif	; .ifdef __ATARIXL__

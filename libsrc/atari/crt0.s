@@ -66,7 +66,7 @@ start:
 ; Setup the stack
 
         tsx
-        stx     spsave
+        stx     SP_save
 
 .ifndef __ATARIXL__
 
@@ -120,14 +120,14 @@ start:
 ; Set left margin to 0
 
         lda     LMARGN
-        sta     old_lmargin
+        sta     LMARGN_save
         ldy     #0
         sty     LMARGN
 
 ; Set keyb to upper/lowercase mode
 
         ldx     SHFLOK
-        stx     old_shflok
+        stx     SHFLOK_save
         sty     SHFLOK
 
 ; Initialize conio stuff
@@ -145,17 +145,17 @@ _exit:  jsr     donelib         ; Run module destructors
 
 ; Restore system stuff
 
-        ldx     spsave
+        ldx     SP_save
         txs                     ; Restore stack pointer
 
 ; Restore left margin
 
-        lda     old_lmargin
+        lda     LMARGN_save
         sta     LMARGN
 
 ; Restore kb mode
 
-        lda     old_shflok
+        lda     SHFLOK_save
         sta     SHFLOK
 
 ; Restore APPMHI
@@ -221,9 +221,9 @@ _exit:  jsr     donelib         ; Run module destructors
 
 .bss
 
-spsave:         .res    1
-old_shflok:     .res    1
-old_lmargin:    .res    1
+SP_save:        .res    1
+SHFLOK_save     .res    1
+LMARGN_save:    .res    1
 .ifndef __ATARIXL__
 APPMHI_save:    .res    2
 .endif

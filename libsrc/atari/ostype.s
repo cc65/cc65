@@ -40,40 +40,38 @@
 
         .export         _get_ostype
 
+        .include "atari.inc"
+	.include "romswitch.inc"
+
 .ifdef __ATARIXL__
 
-        .include "atari.inc"
         .import __CHARGEN_START__
         .segment "LOWCODE"
-.macro  disable_rom
+
+.macro  disable_rom_save_a
         pha
-        lda     PORTB
-        and     #$fe
-        sta     PORTB
-        lda     #>__CHARGEN_START__
-        sta     CHBAS
-        sta     CHBASE
-        pla
-.endmacro
-.macro  enable_rom
-        lda     PORTB
-        ora     #1
-        sta     PORTB
-        lda     #$E0
-        sta     CHBAS
-        sta     CHBASE
+	disable_rom
+	pla
 .endmacro
 
 .else   ; above atarixl, below atari
 
-.macro  disable_rom
-.endmacro
-.macro  enable_rom
+.macro  disable_rom_save_a
 .endmacro
 
-.endif
+.endif  ; .ifdef __ATARIXL__
 
-.proc   _get_ostype
+
+; unknown ROM
+
+_unknown:
+        lda     #0
+        tax
+        disable_rom_save_a
+        rts
+
+
+_get_ostype:
 
         enable_rom
         lda     $fcd8
@@ -97,15 +95,7 @@
         and     #%00111000
         ora     #%11
 _fin:   ldx     #0
-        disable_rom
-        rts
-
-; unknown ROM
-
-_unknown:
-        lda     #0
-        tax
-        disable_rom
+        disable_rom_save_a
         rts
 
 ; 1200XL ROM
@@ -184,5 +174,3 @@ _400800_3:
 
         lda     #%00010001
         bne     _fin
-
-.endproc

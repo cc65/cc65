@@ -5,7 +5,6 @@
 ;
 
 DEBUG	=	1
-USEWSYNC=	1
 CHKBUF	=	1	; check if bounce buffering is needed (bounce buffering is always done if set to 0)
 
 .ifdef __ATARIXL__
@@ -14,6 +13,8 @@ CHKBUF	=	1	; check if bounce buffering is needed (bounce buffering is always don
         .include        "atari.inc"
 	.include	"save_area.inc"
         .include        "zeropage.inc"
+        .include        "romswitch.inc"
+
 	.import		__CHARGEN_START__
 
 	.export		sram_init
@@ -24,56 +25,6 @@ CHKBUF	=	1	; check if bounce buffering is needed (bounce buffering is always don
 
 BUFSZ		=	128		; bounce buffer size
 BUFSZ_SIO	=	256
-
-.macro	wsync
-.if USEWSYNC
-	sta	WSYNC
-.endif
-.endmacro
-
-.macro	disable_rom
-	lda	PORTB
-	and	#$fe
-	wsync
-	sta	PORTB
-	lda	#>__CHARGEN_START__
-	sta	CHBAS
-	sta	CHBASE
-.endmacro
-.macro	disable_rom_quick
-	lda	PORTB
-	and	#$fe
-	sta	PORTB
-	lda	#>__CHARGEN_START__
-	sta	CHBAS
-	sta	CHBASE
-.endmacro
-.macro	disable_rom_val val
-	lda	val
-	wsync
-	sta	PORTB
-	lda	#>__CHARGEN_START__
-	sta	CHBAS
-	sta	CHBASE
-.endmacro
-
-.macro	enable_rom
-	lda	PORTB
-	ora	#1
-	wsync
-	sta	PORTB
-	lda	#$E0
-	sta	CHBAS
-	sta	CHBASE
-.endmacro
-.macro	enable_rom_quick
-	lda	PORTB
-	ora	#1
-	sta	PORTB
-	lda	#$E0
-	sta	CHBAS
-	sta	CHBASE
-.endmacro
 
 .segment "INIT"
 

@@ -222,7 +222,7 @@ _exit:  jsr     donelib         ; Run module destructors
 .bss
 
 SP_save:        .res    1
-SHFLOK_save     .res    1
+SHFLOK_save:    .res    1
 LMARGN_save:    .res    1
 .ifndef __ATARIXL__
 APPMHI_save:    .res    2

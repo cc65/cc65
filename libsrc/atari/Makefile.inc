@@ -14,3 +14,20 @@
 #                  needs DEFAULT_DEVICE to be defined, otherwise no effect
 
 CA65FLAGS += -D NUMDRVS=4 -D LINEBUF=80 -D UCASE_FILENAME=1 -D DEFAULT_DEVICE=1 -D DYNAMIC_DD=1
+
+# The following defines are only used by the 'atarixl' target:
+#
+# CHARGEN_RELOC  - If defined, CHBAS and CHBASE are updated when
+#                  enabling or disabling the ROM.
+#                  If the ROM is enabled, $E0 is written to CHBAS
+#                  and CHBASE.
+#                  If the ROM is disabled, the upper byte of
+#                  __CHARGEN_START__ is written to CHBAS and CHBASE.
+# USEWSYNC       - If defined, the code waits for horizontal retrace
+#                  before switching the ROM and updating CHBAS and
+#                  CHBASE. This define only has effect if CHARGEN_RELOC
+#                  is also defined.
+
+# Disabled by default, you should enable it if the linker script relocates the
+# character generator (like atarixl-largehimem.cfg).
+#CA65FLAGS += -D CHARGEN_RELOC -D USEWSYNC

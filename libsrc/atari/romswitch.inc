@@ -14,15 +14,11 @@
 ;                __CHARGEN_START__ is written to CHBAS and CHBASE.
 ; USEWSYNC:      If defined, the code waits for horizontal retrace
 ;                before switching the ROM and updating CHBAS and
-;                CHBASE. This define only has effect if CHAGEN_RELOC
+;                CHBASE. This define only has effect if CHARGEN_RELOC
 ;                is also defined.
 
 
 .ifdef __ATARIXL__
-
-USEWSYNC =      1
-CHARGEN_RELOC = 1
-
 
 .ifdef CHARGEN_RELOC
 

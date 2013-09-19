@@ -7,9 +7,10 @@
 
 .ifdef __ATARIXL__
 
-USEWSYNC=	1
+USEWSYNC =      1
+CHARGEN_RELOC = 1
 
-.if USEWSYNC
+.if .defined(USEWSYNC) .and .defined(CHARGEN_RELOC)
 .macro  wsync
         sta     WSYNC
 .endmacro
@@ -24,25 +25,31 @@ USEWSYNC=	1
         and     #$fe
         wsync
         sta     PORTB
+.ifdef CHARGEN_RELOC
         lda     #>__CHARGEN_START__
         sta     CHBAS
         sta     CHBASE
+.endif
 .endmacro
 .macro  disable_rom_quick
         lda     PORTB
         and     #$fe
         sta     PORTB
+.ifdef CHARGEN_RELOC
         lda     #>__CHARGEN_START__
         sta     CHBAS
         sta     CHBASE
+.endif
 .endmacro
 .macro  disable_rom_val val
         lda     val
         wsync
         sta     PORTB
+.ifdef CHARGEN_RELOC
         lda     #>__CHARGEN_START__
         sta     CHBAS
         sta     CHBASE
+.endif
 .endmacro
 
 .macro  enable_rom
@@ -50,17 +57,21 @@ USEWSYNC=	1
         ora     #1
         wsync
         sta     PORTB
+.ifdef CHARGEN_RELOC
         lda     #$E0
         sta     CHBAS
         sta     CHBASE
+.endif
 .endmacro
 .macro  enable_rom_quick
         lda     PORTB
         ora     #1
         sta     PORTB
+.ifdef CHARGEN_RELOC
         lda     #$E0
         sta     CHBAS
         sta     CHBASE
+.endif
 .endmacro
 
 .else   ; above __ATARIXL__, below not

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2012, Ullrich von Bassewitz                                      */
+/* (C) 1998-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -60,11 +60,12 @@
 static void Usage (void)
 /* Print usage information and exit */
 {
-    printf ("Usage: %s <operation> lib file|module ...\n"
-            "Operation is one of:\n"
+    fprintf (stderr, "Usage: %s <operation ...> lib file|module ...\n"
+            "Operations are some of:\n"
             "\ta\tAdd modules\n"
             "\td\tDelete modules\n"
             "\tl\tList library contents\n"
+            "\tv\tIncrease verbosity (put before other operation)\n"
             "\tx\tExtract modules\n"
             "\tV\tPrint the archiver version\n",
             ProgName);

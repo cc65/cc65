@@ -6,8 +6,8 @@
 ; Christian Groessler, chris@groessler.org, 2013
 ;
 
-.import	SAVMSC_save
-.import	MEMTOP_save
-.import	APPMHI_save
-.import	RAMTOP_save
-.import	PORTB_save
+.import SAVMSC_save
+.import MEMTOP_save
+.import APPMHI_save
+.import RAMTOP_save
+.import PORTB_save

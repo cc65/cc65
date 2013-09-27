@@ -90,7 +90,7 @@ sramprep:
         lda     lodadr+1
         sta     RAMTOP
 
-	; set APPMHI to MEMLO (+ 1 for sanity)
+        ; set APPMHI to MEMLO (+ 1 for sanity)
         lda     MEMLO
         clc
         adc     #1
@@ -104,7 +104,7 @@ sramprep:
 
 
         jsr     findfreeiocb
-.ifdef DEBUG		; only check in debug version, this shouldn't really happen(tm)
+.ifdef DEBUG            ; only check in debug version, this shouldn't really happen(tm)
         beq     iocbok
         print_string "Internal error, no free IOCB!"
         jsr     delay

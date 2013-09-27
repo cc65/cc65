@@ -41,7 +41,7 @@
         .export         _get_ostype
 
         .include "atari.inc"
-	.include "romswitch.inc"
+        .include "romswitch.inc"
 
 .ifdef __ATARIXL__
 
@@ -50,8 +50,8 @@
 
 .macro  disable_rom_save_a
         pha
-	disable_rom
-	pla
+        disable_rom
+        pla
 .endmacro
 
 .else   ; above atarixl, below atari

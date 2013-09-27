@@ -1,6 +1,6 @@
 ; Name of the "screen" device
 
-	.export	scrdev
+        .export scrdev
 
         .rodata
 

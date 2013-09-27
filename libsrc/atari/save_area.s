@@ -8,18 +8,18 @@
 
 .ifdef __ATARIXL__
 
-.export		SAVMSC_save
-.export		MEMTOP_save
-.export		APPMHI_save
-.export		RAMTOP_save
-.export		PORTB_save
+.export         SAVMSC_save
+.export         MEMTOP_save
+.export         APPMHI_save
+.export         RAMTOP_save
+.export         PORTB_save
 
 .segment        "LOWDATA"
 
-SAVMSC_save:	.res	2
-MEMTOP_save:	.res	2
-APPMHI_save:	.res	2
-RAMTOP_save:	.res	1
-PORTB_save:	.res	1
+SAVMSC_save:    .res    2
+MEMTOP_save:    .res    2
+APPMHI_save:    .res    2
+RAMTOP_save:    .res    1
+PORTB_save:     .res    1
 
 .endif

@@ -4,7 +4,7 @@
 ; Christian Groessler, chris@groessler.org, 2013
 ;
 
-DEBUG   =       1
+;DEBUG   =       1
 CHKBUF  =       1       ; check if bounce buffering is needed (bounce buffering is always done if set to 0)
 
 .ifdef __ATARIXL__

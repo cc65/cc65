@@ -9,7 +9,7 @@
 ; Christian Groessler, chris@groessler.org, 2013
 ;
 
-DEBUG   =       1
+;DEBUG   =       1
 
 .ifdef __ATARIXL__
 
@@ -349,6 +349,25 @@ restore:lda     RAMTOP_save
         sta     APPMHI+1
         rts
 
+; short delay
+.proc   delay
+
+        lda     #10
+@loop:  jsr     delay1
+        clc
+        sbc     #0
+        bne     @loop
+        rts
+
+delay1: ldx     #0
+        ldy     #0
+@loop:   dey
+        bne     @loop
+        dex
+        bne     @loop
+        rts
+
+.endproc
 
 .ifdef DEBUG
 
@@ -356,26 +375,6 @@ restore:lda     RAMTOP_save
 
 sramsize:
         .word   __SHADOW_RAM_SIZE__
-
-; short delay
-.proc   delay
-
-        lda     #10
-l:      jsr     delay1
-        clc
-        sbc     #0
-        bne     l
-        rts
-
-delay1: ldx     #0
-        ldy     #0
-loop:   dey
-        bne     loop
-        dex
-        bne     loop
-        rts
-
-.endproc
 
 .endif          ; .ifdef DEBUG
 

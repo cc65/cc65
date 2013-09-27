@@ -11,7 +11,7 @@
 ; Christian Groessler, chris@groessler.org, 2013
 ;
 
-DEBUG   =       1
+;DEBUG   =       1
 
 .ifdef __ATARIXL__
 

@@ -69,7 +69,7 @@ memory area (assuming a reserved area from $4000 to
 $7FFF), and another part loads into $8000 to
 $BC1F.</P>
 <P>Each load chunk of the executable starts with a 4 byte header which
-defines its load address and size. In the following linker scripts
+defines its load address and size. In the following linker config files
 these headers are named HEADER and SECHDR (for the MEMORY layout), and
 accordingly NEXEHDR and CHKHDR (for the SEGMENTS layout).</P>
 
@@ -89,7 +89,7 @@ recompiling the cc65 atari runtime lib. Therefore the original EXE
 header must be discarded. It will be replaced by a user created
 one. The discarding is done by assigning the EXEHDR segment to the
 BANK memory area. The BANK memory area is discarded in the new linker
-script (written to file "").</P>
+config file (written to file "").</P>
 <P>The user needs to create a customized linker config file which adds
 new memory areas and segments to hold the new EXE header and the
 header data for the second load chunk. Also an assembly source file
@@ -273,7 +273,7 @@ cl65 -t atari -C split2.cfg -o prog.com prog.c split2.s
 
 
 <P>There are two other memory areas which don't appear directly in the
-linker script. They are the stack and the heap.</P>
+linker config file. They are the stack and the heap.</P>
 <P>The cc65 runtime lib places the stack location at the end of available
 memory. This is dynamically set from the MEMTOP system variable at
 startup. The heap is located in the area between the end of the BSS

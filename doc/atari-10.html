@@ -117,13 +117,13 @@ the program start address must be at an 8K boundary.</P>
 <H3><A NAME="chargenloc"></A> Character generator location</H3>
 
 
-<P>The default <CODE>atarixl</CODE> linker script (<CODE>atarixl.cfg</CODE>) leaves the
+<P>The default <CODE>atarixl</CODE> linker config file (<CODE>atarixl.cfg</CODE>) leaves the
 character generator location at the same address where it is in ROM
 ($E000). This has the disadvatage to split the upper memory into
 two parts ([$D800-$DFFF] and
 [$E400-$FFF9]). For applications which
 require a large continuous upper memory area, an alternative linker
-script (<CODE>atarixl-largehimem.cfg</CODE>) is provided. It relocates the
+config file (<CODE>atarixl-largehimem.cfg</CODE>) is provided. It relocates the
 character generator to $D800, providing a single big upper
 memory area at [$DC00-$FFF9].</P>
 <P>With the character generator at a different address as in ROM, the routines

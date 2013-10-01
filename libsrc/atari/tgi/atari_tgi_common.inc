@@ -4,7 +4,7 @@
 
 .macpack longbranch
 
-.if .defined(__ATARIXL__)
+.ifdef __ATARIXL__
         CIO_vec := my_CIOV
 .else
         CIO_vec := CIOV
@@ -117,7 +117,7 @@ libref: .addr   $0000                   ; Library reference
         text_dir:
                 .byte   0       ; Text direction,
 
-.if .defined(__ATARIXL__)
+.ifdef __ATARIXL__
         my_CIOV:
                 .byte   $4C, 0, 0
 .endif
@@ -171,7 +171,7 @@ screen_device_length := * - screen_device
 
         stx     mask
 
-.if .defined(__ATARIXL__)
+.ifdef __ATARIXL__
 
         ; setup pointer to CIO
 

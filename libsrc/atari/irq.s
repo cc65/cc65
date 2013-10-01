@@ -51,7 +51,7 @@ IRQStub:
 .endif
         lda     PORTB
         pha
-        and     #$fe
+        and     #$FE
         sta     PORTB                   ; disable ROM
         set_chbase >__CHARGEN_START__
 .endif

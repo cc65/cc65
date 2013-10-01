@@ -4,12 +4,12 @@
 ; Christian Groessler, chris@groessler.org, 2013
 ;
 
-;DEBUG   =       1
-CHKBUF  =       1       ; check if bounce buffering is needed (bounce buffering is always done if set to 0)
+;DEBUG           =       1
+CHKBUF          =       1       ; check if bounce buffering is needed (bounce buffering is always done if set to 0)
 
 .ifdef __ATARIXL__
 
-        SHRAM_HANDLERS  = 1
+SHRAM_HANDLERS  =       1
         .include        "atari.inc"
         .include        "save_area.inc"
         .include        "zeropage.inc"
@@ -23,7 +23,7 @@ CHKBUF  =       1       ; check if bounce buffering is needed (bounce buffering 
         .export         SIO_handler
         .export         SETVBV_handler
 
-BUFSZ           =       128             ; bounce buffer size
+BUFSZ           =       128     ; bounce buffer size
 BUFSZ_SIO       =       256
 
 .segment "INIT"

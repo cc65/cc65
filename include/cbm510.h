@@ -118,11 +118,11 @@
 
 
 /* The addresses of the static drivers */
-extern void cbm510_inkwl_mou[];
-extern void cbm510_joy_mou[];   /* Referred to by mouse_static_stddrv[] */
-extern void cbm510_ram_emd[];
-extern void cbm510_std_joy[];   /* Referred to by joy_static_stddrv[] */
-extern void cbm510_std_ser[];
+extern unsigned char cbm510_inkwl_mou[];
+extern unsigned char cbm510_joy_mou[];   /* Referred to by mouse_static_stddrv[] */
+extern unsigned char cbm510_ram_emd[];
+extern unsigned char cbm510_std_joy[];   /* Referred to by joy_static_stddrv[] */
+extern unsigned char cbm510_std_ser[];
 
 
 

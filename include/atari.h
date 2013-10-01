@@ -169,24 +169,24 @@ extern char *_getdefdev(void);          /* get default floppy device */
 
 /* global variables */
 extern unsigned char _dos_type;         /* the DOS flavour */
-extern void atr130_emd[];
-extern void atrstd_joy[];               /* referred to by joy_static_stddrv[] */
-extern void atrmj8_joy[];
-extern void atr3_tgi[];
-extern void atr4_tgi[];
-extern void atr5_tgi[];
-extern void atr6_tgi[];
-extern void atr7_tgi[];
-extern void atr8_tgi[];                 /* referred to by tgi_static_stddrv[] */
-extern void atr8p2_tgi[];
-extern void atr9_tgi[];
-extern void atr9p2_tgi[];
-extern void atr10_tgi[];
-extern void atr10p2_tgi[];
-extern void atr11_tgi[];
-extern void atr14_tgi[];
-extern void atr15_tgi[];
-extern void atr15p2_tgi[];
+extern unsigned char atr130_emd[];
+extern unsigned char atrstd_joy[];               /* referred to by joy_static_stddrv[] */
+extern unsigned char atrmj8_joy[];
+extern unsigned char atr3_tgi[];
+extern unsigned char atr4_tgi[];
+extern unsigned char atr5_tgi[];
+extern unsigned char atr6_tgi[];
+extern unsigned char atr7_tgi[];
+extern unsigned char atr8_tgi[];                 /* referred to by tgi_static_stddrv[] */
+extern unsigned char atr8p2_tgi[];
+extern unsigned char atr9_tgi[];
+extern unsigned char atr9p2_tgi[];
+extern unsigned char atr10_tgi[];
+extern unsigned char atr10p2_tgi[];
+extern unsigned char atr11_tgi[];
+extern unsigned char atr14_tgi[];
+extern unsigned char atr15_tgi[];
+extern unsigned char atr15p2_tgi[];
 
 /* provide old names for backwards compatibility */
 #ifdef ATARI_COMPAT_PRE_2_11

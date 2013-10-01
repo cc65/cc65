@@ -130,25 +130,25 @@
 
 
 /* The addresses of the static drivers */
-extern void c64_c256k_emd[];
-extern void c64_dqbb_emd[];
-extern void c64_georam_emd[];
-extern void c64_isepic_emd[];
-extern void c64_ram_emd[];
-extern void c64_ramcart_emd[];
-extern void c64_reu_emd[];
-extern void c64_vdc_emd[];
-extern void dtv_himem_emd[];
-extern void c64_hitjoy_joy[];
-extern void c64_numpad_joy[];
-extern void c64_ptvjoy_joy[];
-extern void c64_stdjoy_joy[];           /* Referred to by joy_static_stddrv[] */
-extern void c64_1351_mou[];             /* Referred to by mouse_static_stddrv[] */
-extern void c64_joy_mou[];
-extern void c64_inkwell_mou[];
-extern void c64_pot_mou[];
-extern void c64_swlink_ser[];
-extern void c64_hi_tgi[];               /* Referred to by tgi_static_stddrv[] */
+extern unsigned char c64_c256k_emd[];
+extern unsigned char c64_dqbb_emd[];
+extern unsigned char c64_georam_emd[];
+extern unsigned char c64_isepic_emd[];
+extern unsigned char c64_ram_emd[];
+extern unsigned char c64_ramcart_emd[];
+extern unsigned char c64_reu_emd[];
+extern unsigned char c64_vdc_emd[];
+extern unsigned char dtv_himem_emd[];
+extern unsigned char c64_hitjoy_joy[];
+extern unsigned char c64_numpad_joy[];
+extern unsigned char c64_ptvjoy_joy[];
+extern unsigned char c64_stdjoy_joy[];           /* Referred to by joy_static_stddrv[] */
+extern unsigned char c64_1351_mou[];             /* Referred to by mouse_static_stddrv[] */
+extern unsigned char c64_joy_mou[];
+extern unsigned char c64_inkwell_mou[];
+extern unsigned char c64_pot_mou[];
+extern unsigned char c64_swlink_ser[];
+extern unsigned char c64_hi_tgi[];               /* Referred to by tgi_static_stddrv[] */
 
 
 

@@ -7,4 +7,9 @@
 
 em_libref       := _exit
 joy_libref      := _exit
+.ifdef __ATARIXL__
+        .import CIO_handler
+tgi_libref      := CIO_handler
+.else
 tgi_libref      := _exit
+.endif

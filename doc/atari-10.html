@@ -53,9 +53,9 @@ checks return false, the loading of the program is aborted.<BR>
 The contents of this chunk come from the SYSCHKCHNK memory area of the linker config file.</LI>
 <LI>"shadow RAM prepare"<BR>
 The second load chunk gets loaded to the selected program load address (default $2400).
-It moves the screen memory below the program load address, copy the character generator
+It moves the screen memory below the program load address, copies the character generator
 from ROM to its new place in RAM, and copies the parts of the program which reside in
-high memory below the ROM to their place. These parts are included in this load chunk<BR>
+high memory below the ROM to their place. The high memory parts are included in this load chunk.<BR>
 At the beginning of this load chunk there is a .bss area, which is not part of the
 EXE file. Therefore the on-disk start address of this load chunk will be higher than the
 selected start address. This .bss area (segment LOWDATA) contains the buffers for the
@@ -65,7 +65,7 @@ The contents of this chunk come from the SRPREPCHNK memory area of the linker co
 <LI>main program<BR>
 This load chunk is loaded just above the LOWDATA segment, replacing the code of
 the previous load chunk. It contains all remaining code and data sections of the program,
-including the startup code.&lt;
+including the startup code.<BR>
 The contents of this chunk come from the RAM memory area of the linker config file.</LI>
 </OL>
 </P>
@@ -78,7 +78,7 @@ describes the amount of installed memory in pages (RAMTOP is only one byte).
 The screen memory and display list are placed immediately below RAMTOP.</P>
 <P>Now in order to relocate the screen memory to lower memory, the startup code
 puts a value into RAMTOP which causes the ROM routines to allocate the display
-memory below the program start address and then issues a ROM call to setup
+memory below the program start address and then it issues a ROM call to setup
 the regular text mode.</P>
 
 <H3><A NAME="loadaddr"></A> Selecting a good program load address</H3>

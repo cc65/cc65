@@ -121,21 +121,21 @@
 
 
 /* The addresses of the static drivers */
-extern void c128_georam_emd[];
-extern void c128_ram_emd[];
-extern void c128_ram2_emd[];
-extern void c128_ramcart_emd[];
-extern void c128_reu_emd[];
-extern void c128_vdc_emd[];
-extern void c128_ptvjoy_joy[];
-extern void c128_stdjoy_joy[];  /* Referred to by joy_static_stddrv[] */
-extern void c128_1351_mous[];   /* Referred to by mouse_static_stddrv[] */
-extern void c128_joy_mou[];
-extern void c128_inkwell_mou[];
-extern void c128_pot_mou[];
-extern void c128_swlink_ser[];
-extern void c128_vdc_tgi[];     /* Referred to by tgi_static_stddrv[] */
-extern void c128_vdc2_tgi[];
+extern unsigned char c128_georam_emd[];
+extern unsigned char c128_ram_emd[];
+extern unsigned char c128_ram2_emd[];
+extern unsigned char c128_ramcart_emd[];
+extern unsigned char c128_reu_emd[];
+extern unsigned char c128_vdc_emd[];
+extern unsigned char c128_ptvjoy_joy[];
+extern unsigned char c128_stdjoy_joy[];  /* Referred to by joy_static_stddrv[] */
+extern unsigned char c128_1351_mous[];   /* Referred to by mouse_static_stddrv[] */
+extern unsigned char c128_joy_mou[];
+extern unsigned char c128_inkwell_mou[];
+extern unsigned char c128_pot_mou[];
+extern unsigned char c128_swlink_ser[];
+extern unsigned char c128_vdc_tgi[];     /* Referred to by tgi_static_stddrv[] */
+extern unsigned char c128_vdc2_tgi[];
 
 
 

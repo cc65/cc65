@@ -80,8 +80,8 @@
 
 
 /* The addresses of the static drivers */
-extern void pet_ptvjoy_joy[];
-extern void pet_stdjoy_joy[];       /* Referred to by joy_static_stddrv[] */
+extern unsigned char pet_ptvjoy_joy[];
+extern unsigned char pet_stdjoy_joy[];       /* Referred to by joy_static_stddrv[] */
 
 
 

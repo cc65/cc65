@@ -27,10 +27,10 @@
 ; Restore timep and check if it is NULL
 
         pla
-        sta     ptr1
+        sta     ptr1+1
         pla
-        sta     ptr1+1          ; Restore timep
-        ora     ptr1            ; timep == 0?
+        sta     ptr1            ; Restore timep
+        ora     ptr1+1          ; timep == 0?
         beq     @L1
 
 ; timep is not NULL, store the result there

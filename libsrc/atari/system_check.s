@@ -98,9 +98,8 @@ syschk: lda     $fcd8           ; from ostype.s
 sys_ok:
         .include "xlmemchk.inc"         ; calculate lowest address we will use when we move the screen buffer down
 
-        sec
         lda     MEMLO
-        sbc     lowadr
+        cmp     lowadr
         lda     MEMLO+1
         sbc     lowadr+1
         bcc     memlo_ok
@@ -140,17 +139,15 @@ syschk:
 
 ;tmp contains address which must be above .bss's end
 
-        sec
         lda     tmp
-        sbc     #<(__BSS_RUN__ + __BSS_SIZE__)
+        cmp     #<(__BSS_RUN__ + __BSS_SIZE__)
         lda     tmp+1
         sbc     #>(__BSS_RUN__ + __BSS_SIZE__)
 
         bcc     mem_err         ; program doesn't fit into memory
 
-        sec
         lda     MEMLO
-        sbc     #<__STARTADDRESS__
+        cmp     #<__STARTADDRESS__
         lda     MEMLO+1
         sbc     #>__STARTADDRESS__
         bcc     memlo_ok

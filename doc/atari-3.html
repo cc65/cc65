@@ -22,16 +22,19 @@
 
 <P>The default linker config file assumes that the BASIC ROM is disabled (or
 the BASIC cartridge unplugged). This gives a usable memory range of
-[$2E00-$BC1F]. The library startup code examines the
+[$2000-$BC1F]. The library startup code examines the
 current memory configuration, which depends on the size of the
-installed memory and cartridges, by inspecting the value in
-the MEMTOP ($2E5) variable. Then the initial stack pointer,
-which indicates the upper bound of memory used, is adjusted. The
-default load address of $2E00 was chosen to accommodate having
-a DOS loaded and a driver that resides in low memory such as the 850
-R: handler. You can override this behaviour by creating a custom
+installed memory and cartridges. It does so by using the value in
+the MEMTOP ($2E5) variable as highest memory address the program
+can use. The initial stack pointer, which is the upper bound of
+memory used by the program, is set to this value, minus an optionally
+defined __RESERVED_MEMORY__ value.</P>
+<P>The default load address of $2000 can be changed by creating a custom
 linker config file or by using the "--start-addr" cl65 command line
 argument or the "--start-addr" or "-S" ld65 command line arguments.</P>
+<P>Please note that the first load chunk (which checks the available memory)
+will always be loaded at $2E00, regardless of the specified start
+address. This address can only be changed by a custom linker config file.</P>
 <P>Special locations:</P>
 <P>
 <DL>
@@ -46,7 +49,7 @@ accommodates the different memory configurations of the Atari
 machines, as well as having a cartridge installed.  You can override
 this behaviour by writing your own crt0.s file and linking it to
 your program (see also 
-<A HREF="atari-9.html#memhole_final_note">Final note</A>).</P>
+<A HREF="atari-10.html#memhole_final_note">Final note</A>).</P>
 
 <DT><B>Heap</B><DD>
 <P>The C heap is located at the end of the program and grows towards the C
@@ -69,7 +72,7 @@ and [$D800-$FFF9] available.</LI>
 <LI>Character generator data is copied from ROM to the CHARGEN location specified in the
 linker config file.  This is (in the default <CODE>atarixl.cfg</CODE> file) at the same address as
 where it is in ROM ($E000, it can be changed, see 
-<A HREF="atari-10.html#chargenloc">atarixl chargen location</A>).  With the character generator at $E000, there are two upper memory
+<A HREF="atari-9.html#chargenloc">atarixl chargen location</A>).  With the character generator at $E000, there are two upper memory
 areas available, [$D800-$DFFF] and [$E400-$FFF9].</LI>
 </OL>
 </P>
@@ -78,7 +81,7 @@ areas available, [$D800-$DFFF] and [$E400-$FFF9].</LI>
 different (and lower) that the default load address for <CODE>atari</CODE>.  This is no problem since
 on the <CODE>atarixl</CODE> target the first load chunk makes sure that the loaded prgram won't overwrite
 memory below MEMLO. See 
-<A HREF="atari-10.html#xlchunks">atarixl load chunks</A>.</P>
+<A HREF="atari-9.html#xlchunks">atarixl load chunks</A>.</P>
 
 <P>Special locations:</P>
 <P>

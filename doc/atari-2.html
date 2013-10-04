@@ -25,17 +25,17 @@ A run vector is added to the end of the
 file ($02E0 $02E1 &lt;run vector&gt;) and is calculated using
 the <CODE>start</CODE> label in crt0.s.  (Technically the run vector is also a load chunk,
 but is not regarded as such here.)</P>
-<P>An <CODE>atari</CODE> program has one load chunk, an <CODE>atarixl</CODE> program has three load
+<P>An <CODE>atari</CODE> program has two load chunks, an <CODE>atarixl</CODE> program has three load
 chunks.  The load chunks are defined in the linker configuration files.  For more
-detailed information about the three <CODE>atarixl</CODE> load chunks see
-<A HREF="atari-10.html#xlchunks">atarixl load chunks</A>, for the discussion here it's
-sufficient to know that the first two load chunks do preparation work and the
-main part of the program is in load chunk #3.</P>
+detailed information about the load chunks see the chapter
+<A HREF="atari-9.html#techdetail">Technical details</A>. For the discussion here it's
+sufficient to know that the first load chunk(s) do preparation work and the
+main part of the program is in the last load chunk.</P>
 <P>The values determining the size of the main part of the program (the only load
 chunk for <CODE>atari</CODE>, the third load chunk for <CODE>atarixl</CODE>) are calculated in
 the crt0.s file from the __STARTUP_LOAD__ and __BSS_LOAD__ values.
 Be aware of that if you create a custom linker config file and start moving segments around (see section
-<A HREF="atari-9.html#memhole">Reserving a memory area inside the program</A>).</P>
+<A HREF="atari-10.html#memhole">Reserving a memory area inside the program</A>).</P>
 
 
 <HR>

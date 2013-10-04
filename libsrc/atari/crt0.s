@@ -34,9 +34,7 @@
 
         .word   $FFFF
 
-.ifdef __ATARIXL__
 .segment        "MAINHDR"
-.endif
 
         .word   __STARTUP_LOAD__
         .word   __BSS_LOAD__ - 1

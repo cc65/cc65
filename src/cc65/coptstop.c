@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2009 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2013, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -58,7 +58,8 @@ typedef enum {
   LI_DIRECT             = 0x01,         /* Direct op may be used */
   LI_RELOAD_Y           = 0x02,         /* Reload index register Y */
   LI_REMOVE             = 0x04,         /* Load may be removed */
-  LI_DUP_LOAD           = 0x08,         /* Duplicate load */
+  LI_DONT_REMOVE        = 0x08,         /* Load may not be removed */
+  LI_DUP_LOAD           = 0x10,         /* Duplicate load */
 } LI_FLAGS;
 
 /* Structure that tells us how to load the lhs values */
@@ -245,6 +246,18 @@ static void AdjustLoadInfo (LoadInfo* LI, int Index, int Change)
 
 
 
+static void HonourUseAndChg (LoadRegInfo* RI, unsigned Reg, const CodeEntry* E)
+/* Honour use and change flags for an instruction */
+{
+    if (E->Chg & Reg) {
+        ClearLoadRegInfo (RI);
+    } else if ((E->Use & Reg) && RI->LoadIndex >= 0) {
+        RI->Flags |= LI_DONT_REMOVE;
+    }
+}
+
+
+
 static void TrackLoads (LoadInfo* LI, CodeEntry* E, int I)
 /* Track loads for a code entry */
 {
@@ -349,15 +362,9 @@ static void TrackLoads (LoadInfo* LI, CodeEntry* E, int I)
 
         ClearLoadRegInfo (&LI->Y);
     } else {
-        if (E->Chg & REG_A) {
-            ClearLoadRegInfo (&LI->A);
-        }
-        if (E->Chg & REG_X) {
-            ClearLoadRegInfo (&LI->X);
-        }
-        if (E->Chg & REG_Y) {
-            ClearLoadRegInfo (&LI->Y);
-        }
+        HonourUseAndChg (&LI->A, REG_A, E);
+        HonourUseAndChg (&LI->X, REG_X, E);
+        HonourUseAndChg (&LI->Y, REG_Y, E);
     }
 }
 
@@ -646,7 +653,7 @@ static void RemoveRegLoads (StackOpData* D, LoadInfo* LI)
     /* Both registers may be loaded with one insn, but DelEntry will in this
      * case clear the other one.
      */
-    if (LI->A.Flags & LI_REMOVE) {
+    if ((LI->A.Flags & (LI_REMOVE | LI_DONT_REMOVE)) == LI_REMOVE) {
         if (LI->A.LoadIndex >= 0) {
             DelEntry (D, LI->A.LoadIndex);
         }
@@ -654,7 +661,7 @@ static void RemoveRegLoads (StackOpData* D, LoadInfo* LI)
             DelEntry (D, LI->A.XferIndex);
         }
     }
-    if (LI->X.Flags & LI_REMOVE) {
+    if ((LI->X.Flags & (LI_REMOVE | LI_DONT_REMOVE)) == LI_REMOVE) {
         if (LI->X.LoadIndex >= 0) {
             DelEntry (D, LI->X.LoadIndex);
         }
@@ -875,7 +882,7 @@ static unsigned Opt_tosshift (StackOpData* D, const char* Name)
         AddStoreA (D);
 
         /* Be sure to setup IP after adding the stores, otherwise it will get
-         * messed up.   
+         * messed up.
          */
         D->IP = D->OpIndex+1;
 

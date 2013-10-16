@@ -28,7 +28,7 @@
         sta     CHBASE
 .endmacro
 
-.else
+.else   ; above CHARGEN_RELOC, below not
 
 .macro  set_chbase val
 .endmacro
@@ -42,7 +42,7 @@
         sta     WSYNC
 .endmacro
 
-.else   ; above 
+.else   ; above USEWSYNC, below not
 
 .macro  wsync
 .endmacro

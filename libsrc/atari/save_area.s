@@ -14,7 +14,7 @@
 .export         RAMTOP_save
 .export         PORTB_save
 
-.segment        "LOWDATA"
+.segment        "LOWBSS"
 
 SAVMSC_save:    .res    2
 MEMTOP_save:    .res    2

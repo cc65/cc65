@@ -7,8 +7,8 @@
 ; and that enough memory is installed (which isn't the case for a 600XL).
 ; For the non-XL target it checks whether there is enough memory
 ; installed to run the program.
-; For both target it checks that the program won't load below MEMLO.
-; If one of the checks fails the loading of the main program
+; For both targets it checks that the program won't load below MEMLO.
+; If one of the checks fails, the loading of the main program
 ; is aborted by jumping to DOSVEC.
 ;
 ; Christian Groessler, chris@groessler.org, 2013
@@ -46,8 +46,8 @@ cont:   ldx     #0              ; channel 0
         sta     ICCOM,x
         jsr     CIOV_org
 .endmacro
-.macro print_string2 addr, len
 
+.macro print_string2 addr, len
         ldx     #0              ; channel 0
         lda     #<addr
         sta     ICBAL,x         ; address
@@ -60,7 +60,6 @@ cont:   ldx     #0              ; channel 0
         lda     #PUTCHR
         sta     ICCOM,x
         jsr     CIOV_org
-
 .endmacro
 
 

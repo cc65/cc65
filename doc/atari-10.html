@@ -330,7 +330,7 @@ MAINHDR: load = HEADER, type = ro;
 
 
 <P>If, for some reason, you don't want to include the "system check" load
-chunk, you can do so by defining the symbol <CODE>syschk</CODE> when linking the
+chunk, you can do so by defining the symbol <CODE>__SYSTEM_CHECK__</CODE> when linking the
 program. The "system check" chunk doesn't include vital parts of the
 program. So if you don't want the system checks, it is save to leave them out.
 This is probably mostly interesting for debugging.</P>
@@ -338,12 +338,12 @@ This is probably mostly interesting for debugging.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-cl65 -Wl -Dsyschk=1 &lt;arguments>
+cl65 -Wl -D__SYSTEM_CHECK__=1 &lt;arguments>
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>The value you assign to <CODE>syschk</CODE> doesn't matter. If the <CODE>syschk</CODE>
-symbol is defined, the load chunk won't be included.</P>
+<P>The value you assign to <CODE>__SYSTEM_CHECK_</CODE> doesn't matter. If the
+<CODE>__SYSTEM_CHECK__</CODE> symbol is defined, the load chunk won't be included.</P>
 
 
 <HR>

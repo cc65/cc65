@@ -16,7 +16,7 @@
 
 ;DEBUG   =       1
 
-        .export         syschk
+        .export         __SYSTEM_CHECK__: absolute = 1
         .import         __SYSCHK_LOAD__
         .import         __STARTADDRESS__
 

@@ -14,6 +14,7 @@
 .ifdef __ATARIXL__
 
         .export         sramprep
+
         .import         __SRPREP_LOAD__, __SRPREPCHNK_LAST__
         .import         __SHADOW_RAM_LOAD__, __SHADOW_RAM_SIZE__, __SHADOW_RAM_RUN__
         .import         __SHADOW_RAM2_LOAD__, __SHADOW_RAM2_SIZE__, __SHADOW_RAM2_RUN__

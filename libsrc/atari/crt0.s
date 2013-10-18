@@ -20,6 +20,7 @@
         .import         sram_init
         .import         scrdev
         .import         findfreeiocb
+        .forceimport    sramprep                        ; force inclusion of the "shadow RAM preparation" load chunk
         .include        "save_area.inc"
 .endif
 

@@ -4,6 +4,12 @@
 
 .macpack longbranch
 
+.ifdef __ATARIXL__
+        CIO_vec := my_CIOV
+.else
+        CIO_vec := CIOV
+.endif
+
 ; ******************************************************************************
 
         ; ----------------------------------------------------------------------
@@ -18,7 +24,7 @@
 
         .byte   $74, $67, $69           ; "tgi"
         .byte   TGI_API_VERSION         ; TGI API version number
-        .addr   $0000                   ; Library reference
+libref: .addr   $0000                   ; Library reference
         .word   x_res                   ; X resolution
         .word   y_res                   ; Y resolution
         .byte   colors                  ; Number of drawing colors
@@ -111,6 +117,10 @@
         text_dir:
                 .byte   0       ; Text direction,
 
+.ifdef __ATARIXL__
+        my_CIOV:
+                .byte   $4C, 0, 0
+.endif
 .code
 
 ; ******************************************************************************
@@ -161,6 +171,17 @@ screen_device_length := * - screen_device
 
         stx     mask
 
+.ifdef __ATARIXL__
+
+        ; setup pointer to CIO
+
+        lda     libref
+        sta     my_CIOV+1
+        lda     libref+1
+        sta     my_CIOV+2
+.endif
+
+
         ; Find a free IOCB
         lda     #$70
 search: tax
@@ -202,7 +223,7 @@ switch: lda     #OPEN
         sta     ICBLL,x
         lda     #>screen_device_length
         sta     ICBLH,x
-        jsr     CIOV
+        jsr     CIO_vec
 
 .if ::pages = 2
         ; Reserve 8K of high memory
@@ -212,7 +233,7 @@ switch: lda     #OPEN
         ; Close and reopen graphics
         lda     #CLOSE
         sta     ICCOM,x
-        jsr     CIOV
+        jsr     CIO_vec
         ; Reopen graphics
         lda     #OPEN
         sta     ICCOM,x
@@ -228,7 +249,7 @@ switch: lda     #OPEN
         sta     ICBLL,x
         lda     #>screen_device_length
         sta     ICBLH,x
-        jsr     CIOV
+        jsr     CIO_vec
         ; Save screen pointers
         lda     SAVMSC + 1
         sta     p0scr
@@ -271,7 +292,7 @@ exit:   sta     error
         ; Close the S: device
         lda     #CLOSE
         sta     ICCOM,x
-        jsr     CIOV
+        jsr     CIO_vec
 
         ; Reopen it in Graphics 0
         lda     #OPEN
@@ -288,12 +309,12 @@ exit:   sta     error
         sta     ICBLL,x
         lda     #>screen_device_length
         sta     ICBLH,x
-        jsr     CIOV
+        jsr     CIO_vec
 
         ; Now close it again; we don't need it anymore :)
         lda     #CLOSE
         sta     ICCOM,x
-        jmp     CIOV
+        jmp     CIO_vec
 .endproc
 
 ; ******************************************************************************
@@ -640,7 +661,7 @@ done10:
 .endif
 
         sta     ATACHR
-        jmp     CIOV
+        jmp     CIO_vec
 
 .else   ; USE_CIO_LINE
 

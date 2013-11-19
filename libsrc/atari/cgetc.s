@@ -7,22 +7,28 @@
 
         .include "atari.inc"
         .export _cgetc,setcursor
+        .import KEYBDV_handler
         .import cursor,mul40
 
 _cgetc:
         jsr     setcursor
+        lda     #12
+        sta     ICAX1Z          ; fix problems with direct call to KEYBDV
+.ifndef __ATARIXL__
         jsr     @1
+.else
+        jsr     KEYBDV_handler
+.endif
         ldx     #0
         rts
 
+.ifndef __ATARIXL__
 @1:     lda     KEYBDV+5
         pha
         lda     KEYBDV+4
         pha
-        lda     #12
-        sta     ICAX1Z          ; fix problems with direct call to KEYBDV
         rts
-
+.endif
 
 .proc   setcursor
 

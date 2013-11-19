@@ -8,7 +8,6 @@
 ;
 
         .include        "atari.inc"
-        .include        "errno.inc"
         .export         __sysrmdir
         .import         __sysremove
         .import         __dos_type
@@ -17,7 +16,6 @@
 .ifdef  UCASE_FILENAME
         .import         ucase_fn
         .import         addysp
-        .importzp       sreg
         .importzp       tmp3
 .ifdef  DEFAULT_DEVICE
         .importzp tmp2

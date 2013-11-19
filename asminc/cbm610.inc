@@ -1,16 +1,19 @@
 ;
-; Zeropage and I/O definitions for the CBM 610
+; Zero page variables and I/O definitions for the CBM 610
 ;
 ; Taken from a kernal disassembly done by myself in 1987.
 ;
-; Ullrich von Bassewitz, 28.09.1998
+; 1998-09-28, Ullrich von Bassewitz
+; 2013-08-26, Greg King
 
 
 ; ---------------------------------------------------------------------------
 ; Zeropage stuff
 
-ExecReg         = $00
-IndReg          = $01
+ExecReg         := $00          ; Controls execution memory bank
+IndReg          := $01          ; Controls indirect indexed load-store bank
+
+TXTPTR          := $85          ; Far pointer into BASIC source code
 
 ; ---------------------------------------------------------------------------
 ; Screen size
@@ -29,7 +32,8 @@ YSIZE           = 25
         DATA    .byte
 .endstruct
 
-; I/O  $db00: CIA 6526 Inter Process Communication
+
+; I/O  $db00: CIA 6526, Inter Process Communication
 ;
 ;       IPCcia          =       $db00
 
@@ -66,7 +70,6 @@ YSIZE           = 25
 ; I/O  $dc00: CIA 6526
 ;
 ;       cia             =       $dc00
-
 
 
 ; I/O  $dd00: ACIA 6551
@@ -108,3 +111,7 @@ YSIZE           = 25
 ;       tpi2            =       $df00
 
 
+;-----------------------------------------------------------------------------
+
+BASIC_BUF       := $FA5E        ; Bank 1 location of command-line
+BASIC_BUF_LEN   = 162           ; Maximum length of command-line

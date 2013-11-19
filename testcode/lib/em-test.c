@@ -20,6 +20,10 @@
 #define DRIVERNAME      "a2e.auxmem.emd"
 #elif defined(__APPLE2__)
 #define DRIVERNAME      "a2.auxmem.emd"
+#elif defined(__ATARIXL__)
+#define DRIVERNAME      "atrx130.emd"
+#elif defined(__ATARI__)
+#define DRIVERNAME      "atr130.emd"
 #else
 #define DRIVERNAME      "unknown"
 #error "Unknown target system"
@@ -63,6 +67,9 @@ static void cmp (unsigned page, register const unsigned* buf,
             cprintf ("\r\nData mismatch in page $%04X at $%04X\r\n"
                      "Data is $%04X (should be $%04X)\r\n",
                      page, buf, *buf, num);
+#ifdef __ATARI__
+            cgetc ();
+#endif
             exit (EXIT_FAILURE);
         }
     }
@@ -84,6 +91,9 @@ int main (void)
     if (Res != EM_ERR_OK) {
         cprintf ("Error in em_load_driver: %u\r\n", Res);
         cprintf ("os: %u, %s\r\n", _oserror, _stroserror (_oserror));
+#ifdef __ATARI__
+        cgetc ();
+#endif
         exit (EXIT_FAILURE);
     }
     atexit (cleanup);
@@ -194,6 +204,10 @@ int main (void)
 
     /* Success */
     cprintf ("\r\nPassed!\r\n");
+
+#ifdef __ATARI__
+    cgetc ();
+#endif
 
     return 0;
 

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2012, Ullrich von Bassewitz                                      */
+/* (C) 1998-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -38,6 +38,7 @@
 #include <errno.h>
 
 /* common */
+#include "cmdline.h"
 #include "exprdefs.h"
 #include "libdefs.h"
 #include "print.h"
@@ -60,7 +61,7 @@
 /*****************************************************************************/
 
 
-                        
+
 /* Name of the library file */
 const char*             LibName = 0;
 
@@ -101,7 +102,7 @@ static void ReadHeader (void)
     }
     Header.Flags   = Read16 (Lib);
     Header.IndexOffs = Read32 (Lib);
-}                                                  
+}
 
 
 
@@ -229,7 +230,9 @@ void LibOpen (const char* Name, int MustExist, int NeedTemp)
         if (MustExist) {
             Error ("Library `%s' does not exist", Name);
         } else {
-            Warning ("Library `%s' not found - will be created", Name);
+            /* Announce the library's creation if ar65 is verbose. */
+            Print (stdout, 1,
+                   "%s: Library `%s' will be created.\n", ProgName, Name);
         }
 
     } else {
@@ -307,7 +310,7 @@ static void LibCheckExports (ObjData* O)
     unsigned I;
 
     /* Let the user know what we do */
-    Print (stdout, 1, "Module `%s' (%u exports):\n", O->Name, CollCount (&O->Exports));
+    Print (stdout, 2, "Module `%s' (%u exports):\n", O->Name, CollCount (&O->Exports));
 
     /* Insert the exports into the global table */
     for (I = 0; I < CollCount (&O->Exports); ++I) {
@@ -316,7 +319,7 @@ static void LibCheckExports (ObjData* O)
         const char* Name = CollConstAt (&O->Exports, I);
 
         /* Insert the name into the hash table */
-        Print (stdout, 1, "  %s\n", Name);
+        Print (stdout, 2, "  %s\n", Name);
         ExpInsert (Name, O);
     }
 }

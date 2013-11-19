@@ -5,7 +5,7 @@
 ;
 
         .export         _open, closedirect, freebuffer
-        .export         __filetype, __auxtype
+        .export         __filetype, __auxtype, __datetime
         .constructor    raisefilelevel
         .destructor     closeallfiles, 5
 
@@ -246,5 +246,6 @@ __filetype:
 __auxtype:
         .word   $0000           ; AUX_TYPE:     Load address N/A
         .byte   $01             ; STORAGE_TYPE: Standard seedling file
+__datetime:
         .word   $0000           ; CREATE_DATE:  Current date
         .word   $0000           ; CREATE_TIME:  Current time

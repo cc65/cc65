@@ -15,6 +15,7 @@
         .import clriocb
         .import fdtoiocb
         .import newfd
+        .import scrdev
         .importzp tmp1,tmp2,tmp3
 
         .include        "atari.inc"
@@ -105,8 +106,3 @@ cioerr: sty     tmp3            ; remember error code
         jmp     __mappederrno
 
 .endproc        ; __graphics
-
-
-        .rodata
-
-scrdev: .byte   "S:", 0

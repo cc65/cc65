@@ -101,11 +101,28 @@ SIO_FORMAT   = $21      ;format disk (default density)
 SIO_FORMATS  = $22      ;1050: format medium density
 SIO_CONFIG   = $44      ;configure drive
 SIO_CONFIGSF = $4B      ;slow/fast configure drive??
+SIO_RDPERCOM = $4E      ;read PERCOM block (XF551)
+SIO_WRPERCOM = $4F      ;write PERCOM block (XF551)
 SIO_WRITE    = $50      ;write sector
 SIO_READ     = $52      ;read sector
 SIO_STAT     = $53      ;get status information
 SIO_VERIFY   = $56      ;verify sector 
 SIO_WRITEV   = $57      ;write sector with verify
+SIO_WRITETRK = $60      ;write track (Speedy)
+SIO_READTRK  = $62      ;read track (Speedy)
+
+; SIO Status Code (DSTATS)
+; Input: data direction
+;     Bit #7 - W (write operation)
+;         #6 - R (read operation)
+; Output: status code
+;     $01 (001) -- OPERATION COMPLETE (NO ERRORS)
+;     $8A (138) -- DEVICE TIMEOUT (DOESN'T RESPOND)
+;     $8B (139) -- DEVICE NAK
+;     $8C (140) -- SERIAL BUS INPUT FRAMING ERROR
+;     $8E (142) -- SERIAL BUS DATA FRAME OVERRUN ERROR
+;     $8F (143) -- SERIAL BUS DATA FRAME CHECKSUM ERROR
+;     $90 (144) -- DEVICE DONE ERROR
 
 ; Character and Key Code Equates
 
@@ -985,9 +1002,21 @@ CASETV  = $E440         ;cassette handler vector table
 
 DISKIV  = $E450         ;vector to initialize DIO
 DSKINV  = $E453         ;vector to DIO
+.ifdef __ATARIXL__
+.ifndef SHRAM_HANDLERS
+.import CIO_handler, SIO_handler, SETVBV_handler
+.endif
+.define CIOV    CIO_handler
+.define SIOV    SIO_handler
+.define SETVBV  SETVBV_handler
+CIOV_org    = $E456     ;vector to CIO
+SIOV_org    = $E459     ;vector to SIO
+SETVBV_org  = $E45C     ;vector to set VBLANK parameters
+.else
 CIOV    = $E456         ;vector to CIO
 SIOV    = $E459         ;vector to SIO
 SETVBV  = $E45C         ;vector to set VBLANK parameters
+.endif
 SYSVBV  = $E45F         ;vector to process immediate VBLANK
 XITVBV  = $E462         ;vector to process deferred VBLANK
 SIOINV  = $E465         ;vector to initialize SIO

@@ -114,7 +114,6 @@ static void Usage (void)
             "  --config name\t\tUse linker config file\n"
             "  --dbgfile name\tGenerate debug information\n"
             "  --define sym=val\tDefine a symbol\n"
-            "  --dump-config name\tDump a builtin configuration\n"
             "  --end-group\t\tEnd a library group\n"
             "  --force-import sym\tForce an import of symbol `sym'\n"
             "  --help\t\tHelp (this text)\n"

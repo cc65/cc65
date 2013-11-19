@@ -2,11 +2,11 @@
 /*                                                                           */
 /*                                 cbm510.h                                  */
 /*                                                                           */
-/*             System specific definitions for the CBM5x0 / P500             */
+/*             System-specific definitions for the CBM5x0 / P500             */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2009, Ullrich von Bassewitz                                      */
+/* (C) 2001-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -100,7 +100,7 @@
 #define SID     (*(struct __sid*)0xDA00)
 
 #include <_6526.h>
-#define CIA     (*(struct __6526*)0xDC00)
+#define CIA2    (*(struct __6526*)0xDC00)
 
 #include <_6551.h>
 #define ACIA    (*(struct __6551*)0xDD00)
@@ -118,6 +118,8 @@
 
 
 /* The addresses of the static drivers */
+extern void cbm510_inkwl_mou[];
+extern void cbm510_joy_mou[];   /* Referred to by mouse_static_stddrv[] */
 extern void cbm510_ram_emd[];
 extern void cbm510_std_joy[];   /* Referred to by joy_static_stddrv[] */
 extern void cbm510_std_ser[];

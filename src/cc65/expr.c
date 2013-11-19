@@ -1952,6 +1952,7 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
             type = CF_CONST;
             if ((Gen->Flags & GEN_NOPUSH) == 0) {
                 g_push (ltype, 0);
+            } else {
                 ltype |= CF_REG;        /* Value is in register */
             }
 

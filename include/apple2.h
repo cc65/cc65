@@ -136,10 +136,22 @@ extern unsigned char _dos_type;
 
 
 /* The file stream implementation and the POSIX I/O functions will use the
- * following variables to determine the file type and the aux type to use.
+ * following variables to determine the file type, aux type and creation time
+ * stamp to use.
  */
-extern unsigned char _filetype;  /* Default 6 */
-extern unsigned int  _auxtype;   /* Default 0 */
+extern unsigned char _filetype;  /* Default: 6 */
+extern unsigned int _auxtype;    /* Default: 0 */
+extern struct {
+    struct {
+        unsigned day  :5;
+        unsigned mon  :4;
+        unsigned year :7;
+    }             createdate;    /* Current date: 0 */ 
+    struct {
+        unsigned char min;
+        unsigned char hour;
+    }             createtime;    /* Current time: 0 */ 
+} _datetime;
 
 /* The addresses of the static drivers */
 #if !defined(__APPLE2ENH__)

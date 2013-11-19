@@ -55,7 +55,7 @@
 ;------------------------------------------------------------------------------
 ; The EMD API version, stored in EMD_HDR::VERSION
 
-EMD_API_VERSION         = $01
+EMD_API_VERSION         = $02
 
 ;------------------------------------------------------------------------------
 ; The asm equivalent to the C em_copy structure

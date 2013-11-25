@@ -13,7 +13,57 @@
 <EM>The ld65 linker combines object files into an executable file. ld65 is highly
 configurable and uses configuration files for high flexibility.</EM>
 <HR>
-<H2><A NAME="s1">1. Overview</A></H2>
+<P>
+<H2><A NAME="toc1">1.</A> <A HREF="ld65.html#s1">Overview</A></H2>
+
+<P>
+<H2><A NAME="toc2">2.</A> <A HREF="ld65.html#s2">Usage</A></H2>
+
+<UL>
+<LI><A NAME="toc2.1">2.1</A> <A HREF="ld65.html#ss2.1">Command line option overview</A>
+<LI><A NAME="toc2.2">2.2</A> <A HREF="ld65.html#ss2.2">Command line options in detail</A>
+</UL>
+<P>
+<H2><A NAME="toc3">3.</A> <A HREF="ld65.html#s3">Search paths</A></H2>
+
+<UL>
+<LI><A NAME="toc3.1">3.1</A> <A HREF="ld65.html#ss3.1">Library search path</A>
+<LI><A NAME="toc3.2">3.2</A> <A HREF="ld65.html#ss3.2">Object file search path</A>
+<LI><A NAME="toc3.3">3.3</A> <A HREF="ld65.html#ss3.3">Config file search path</A>
+</UL>
+<P>
+<H2><A NAME="toc4">4.</A> <A HREF="ld65.html#s4">Detailed workings</A></H2>
+
+<P>
+<H2><A NAME="toc5">5.</A> <A HREF="ld65.html#s5">Configuration files</A></H2>
+
+<UL>
+<LI><A NAME="toc5.1">5.1</A> <A HREF="ld65.html#ss5.1">Memory areas</A>
+<LI><A NAME="toc5.2">5.2</A> <A HREF="ld65.html#ss5.2">Segments</A>
+<LI><A NAME="toc5.3">5.3</A> <A HREF="ld65.html#ss5.3">Output files</A>
+<LI><A NAME="toc5.4">5.4</A> <A HREF="ld65.html#ss5.4">LOAD and RUN addresses (ROMable code)</A>
+<LI><A NAME="toc5.5">5.5</A> <A HREF="ld65.html#ss5.5">Other MEMORY area attributes</A>
+<LI><A NAME="toc5.6">5.6</A> <A HREF="ld65.html#ss5.6">Other SEGMENT attributes</A>
+<LI><A NAME="toc5.7">5.7</A> <A HREF="ld65.html#ss5.7">The FILES section</A>
+<LI><A NAME="toc5.8">5.8</A> <A HREF="ld65.html#ss5.8">The FORMAT section</A>
+<LI><A NAME="toc5.9">5.9</A> <A HREF="ld65.html#ss5.9">The FEATURES section</A>
+<LI><A NAME="toc5.10">5.10</A> <A HREF="ld65.html#ss5.10">The SYMBOLS section</A>
+</UL>
+<P>
+<H2><A NAME="toc6">6.</A> <A HREF="ld65.html#s6">Special segments</A></H2>
+
+<UL>
+<LI><A NAME="toc6.1">6.1</A> <A HREF="ld65.html#ss6.1">INIT</A>
+<LI><A NAME="toc6.2">6.2</A> <A HREF="ld65.html#ss6.2">LOWCODE</A>
+<LI><A NAME="toc6.3">6.3</A> <A HREF="ld65.html#ss6.3">STARTUP</A>
+<LI><A NAME="toc6.4">6.4</A> <A HREF="ld65.html#ss6.4">ZPSAVE</A>
+</UL>
+<P>
+<H2><A NAME="toc7">7.</A> <A HREF="ld65.html#s7">Copyright</A></H2>
+
+
+<HR>
+<H2><A NAME="s1">1.</A> <A HREF="#toc1">Overview</A></H2>
 
 
 <P>The ld65 linker combines several object modules created by the ca65
@@ -43,12 +93,12 @@ adding other formats shouldn't be a great problem.
 </P>
 
 
-<H2><A NAME="s2">2. Usage</A></H2>
+<H2><A NAME="s2">2.</A> <A HREF="#toc2">Usage</A></H2>
 
 
 
 
-<H2><A NAME="ss2.1">2.1 Command line option overview</A>
+<H2><A NAME="ss2.1">2.1</A> <A HREF="#toc2.1">Command line option overview</A>
 </H2>
 
 
@@ -99,7 +149,7 @@ Long options:
 </P>
 
 
-<H2><A NAME="ss2.2">2.2 Command line options in detail</A>
+<H2><A NAME="ss2.2">2.2</A> <A HREF="#toc2.2">Command line options in detail</A>
 </H2>
 
 
@@ -303,7 +353,7 @@ and in the list of directories specified using <CODE>--obj-path</CODE>.</P>
 
 
 
-<H2><A NAME="s3">3. Search paths</A></H2>
+<H2><A NAME="s3">3.</A> <A HREF="#toc3">Search paths</A></H2>
 
 
 <P>Starting with version 2.10, there are now several search-path lists for files needed
@@ -311,7 +361,7 @@ by the linker: one for libraries, one for object files, and one for config
 files.</P>
 
 
-<H2><A NAME="ss3.1">3.1 Library search path</A>
+<H2><A NAME="ss3.1">3.1</A> <A HREF="#toc3.1">Library search path</A>
 </H2>
 
 
@@ -329,7 +379,7 @@ variable <CODE>CC65_HOME</CODE>, if it is defined.</LI>
 </P>
 
 
-<H2><A NAME="ss3.2">3.2 Object file search path</A>
+<H2><A NAME="ss3.2">3.2</A> <A HREF="#toc3.2">Object file search path</A>
 </H2>
 
 
@@ -347,7 +397,7 @@ variable <CODE>CC65_HOME</CODE>, if it is defined.</LI>
 </P>
 
 
-<H2><A NAME="ss3.3">3.3 Config file search path</A>
+<H2><A NAME="ss3.3">3.3</A> <A HREF="#toc3.3">Config file search path</A>
 </H2>
 
 
@@ -366,7 +416,7 @@ variable <CODE>CC65_HOME</CODE>, if it is defined.</LI>
 
 
 
-<H2><A NAME="s4">4. Detailed workings</A></H2>
+<H2><A NAME="s4">4.</A> <A HREF="#toc4">Detailed workings</A></H2>
 
 
 <P>The linker does several things when combining object modules:</P>
@@ -420,7 +470,7 @@ unreadable if you're not a developer:-)</P>
 
 
 
-<H2><A NAME="config-files"></A> <A NAME="s5">5. Configuration files</A></H2>
+<H2><A NAME="config-files"></A> <A NAME="s5">5.</A> <A HREF="#toc5">Configuration files</A></H2>
 
 
 <P>Configuration files are used to describe the layout of the output file(s). Two
@@ -432,7 +482,7 @@ several other attributes may be specified.</P>
 
 
 
-<H2><A NAME="ss5.1">5.1 Memory areas</A>
+<H2><A NAME="ss5.1">5.1</A> <A HREF="#toc5.1">Memory areas</A>
 </H2>
 
 
@@ -492,7 +542,7 @@ comment in the example above. Comments start with a hash mark (`#'), the
 remainder of the line is ignored if this character is found.</P>
 
 
-<H2><A NAME="ss5.2">5.2 Segments</A>
+<H2><A NAME="ss5.2">5.2</A> <A HREF="#toc5.2">Segments</A>
 </H2>
 
 
@@ -564,7 +614,7 @@ create symbols for the last one, there's only one question left: Where does
 the linker put the data? It would be very convenient to have the data in a
 file, wouldn't it?</P>
 
-<H2><A NAME="ss5.3">5.3 Output files</A>
+<H2><A NAME="ss5.3">5.3</A> <A HREF="#toc5.3">Output files</A>
 </H2>
 
 
@@ -627,7 +677,7 @@ the command line, with "-1.bin" and "-2.bin" appended respectively. Because
 '%' is used as an escape char, the sequence "%%" has to be used if a single
 percent sign is required.</P>
 
-<H2><A NAME="ss5.4">5.4 LOAD and RUN addresses (ROMable code)</A>
+<H2><A NAME="ss5.4">5.4</A> <A HREF="#toc5.4">LOAD and RUN addresses (ROMable code)</A>
 </H2>
 
 
@@ -705,7 +755,7 @@ by the linker, so things will work properly.</P>
 look at it's inner workings before using it!</P>
 
 
-<H2><A NAME="ss5.5">5.5 Other MEMORY area attributes</A>
+<H2><A NAME="ss5.5">5.5</A> <A HREF="#toc5.5">Other MEMORY area attributes</A>
 </H2>
 
 
@@ -773,7 +823,7 @@ function is the value of the bank attribute for the run memory area of the
 segment.</P>
 
 
-<H2><A NAME="ss5.6">5.6 Other SEGMENT attributes</A>
+<H2><A NAME="ss5.6">5.6</A> <A HREF="#toc5.6">Other SEGMENT attributes</A>
 </H2>
 
 
@@ -851,7 +901,7 @@ segment attribute. Be careful when using this attribute, because a missing
 segment may be a sign of a problem, and if you're suppressing the warning,
 there is no one left to tell you about it.</P>
 
-<H2><A NAME="ss5.7">5.7 The FILES section</A>
+<H2><A NAME="ss5.7">5.7</A> <A HREF="#toc5.7">The FILES section</A>
 </H2>
 
 
@@ -887,7 +937,7 @@ Fachat (see the
 
 
 
-<H2><A NAME="ss5.8">5.8 The FORMAT section</A>
+<H2><A NAME="ss5.8">5.8</A> <A HREF="#toc5.8">The FORMAT section</A>
 </H2>
 
 
@@ -910,7 +960,7 @@ has several attributes that may be defined here.</P>
 
 
 
-<H2><A NAME="FEATURES"></A> <A NAME="ss5.9">5.9 The FEATURES section</A>
+<H2><A NAME="FEATURES"></A> <A NAME="ss5.9">5.9</A> <A HREF="#toc5.9">The FEATURES section</A>
 </H2>
 
 
@@ -1010,7 +1060,7 @@ mean, that the <CODE>FEATURES</CODE> section has to go to the top of the config 
 
 
 
-<H2><A NAME="SYMBOLS"></A> <A NAME="ss5.10">5.10 The SYMBOLS section</A>
+<H2><A NAME="SYMBOLS"></A> <A NAME="ss5.10">5.10</A> <A HREF="#toc5.10">The SYMBOLS section</A>
 </H2>
 
 
@@ -1063,14 +1113,14 @@ __STACKSIZE__=xxx</CODE> on the command line.</P>
 
 
 
-<H2><A NAME="s6">6. Special segments</A></H2>
+<H2><A NAME="s6">6.</A> <A HREF="#toc6">Special segments</A></H2>
 
 
 <P>The builtin config files do contain segments that have a special meaning for
 the compiler and the libraries that come with it. If you replace the builtin
 config files, you will need the following information.</P>
 
-<H2><A NAME="ss6.1">6.1 INIT</A>
+<H2><A NAME="ss6.1">6.1</A> <A HREF="#toc6.1">INIT</A>
 </H2>
 
 
@@ -1079,14 +1129,14 @@ execution reaches main() - provided that the program runs in RAM. You
 may for example add the INIT segment to the heap in really memory
 constrained systems.</P>
 
-<H2><A NAME="ss6.2">6.2 LOWCODE</A>
+<H2><A NAME="ss6.2">6.2</A> <A HREF="#toc6.2">LOWCODE</A>
 </H2>
 
 
 <P>For the LOWCODE segment, it is guaranteed that it won't be banked out, so it
 is reachable at any time by interrupt handlers or similar.</P>
 
-<H2><A NAME="ss6.3">6.3 STARTUP</A>
+<H2><A NAME="ss6.3">6.3</A> <A HREF="#toc6.3">STARTUP</A>
 </H2>
 
 
@@ -1094,7 +1144,7 @@ is reachable at any time by interrupt handlers or similar.</P>
 and the libraries. It is placed in its own segment because it needs to be
 loaded at the lowest possible program address on several platforms.</P>
 
-<H2><A NAME="ss6.4">6.4 ZPSAVE</A>
+<H2><A NAME="ss6.4">6.4</A> <A HREF="#toc6.4">ZPSAVE</A>
 </H2>
 
 
@@ -1104,7 +1154,7 @@ initialized.</P>
 
 
 
-<H2><A NAME="s7">7. Copyright</A></H2>
+<H2><A NAME="s7">7.</A> <A HREF="#toc7">Copyright</A></H2>
 
 
 <P>ld65 (and all cc65 binutils) are (C) Copyright 1998-2005 Ullrich von

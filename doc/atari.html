@@ -15,7 +15,72 @@ Christian Groessler,
 <EM>An overview over the Atari runtime system as it is implemented for the cc65 C
 compiler.</EM>
 <HR>
-<H2><A NAME="s1">1. Overview</A></H2>
+<P>
+<H2><A NAME="toc1">1.</A> <A HREF="atari.html#s1">Overview</A></H2>
+
+<P>
+<H2><A NAME="toc2">2.</A> <A HREF="atari.html#s2">Binary format</A></H2>
+
+<P>
+<H2><A NAME="toc3">3.</A> <A HREF="atari.html#s3">Memory layout</A></H2>
+
+<UL>
+<LI><A NAME="toc3.1">3.1</A> <A HREF="atari.html#ss3.1"><CODE>atari</CODE> target</A>
+<LI><A NAME="toc3.2">3.2</A> <A HREF="atari.html#ss3.2"><CODE>atarixl</CODE> target</A>
+</UL>
+<P>
+<H2><A NAME="toc4">4.</A> <A HREF="atari.html#s4">Platform specific header files</A></H2>
+
+<UL>
+<LI><A NAME="toc4.1">4.1</A> <A HREF="atari.html#ss4.1">Atari specific functions</A>
+<LI><A NAME="toc4.2">4.2</A> <A HREF="atari.html#ss4.2">Hardware access</A>
+</UL>
+<P>
+<H2><A NAME="toc5">5.</A> <A HREF="atari.html#s5">Loadable drivers</A></H2>
+
+<UL>
+<LI><A NAME="toc5.1">5.1</A> <A HREF="atari.html#ss5.1">Graphics drivers</A>
+<LI><A NAME="toc5.2">5.2</A> <A HREF="atari.html#ss5.2">Extended memory drivers</A>
+<LI><A NAME="toc5.3">5.3</A> <A HREF="atari.html#ss5.3">Joystick drivers</A>
+<LI><A NAME="toc5.4">5.4</A> <A HREF="atari.html#ss5.4">Mouse drivers</A>
+<LI><A NAME="toc5.5">5.5</A> <A HREF="atari.html#ss5.5">RS232 device drivers</A>
+</UL>
+<P>
+<H2><A NAME="toc6">6.</A> <A HREF="atari.html#s6">Limitations</A></H2>
+
+<UL>
+<LI><A NAME="toc6.1">6.1</A> <A HREF="atari.html#ss6.1"><CODE>atarixl</CODE></A>
+</UL>
+<P>
+<H2><A NAME="toc7">7.</A> <A HREF="atari.html#s7">DIO implementation</A></H2>
+
+<P>
+<H2><A NAME="toc8">8.</A> <A HREF="atari.html#s8">CONIO implementation</A></H2>
+
+<P>
+<H2><A NAME="toc9">9.</A> <A HREF="atari.html#s9">Technical details</A></H2>
+
+<UL>
+<LI><A NAME="toc9.1">9.1</A> <A HREF="atari.html#ss9.1"><CODE>atari</CODE></A>
+<LI><A NAME="toc9.2">9.2</A> <A HREF="atari.html#ss9.2"><CODE>atarixl</CODE></A>
+</UL>
+<P>
+<H2><A NAME="toc10">10.</A> <A HREF="atari.html#s10">Other hints</A></H2>
+
+<UL>
+<LI><A NAME="toc10.1">10.1</A> <A HREF="atari.html#ss10.1">Function keys</A>
+<LI><A NAME="toc10.2">10.2</A> <A HREF="atari.html#ss10.2">Passing arguments to the program</A>
+<LI><A NAME="toc10.3">10.3</A> <A HREF="atari.html#ss10.3">Interrupts</A>
+<LI><A NAME="toc10.4">10.4</A> <A HREF="atari.html#ss10.4">Reserving a memory area inside a program</A>
+<LI><A NAME="toc10.5">10.5</A> <A HREF="atari.html#ss10.5">Upgrading from an older cc65 version</A>
+<LI><A NAME="toc10.6">10.6</A> <A HREF="atari.html#ss10.6">Getting rid of the "system check" load chunk</A>
+</UL>
+<P>
+<H2><A NAME="toc11">11.</A> <A HREF="atari.html#s11">License</A></H2>
+
+
+<HR>
+<H2><A NAME="s1">1.</A> <A HREF="#toc1">Overview</A></H2>
 
 
 <P>This file contains an overview of the Atari runtime system as it comes
@@ -38,7 +103,7 @@ more than one platform. Please see the function reference for more
 information.</P>
 
 
-<H2><A NAME="s2">2. Binary format</A></H2>
+<H2><A NAME="s2">2.</A> <A HREF="#toc2">Binary format</A></H2>
 
 
 <P>The Atari DOS executable file format supports more than one load block (<I>chunk</I>).</P>
@@ -64,11 +129,11 @@ Be aware of that if you create a custom linker config file and start moving segm
 <A HREF="#memhole">Reserving a memory area inside the program</A>).</P>
 
 
-<H2><A NAME="s3">3. Memory layout</A></H2>
+<H2><A NAME="s3">3.</A> <A HREF="#toc3">Memory layout</A></H2>
 
 
 
-<H2><A NAME="ss3.1">3.1 <CODE>atari</CODE> target</A>
+<H2><A NAME="ss3.1">3.1</A> <A HREF="#toc3.1"><CODE>atari</CODE> target</A>
 </H2>
 
 
@@ -111,7 +176,7 @@ runtime stack.</P>
 </P>
 
 
-<H2><A NAME="ss3.2">3.2 <CODE>atarixl</CODE> target</A>
+<H2><A NAME="ss3.2">3.2</A> <A HREF="#toc3.2"><CODE>atarixl</CODE> target</A>
 </H2>
 
 
@@ -158,14 +223,14 @@ grows towards the C runtime stack.</P>
 
 
 
-<H2><A NAME="s4">4. Platform specific header files</A></H2>
+<H2><A NAME="s4">4.</A> <A HREF="#toc4">Platform specific header files</A></H2>
 
 
 <P>Programs containing Atari specific code may use the <CODE>atari.h</CODE>
 header file.</P>
 
 
-<H2><A NAME="ss4.1">4.1 Atari specific functions</A>
+<H2><A NAME="ss4.1">4.1</A> <A HREF="#toc4.1">Atari specific functions</A>
 </H2>
 
 
@@ -190,7 +255,7 @@ See the
 </P>
 
 
-<H2><A NAME="ss4.2">4.2 Hardware access</A>
+<H2><A NAME="ss4.2">4.2</A> <A HREF="#toc4.2">Hardware access</A>
 </H2>
 
 
@@ -229,13 +294,13 @@ for the declaration of the structure.</P>
 
 
 
-<H2><A NAME="s5">5. Loadable drivers</A></H2>
+<H2><A NAME="s5">5.</A> <A HREF="#toc5">Loadable drivers</A></H2>
 
 
 <P>The names in the parentheses denote the symbols to be used for static linking of the drivers.</P>
 
 
-<H2><A NAME="ss5.1">5.1 Graphics drivers</A>
+<H2><A NAME="ss5.1">5.1</A> <A HREF="#toc5.1">Graphics drivers</A>
 </H2>
 
 
@@ -325,7 +390,7 @@ graphics mode</TD><TD>reserved memory</TD></TR><TR><TD>
 it doesn't have at least one byte available. This seems to be a bug of
 the Atari ROM code.</P>
 
-<H2><A NAME="ss5.2">5.2 Extended memory drivers</A>
+<H2><A NAME="ss5.2">5.2</A> <A HREF="#toc5.2">Extended memory drivers</A>
 </H2>
 
 
@@ -339,7 +404,7 @@ the Atari ROM code.</P>
 </CENTER><BR>
 </P>
 
-<H2><A NAME="ss5.3">5.3 Joystick drivers</A>
+<H2><A NAME="ss5.3">5.3</A> <A HREF="#toc5.3">Joystick drivers</A>
 </H2>
 
 
@@ -356,7 +421,7 @@ the Atari ROM code.</P>
 </P>
 
 
-<H2><A NAME="ss5.4">5.4 Mouse drivers</A>
+<H2><A NAME="ss5.4">5.4</A> <A HREF="#toc5.4">Mouse drivers</A>
 </H2>
 
 
@@ -364,7 +429,7 @@ the Atari ROM code.</P>
 platform.</P>
 
 
-<H2><A NAME="ss5.5">5.5 RS232 device drivers</A>
+<H2><A NAME="ss5.5">5.5</A> <A HREF="#toc5.5">RS232 device drivers</A>
 </H2>
 
 
@@ -372,11 +437,11 @@ platform.</P>
 platform.</P>
 
 
-<H2><A NAME="s6">6. Limitations</A></H2>
+<H2><A NAME="s6">6.</A> <A HREF="#toc6">Limitations</A></H2>
 
 
 
-<H2><A NAME="limitations"></A> <A NAME="ss6.1">6.1 <CODE>atarixl</CODE></A>
+<H2><A NAME="limitations"></A> <A NAME="ss6.1">6.1</A> <A HREF="#toc6.1"><CODE>atarixl</CODE></A>
 </H2>
 
 
@@ -391,7 +456,7 @@ the ROM in and out.  All functions used by the runtime library are handled, thou
 </UL>
 </P>
 
-<H2><A NAME="dio"></A> <A NAME="s7">7. DIO implementation</A></H2>
+<H2><A NAME="dio"></A> <A NAME="s7">7.</A> <A HREF="#toc7">DIO implementation</A></H2>
 
 
 <P>The Atari supports disk drives with either 128 or 256 byte sectors.
@@ -401,18 +466,18 @@ because the system can only boot from 128 bytes sectors.</P>
 for sectors 1 to 3, regardless of the type of diskette.</P>
 
 
-<H2><A NAME="conio"></A> <A NAME="s8">8. CONIO implementation</A></H2>
+<H2><A NAME="conio"></A> <A NAME="s8">8.</A> <A HREF="#toc8">CONIO implementation</A></H2>
 
 
 <P>The console I/O is speed optimized therefore support for XEP80 hardware
 or f80.com software is missing. Of course you may use stdio.h functions.</P>
 
 
-<H2><A NAME="techdetail"></A> <A NAME="s9">9. Technical details</A></H2>
+<H2><A NAME="techdetail"></A> <A NAME="s9">9.</A> <A HREF="#toc9">Technical details</A></H2>
 
 
 
-<H2><A NAME="ss9.1">9.1 <CODE>atari</CODE></A>
+<H2><A NAME="ss9.1">9.1</A> <A HREF="#toc9.1"><CODE>atari</CODE></A>
 </H2>
 
 
@@ -436,7 +501,7 @@ The contents of this chunk come from the RAM memory area of the linker config fi
 </P>
 
 
-<H2><A NAME="ss9.2">9.2 <CODE>atarixl</CODE></A>
+<H2><A NAME="ss9.2">9.2</A> <A HREF="#toc9.2"><CODE>atarixl</CODE></A>
 </H2>
 
 
@@ -552,19 +617,19 @@ This code is not enabled by default. In order to enable it,
 uncomment the line which sets CHARGEN_RELOC in <CODE>libsrc/atari/Makefile.inc</CODE>
 and recompile the <CODE>atarixl</CODE> runtime library.</P>
 
-<H2><A NAME="s10">10. Other hints</A></H2>
+<H2><A NAME="s10">10.</A> <A HREF="#toc10">Other hints</A></H2>
 
 
 
 
-<H2><A NAME="ss10.1">10.1 Function keys</A>
+<H2><A NAME="ss10.1">10.1</A> <A HREF="#toc10.1">Function keys</A>
 </H2>
 
 
 <P>Function keys are mapped to Atari + number key.</P>
 
 
-<H2><A NAME="ss10.2">10.2 Passing arguments to the program</A>
+<H2><A NAME="ss10.2">10.2</A> <A HREF="#toc10.2">Passing arguments to the program</A>
 </H2>
 
 
@@ -580,7 +645,7 @@ supported.                                                       </LI>
 </P>
 
 
-<H2><A NAME="ss10.3">10.3 Interrupts</A>
+<H2><A NAME="ss10.3">10.3</A> <A HREF="#toc10.3">Interrupts</A>
 </H2>
 
 
@@ -592,7 +657,7 @@ feature in the
 <A HREF="ca65.html">assembler manual</A>.</P>
 
 
-<H2><A NAME="memhole"></A> <A NAME="ss10.4">10.4 Reserving a memory area inside a program</A>
+<H2><A NAME="memhole"></A> <A NAME="ss10.4">10.4</A> <A HREF="#toc10.4">Reserving a memory area inside a program</A>
 </H2>
 
 
@@ -833,7 +898,7 @@ some parts of the cc65 runtime lib need to be replaced/modified.</P>
 defines the location of the stack by initializing sp.</P>
 
 
-<H2><A NAME="ss10.5">10.5 Upgrading from an older cc65 version</A>
+<H2><A NAME="ss10.5">10.5</A> <A HREF="#toc10.5">Upgrading from an older cc65 version</A>
 </H2>
 
 
@@ -865,7 +930,7 @@ MAINHDR: load = HEADER, type = ro;
 
 
 
-<H2><A NAME="ss10.6">10.6 Getting rid of the "system check" load chunk</A>
+<H2><A NAME="ss10.6">10.6</A> <A HREF="#toc10.6">Getting rid of the "system check" load chunk</A>
 </H2>
 
 
@@ -886,7 +951,7 @@ cl65 -Wl -D__SYSTEM_CHECK__=1 &lt;arguments>
 <CODE>__SYSTEM_CHECK__</CODE> symbol is defined, the load chunk won't be included.</P>
 
 
-<H2><A NAME="s11">11. License</A></H2>
+<H2><A NAME="s11">11.</A> <A HREF="#toc11">License</A></H2>
 
 
 <P>This software is provided 'as-is', without any expressed or implied

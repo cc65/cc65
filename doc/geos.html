@@ -13,7 +13,47 @@
 <EM>This is the documentation of cc65's GEOSLib, but information contained here may be also
 useful for writing GEOS applications in general.</EM>
 <HR>
-<H2><A NAME="s1">1. Introduction</A></H2>
+<P>
+<H2><A NAME="toc1">1.</A> <A HREF="geos.html#s1">Introduction</A></H2>
+
+<UL>
+<LI><A NAME="toc1.1">1.1</A> <A HREF="geos.html#ss1.1">Requirements</A>
+<LI><A NAME="toc1.2">1.2</A> <A HREF="geos.html#ss1.2">Legal</A>
+</UL>
+<P>
+<H2><A NAME="toc2">2.</A> <A HREF="geos.html#s2">What do you have and what to do with it?</A></H2>
+
+<UL>
+<LI><A NAME="toc2.1">2.1</A> <A HREF="geos.html#ss2.1">Usage</A>
+<LI><A NAME="toc2.2">2.2</A> <A HREF="geos.html#ss2.2">Notes on style</A>
+</UL>
+<P>
+<H2><A NAME="toc3">3.</A> <A HREF="geos.html#s3">Library Functions</A></H2>
+
+<UL>
+<LI><A NAME="toc3.1">3.1</A> <A HREF="geos.html#ss3.1">Graphics</A>
+<LI><A NAME="toc3.2">3.2</A> <A HREF="geos.html#ss3.2">Menus and Icons</A>
+<LI><A NAME="toc3.3">3.3</A> <A HREF="geos.html#ss3.3">DialogBoxes</A>
+<LI><A NAME="toc3.4">3.4</A> <A HREF="geos.html#ss3.4">Mouse, Sprites and Cursors</A>
+<LI><A NAME="toc3.5">3.5</A> <A HREF="geos.html#ss3.5">Disk</A>
+<LI><A NAME="toc3.6">3.6</A> <A HREF="geos.html#ss3.6">Files</A>
+<LI><A NAME="toc3.7">3.7</A> <A HREF="geos.html#ss3.7">Memory and Strings</A>
+<LI><A NAME="toc3.8">3.8</A> <A HREF="geos.html#ss3.8">Processes and Multitasking</A>
+<LI><A NAME="toc3.9">3.9</A> <A HREF="geos.html#ss3.9">System Functions</A>
+</UL>
+<P>
+<H2><A NAME="toc4">4.</A> <A HREF="geos.html#s4">Library Structures</A></H2>
+
+<UL>
+<LI><A NAME="toc4.1">4.1</A> <A HREF="geos.html#ss4.1">Graphics Structures</A>
+<LI><A NAME="toc4.2">4.2</A> <A HREF="geos.html#ss4.2">Icons</A>
+<LI><A NAME="toc4.3">4.3</A> <A HREF="geos.html#ss4.3">File and Disk</A>
+<LI><A NAME="toc4.4">4.4</A> <A HREF="geos.html#ss4.4">System Structures</A>
+<LI><A NAME="toc4.5">4.5</A> <A HREF="geos.html#ss4.5">A few things in detail...</A>
+</UL>
+
+<HR>
+<H2><A NAME="s1">1.</A> <A HREF="#toc1">Introduction</A></H2>
 
 <P>As we all know that the best computers in the world are the C64 and C128. They have their GUI too -
 the excellent GEOS. GEOS seems very difficult and cryptic for many people, from programmer's point
@@ -48,7 +88,7 @@ just raw calls to the Kernal (assembled just as <CODE>jsr _foo</CODE>), look in 
 can find many definitions of standard GEOS locations. Access to these addresses is optimized by
 cc65 to simple <CODE>lda</CODE> and <CODE>sta</CODE>. Don't be afraid to use C syntax.</P>
 
-<H2><A NAME="ss1.1">1.1 Requirements</A>
+<H2><A NAME="ss1.1">1.1</A> <A HREF="#toc1.1">Requirements</A>
 </H2>
 
 <P>You don't need a C64 or C128 for development. The only hardware requirement is a PC capable of
@@ -79,7 +119,7 @@ this purpose. Check out:
 needs cc65.</P>
 <P><EM>Update:</EM> starting from v2.5.0 GEOSLib is a part of the cc65 package as its GEOS support library.</P>
 
-<H2><A NAME="ss1.2">1.2 Legal</A>
+<H2><A NAME="ss1.2">1.2</A> <A HREF="#toc1.2">Legal</A>
 </H2>
 
 <P>I want to thank Uz for his cc65 package, Alexander Boyce for his excellent GEOS Programmer's
@@ -95,11 +135,11 @@ with it.</P>
 <P>POLAND</P>
 <P>e-mail: <CODE>ytm@elysium.pl</CODE></P>
 
-<H2><A NAME="s2">2. What do you have and what to do with it?</A></H2>
+<H2><A NAME="s2">2.</A> <A HREF="#toc2">What do you have and what to do with it?</A></H2>
 
 <P>This chapter describes some rules you ought to obey, and how to use GEOSLib.</P>
 
-<H2><A NAME="ss2.1">2.1 Usage</A>
+<H2><A NAME="ss2.1">2.1</A> <A HREF="#toc2.1">Usage</A>
 </H2>
 
 <P>Apart from this file, which merely describes only standard GEOS library
@@ -124,7 +164,7 @@ to find bugs.</P>
 <P>All types used in GEOSLib are <CODE>unsigned</CODE>.</P>
 <P>Screen coordinates are given in pixels unless stated differently.</P>
 
-<H2><A NAME="ss2.2">2.2 Notes on style</A>
+<H2><A NAME="ss2.2">2.2</A> <A HREF="#toc2.2">Notes on style</A>
 </H2>
 
 <P>Contrary to a typical GEOS assembly program which has a main function called after loading that
@@ -158,14 +198,14 @@ A GEOS TGI driver, a GEOS EMD driver (for VDC extended memory) and a GEOS JOY dr
 Just make sure that their filenames appear UPPERCASE in DeskTop. There are no more special
 recommendations, read the cc65 documentation about modules and the demo programs source code.</P>
 
-<H2><A NAME="s3">3. Library Functions</A></H2>
+<H2><A NAME="s3">3.</A> <A HREF="#toc3">Library Functions</A></H2>
 
 <P>Functions here are sorted more or less in the way they appear in the header files. This way I am able
 to keep functions covering similar tasks near each other. All function names are identical to those
 from the <CODE>geosSym</CODE> file provided with the GeoProgrammer package. Only my extensions to <CODE>geosSym</CODE>
 are covered by new names, but I tried to keep them in the naming convention.</P>
 
-<H2><A NAME="ss3.1">3.1 Graphics</A>
+<H2><A NAME="ss3.1">3.1</A> <A HREF="#toc3.1">Graphics</A>
 </H2>
 
 <P>This section covers the drawing package of GEOS along with text output routines.</P>
@@ -344,7 +384,7 @@ returns in .A the next value), and <CODE>proc2</CODE> is called every time the p
 not a piece of a pattern (byte of code greater than 219). Both procedures should be written
 separately in assembler and declared as <CODE>__fastcall__</CODE> returning char.</P>
 
-<H2><A NAME="ss3.2">3.2 Menus and Icons</A>
+<H2><A NAME="ss3.2">3.2</A> <A HREF="#toc3.2">Menus and Icons</A>
 </H2>
 
 <P>Here you will find information about functions related with menus and icons.</P>
@@ -409,7 +449,7 @@ There is only one, but powerful icon function.</P>
 <P>This function initializes all icons that are present on the screen at once. For more information
 look at the <CODE>Icons</CODE> chapter in this manual.</P>
 
-<H2><A NAME="ss3.3">3.3 DialogBoxes</A>
+<H2><A NAME="ss3.3">3.3</A> <A HREF="#toc3.3">DialogBoxes</A>
 </H2>
 
 <P>This chapter covers the most powerful GEOS user interface function - <CODE>DoDlgBox</CODE>.</P>
@@ -478,7 +518,7 @@ it adds quite amount of code to your program.</P>
 <P>Note: the formatted text <EM>cannot exceed</EM> 255 bytes in length, there is no check
 for that.</P>
 
-<H2><A NAME="ss3.4">3.4 Mouse, Sprites and Cursors</A>
+<H2><A NAME="ss3.4">3.4</A> <A HREF="#toc3.4">Mouse, Sprites and Cursors</A>
 </H2>
 
 <P>You will find here functions related to sprite and mouse drawing and handling.</P>
@@ -561,7 +601,7 @@ The second one is pretty self-explanatory.</P>
 <CODE>NULL</CODE>, otherwise you receive the true ASCII code of a character or the value of a special (function)
 key. See <CODE>gsprite.h</CODE> for the list of them.</P>
 
-<H2><A NAME="ss3.5">3.5 Disk</A>
+<H2><A NAME="ss3.5">3.5</A> <A HREF="#toc3.5">Disk</A>
 </H2>
 
 <P>This chapter covers rather low-level disk routines. You should use them with care, because
@@ -739,7 +779,7 @@ checked with <CODE>ChkDkGEOS</CODE> and the disk name is updated in the internal
 <P><CODE>char NewDisk (void)</CODE></P>
 <P>This function is similar to the DOS command I. It clears the REU cache and enables TurboDos if needed.</P>
 
-<H2><A NAME="ss3.6">3.6 Files</A>
+<H2><A NAME="ss3.6">3.6</A> <A HREF="#toc3.6">Files</A>
 </H2>
 
 <P>This section covers the GEOS file interface.</P>
@@ -927,7 +967,7 @@ can be found in <CODE>VLIRInfo.curRecord + 1</CODE>).</P>
 <P>This function will load or save at most <CODE>fLength</CODE> bytes from the currently pointed record into or from
 <CODE>buffer</CODE>.</P>
 
-<H2><A NAME="ss3.7">3.7 Memory and Strings</A>
+<H2><A NAME="ss3.7">3.7</A> <A HREF="#toc3.7">Memory and Strings</A>
 </H2>
 
 <P>The functions covered in this section are common for the whole C world - copying memory parts and
@@ -998,7 +1038,7 @@ This is done with a <CODE>table</CODE> where everything is defined. See the stru
 You can check for REU presence by taking the value of <CODE>ramExpSize</CODE>. You have to do it before
 using any of these functions.</P>
 
-<H2><A NAME="ss3.8">3.8 Processes and Multitasking</A>
+<H2><A NAME="ss3.8">3.8</A> <A HREF="#toc3.8">Processes and Multitasking</A>
 </H2>
 
 <P>Weird? Not at all. GEOS has some limited multitasking ability. You can set up a chain of functions
@@ -1058,7 +1098,7 @@ video mode (PAL or NTSC) how many jiffies there are per second (50 or 60, respec
 If you don't want to worry about it and need only full second resolution, call the standard
 <CODE>sleep</CODE> function from <CODE>unistd.h</CODE>.</P>
 
-<H2><A NAME="ss3.9">3.9 System Functions</A>
+<H2><A NAME="ss3.9">3.9</A> <A HREF="#toc3.9">System Functions</A>
 </H2>
 
 <H3>FirstInit</H3>
@@ -1169,7 +1209,7 @@ runtime. It is unclear if this will work for GEOS 64 so you probably do not want
 anything if not running under GEOS128. Use <CODE>get_ostype</CODE> to check it. Read <CODE>gsys.h</CODE> for
 definitions of the returned values.</P>
 
-<H2><A NAME="s4">4. Library Structures</A></H2>
+<H2><A NAME="s4">4.</A> <A HREF="#toc4">Library Structures</A></H2>
 
 <P>To simplify usage and optimize passing parameters to functions I have declared several structures
 which describe the most common objects. Some of these structures are bound to static addresses in
@@ -1177,7 +1217,7 @@ the GEOS data space (<CODE>$8000-$8fff</CODE>), so you can use their fields dire
 Please see <CODE>gsym.h</CODE> to find them. All structures are defined in <CODE>gstruct.h</CODE> and you may
 find also some comments there.</P>
 
-<H2><A NAME="ss4.1">4.1 Graphics Structures</A>
+<H2><A NAME="ss4.1">4.1</A> <A HREF="#toc4.1">Graphics Structures</A>
 </H2>
 
 <H3>pixel</H3>
@@ -1207,7 +1247,7 @@ a bitmap on the screen. The bitmap has to be encoded - if you have some non-GEOS
 convert them to Photo Scraps - this is the format used by all GEOS bitmap functions - <CODE>DoIcons</CODE>
 too.</P>
 
-<H2><A NAME="ss4.2">4.2 Icons</A>
+<H2><A NAME="ss4.2">4.2</A> <A HREF="#toc4.2">Icons</A>
 </H2>
 
 <P>These structures describe click boxes (icons) that can be placed on screen or in a dialog box.</P>
@@ -1229,7 +1269,7 @@ descriptions for all icons</LI>
 </UL>
 </P>
 
-<H2><A NAME="ss4.3">4.3 File and Disk</A>
+<H2><A NAME="ss4.3">4.3</A> <A HREF="#toc4.3">File and Disk</A>
 </H2>
 
 <H3>tr_se</H3>
@@ -1258,7 +1298,7 @@ fixed area using <CODE>GetFHdrInfo</CODE>. (note that <CODE>fileHeader</CODE> is
 <CODE>fileheader</CODE> is a structure).
 You will also need your own fileheader for <CODE>SaveFile</CODE>.</P>
 
-<H2><A NAME="ss4.4">4.4 System Structures</A>
+<H2><A NAME="ss4.4">4.4</A> <A HREF="#toc4.4">System Structures</A>
 </H2>
 
 <H3>s_date</H3>
@@ -1277,7 +1317,7 @@ function (void returning void), you will probably have to cast that pointer into
 The second field <CODE>jiffies</CODE> holds the amount of time between calls to that function.
 On PAL systems there are 50 jiffies per second, while NTSC have 60 of them.</P>
 
-<H2><A NAME="ss4.5">4.5 A few things in detail...</A>
+<H2><A NAME="ss4.5">4.5</A> <A HREF="#toc4.5">A few things in detail...</A>
 </H2>
 
 <P>GEOSLib uses cc65 non-ANSI extensions to easily initialize data in memory. This is done with a

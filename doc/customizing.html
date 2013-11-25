@@ -13,7 +13,36 @@
 toolset for a custom hardware platform (a target system not currently
 supported by the cc65 library set).</EM>
 <HR>
-<H2><A NAME="s1">1. Overview</A></H2>
+<P>
+<H2><A NAME="toc1">1.</A> <A HREF="customizing.html#s1">Overview</A></H2>
+
+<P>
+<H2><A NAME="toc2">2.</A> <A HREF="customizing.html#s2">System Memory Map Definition</A></H2>
+
+<P>
+<H2><A NAME="toc3">3.</A> <A HREF="customizing.html#s3">Startup Code Definition</A></H2>
+
+<P>
+<H2><A NAME="toc4">4.</A> <A HREF="customizing.html#s4">Custom Run-Time Library Creation</A></H2>
+
+<P>
+<H2><A NAME="toc5">5.</A> <A HREF="customizing.html#s5">Interrupt Service Routine Definition</A></H2>
+
+<P>
+<H2><A NAME="toc6">6.</A> <A HREF="customizing.html#s6">Adding Custom Instructions</A></H2>
+
+<P>
+<H2><A NAME="toc7">7.</A> <A HREF="customizing.html#s7">Hardware Drivers</A></H2>
+
+<P>
+<H2><A NAME="toc8">8.</A> <A HREF="customizing.html#s8">Hello World! Example</A></H2>
+
+<P>
+<H2><A NAME="toc9">9.</A> <A HREF="customizing.html#s9">Putting It All Together</A></H2>
+
+
+<HR>
+<H2><A NAME="s1">1.</A> <A HREF="#toc1">Overview</A></H2>
 
 
 <P>The cc65 toolset provides a set of pre-defined libraries that allow the
@@ -30,7 +59,7 @@ STP and WAI instructions.  These instructions will create a set of files
 to create a custom target, named SBC, for <B>S</B>ingle <B>B</B>oard
 <B>C</B>omputer.</P>
 
-<H2><A NAME="s2">2. System Memory Map Definition</A></H2>
+<H2><A NAME="s2">2.</A> <A HREF="#toc2">System Memory Map Definition</A></H2>
 
 
 <P>The targeted system uses block RAM contained on the XILINX FPGA for the
@@ -153,7 +182,7 @@ SYMBOLS {
 <P>These definitions are placed in a file named &#34;sbc.cfg&#34;
 and are referred to during the ld65 linker stage.</P>
 
-<H2><A NAME="s3">3. Startup Code Definition</A></H2>
+<H2><A NAME="s3">3.</A> <A HREF="#toc3">Startup Code Definition</A></H2>
 
 
 <P>In the cc65 toolset, a startup routine must be defined that is executed
@@ -325,7 +354,7 @@ the final binary code.  In addition, the hardware has been designed to
 force the data lines to $00 for all illegal memory accesses, thereby
 also forcing a BRK instruction into the CPU.</P>
 
-<H2><A NAME="s4">4. Custom Run-Time Library Creation</A></H2>
+<H2><A NAME="s4">4.</A> <A HREF="#toc4">Custom Run-Time Library Creation</A></H2>
 
 
 <P>The next step in customizing the cc65 toolset is creating a run-time
@@ -350,7 +379,7 @@ $ ar65 a sbc.lib crt0.o
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="s5">5. Interrupt Service Routine Definition</A></H2>
+<H2><A NAME="s5">5.</A> <A HREF="#toc5">Interrupt Service Routine Definition</A></H2>
 
 
 <P>For this system, the CPU is put into a wait condition prior to allowing
@@ -487,7 +516,7 @@ memory in their proper little-endian format as:</P>
 <P>The cc65 toolset will replace the address symbols defined here with the
 actual addresses of the routines during the link process.</P>
 
-<H2><A NAME="s6">6. Adding Custom Instructions</A></H2>
+<H2><A NAME="s6">6.</A> <A HREF="#toc6">Adding Custom Instructions</A></H2>
 
 
 <P>The cc65 instruction set only supports the WAI (Wait for Interrupt) and
@@ -553,7 +582,7 @@ within the C-level code via a call to <CODE>stop&nbsp;()</CODE>.  In
 addition, the routine can be called from assembly code by calling
 <CODE>_stop</CODE> (as was done in the interrupt service routine).</P>
 
-<H2><A NAME="s7">7. Hardware Drivers</A></H2>
+<H2><A NAME="s7">7.</A> <A HREF="#toc7">Hardware Drivers</A></H2>
 
 
 <P>Oftentimes, it can be advantageous to create small application helpers
@@ -700,7 +729,7 @@ loop:   sta     TX_FIFO          ;  Loop:  Store character in FIFO
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="s8">8. Hello World! Example</A></H2>
+<H2><A NAME="s8">8.</A> <A HREF="#toc8">Hello World! Example</A></H2>
 
 
 <P>The following short example demonstrates programming in C using the cc65
@@ -756,7 +785,7 @@ int main () {
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="s9">9. Putting It All Together</A></H2>
+<H2><A NAME="s9">9.</A> <A HREF="#toc9">Putting It All Together</A></H2>
 
 
 <P>The following commands will create a ROM image named &#34;a.out&#34;

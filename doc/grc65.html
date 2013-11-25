@@ -15,8 +15,47 @@
 <EM>This document describes a compiler that can create GEOS headers and menues for
 cc65-compiled programs.</EM>
 <HR>
+<P>
+<H2><A NAME="toc1">1.</A> <A HREF="grc65.html#s1">Overview</A></H2>
+
+<P>
+<H2><A NAME="toc2">2.</A> <A HREF="grc65.html#s2">Usage</A></H2>
+
+<P>
+<H2><A NAME="toc3">3.</A> <A HREF="grc65.html#s3">Resource file format</A></H2>
+
+<UL>
+<LI><A NAME="toc3.1">3.1</A> <A HREF="grc65.html#ss3.1">Menu definition</A>
+<LI><A NAME="toc3.2">3.2</A> <A HREF="grc65.html#ss3.2">Header definition</A>
+<LI><A NAME="toc3.3">3.3</A> <A HREF="grc65.html#ss3.3">Memory definition</A>
+</UL>
+<P>
+<H2><A NAME="toc4">4.</A> <A HREF="grc65.html#s4">Building a GEOS sequential application</A></H2>
+
+<UL>
+<LI><A NAME="toc4.1">4.1</A> <A HREF="grc65.html#ss4.1">Building the GEOS application using cl65</A>
+<LI><A NAME="toc4.2">4.2</A> <A HREF="grc65.html#ss4.2">Building the GEOS application without cl65</A>
+</UL>
+<P>
+<H2><A NAME="toc5">5.</A> <A HREF="grc65.html#s5">Building a GEOS VLIR overlay application</A></H2>
+
+<UL>
+<LI><A NAME="toc5.1">5.1</A> <A HREF="grc65.html#ss5.1">Building the GEOS overlay application using cl65</A>
+<LI><A NAME="toc5.2">5.2</A> <A HREF="grc65.html#ss5.2">Building the GEOS overlay application without cl65</A>
+</UL>
+<P>
+<H2><A NAME="toc6">6.</A> <A HREF="grc65.html#s6">Bugs and feedback</A></H2>
+
+<P>
+<H2><A NAME="toc7">7.</A> <A HREF="grc65.html#s7">Legal stuff</A></H2>
+
 <H2>Appendix</H2>
-<H2><A NAME="s1">1. Overview</A></H2>
+<P>
+<H2><A NAME="toc8">8.</A> <A HREF="grc65.html#s8">Appendix A -- example.grc</A></H2>
+
+
+<HR>
+<H2><A NAME="s1">1.</A> <A HREF="#toc1">Overview</A></H2>
 
 <P><B>grc65</B> is a part of cc65's GEOS support.  The tool is necessary to
 generate required and optional resources.  A required resource for every GEOS
@@ -35,7 +74,7 @@ should be processed by <B>ca65</B> and linked to the application (read about
 
 
 
-<H2><A NAME="s2">2. Usage</A></H2>
+<H2><A NAME="s2">2.</A> <A HREF="#toc2">Usage</A></H2>
 
 <P>grc65 accepts the following options:</P>
 <P>
@@ -63,7 +102,7 @@ Default output names are made from input names with extensions replaced by
 
 
 
-<H2><A NAME="s3">3. Resource file format</A></H2>
+<H2><A NAME="s3">3.</A> <A HREF="#toc3">Resource file format</A></H2>
 
 <P>A resource file has the name extension <CODE>.grc</CODE>.  That is not required, but
 it will make for an easier recognition of the file's purpose.  Also, <B>cl65</B>
@@ -76,7 +115,7 @@ included
 better view of the situation.</P>
 
 
-<H2><A NAME="ss3.1">3.1 Menu definition</A>
+<H2><A NAME="ss3.1">3.1</A> <A HREF="#toc3.1">Menu definition</A>
 </H2>
 
 <P>
@@ -118,7 +157,7 @@ definition first, and the top-level menu as the last one.  That way the C
 compiler won't complain about unknown names.</P>
 
 
-<H2><A NAME="ss3.2">3.2 Header definition</A>
+<H2><A NAME="ss3.2">3.2</A> <A HREF="#toc3.2">Header definition</A>
 </H2>
 
 <P>
@@ -165,7 +204,7 @@ programs generating such files are <EM>Sprite Painter</EM>, <EM>SpritePad</EM> a
 is an empty frame internally represented in the generated assembly file.</P>
 
 
-<H2><A NAME="ss3.3">3.3 Memory definition</A>
+<H2><A NAME="ss3.3">3.3</A> <A HREF="#toc3.3">Memory definition</A>
 </H2>
 
 <P>
@@ -197,7 +236,7 @@ Skipped numbers denote empty records.  In the example, record number 3 is missin
 
 
 
-<H2><A NAME="building-seq"></A> <A NAME="s4">4. Building a GEOS sequential application</A></H2>
+<H2><A NAME="building-seq"></A> <A NAME="s4">4.</A> <A HREF="#toc4">Building a GEOS sequential application</A></H2>
 
 <P>Before proceeding, please read the 
 <A HREF="cc65.html">compiler</A>,
@@ -244,7 +283,7 @@ because you will have to be very careful with names (<B>grc65</B> will make
 There are no other includes.</P>
 
 
-<H2><A NAME="ss4.1">4.1 Building the GEOS application using cl65</A>
+<H2><A NAME="ss4.1">4.1</A> <A HREF="#toc4.1">Building the GEOS application using cl65</A>
 </H2>
 
 <P>This is a simple one step process:
@@ -259,7 +298,7 @@ to make sure that the generated <CODE>.h</CODE> file is available when it is nee
 inclusion by a <CODE>.c</CODE> file.</P>
 
 
-<H2><A NAME="ss4.2">4.2 Building the GEOS application without cl65</A>
+<H2><A NAME="ss4.2">4.2</A> <A HREF="#toc4.2">Building the GEOS application without cl65</A>
 </H2>
 
 <H3>First step -- compiling the resources</H3>
@@ -319,7 +358,7 @@ required for the correct process of GEOS sequential application building.</P>
 
 
 
-<H2><A NAME="building-vlir"></A> <A NAME="s5">5. Building a GEOS VLIR overlay application</A></H2>
+<H2><A NAME="building-vlir"></A> <A NAME="s5">5.</A> <A HREF="#toc5">Building a GEOS VLIR overlay application</A></H2>
 
 <P>Large GEOS applications typically don't fit in one piece in their designated
 memory area.  They are therefore split into overlays which are loaded into memory
@@ -331,7 +370,7 @@ starting with 1 are to be used for the actual overlays.</P>
 of the files "<CODE>overlay-demo.c</CODE>" and "<CODE>overlay-demores.grc</CODE>".</P>
 
 
-<H2><A NAME="ss5.1">5.1 Building the GEOS overlay application using cl65</A>
+<H2><A NAME="ss5.1">5.1</A> <A HREF="#toc5.1">Building the GEOS overlay application using cl65</A>
 </H2>
 
 <P>This is a simple one step process:
@@ -350,7 +389,7 @@ the distribution of code into the overlays and to optimize the memory area reser
 for the overlays.</P>
 
 
-<H2><A NAME="ss5.2">5.2 Building the GEOS overlay application without cl65</A>
+<H2><A NAME="ss5.2">5.2</A> <A HREF="#toc5.2">Building the GEOS overlay application without cl65</A>
 </H2>
 
 <H3>First step -- compiling the overlay resources</H3>
@@ -396,7 +435,7 @@ ld65 -t geos-cbm -o overlay-demo.cvt -m overlay-demo.map overlay-demores.o overl
 
 
 
-<H2><A NAME="s6">6. Bugs and feedback</A></H2>
+<H2><A NAME="s6">6.</A> <A HREF="#toc6">Bugs and feedback</A></H2>
 
 <P>This is the first release of <B>grc65</B>, and it contains bugs, for sure!  I
 am aware of them; I know that the parser is weak, and if you don't follow the
@@ -408,7 +447,7 @@ better.</P>
 
 
 
-<H2><A NAME="s7">7. Legal stuff</A></H2>
+<H2><A NAME="s7">7.</A> <A HREF="#toc7">Legal stuff</A></H2>
 
 <P><B>grc65</B> is covered by the same license as the whole cc65 package, so you
 should see its documentation for more info.  Anyway, if you like it, and want
@@ -420,7 +459,7 @@ for addresses.</P>
 
 
 
-<H2><A NAME="example-grc"></A> <A NAME="s8">8. Appendix A -- example.grc</A></H2>
+<H2><A NAME="example-grc"></A> <A NAME="s8">8.</A> <A HREF="#toc8">Appendix A -- example.grc</A></H2>
 
 <P>
 <BLOCKQUOTE><CODE>

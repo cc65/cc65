@@ -13,7 +13,64 @@
 <EM>cc65 is a C compiler for 6502 targets. It supports several 6502 based home
 computers like the Commodore and Atari machines, but it is easily retargetable.</EM>
 <HR>
-<H2><A NAME="s1">1. Overview</A></H2>
+<P>
+<H2><A NAME="toc1">1.</A> <A HREF="cc65.html#s1">Overview</A></H2>
+
+<P>
+<H2><A NAME="toc2">2.</A> <A HREF="cc65.html#s2">Usage</A></H2>
+
+<UL>
+<LI><A NAME="toc2.1">2.1</A> <A HREF="cc65.html#ss2.1">Command line option overview</A>
+<LI><A NAME="toc2.2">2.2</A> <A HREF="cc65.html#ss2.2">Command line options in detail</A>
+</UL>
+<P>
+<H2><A NAME="toc3">3.</A> <A HREF="cc65.html#s3">Input and output</A></H2>
+
+<P>
+<H2><A NAME="toc4">4.</A> <A HREF="cc65.html#s4">Differences to the ISO standard</A></H2>
+
+<P>
+<H2><A NAME="toc5">5.</A> <A HREF="cc65.html#s5">Extensions</A></H2>
+
+<P>
+<H2><A NAME="toc6">6.</A> <A HREF="cc65.html#s6">Predefined macros</A></H2>
+
+<P>
+<H2><A NAME="toc7">7.</A> <A HREF="cc65.html#s7">#pragmas</A></H2>
+
+<UL>
+<LI><A NAME="toc7.1">7.1</A> <A HREF="cc65.html#ss7.1"><CODE>#pragma bss-name ([push,] &lt;name&gt;)</CODE></A>
+<LI><A NAME="toc7.2">7.2</A> <A HREF="cc65.html#ss7.2"><CODE>#pragma charmap (&lt;index&gt;, &lt;code&gt;)</CODE></A>
+<LI><A NAME="toc7.3">7.3</A> <A HREF="cc65.html#ss7.3"><CODE>#pragma check-stack ([push,] on|off)</CODE></A>
+<LI><A NAME="toc7.4">7.4</A> <A HREF="cc65.html#ss7.4"><CODE>#pragma code-name ([push,] &lt;name&gt;)</CODE></A>
+<LI><A NAME="toc7.5">7.5</A> <A HREF="cc65.html#ss7.5"><CODE>#pragma codesize ([push,] &lt;int&gt;)</CODE></A>
+<LI><A NAME="toc7.6">7.6</A> <A HREF="cc65.html#ss7.6"><CODE>#pragma data-name ([push,] &lt;name&gt;)</CODE></A>
+<LI><A NAME="toc7.7">7.7</A> <A HREF="cc65.html#ss7.7"><CODE>#pragma local-strings ([push,] on|off)</CODE></A>
+<LI><A NAME="toc7.8">7.8</A> <A HREF="cc65.html#ss7.8"><CODE>#pragma optimize ([push,] on|off)</CODE></A>
+<LI><A NAME="toc7.9">7.9</A> <A HREF="cc65.html#ss7.9"><CODE>#pragma rodata-name ([push,] &lt;name&gt;)</CODE></A>
+<LI><A NAME="toc7.10">7.10</A> <A HREF="cc65.html#ss7.10"><CODE>#pragma regvaraddr ([push,] on|off)</CODE></A>
+<LI><A NAME="toc7.11">7.11</A> <A HREF="cc65.html#ss7.11"><CODE>#pragma register-vars ([push,] on|off)</CODE></A>
+<LI><A NAME="toc7.12">7.12</A> <A HREF="cc65.html#ss7.12"><CODE>#pragma signed-chars ([push,] on|off)</CODE></A>
+<LI><A NAME="toc7.13">7.13</A> <A HREF="cc65.html#ss7.13"><CODE>#pragma static-locals ([push,] on|off)</CODE></A>
+<LI><A NAME="toc7.14">7.14</A> <A HREF="cc65.html#ss7.14"><CODE>#pragma warn (name, [push,] on|off)</CODE></A>
+<LI><A NAME="toc7.15">7.15</A> <A HREF="cc65.html#ss7.15"><CODE>#pragma writable-strings ([push,] on|off)</CODE></A>
+<LI><A NAME="toc7.16">7.16</A> <A HREF="cc65.html#ss7.16"><CODE>#pragma zpsym (&lt;name&gt;)</CODE></A>
+</UL>
+<P>
+<H2><A NAME="toc8">8.</A> <A HREF="cc65.html#s8">Register variables</A></H2>
+
+<P>
+<H2><A NAME="toc9">9.</A> <A HREF="cc65.html#s9">Inline assembler</A></H2>
+
+<P>
+<H2><A NAME="toc10">10.</A> <A HREF="cc65.html#s10">Implementation-defined behavior</A></H2>
+
+<P>
+<H2><A NAME="toc11">11.</A> <A HREF="cc65.html#s11">Copyright</A></H2>
+
+
+<HR>
+<H2><A NAME="s1">1.</A> <A HREF="#toc1">Overview</A></H2>
 
 
 <P>cc65 was originally a C compiler for the Atari 8-bit machines written by
@@ -34,7 +91,7 @@ issues.</P>
 
 
 
-<H2><A NAME="s2">2. Usage</A></H2>
+<H2><A NAME="s2">2.</A> <A HREF="#toc2">Usage</A></H2>
 
 
 <P>The compiler translates C files into files containing assembly code that
@@ -43,7 +100,7 @@ the assembler, have a look at
 <A HREF="ca65.html">ca65.html</A>).</P>
 
 
-<H2><A NAME="ss2.1">2.1 Command line option overview</A>
+<H2><A NAME="ss2.1">2.1</A> <A HREF="#toc2.1">Command line option overview</A>
 </H2>
 
 
@@ -113,7 +170,7 @@ Long options:
 </P>
 
 
-<H2><A NAME="ss2.2">2.2 Command line options in detail</A>
+<H2><A NAME="ss2.2">2.2</A> <A HREF="#toc2.2">Command line options in detail</A>
 </H2>
 
 
@@ -488,7 +545,7 @@ control this setting for smaller pieces of code from within your code.</P>
 
 
 
-<H2><A NAME="s3">3. Input and output</A></H2>
+<H2><A NAME="s3">3.</A> <A HREF="#toc3">Input and output</A></H2>
 
 
 <P>The compiler will accept one C file per invocation and create a file with
@@ -514,7 +571,7 @@ environment variable <CODE>CC65_HOME</CODE>, if it is defined.</LI>
 
 
 
-<H2><A NAME="s4">4. Differences to the ISO standard</A></H2>
+<H2><A NAME="s4">4.</A> <A HREF="#toc4">Differences to the ISO standard</A></H2>
 
 
 <P>Apart from the things listed below, the compiler does support additional
@@ -553,7 +610,7 @@ mind, you should be able to write fairly portable code.</P>
 
 
 
-<H2><A NAME="s5">5. Extensions</A></H2>
+<H2><A NAME="s5">5.</A> <A HREF="#toc5">Extensions</A></H2>
 
 
 <P>This cc65 version has some extensions to the ISO C standard.</P>
@@ -729,7 +786,7 @@ size zero, even if it is initialized.
 
 
 
-<H2><A NAME="s6">6. Predefined macros</A></H2>
+<H2><A NAME="s6">6.</A> <A HREF="#toc6">Predefined macros</A></H2>
 
 
 <P>The compiler defines several macros at startup:</P>
@@ -852,7 +909,7 @@ translation unit in the form "hh:mm:ss".</P>
 </P>
 
 
-<H2><A NAME="pragmas"></A> <A NAME="s7">7. #pragmas</A></H2>
+<H2><A NAME="pragmas"></A> <A NAME="s7">7.</A> <A HREF="#toc7">#pragmas</A></H2>
 
 
 <P>The compiler understands some pragmas that may be used to change code
@@ -861,7 +918,7 @@ If the first parameter is <CODE>push</CODE>, the old value is saved onto a stack
 before changing it. The value may later be restored by using the <CODE>pop</CODE>
 parameter with the <CODE>#pragma</CODE>.</P>
 
-<H2><A NAME="pragma-bss-name"></A> <A NAME="ss7.1">7.1 <CODE>#pragma bss-name ([push,] &lt;name&gt;)</CODE></A>
+<H2><A NAME="pragma-bss-name"></A> <A NAME="ss7.1">7.1</A> <A HREF="#toc7.1"><CODE>#pragma bss-name ([push,] &lt;name&gt;)</CODE></A>
 </H2>
 
 
@@ -885,7 +942,7 @@ uninitialized variables do not have the value zero.</P>
 </P>
 
 
-<H2><A NAME="pragma-charmap"></A> <A NAME="ss7.2">7.2 <CODE>#pragma charmap (&lt;index&gt;, &lt;code&gt;)</CODE></A>
+<H2><A NAME="pragma-charmap"></A> <A NAME="ss7.2">7.2</A> <A HREF="#toc7.2"><CODE>#pragma charmap (&lt;index&gt;, &lt;code&gt;)</CODE></A>
 </H2>
 
 
@@ -922,7 +979,7 @@ character literals and use numeric character codes instead.</LI>
 </P>
 
 
-<H2><A NAME="pragma-check-stack"></A> <A NAME="ss7.3">7.3 <CODE>#pragma check-stack ([push,] on|off)</CODE></A>
+<H2><A NAME="pragma-check-stack"></A> <A NAME="ss7.3">7.3</A> <A HREF="#toc7.3"><CODE>#pragma check-stack ([push,] on|off)</CODE></A>
 </H2>
 
 
@@ -935,7 +992,7 @@ detected, the program is aborted.</P>
 they're enabled.</P>
 <P>The <CODE>#pragma</CODE> understands the push and pop parameters as explained above.</P>
 
-<H2><A NAME="pragma-code-name"></A> <A NAME="ss7.4">7.4 <CODE>#pragma code-name ([push,] &lt;name&gt;)</CODE></A>
+<H2><A NAME="pragma-code-name"></A> <A NAME="ss7.4">7.4</A> <A HREF="#toc7.4"><CODE>#pragma code-name ([push,] &lt;name&gt;)</CODE></A>
 </H2>
 
 
@@ -956,7 +1013,7 @@ configuration file.</P>
 </P>
 
 
-<H2><A NAME="pragma-codesize"></A> <A NAME="ss7.5">7.5 <CODE>#pragma codesize ([push,] &lt;int&gt;)</CODE></A>
+<H2><A NAME="pragma-codesize"></A> <A NAME="ss7.5">7.5</A> <A HREF="#toc7.5"><CODE>#pragma codesize ([push,] &lt;int&gt;)</CODE></A>
 </H2>
 
 
@@ -967,7 +1024,7 @@ generation and optimization phase. It gives the allowed size increase factor
 <P>The <CODE>#pragma</CODE> understands the push and pop parameters as explained above.</P>
 
 
-<H2><A NAME="pragma-data-name"></A> <A NAME="ss7.6">7.6 <CODE>#pragma data-name ([push,] &lt;name&gt;)</CODE></A>
+<H2><A NAME="pragma-data-name"></A> <A NAME="ss7.6">7.6</A> <A HREF="#toc7.6"><CODE>#pragma data-name ([push,] &lt;name&gt;)</CODE></A>
 </H2>
 
 
@@ -988,7 +1045,7 @@ configuration file.</P>
 </P>
 
 
-<H2><A NAME="pragma-local-strings"></A> <A NAME="ss7.7">7.7 <CODE>#pragma local-strings ([push,] on|off)</CODE></A>
+<H2><A NAME="pragma-local-strings"></A> <A NAME="ss7.7">7.7</A> <A HREF="#toc7.7"><CODE>#pragma local-strings ([push,] on|off)</CODE></A>
 </H2>
 
 
@@ -1003,7 +1060,7 @@ or rodata segment, but cannot be merged. When inactive, string literals are
 remembered and output as a whole when translation is finished.</P>
 
 
-<H2><A NAME="pragma-optimize"></A> <A NAME="ss7.8">7.8 <CODE>#pragma optimize ([push,] on|off)</CODE></A>
+<H2><A NAME="pragma-optimize"></A> <A NAME="ss7.8">7.8</A> <A HREF="#toc7.8"><CODE>#pragma optimize ([push,] on|off)</CODE></A>
 </H2>
 
 
@@ -1018,7 +1075,7 @@ determine if the generated code is optimized or not.</P>
 <P>The <CODE>#pragma</CODE> understands the push and pop parameters as explained above.</P>
 
 
-<H2><A NAME="pragma-rodata-name"></A> <A NAME="ss7.9">7.9 <CODE>#pragma rodata-name ([push,] &lt;name&gt;)</CODE></A>
+<H2><A NAME="pragma-rodata-name"></A> <A NAME="ss7.9">7.9</A> <A HREF="#toc7.9"><CODE>#pragma rodata-name ([push,] &lt;name&gt;)</CODE></A>
 </H2>
 
 
@@ -1039,7 +1096,7 @@ configuration file.</P>
 </P>
 
 
-<H2><A NAME="pragma-regvaraddr"></A> <A NAME="ss7.10">7.10 <CODE>#pragma regvaraddr ([push,] on|off)</CODE></A>
+<H2><A NAME="pragma-regvaraddr"></A> <A NAME="ss7.10">7.10</A> <A HREF="#toc7.10"><CODE>#pragma regvaraddr ([push,] on|off)</CODE></A>
 </H2>
 
 
@@ -1066,7 +1123,7 @@ register variables. So be careful with this #pragma.</P>
 </P>
 
 
-<H2><A NAME="pragma-register-vars"></A> <A NAME="ss7.11">7.11 <CODE>#pragma register-vars ([push,] on|off)</CODE></A>
+<H2><A NAME="pragma-register-vars"></A> <A NAME="ss7.11">7.11</A> <A HREF="#toc7.11"><CODE>#pragma register-vars ([push,] on|off)</CODE></A>
 </H2>
 
 
@@ -1077,7 +1134,7 @@ variables are explained in more detail in
 <P>The <CODE>#pragma</CODE> understands the push and pop parameters as explained above.</P>
 
 
-<H2><A NAME="pragma-signed-chars"></A> <A NAME="ss7.12">7.12 <CODE>#pragma signed-chars ([push,] on|off)</CODE></A>
+<H2><A NAME="pragma-signed-chars"></A> <A NAME="ss7.12">7.12</A> <A HREF="#toc7.12"><CODE>#pragma signed-chars ([push,] on|off)</CODE></A>
 </H2>
 
 
@@ -1089,7 +1146,7 @@ better code. This default may be overridden by the <CODE>
 <P>The <CODE>#pragma</CODE> understands the push and pop parameters as explained above.</P>
 
 
-<H2><A NAME="pragma-static-locals"></A> <A NAME="ss7.13">7.13 <CODE>#pragma static-locals ([push,] on|off)</CODE></A>
+<H2><A NAME="pragma-static-locals"></A> <A NAME="ss7.13">7.13</A> <A HREF="#toc7.13"><CODE>#pragma static-locals ([push,] on|off)</CODE></A>
 </H2>
 
 
@@ -1101,7 +1158,7 @@ most cases faster, but non-reentrant code.</P>
 <P>The <CODE>#pragma</CODE> understands the push and pop parameters as explained above.</P>
 
 
-<H2><A NAME="pragma-warn"></A> <A NAME="ss7.14">7.14 <CODE>#pragma warn (name, [push,] on|off)</CODE></A>
+<H2><A NAME="pragma-warn"></A> <A NAME="ss7.14">7.14</A> <A HREF="#toc7.14"><CODE>#pragma warn (name, [push,] on|off)</CODE></A>
 </H2>
 
 
@@ -1126,7 +1183,7 @@ changing it.</P>
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="pragma-writable-strings"></A> <A NAME="ss7.15">7.15 <CODE>#pragma writable-strings ([push,] on|off)</CODE></A>
+<H2><A NAME="pragma-writable-strings"></A> <A NAME="ss7.15">7.15</A> <A HREF="#toc7.15"><CODE>#pragma writable-strings ([push,] on|off)</CODE></A>
 </H2>
 
 
@@ -1142,7 +1199,7 @@ worry.</P>
 <P>The <CODE>#pragma</CODE> understands the push and pop parameters as explained above.</P>
 
 
-<H2><A NAME="ss7.16">7.16 <CODE>#pragma zpsym (&lt;name&gt;)</CODE></A>
+<H2><A NAME="ss7.16">7.16</A> <A HREF="#toc7.16"><CODE>#pragma zpsym (&lt;name&gt;)</CODE></A>
 </H2>
 
 
@@ -1162,7 +1219,7 @@ The compiler will create a matching import declaration for the assembler.</P>
 
 
 
-<H2><A NAME="register-vars"></A> <A NAME="s8">8. Register variables</A></H2>
+<H2><A NAME="register-vars"></A> <A NAME="s8">8.</A> <A HREF="#toc8">Register variables</A></H2>
 
 
 <P>The runtime for all supported platforms has 6 bytes of zero page space
@@ -1202,7 +1259,7 @@ bloated code and a slowdown.</P>
 
 
 
-<H2><A NAME="inline-asm"></A> <A NAME="s9">9. Inline assembler</A></H2>
+<H2><A NAME="inline-asm"></A> <A NAME="s9">9.</A> <A HREF="#toc9">Inline assembler</A></H2>
 
 
 <P>The compiler allows to insert assembler statements into the output file. The
@@ -1361,14 +1418,14 @@ a future version. Instead use the format specifiers from the table above:</P>
 
 
 
-<H2><A NAME="s10">10. Implementation-defined behavior</A></H2>
+<H2><A NAME="s10">10.</A> <A HREF="#toc10">Implementation-defined behavior</A></H2>
 
 
 <P>This section describes the behavior of cc65 when the standard describes the
 behavior as implementation-defined.</P>
 <P>(to be done)</P>
 
-<H2><A NAME="s11">11. Copyright</A></H2>
+<H2><A NAME="s11">11.</A> <A HREF="#toc11">Copyright</A></H2>
 
 
 <P>This is the original compiler copyright:</P>

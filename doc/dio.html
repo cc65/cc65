@@ -13,7 +13,21 @@
 <EM>The cc65 library provides functions to read and write raw disk sectors.
 Include the dio.h header file to get the necessary definitions.</EM>
 <HR>
-<H2><A NAME="s1">1. Opening the disk for low level I/O</A></H2>
+<P>
+<H2><A NAME="toc1">1.</A> <A HREF="dio.html#s1">Opening the disk for low level I/O</A></H2>
+
+<P>
+<H2><A NAME="toc2">2.</A> <A HREF="dio.html#s2">Reading and writing sectors</A></H2>
+
+<P>
+<H2><A NAME="toc3">3.</A> <A HREF="dio.html#s3">Querying sector size and count</A></H2>
+
+<P>
+<H2><A NAME="toc4">4.</A> <A HREF="dio.html#s4">Converting sector numbers</A></H2>
+
+
+<HR>
+<H2><A NAME="s1">1.</A> <A HREF="#toc1">Opening the disk for low level I/O</A></H2>
 
 
 <P>Prior to using these functions a handle to the device has to be obtained. This
@@ -38,7 +52,7 @@ device, 1 the second, and so on.</P>
 <P>Closes a handle obtained by <CODE>dio_open</CODE>. Returns status code.</P>
 
 
-<H2><A NAME="s2">2. Reading and writing sectors</A></H2>
+<H2><A NAME="s2">2.</A> <A HREF="#toc2">Reading and writing sectors</A></H2>
 
 
 <P>The read and write functions are:</P>
@@ -86,7 +100,7 @@ function to query the number of available sectors.</P>
 case of failure.</P>
 
 
-<H2><A NAME="sectsizecount"></A> <A NAME="s3">3. Querying sector size and count</A></H2>
+<H2><A NAME="sectsizecount"></A> <A NAME="s3">3.</A> <A HREF="#toc3">Querying sector size and count</A></H2>
 
 
 <P>Some systems support multiple diskette formats which have different sector sizes
@@ -114,7 +128,7 @@ specific platform documentation.</P>
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="s4">4. Converting sector numbers</A></H2>
+<H2><A NAME="s4">4.</A> <A HREF="#toc4">Converting sector numbers</A></H2>
 
 
 <P>Since the read and write functions expect a sector number, for systems where

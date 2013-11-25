@@ -178,7 +178,7 @@ $1_STCS = $$(patsubst $$($1_DRVPAT),$$($1_STCPAT),$$($1_DRVS))
 $$($1_OBJS): | $$($1_OBJDIR)
 
 $$($1_DRVPAT): $$($1_OBJPAT) $$(ZPOBJ) | $$($1_DRVDIR)
-	@echo $$(TARGET) - $$(@F)
+	@echo $$(TARGET) - $$(<F)
 	@$$(LD65) -o $$@ -t module $$^
 
 $$($1_OBJDIR) $$($1_DRVDIR):
@@ -237,7 +237,7 @@ endef
 	$(COMPILE_recipe)
 
 $(EXTRA_OBJPAT): $(EXTRA_SRCPAT) | ../lib
-	@echo $(TARGET) - $(@F)
+	@echo $(TARGET) - $(<F)
 	@$(CA65) -t $(TARGET) $(CA65FLAGS) -o $@ $<
 
 ../lib/$(TARGET).lib: $(OBJS) | ../lib

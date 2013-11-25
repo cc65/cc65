@@ -16,7 +16,40 @@
 <HR>
 <EM>How to use the cc65 C language system -- an introduction.</EM>
 <HR>
-<H2><A NAME="s1">1. Overview</A></H2>
+<P>
+<H2><A NAME="toc1">1.</A> <A HREF="intro.html#s1">Overview</A></H2>
+
+<UL>
+<LI><A NAME="toc1.1">1.1</A> <A HREF="intro.html#ss1.1">Before we start</A>
+<LI><A NAME="toc1.2">1.2</A> <A HREF="intro.html#ss1.2">The sample modules</A>
+<LI><A NAME="toc1.3">1.3</A> <A HREF="intro.html#ss1.3">Translation phases</A>
+</UL>
+<P>
+<H2><A NAME="toc2">2.</A> <A HREF="intro.html#s2">The compiler</A></H2>
+
+<P>
+<H2><A NAME="toc3">3.</A> <A HREF="intro.html#s3">The assembler</A></H2>
+
+<P>
+<H2><A NAME="toc4">4.</A> <A HREF="intro.html#s4">The linker</A></H2>
+
+<P>
+<H2><A NAME="toc5">5.</A> <A HREF="intro.html#s5">The easy way (using the cl65 utility)</A></H2>
+
+<P>
+<H2><A NAME="toc6">6.</A> <A HREF="intro.html#s6">Running The Executable</A></H2>
+
+<UL>
+<LI><A NAME="toc6.1">6.1</A> <A HREF="intro.html#ss6.1">Apple</A>
+<LI><A NAME="toc6.2">6.2</A> <A HREF="intro.html#ss6.2">Atari</A>
+<LI><A NAME="toc6.3">6.3</A> <A HREF="intro.html#ss6.3">Atmos</A>
+<LI><A NAME="toc6.4">6.4</A> <A HREF="intro.html#ss6.4">Commodore</A>
+<LI><A NAME="toc6.5">6.5</A> <A HREF="intro.html#ss6.5">GEOS</A>
+<LI><A NAME="toc6.6">6.6</A> <A HREF="intro.html#ss6.6">Contributions wanted</A>
+</UL>
+
+<HR>
+<H2><A NAME="s1">1.</A> <A HREF="#toc1">Overview</A></H2>
 
 
 <P>This is a short intro of how to use the compiler and the bin-utils. It contains
@@ -44,7 +77,7 @@ described
 <A HREF="#using-cl65">later</A>.</P>
 
 
-<H2><A NAME="ss1.1">1.1 Before we start</A>
+<H2><A NAME="ss1.1">1.1</A> <A HREF="#toc1.1">Before we start</A>
 </H2>
 
 
@@ -56,7 +89,7 @@ missing include files and/or libraries, please check the environment variables
 installed cc65.</P>
 
 
-<H2><A NAME="ss1.2">1.2 The sample modules</A>
+<H2><A NAME="ss1.2">1.2</A> <A HREF="#toc1.2">The sample modules</A>
 </H2>
 
 
@@ -91,7 +124,7 @@ installed cc65.</P>
 </P>
 
 
-<H2><A NAME="ss1.3">1.3 Translation phases</A>
+<H2><A NAME="ss1.3">1.3</A> <A HREF="#toc1.3">Translation phases</A>
 </H2>
 
 
@@ -130,7 +163,7 @@ startup code is contained in the library, so you won't need to care about it.</P
 
 
 
-<H2><A NAME="s2">2. The compiler</A></H2>
+<H2><A NAME="s2">2.</A> <A HREF="#toc2">The compiler</A></H2>
 
 
 <P>The compiler translates one C source into one assembly source, for each
@@ -158,7 +191,7 @@ assembly source for the <B>hello</B> module.</P>
 
 
 
-<H2><A NAME="s3">3. The assembler</A></H2>
+<H2><A NAME="s3">3.</A> <A HREF="#toc3">The assembler</A></H2>
 
 
 <P>The assembler translates one assembly source into an object file, for each
@@ -186,7 +219,7 @@ however).</P>
 
 
 
-<H2><A NAME="s4">4. The linker</A></H2>
+<H2><A NAME="s4">4.</A> <A HREF="#toc4">The linker</A></H2>
 
 
 <P>The linker combines several object and library files into one output file.
@@ -216,7 +249,7 @@ our C64!</P>
 
 
 
-<H2><A NAME="using-cl65"></A> <A NAME="s5">5. The easy way (using the cl65 utility)</A></H2>
+<H2><A NAME="using-cl65"></A> <A NAME="s5">5.</A> <A HREF="#toc5">The easy way (using the cl65 utility)</A></H2>
 
 
 <P>The <B>cl65</B> utility is able to do all of the steps described above, in just
@@ -244,7 +277,7 @@ current directory.</P>
 
 
 
-<H2><A NAME="s6">6. Running The Executable</A></H2>
+<H2><A NAME="s6">6.</A> <A HREF="#toc6">Running The Executable</A></H2>
 
 
 <P><EM>Note: this section is incomplete!</EM></P>
@@ -256,7 +289,7 @@ start, and wait for a keypress at the end of your program, as each target
 varies in its start and exit conditions.</P>
 
 
-<H2><A NAME="ss6.1">6.1 Apple</A>
+<H2><A NAME="ss6.1">6.1</A> <A HREF="#toc6.1">Apple</A>
 </H2>
 
 <H3>AppleWin</H3>
@@ -315,7 +348,7 @@ Schmidt,
 in completing this section.</P>
 
 
-<H2><A NAME="ss6.2">6.2 Atari</A>
+<H2><A NAME="ss6.2">6.2</A> <A HREF="#toc6.2">Atari</A>
 </H2>
 
 <H3>Atari800Win PLus</H3>
@@ -360,7 +393,7 @@ to the DOS menu.  Your C program should wait for a keypress if you want to see
 any output.</P>
 
 
-<H2><A NAME="ss6.3">6.3 Atmos</A>
+<H2><A NAME="ss6.3">6.3</A> <A HREF="#toc6.3">Atmos</A>
 </H2>
 
 <H3>Oricutron</H3>
@@ -395,7 +428,7 @@ CLOAD""
 <P>The emulation, also, supports that method.</P>
 
 
-<H2><A NAME="ss6.4">6.4 Commodore</A>
+<H2><A NAME="ss6.4">6.4</A> <A HREF="#toc6.4">Commodore</A>
 </H2>
 
 <H3>VICE</H3>
@@ -479,7 +512,7 @@ RUN "HELLO"
 prompt.</P>
 
 
-<H2><A NAME="ss6.5">6.5 GEOS</A>
+<H2><A NAME="ss6.5">6.5</A> <A HREF="#toc6.5">GEOS</A>
 </H2>
 
 <P>Available at <I>Click Here Software's</I> 
@@ -553,7 +586,7 @@ directory notePad.  Look at the eight file-positions on each page until you see
 reading it.</P>
 
 
-<H2><A NAME="ss6.6">6.6 Contributions wanted</A>
+<H2><A NAME="ss6.6">6.6</A> <A HREF="#toc6.6">Contributions wanted</A>
 </H2>
 
 

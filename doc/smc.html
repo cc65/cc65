@@ -12,7 +12,25 @@
 <EM>The 'smc.inc' macro package for ca65 eases the use, increases the safeness and
 self-explanation of 'self-modifying-code' (SMC).</EM>
 <HR>
-<H2><A NAME="s1">1. Overview</A></H2>
+<P>
+<H2><A NAME="toc1">1.</A> <A HREF="smc.html#s1">Overview</A></H2>
+
+<P>
+<H2><A NAME="toc2">2.</A> <A HREF="smc.html#s2">Usage</A></H2>
+
+<UL>
+<LI><A NAME="toc2.1">2.1</A> <A HREF="smc.html#ss2.1">Argument placeholders</A>
+<LI><A NAME="toc2.2">2.2</A> <A HREF="smc.html#ss2.2">Accessing opcodes</A>
+<LI><A NAME="toc2.3">2.3</A> <A HREF="smc.html#ss2.3">Accessing arguments</A>
+<LI><A NAME="toc2.4">2.4</A> <A HREF="smc.html#ss2.4">Operational macros</A>
+<LI><A NAME="toc2.5">2.5</A> <A HREF="smc.html#ss2.5">Scope macros</A>
+</UL>
+<P>
+<H2><A NAME="toc3">3.</A> <A HREF="smc.html#s3">A complex example</A></H2>
+
+
+<HR>
+<H2><A NAME="s1">1.</A> <A HREF="#toc1">Overview</A></H2>
 
 <P>When reading assembler sources, self modifying code is often hard to identify
 and applying it needs a lot of discipline.</P>
@@ -40,7 +58,7 @@ general purpose library with SMC excludes ROM targets!</P>
 <P>The latter is only needed if you also plan to modify opcodes and not only data
 within your code.</P>
 
-<H2><A NAME="s2">2. Usage</A></H2>
+<H2><A NAME="s2">2.</A> <A HREF="#toc2">Usage</A></H2>
 
 <P>The use of the macros is quite simple:</P>
 <P>Original:</P>
@@ -105,7 +123,7 @@ notice that below, quite eye catching defined.</LI>
 </OL>
 </P>
 
-<H2><A NAME="ss2.1">2.1 Argument placeholders</A>
+<H2><A NAME="ss2.1">2.1</A> <A HREF="#toc2.1">Argument placeholders</A>
 </H2>
 
 
@@ -148,7 +166,7 @@ disassembly, because '<CODE>$DE</CODE>' is interpreted as '<CODE>DEC abx</CODE>'
 a valid placeholder instruction may be better:</P>
 <P><CODE>SMC Example, { sta SMC_AbsAdr }     ; Note: Opcode will be modified too!</CODE></P>
 
-<H2><A NAME="ss2.2">2.2 Accessing opcodes</A>
+<H2><A NAME="ss2.2">2.2</A> <A HREF="#toc2.2">Accessing opcodes</A>
 </H2>
 
 
@@ -210,7 +228,7 @@ SMC AdaptUnderlineWidth, { NOP }
 </DL>
 </P>
 
-<H2><A NAME="ss2.3">2.3 Accessing arguments</A>
+<H2><A NAME="ss2.3">2.3</A> <A HREF="#toc2.3">Accessing arguments</A>
 </H2>
 
 
@@ -468,7 +486,7 @@ SMC GetData, { LDA SMC_AbsAdr }
 </DL>
 </P>
 
-<H2><A NAME="ss2.4">2.4 Operational macros</A>
+<H2><A NAME="ss2.4">2.4</A> <A HREF="#toc2.4">Operational macros</A>
 </H2>
 
 
@@ -520,7 +538,7 @@ SMC GetPageData, { LDA SourceData, X }
 </DL>
 </P>
 
-<H2><A NAME="ss2.5">2.5 Scope macros</A>
+<H2><A NAME="ss2.5">2.5</A> <A HREF="#toc2.5">Scope macros</A>
 </H2>
 
 
@@ -564,7 +582,7 @@ SMC_Import GetValueLoader
 </DL>
 </P>
 
-<H2><A NAME="s3">3. A complex example</A></H2>
+<H2><A NAME="s3">3.</A> <A HREF="#toc3">A complex example</A></H2>
 
 <P>Let's have a look on a quite sophisticated example for the usage of SMC. It
 not only modifies code, but also the modification of the code is modified -

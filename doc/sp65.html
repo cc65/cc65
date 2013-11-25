@@ -14,7 +14,52 @@
 It is used to convert graphics and bitmaps into the target formats of the
 supported machines.</EM>
 <HR>
-<H2><A NAME="s1">1. Overview</A></H2>
+<P>
+<H2><A NAME="toc1">1.</A> <A HREF="sp65.html#s1">Overview</A></H2>
+
+<P>
+<H2><A NAME="toc2">2.</A> <A HREF="sp65.html#s2">Usage</A></H2>
+
+<UL>
+<LI><A NAME="toc2.1">2.1</A> <A HREF="sp65.html#ss2.1">Command line option overview</A>
+<LI><A NAME="toc2.2">2.2</A> <A HREF="sp65.html#ss2.2">Command line options in detail</A>
+</UL>
+<P>
+<H2><A NAME="toc3">3.</A> <A HREF="sp65.html#s3">Processing pipeline</A></H2>
+
+<P>
+<H2><A NAME="toc4">4.</A> <A HREF="sp65.html#s4">Attribute lists</A></H2>
+
+<P>
+<H2><A NAME="toc5">5.</A> <A HREF="sp65.html#s5">Input formats</A></H2>
+
+<UL>
+<LI><A NAME="toc5.1">5.1</A> <A HREF="sp65.html#ss5.1">PCX</A>
+</UL>
+<P>
+<H2><A NAME="toc6">6.</A> <A HREF="sp65.html#s6">Conversions</A></H2>
+
+<UL>
+<LI><A NAME="toc6.1">6.1</A> <A HREF="sp65.html#ss6.1">GEOS bitmap</A>
+<LI><A NAME="toc6.2">6.2</A> <A HREF="sp65.html#ss6.2">GEOS icon</A>
+<LI><A NAME="toc6.3">6.3</A> <A HREF="sp65.html#ss6.3">Koala image</A>
+<LI><A NAME="toc6.4">6.4</A> <A HREF="sp65.html#ss6.4">Lynx sprite</A>
+<LI><A NAME="toc6.5">6.5</A> <A HREF="sp65.html#ss6.5">VIC2 sprite</A>
+</UL>
+<P>
+<H2><A NAME="toc7">7.</A> <A HREF="sp65.html#s7">Output formats</A></H2>
+
+<UL>
+<LI><A NAME="toc7.1">7.1</A> <A HREF="sp65.html#ss7.1">Binary</A>
+<LI><A NAME="toc7.2">7.2</A> <A HREF="sp65.html#ss7.2">Assembler code</A>
+<LI><A NAME="toc7.3">7.3</A> <A HREF="sp65.html#ss7.3">C code</A>
+</UL>
+<P>
+<H2><A NAME="toc8">8.</A> <A HREF="sp65.html#s8">Copyright</A></H2>
+
+
+<HR>
+<H2><A NAME="s1">1.</A> <A HREF="#toc1">Overview</A></H2>
 
 
 <P>sp65 is a tool that converts images from common formats into formats used
@@ -26,12 +71,12 @@ formats is easy. The final output is either binary, or C/assembler source.</P>
 
 
 
-<H2><A NAME="s2">2. Usage</A></H2>
+<H2><A NAME="s2">2.</A> <A HREF="#toc2">Usage</A></H2>
 
 
 
 
-<H2><A NAME="ss2.1">2.1 Command line option overview</A>
+<H2><A NAME="ss2.1">2.1</A> <A HREF="#toc2.1">Command line option overview</A>
 </H2>
 
 
@@ -66,7 +111,7 @@ Long options:
 </P>
 
 
-<H2><A NAME="ss2.2">2.2 Command line options in detail</A>
+<H2><A NAME="ss2.2">2.2</A> <A HREF="#toc2.2">Command line options in detail</A>
 </H2>
 
 
@@ -134,7 +179,7 @@ information.</P>
 
 
 
-<H2><A NAME="processing-pipeline"></A> <A NAME="s3">3. Processing pipeline</A></H2>
+<H2><A NAME="processing-pipeline"></A> <A NAME="s3">3.</A> <A HREF="#toc3">Processing pipeline</A></H2>
 
 
 <P>sp65 consists of</P>
@@ -152,7 +197,7 @@ writes this binary data to disk in one of several forms.</P>
 
 
 
-<H2><A NAME="attr-lists"></A> <A NAME="s4">4. Attribute lists</A></H2>
+<H2><A NAME="attr-lists"></A> <A NAME="s4">4.</A> <A HREF="#toc4">Attribute lists</A></H2>
 
 
 <P>As described in 
@@ -238,14 +283,14 @@ below.</P>
 
 
 
-<H2><A NAME="input-formats"></A> <A NAME="s5">5. Input formats</A></H2>
+<H2><A NAME="input-formats"></A> <A NAME="s5">5.</A> <A HREF="#toc5">Input formats</A></H2>
 
 
 <P>Input formats are either specified explicitly when using <CODE>
 <A HREF="#option--read">--read</A></CODE>, or are determined by looking at the
 extension of the file name given.</P>
 
-<H2><A NAME="ss5.1">5.1 PCX</A>
+<H2><A NAME="ss5.1">5.1</A> <A HREF="#toc5.1">PCX</A>
 </H2>
 
 
@@ -254,11 +299,11 @@ format. There are no additional attributes for this format.</P>
 
 
 
-<H2><A NAME="conversions"></A> <A NAME="s6">6. Conversions</A></H2>
+<H2><A NAME="conversions"></A> <A NAME="s6">6.</A> <A HREF="#toc6">Conversions</A></H2>
 
 
 
-<H2><A NAME="ss6.1">6.1 GEOS bitmap</A>
+<H2><A NAME="ss6.1">6.1</A> <A HREF="#toc6.1">GEOS bitmap</A>
 </H2>
 
 
@@ -268,7 +313,7 @@ in 'The Official GEOS Programmers Reference Guide', chapter 4, section
 'Bit-Mapped Graphics'.</P>
 
 
-<H2><A NAME="ss6.2">6.2 GEOS icon</A>
+<H2><A NAME="ss6.2">6.2</A> <A HREF="#toc6.2">GEOS icon</A>
 </H2>
 
 
@@ -277,13 +322,13 @@ has the same format as a C64 high resolution sprite (24x21, monochrome, 63
 bytes). There are no additional attributes for this conversion.</P>
 
 
-<H2><A NAME="ss6.3">6.3 Koala image</A>
+<H2><A NAME="ss6.3">6.3</A> <A HREF="#toc6.3">Koala image</A>
 </H2>
 
 
 
 
-<H2><A NAME="ss6.4">6.4 Lynx sprite</A>
+<H2><A NAME="ss6.4">6.4</A> <A HREF="#toc6.4">Lynx sprite</A>
 </H2>
 
 
@@ -334,7 +379,7 @@ around the anchor point. The default value is 0 (top).</P>
 </DL>
 </P>
 
-<H2><A NAME="ss6.5">6.5 VIC2 sprite</A>
+<H2><A NAME="ss6.5">6.5</A> <A HREF="#toc6.5">VIC2 sprite</A>
 </H2>
 
 
@@ -342,7 +387,7 @@ around the anchor point. The default value is 0 (top).</P>
 
 
 
-<H2><A NAME="output-formats"></A> <A NAME="s7">7. Output formats</A></H2>
+<H2><A NAME="output-formats"></A> <A NAME="s7">7.</A> <A HREF="#toc7">Output formats</A></H2>
 
 
 <P>Using <CODE>
@@ -353,7 +398,7 @@ attribute named "format". If this attribute doesn't exist, the output format
 is determined by looking at the file name extension.</P>
 
 
-<H2><A NAME="ss7.1">7.1 Binary</A>
+<H2><A NAME="ss7.1">7.1</A> <A HREF="#toc7.1">Binary</A>
 </H2>
 
 
@@ -362,7 +407,7 @@ binary format. There are no additional attributes (besides "name" and
 "format") for this output format.</P>
 
 
-<H2><A NAME="ss7.2">7.2 Assembler code</A>
+<H2><A NAME="ss7.2">7.2</A> <A HREF="#toc7.2">Assembler code</A>
 </H2>
 
 
@@ -392,7 +437,7 @@ and <CODE>HEIGHT</CODE>.</P>
 
 
 
-<H2><A NAME="ss7.3">7.3 C code</A>
+<H2><A NAME="ss7.3">7.3</A> <A HREF="#toc7.3">C code</A>
 </H2>
 
 
@@ -421,7 +466,7 @@ three <CODE>#define</CODE>s are added for <CODE>&lt;ident&gt;_COLORS</CODE>,
 
 
 
-<H2><A NAME="s8">8. Copyright</A></H2>
+<H2><A NAME="s8">8.</A> <A HREF="#toc8">Copyright</A></H2>
 
 
 <P>sp65 (and all cc65 binutils) are (C) Copyright 1998-2012 Ullrich von Bassewitz

@@ -14,7 +14,280 @@
 used as a companion assembler for the cc65 crosscompiler, but it may also be
 used as a standalone product.</EM>
 <HR>
-<H2><A NAME="s1">1. Overview</A></H2>
+<P>
+<H2><A NAME="toc1">1.</A> <A HREF="ca65.html#s1">Overview</A></H2>
+
+<UL>
+<LI><A NAME="toc1.1">1.1</A> <A HREF="ca65.html#ss1.1">Design criteria</A>
+</UL>
+<P>
+<H2><A NAME="toc2">2.</A> <A HREF="ca65.html#s2">Usage</A></H2>
+
+<UL>
+<LI><A NAME="toc2.1">2.1</A> <A HREF="ca65.html#ss2.1">Command line option overview</A>
+<LI><A NAME="toc2.2">2.2</A> <A HREF="ca65.html#ss2.2">Command line options in detail</A>
+</UL>
+<P>
+<H2><A NAME="toc3">3.</A> <A HREF="ca65.html#s3">Search paths</A></H2>
+
+<P>
+<H2><A NAME="toc4">4.</A> <A HREF="ca65.html#s4">Input format</A></H2>
+
+<UL>
+<LI><A NAME="toc4.1">4.1</A> <A HREF="ca65.html#ss4.1">Assembler syntax</A>
+<LI><A NAME="toc4.2">4.2</A> <A HREF="ca65.html#ss4.2">65816 mode</A>
+<LI><A NAME="toc4.3">4.3</A> <A HREF="ca65.html#ss4.3">6502X mode</A>
+<LI><A NAME="toc4.4">4.4</A> <A HREF="ca65.html#ss4.4">sweet16 mode</A>
+<LI><A NAME="toc4.5">4.5</A> <A HREF="ca65.html#ss4.5">Number format</A>
+<LI><A NAME="toc4.6">4.6</A> <A HREF="ca65.html#ss4.6">Conditional assembly</A>
+</UL>
+<P>
+<H2><A NAME="toc5">5.</A> <A HREF="ca65.html#s5">Expressions</A></H2>
+
+<UL>
+<LI><A NAME="toc5.1">5.1</A> <A HREF="ca65.html#ss5.1">Expression evaluation</A>
+<LI><A NAME="toc5.2">5.2</A> <A HREF="ca65.html#ss5.2">Size of an expression result</A>
+<LI><A NAME="toc5.3">5.3</A> <A HREF="ca65.html#ss5.3">Boolean expressions</A>
+<LI><A NAME="toc5.4">5.4</A> <A HREF="ca65.html#ss5.4">Constant expressions</A>
+<LI><A NAME="toc5.5">5.5</A> <A HREF="ca65.html#ss5.5">Available operators</A>
+</UL>
+<P>
+<H2><A NAME="toc6">6.</A> <A HREF="ca65.html#s6">Symbols and labels</A></H2>
+
+<UL>
+<LI><A NAME="toc6.1">6.1</A> <A HREF="ca65.html#ss6.1">Numeric constants</A>
+<LI><A NAME="toc6.2">6.2</A> <A HREF="ca65.html#ss6.2">Numeric variables</A>
+<LI><A NAME="toc6.3">6.3</A> <A HREF="ca65.html#ss6.3">Standard labels</A>
+<LI><A NAME="toc6.4">6.4</A> <A HREF="ca65.html#ss6.4">Local labels and symbols</A>
+<LI><A NAME="toc6.5">6.5</A> <A HREF="ca65.html#ss6.5">Cheap local labels</A>
+<LI><A NAME="toc6.6">6.6</A> <A HREF="ca65.html#ss6.6">Unnamed labels</A>
+<LI><A NAME="toc6.7">6.7</A> <A HREF="ca65.html#ss6.7">Using macros to define labels and constants</A>
+<LI><A NAME="toc6.8">6.8</A> <A HREF="ca65.html#ss6.8">Symbols and <CODE>.DEBUGINFO</CODE></A>
+</UL>
+<P>
+<H2><A NAME="toc7">7.</A> <A HREF="ca65.html#s7">Scopes</A></H2>
+
+<UL>
+<LI><A NAME="toc7.1">7.1</A> <A HREF="ca65.html#ss7.1">Global scope</A>
+<LI><A NAME="toc7.2">7.2</A> <A HREF="ca65.html#ss7.2">Cheap locals</A>
+<LI><A NAME="toc7.3">7.3</A> <A HREF="ca65.html#ss7.3">Generic nested scopes</A>
+<LI><A NAME="toc7.4">7.4</A> <A HREF="ca65.html#ss7.4">Nested procedures</A>
+<LI><A NAME="toc7.5">7.5</A> <A HREF="ca65.html#ss7.5">Structs, unions and enums</A>
+<LI><A NAME="toc7.6">7.6</A> <A HREF="ca65.html#ss7.6">Explicit scope specification</A>
+<LI><A NAME="toc7.7">7.7</A> <A HREF="ca65.html#ss7.7">Scope search order</A>
+</UL>
+<P>
+<H2><A NAME="toc8">8.</A> <A HREF="ca65.html#s8">Address sizes and memory models</A></H2>
+
+<UL>
+<LI><A NAME="toc8.1">8.1</A> <A HREF="ca65.html#ss8.1">Address sizes</A>
+<LI><A NAME="toc8.2">8.2</A> <A HREF="ca65.html#ss8.2">Address sizes of segments</A>
+<LI><A NAME="toc8.3">8.3</A> <A HREF="ca65.html#ss8.3">Address sizes of symbols</A>
+<LI><A NAME="toc8.4">8.4</A> <A HREF="ca65.html#ss8.4">Memory models</A>
+</UL>
+<P>
+<H2><A NAME="toc9">9.</A> <A HREF="ca65.html#s9">Pseudo variables</A></H2>
+
+<UL>
+<LI><A NAME="toc9.1">9.1</A> <A HREF="ca65.html#ss9.1"><CODE>*</CODE></A>
+<LI><A NAME="toc9.2">9.2</A> <A HREF="ca65.html#ss9.2"><CODE>.CPU</CODE></A>
+<LI><A NAME="toc9.3">9.3</A> <A HREF="ca65.html#ss9.3"><CODE>.PARAMCOUNT</CODE></A>
+<LI><A NAME="toc9.4">9.4</A> <A HREF="ca65.html#ss9.4"><CODE>.TIME</CODE></A>
+<LI><A NAME="toc9.5">9.5</A> <A HREF="ca65.html#ss9.5"><CODE>.VERSION</CODE></A>
+</UL>
+<P>
+<H2><A NAME="toc10">10.</A> <A HREF="ca65.html#s10">Pseudo functions</A></H2>
+
+<UL>
+<LI><A NAME="toc10.1">10.1</A> <A HREF="ca65.html#ss10.1"><CODE>.BANK</CODE></A>
+<LI><A NAME="toc10.2">10.2</A> <A HREF="ca65.html#ss10.2"><CODE>.BANKBYTE</CODE></A>
+<LI><A NAME="toc10.3">10.3</A> <A HREF="ca65.html#ss10.3"><CODE>.BLANK</CODE></A>
+<LI><A NAME="toc10.4">10.4</A> <A HREF="ca65.html#ss10.4"><CODE>.CONCAT</CODE></A>
+<LI><A NAME="toc10.5">10.5</A> <A HREF="ca65.html#ss10.5"><CODE>.CONST</CODE></A>
+<LI><A NAME="toc10.6">10.6</A> <A HREF="ca65.html#ss10.6"><CODE>.HIBYTE</CODE></A>
+<LI><A NAME="toc10.7">10.7</A> <A HREF="ca65.html#ss10.7"><CODE>.HIWORD</CODE></A>
+<LI><A NAME="toc10.8">10.8</A> <A HREF="ca65.html#ss10.8"><CODE>.IDENT</CODE></A>
+<LI><A NAME="toc10.9">10.9</A> <A HREF="ca65.html#ss10.9"><CODE>.LEFT</CODE></A>
+<LI><A NAME="toc10.10">10.10</A> <A HREF="ca65.html#ss10.10"><CODE>.LOBYTE</CODE></A>
+<LI><A NAME="toc10.11">10.11</A> <A HREF="ca65.html#ss10.11"><CODE>.LOWORD</CODE></A>
+<LI><A NAME="toc10.12">10.12</A> <A HREF="ca65.html#ss10.12"><CODE>.MATCH</CODE></A>
+<LI><A NAME="toc10.13">10.13</A> <A HREF="ca65.html#ss10.13"><CODE>.MAX</CODE></A>
+<LI><A NAME="toc10.14">10.14</A> <A HREF="ca65.html#ss10.14"><CODE>.MID</CODE></A>
+<LI><A NAME="toc10.15">10.15</A> <A HREF="ca65.html#ss10.15"><CODE>.MIN</CODE></A>
+<LI><A NAME="toc10.16">10.16</A> <A HREF="ca65.html#ss10.16"><CODE>.REF, .REFERENCED</CODE></A>
+<LI><A NAME="toc10.17">10.17</A> <A HREF="ca65.html#ss10.17"><CODE>.RIGHT</CODE></A>
+<LI><A NAME="toc10.18">10.18</A> <A HREF="ca65.html#ss10.18"><CODE>.SIZEOF</CODE></A>
+<LI><A NAME="toc10.19">10.19</A> <A HREF="ca65.html#ss10.19"><CODE>.STRAT</CODE></A>
+<LI><A NAME="toc10.20">10.20</A> <A HREF="ca65.html#ss10.20"><CODE>.SPRINTF</CODE></A>
+<LI><A NAME="toc10.21">10.21</A> <A HREF="ca65.html#ss10.21"><CODE>.STRING</CODE></A>
+<LI><A NAME="toc10.22">10.22</A> <A HREF="ca65.html#ss10.22"><CODE>.STRLEN</CODE></A>
+<LI><A NAME="toc10.23">10.23</A> <A HREF="ca65.html#ss10.23"><CODE>.TCOUNT</CODE></A>
+<LI><A NAME="toc10.24">10.24</A> <A HREF="ca65.html#ss10.24"><CODE>.XMATCH</CODE></A>
+</UL>
+<P>
+<H2><A NAME="toc11">11.</A> <A HREF="ca65.html#s11">Control commands</A></H2>
+
+<UL>
+<LI><A NAME="toc11.1">11.1</A> <A HREF="ca65.html#ss11.1"><CODE>.A16</CODE></A>
+<LI><A NAME="toc11.2">11.2</A> <A HREF="ca65.html#ss11.2"><CODE>.A8</CODE></A>
+<LI><A NAME="toc11.3">11.3</A> <A HREF="ca65.html#ss11.3"><CODE>.ADDR</CODE></A>
+<LI><A NAME="toc11.4">11.4</A> <A HREF="ca65.html#ss11.4"><CODE>.ALIGN</CODE></A>
+<LI><A NAME="toc11.5">11.5</A> <A HREF="ca65.html#ss11.5"><CODE>.ASCIIZ</CODE></A>
+<LI><A NAME="toc11.6">11.6</A> <A HREF="ca65.html#ss11.6"><CODE>.ASSERT</CODE></A>
+<LI><A NAME="toc11.7">11.7</A> <A HREF="ca65.html#ss11.7"><CODE>.AUTOIMPORT</CODE></A>
+<LI><A NAME="toc11.8">11.8</A> <A HREF="ca65.html#ss11.8"><CODE>.BANKBYTES</CODE></A>
+<LI><A NAME="toc11.9">11.9</A> <A HREF="ca65.html#ss11.9"><CODE>.BSS</CODE></A>
+<LI><A NAME="toc11.10">11.10</A> <A HREF="ca65.html#ss11.10"><CODE>.BYT, .BYTE</CODE></A>
+<LI><A NAME="toc11.11">11.11</A> <A HREF="ca65.html#ss11.11"><CODE>.CASE</CODE></A>
+<LI><A NAME="toc11.12">11.12</A> <A HREF="ca65.html#ss11.12"><CODE>.CHARMAP</CODE></A>
+<LI><A NAME="toc11.13">11.13</A> <A HREF="ca65.html#ss11.13"><CODE>.CODE</CODE></A>
+<LI><A NAME="toc11.14">11.14</A> <A HREF="ca65.html#ss11.14"><CODE>.CONDES</CODE></A>
+<LI><A NAME="toc11.15">11.15</A> <A HREF="ca65.html#ss11.15"><CODE>.CONSTRUCTOR</CODE></A>
+<LI><A NAME="toc11.16">11.16</A> <A HREF="ca65.html#ss11.16"><CODE>.DATA</CODE></A>
+<LI><A NAME="toc11.17">11.17</A> <A HREF="ca65.html#ss11.17"><CODE>.DBYT</CODE></A>
+<LI><A NAME="toc11.18">11.18</A> <A HREF="ca65.html#ss11.18"><CODE>.DEBUGINFO</CODE></A>
+<LI><A NAME="toc11.19">11.19</A> <A HREF="ca65.html#ss11.19"><CODE>.DEFINE</CODE></A>
+<LI><A NAME="toc11.20">11.20</A> <A HREF="ca65.html#ss11.20"><CODE>.DELMAC, .DELMACRO</CODE></A>
+<LI><A NAME="toc11.21">11.21</A> <A HREF="ca65.html#ss11.21"><CODE>.DEF, .DEFINED</CODE></A>
+<LI><A NAME="toc11.22">11.22</A> <A HREF="ca65.html#ss11.22"><CODE>.DESTRUCTOR</CODE></A>
+<LI><A NAME="toc11.23">11.23</A> <A HREF="ca65.html#ss11.23"><CODE>.DWORD</CODE></A>
+<LI><A NAME="toc11.24">11.24</A> <A HREF="ca65.html#ss11.24"><CODE>.ELSE</CODE></A>
+<LI><A NAME="toc11.25">11.25</A> <A HREF="ca65.html#ss11.25"><CODE>.ELSEIF</CODE></A>
+<LI><A NAME="toc11.26">11.26</A> <A HREF="ca65.html#ss11.26"><CODE>.END</CODE></A>
+<LI><A NAME="toc11.27">11.27</A> <A HREF="ca65.html#ss11.27"><CODE>.ENDENUM</CODE></A>
+<LI><A NAME="toc11.28">11.28</A> <A HREF="ca65.html#ss11.28"><CODE>.ENDIF</CODE></A>
+<LI><A NAME="toc11.29">11.29</A> <A HREF="ca65.html#ss11.29"><CODE>.ENDMAC, .ENDMACRO</CODE></A>
+<LI><A NAME="toc11.30">11.30</A> <A HREF="ca65.html#ss11.30"><CODE>.ENDPROC</CODE></A>
+<LI><A NAME="toc11.31">11.31</A> <A HREF="ca65.html#ss11.31"><CODE>.ENDREP, .ENDREPEAT</CODE></A>
+<LI><A NAME="toc11.32">11.32</A> <A HREF="ca65.html#ss11.32"><CODE>.ENDSCOPE</CODE></A>
+<LI><A NAME="toc11.33">11.33</A> <A HREF="ca65.html#ss11.33"><CODE>.ENDSTRUCT</CODE></A>
+<LI><A NAME="toc11.34">11.34</A> <A HREF="ca65.html#ss11.34"><CODE>.ENDUNION</CODE></A>
+<LI><A NAME="toc11.35">11.35</A> <A HREF="ca65.html#ss11.35"><CODE>.ENUM</CODE></A>
+<LI><A NAME="toc11.36">11.36</A> <A HREF="ca65.html#ss11.36"><CODE>.ERROR</CODE></A>
+<LI><A NAME="toc11.37">11.37</A> <A HREF="ca65.html#ss11.37"><CODE>.EXITMAC, .EXITMACRO</CODE></A>
+<LI><A NAME="toc11.38">11.38</A> <A HREF="ca65.html#ss11.38"><CODE>.EXPORT</CODE></A>
+<LI><A NAME="toc11.39">11.39</A> <A HREF="ca65.html#ss11.39"><CODE>.EXPORTZP</CODE></A>
+<LI><A NAME="toc11.40">11.40</A> <A HREF="ca65.html#ss11.40"><CODE>.FARADDR</CODE></A>
+<LI><A NAME="toc11.41">11.41</A> <A HREF="ca65.html#ss11.41"><CODE>.FATAL</CODE></A>
+<LI><A NAME="toc11.42">11.42</A> <A HREF="ca65.html#ss11.42"><CODE>.FEATURE</CODE></A>
+<LI><A NAME="toc11.43">11.43</A> <A HREF="ca65.html#ss11.43"><CODE>.FILEOPT, .FOPT</CODE></A>
+<LI><A NAME="toc11.44">11.44</A> <A HREF="ca65.html#ss11.44"><CODE>.FORCEIMPORT</CODE></A>
+<LI><A NAME="toc11.45">11.45</A> <A HREF="ca65.html#ss11.45"><CODE>.GLOBAL</CODE></A>
+<LI><A NAME="toc11.46">11.46</A> <A HREF="ca65.html#ss11.46"><CODE>.GLOBALZP</CODE></A>
+<LI><A NAME="toc11.47">11.47</A> <A HREF="ca65.html#ss11.47"><CODE>.HIBYTES</CODE></A>
+<LI><A NAME="toc11.48">11.48</A> <A HREF="ca65.html#ss11.48"><CODE>.I16</CODE></A>
+<LI><A NAME="toc11.49">11.49</A> <A HREF="ca65.html#ss11.49"><CODE>.I8</CODE></A>
+<LI><A NAME="toc11.50">11.50</A> <A HREF="ca65.html#ss11.50"><CODE>.IF</CODE></A>
+<LI><A NAME="toc11.51">11.51</A> <A HREF="ca65.html#ss11.51"><CODE>.IFBLANK</CODE></A>
+<LI><A NAME="toc11.52">11.52</A> <A HREF="ca65.html#ss11.52"><CODE>.IFCONST</CODE></A>
+<LI><A NAME="toc11.53">11.53</A> <A HREF="ca65.html#ss11.53"><CODE>.IFDEF</CODE></A>
+<LI><A NAME="toc11.54">11.54</A> <A HREF="ca65.html#ss11.54"><CODE>.IFNBLANK</CODE></A>
+<LI><A NAME="toc11.55">11.55</A> <A HREF="ca65.html#ss11.55"><CODE>.IFNDEF</CODE></A>
+<LI><A NAME="toc11.56">11.56</A> <A HREF="ca65.html#ss11.56"><CODE>.IFNREF</CODE></A>
+<LI><A NAME="toc11.57">11.57</A> <A HREF="ca65.html#ss11.57"><CODE>.IFP02</CODE></A>
+<LI><A NAME="toc11.58">11.58</A> <A HREF="ca65.html#ss11.58"><CODE>.IFP816</CODE></A>
+<LI><A NAME="toc11.59">11.59</A> <A HREF="ca65.html#ss11.59"><CODE>.IFPC02</CODE></A>
+<LI><A NAME="toc11.60">11.60</A> <A HREF="ca65.html#ss11.60"><CODE>.IFPSC02</CODE></A>
+<LI><A NAME="toc11.61">11.61</A> <A HREF="ca65.html#ss11.61"><CODE>.IFREF</CODE></A>
+<LI><A NAME="toc11.62">11.62</A> <A HREF="ca65.html#ss11.62"><CODE>.IMPORT</CODE></A>
+<LI><A NAME="toc11.63">11.63</A> <A HREF="ca65.html#ss11.63"><CODE>.IMPORTZP</CODE></A>
+<LI><A NAME="toc11.64">11.64</A> <A HREF="ca65.html#ss11.64"><CODE>.INCBIN</CODE></A>
+<LI><A NAME="toc11.65">11.65</A> <A HREF="ca65.html#ss11.65"><CODE>.INCLUDE</CODE></A>
+<LI><A NAME="toc11.66">11.66</A> <A HREF="ca65.html#ss11.66"><CODE>.INTERRUPTOR</CODE></A>
+<LI><A NAME="toc11.67">11.67</A> <A HREF="ca65.html#ss11.67"><CODE>.LINECONT</CODE></A>
+<LI><A NAME="toc11.68">11.68</A> <A HREF="ca65.html#ss11.68"><CODE>.LIST</CODE></A>
+<LI><A NAME="toc11.69">11.69</A> <A HREF="ca65.html#ss11.69"><CODE>.LISTBYTES</CODE></A>
+<LI><A NAME="toc11.70">11.70</A> <A HREF="ca65.html#ss11.70"><CODE>.LOBYTES</CODE></A>
+<LI><A NAME="toc11.71">11.71</A> <A HREF="ca65.html#ss11.71"><CODE>.LOCAL</CODE></A>
+<LI><A NAME="toc11.72">11.72</A> <A HREF="ca65.html#ss11.72"><CODE>.LOCALCHAR</CODE></A>
+<LI><A NAME="toc11.73">11.73</A> <A HREF="ca65.html#ss11.73"><CODE>.MACPACK</CODE></A>
+<LI><A NAME="toc11.74">11.74</A> <A HREF="ca65.html#ss11.74"><CODE>.MAC, .MACRO</CODE></A>
+<LI><A NAME="toc11.75">11.75</A> <A HREF="ca65.html#ss11.75"><CODE>.ORG</CODE></A>
+<LI><A NAME="toc11.76">11.76</A> <A HREF="ca65.html#ss11.76"><CODE>.OUT</CODE></A>
+<LI><A NAME="toc11.77">11.77</A> <A HREF="ca65.html#ss11.77"><CODE>.P02</CODE></A>
+<LI><A NAME="toc11.78">11.78</A> <A HREF="ca65.html#ss11.78"><CODE>.P816</CODE></A>
+<LI><A NAME="toc11.79">11.79</A> <A HREF="ca65.html#ss11.79"><CODE>.PAGELEN, .PAGELENGTH</CODE></A>
+<LI><A NAME="toc11.80">11.80</A> <A HREF="ca65.html#ss11.80"><CODE>.PC02</CODE></A>
+<LI><A NAME="toc11.81">11.81</A> <A HREF="ca65.html#ss11.81"><CODE>.POPCPU</CODE></A>
+<LI><A NAME="toc11.82">11.82</A> <A HREF="ca65.html#ss11.82"><CODE>.POPSEG</CODE></A>
+<LI><A NAME="toc11.83">11.83</A> <A HREF="ca65.html#ss11.83"><CODE>.PROC</CODE></A>
+<LI><A NAME="toc11.84">11.84</A> <A HREF="ca65.html#ss11.84"><CODE>.PSC02</CODE></A>
+<LI><A NAME="toc11.85">11.85</A> <A HREF="ca65.html#ss11.85"><CODE>.PUSHCPU</CODE></A>
+<LI><A NAME="toc11.86">11.86</A> <A HREF="ca65.html#ss11.86"><CODE>.PUSHSEG</CODE></A>
+<LI><A NAME="toc11.87">11.87</A> <A HREF="ca65.html#ss11.87"><CODE>.RELOC</CODE></A>
+<LI><A NAME="toc11.88">11.88</A> <A HREF="ca65.html#ss11.88"><CODE>.REPEAT</CODE></A>
+<LI><A NAME="toc11.89">11.89</A> <A HREF="ca65.html#ss11.89"><CODE>.RES</CODE></A>
+<LI><A NAME="toc11.90">11.90</A> <A HREF="ca65.html#ss11.90"><CODE>.RODATA</CODE></A>
+<LI><A NAME="toc11.91">11.91</A> <A HREF="ca65.html#ss11.91"><CODE>.SCOPE</CODE></A>
+<LI><A NAME="toc11.92">11.92</A> <A HREF="ca65.html#ss11.92"><CODE>.SEGMENT</CODE></A>
+<LI><A NAME="toc11.93">11.93</A> <A HREF="ca65.html#ss11.93"><CODE>.SET</CODE></A>
+<LI><A NAME="toc11.94">11.94</A> <A HREF="ca65.html#ss11.94"><CODE>.SETCPU</CODE></A>
+<LI><A NAME="toc11.95">11.95</A> <A HREF="ca65.html#ss11.95"><CODE>.SMART</CODE></A>
+<LI><A NAME="toc11.96">11.96</A> <A HREF="ca65.html#ss11.96"><CODE>.STRUCT</CODE></A>
+<LI><A NAME="toc11.97">11.97</A> <A HREF="ca65.html#ss11.97"><CODE>.SUNPLUS</CODE></A>
+<LI><A NAME="toc11.98">11.98</A> <A HREF="ca65.html#ss11.98"><CODE>.TAG</CODE></A>
+<LI><A NAME="toc11.99">11.99</A> <A HREF="ca65.html#ss11.99"><CODE>.UNDEF, .UNDEFINE</CODE></A>
+<LI><A NAME="toc11.100">11.100</A> <A HREF="ca65.html#ss11.100"><CODE>.UNION</CODE></A>
+<LI><A NAME="toc11.101">11.101</A> <A HREF="ca65.html#ss11.101"><CODE>.WARNING</CODE></A>
+<LI><A NAME="toc11.102">11.102</A> <A HREF="ca65.html#ss11.102"><CODE>.WORD</CODE></A>
+<LI><A NAME="toc11.103">11.103</A> <A HREF="ca65.html#ss11.103"><CODE>.ZEROPAGE</CODE></A>
+</UL>
+<P>
+<H2><A NAME="toc12">12.</A> <A HREF="ca65.html#s12">Macros</A></H2>
+
+<UL>
+<LI><A NAME="toc12.1">12.1</A> <A HREF="ca65.html#ss12.1">Introduction</A>
+<LI><A NAME="toc12.2">12.2</A> <A HREF="ca65.html#ss12.2">Macros without parameters</A>
+<LI><A NAME="toc12.3">12.3</A> <A HREF="ca65.html#ss12.3">Parametrized macros</A>
+<LI><A NAME="toc12.4">12.4</A> <A HREF="ca65.html#ss12.4">Detecting parameter types</A>
+<LI><A NAME="toc12.5">12.5</A> <A HREF="ca65.html#ss12.5">Recursive macros</A>
+<LI><A NAME="toc12.6">12.6</A> <A HREF="ca65.html#ss12.6">Local symbols inside macros</A>
+<LI><A NAME="toc12.7">12.7</A> <A HREF="ca65.html#ss12.7">C style macros</A>
+<LI><A NAME="toc12.8">12.8</A> <A HREF="ca65.html#ss12.8">Characters in macros</A>
+<LI><A NAME="toc12.9">12.9</A> <A HREF="ca65.html#ss12.9">Deleting macros</A>
+</UL>
+<P>
+<H2><A NAME="toc13">13.</A> <A HREF="ca65.html#s13">Macro packages</A></H2>
+
+<UL>
+<LI><A NAME="toc13.1">13.1</A> <A HREF="ca65.html#ss13.1"><CODE>.MACPACK generic</CODE></A>
+<LI><A NAME="toc13.2">13.2</A> <A HREF="ca65.html#ss13.2"><CODE>.MACPACK longbranch</CODE></A>
+<LI><A NAME="toc13.3">13.3</A> <A HREF="ca65.html#ss13.3"><CODE>.MACPACK atari</CODE></A>
+<LI><A NAME="toc13.4">13.4</A> <A HREF="ca65.html#ss13.4"><CODE>.MACPACK cbm</CODE></A>
+<LI><A NAME="toc13.5">13.5</A> <A HREF="ca65.html#ss13.5"><CODE>.MACPACK cpu</CODE></A>
+</UL>
+<P>
+<H2><A NAME="toc14">14.</A> <A HREF="ca65.html#s14">Predefined constants</A></H2>
+
+<P>
+<H2><A NAME="toc15">15.</A> <A HREF="ca65.html#s15">Structs and unions</A></H2>
+
+<UL>
+<LI><A NAME="toc15.1">15.1</A> <A HREF="ca65.html#ss15.1">Structs and unions Overview</A>
+<LI><A NAME="toc15.2">15.2</A> <A HREF="ca65.html#ss15.2">Declaration</A>
+<LI><A NAME="toc15.3">15.3</A> <A HREF="ca65.html#ss15.3">The <CODE>.TAG</CODE> keyword</A>
+<LI><A NAME="toc15.4">15.4</A> <A HREF="ca65.html#ss15.4">Limitations</A>
+</UL>
+<P>
+<H2><A NAME="toc16">16.</A> <A HREF="ca65.html#s16">Module constructors/destructors</A></H2>
+
+<UL>
+<LI><A NAME="toc16.1">16.1</A> <A HREF="ca65.html#ss16.1">Module constructors/destructors Overview</A>
+<LI><A NAME="toc16.2">16.2</A> <A HREF="ca65.html#ss16.2">Calling order</A>
+<LI><A NAME="toc16.3">16.3</A> <A HREF="ca65.html#ss16.3">Pitfalls</A>
+</UL>
+<P>
+<H2><A NAME="toc17">17.</A> <A HREF="ca65.html#s17">Porting sources from other assemblers</A></H2>
+
+<UL>
+<LI><A NAME="toc17.1">17.1</A> <A HREF="ca65.html#ss17.1">TASS</A>
+</UL>
+<P>
+<H2><A NAME="toc18">18.</A> <A HREF="ca65.html#s18">Copyright</A></H2>
+
+
+<HR>
+<H2><A NAME="s1">1.</A> <A HREF="#toc1">Overview</A></H2>
 
 
 <P>ca65 is a replacement for the ra65 assembler that was part of the cc65 C
@@ -27,7 +300,7 @@ table handling) are taken from an older crossassembler named a816 written
 by me a long time ago.</P>
 
 
-<H2><A NAME="ss1.1">1.1 Design criteria</A>
+<H2><A NAME="ss1.1">1.1</A> <A HREF="#toc1.1">Design criteria</A>
 </H2>
 
 
@@ -79,12 +352,12 @@ fear of "GPL infecting" other code.</LI>
 
 
 
-<H2><A NAME="s2">2. Usage</A></H2>
+<H2><A NAME="s2">2.</A> <A HREF="#toc2">Usage</A></H2>
 
 
 
 
-<H2><A NAME="ss2.1">2.1 Command line option overview</A>
+<H2><A NAME="ss2.1">2.1</A> <A HREF="#toc2.1">Command line option overview</A>
 </H2>
 
 
@@ -139,7 +412,7 @@ Long options:
 </P>
 
 
-<H2><A NAME="ss2.2">2.2 Command line options in detail</A>
+<H2><A NAME="ss2.2">2.2</A> <A HREF="#toc2.2">Command line options in detail</A>
 </H2>
 
 
@@ -358,7 +631,7 @@ something lower.</P>
 
 
 
-<H2><A NAME="search-paths"></A> <A NAME="s3">3. Search paths</A></H2>
+<H2><A NAME="search-paths"></A> <A NAME="s3">3.</A> <A HREF="#toc3">Search paths</A></H2>
 
 
 <P>Normal include files are searched in the following places:</P>
@@ -385,11 +658,11 @@ environment variable <CODE>CC65_HOME</CODE>, if it is defined.</LI>
 
 
 
-<H2><A NAME="s4">4. Input format</A></H2>
+<H2><A NAME="s4">4.</A> <A HREF="#toc4">Input format</A></H2>
 
 
 
-<H2><A NAME="ss4.1">4.1 Assembler syntax</A>
+<H2><A NAME="ss4.1">4.1</A> <A HREF="#toc4.1">Assembler syntax</A>
 </H2>
 
 
@@ -438,7 +711,7 @@ it is ignored).</P>
 </P>
 
 
-<H2><A NAME="ss4.2">4.2 65816 mode</A>
+<H2><A NAME="ss4.2">4.2</A> <A HREF="#toc4.2">65816 mode</A>
 </H2>
 
 
@@ -463,7 +736,7 @@ mnemonics:</P>
 
 
 
-<H2><A NAME="6502X-mode"></A> <A NAME="ss4.3">4.3 6502X mode</A>
+<H2><A NAME="6502X-mode"></A> <A NAME="ss4.3">4.3</A> <A HREF="#toc4.3">6502X mode</A>
 </H2>
 
 
@@ -494,7 +767,7 @@ from the mentioned web page, for more information, see there.</P>
 
 
 
-<H2><A NAME="sweet16-mode"></A> <A NAME="ss4.4">4.4 sweet16 mode</A>
+<H2><A NAME="sweet16-mode"></A> <A NAME="ss4.4">4.4</A> <A HREF="#toc4.4">sweet16 mode</A>
 </H2>
 
 
@@ -522,7 +795,7 @@ nor does it call the interpreter. All this must be done by your program. Apple
 <A HREF="http://www.6502.org/source/interpreters/sweet16.htm">http://www.6502.org/source/interpreters/sweet16.htm</A>.</P>
 
 
-<H2><A NAME="ss4.5">4.5 Number format</A>
+<H2><A NAME="ss4.5">4.5</A> <A HREF="#toc4.5">Number format</A>
 </H2>
 
 
@@ -532,7 +805,7 @@ denotes a binary value, and a bare number is interpreted as a decimal. There
 are currently no octal values and no floats.</P>
 
 
-<H2><A NAME="ss4.6">4.6 Conditional assembly</A>
+<H2><A NAME="ss4.6">4.6</A> <A HREF="#toc4.6">Conditional assembly</A>
 </H2>
 
 
@@ -546,12 +819,12 @@ conditional assembly directives may <B>not</B> be used to prevent normal text
 
 
 
-<H2><A NAME="s5">5. Expressions</A></H2>
+<H2><A NAME="s5">5.</A> <A HREF="#toc5">Expressions</A></H2>
 
 
 
 
-<H2><A NAME="ss5.1">5.1 Expression evaluation</A>
+<H2><A NAME="ss5.1">5.1</A> <A HREF="#toc5.1">Expression evaluation</A>
 </H2>
 
 
@@ -563,7 +836,7 @@ Expressions referencing imported symbols must always be evaluated by the
 linker.</P>
 
 
-<H2><A NAME="ss5.2">5.2 Size of an expression result</A>
+<H2><A NAME="ss5.2">5.2</A> <A HREF="#toc5.2">Size of an expression result</A>
 </H2>
 
 
@@ -594,7 +867,7 @@ time, the linker will evaluate it and check for range errors as soon as
 the result is known.</P>
 
 
-<H2><A NAME="ss5.3">5.3 Boolean expressions</A>
+<H2><A NAME="ss5.3">5.3</A> <A HREF="#toc5.3">Boolean expressions</A>
 </H2>
 
 
@@ -607,7 +880,7 @@ already known, after evaluating the left hand side, the right hand side is
 not evaluated.</P>
 
 
-<H2><A NAME="ss5.4">5.4 Constant expressions</A>
+<H2><A NAME="ss5.4">5.4</A> <A HREF="#toc5.4">Constant expressions</A>
 </H2>
 
 
@@ -629,7 +902,7 @@ problem in most cases.</P>
 
 
 
-<H2><A NAME="operators"></A> <A NAME="ss5.5">5.5 Available operators</A>
+<H2><A NAME="operators"></A> <A NAME="ss5.5">5.5</A> <A HREF="#toc5.5">Available operators</A>
 </H2>
 
 
@@ -681,7 +954,7 @@ problem in most cases.</P>
 
 
 
-<H2><A NAME="s6">6. Symbols and labels</A></H2>
+<H2><A NAME="s6">6.</A> <A HREF="#toc6">Symbols and labels</A></H2>
 
 
 <P>A symbol or label is an identifier that starts with a letter and is followed
@@ -700,7 +973,7 @@ because it is the keyword for the accumulator).</P>
 the source more readable. There are a lot of different ways to define and
 use symbols and labels, giving a lot of flexibility.</P>
 
-<H2><A NAME="ss6.1">6.1 Numeric constants</A>
+<H2><A NAME="ss6.1">6.1</A> <A HREF="#toc6.1">Numeric constants</A>
 </H2>
 
 
@@ -735,7 +1008,7 @@ handled differently in a debugger:</P>
 
 <P>
 <A NAME="variables"></A> </P>
-<H2><A NAME="ss6.2">6.2 Numeric variables</A>
+<H2><A NAME="ss6.2">6.2</A> <A HREF="#toc6.2">Numeric variables</A>
 </H2>
 
 
@@ -774,7 +1047,7 @@ and a numeric variable named <CODE>lcount</CODE>.</P>
 </P>
 
 
-<H2><A NAME="ss6.3">6.3 Standard labels</A>
+<H2><A NAME="ss6.3">6.3</A> <A HREF="#toc6.3">Standard labels</A>
 </H2>
 
 
@@ -784,7 +1057,7 @@ colon. This will declare a symbol with the given name and the value of the
 current program counter.</P>
 
 
-<H2><A NAME="ss6.4">6.4 Local labels and symbols</A>
+<H2><A NAME="ss6.4">6.4</A> <A HREF="#toc6.4">Local labels and symbols</A>
 </H2>
 
 
@@ -798,7 +1071,7 @@ there. Such regions may be nested like PROCEDUREs in Pascal.</P>
 directive for more information.</P>
 
 
-<H2><A NAME="ss6.5">6.5 Cheap local labels</A>
+<H2><A NAME="ss6.5">6.5</A> <A HREF="#toc6.5">Cheap local labels</A>
 </H2>
 
 
@@ -829,7 +1102,7 @@ names like "Loop". Here is an example:</P>
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss6.6">6.6 Unnamed labels</A>
+<H2><A NAME="ss6.6">6.6</A> <A HREF="#toc6.6">Unnamed labels</A>
 </H2>
 
 
@@ -875,7 +1148,7 @@ unnamed ones, so scopes don't have an effect on unnamed labels.</P>
 
 
 
-<H2><A NAME="ss6.7">6.7 Using macros to define labels and constants</A>
+<H2><A NAME="ss6.7">6.7</A> <A HREF="#toc6.7">Using macros to define labels and constants</A>
 </H2>
 
 
@@ -909,7 +1182,7 @@ errors. Because of these problems, the general advice is, <B>NOT</B> do use
 </P>
 
 
-<H2><A NAME="ss6.8">6.8 Symbols and <CODE>.DEBUGINFO</CODE></A>
+<H2><A NAME="ss6.8">6.8</A> <A HREF="#toc6.8">Symbols and <CODE>.DEBUGINFO</CODE></A>
 </H2>
 
 
@@ -922,12 +1195,12 @@ because they don't have a name which would allow to access them.</P>
 
 
 
-<H2><A NAME="scopes"></A> <A NAME="s7">7. Scopes</A></H2>
+<H2><A NAME="scopes"></A> <A NAME="s7">7.</A> <A HREF="#toc7">Scopes</A></H2>
 
 
 <P>ca65 implements several sorts of scopes for symbols.</P>
 
-<H2><A NAME="ss7.1">7.1 Global scope</A>
+<H2><A NAME="ss7.1">7.1</A> <A HREF="#toc7.1">Global scope</A>
 </H2>
 
 
@@ -935,7 +1208,7 @@ because they don't have a name which would allow to access them.</P>
 are in global scope.</P>
 
 
-<H2><A NAME="ss7.2">7.2 Cheap locals</A>
+<H2><A NAME="ss7.2">7.2</A> <A HREF="#toc7.2">Cheap locals</A>
 </H2>
 
 
@@ -944,7 +1217,7 @@ local symbol to the next one, without any provisions made by the programmer.
 All other scopes differ in usage but use the same concept internally.</P>
 
 
-<H2><A NAME="ss7.3">7.3 Generic nested scopes</A>
+<H2><A NAME="ss7.3">7.3</A> <A HREF="#toc7.3">Generic nested scopes</A>
 </H2>
 
 
@@ -1037,7 +1310,7 @@ addressing mode, which means changing the symbol reference later does not
 cause any errors.</P>
 
 
-<H2><A NAME="ss7.4">7.4 Nested procedures</A>
+<H2><A NAME="ss7.4">7.4</A> <A HREF="#toc7.4">Nested procedures</A>
 </H2>
 
 
@@ -1076,7 +1349,7 @@ different namespaces. There can be a symbol named <CODE>foo</CODE> and a scope n
 <A HREF="#scopesearch">&#34;Scope search order&#34;</A>).</P>
 
 
-<H2><A NAME="ss7.5">7.5 Structs, unions and enums</A>
+<H2><A NAME="ss7.5">7.5</A> <A HREF="#toc7.5">Structs, unions and enums</A>
 </H2>
 
 
@@ -1089,7 +1362,7 @@ a struct, union, or enum declaration will then be added to the enclosing scope
 instead.</P>
 
 
-<H2><A NAME="scopesyntax"></A> <A NAME="ss7.6">7.6 Explicit scope specification</A>
+<H2><A NAME="scopesyntax"></A> <A NAME="ss7.6">7.6</A> <A HREF="#toc7.6">Explicit scope specification</A>
 </H2>
 
 
@@ -1127,7 +1400,7 @@ preceded by the namespace token, the global scope is searched:</P>
 </P>
 
 
-<H2><A NAME="scopesearch"></A> <A NAME="ss7.7">7.7 Scope search order</A>
+<H2><A NAME="scopesearch"></A> <A NAME="ss7.7">7.7</A> <A HREF="#toc7.7">Scope search order</A>
 </H2>
 
 
@@ -1224,11 +1497,11 @@ if you want to access the "other" symbol <CODE>bar</CODE>, you would have to wri
 </P>
 
 
-<H2><A NAME="address-sizes"></A> <A NAME="s8">8. Address sizes and memory models</A></H2>
+<H2><A NAME="address-sizes"></A> <A NAME="s8">8.</A> <A HREF="#toc8">Address sizes and memory models</A></H2>
 
 
 
-<H2><A NAME="ss8.1">8.1 Address sizes</A>
+<H2><A NAME="ss8.1">8.1</A> <A HREF="#toc8.1">Address sizes</A>
 </H2>
 
 
@@ -1257,7 +1530,7 @@ it is necessary, the following keywords may be used to specify address sizes:</P
 </P>
 
 
-<H2><A NAME="ss8.2">8.2 Address sizes of segments</A>
+<H2><A NAME="ss8.2">8.2</A> <A HREF="#toc8.2">Address sizes of segments</A>
 </H2>
 
 
@@ -1270,7 +1543,7 @@ size modifier. See the <CODE>
 an explanation on how this is done.</P>
 
 
-<H2><A NAME="ss8.3">8.3 Address sizes of symbols</A>
+<H2><A NAME="ss8.3">8.3</A> <A HREF="#toc8.3">Address sizes of symbols</A>
 </H2>
 
 
@@ -1278,7 +1551,7 @@ an explanation on how this is done.</P>
 
 
 
-<H2><A NAME="ss8.4">8.4 Memory models</A>
+<H2><A NAME="ss8.4">8.4</A> <A HREF="#toc8.4">Memory models</A>
 </H2>
 
 
@@ -1290,13 +1563,13 @@ symbols at once.</P>
 
 
 
-<H2><A NAME="pseudo-variables"></A> <A NAME="s9">9. Pseudo variables</A></H2>
+<H2><A NAME="pseudo-variables"></A> <A NAME="s9">9.</A> <A HREF="#toc9">Pseudo variables</A></H2>
 
 
 <P>Pseudo variables are readable in all cases, and in some special cases also
 writable.</P>
 
-<H2><A NAME="ss9.1">9.1 <CODE>*</CODE></A>
+<H2><A NAME="ss9.1">9.1</A> <A HREF="#toc9.1"><CODE>*</CODE></A>
 </H2>
 
 
@@ -1308,7 +1581,7 @@ assignments to <CODE>*</CODE>, use <CODE>
 <A HREF="#.ORG">.ORG</A></CODE> instead.</P>
 
 
-<H2><A NAME=".CPU"></A> <A NAME="ss9.2">9.2 <CODE>.CPU</CODE></A>
+<H2><A NAME=".CPU"></A> <A NAME="ss9.2">9.2</A> <A HREF="#toc9.2"><CODE>.CPU</CODE></A>
 </H2>
 
 
@@ -1340,7 +1613,7 @@ even more complex expressions.</P>
 </P>
 
 
-<H2><A NAME=".PARAMCOUNT"></A> <A NAME="ss9.3">9.3 <CODE>.PARAMCOUNT</CODE></A>
+<H2><A NAME=".PARAMCOUNT"></A> <A NAME="ss9.3">9.3</A> <A HREF="#toc9.3"><CODE>.PARAMCOUNT</CODE></A>
 </H2>
 
 
@@ -1364,7 +1637,7 @@ the actual number of parameters that were given in the macro invocation.</P>
 <A HREF="#macros">Macros</A>.</P>
 
 
-<H2><A NAME=".TIME"></A> <A NAME="ss9.4">9.4 <CODE>.TIME</CODE></A>
+<H2><A NAME=".TIME"></A> <A NAME="ss9.4">9.4</A> <A HREF="#toc9.4"><CODE>.TIME</CODE></A>
 </H2>
 
 
@@ -1384,7 +1657,7 @@ code.</P>
 </P>
 
 
-<H2><A NAME=".VERSION"></A> <A NAME="ss9.5">9.5 <CODE>.VERSION</CODE></A>
+<H2><A NAME=".VERSION"></A> <A NAME="ss9.5">9.5</A> <A HREF="#toc9.5"><CODE>.VERSION</CODE></A>
 </H2>
 
 
@@ -1399,14 +1672,14 @@ reading the pseudo variable <CODE>.VERSION</CODE>.</P>
 
 
 
-<H2><A NAME="pseudo-functions"></A> <A NAME="s10">10. Pseudo functions</A></H2>
+<H2><A NAME="pseudo-functions"></A> <A NAME="s10">10.</A> <A HREF="#toc10">Pseudo functions</A></H2>
 
 
 <P>Pseudo functions expect their arguments in parenthesis, and they have a result,
 either a string or an expression.</P>
 
 
-<H2><A NAME=".BANK"></A> <A NAME="ss10.1">10.1 <CODE>.BANK</CODE></A>
+<H2><A NAME=".BANK"></A> <A NAME="ss10.1">10.1</A> <A HREF="#toc10.1"><CODE>.BANK</CODE></A>
 </H2>
 
 
@@ -1451,7 +1724,7 @@ result is expected (for example with <CODE>.RES</CODE>).</P>
 
 
 
-<H2><A NAME=".BANKBYTE"></A> <A NAME="ss10.2">10.2 <CODE>.BANKBYTE</CODE></A>
+<H2><A NAME=".BANKBYTE"></A> <A NAME="ss10.2">10.2</A> <A HREF="#toc10.2"><CODE>.BANKBYTE</CODE></A>
 </H2>
 
 
@@ -1463,7 +1736,7 @@ It works identical to the '^' operator.</P>
 <A HREF="#.LOBYTE">.LOBYTE</A></CODE></P>
 
 
-<H2><A NAME=".BLANK"></A> <A NAME="ss10.3">10.3 <CODE>.BLANK</CODE></A>
+<H2><A NAME=".BLANK"></A> <A NAME="ss10.3">10.3</A> <A HREF="#toc10.3"><CODE>.BLANK</CODE></A>
 </H2>
 
 
@@ -1486,7 +1759,7 @@ just consisting of curly braces is considered to be empty.</P>
 
 
 
-<H2><A NAME=".CONCAT"></A> <A NAME="ss10.4">10.4 <CODE>.CONCAT</CODE></A>
+<H2><A NAME=".CONCAT"></A> <A NAME="ss10.4">10.4</A> <A HREF="#toc10.4"><CODE>.CONCAT</CODE></A>
 </H2>
 
 
@@ -1515,7 +1788,7 @@ be used in any case where a string constant is expected.</P>
 </P>
 
 
-<H2><A NAME=".CONST"></A> <A NAME="ss10.5">10.5 <CODE>.CONST</CODE></A>
+<H2><A NAME=".CONST"></A> <A NAME="ss10.5">10.5</A> <A HREF="#toc10.5"><CODE>.CONST</CODE></A>
 </H2>
 
 
@@ -1533,7 +1806,7 @@ otherwise. As an example, the .IFCONST statement may be replaced by</P>
 </P>
 
 
-<H2><A NAME=".HIBYTE"></A> <A NAME="ss10.6">10.6 <CODE>.HIBYTE</CODE></A>
+<H2><A NAME=".HIBYTE"></A> <A NAME="ss10.6">10.6</A> <A HREF="#toc10.6"><CODE>.HIBYTE</CODE></A>
 </H2>
 
 
@@ -1545,7 +1818,7 @@ It works identical to the '>' operator.</P>
 <A HREF="#.BANKBYTE">.BANKBYTE</A></CODE></P>
 
 
-<H2><A NAME=".HIWORD"></A> <A NAME="ss10.7">10.7 <CODE>.HIWORD</CODE></A>
+<H2><A NAME=".HIWORD"></A> <A NAME="ss10.7">10.7</A> <A HREF="#toc10.7"><CODE>.HIWORD</CODE></A>
 </H2>
 
 
@@ -1554,7 +1827,7 @@ It works identical to the '>' operator.</P>
 <A HREF="#.LOWORD">.LOWORD</A></CODE></P>
 
 
-<H2><A NAME=".IDENT"></A> <A NAME="ss10.8">10.8 <CODE>.IDENT</CODE></A>
+<H2><A NAME=".IDENT"></A> <A NAME="ss10.8">10.8</A> <A HREF="#toc10.8"><CODE>.IDENT</CODE></A>
 </H2>
 
 
@@ -1579,7 +1852,7 @@ identifier, otherwise it will be converted into a normal identifier.</P>
 </P>
 
 
-<H2><A NAME=".LEFT"></A> <A NAME="ss10.9">10.9 <CODE>.LEFT</CODE></A>
+<H2><A NAME=".LEFT"></A> <A NAME="ss10.9">10.9</A> <A HREF="#toc10.9"><CODE>.LEFT</CODE></A>
 </H2>
 
 
@@ -1623,7 +1896,7 @@ right paren in the given case).</P>
 <A HREF="#.RIGHT">.RIGHT</A></CODE> builtin functions.</P>
 
 
-<H2><A NAME=".LOBYTE"></A> <A NAME="ss10.10">10.10 <CODE>.LOBYTE</CODE></A>
+<H2><A NAME=".LOBYTE"></A> <A NAME="ss10.10">10.10</A> <A HREF="#toc10.10"><CODE>.LOBYTE</CODE></A>
 </H2>
 
 
@@ -1635,7 +1908,7 @@ It works identical to the '&lt;' operator.</P>
 <A HREF="#.BANKBYTE">.BANKBYTE</A></CODE></P>
 
 
-<H2><A NAME=".LOWORD"></A> <A NAME="ss10.11">10.11 <CODE>.LOWORD</CODE></A>
+<H2><A NAME=".LOWORD"></A> <A NAME="ss10.11">10.11</A> <A HREF="#toc10.11"><CODE>.LOWORD</CODE></A>
 </H2>
 
 
@@ -1644,7 +1917,7 @@ It works identical to the '&lt;' operator.</P>
 <A HREF="#.HIWORD">.HIWORD</A></CODE></P>
 
 
-<H2><A NAME=".MATCH"></A> <A NAME="ss10.12">10.12 <CODE>.MATCH</CODE></A>
+<H2><A NAME=".MATCH"></A> <A NAME="ss10.12">10.12</A> <A HREF="#toc10.12"><CODE>.MATCH</CODE></A>
 </H2>
 
 
@@ -1707,7 +1980,7 @@ reserved keyword "A".</P>
 <A HREF="#.XMATCH">.XMATCH</A></CODE></P>
 
 
-<H2><A NAME=".MAX"></A> <A NAME="ss10.13">10.13 <CODE>.MAX</CODE></A>
+<H2><A NAME=".MAX"></A> <A NAME="ss10.13">10.13</A> <A HREF="#toc10.13"><CODE>.MAX</CODE></A>
 </H2>
 
 
@@ -1735,7 +2008,7 @@ reserved keyword "A".</P>
 <A HREF="#.MIN">.MIN</A></CODE></P>
 
 
-<H2><A NAME=".MID"></A> <A NAME="ss10.14">10.14 <CODE>.MID</CODE></A>
+<H2><A NAME=".MID"></A> <A NAME="ss10.14">10.14</A> <A HREF="#toc10.14"><CODE>.MID</CODE></A>
 </H2>
 
 
@@ -1781,7 +2054,7 @@ right paren in the given case).</P>
 <A HREF="#.RIGHT">.RIGHT</A></CODE> builtin functions.</P>
 
 
-<H2><A NAME=".MIN"></A> <A NAME="ss10.15">10.15 <CODE>.MIN</CODE></A>
+<H2><A NAME=".MIN"></A> <A NAME="ss10.15">10.15</A> <A HREF="#toc10.15"><CODE>.MIN</CODE></A>
 </H2>
 
 
@@ -1809,7 +2082,7 @@ right paren in the given case).</P>
 <A HREF="#.MAX">.MAX</A></CODE></P>
 
 
-<H2><A NAME=".REFERENCED"></A> <A NAME="ss10.16">10.16 <CODE>.REF, .REFERENCED</CODE></A>
+<H2><A NAME=".REFERENCED"></A> <A NAME="ss10.16">10.16</A> <A HREF="#toc10.16"><CODE>.REF, .REFERENCED</CODE></A>
 </H2>
 
 
@@ -1831,7 +2104,7 @@ the <CODE>
 <A HREF="#.DEFINED">.DEFINED</A></CODE></P>
 
 
-<H2><A NAME=".RIGHT"></A> <A NAME="ss10.17">10.17 <CODE>.RIGHT</CODE></A>
+<H2><A NAME=".RIGHT"></A> <A NAME="ss10.17">10.17</A> <A HREF="#toc10.17"><CODE>.RIGHT</CODE></A>
 </H2>
 
 
@@ -1855,7 +2128,7 @@ the given case).</P>
 <A HREF="#.MID">.MID</A></CODE> builtin functions.</P>
 
 
-<H2><A NAME=".SIZEOF"></A> <A NAME="ss10.18">10.18 <CODE>.SIZEOF</CODE></A>
+<H2><A NAME=".SIZEOF"></A> <A NAME="ss10.18">10.18</A> <A HREF="#toc10.18"><CODE>.SIZEOF</CODE></A>
 </H2>
 
 
@@ -1934,7 +2207,7 @@ segment.</P>
 </P>
 
 
-<H2><A NAME=".STRAT"></A> <A NAME="ss10.19">10.19 <CODE>.STRAT</CODE></A>
+<H2><A NAME=".STRAT"></A> <A NAME="ss10.19">10.19</A> <A HREF="#toc10.19"><CODE>.STRAT</CODE></A>
 </H2>
 
 
@@ -1957,7 +2230,7 @@ as an integer value. The index is zero based.</P>
 </P>
 
 
-<H2><A NAME=".SPRINTF"></A> <A NAME="ss10.20">10.20 <CODE>.SPRINTF</CODE></A>
+<H2><A NAME=".SPRINTF"></A> <A NAME="ss10.20">10.20</A> <A HREF="#toc10.20"><CODE>.SPRINTF</CODE></A>
 </H2>
 
 
@@ -1980,7 +2253,7 @@ are: Length modifiers, variable width.</P>
 </P>
 
 
-<H2><A NAME=".STRING"></A> <A NAME="ss10.21">10.21 <CODE>.STRING</CODE></A>
+<H2><A NAME=".STRING"></A> <A NAME="ss10.21">10.21</A> <A HREF="#toc10.21"><CODE>.STRING</CODE></A>
 </H2>
 
 
@@ -2003,7 +2276,7 @@ not be obvious. However, it is useful in macros, or more complex setups.</P>
 </P>
 
 
-<H2><A NAME=".STRLEN"></A> <A NAME="ss10.22">10.22 <CODE>.STRLEN</CODE></A>
+<H2><A NAME=".STRLEN"></A> <A NAME="ss10.22">10.22</A> <A HREF="#toc10.22"><CODE>.STRLEN</CODE></A>
 </H2>
 
 
@@ -2024,7 +2297,7 @@ a leading length byte.</P>
 </P>
 
 
-<H2><A NAME=".TCOUNT"></A> <A NAME="ss10.23">10.23 <CODE>.TCOUNT</CODE></A>
+<H2><A NAME=".TCOUNT"></A> <A NAME="ss10.23">10.23</A> <A HREF="#toc10.23"><CODE>.TCOUNT</CODE></A>
 </H2>
 
 
@@ -2056,7 +2329,7 @@ load instructions, the '#' token has to get stripped from the argument:</P>
 </P>
 
 
-<H2><A NAME=".XMATCH"></A> <A NAME="ss10.24">10.24 <CODE>.XMATCH</CODE></A>
+<H2><A NAME=".XMATCH"></A> <A NAME="ss10.24">10.24</A> <A HREF="#toc10.24"><CODE>.XMATCH</CODE></A>
 </H2>
 
 
@@ -2092,13 +2365,13 @@ that just compares the type of tokens, have a look at the <CODE>
 
 
 
-<H2><A NAME="control-commands"></A> <A NAME="s11">11. Control commands</A></H2>
+<H2><A NAME="control-commands"></A> <A NAME="s11">11.</A> <A HREF="#toc11">Control commands</A></H2>
 
 
 <P>Here's a list of all control commands and a description, what they do:</P>
 
 
-<H2><A NAME=".A16"></A> <A NAME="ss11.1">11.1 <CODE>.A16</CODE></A>
+<H2><A NAME=".A16"></A> <A NAME="ss11.1">11.1</A> <A HREF="#toc11.1"><CODE>.A16</CODE></A>
 </H2>
 
 
@@ -2109,7 +2382,7 @@ create 16 bit operands for immediate accumulator addressing mode.</P>
 <A HREF="#.SMART">.SMART</A></CODE></P>
 
 
-<H2><A NAME=".A8"></A> <A NAME="ss11.2">11.2 <CODE>.A8</CODE></A>
+<H2><A NAME=".A8"></A> <A NAME="ss11.2">11.2</A> <A HREF="#toc11.2"><CODE>.A8</CODE></A>
 </H2>
 
 
@@ -2120,7 +2393,7 @@ create 8 bit operands for immediate accu addressing mode.</P>
 <A HREF="#.SMART">.SMART</A></CODE></P>
 
 
-<H2><A NAME=".ADDR"></A> <A NAME="ss11.3">11.3 <CODE>.ADDR</CODE></A>
+<H2><A NAME=".ADDR"></A> <A NAME="ss11.3">11.3</A> <A HREF="#toc11.3"><CODE>.ADDR</CODE></A>
 </H2>
 
 
@@ -2144,7 +2417,7 @@ must be followed by a sequence of (not necessarily constant) expressions.</P>
 <A HREF="#.WORD">.WORD</A></CODE></P>
 
 
-<H2><A NAME=".ALIGN"></A> <A NAME="ss11.4">11.4 <CODE>.ALIGN</CODE></A>
+<H2><A NAME=".ALIGN"></A> <A NAME="ss11.4">11.4</A> <A HREF="#toc11.4"><CODE>.ALIGN</CODE></A>
 </H2>
 
 
@@ -2219,7 +2492,7 @@ always the larger one.</P>
 
 
 
-<H2><A NAME=".ASCIIZ"></A> <A NAME="ss11.5">11.5 <CODE>.ASCIIZ</CODE></A>
+<H2><A NAME=".ASCIIZ"></A> <A NAME="ss11.5">11.5</A> <A HREF="#toc11.5"><CODE>.ASCIIZ</CODE></A>
 </H2>
 
 
@@ -2238,7 +2511,7 @@ the current segment. There may be more strings separated by commas, but
 the binary zero is only appended once (after the last one).</P>
 
 
-<H2><A NAME=".ASSERT"></A> <A NAME="ss11.6">11.6 <CODE>.ASSERT</CODE></A>
+<H2><A NAME=".ASSERT"></A> <A NAME="ss11.6">11.6</A> <A HREF="#toc11.6"><CODE>.ASSERT</CODE></A>
 </H2>
 
 
@@ -2267,7 +2540,7 @@ an error message. In the latter case, generation of the output file is
 suppressed in both the assembler and linker.</P>
 
 
-<H2><A NAME=".AUTOIMPORT"></A> <A NAME="ss11.7">11.7 <CODE>.AUTOIMPORT</CODE></A>
+<H2><A NAME=".AUTOIMPORT"></A> <A NAME="ss11.7">11.7</A> <A HREF="#toc11.7"><CODE>.AUTOIMPORT</CODE></A>
 </H2>
 
 
@@ -2295,7 +2568,7 @@ routine from the runtime library.</P>
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME=".BANKBYTES"></A> <A NAME="ss11.8">11.8 <CODE>.BANKBYTES</CODE></A>
+<H2><A NAME=".BANKBYTES"></A> <A NAME="ss11.8">11.8</A> <A HREF="#toc11.8"><CODE>.BANKBYTES</CODE></A>
 </H2>
 
 
@@ -2335,7 +2608,7 @@ the operator '^' prepended to each expression in its list.</P>
 <A HREF="#.LOBYTES">.LOBYTES</A></CODE></P>
 
 
-<H2><A NAME=".BSS"></A> <A NAME="ss11.9">11.9 <CODE>.BSS</CODE></A>
+<H2><A NAME=".BSS"></A> <A NAME="ss11.9">11.9</A> <A HREF="#toc11.9"><CODE>.BSS</CODE></A>
 </H2>
 
 
@@ -2353,7 +2626,7 @@ so this is a shortcut for</P>
 <A HREF="#.SEGMENT">.SEGMENT</A></CODE> command.</P>
 
 
-<H2><A NAME=".BYTE"></A> <A NAME="ss11.10">11.10 <CODE>.BYT, .BYTE</CODE></A>
+<H2><A NAME=".BYTE"></A> <A NAME="ss11.10">11.10</A> <A HREF="#toc11.10"><CODE>.BYT, .BYTE</CODE></A>
 </H2>
 
 
@@ -2371,7 +2644,7 @@ expressions or strings.</P>
 </P>
 
 
-<H2><A NAME=".CASE"></A> <A NAME="ss11.11">11.11 <CODE>.CASE</CODE></A>
+<H2><A NAME=".CASE"></A> <A NAME="ss11.11">11.11</A> <A HREF="#toc11.11"><CODE>.CASE</CODE></A>
 </H2>
 
 
@@ -2391,7 +2664,7 @@ option on or off respectively.</P>
 </P>
 
 
-<H2><A NAME=".CHARMAP"></A> <A NAME="ss11.12">11.12 <CODE>.CHARMAP</CODE></A>
+<H2><A NAME=".CHARMAP"></A> <A NAME="ss11.12">11.12</A> <A HREF="#toc11.12"><CODE>.CHARMAP</CODE></A>
 </H2>
 
 
@@ -2413,7 +2686,7 @@ command line switch.</P>
 </P>
 
 
-<H2><A NAME=".CODE"></A> <A NAME="ss11.13">11.13 <CODE>.CODE</CODE></A>
+<H2><A NAME=".CODE"></A> <A NAME="ss11.13">11.13</A> <A HREF="#toc11.13"><CODE>.CODE</CODE></A>
 </H2>
 
 
@@ -2431,7 +2704,7 @@ command line switch.</P>
 <A HREF="#.SEGMENT">.SEGMENT</A></CODE> command.</P>
 
 
-<H2><A NAME=".CONDES"></A> <A NAME="ss11.14">11.14 <CODE>.CONDES</CODE></A>
+<H2><A NAME=".CONDES"></A> <A NAME="ss11.14">11.14</A> <A HREF="#toc11.14"><CODE>.CONDES</CODE></A>
 </H2>
 
 
@@ -2475,7 +2748,7 @@ so they won't interfere with the ones in the cc65 library.</P>
 detail.</P>
 
 
-<H2><A NAME=".CONSTRUCTOR"></A> <A NAME="ss11.15">11.15 <CODE>.CONSTRUCTOR</CODE></A>
+<H2><A NAME=".CONSTRUCTOR"></A> <A NAME="ss11.15">11.15</A> <A HREF="#toc11.15"><CODE>.CONSTRUCTOR</CODE></A>
 </H2>
 
 
@@ -2509,7 +2782,7 @@ ones in the cc65 library.</P>
 feature in more detail.</P>
 
 
-<H2><A NAME=".DATA"></A> <A NAME="ss11.16">11.16 <CODE>.DATA</CODE></A>
+<H2><A NAME=".DATA"></A> <A NAME="ss11.16">11.16</A> <A HREF="#toc11.16"><CODE>.DATA</CODE></A>
 </H2>
 
 
@@ -2527,7 +2800,7 @@ feature in more detail.</P>
 <A HREF="#.SEGMENT">.SEGMENT</A></CODE> command.</P>
 
 
-<H2><A NAME=".DBYT"></A> <A NAME="ss11.17">11.17 <CODE>.DBYT</CODE></A>
+<H2><A NAME=".DBYT"></A> <A NAME="ss11.17">11.17</A> <A HREF="#toc11.17"><CODE>.DBYT</CODE></A>
 </H2>
 
 
@@ -2555,7 +2828,7 @@ sequence of (word ranged) expressions.</P>
 <P>into the current segment in that order.</P>
 
 
-<H2><A NAME=".DEBUGINFO"></A> <A NAME="ss11.18">11.18 <CODE>.DEBUGINFO</CODE></A>
+<H2><A NAME=".DEBUGINFO"></A> <A NAME="ss11.18">11.18</A> <A HREF="#toc11.18"><CODE>.DEBUGINFO</CODE></A>
 </H2>
 
 
@@ -2575,7 +2848,7 @@ option on or off respectively.</P>
 </P>
 
 
-<H2><A NAME=".DEFINE"></A> <A NAME="ss11.19">11.19 <CODE>.DEFINE</CODE></A>
+<H2><A NAME=".DEFINE"></A> <A NAME="ss11.19">11.19</A> <A HREF="#toc11.19"><CODE>.DEFINE</CODE></A>
 </H2>
 
 
@@ -2591,7 +2864,7 @@ section
 <A HREF="#macros">Macros</A>.</P>
 
 
-<H2><A NAME=".DELMACRO"></A> <A NAME="ss11.20">11.20 <CODE>.DELMAC, .DELMACRO</CODE></A>
+<H2><A NAME=".DELMACRO"></A> <A NAME="ss11.20">11.20</A> <A HREF="#toc11.20"><CODE>.DELMAC, .DELMACRO</CODE></A>
 </H2>
 
 
@@ -2609,7 +2882,7 @@ If necessary, another macro with this name may be defined later.</P>
 <A HREF="#macros">Macros</A>.</P>
 
 
-<H2><A NAME=".DEFINED"></A> <A NAME="ss11.21">11.21 <CODE>.DEF, .DEFINED</CODE></A>
+<H2><A NAME=".DEFINED"></A> <A NAME="ss11.21">11.21</A> <A HREF="#toc11.21"><CODE>.DEF, .DEFINED</CODE></A>
 </H2>
 
 
@@ -2629,7 +2902,7 @@ current position. Otherwise the function yields false. As an example, the
 </P>
 
 
-<H2><A NAME=".DESTRUCTOR"></A> <A NAME="ss11.22">11.22 <CODE>.DESTRUCTOR</CODE></A>
+<H2><A NAME=".DESTRUCTOR"></A> <A NAME="ss11.22">11.22</A> <A HREF="#toc11.22"><CODE>.DESTRUCTOR</CODE></A>
 </H2>
 
 
@@ -2664,7 +2937,7 @@ section
 the feature in more detail.</P>
 
 
-<H2><A NAME=".DWORD"></A> <A NAME="ss11.23">11.23 <CODE>.DWORD</CODE></A>
+<H2><A NAME=".DWORD"></A> <A NAME="ss11.23">11.23</A> <A HREF="#toc11.23"><CODE>.DWORD</CODE></A>
 </H2>
 
 
@@ -2681,21 +2954,21 @@ expressions.</P>
 </P>
 
 
-<H2><A NAME=".ELSE"></A> <A NAME="ss11.24">11.24 <CODE>.ELSE</CODE></A>
+<H2><A NAME=".ELSE"></A> <A NAME="ss11.24">11.24</A> <A HREF="#toc11.24"><CODE>.ELSE</CODE></A>
 </H2>
 
 
 <P>Conditional assembly: Reverse the current condition.</P>
 
 
-<H2><A NAME=".ELSEIF"></A> <A NAME="ss11.25">11.25 <CODE>.ELSEIF</CODE></A>
+<H2><A NAME=".ELSEIF"></A> <A NAME="ss11.25">11.25</A> <A HREF="#toc11.25"><CODE>.ELSEIF</CODE></A>
 </H2>
 
 
 <P>Conditional assembly: Reverse current condition and test a new one.</P>
 
 
-<H2><A NAME=".END"></A> <A NAME="ss11.26">11.26 <CODE>.END</CODE></A>
+<H2><A NAME=".END"></A> <A NAME="ss11.26">11.26</A> <A HREF="#toc11.26"><CODE>.END</CODE></A>
 </H2>
 
 
@@ -2703,7 +2976,7 @@ expressions.</P>
 is read from an include file.</P>
 
 
-<H2><A NAME=".ENDENUM"></A> <A NAME="ss11.27">11.27 <CODE>.ENDENUM</CODE></A>
+<H2><A NAME=".ENDENUM"></A> <A NAME="ss11.27">11.27</A> <A HREF="#toc11.27"><CODE>.ENDENUM</CODE></A>
 </H2>
 
 
@@ -2711,7 +2984,7 @@ is read from an include file.</P>
 <A HREF="#.ENUM">.ENUM</A></CODE> declaration.</P>
 
 
-<H2><A NAME=".ENDIF"></A> <A NAME="ss11.28">11.28 <CODE>.ENDIF</CODE></A>
+<H2><A NAME=".ENDIF"></A> <A NAME="ss11.28">11.28</A> <A HREF="#toc11.28"><CODE>.ENDIF</CODE></A>
 </H2>
 
 
@@ -2721,7 +2994,7 @@ is read from an include file.</P>
 <A HREF="#.ELSE">.ELSE</A></CODE> branch.</P>
 
 
-<H2><A NAME=".ENDMACRO"></A> <A NAME="ss11.29">11.29 <CODE>.ENDMAC, .ENDMACRO</CODE></A>
+<H2><A NAME=".ENDMACRO"></A> <A NAME="ss11.29">11.29</A> <A HREF="#toc11.29"><CODE>.ENDMAC, .ENDMACRO</CODE></A>
 </H2>
 
 
@@ -2736,7 +3009,7 @@ is read from an include file.</P>
 <A HREF="#macros">Macros</A>.</P>
 
 
-<H2><A NAME=".ENDPROC"></A> <A NAME="ss11.30">11.30 <CODE>.ENDPROC</CODE></A>
+<H2><A NAME=".ENDPROC"></A> <A NAME="ss11.30">11.30</A> <A HREF="#toc11.30"><CODE>.ENDPROC</CODE></A>
 </H2>
 
 
@@ -2744,7 +3017,7 @@ is read from an include file.</P>
 <A HREF="#.PROC">.PROC</A></CODE>).</P>
 
 
-<H2><A NAME=".ENDREPEAT"></A> <A NAME="ss11.31">11.31 <CODE>.ENDREP, .ENDREPEAT</CODE></A>
+<H2><A NAME=".ENDREPEAT"></A> <A NAME="ss11.31">11.31</A> <A HREF="#toc11.31"><CODE>.ENDREP, .ENDREPEAT</CODE></A>
 </H2>
 
 
@@ -2752,7 +3025,7 @@ is read from an include file.</P>
 <A HREF="#.REPEAT">.REPEAT</A></CODE> block.</P>
 
 
-<H2><A NAME=".ENDSCOPE"></A> <A NAME="ss11.32">11.32 <CODE>.ENDSCOPE</CODE></A>
+<H2><A NAME=".ENDSCOPE"></A> <A NAME="ss11.32">11.32</A> <A HREF="#toc11.32"><CODE>.ENDSCOPE</CODE></A>
 </H2>
 
 
@@ -2760,7 +3033,7 @@ is read from an include file.</P>
 <A HREF="#.SCOPE">.SCOPE</A></CODE>).</P>
 
 
-<H2><A NAME=".ENDSTRUCT"></A> <A NAME="ss11.33">11.33 <CODE>.ENDSTRUCT</CODE></A>
+<H2><A NAME=".ENDSTRUCT"></A> <A NAME="ss11.33">11.33</A> <A HREF="#toc11.33"><CODE>.ENDSTRUCT</CODE></A>
 </H2>
 
 
@@ -2770,7 +3043,7 @@ command and the separate section named
 <A HREF="#structs">&#34;Structs   and unions&#34;</A>.</P>
 
 
-<H2><A NAME=".ENDUNION"></A> <A NAME="ss11.34">11.34 <CODE>.ENDUNION</CODE></A>
+<H2><A NAME=".ENDUNION"></A> <A NAME="ss11.34">11.34</A> <A HREF="#toc11.34"><CODE>.ENDUNION</CODE></A>
 </H2>
 
 
@@ -2780,7 +3053,7 @@ command and the separate section named
 <A HREF="#structs">&#34;Structs   and unions&#34;</A>.</P>
 
 
-<H2><A NAME=".ENUM"></A> <A NAME="ss11.35">11.35 <CODE>.ENUM</CODE></A>
+<H2><A NAME=".ENUM"></A> <A NAME="ss11.35">11.35</A> <A HREF="#toc11.35"><CODE>.ENUM</CODE></A>
 </H2>
 
 
@@ -2852,7 +3125,7 @@ be zero and so on. <CODE>EWOULDBLOCK</CODE> is an alias for <CODE>EGAIN</CODE>, 
 override for the value using an already defined symbol.</P>
 
 
-<H2><A NAME=".ERROR"></A> <A NAME="ss11.36">11.36 <CODE>.ERROR</CODE></A>
+<H2><A NAME=".ERROR"></A> <A NAME="ss11.36">11.36</A> <A HREF="#toc11.36"><CODE>.ERROR</CODE></A>
 </H2>
 
 
@@ -2884,7 +3157,7 @@ set before assembling a source file.</P>
 <A HREF="#.WARNING">.WARNING</A></CODE></P>
 
 
-<H2><A NAME=".EXITMACRO"></A> <A NAME="ss11.37">11.37 <CODE>.EXITMAC, .EXITMACRO</CODE></A>
+<H2><A NAME=".EXITMACRO"></A> <A NAME="ss11.37">11.37</A> <A HREF="#toc11.37"><CODE>.EXITMAC, .EXITMACRO</CODE></A>
 </H2>
 
 
@@ -2900,7 +3173,7 @@ recursive macros.</P>
 <A HREF="#macros">Macros</A>.</P>
 
 
-<H2><A NAME=".EXPORT"></A> <A NAME="ss11.38">11.38 <CODE>.EXPORT</CODE></A>
+<H2><A NAME=".EXPORT"></A> <A NAME="ss11.38">11.38</A> <A HREF="#toc11.38"><CODE>.EXPORT</CODE></A>
 </H2>
 
 
@@ -2929,7 +3202,7 @@ symbols as a label.</P>
 <A HREF="#.EXPORTZP">.EXPORTZP</A></CODE></P>
 
 
-<H2><A NAME=".EXPORTZP"></A> <A NAME="ss11.39">11.39 <CODE>.EXPORTZP</CODE></A>
+<H2><A NAME=".EXPORTZP"></A> <A NAME="ss11.39">11.39</A> <A HREF="#toc11.39"><CODE>.EXPORTZP</CODE></A>
 </H2>
 
 
@@ -2952,7 +3225,7 @@ statement.</P>
 <A HREF="#.EXPORT">.EXPORT</A></CODE></P>
 
 
-<H2><A NAME=".FARADDR"></A> <A NAME="ss11.40">11.40 <CODE>.FARADDR</CODE></A>
+<H2><A NAME=".FARADDR"></A> <A NAME="ss11.40">11.40</A> <A HREF="#toc11.40"><CODE>.FARADDR</CODE></A>
 </H2>
 
 
@@ -2971,7 +3244,7 @@ sequence of (not necessarily constant) expressions.</P>
 <A HREF="#.ADDR">.ADDR</A></CODE></P>
 
 
-<H2><A NAME=".FATAL"></A> <A NAME="ss11.41">11.41 <CODE>.FATAL</CODE></A>
+<H2><A NAME=".FATAL"></A> <A NAME="ss11.41">11.41</A> <A HREF="#toc11.41"><CODE>.FATAL</CODE></A>
 </H2>
 
 
@@ -3003,7 +3276,7 @@ set before assembling a source file.</P>
 <A HREF="#.WARNING">.WARNING</A></CODE></P>
 
 
-<H2><A NAME=".FEATURE"></A> <A NAME="ss11.42">11.42 <CODE>.FEATURE</CODE></A>
+<H2><A NAME=".FEATURE"></A> <A NAME="ss11.42">11.42</A> <A HREF="#toc11.42"><CODE>.FEATURE</CODE></A>
 </H2>
 
 
@@ -3167,7 +3440,7 @@ features. However, I have found several sources that translate without
 problems when enabling these features on the command line.</P>
 
 
-<H2><A NAME=".FOPT"></A> <A NAME="ss11.43">11.43 <CODE>.FILEOPT, .FOPT</CODE></A>
+<H2><A NAME=".FOPT"></A> <A NAME="ss11.43">11.43</A> <A HREF="#toc11.43"><CODE>.FILEOPT, .FOPT</CODE></A>
 </H2>
 
 
@@ -3204,7 +3477,7 @@ object file.</P>
 </P>
 
 
-<H2><A NAME=".FORCEIMPORT"></A> <A NAME="ss11.44">11.44 <CODE>.FORCEIMPORT</CODE></A>
+<H2><A NAME=".FORCEIMPORT"></A> <A NAME="ss11.44">11.44</A> <A HREF="#toc11.44"><CODE>.FORCEIMPORT</CODE></A>
 </H2>
 
 
@@ -3228,7 +3501,7 @@ references for unused symbols).</P>
 <A HREF="#.IMPORT">.IMPORT</A></CODE></P>
 
 
-<H2><A NAME=".GLOBAL"></A> <A NAME="ss11.45">11.45 <CODE>.GLOBAL</CODE></A>
+<H2><A NAME=".GLOBAL"></A> <A NAME="ss11.45">11.45</A> <A HREF="#toc11.45"><CODE>.GLOBAL</CODE></A>
 </H2>
 
 
@@ -3248,7 +3521,7 @@ source, are exported, all others are imported. Additional <CODE>
 </P>
 
 
-<H2><A NAME=".GLOBALZP"></A> <A NAME="ss11.46">11.46 <CODE>.GLOBALZP</CODE></A>
+<H2><A NAME=".GLOBALZP"></A> <A NAME="ss11.46">11.46</A> <A HREF="#toc11.46"><CODE>.GLOBALZP</CODE></A>
 </H2>
 
 
@@ -3268,7 +3541,7 @@ in the list are explicitly marked as zero page symbols.</P>
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME=".HIBYTES"></A> <A NAME="ss11.47">11.47 <CODE>.HIBYTES</CODE></A>
+<H2><A NAME=".HIBYTES"></A> <A NAME="ss11.47">11.47</A> <A HREF="#toc11.47"><CODE>.HIBYTES</CODE></A>
 </H2>
 
 
@@ -3326,7 +3599,7 @@ the operator '>' prepended to each expression in its list.</P>
 <A HREF="#.BANKBYTES">.BANKBYTES</A></CODE></P>
 
 
-<H2><A NAME=".I16"></A> <A NAME="ss11.48">11.48 <CODE>.I16</CODE></A>
+<H2><A NAME=".I16"></A> <A NAME="ss11.48">11.48</A> <A HREF="#toc11.48"><CODE>.I16</CODE></A>
 </H2>
 
 
@@ -3338,7 +3611,7 @@ create 16 bit operands for immediate operands.</P>
 <A HREF="#.SMART">.SMART</A></CODE> commands.</P>
 
 
-<H2><A NAME=".I8"></A> <A NAME="ss11.49">11.49 <CODE>.I8</CODE></A>
+<H2><A NAME=".I8"></A> <A NAME="ss11.49">11.49</A> <A HREF="#toc11.49"><CODE>.I8</CODE></A>
 </H2>
 
 
@@ -3350,7 +3623,7 @@ create 8 bit operands for immediate operands.</P>
 <A HREF="#.SMART">.SMART</A></CODE> commands.</P>
 
 
-<H2><A NAME=".IF"></A> <A NAME="ss11.50">11.50 <CODE>.IF</CODE></A>
+<H2><A NAME=".IF"></A> <A NAME="ss11.50">11.50</A> <A HREF="#toc11.50"><CODE>.IF</CODE></A>
 </H2>
 
 
@@ -3361,7 +3634,7 @@ expression, that is, all operands must be defined.</P>
 to TRUE.</P>
 
 
-<H2><A NAME=".IFBLANK"></A> <A NAME="ss11.51">11.51 <CODE>.IFBLANK</CODE></A>
+<H2><A NAME=".IFBLANK"></A> <A NAME="ss11.51">11.51</A> <A HREF="#toc11.51"><CODE>.IFBLANK</CODE></A>
 </H2>
 
 
@@ -3394,7 +3667,7 @@ to TRUE if an empty parameter was given.</P>
 <A HREF="#.BLANK">.BLANK</A></CODE></P>
 
 
-<H2><A NAME=".IFCONST"></A> <A NAME="ss11.52">11.52 <CODE>.IFCONST</CODE></A>
+<H2><A NAME=".IFCONST"></A> <A NAME="ss11.52">11.52</A> <A HREF="#toc11.52"><CODE>.IFCONST</CODE></A>
 </H2>
 
 
@@ -3407,7 +3680,7 @@ FALSE.</P>
 <A HREF="#.CONST">.CONST</A></CODE></P>
 
 
-<H2><A NAME=".IFDEF"></A> <A NAME="ss11.53">11.53 <CODE>.IFDEF</CODE></A>
+<H2><A NAME=".IFDEF"></A> <A NAME="ss11.53">11.53</A> <A HREF="#toc11.53"><CODE>.IFDEF</CODE></A>
 </H2>
 
 
@@ -3418,7 +3691,7 @@ defined, and false otherwise.</P>
 <A HREF="#.DEFINED">.DEFINED</A></CODE></P>
 
 
-<H2><A NAME=".IFNBLANK"></A> <A NAME="ss11.54">11.54 <CODE>.IFNBLANK</CODE></A>
+<H2><A NAME=".IFNBLANK"></A> <A NAME="ss11.54">11.54</A> <A HREF="#toc11.54"><CODE>.IFNBLANK</CODE></A>
 </H2>
 
 
@@ -3450,7 +3723,7 @@ will evaluate to FALSE if an empty parameter was given.</P>
 <A HREF="#.BLANK">.BLANK</A></CODE></P>
 
 
-<H2><A NAME=".IFNDEF"></A> <A NAME="ss11.55">11.55 <CODE>.IFNDEF</CODE></A>
+<H2><A NAME=".IFNDEF"></A> <A NAME="ss11.55">11.55</A> <A HREF="#toc11.55"><CODE>.IFNDEF</CODE></A>
 </H2>
 
 
@@ -3461,7 +3734,7 @@ defined, and false otherwise.</P>
 <A HREF="#.DEFINED">.DEFINED</A></CODE></P>
 
 
-<H2><A NAME=".IFNREF"></A> <A NAME="ss11.56">11.56 <CODE>.IFNREF</CODE></A>
+<H2><A NAME=".IFNREF"></A> <A NAME="ss11.56">11.56</A> <A HREF="#toc11.56"><CODE>.IFNREF</CODE></A>
 </H2>
 
 
@@ -3472,7 +3745,7 @@ not referenced before, and false otherwise.</P>
 <A HREF="#.REFERENCED">.REFERENCED</A></CODE></P>
 
 
-<H2><A NAME=".IFP02"></A> <A NAME="ss11.57">11.57 <CODE>.IFP02</CODE></A>
+<H2><A NAME=".IFP02"></A> <A NAME="ss11.57">11.57</A> <A HREF="#toc11.57"><CODE>.IFP02</CODE></A>
 </H2>
 
 
@@ -3481,7 +3754,7 @@ not referenced before, and false otherwise.</P>
 <A HREF="#.P02">.P02</A></CODE> command).</P>
 
 
-<H2><A NAME=".IFP816"></A> <A NAME="ss11.58">11.58 <CODE>.IFP816</CODE></A>
+<H2><A NAME=".IFP816"></A> <A NAME="ss11.58">11.58</A> <A HREF="#toc11.58"><CODE>.IFP816</CODE></A>
 </H2>
 
 
@@ -3490,7 +3763,7 @@ not referenced before, and false otherwise.</P>
 <A HREF="#.P816">.P816</A></CODE> command).</P>
 
 
-<H2><A NAME=".IFPC02"></A> <A NAME="ss11.59">11.59 <CODE>.IFPC02</CODE></A>
+<H2><A NAME=".IFPC02"></A> <A NAME="ss11.59">11.59</A> <A HREF="#toc11.59"><CODE>.IFPC02</CODE></A>
 </H2>
 
 
@@ -3499,7 +3772,7 @@ not referenced before, and false otherwise.</P>
 <A HREF="#.PC02">.PC02</A></CODE> command).</P>
 
 
-<H2><A NAME=".IFPSC02"></A> <A NAME="ss11.60">11.60 <CODE>.IFPSC02</CODE></A>
+<H2><A NAME=".IFPSC02"></A> <A NAME="ss11.60">11.60</A> <A HREF="#toc11.60"><CODE>.IFPSC02</CODE></A>
 </H2>
 
 
@@ -3508,7 +3781,7 @@ not referenced before, and false otherwise.</P>
 <A HREF="#.PSC02">.PSC02</A></CODE> command).</P>
 
 
-<H2><A NAME=".IFREF"></A> <A NAME="ss11.61">11.61 <CODE>.IFREF</CODE></A>
+<H2><A NAME=".IFREF"></A> <A NAME="ss11.61">11.61</A> <A HREF="#toc11.61"><CODE>.IFREF</CODE></A>
 </H2>
 
 
@@ -3534,7 +3807,7 @@ referenced before, and false otherwise.</P>
 <A HREF="#.REFERENCED">.REFERENCED</A></CODE></P>
 
 
-<H2><A NAME=".IMPORT"></A> <A NAME="ss11.62">11.62 <CODE>.IMPORT</CODE></A>
+<H2><A NAME=".IMPORT"></A> <A NAME="ss11.62">11.62</A> <A HREF="#toc11.62"><CODE>.IMPORT</CODE></A>
 </H2>
 
 
@@ -3555,7 +3828,7 @@ an address specification.</P>
 <A HREF="#.IMPORTZP">.IMPORTZP</A></CODE></P>
 
 
-<H2><A NAME=".IMPORTZP"></A> <A NAME="ss11.63">11.63 <CODE>.IMPORTZP</CODE></A>
+<H2><A NAME=".IMPORTZP"></A> <A NAME="ss11.63">11.63</A> <A HREF="#toc11.63"><CODE>.IMPORTZP</CODE></A>
 </H2>
 
 
@@ -3575,7 +3848,7 @@ as zero page symbols (that is, symbols with values in byte range).</P>
 <A HREF="#.IMPORT">.IMPORT</A></CODE></P>
 
 
-<H2><A NAME=".INCBIN"></A> <A NAME="ss11.64">11.64 <CODE>.INCBIN</CODE></A>
+<H2><A NAME=".INCBIN"></A> <A NAME="ss11.64">11.64</A> <A HREF="#toc11.64"><CODE>.INCBIN</CODE></A>
 </H2>
 
 
@@ -3603,7 +3876,7 @@ either, zero is assumed (which means that the whole file is inserted).</P>
 </P>
 
 
-<H2><A NAME=".INCLUDE"></A> <A NAME="ss11.65">11.65 <CODE>.INCLUDE</CODE></A>
+<H2><A NAME=".INCLUDE"></A> <A NAME="ss11.65">11.65</A> <A HREF="#toc11.65"><CODE>.INCLUDE</CODE></A>
 </H2>
 
 
@@ -3619,7 +3892,7 @@ either, zero is assumed (which means that the whole file is inserted).</P>
 </P>
 
 
-<H2><A NAME=".INTERRUPTOR"></A> <A NAME="ss11.66">11.66 <CODE>.INTERRUPTOR</CODE></A>
+<H2><A NAME=".INTERRUPTOR"></A> <A NAME="ss11.66">11.66</A> <A HREF="#toc11.66"><CODE>.INTERRUPTOR</CODE></A>
 </H2>
 
 
@@ -3653,7 +3926,7 @@ section
 the feature in more detail.</P>
 
 
-<H2><A NAME=".LINECONT"></A> <A NAME="ss11.67">11.67 <CODE>.LINECONT</CODE></A>
+<H2><A NAME=".LINECONT"></A> <A NAME="ss11.67">11.67</A> <A HREF="#toc11.67"><CODE>.LINECONT</CODE></A>
 </H2>
 
 
@@ -3678,7 +3951,7 @@ option on or off respectively.</P>
 </P>
 
 
-<H2><A NAME=".LIST"></A> <A NAME="ss11.68">11.68 <CODE>.LIST</CODE></A>
+<H2><A NAME=".LIST"></A> <A NAME="ss11.68">11.68</A> <A HREF="#toc11.68"><CODE>.LIST</CODE></A>
 </H2>
 
 
@@ -3701,7 +3974,7 @@ counter.</P>
 </P>
 
 
-<H2><A NAME=".LISTBYTES"></A> <A NAME="ss11.69">11.69 <CODE>.LISTBYTES</CODE></A>
+<H2><A NAME=".LISTBYTES"></A> <A NAME="ss11.69">11.69</A> <A HREF="#toc11.69"><CODE>.LISTBYTES</CODE></A>
 </H2>
 
 
@@ -3723,7 +3996,7 @@ integer constant in the range 4..255.</P>
 </P>
 
 
-<H2><A NAME=".LOBYTES"></A> <A NAME="ss11.70">11.70 <CODE>.LOBYTES</CODE></A>
+<H2><A NAME=".LOBYTES"></A> <A NAME="ss11.70">11.70</A> <A HREF="#toc11.70"><CODE>.LOBYTES</CODE></A>
 </H2>
 
 
@@ -3781,7 +4054,7 @@ the operator '&lt;' prepended to each expression in its list.</P>
 <A HREF="#.BANKBYTES">.BANKBYTES</A></CODE></P>
 
 
-<H2><A NAME=".LOCAL"></A> <A NAME="ss11.71">11.71 <CODE>.LOCAL</CODE></A>
+<H2><A NAME=".LOCAL"></A> <A NAME="ss11.71">11.71</A> <A HREF="#toc11.71"><CODE>.LOCAL</CODE></A>
 </H2>
 
 
@@ -3804,7 +4077,7 @@ to address the problem.</P>
 a macro.</P>
 
 
-<H2><A NAME=".LOCALCHAR"></A> <A NAME="ss11.72">11.72 <CODE>.LOCALCHAR</CODE></A>
+<H2><A NAME=".LOCALCHAR"></A> <A NAME="ss11.72">11.72</A> <A HREF="#toc11.72"><CODE>.LOCALCHAR</CODE></A>
 </H2>
 
 
@@ -3832,7 +4105,7 @@ using explicit lexical nesting.</P>
 </P>
 
 
-<H2><A NAME=".MACPACK"></A> <A NAME="ss11.73">11.73 <CODE>.MACPACK</CODE></A>
+<H2><A NAME=".MACPACK"></A> <A NAME="ss11.73">11.73</A> <A HREF="#toc11.73"><CODE>.MACPACK</CODE></A>
 </H2>
 
 
@@ -3869,7 +4142,7 @@ redefines already existing macros will lead to an error.</P>
 <A HREF="#macropackages">Macro packages</A>.</P>
 
 
-<H2><A NAME=".MACRO"></A> <A NAME="ss11.74">11.74 <CODE>.MAC, .MACRO</CODE></A>
+<H2><A NAME=".MACRO"></A> <A NAME="ss11.74">11.74</A> <A HREF="#toc11.74"><CODE>.MAC, .MACRO</CODE></A>
 </H2>
 
 
@@ -3898,7 +4171,7 @@ that are macro parameters. A macro definition is terminated by <CODE>
 <A HREF="#macros">Macros</A>.</P>
 
 
-<H2><A NAME=".ORG"></A> <A NAME="ss11.75">11.75 <CODE>.ORG</CODE></A>
+<H2><A NAME=".ORG"></A> <A NAME="ss11.75">11.75</A> <A HREF="#toc11.75"><CODE>.ORG</CODE></A>
 </H2>
 
 
@@ -3925,7 +4198,7 @@ there is usually no reason to assemble code to a specific address.</P>
 </P>
 
 
-<H2><A NAME=".OUT"></A> <A NAME="ss11.76">11.76 <CODE>.OUT</CODE></A>
+<H2><A NAME=".OUT"></A> <A NAME="ss11.76">11.76</A> <A HREF="#toc11.76"><CODE>.OUT</CODE></A>
 </H2>
 
 
@@ -3949,7 +4222,7 @@ that prevents the creation of an object file.</P>
 <A HREF="#.WARNING">.WARNING</A></CODE></P>
 
 
-<H2><A NAME=".P02"></A> <A NAME="ss11.77">11.77 <CODE>.P02</CODE></A>
+<H2><A NAME=".P02"></A> <A NAME="ss11.77">11.77</A> <A HREF="#toc11.77"><CODE>.P02</CODE></A>
 </H2>
 
 
@@ -3963,7 +4236,7 @@ instructions. This is the default if not overridden by the
 <A HREF="#.P816">.P816</A></CODE></P>
 
 
-<H2><A NAME=".P816"></A> <A NAME="ss11.78">11.78 <CODE>.P816</CODE></A>
+<H2><A NAME=".P816"></A> <A NAME="ss11.78">11.78</A> <A HREF="#toc11.78"><CODE>.P816</CODE></A>
 </H2>
 
 
@@ -3975,7 +4248,7 @@ instructions. This is the default if not overridden by the
 <A HREF="#.PC02">.PC02</A></CODE></P>
 
 
-<H2><A NAME=".PAGELENGTH"></A> <A NAME="ss11.79">11.79 <CODE>.PAGELEN, .PAGELENGTH</CODE></A>
+<H2><A NAME=".PAGELENGTH"></A> <A NAME="ss11.79">11.79</A> <A HREF="#toc11.79"><CODE>.PAGELEN, .PAGELENGTH</CODE></A>
 </H2>
 
 
@@ -3999,7 +4272,7 @@ source. Instead, the value set with the last <CODE>.PAGELENGTH</CODE> is used.</
 </P>
 
 
-<H2><A NAME=".PC02"></A> <A NAME="ss11.80">11.80 <CODE>.PC02</CODE></A>
+<H2><A NAME=".PC02"></A> <A NAME="ss11.80">11.80</A> <A HREF="#toc11.80"><CODE>.PC02</CODE></A>
 </H2>
 
 
@@ -4011,7 +4284,7 @@ source. Instead, the value set with the last <CODE>.PAGELENGTH</CODE> is used.</
 <A HREF="#.P816">.P816</A></CODE></P>
 
 
-<H2><A NAME=".POPCPU"></A> <A NAME="ss11.81">11.81 <CODE>.POPCPU</CODE></A>
+<H2><A NAME=".POPCPU"></A> <A NAME="ss11.81">11.81</A> <A HREF="#toc11.81"><CODE>.POPCPU</CODE></A>
 </H2>
 
 
@@ -4028,7 +4301,7 @@ this command is issued.</P>
 <A HREF="#.SETCPU">.SETCPU</A></CODE></P>
 
 
-<H2><A NAME=".POPSEG"></A> <A NAME="ss11.82">11.82 <CODE>.POPSEG</CODE></A>
+<H2><A NAME=".POPSEG"></A> <A NAME="ss11.82">11.82</A> <A HREF="#toc11.82"><CODE>.POPSEG</CODE></A>
 </H2>
 
 
@@ -4043,7 +4316,7 @@ when this command is issued.</P>
 <A HREF="#.PUSHSEG">.PUSHSEG</A></CODE></P>
 
 
-<H2><A NAME=".PROC"></A> <A NAME="ss11.83">11.83 <CODE>.PROC</CODE></A>
+<H2><A NAME=".PROC"></A> <A NAME="ss11.83">11.83</A> <A HREF="#toc11.83"><CODE>.PROC</CODE></A>
 </H2>
 
 
@@ -4083,7 +4356,7 @@ had any need for local macro definitions.</P>
 <A HREF="#.SCOPE">.SCOPE</A></CODE></P>
 
 
-<H2><A NAME=".PSC02"></A> <A NAME="ss11.84">11.84 <CODE>.PSC02</CODE></A>
+<H2><A NAME=".PSC02"></A> <A NAME="ss11.84">11.84</A> <A HREF="#toc11.84"><CODE>.PSC02</CODE></A>
 </H2>
 
 
@@ -4095,7 +4368,7 @@ had any need for local macro definitions.</P>
 <A HREF="#.P816">.P816</A></CODE></P>
 
 
-<H2><A NAME=".PUSHCPU"></A> <A NAME="ss11.85">11.85 <CODE>.PUSHCPU</CODE></A>
+<H2><A NAME=".PUSHCPU"></A> <A NAME="ss11.85">11.85</A> <A HREF="#toc11.85"><CODE>.PUSHCPU</CODE></A>
 </H2>
 
 
@@ -4112,7 +4385,7 @@ when this command is issued.</P>
 <A HREF="#.SETCPU">.SETCPU</A></CODE></P>
 
 
-<H2><A NAME=".PUSHSEG"></A> <A NAME="ss11.86">11.86 <CODE>.PUSHSEG</CODE></A>
+<H2><A NAME=".PUSHSEG"></A> <A NAME="ss11.86">11.86</A> <A HREF="#toc11.86"><CODE>.PUSHSEG</CODE></A>
 </H2>
 
 
@@ -4129,7 +4402,7 @@ full, when this command is issued.</P>
 <A HREF="#.POPSEG">.POPSEG</A></CODE></P>
 
 
-<H2><A NAME=".RELOC"></A> <A NAME="ss11.87">11.87 <CODE>.RELOC</CODE></A>
+<H2><A NAME=".RELOC"></A> <A NAME="ss11.87">11.87</A> <A HREF="#toc11.87"><CODE>.RELOC</CODE></A>
 </H2>
 
 
@@ -4137,7 +4410,7 @@ full, when this command is issued.</P>
 <A HREF="#.ORG">.ORG</A></CODE> command.</P>
 
 
-<H2><A NAME=".REPEAT"></A> <A NAME="ss11.88">11.88 <CODE>.REPEAT</CODE></A>
+<H2><A NAME=".REPEAT"></A> <A NAME="ss11.88">11.88</A> <A HREF="#toc11.88"><CODE>.REPEAT</CODE></A>
 </H2>
 
 
@@ -4170,7 +4443,7 @@ characters of the string are XORed by the value $55.</P>
 <A HREF="#.ENDREPEAT">.ENDREPEAT</A></CODE></P>
 
 
-<H2><A NAME=".RES"></A> <A NAME="ss11.89">11.89 <CODE>.RES</CODE></A>
+<H2><A NAME=".RES"></A> <A NAME="ss11.89">11.89</A> <A HREF="#toc11.89"><CODE>.RES</CODE></A>
 </H2>
 
 
@@ -4192,7 +4465,7 @@ linker configuration file (default: zero).</P>
 </P>
 
 
-<H2><A NAME=".RODATA"></A> <A NAME="ss11.90">11.90 <CODE>.RODATA</CODE></A>
+<H2><A NAME=".RODATA"></A> <A NAME="ss11.90">11.90</A> <A HREF="#toc11.90"><CODE>.RODATA</CODE></A>
 </H2>
 
 
@@ -4212,7 +4485,7 @@ readonly data like string constants.</P>
 <A HREF="#.SEGMENT">.SEGMENT</A></CODE> command.</P>
 
 
-<H2><A NAME=".SCOPE"></A> <A NAME="ss11.91">11.91 <CODE>.SCOPE</CODE></A>
+<H2><A NAME=".SCOPE"></A> <A NAME="ss11.91">11.91</A> <A HREF="#toc11.91"><CODE>.SCOPE</CODE></A>
 </H2>
 
 
@@ -4250,7 +4523,7 @@ had any need for local macro definitions.</P>
 <A HREF="#.PROC">.PROC</A></CODE></P>
 
 
-<H2><A NAME=".SEGMENT"></A> <A NAME="ss11.92">11.92 <CODE>.SEGMENT</CODE></A>
+<H2><A NAME=".SEGMENT"></A> <A NAME="ss11.92">11.92</A> <A HREF="#toc11.92"><CODE>.SEGMENT</CODE></A>
 </H2>
 
 
@@ -4295,7 +4568,7 @@ segment specified as zeropage cannot be declared as being absolute later.</P>
 <A HREF="#.RODATA">.RODATA</A></CODE></P>
 
 
-<H2><A NAME=".SET"></A> <A NAME="ss11.93">11.93 <CODE>.SET</CODE></A>
+<H2><A NAME=".SET"></A> <A NAME="ss11.93">11.93</A> <A HREF="#toc11.93"><CODE>.SET</CODE></A>
 </H2>
 
 
@@ -4303,7 +4576,7 @@ segment specified as zeropage cannot be declared as being absolute later.</P>
 <A HREF="#variables">Numeric variables</A> for a full description.</P>
 
 
-<H2><A NAME=".SETCPU"></A> <A NAME="ss11.94">11.94 <CODE>.SETCPU</CODE></A>
+<H2><A NAME=".SETCPU"></A> <A NAME="ss11.94">11.94</A> <A HREF="#toc11.94"><CODE>.SETCPU</CODE></A>
 </H2>
 
 
@@ -4335,7 +4608,7 @@ and confidential".</P>
 <A HREF="#.PSC02">.PSC02</A></CODE></P>
 
 
-<H2><A NAME=".SMART"></A> <A NAME="ss11.95">11.95 <CODE>.SMART</CODE></A>
+<H2><A NAME=".SMART"></A> <A NAME="ss11.95">11.95</A> <A HREF="#toc11.95"><CODE>.SMART</CODE></A>
 </H2>
 
 
@@ -4379,7 +4652,7 @@ memory model used.</LI>
 <A HREF="#.I8">.I8</A></CODE></P>
 
 
-<H2><A NAME=".STRUCT"></A> <A NAME="ss11.96">11.96 <CODE>.STRUCT</CODE></A>
+<H2><A NAME=".STRUCT"></A> <A NAME="ss11.96">11.96</A> <A HREF="#toc11.96"><CODE>.STRUCT</CODE></A>
 </H2>
 
 
@@ -4393,7 +4666,7 @@ memory model used.</LI>
 <A HREF="#.UNION">.UNION</A></CODE></P>
 
 
-<H2><A NAME=".SUNPLUS"></A> <A NAME="ss11.97">11.97 <CODE>.SUNPLUS</CODE></A>
+<H2><A NAME=".SUNPLUS"></A> <A NAME="ss11.97">11.97</A> <A HREF="#toc11.97"><CODE>.SUNPLUS</CODE></A>
 </H2>
 
 
@@ -4408,7 +4681,7 @@ freeware version of the assembler, because the instruction set is
 <A HREF="#.P816">.P816</A></CODE></P>
 
 
-<H2><A NAME=".TAG"></A> <A NAME="ss11.98">11.98 <CODE>.TAG</CODE></A>
+<H2><A NAME=".TAG"></A> <A NAME="ss11.98">11.98</A> <A HREF="#toc11.98"><CODE>.TAG</CODE></A>
 </H2>
 
 
@@ -4430,7 +4703,7 @@ freeware version of the assembler, because the instruction set is
 </P>
 
 
-<H2><A NAME=".UNDEFINE"></A> <A NAME="ss11.99">11.99 <CODE>.UNDEF, .UNDEFINE</CODE></A>
+<H2><A NAME=".UNDEFINE"></A> <A NAME="ss11.99">11.99</A> <A HREF="#toc11.99"><CODE>.UNDEF, .UNDEFINE</CODE></A>
 </H2>
 
 
@@ -4444,7 +4717,7 @@ section
 <A HREF="#macros">Macros</A>.</P>
 
 
-<H2><A NAME=".UNION"></A> <A NAME="ss11.100">11.100 <CODE>.UNION</CODE></A>
+<H2><A NAME=".UNION"></A> <A NAME="ss11.100">11.100</A> <A HREF="#toc11.100"><CODE>.UNION</CODE></A>
 </H2>
 
 
@@ -4458,7 +4731,7 @@ section
 <A HREF="#.STRUCT">.STRUCT</A></CODE></P>
 
 
-<H2><A NAME=".WARNING"></A> <A NAME="ss11.101">11.101 <CODE>.WARNING</CODE></A>
+<H2><A NAME=".WARNING"></A> <A NAME="ss11.101">11.101</A> <A HREF="#toc11.101"><CODE>.WARNING</CODE></A>
 </H2>
 
 
@@ -4496,7 +4769,7 @@ the source file.</P>
 <A HREF="#.OUT">.OUT</A></CODE></P>
 
 
-<H2><A NAME=".WORD"></A> <A NAME="ss11.102">11.102 <CODE>.WORD</CODE></A>
+<H2><A NAME=".WORD"></A> <A NAME="ss11.102">11.102</A> <A HREF="#toc11.102"><CODE>.WORD</CODE></A>
 </H2>
 
 
@@ -4513,7 +4786,7 @@ but not necessarily constant) expressions.</P>
 </P>
 
 
-<H2><A NAME=".ZEROPAGE"></A> <A NAME="ss11.103">11.103 <CODE>.ZEROPAGE</CODE></A>
+<H2><A NAME=".ZEROPAGE"></A> <A NAME="ss11.103">11.103</A> <A HREF="#toc11.103"><CODE>.ZEROPAGE</CODE></A>
 </H2>
 
 
@@ -4537,12 +4810,12 @@ otherwise you will get errors.</P>
 
 
 
-<H2><A NAME="macros"></A> <A NAME="s12">12. Macros</A></H2>
+<H2><A NAME="macros"></A> <A NAME="s12">12.</A> <A HREF="#toc12">Macros</A></H2>
 
 
 
 
-<H2><A NAME="ss12.1">12.1 Introduction</A>
+<H2><A NAME="ss12.1">12.1</A> <A HREF="#toc12.1">Introduction</A>
 </H2>
 
 
@@ -4552,7 +4825,7 @@ file, the macro is "expanded", that is, it is replaced by the tokens that
 were specified when the macro was defined.</P>
 
 
-<H2><A NAME="ss12.2">12.2 Macros without parameters</A>
+<H2><A NAME="ss12.2">12.2</A> <A HREF="#toc12.2">Macros without parameters</A>
 </H2>
 
 
@@ -4582,7 +4855,7 @@ by using the name, like this:</P>
 </P>
 
 
-<H2><A NAME="ss12.3">12.3 Parametrized macros</A>
+<H2><A NAME="ss12.3">12.3</A> <A HREF="#toc12.3">Parametrized macros</A>
 </H2>
 
 
@@ -4709,7 +4982,7 @@ calling sequence, not the parameters.</P>
 including the comma.</P>
 
 
-<H2><A NAME="ss12.4">12.4 Detecting parameter types</A>
+<H2><A NAME="ss12.4">12.4</A> <A HREF="#toc12.4">Detecting parameter types</A>
 </H2>
 
 
@@ -4758,7 +5031,7 @@ as end-of-list.</P>
 </P>
 
 
-<H2><A NAME="ss12.5">12.5 Recursive macros</A>
+<H2><A NAME="ss12.5">12.5</A> <A HREF="#toc12.5">Recursive macros</A>
 </H2>
 
 
@@ -4807,7 +5080,7 @@ until an empty one is encountered. The macro may be called like this:</P>
 </P>
 
 
-<H2><A NAME="ss12.6">12.6 Local symbols inside macros</A>
+<H2><A NAME="ss12.6">12.6</A> <A HREF="#toc12.6">Local symbols inside macros</A>
 </H2>
 
 
@@ -4884,7 +5157,7 @@ that hides any labels:</P>
 </P>
 
 
-<H2><A NAME="ss12.7">12.7 C style macros</A>
+<H2><A NAME="ss12.7">12.7</A> <A HREF="#toc12.7">C style macros</A>
 </H2>
 
 
@@ -4981,7 +5254,7 @@ don't like that, use classic macros instead:</P>
 <P>(This is an example where a problem can be solved with both macro types).</P>
 
 
-<H2><A NAME="ss12.8">12.8 Characters in macros</A>
+<H2><A NAME="ss12.8">12.8</A> <A HREF="#toc12.8">Characters in macros</A>
 </H2>
 
 
@@ -4998,7 +5271,7 @@ doing more complex macros. If you compare characters against numeric values,
 be sure to take the translation into account.</P>
 
 
-<H2><A NAME="ss12.9">12.9 Deleting macros</A>
+<H2><A NAME="ss12.9">12.9</A> <A HREF="#toc12.9">Deleting macros</A>
 </H2>
 
 
@@ -5049,7 +5322,7 @@ argument to <CODE>.UNDEFINE</CODE> is not allowed to come from another
 different commands increases flexibility.</P>
 
 
-<H2><A NAME="macropackages"></A> <A NAME="s13">13. Macro packages</A></H2>
+<H2><A NAME="macropackages"></A> <A NAME="s13">13.</A> <A HREF="#toc13">Macro packages</A></H2>
 
 
 <P>Using the <CODE>
@@ -5058,7 +5331,7 @@ macro packages may be included with just one command. Available macro packages
 are:</P>
 
 
-<H2><A NAME="ss13.1">13.1 <CODE>.MACPACK generic</CODE></A>
+<H2><A NAME="ss13.1">13.1</A> <A HREF="#toc13.1"><CODE>.MACPACK generic</CODE></A>
 </H2>
 
 
@@ -5109,7 +5382,7 @@ Currently defined macros are:</P>
 </P>
 
 
-<H2><A NAME="ss13.2">13.2 <CODE>.MACPACK longbranch</CODE></A>
+<H2><A NAME="ss13.2">13.2</A> <A HREF="#toc13.2"><CODE>.MACPACK longbranch</CODE></A>
 </H2>
 
 
@@ -5146,7 +5419,7 @@ jump to the actual branch target.</P>
 
 
 
-<H2><A NAME="ss13.3">13.3 <CODE>.MACPACK atari</CODE></A>
+<H2><A NAME="ss13.3">13.3</A> <A HREF="#toc13.3"><CODE>.MACPACK atari</CODE></A>
 </H2>
 
 
@@ -5155,7 +5428,7 @@ string as argument and places this string into memory translated into screen
 codes.</P>
 
 
-<H2><A NAME="ss13.4">13.4 <CODE>.MACPACK cbm</CODE></A>
+<H2><A NAME="ss13.4">13.4</A> <A HREF="#toc13.4"><CODE>.MACPACK cbm</CODE></A>
 </H2>
 
 
@@ -5164,7 +5437,7 @@ string as argument and places this string into memory translated into screen
 codes.</P>
 
 
-<H2><A NAME="ss13.5">13.5 <CODE>.MACPACK cpu</CODE></A>
+<H2><A NAME="ss13.5">13.5</A> <A HREF="#toc13.5"><CODE>.MACPACK cpu</CODE></A>
 </H2>
 
 
@@ -5234,7 +5507,7 @@ CPUs (the latter two are upwards compatible to the 65SC02).</P>
 
 
 
-<H2><A NAME="predefined-constants"></A> <A NAME="s14">14. Predefined constants</A></H2>
+<H2><A NAME="predefined-constants"></A> <A NAME="s14">14.</A> <A HREF="#toc14">Predefined constants</A></H2>
 
 
 <P>For better orthogonality, the assembler defines similar symbols as the
@@ -5269,11 +5542,11 @@ compiler, depending on the target system selected:</P>
 </P>
 
 
-<H2><A NAME="structs"></A> <A NAME="s15">15. Structs and unions</A></H2>
+<H2><A NAME="structs"></A> <A NAME="s15">15.</A> <A HREF="#toc15">Structs and unions</A></H2>
 
 
 
-<H2><A NAME="ss15.1">15.1 Structs and unions Overview</A>
+<H2><A NAME="ss15.1">15.1</A> <A HREF="#toc15.1">Structs and unions Overview</A>
 </H2>
 
 
@@ -5285,7 +5558,7 @@ in case of a struct, is the offset from the beginning and, in case of a union,
 is always zero.</P>
 
 
-<H2><A NAME="ss15.2">15.2 Declaration</A>
+<H2><A NAME="ss15.2">15.2</A> <A HREF="#toc15.2">Declaration</A>
 </H2>
 
 
@@ -5333,7 +5606,7 @@ storage allocators may contain a multiplier, as in the example below:</P>
 </P>
 
 
-<H2><A NAME="ss15.3">15.3 The <CODE>.TAG</CODE> keyword</A>
+<H2><A NAME="ss15.3">15.3</A> <A HREF="#toc15.3">The <CODE>.TAG</CODE> keyword</A>
 </H2>
 
 
@@ -5377,7 +5650,7 @@ of the struct itself:</P>
 <P>This may change in a future version of the assembler.</P>
 
 
-<H2><A NAME="ss15.4">15.4 Limitations</A>
+<H2><A NAME="ss15.4">15.4</A> <A HREF="#toc15.4">Limitations</A>
 </H2>
 
 
@@ -5393,7 +5666,7 @@ this structure accessible by using the '::' operator.</P>
 
 
 
-<H2><A NAME="condes"></A> <A NAME="s16">16. Module constructors/destructors</A></H2>
+<H2><A NAME="condes"></A> <A NAME="s16">16.</A> <A HREF="#toc16">Module constructors/destructors</A></H2>
 
 
 <P><EM>Note:</EM> This section applies mostly to C programs, so the explanation
@@ -5401,7 +5674,7 @@ below uses examples from the C libraries. However, the feature may also be
 useful for assembler programs.</P>
 
 
-<H2><A NAME="ss16.1">16.1 Module constructors/destructors Overview</A>
+<H2><A NAME="ss16.1">16.1</A> <A HREF="#toc16.1">Module constructors/destructors Overview</A>
 </H2>
 
 
@@ -5447,7 +5720,7 @@ two bytes in the table (a pointer to the function).
 </P>
 
 
-<H2><A NAME="ss16.2">16.2 Calling order</A>
+<H2><A NAME="ss16.2">16.2</A> <A HREF="#toc16.2">Calling order</A>
 </H2>
 
 
@@ -5461,7 +5734,7 @@ a high priority are called first.</P>
 first, followed by low priority functions.</P>
 
 
-<H2><A NAME="ss16.3">16.3 Pitfalls</A>
+<H2><A NAME="ss16.3">16.3</A> <A HREF="#toc16.3">Pitfalls</A>
 </H2>
 
 
@@ -5502,7 +5775,7 @@ additional type. Predefined types are 0 (constructor), 1 (destructor) and 2
 </P>
 
 
-<H2><A NAME="s17">17. Porting sources from other assemblers</A></H2>
+<H2><A NAME="s17">17.</A> <A HREF="#toc17">Porting sources from other assemblers</A></H2>
 
 
 <P>Sometimes it is necessary to port code written for older assemblers to ca65.
@@ -5518,7 +5791,7 @@ done within the assembler and there is no external linker.</P>
 features of the assembler, but there may be situations where even this rule is
 not valid.</P>
 
-<H2><A NAME="ss17.1">17.1 TASS</A>
+<H2><A NAME="ss17.1">17.1</A> <A HREF="#toc17.1">TASS</A>
 </H2>
 
 
@@ -5604,7 +5877,7 @@ are used for the cbm load address.
 </P>
 
 
-<H2><A NAME="s18">18. Copyright</A></H2>
+<H2><A NAME="s18">18.</A> <A HREF="#toc18">Copyright</A></H2>
 
 
 <P>ca65 (and all cc65 binutils) are (C) Copyright 1998-2003 Ullrich von

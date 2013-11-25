@@ -16,7 +16,33 @@ file format used by cc65 for loadable drivers, the co65 utility allows (among
 other things) to link drivers statically to the generated executables instead
 of loading them from disk.</EM>
 <HR>
-<H2><A NAME="s1">1. Overview</A></H2>
+<P>
+<H2><A NAME="toc1">1.</A> <A HREF="co65.html#s1">Overview</A></H2>
+
+<P>
+<H2><A NAME="toc2">2.</A> <A HREF="co65.html#s2">Usage</A></H2>
+
+<UL>
+<LI><A NAME="toc2.1">2.1</A> <A HREF="co65.html#ss2.1">Command line option overview</A>
+<LI><A NAME="toc2.2">2.2</A> <A HREF="co65.html#ss2.2">Command line options in detail</A>
+</UL>
+<P>
+<H2><A NAME="toc3">3.</A> <A HREF="co65.html#s3">Input and output</A></H2>
+
+<P>
+<H2><A NAME="toc4">4.</A> <A HREF="co65.html#s4">Converting loadable drivers</A></H2>
+
+<UL>
+<LI><A NAME="toc4.1">4.1</A> <A HREF="co65.html#ss4.1">Differences between static linking and runtime loading</A>
+<LI><A NAME="toc4.2">4.2</A> <A HREF="co65.html#ss4.2">Additional requirements</A>
+<LI><A NAME="toc4.3">4.3</A> <A HREF="co65.html#ss4.3">Example - Convert and link a graphics driver</A>
+</UL>
+<P>
+<H2><A NAME="toc5">5.</A> <A HREF="co65.html#s5">Copyright</A></H2>
+
+
+<HR>
+<H2><A NAME="s1">1.</A> <A HREF="#toc1">Overview</A></H2>
 
 
 <P>co65 is an object file conversion utility. It converts o65 object files into
@@ -32,7 +58,7 @@ since such tools are currently rare.</P>
 
 
 
-<H2><A NAME="s2">2. Usage</A></H2>
+<H2><A NAME="s2">2.</A> <A HREF="#toc2">Usage</A></H2>
 
 
 <P>The co65 utility converts one o65 file per run into one assembler files in
@@ -40,7 +66,7 @@ ca65 format. The utility tries to autodetect the type of the o65 input file
 using the operating system identifier contained in the o65 option list.</P>
 
 
-<H2><A NAME="ss2.1">2.1 Command line option overview</A>
+<H2><A NAME="ss2.1">2.1</A> <A HREF="#toc2.1">Command line option overview</A>
 </H2>
 
 
@@ -80,7 +106,7 @@ Long options:
 </P>
 
 
-<H2><A NAME="ss2.2">2.2 Command line options in detail</A>
+<H2><A NAME="ss2.2">2.2</A> <A HREF="#toc2.2">Command line options in detail</A>
 </H2>
 
 
@@ -204,7 +230,7 @@ compatible with the standard ld65 linker configurations.</P>
 </P>
 
 
-<H2><A NAME="s3">3. Input and output</A></H2>
+<H2><A NAME="s3">3.</A> <A HREF="#toc3">Input and output</A></H2>
 
 
 <P>The converter will accept one o65 file per invocation and create a file with
@@ -213,11 +239,11 @@ file contains assembler code suitable for the use with the ca65 macro
 assembler.</P>
 
 
-<H2><A NAME="s4">4. Converting loadable drivers</A></H2>
+<H2><A NAME="s4">4.</A> <A HREF="#toc4">Converting loadable drivers</A></H2>
 
 
 
-<H2><A NAME="ss4.1">4.1 Differences between static linking and runtime loading</A>
+<H2><A NAME="ss4.1">4.1</A> <A HREF="#toc4.1">Differences between static linking and runtime loading</A>
 </H2>
 
 
@@ -244,7 +270,7 @@ with cc65 behave correctly when linked statically.
 </P>
 
 
-<H2><A NAME="ss4.2">4.2 Additional requirements</A>
+<H2><A NAME="ss4.2">4.2</A> <A HREF="#toc4.2">Additional requirements</A>
 </H2>
 
 
@@ -268,7 +294,7 @@ Be sure to never modify the variable which is in reality the start of your
 driver!</P>
 
 
-<H2><A NAME="ss4.3">4.3 Example - Convert and link a graphics driver</A>
+<H2><A NAME="ss4.3">4.3</A> <A HREF="#toc4.3">Example - Convert and link a graphics driver</A>
 </H2>
 
 
@@ -318,7 +344,7 @@ will get an "undefined external" error for the _c64_hi symbol.</P>
 
 
 
-<H2><A NAME="s5">5. Copyright</A></H2>
+<H2><A NAME="s5">5.</A> <A HREF="#toc5">Copyright</A></H2>
 
 
 <P>co65 is (C) Copyright 2003 Ullrich von Bassewitz. For usage of the binaries

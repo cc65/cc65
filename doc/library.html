@@ -13,7 +13,33 @@
 <EM>An overview over the runtime and C libraries that come with the cc65 compiler,
 including a discussion of the differences to the ISO standard.</EM>
 <HR>
-<H2><A NAME="s1">1. Overview</A></H2>
+<P>
+<H2><A NAME="toc1">1.</A> <A HREF="library.html#s1">Overview</A></H2>
+
+<P>
+<H2><A NAME="toc2">2.</A> <A HREF="library.html#s2">ISO C compatible library</A></H2>
+
+<P>
+<H2><A NAME="toc3">3.</A> <A HREF="library.html#s3">CPU specific stuff - 6502.h</A></H2>
+
+<P>
+<H2><A NAME="toc4">4.</A> <A HREF="library.html#s4">Target specific stuff</A></H2>
+
+<P>
+<H2><A NAME="toc5">5.</A> <A HREF="library.html#s5">Direct console I/O - <CODE>conio.h</CODE></A></H2>
+
+<P>
+<H2><A NAME="toc6">6.</A> <A HREF="library.html#s6">Using the joystick - <CODE>joystick.h</CODE></A></H2>
+
+<P>
+<H2><A NAME="toc7">7.</A> <A HREF="library.html#s7">Using a mouse - <CODE>mouse.h</CODE></A></H2>
+
+<P>
+<H2><A NAME="toc8">8.</A> <A HREF="library.html#s8">Copyright</A></H2>
+
+
+<HR>
+<H2><A NAME="s1">1.</A> <A HREF="#toc1">Overview</A></H2>
 
 
 <P>This file contains a short overview of the libraries available for the cc65 C
@@ -26,7 +52,7 @@ the headers, explaining their use.</P>
 
 
 
-<H2><A NAME="s2">2. ISO C compatible library</A></H2>
+<H2><A NAME="s2">2.</A> <A HREF="#toc2">ISO C compatible library</A></H2>
 
 
 <P>The C library contains a large subset of the ISO C library. Functions are
@@ -121,7 +147,7 @@ available if the macro definition is removed).</LI>
 
 
 
-<H2><A NAME="s3">3. CPU specific stuff - 6502.h</A></H2>
+<H2><A NAME="s3">3.</A> <A HREF="#toc3">CPU specific stuff - 6502.h</A></H2>
 
 
 <P>The header file 6502.h contains some functions that make only sense with the
@@ -131,7 +157,7 @@ passing registers in and out.</P>
 
 
 
-<H2><A NAME="s4">4. Target specific stuff</A></H2>
+<H2><A NAME="s4">4.</A> <A HREF="#toc4">Target specific stuff</A></H2>
 
 
 <P>For each supported system there's a header file that contains calls or defines
@@ -163,7 +189,7 @@ family.
 </P>
 
 
-<H2><A NAME="s5">5. Direct console I/O - <CODE>conio.h</CODE></A></H2>
+<H2><A NAME="s5">5.</A> <A HREF="#toc5">Direct console I/O - <CODE>conio.h</CODE></A></H2>
 
 
 <P>The <CODE>conio.h</CODE> header file contains a large set of functions that do screen
@@ -196,7 +222,7 @@ which define constants for special characters and keys.</P>
 
 
 
-<H2><A NAME="s6">6. Using the joystick - <CODE>joystick.h</CODE></A></H2>
+<H2><A NAME="s6">6.</A> <A HREF="#toc6">Using the joystick - <CODE>joystick.h</CODE></A></H2>
 
 
 <P>For systems that have a joystick, <CODE>joystick.h</CODE> will define a subroutine to
@@ -205,7 +231,7 @@ function.</P>
 
 
 
-<H2><A NAME="s7">7. Using a mouse - <CODE>mouse.h</CODE></A></H2>
+<H2><A NAME="s7">7.</A> <A HREF="#toc7">Using a mouse - <CODE>mouse.h</CODE></A></H2>
 
 
 <P>Some target machines support a mouse. Mouse support is currently available for
@@ -221,7 +247,7 @@ the following targets:</P>
 <P>The available functions are declared in <CODE>mouse.h</CODE>.</P>
 
 
-<H2><A NAME="s8">8. Copyright</A></H2>
+<H2><A NAME="s8">8.</A> <A HREF="#toc8">Copyright</A></H2>
 
 
 <P>This C runtime library implementation for the cc65 compiler is (C)

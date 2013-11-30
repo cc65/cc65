@@ -646,15 +646,18 @@ static void OneLine (void)
      * an instruction.
      */
     if (CurTok.Tok == TOK_IDENT) {
-        if (!UbiquitousIdents) {
-            /* Macros and symbols cannot use instruction names */
+        if (UbiquitousIdents) {
+            /* Macros CAN be instructions, so check for them first */
+            Mac = FindMacro (&CurTok.SVal);
+            if (Mac == 0) {
+                Instr = FindInstruction (&CurTok.SVal);
+            }
+        } else {
+            /* Macros and symbols may NOT use the names of instructions */
             Instr = FindInstruction (&CurTok.SVal);
             if (Instr < 0) {
                 Mac = FindMacro (&CurTok.SVal);
             }
-        } else {
-            /* Macros and symbols may use the names of instructions */
-            Mac = FindMacro (&CurTok.SVal);
         }
     }
 
@@ -741,15 +744,18 @@ static void OneLine (void)
              * be a macro or instruction.
              */
             if (CurTok.Tok == TOK_IDENT) {
-                if (!UbiquitousIdents) {
-                    /* Macros and symbols cannot use instruction names */
+                if (UbiquitousIdents) {
+                    /* Macros CAN be instructions, so check for them first */
+                    Mac = FindMacro (&CurTok.SVal);
+                    if (Mac == 0) {
+                        Instr = FindInstruction (&CurTok.SVal);
+                    }
+                } else {
+                    /* Macros and symbols may NOT use the names of instructions */
                     Instr = FindInstruction (&CurTok.SVal);
                     if (Instr < 0) {
                         Mac = FindMacro (&CurTok.SVal);
                     }
-                } else {
-                    /* Macros and symbols may use the names of instructions */
-                    Mac = FindMacro (&CurTok.SVal);
                 }
             }
         }

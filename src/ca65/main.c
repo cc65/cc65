@@ -768,8 +768,7 @@ static void OneLine (void)
     } else if (Mac != 0) {
         /* A macro expansion */
         MacExpandStart (Mac);
-    } else if (Instr >= 0 ||
-               (UbiquitousIdents && ((Instr = FindInstruction (&CurTok.SVal)) >= 0))) {
+    } else if (Instr >= 0) {
         /* A mnemonic - assemble one instruction */
         HandleInstruction (Instr);
     } else if (PCAssignment && (CurTok.Tok == TOK_STAR || CurTok.Tok == TOK_PC)) {

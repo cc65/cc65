@@ -10,17 +10,18 @@ CBMS = c128   \
 GEOS = geos-apple \
        geos-cbm
 
-TARGETS = apple2    \
-          apple2enh \
-          atari     \
-          atarixl   \
-          atmos     \
-          $(CBMS)   \
-          $(GEOS)   \
-          lynx      \
-          nes       \
-          sim6502   \
-          sim65c02  \
+TARGETS = apple2       \
+          apple2enh    \
+          atari        \
+          atarixl      \
+          atmos        \
+          creativision \
+          $(CBMS)      \
+          $(GEOS)      \
+          lynx         \
+          nes          \
+          sim6502      \
+          sim65c02     \
           supervision
 
 DRVTYPES = emd \

@@ -64,26 +64,25 @@ typedef enum {
     TGT_CBM510,
     TGT_CBM610,
     TGT_PET,
+    TGT_BBC,
     TGT_APPLE2,
     TGT_APPLE2ENH,
-    TGT_ATMOS,
-    TGT_BBC,
-    TGT_CREATIVISION,
-    TGT_GEOS_APPLE,
     TGT_GEOS_CBM,
+    TGT_GEOS_APPLE,
     TGT_LUNIX,
-    TGT_LYNX,
+    TGT_ATMOS,
     TGT_NES,
+    TGT_SUPERVISION,
+    TGT_LYNX,
     TGT_SIM6502,
     TGT_SIM65C02,
-    TGT_SUPERVISION,
     TGT_COUNT                   /* Number of target systems */
 } target_t;
 
 /* Collection of target properties */
 typedef struct TargetProperties TargetProperties;
 struct TargetProperties {
-    const char              Name[13];   /* Name of the target */
+    const char              Name[12];   /* Name of the target */
     cpu_t                   DefaultCPU; /* Default CPU for this target */
     unsigned char           BinFmt;     /* Default binary format for this target */
     const unsigned char*    CharMap;    /* Character translation table */

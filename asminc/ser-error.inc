@@ -48,6 +48,7 @@
         SER_ERR_INIT_FAILED             ; Initialization failed
         SER_ERR_INV_IOCTL               ; IOCTL not supported
         SER_ERR_INSTALLED               ; A driver is already installed
+        SER_ERR_NOT_OPEN                ; Driver not open
 
         SER_ERR_COUNT                   ; Special: Number of error codes
 .endenum

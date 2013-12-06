@@ -111,6 +111,7 @@
 #define SER_ERR_INIT_FAILED     0x08    /* Initialization failed */
 #define SER_ERR_INV_IOCTL       0x09    /* IOCTL not supported */
 #define SER_ERR_INSTALLED       0x0A    /* A driver is already installed */
+#define SER_ERR_NOT_OPEN        0x0B    /* Driver is not open */
 
 /* Struct containing parameters for the serial port */
 struct ser_params {

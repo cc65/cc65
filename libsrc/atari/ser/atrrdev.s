@@ -1,6 +1,6 @@
 ;
 ; Christian Groessler, Dec-2001
-; converted to driver interface Nov-2013
+; converted to driver interface Dec-2013
 ;
 ; RS232 routines using the R: device (currently tested with an 850 only)
 ;
@@ -10,57 +10,6 @@
         .include        "ser-error.inc"
         .include        "atari.inc"
 
-.macro	pushall
-	php
-	pha
-	txa
-	pha
-	tya
-	pha
-.endmacro
-.macro	pullall
-	pla
-	tay
-	pla
-	tax
-	pla
-	plp
-.endmacro
-
-.ifdef __ATARIXL__
-.macro print_string text
-.endmacro
-.else
-.macro print_string text
-        .local  @start, @cont
-        jmp     @cont
-@start:  .byte   text, ATEOL
-@cont:   php
-	pha
-	txa
-	pha
-	tya
-	pha
-	ldx     #0              ; channel 0
-        lda     #<@start
-        sta     ICBAL,x         ; address
-        lda     #>@start
-        sta     ICBAH,x
-        lda     #<(@cont - @start)
-        sta     ICBLL,x         ; length
-        lda     #>(@cont - @start)
-        sta     ICBLH,x
-        lda     #PUTCHR
-        sta     ICCOM,x
-        jsr     CIOV
-	pla
-	tay
-	pla
-	tax
-	pla
-	plp
-.endmacro
-.endif
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
@@ -92,43 +41,43 @@ libref: .addr   $0000
         .rodata
 
 rdev:   .byte   "R:", ATEOL, 0
-bauds:	.byte	1		; SER_BAUD_45_5
-	.byte	2		; SER_BAUD_50
-	.byte	4		; SER_BAUD_75
-	.byte	5		; SER_BAUD_110
-	.byte	6		; SER_BAUD_134_5
-	.byte	7		; SER_BAUD_150
-	.byte	8		; SER_BAUD_300
-	.byte	9		; SER_BAUD_600
-	.byte	10		; SER_BAUD_1200
-	.byte	11		; SER_BAUD_1800
-	.byte	12		; SER_BAUD_2400
-	.byte	0		; SER_BAUD_3600
-	.byte	13		; SER_BAUD_4800
-	.byte	0		; SER_BAUD_7200
-	.byte	14		; SER_BAUD_9600
-	.byte	0		; SER_BAUD_19200
-	.byte	0		; SER_BAUD_38400
-	.byte	0		; SER_BAUD_57600
-	.byte	0		; SER_BAUD_115200
-	.byte	0		; SER_BAUD_230400
-	.byte	0		; SER_BAUD_31250
-	.byte	0		; SER_BAUD_62500
-	.byte	3		; SER_BAUD_56_875
-num_bauds	=	* - bauds
+bauds:  .byte   1               ; SER_BAUD_45_5
+        .byte   2               ; SER_BAUD_50
+        .byte   4               ; SER_BAUD_75
+        .byte   5               ; SER_BAUD_110
+        .byte   6               ; SER_BAUD_134_5
+        .byte   7               ; SER_BAUD_150
+        .byte   8               ; SER_BAUD_300
+        .byte   9               ; SER_BAUD_600
+        .byte   10              ; SER_BAUD_1200
+        .byte   11              ; SER_BAUD_1800
+        .byte   12              ; SER_BAUD_2400
+        .byte   0               ; SER_BAUD_3600
+        .byte   13              ; SER_BAUD_4800
+        .byte   0               ; SER_BAUD_7200
+        .byte   14              ; SER_BAUD_9600
+        .byte   0               ; SER_BAUD_19200
+        .byte   0               ; SER_BAUD_38400
+        .byte   0               ; SER_BAUD_57600
+        .byte   0               ; SER_BAUD_115200
+        .byte   0               ; SER_BAUD_230400
+        .byte   0               ; SER_BAUD_31250
+        .byte   0               ; SER_BAUD_62500
+        .byte   3               ; SER_BAUD_56_875
+num_bauds       =       * - bauds
 databits:
-	.byte	48		; SER_BITS_5
-	.byte	32		; SER_BITS_6
-	.byte	16		; SER_BITS_7
-	.byte	0		; SER_BITS_8
-num_databits	=	* - databits
+        .byte   48              ; SER_BITS_5
+        .byte   32              ; SER_BITS_6
+        .byte   16              ; SER_BITS_7
+        .byte   0               ; SER_BITS_8
+num_databits    =       * - databits
 parities:
-	.byte	0		; SER_PAR_NONE
-	.byte	4+1		; SER_PAR_ODD
-	.byte	2+8		; SER_PAR_EVEN
-	;.byte	0		; SER_PAR_MARK
-	;.byte	0		; SER_PAR_SPACE
-num_parities	=	* - parities
+        .byte   0               ; SER_PAR_NONE
+        .byte   4+1             ; SER_PAR_ODD
+        .byte   2+8             ; SER_PAR_EVEN
+        ;.byte  0               ; SER_PAR_MARK
+        ;.byte  0               ; SER_PAR_SPACE
+num_parities    =       * - parities
 
         .bss
 
@@ -183,7 +132,7 @@ invbaud:
         lda     #<SER_ERR_BAUD_UNAVAIL
         ldx     #>SER_ERR_BAUD_UNAVAIL
 openerr:
-	rts
+        rts
 
 
 ;----------------------------------------------------------------------------
@@ -191,8 +140,8 @@ openerr:
 ; Must return an SER_ERR_xx code in a/x.
 
 SER_OPEN:
-	jsr	do_open
-	bne	openerr
+        jsr     do_open
+        bne     openerr
 
 ; set line parameters
         lda     rshand
@@ -203,49 +152,40 @@ SER_OPEN:
 
         ; set baud rate, word size, stop bits and ready monitoring
 
-	; build ICAX1 value
+        ; build ICAX1 value
+        ldy     #SER_PARAMS::BAUDRATE
+        lda     (ptr1),y
+        cmp     #num_bauds
+        bcs     invbaud
 
-	jsr	dump
-	jsr	print_open_txt
-	jsr	print_iocb_txt
-	jsr	dump_iocb_num
-	jsr	nl
+        tay
+        lda     bauds,y
+        beq     invbaud
+        sta     ICAX1,x
 
-	ldy     #SER_PARAMS::BAUDRATE
-	lda	(ptr1),y
-	cmp	#num_bauds
-	bcs	invbaud
+        ldy     #SER_PARAMS::DATABITS
+        lda     (ptr1),y
+        cmp     #num_databits
+        bcs     init_err
 
-	tay
-	lda	bauds,y
-	beq	invbaud
-	sta	ICAX1,x
+        tay
+        lda     databits,y
+        ora     ICAX1,x
+        sta     ICAX1,x
 
-	ldy     #SER_PARAMS::DATABITS
-	lda	(ptr1),y
-	cmp	#num_databits
-	bcs	init_err
-
-	tay
-	lda	databits,y
-	ora	ICAX1,x
-	sta	ICAX1,x
-
-	ldy     #SER_PARAMS::STOPBITS
-	lda	(ptr1),y
-	clc
-	ror	a
-	ror	a
-	ora	ICAX1,x
-	sta	ICAX1,x
-
-	jsr	dump_aux1
+        ldy     #SER_PARAMS::STOPBITS
+        lda     (ptr1),y
+        clc
+        ror     a
+        ror     a
+        ora     ICAX1,x
+        sta     ICAX1,x
 
         lda     #36             ; xio 36, baud rate
         sta     ICCOM,x
-	lda	#0
+        lda     #0
         ;ICAX2 = 0, monitor nothing
-	sta	ICAX2,x
+        sta     ICAX2,x
         sta     ICBLL,x
         sta     ICBLH,x
         sta     ICBAL,x
@@ -270,15 +210,13 @@ SER_OPEN:
         ; set translation and parity
         ldy     #SER_PARAMS::PARITY
         lda     (ptr1),y
-	cmp	#num_parities
-	bcs	init_err
+        cmp     #num_parities
+        bcs     init_err
 
-	tay
-	lda	parities,y
-	ora	#32		; no translation
+        tay
+        lda     parities,y
+        ora     #32             ; no translation
         sta     ICAX1,x
-
-	jsr	dump_aux1
 
         lda     #38             ; xio 38, translation and parity
         sta     ICCOM,x
@@ -292,7 +230,7 @@ SER_OPEN:
 inverr: jmp     my___inviocb
 
 cioerr:
-	; @@@ need to close IOCB here
+        ; @@@ need to close IOCB here
         jsr     my_fddecusage   ; decrement usage counter of fd as open failed
 
 init_err:
@@ -351,21 +289,18 @@ do_open:
 ; CLOSE: Close the port, disable interrupts and flush the buffer. Called
 ; without parameters. Must return an error code in a/x.
 ;
+;----------------------------------------------------------------------------
+; SER_UNINSTALL routine. Is called before the driver is removed from memory.
+; Must return an SER_ERR_xx code in a/x.
+;
 
+SER_UNINSTALL:
 SER_CLOSE:
-	pushall
-	print_string "SER_CLOSE called"
-	pullall
         lda     rshand
         cmp     #$ff
         beq     @done
 
-	pushall
-	print_string "SER_CLOSE do work"
-	pullall
-
         ldx     rshand+1
-        ;jsr     my_pushax
         jsr     my__close
         ldx     #$ff
         stx     rshand
@@ -374,9 +309,6 @@ SER_CLOSE:
         stx     cm_run
 @done:  lda     #<SER_ERR_OK
         ldx     #>SER_ERR_OK
-	pushall
-	print_string "SER_CLOSE returns"
-	pullall
         rts
 
 ;----------------------------------------------------------------------------
@@ -388,11 +320,9 @@ SER_CLOSE:
 SER_GET:
         ldy     rshand
         cpy     #$ff
-        bne     @work           ; work only if initialized
-        lda     #SER_ERR_NOT_OPEN
-        bne     nierr
+        beq     ni_err           ; work only if initialized
 
-@work:  lda     rshand
+        lda     rshand
         ldx     #0
         jsr     my_fdtoiocb
         tax
@@ -433,11 +363,12 @@ SER_GET:
         rts
 
 ser_error:
-	lda     #SER_ERR_OVERFLOW	; there is no large selection of serial error codes... :-/
+        lda     #SER_ERR_OVERFLOW       ; there is no large selection of serial error codes... :-/
         ldx     #0
         rts
 
-nierr:  ldx     #0
+ni_err: lda     #SER_ERR_NOT_OPEN
+        ldx     #0
         rts
 
 ;----------------------------------------------------------------------------
@@ -448,23 +379,13 @@ nierr:  ldx     #0
 SER_PUT:
         ldy     rshand
         cpy     #$ff
-        bne     @work           ; work only if initialized
-        lda     #SER_ERR_NOT_OPEN
-        bne     nierr
+        beq     ni_err          ; work only if initialized
 
-@work:  pha			; char to write
+        pha                     ; remember char to write
         lda     rshand
         ldx     #0
         jsr     my_fdtoiocb
         tax
-
-	jsr	print_put_txt
-	pla
-	pha
-	jsr	dump_hex	; dump char to write
-	jsr	print_iocb_txt
-	jsr	dump_iocb_num
-	jsr	nl
 
         lda     cm_run          ; concurrent mode already running?
         bne     @go
@@ -481,8 +402,8 @@ SER_PUT:
         pla                     ; get the char back
         jsr     my_CIOV         ; go do it
         bmi     ser_error
-	lda	#0
-	tax
+        lda     #0
+        tax
         rts
 
 ;----------------------------------------------------------------------------
@@ -516,15 +437,7 @@ SER_IRQ     = $0000
 ; Must return an SER_ERR_xx code in a/x.
 
 SER_INSTALL:
-
-	;print_string "SER_INSTALL with error"
-	;brk
-        ;lda     #42
-        ;ldx     #0
-        ;rts
-
         ; check if R: device is installed
-
         ldy     #0
 search: lda     HATABS,y                ; get device name
         cmp     #'R'
@@ -639,249 +552,6 @@ found:  lda     ptr3
         tax                     ; A is zero
         rts
 
-;----------------------------------------------------------------------------
-; SER_UNINSTALL routine. Is called before the driver is removed from memory.
-; Must return an SER_ERR_xx code in a/x.
-
-SER_UNINSTALL:
-	pushall
-	print_string "SER_UNINSTALL called"
-	pullall
-        jmp     SER_CLOSE
-
-
-.macro print_string2 addr, len
-        ldx     #0              ; channel 0
-        lda     #<addr
-        sta     ICBAL,x         ; address
-        lda     #>addr
-        sta     ICBAH,x
-        lda     #<len
-        sta     ICBLL,x         ; length
-        lda     #>len
-        sta     ICBLH,x
-        lda     #PUTCHR
-        sta     ICCOM,x
-        jsr     CIOV
-.endmacro
-
-.macro	push_ptr1
-	lda	ptr1+1
-	pha
-	lda	ptr1
-	pha
-.endmacro
-
-.macro	pull_ptr1
-	pla
-	sta	ptr1
-	pla
-	sta	ptr1+1
-.endmacro
-
-.macro	push_ptr2und1
-	lda	ptr2+1
-	pha
-	lda	ptr2
-	pha
-	lda	ptr1+1
-	pha
-	sta	ptr2+1
-	tax
-	lda	ptr1
-	pha
-	sta	ptr2
-.endmacro
-
-.macro	pull_ptr2und1
-	pla
-	sta	ptr1
-	pla
-	sta	ptr1+1
-	pla
-	sta	ptr2
-	pla
-	sta	ptr2+1
-.endmacro
-
-
-nl_txt:  .byte   ATEOL
-nl_txt_len = * - nl_txt
-
-nl:	pushall
-	print_string2 nl_txt, nl_txt_len
-	pullall
-	rts
-
-iocb_txt:  .byte   " IOCB number: " 
-iocb_txt_len = * - iocb_txt
-
-print_iocb_txt:
-	pushall
-	print_string2 iocb_txt, iocb_txt_len
-	pullall
-	rts
-
-open_txt:  .byte   "OPEN" 
-open_txt_len = * - open_txt
-
-print_open_txt:
-	pushall
-	print_string2 open_txt, open_txt_len
-	pullall
-	rts
-
-
-put_txt:  .byte   "PUT " 
-put_txt_len = * - put_txt
-
-print_put_txt:
-	pushall
-	print_string2 put_txt, put_txt_len
-	pullall
-	rts
-
-aux1_txt:  .byte   "AUX1: " 
-aux1_txt_len = * - aux1_txt
-
-dump_aux1:
-	pushall
-	print_string2 aux1_txt,aux1_txt_len
-	tsx
-	lda	$103,x
-	jsr	dump_hex_low
-	jsr	nl
-	pullall
-	rts
-
-dump_iocb_num:
-	pushall
-	txa
-	jsr	dump_hex_low
-	pullall
-	rts
-
-dump_hex:
-	pushall
-	tsx
-	lda	$103,x
-	jsr	dump_hex_low
-	pullall
-	rts
-
-
-; no need to preserve regs
-dump_hex_low:
-	tax
-	push_ptr1
-
-	lda	#<outbuf
-	sta	ptr1
-	lda	#>outbuf
-	sta	ptr1+1
-
-	txa
-	jsr	hex8
-
-	ldx     #0              ; channel 0
-
-	lda	#2
-        sta     ICBLL,x         ; length
-	lda	#0
-        sta     ICBLH,x
-
-        lda     #<outbuf
-        sta     ICBAL,x         ; address
-        lda     #>outbuf
-        sta     ICBAH,x
-        lda     #PUTCHR
-        sta     ICCOM,x
-        jsr     CIOV
-
-
-	pull_ptr1
-	rts
-
-
-;	ldy     #SER_PARAMS::BAUDRATE
-;	lda	(ptr1),y
-
-dump:
-	pushall
-	push_ptr2und1
-
-.ifndef __ATARIXL__
-	tay
-	lda	#<outbuf
-	sta	ptr1
-	lda	#>outbuf
-	sta	ptr1+1
-
-	; ptr1 - pointer to string buffer
-	; ptr2 - pointer to rs232 params
-	tya
-	jsr	hex16
-	lda	#':'
-	sta	(ptr1),y
-	iny
-	lda	#' '
-	sta	(ptr1),y
-	iny
-	lda	#' '
-	sta	(ptr1),y
-	lda	ptr1
-	clc
-	adc	#3
-	sta	ptr1
-	bcc	@f
-	inc	ptr1+1
-@f:
-
-.repeat 5
-
-	ldy	#0
-	lda	(ptr2),y
-	jsr	hex8
-	lda	#' '
-	sta	(ptr1),y
-	inc	ptr1
-	bne	*+4
-	inc	ptr1+1
-	inc	ptr2
-	bne	*+4
-	inc	ptr2+1
-
-.endrepeat
-
-	lda	#ATEOL
-	sta	(ptr1),y
-	inc	ptr1
-	bne	*+4
-	inc	ptr1+1
-
-	ldx     #0              ; channel 0
-
-	lda	ptr1
-	sec
-	sbc	#<outbuf
-        sta     ICBLL,x         ; length
-	lda	ptr1+1
-	sbc	#>outbuf
-        sta     ICBLH,x
-
-        lda     #<outbuf
-        sta     ICBAL,x         ; address
-        lda     #>outbuf
-        sta     ICBAH,x
-        lda     #PUTCHR
-        sta     ICCOM,x
-        jsr     CIOV
-.endif
-
-	pull_ptr2und1
-	pullall
-	rts
-
 
 ; enable concurrent rs232 mode
 ; gets iocb index in X
@@ -908,73 +578,3 @@ dump:
         jmp     my_CIOV
 
 .endproc        ;ena_cm
-
-;*****************************************************************************
-;* Unterprogramm:	HEX16						     *
-;* Aufgabe:		16-bit Binärzahl in String wandeln (hexadezimal)     *
-;* Übergabe:		ptr1   - Zeiger auf 4-byte Zielpuffer		     *
-;*			AX     - zu wandelnde Zahl (high X, low A)	     *
-;* Zurück:		ptr1   - Zeiger hinter Hexstring		     *
-;*			Y      - 0					     *
-;* Benutzt:		HEX8						     *
-;*									     *
-;* alle Register zerstört						     *
-;*****************************************************************************
-
-hex16:
-	pha
-	txa
-	jsr	hex8
-	pla
-	;fall into hex8
-
-
-;*****************************************************************************
-;* Unterprogramm:	HEX8						     *
-;* Aufgabe:		8-bit Binärzahl in String wandeln (hexadezimal)      *
-;* Übergabe:		ptr1   - Zeiger auf 2-byte Zielpuffer		     *
-;*			A      - zu wandelnde Zahl			     *
-;* Zurück:		ptr1   - Zeiger hinter Hexstring		     *
-;*			Y      - 0					     *
-;*									     *
-;* alle Register zerstört						     *
-;*****************************************************************************
-
-hex8:
-	tax
-	lsr	a
-	lsr	a
-	lsr	a
-	lsr	a
-	cmp	#10
-	bcc	hex_1
-	clc
-	adc	#'A'-10
-	bne	hex_2
-
-hex_1:	adc	#'0'
-hex_2:	ldy	#0
-	sta	(ptr1),y
-	inc	ptr1
-	bne	hex_3
-	inc	ptr1+1
-
-hex_3:	txa
-	and	#15
-
-	cmp	#10
-	bcc	hex_4
-	clc
-	adc	#'A'-10
-	bne	hex_5
-hex_4:	adc	#'0'
-hex_5:	ldy	#0
-	sta	(ptr1),y
-	inc	ptr1
-	bne	hex_6
-	inc	ptr1+1
-hex_6:	rts
-
-.data
-
-outbuf:	.res	48

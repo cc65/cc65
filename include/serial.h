@@ -67,6 +67,7 @@
 #define SER_BAUD_230400         0x13
 #define SER_BAUD_31250          0x14
 #define SER_BAUD_62500          0x15
+#define SER_BAUD_56_875         0x16
 
 /* Data bit settings */
 #define SER_BITS_5              0x00

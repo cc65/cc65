@@ -538,9 +538,8 @@ BASIC.SYSTEM) there are some limitations for DOS 3.3:</P>
 <DT><B>Disk File I/O</B><DD>
 <P>There's no disk file I/O support. Any attempt to use it yields an error with
 <CODE>errno</CODE> set to <CODE>ENOSYS</CODE>. This implicitly means that loadable drivers
-are in general not functional as they depend on disk file I/O. However they
-may be converted to statically linked drivers using the co65 object-file
-converter.</P>
+are in general not functional as they depend on disk file I/O. Therefore the statically
+linked drivers have to be used instead.</P>
 
 <DT><B>Interrupts</B><DD>
 <P>There's no <CODE>interruptor</CODE> support. Any attempt to use it yields the message

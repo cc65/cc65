@@ -562,8 +562,9 @@ found:  lda     ptr3
         lda     #40             ; XIO 40, start concurrent IO
         sta     ICCOM,x
         sta     cm_run          ; indicate concurrent mode is running
+        lda     #$0D            ; value from 850 manual, p62.  must be $0D?,
+        sta     ICAX1,x         ;  or any non-zero?
         lda     #0
-        sta     ICAX1,x
         sta     ICAX2,x
         lda     #<recv_buf
         sta     ICBAL,x
@@ -573,8 +574,6 @@ found:  lda     ptr3
         sta     ICBLL,x
         lda     #>RECVBUF_SZ
         sta     ICBLH,x
-        lda     #$0D            ; value from 850 man, p62.  must be $0D?,
-        sta     ICAX1,x         ;  or any non-zero?
         jmp     my_CIOV
 
 .endproc        ;ena_cm

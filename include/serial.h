@@ -67,6 +67,7 @@
 #define SER_BAUD_230400         0x13
 #define SER_BAUD_31250          0x14
 #define SER_BAUD_62500          0x15
+#define SER_BAUD_56_875         0x16
 
 /* Data bit settings */
 #define SER_BITS_5              0x00
@@ -111,6 +112,7 @@
 #define SER_ERR_INIT_FAILED     0x08    /* Initialization failed */
 #define SER_ERR_INV_IOCTL       0x09    /* IOCTL not supported */
 #define SER_ERR_INSTALLED       0x0A    /* A driver is already installed */
+#define SER_ERR_NOT_OPEN        0x0B    /* Driver is not open */
 
 /* Struct containing parameters for the serial port */
 struct ser_params {

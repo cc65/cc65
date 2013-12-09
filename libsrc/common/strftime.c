@@ -114,7 +114,7 @@ size_t __fastcall__ strftime (char* buf, size_t bufsize, const char* format,
                     break;
 
                 case 'I':
-                    sprintf (arg, "%02d", tm->tm_hour % 12);
+                    sprintf (arg, "%02d", (tm->tm_hour + 11) % 12 + 1);
                     break;
 
                 case 'M':

@@ -29,7 +29,8 @@ endif
 CFLAGS += -MMD -MP -O -std=c89 -I common \
           -Wall -Wextra -Wno-char-subscripts -Werror \
           -DCA65_INC=$(CA65_INC) -DCC65_INC=$(CC65_INC) \
-          -DLD65_LIB=$(LD65_LIB) -DLD65_OBJ=$(LD65_OBJ) -DLD65_CFG=$(LD65_CFG)
+          -DLD65_LIB=$(LD65_LIB) -DLD65_OBJ=$(LD65_OBJ) -DLD65_CFG=$(LD65_CFG) \
+          $(USER_CFLAGS)
 
 LDLIBS += -lm
 
@@ -88,10 +89,10 @@ define PROG_template
 
 $$(eval $$(call OBJS_template,$1))
 
-../bin/$1: $$($1_OBJS) ../wrk/common/common.a | ../bin
+../bin/$1$(PROGEXT): $$($1_OBJS) ../wrk/common/common.a | ../bin
 	$$(CC) $$(LDFLAGS) -o $$@ $$^ $$(LDLIBS)
 
-$1: ../bin/$1
+$1: ../bin/$1$(PROGEXT)
 
 endef
 

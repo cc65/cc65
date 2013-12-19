@@ -27,10 +27,9 @@ else
 endif
 
 CFLAGS += -MMD -MP -O -std=c89 -I common \
-          -Wall -Wextra -Wno-char-subscripts -Werror \
+          -Wall -Wextra -Wno-char-subscripts -Werror $(USER_CFLAGS) \
           -DCA65_INC=$(CA65_INC) -DCC65_INC=$(CC65_INC) \
-          -DLD65_LIB=$(LD65_LIB) -DLD65_OBJ=$(LD65_OBJ) -DLD65_CFG=$(LD65_CFG) \
-          $(USER_CFLAGS)
+          -DLD65_LIB=$(LD65_LIB) -DLD65_OBJ=$(LD65_OBJ) -DLD65_CFG=$(LD65_CFG)
 
 LDLIBS += -lm
 

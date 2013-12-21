@@ -1,0 +1,9 @@
+HiMem64: a cc65 Memory Configuration for C64 Programs
+	By Joseph Rose, a.k.a. Harry Potter
+-----------------------------------------------------
+Provides support for 8k c64 programs starting at $8000 and
+4k at $C000.
+
+Compiled under cc65 V.2.13.3, SVN: 5495
+
+Note: only the base 8k config. is currently tested.

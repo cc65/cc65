@@ -1,6 +1,6 @@
 ;
 ; 2002-11-16, Ullrich von Bassewitz
-; 2013-12-18, Greg King
+; 2013-12-23, Greg King
 ;
 ; int read (int fd, void* buf, unsigned count);
 ;
@@ -52,12 +52,13 @@
         adc     #LFN_OFFS       ; Carry is already clear
         tax
         lda     fdtab-LFN_OFFS,x; Get flags for this handle
+        tay
         and     #LFN_READ       ; File open for writing?
         beq     invalidfd
 
 ; Check the EOF flag. If it is set, don't read anything
 
-        lda     fdtab-LFN_OFFS,x; Get flags for this handle
+        tya                     ; Get flags again
         bmi     eof
 
 ; Remember the device number.

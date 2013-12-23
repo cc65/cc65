@@ -1,5 +1,6 @@
 ;
-; Ullrich von Bassewitz, 16.11.2002
+; 2002-11-16, Ullrich von Bassewitz
+; 2013-12-18, Greg King
 ;
 ; int read (int fd, void* buf, unsigned count);
 ;
@@ -7,7 +8,7 @@
         .export         _read
         .constructor    initstdin
 
-        .import         SETLFS, OPEN, CHKIN, BASIN, CLRCH, READST
+        .import         SETLFS, OPEN, CHKIN, BASIN, CLRCH, BSOUT, READST
         .import         rwcommon
         .import         popax
         .importzp       ptr1, ptr2, ptr3, tmp1, tmp2, tmp3
@@ -59,6 +60,11 @@
         lda     fdtab-LFN_OFFS,x; Get flags for this handle
         bmi     eof
 
+; Remember the device number.
+
+        ldy     unittab-LFN_OFFS,x
+        sty     unit
+
 ; Valid lfn. Make it the input file
 
         jsr     CHKIN
@@ -69,8 +75,13 @@
 
 @L0:    jsr     BASIN
         sta     tmp1            ; Save the input byte
+        ldx     unit
+        bne     @L0_1           ; Not keyboard/screen-editor
+        cmp     #$0D            ; Is it a Carriage Return?
+        bne     @L0_1
+        jsr     BSOUT           ; Yes, echo it (because editor didn't)
 
-        jsr     READST          ; Read the IEEE status
+@L0_1:  jsr     READST          ; Read the IEEE status
         sta     tmp3            ; Save it
         and     #%10111111      ; Check anything but the EOI bit
         bne     devnotpresent   ; Assume device not present
@@ -137,5 +148,11 @@ invalidfd:
 
 .endproc
 
+
+;--------------------------------------------------------------------------
+
+.bss
+
+unit:   .res    1
 
 

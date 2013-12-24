@@ -1,7 +1,7 @@
 ;
 ; 2003-03-07, Ullrich von Bassewitz
 ; 2011-01-28, Stefan Haubenthal
-; 2013-07-15, Greg King
+; 2013-12-22, Greg King
 ;
 ; Setup arguments for main
 ;
@@ -40,11 +40,21 @@ L0:     lda     CFOUND_NAME,y
 ;
         ldx     #0
 L2:     lda     BASIC_BUF,x
-        beq     done            ; no "rem," no args.
+        beq     done            ; no "rem", no args.
         inx
         cmp     #REM
         bne     L2
-        ldy     #1 * 2
+
+; The arguments must be copied to a safe place because BASIC's input buffer
+; might be re-used by the stdin console.
+
+        ldy     #(SCREEN_XSIZE * 2 - 1) - 1
+L3:     lda     BASIC_BUF,y
+        sta     args,y
+        dey
+        bpl     L3
+
+        ldy     #1 * 2          ; Point to second argv slot
 
 ; Find the next argument
 
@@ -65,12 +75,14 @@ found:  cmp     #'"'            ; Is the argument quoted?
         lda     #' '            ; A space ends the argument
 setterm:sta     term            ; Set end of argument marker
 
-; Now store a pointer to the argument into the next slot. Since the BASIC
-; input buffer is located at the zero page, no calculations are necessary.
+; Now, store a pointer, to the argument, into the next slot.
 
         txa                     ; Get low byte
-        add     #<BASIC_BUF     ; Not at page boundary
+        add     #<args
         sta     argv,y          ; argv[y]= &arg
+        lda     #>0
+        adc     #>args
+        sta     argv+1,y
         iny
         iny
         inc     __argc          ; Found another arg
@@ -88,7 +100,7 @@ argloop:lda     BASIC_BUF,x
 ; replace the terminating character by a zero.
 
         lda     #0
-        sta     BASIC_BUF-1,x
+        sta     args-1,x
 
 ; Check if the maximum number of command line arguments is reached. If not,
 ; parse the next one.
@@ -103,7 +115,6 @@ done:   lda     #<argv
         ldx     #>argv
         sta     __argv
         stx     __argv + 1
-
         rts
 
 .endproc
@@ -115,7 +126,8 @@ done:   lda     #<argv
 .bss
 term:   .res    1
 name:   .res    FNAME_LEN + 1
+args:   .res    SCREEN_XSIZE * 2 - 1
 
 .data
 argv:   .addr   name
-        .res    MAXARGS * 2
+        .res    MAXARGS * 2, 0

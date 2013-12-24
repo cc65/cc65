@@ -7,6 +7,7 @@
 ;
 
         .export         _read
+        .constructor    initstdin
 
         .import         popax
         .importzp       ptr1, ptr2, ptr3
@@ -63,8 +64,22 @@ L9:     lda     ptr3
 
 .endproc
 
-.data
+
+;--------------------------------------------------------------------------
+; initstdin:  Reset the stdin console.
+
+.segment        "INIT"
+
+initstdin:
+        ldx     #<-1
+        stx     text_count
+        rts
+
+
+;--------------------------------------------------------------------------
+
+.bss
 
 text_count:
-        .byte   <-1
+        .res    1
 

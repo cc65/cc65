@@ -306,7 +306,7 @@ code:</P>
 <BLOCKQUOTE><CODE>
 <PRE>
     /* Check for the existence of RAM */
-    if (PEEK(0xA000) == POKE(0xA000, PEEK(0xA000)+1)) {&lt;br>
+    if (PEEK(0xA000) == POKE(0xA000, PEEK(0xA000)+1)) {
         /* Add it to the heap */
         _heapadd ((void *) 0xA000, 0x2000);
     }

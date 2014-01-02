@@ -16,11 +16,11 @@
 .segment        "INIT"
 
 initirq:
-        lda     VVBLKI
-        ldx     VVBLKI+1
+        lda     VVBLKD
+        ldx     VVBLKD+1
         sta     IRQInd+1
         stx     IRQInd+2
-        lda     #6
+        lda     #7
         ldy     #<IRQStub
         ldx     #>IRQStub
         jsr     SETVBV
@@ -31,7 +31,7 @@ initirq:
 .code
 
 doneirq:
-        lda     #6
+        lda     #7
         ldy     IRQInd+1
         ldx     IRQInd+2
         jsr     SETVBV
@@ -44,7 +44,6 @@ doneirq:
 IRQStub:
         cld                             ; Just to be sure
 .ifdef __ATARIXL__
-        pha
 .ifdef CHARGEN_RELOC
         lda     CHBAS
         pha
@@ -64,7 +63,6 @@ IRQStub:
         sta     CHBAS
         sta     CHBASE
 .endif
-        pla
 .endif
         jmp     IRQInd                  ; Jump to the saved IRQ vector
 

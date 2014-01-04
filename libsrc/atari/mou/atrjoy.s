@@ -122,6 +122,7 @@ INSTALL:
 ; need to do that here, because our mouse interrupt handler doesn't set the
 ; mouse position if it hasn't changed.
 
+        php
         sei
         jsr     CHIDE
         lda     XPos
@@ -130,7 +131,7 @@ INSTALL:
         lda     YPos
         ldx     YPos+1
         jsr     CMOVEY
-        cli
+        plp
 
 ; Done, return zero (= MOUSE_ERR_OK)
 
@@ -152,9 +153,10 @@ UNINSTALL       = HIDE                  ; Hide cursor on exit
 ; No return code required.
 
 HIDE:   dec     visible
+        php
         sei
         jsr     CHIDE
-        cli
+        plp
         rts
 
 ;----------------------------------------------------------------------------
@@ -165,9 +167,10 @@ HIDE:   dec     visible
 ; No return code required.
 
 SHOW:   inc     visible
+        php
         sei
         jsr     CSHOW
-        cli
+        plp
         rts
 
 ;----------------------------------------------------------------------------
@@ -181,6 +184,7 @@ SETBOX: sta     ptr1
         stx     ptr1+1                  ; Save data pointer
 
         ldy     #.sizeof (MOUSE_BOX)-1
+        php
         sei
 
 @L1:    lda     (ptr1),y
@@ -188,7 +192,7 @@ SETBOX: sta     ptr1
         dey
         bpl     @L1
 
-        cli
+        plp
         rts
 
 ;----------------------------------------------------------------------------
@@ -199,6 +203,7 @@ GETBOX: sta     ptr1
         stx     ptr1+1                  ; Save data pointer
 
         ldy     #.sizeof (MOUSE_BOX)-1
+        php
         sei
 
 @L1:    lda     XMin,y
@@ -206,7 +211,7 @@ GETBOX: sta     ptr1
         dey
         bpl     @L1
 
-        cli
+        plp
         rts
 
 ;----------------------------------------------------------------------------
@@ -217,7 +222,8 @@ GETBOX: sta     ptr1
 ; the screen). No return code required.
 ;
 
-MOVE:   sei                             ; No interrupts
+MOVE:   php
+        sei                             ; No interrupts
 
         pha
         txa
@@ -246,7 +252,7 @@ MOVE:   sei                             ; No interrupts
         
         jsr     CSHOW
 
-@Ret:   cli                             ; Allow interrupts
+@Ret:   plp                             ; Restore interrupt flag
         rts
 
 ;----------------------------------------------------------------------------
@@ -263,6 +269,7 @@ BUTTONS:
 
 POS:    ldy     #MOUSE_POS::XCOORD      ; Structure offset
 
+        php
         sei                             ; Disable interrupts
         lda     XPos                    ; Transfer the position
         sta     (ptr1),y
@@ -273,7 +280,7 @@ POS:    ldy     #MOUSE_POS::XCOORD      ; Structure offset
         iny
         sta     (ptr1),y
         lda     YPos+1
-        cli                             ; Enable interrupts
+        plp                             ; Restore interrupt flag
 
         iny
         sta     (ptr1),y                ; Store last byte

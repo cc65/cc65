@@ -83,7 +83,6 @@ show:
 
 ; Move the mouse cursor x position to the value in A/X.
 movex:
-        cpx #0
         cpx     #1
         ror     a
         lsr     a               ; convert to character position

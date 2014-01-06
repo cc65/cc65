@@ -330,15 +330,12 @@ IRQ:
         ldx     #0
         stx     XPos+1
         stx     YPos+1
-        lda     TRIG0                   ; joystick #0 trigger
-        bne     @L00                    ; not pressed
-        ldx     #MOUSE_BTN_LEFT
-@L00:   stx     Buttons
+        stx     Buttons
 
         lda     PORTA                   ; get other buttons
         eor     #255
         tax
-        and     #4
+        and     #5			; pen button and left button are mapped to left mouse button
         beq     @L01
         lda     #MOUSE_BTN_LEFT
         ora     Buttons
@@ -350,7 +347,18 @@ IRQ:
         ora     Buttons
         sta     Buttons
 
-@L02:   lda     visible
+; If we read 228 for X or Y positions, we assume the user has lifted the pen
+; and don't change the cursor position.
+
+@L02:   lda	PADDL0
+	cmp	#228
+	beq	@Dont
+	lda	PADDL1
+	cmp	#228
+	bne	@Do
+@Dont:  jmp	@Done
+
+@Do:	lda     visible
         beq     @L03
         jsr     CHIDE
 
@@ -473,9 +481,9 @@ IRQ:
         jsr     CMOVEY
 
         lda     visible
-        beq     @L11
+        beq     @Done
         jsr     CSHOW
 
-@L11:   clc                             ; Interrupt not "handled"
+@Done:  clc                             ; Interrupt not "handled"
         rts
 

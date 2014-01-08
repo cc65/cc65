@@ -1,5 +1,5 @@
 ;
-; Mouse driver for Atari Trakball
+; Mouse driver for Atari Touch Tablet
 ;
 ; Christian Groessler, 2014-01-05
 ;
@@ -364,7 +364,7 @@ IRQ:
 
 ; Get cursor position
 ; -------------------
-; The touchpad is read thru the paddle potentiometers. The possible
+; The touch pad is read thru the paddle potentiometers. The possible
 ; values are 1..228. Since the maximum value is less than the X
 ; dimension we have to "stretch" this value. In order to use only
 ; divisions by powers of two, we use the following appoximation:

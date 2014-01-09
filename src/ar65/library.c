@@ -247,7 +247,12 @@ void LibOpen (const char* Name, int MustExist, int NeedTemp)
 
     if (NeedTemp) {
         /* Create the temporary library */
-        NewLib = tmpfile ();
+        /* We don't use tmpfile() as that requires root on Windows */
+        char * name = NULL;
+        if( ( name = tmpnam( NULL ) ) == NULL ) {
+            Error ("Cannot create temporary file: %s", strerror (errno));
+        }
+        NewLib = fopen (name, "w+b");
         if (NewLib == 0) {
             Error ("Cannot create temporary file: %s", strerror (errno));
         }

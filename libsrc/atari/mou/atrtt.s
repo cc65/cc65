@@ -89,6 +89,8 @@ visible:        .res    1
 
 .rodata
 
+; (We use ".proc" because we want to define both a label and a scope.)
+
 .proc   DefVars
         .word   SCREEN_HEIGHT/2         ; YPos
         .word   SCREEN_WIDTH/2          ; XPos
@@ -328,14 +330,12 @@ IRQ:
 ; Check for a pressed button and place the result into Buttons
 
         ldx     #0
-        stx     XPos+1
-        stx     YPos+1
         stx     Buttons
 
         lda     PORTA                   ; get other buttons
         eor     #255
         tax
-        and     #5			; pen button and left button are mapped to left mouse button
+        and     #5                      ; pen button and left button are mapped to left mouse button
         beq     @L01
         lda     #MOUSE_BTN_LEFT
         ora     Buttons
@@ -350,17 +350,21 @@ IRQ:
 ; If we read 228 for X or Y positions, we assume the user has lifted the pen
 ; and don't change the cursor position.
 
-@L02:   lda	PADDL0
-	cmp	#228
-	beq	@Dont
-	lda	PADDL1
-	cmp	#228
-	bne	@Do
-@Dont:  jmp	@Done
+@L02:   lda     PADDL0
+        cmp     #228
+        beq     @Dont
+        lda     PADDL1
+        cmp     #228
+        bne     @Do
+@Dont:  jmp     @Done
 
-@Do:	lda     visible
+@Do:    lda     visible
         beq     @L03
         jsr     CHIDE
+
+@L03:   ldx     #0
+        stx     XPos+1
+        stx     YPos+1
 
 ; Get cursor position
 ; -------------------
@@ -378,7 +382,7 @@ IRQ:
 
 ; X
 
-@L03:   ldx     PADDL0                  ; get X postion
+        ldx     PADDL0                  ; get X postion
         dex                             ; decrement, since it's 1-based
         stx     XPos
         txa

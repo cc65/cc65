@@ -8,15 +8,15 @@
 
         .export _mouse_static_stddrv
         .ifdef  __ATARIXL__
-        .import _atrxjoy_mou
+        .import _atrxst_mou
         .else
-        .import _atrjoy_mou
+        .import _atrst_mou
         .endif
 
 .rodata
 
         .ifdef  __ATARIXL__
-_mouse_static_stddrv := _atrxjoy_mou
+_mouse_static_stddrv := _atrxst_mou
         .else
-_mouse_static_stddrv := _atrjoy_mou
+_mouse_static_stddrv := _atrst_mou
         .endif

@@ -113,6 +113,8 @@ oldval:         .res    1
 
 .rodata
 
+; (We use ".proc" because we want to define both a label and a scope.)
+
 .proc   DefVars
         .word   (SCREEN_HEIGHT+1)/2     ; YPos
         .word   (SCREEN_WIDTH+1)/2      ; XPos

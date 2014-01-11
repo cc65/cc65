@@ -43,19 +43,19 @@ _mouse_def_callbacks:
 
         .data
 
-cursor = 11             ; '+' screen code'
+cursor = 11                     ; '+' screen code'
 
 ; setcursor
 
 getcursor:
 column: ldy     #$00            ; Patched at runtime
-        lda     (scrptr),y         ; Patched at runtime
+        lda     (scrptr),y      ; Patched at runtime
         cmp     #cursor
         rts
 
 setcursor:
         lda     #cursor
-setscr: sta     (scrptr),y         ; Patched at runtime
+setscr: sta     (scrptr),y      ; Patched at runtime
         rts
 
 ; ------------------------------------------------------------------------

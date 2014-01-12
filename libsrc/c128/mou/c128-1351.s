@@ -83,7 +83,7 @@ NewValue:       .res    1               ; Temp for MoveCheck routine
 
 .rodata
 
-; Default values for below variables
+; Default values for above variables
 ; (We use ".proc" because we want to define both a label and a scope.)
 
 .proc   DefVars

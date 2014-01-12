@@ -91,7 +91,7 @@ Temp:           .res    1
 
 .rodata
 
-; Default values for below variables
+; Default values for above variables
 ; (We use ".proc" because we want to define both a label and a scope.)
 
 .proc   DefVars

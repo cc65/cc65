@@ -118,12 +118,8 @@ INSTALL:
         dex
         bpl     @L1
 
-; Be sure the mouse cursor is invisible and at the default location. We
-; need to do that here, because our mouse interrupt handler doesn't set the
-; mouse position if it hasn't changed.
+; Be sure the mouse cursor is invisible and at the default location.
 
-        php
-        sei
         jsr     CHIDE
         lda     XPos
         ldx     XPos+1
@@ -131,7 +127,6 @@ INSTALL:
         lda     YPos
         ldx     YPos+1
         jsr     CMOVEY
-        plp
 
 ; Done, return zero (= MOUSE_ERR_OK)
 
@@ -352,15 +347,18 @@ IRQ:
 
 @L02:   lda     PADDL0
         cmp     #228
-        beq     @Dont
+        beq     @Cont                   ; CF set if equal
         lda     PADDL1
-        cmp     #228
-        bne     @Do
-@Dont:  jmp     @Done
+        cmp     #228                    ; CF set if equal
 
-@Do:    lda     visible
-        beq     @L03
+@Cont:  lda     visible
+        beq     @Go
+        php                             ; remember CF
         jsr     CHIDE
+        plp                             ; restore CF
+
+@Go:    bcc     @L03
+        jmp     @Show
 
 @L03:   ldx     #0
         stx     XPos+1
@@ -484,7 +482,7 @@ IRQ:
         tya
         jsr     CMOVEY
 
-        lda     visible
+@Show:  lda     visible
         beq     @Done
         jsr     CSHOW
 

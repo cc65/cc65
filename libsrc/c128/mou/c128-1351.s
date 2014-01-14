@@ -81,9 +81,10 @@ YMax:           .res    2               ; Y2 value of bounding box
 OldValue:       .res    1               ; Temp for MoveCheck routine
 NewValue:       .res    1               ; Temp for MoveCheck routine
 
-; Default values for above variables
-
 .rodata
+
+; Default values for above variables
+; (We use ".proc" because we want to define both a label and a scope.)
 
 .proc   DefVars
         .byte   0, 0                    ; OldPotX/OldPotY

@@ -84,9 +84,10 @@ Buttons:        .res    1               ; Button mask
 
 Temp:           .res    1
 
-; Default values for above variables
-
 .rodata
+
+; Default values for above variables
+; (We use ".proc" because we want to define both a label and a scope.)
 
 .proc   DefVars
         .word   SCREEN_HEIGHT/2         ; YPos

@@ -101,10 +101,9 @@ Buttons:        .res    1               ; button status bits
 OldValue:       .res    1               ; Temp for MoveCheck routine
 NewValue:       .res    1               ; Temp for MoveCheck routine
 
-; Default values for above variables
-
 .rodata
 
+; Default values for above variables
 ; (We use ".proc" because we want to define both a label and a scope.)
 
 .proc   DefVars

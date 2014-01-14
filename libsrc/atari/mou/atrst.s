@@ -170,11 +170,8 @@ INSTALL:
         dex
         bpl     @L1
 
-; Be sure the mouse cursor is invisible and at the default location. We
-; need to do that here, because our mouse interrupt handler doesn't set the
-; mouse position if it hasn't changed.
+; Be sure the mouse cursor is invisible and at the default location.
 
-        sei
         jsr     CHIDE
         lda     XPos
         sta     XPosWrk
@@ -186,7 +183,6 @@ INSTALL:
         ldx     YPos+1
         stx     YPosWrk+1
         jsr     CMOVEY
-        cli
 
 ; Install timer irq routine to poll mouse.
 
@@ -470,22 +466,7 @@ IRQ:
         ldx     #MOUSE_BTN_LEFT
 @L0:    stx     Buttons
 
-; Update coordinates if needed
-
-        lda     XPosWrk
-        cmp     XPos
-        bne     @Update
-        lda     XPosWrk+1
-        cmp     XPos+1
-        bne     @Update
-        lda     YPosWrk
-        cmp     YPos
-        bne     @Update
-        lda     YPosWrk+1
-        cmp     YPos+1
-        beq     @Done
-
-@Update:ldx     visible
+        ldx     visible
         beq     @L1
         jsr     CHIDE
 

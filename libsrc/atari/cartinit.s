@@ -4,10 +4,10 @@
 
 .ifndef __ATARIXL__
 
-.export		cartinit
+.export         cartinit
 
-.segment	"STARTUP"
+.segment        "STARTUP"
 
-cartinit:	rts
+cartinit:       rts
 
-.endif	; .ifndef __ATARIXL__
+.endif  ; .ifndef __ATARIXL__

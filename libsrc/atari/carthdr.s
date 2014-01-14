@@ -5,16 +5,16 @@
 
 .ifndef __ATARIXL__
 
-.import		__CARTFLAGS__, cartinit, cartstart
-.export		__CART_HEADER__: absolute = 1
+.import         __CARTFLAGS__, cartinit, cartstart
+.export         __CART_HEADER__: absolute = 1
 
-.include	"atari.inc"
+.include        "atari.inc"
 
-		.segment "CARTHDR"
+                .segment "CARTHDR"
 
-		.word	cartstart	; start routine
-		.byte	0		; must be zero
-		.byte	<__CARTFLAGS__
-		.word	cartinit	; init routine
+                .word   cartstart       ; start routine
+                .byte   0               ; must be zero
+                .byte   <__CARTFLAGS__
+                .word   cartinit        ; init routine
 
-.endif	; .ifndef __ATARIXL__
+.endif  ; .ifndef __ATARIXL__

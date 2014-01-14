@@ -120,12 +120,8 @@ INSTALL:
         dex
         bpl     @L1
 
-; Be sure the mouse cursor is invisible and at the default location. We
-; need to do that here, because our mouse interrupt handler doesn't set the
-; mouse position if it hasn't changed.
+; Be sure the mouse cursor is invisible and at the default location.
 
-        php
-        sei
         jsr     CHIDE
         lda     XPos
         ldx     XPos+1
@@ -133,7 +129,6 @@ INSTALL:
         lda     YPos
         ldx     YPos+1
         jsr     CMOVEY
-        plp
 
 ; Done, return zero (= MOUSE_ERR_OK)
 
@@ -316,7 +311,7 @@ INFO:   jsr     POS
 
 IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioclts for now
         ldx     #>MOUSE_ERR_INV_IOCTL
-hlprts: rts
+        rts
 
 ;----------------------------------------------------------------------------
 ; IRQ: Irq handler entry point. Called as a subroutine but in IRQ context
@@ -339,8 +334,6 @@ IRQ:
         and     #15                     ; clear joystick #1 bits
         eor     #15
         sta     Temp
-        clc
-        beq     hlprts                  ; no movement, do nothing
 
         jsr     CHIDE
 

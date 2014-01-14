@@ -49,13 +49,12 @@ cursor = 11                     ; '+' screen code'
 
 getcursor:
 column: ldy     #$00            ; Patched at runtime
-        lda     (scrptr),y      ; Patched at runtime
-        cmp     #cursor
+        lda     (scrptr),y
         rts
 
 setcursor:
-        lda     #cursor
-setscr: sta     (scrptr),y      ; Patched at runtime
+column2:ldy     #$00            ; Patched at runtime
+        sta     (scrptr),y
         rts
 
 ; ------------------------------------------------------------------------
@@ -67,16 +66,19 @@ done:
 
 ; Hide the mouse cursor.
 hide:
-        jsr     getcursor       ; Cursor visible at current position?
-        bne     done            ; No, we're done
-        lda     backup          ; Get character at cursor position
-        jmp     setscr          ; Draw character
+        jsr     getcursor       ; Get character at cursor position
+        cmp     #cursor         ; "mouse" character
+        bne     overwr          ; no, probably program has overwritten it
+        lda     backup          ; 
+        jmp     setcursor       ; Draw character
+overwr: sta     backup
+        rts
 
 ; Show the mouse cursor.
 show:
         jsr     getcursor       ; Cursor visible at current position?
-        beq     done            ; Yes, we're done
         sta     backup          ; Save character at cursor position
+        lda     #cursor
         jmp     setcursor       ; Draw cursor
 
 
@@ -87,6 +89,7 @@ movex:
         lsr     a               ; convert to character position
         lsr     a
         sta     column+1
+        sta     column2+1
         rts
 
 ; Move the mouse cursor y position to the value in A/X.

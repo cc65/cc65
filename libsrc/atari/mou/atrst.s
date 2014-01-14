@@ -35,7 +35,7 @@ HEADER:
 
 ; Library reference
 
-        .addr   $0000
+libref: .addr   $0000
 
 ; Jump table
 
@@ -96,7 +96,6 @@ Buttons:        .res    1               ; Button mask
 XPosWrk:        .res    2
 YPosWrk:        .res    2
 
-OldT1:          .res    2
 visible:        .res    1
 
 .if .defined (AMIGA_MOUSE) .or .defined (ST_MOUSE)
@@ -108,11 +107,18 @@ dumy:           .res    1
 oldval:         .res    1
 .endif
 
+.ifndef __ATARIXL__
+OldT1:          .res    2
+.else
 
-; Default values for some of the above variables
+.data
+set_VTIMR1_handler:
+                .byte   $4C, 0, 0
+.endif
 
 .rodata
 
+; Default values for some of the above variables
 ; (We use ".proc" because we want to define both a label and a scope.)
 
 .proc   DefVars
@@ -182,7 +188,23 @@ INSTALL:
         jsr     CMOVEY
         cli
 
-; install timer irq routine to poll mouse
+; Install timer irq routine to poll mouse.
+
+.ifdef __ATARIXL__
+
+        ; Setup pointer to wrapper install/deinstall function.
+        lda     libref
+        sta     set_VTIMR1_handler+1
+        lda     libref+1
+        sta     set_VTIMR1_handler+2
+
+        ; Install my handler.
+        sec
+        lda     #<T1Han
+        ldx     #>T1Han
+        jsr     set_VTIMR1_handler
+
+.else
 
         lda     VTIMR1
         sta     OldT1
@@ -196,6 +218,8 @@ INSTALL:
         lda     #>T1Han
         sta     VTIMR1+1
         plp
+
+.endif
 
         lda     #%00000001
         sta     AUDCTL
@@ -231,6 +255,13 @@ UNINSTALL:
         sta     IRQEN
         sta     POKMSK
 
+.ifdef __ATARIXL__
+
+        clc
+        jsr     set_VTIMR1_handler
+
+.else
+
         php
         sei
         lda     OldT1
@@ -239,6 +270,7 @@ UNINSTALL:
         sta     VTIMR1+1
         plp
 
+.endif
         ; fall thru...
 
 ;----------------------------------------------------------------------------
@@ -354,7 +386,7 @@ MOVE:   php
 
         lda     visible
         beq     @Ret
-        
+
         jsr     CSHOW
 
 @Ret:   plp                             ; Restore interrupt flag
@@ -520,7 +552,7 @@ IRQ:
 T1Han:  tya
         pha
         txa
-        pha     
+        pha
 
 .ifdef DEBUG
         lda     RANDOM
@@ -692,6 +724,9 @@ mmexit: sty     oldval
         tax
         pla
         tay
+.ifdef  __ATARIXL__
+        rts
+.else
         pla
         rti
-
+.endif

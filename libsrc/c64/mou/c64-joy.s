@@ -68,6 +68,8 @@ HEADER:
 
 CHIDE:  jmp     $0000                   ; Hide the cursor
 CSHOW:  jmp     $0000                   ; Show the cursor
+CDRAW:  jmp     $0000                   ; Draw the cursor
+CMOVE:  jmp     $0000                   ; Prepare to move the cursor
 CMOVEX: jmp     $0000                   ; Move the cursor to X coord
 CMOVEY: jmp     $0000                   ; Move the cursor to Y coord
 
@@ -319,9 +321,11 @@ IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioclts for now
 ; MUST return carry clear.
 ;
 
+IRQ:    jsr     CMOVE
+
 ; Avoid crosstalk between the keyboard and a joystick.
 
-IRQ:    ldy     #%00000000              ; Set ports A and B to input
+        ldy     #%00000000              ; Set ports A and B to input
         sty     CIA1_DDRB
         sty     CIA1_DDRA               ; Keyboard won't look like joystick
         lda     CIA1_PRB                ; Read Control-Port 1
@@ -438,6 +442,7 @@ IRQ:    ldy     #%00000000              ; Set ports A and B to input
 
 ; Done
 
-@SkipY: clc                             ; Interrupt not handled
+@SkipY: jsr     CDRAW
+        clc                             ; Interrupt not "handled"
         rts
 

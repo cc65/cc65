@@ -1,5 +1,5 @@
 ;
-; Default mouse callbacks for the C64
+; Default mouse callbacks for the C128
 ;
 ; Ullrich von Bassewitz, 2004-03-20
 ;
@@ -44,6 +44,24 @@ VIC_SPR_Y       = (VIC_SPR0_Y + 2*MOUSE_SPR)    ; Sprite Y register
         lda     #MOUSE_SPR_MASK
         ora     VIC_SPR_ENA
         sta     VIC_SPR_ENA
+        rts
+
+.endproc
+
+; --------------------------------------------------------------------------
+; Draw the mouse pointer. Always called with interrupts disabled.
+
+.proc   draw
+
+        rts
+
+.endproc
+
+; --------------------------------------------------------------------------
+; Prepare to move the mouse pointer. Always called with interrupts disabled.
+
+.proc   move
+
         rts
 
 .endproc
@@ -103,7 +121,7 @@ VIC_SPR_Y       = (VIC_SPR0_Y + 2*MOUSE_SPR)    ; Sprite Y register
 _mouse_def_callbacks:
         .addr   hide
         .addr   show
+        .addr   draw
+        .addr   move
         .addr   movex
         .addr   movey
-
-

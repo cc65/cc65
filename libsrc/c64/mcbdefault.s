@@ -49,6 +49,24 @@ VIC_SPR_Y       = (VIC_SPR0_Y + 2*MOUSE_SPR)    ; Sprite Y register
 .endproc
 
 ; --------------------------------------------------------------------------
+; Draw the mouse pointer. Always called with interrupts disabled.
+
+.proc   draw
+
+        rts
+
+.endproc
+
+; --------------------------------------------------------------------------
+; Prepare to move the mouse pointer. Always called with interrupts disabled.
+
+.proc   move
+
+        rts
+
+.endproc
+
+; --------------------------------------------------------------------------
 ; Move the mouse pointer X position to the value in a/x. Always called with
 ; interrupts disabled.
 
@@ -96,7 +114,7 @@ VIC_SPR_Y       = (VIC_SPR0_Y + 2*MOUSE_SPR)    ; Sprite Y register
 _mouse_def_callbacks:
         .addr   hide
         .addr   show
+        .addr   draw
+        .addr   move
         .addr   movex
         .addr   movey
-
-

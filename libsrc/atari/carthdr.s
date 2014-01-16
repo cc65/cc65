@@ -10,7 +10,7 @@
 
 .include        "atari.inc"
 
-                .segment "CARTHDR"
+.segment        "CARTHDR"
 
                 .word   cartstart       ; start routine
                 .byte   0               ; must be zero

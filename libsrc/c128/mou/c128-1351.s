@@ -50,6 +50,8 @@ HEADER:
 
 CHIDE:  jmp     $0000                   ; Hide the cursor
 CSHOW:  jmp     $0000                   ; Show the cursor
+CDRAW:  jmp     $0000                   ; Draw the cursor
+CMOVE:  jmp     $0000                   ; Prepare to move the cursor
 CMOVEX: jmp     $0000                   ; Move the cursor to X coord
 CMOVEY: jmp     $0000                   ; Move the cursor to Y coord
 
@@ -302,7 +304,8 @@ IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioclts for now
 ; MUST return carry clear.
 ;
 
-IRQ:    lda     SID_ADConv1             ; Get mouse X movement
+IRQ:    jsr     CMOVE
+        lda     SID_ADConv1             ; Get mouse X movement
         ldy     OldPotX
         jsr     MoveCheck               ; Calculate movement vector
         sty     OldPotX
@@ -389,8 +392,9 @@ IRQ:    lda     SID_ADConv1             ; Get mouse X movement
 
 ; Done
 
-        clc                     ; Interrupt not "handled"
-@SkipY: rts
+@SkipY: jsr     CDRAW
+        clc                             ; Interrupt not "handled"
+        rts
 
 ; --------------------------------------------------------------------------
 ;

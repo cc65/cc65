@@ -12,7 +12,7 @@
 
 .include        "atari.inc"
 
-.segment         "STARTUP"
+.segment         "CODE"
 
 ; start routine of cartridge
 ; copy data segment to RAM and chain to entry point of crt0.s

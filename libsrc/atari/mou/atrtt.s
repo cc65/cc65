@@ -49,6 +49,8 @@ HEADER:
 
 CHIDE:  jmp     $0000                   ; Hide the cursor
 CSHOW:  jmp     $0000                   ; Show the cursor
+CPREP:  jmp     $0000                   ; Prepare to move the cursor
+CDRAW:  jmp     $0000                   ; Draw the cursor
 CMOVEX: jmp     $0000                   ; Move the cursor to X coord
 CMOVEY: jmp     $0000                   ; Move the cursor to Y coord
 
@@ -81,9 +83,6 @@ YMin:           .res    2               ; Y1 value of bounding box
 XMax:           .res    2               ; X2 value of bounding box
 YMax:           .res    2               ; Y2 value of bounding box
 Buttons:        .res    1               ; Button mask
-
-
-visible:        .res    1
 
 ; Default values for above variables
 
@@ -118,9 +117,8 @@ INSTALL:
         dex
         bpl     @L1
 
-; Be sure the mouse cursor is invisible and at the default location.
+; Make sure the mouse cursor is at the default location.
 
-        jsr     CHIDE
         lda     XPos
         ldx     XPos+1
         jsr     CMOVEX
@@ -147,8 +145,7 @@ UNINSTALL       = HIDE                  ; Hide cursor on exit
 ; no special action is required besides hiding the mouse cursor.
 ; No return code required.
 
-HIDE:   dec     visible
-        php
+HIDE:   php
         sei
         jsr     CHIDE
         plp
@@ -161,8 +158,7 @@ HIDE:   dec     visible
 ; no special action is required besides enabling the mouse cursor.
 ; No return code required.
 
-SHOW:   inc     visible
-        php
+SHOW:   php
         sei
         jsr     CSHOW
         plp
@@ -221,14 +217,12 @@ MOVE:   php
         sei                             ; No interrupts
 
         pha
-        lda     visible
-        beq     @nohide
         txa
         pha
-        jsr     CHIDE
+        jsr     CPREP
         pla
         tax
-@nohide:pla
+        pla
 
         sta     YPos
         stx     YPos+1                  ; New Y position
@@ -241,15 +235,11 @@ MOVE:   php
         dey
         lda     (sp),y
         sta     XPos                    ; New X position
-
         jsr     CMOVEX                  ; Move the cursor
 
-        lda     visible
-        beq     @Ret
-        
         jsr     CSHOW
 
-@Ret:   plp                             ; Restore interrupt flag
+        plp                             ; Restore interrupt flag
         rts
 
 ;----------------------------------------------------------------------------
@@ -351,13 +341,11 @@ IRQ:
         lda     PADDL1
         cmp     #228                    ; CF set if equal
 
-@Cont:  lda     visible
-        beq     @Go
-        php                             ; remember CF
-        jsr     CHIDE
+@Cont:  php                             ; remember CF
+        jsr     CPREP
         plp                             ; restore CF
 
-@Go:    bcc     @L03
+        bcc     @L03
         jmp     @Show
 
 @L03:   ldx     #0
@@ -482,10 +470,8 @@ IRQ:
         tya
         jsr     CMOVEY
 
-@Show:  lda     visible
-        beq     @Done
-        jsr     CSHOW
+@Show:  jsr     CDRAW
 
-@Done:  clc                             ; Interrupt not "handled"
+        clc                             ; Interrupt not "handled"
         rts
 

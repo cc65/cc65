@@ -50,6 +50,8 @@ HEADER:
 
 CHIDE:  jmp     $0000                   ; Hide the cursor
 CSHOW:  jmp     $0000                   ; Show the cursor
+CPREP:  jmp     $0000                   ; Prepare to move the cursor
+CDRAW:  jmp     $0000                   ; Draw the cursor
 CMOVEX: jmp     $0000                   ; Move the cursor to X coord
 CMOVEY: jmp     $0000                   ; Move the cursor to Y coord
 
@@ -85,7 +87,6 @@ Buttons:        .res    1               ; Button mask
 
 
 Temp:           .res    1               ; Temporary value used in the int handler
-visible:        .res    1
 
 ; Default values for above variables
 
@@ -120,9 +121,8 @@ INSTALL:
         dex
         bpl     @L1
 
-; Be sure the mouse cursor is invisible and at the default location.
+; Make sure the mouse cursor is at the default location.
 
-        jsr     CHIDE
         lda     XPos
         ldx     XPos+1
         jsr     CMOVEX
@@ -149,8 +149,7 @@ UNINSTALL       = HIDE                  ; Hide cursor on exit
 ; no special action is required besides hiding the mouse cursor.
 ; No return code required.
 
-HIDE:   dec     visible
-        php
+HIDE:   php
         sei
         jsr     CHIDE
         plp
@@ -163,8 +162,7 @@ HIDE:   dec     visible
 ; no special action is required besides enabling the mouse cursor.
 ; No return code required.
 
-SHOW:   inc     visible
-        php
+SHOW:   php
         sei
         jsr     CSHOW
         plp
@@ -225,7 +223,7 @@ MOVE:   php
         pha
         txa
         pha
-        jsr     CHIDE
+        jsr     CPREP
         pla
         tax
         pla
@@ -241,15 +239,11 @@ MOVE:   php
         dey
         lda     (sp),y
         sta     XPos                    ; New X position
-
         jsr     CMOVEX                  ; Move the cursor
 
-        lda     visible
-        beq     @Ret
-        
-        jsr     CSHOW
+        jsr     CDRAW
 
-@Ret:   plp                             ; Restore interrupt flag
+        plp                             ; Restore interrupt flag
         rts
 
 ;----------------------------------------------------------------------------
@@ -335,7 +329,7 @@ IRQ:
         eor     #15
         sta     Temp
 
-        jsr     CHIDE
+        jsr     CPREP
 
 ; Check left/right
 
@@ -435,11 +429,7 @@ IRQ:
 
 ; Done
 
-@SkipY: lda     visible
-        beq     @Done
-
-        jsr     CSHOW
-
-@Done:  clc                             ; Interrupt not "handled"
+@SkipY: jsr     CDRAW
+        clc                             ; Interrupt not "handled"
         rts
 

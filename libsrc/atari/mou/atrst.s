@@ -60,6 +60,8 @@ libref: .addr   $0000
 
 CHIDE:  jmp     $0000                   ; Hide the cursor
 CSHOW:  jmp     $0000                   ; Show the cursor
+CPREP:  jmp     $0000                   ; Prepare to move the cursor
+CDRAW:  jmp     $0000                   ; Draw the cursor
 CMOVEX: jmp     $0000                   ; Move the cursor to X coord
 CMOVEY: jmp     $0000                   ; Move the cursor to Y coord
 
@@ -95,8 +97,6 @@ Buttons:        .res    1               ; Button mask
 
 XPosWrk:        .res    2
 YPosWrk:        .res    2
-
-visible:        .res    1
 
 .if .defined (AMIGA_MOUSE) .or .defined (ST_MOUSE)
 dumx:           .res    1
@@ -170,9 +170,8 @@ INSTALL:
         dex
         bpl     @L1
 
-; Be sure the mouse cursor is invisible and at the default location.
+; Make sure the mouse cursor is at the default location.
 
-        jsr     CHIDE
         lda     XPos
         sta     XPosWrk
         ldx     XPos+1
@@ -276,8 +275,7 @@ UNINSTALL:
 ; no special action is required besides hiding the mouse cursor.
 ; No return code required.
 
-HIDE:   dec     visible
-        php
+HIDE:   php
         sei
         jsr     CHIDE
         plp
@@ -290,8 +288,7 @@ HIDE:   dec     visible
 ; no special action is required besides enabling the mouse cursor.
 ; No return code required.
 
-SHOW:   inc     visible
-        php
+SHOW:   php
         sei
         jsr     CSHOW
         plp
@@ -352,13 +349,8 @@ MOVE:   php
         pha
         txa
         pha
-
-        lda     visible
-        beq     @L01
-
-        jsr     CHIDE
-
-@L01:   pla
+        jsr     CPREP
+        pla
         tax
         pla
 
@@ -377,15 +369,11 @@ MOVE:   php
         lda     (sp),y
         sta     XPos                    ; New X position
         sta     XPosWrk
-
         jsr     CMOVEX                  ; Move the cursor
 
-        lda     visible
-        beq     @Ret
+        jsr     CDRAW
 
-        jsr     CSHOW
-
-@Ret:   plp                             ; Restore interrupt flag
+        plp                             ; Restore interrupt flag
         rts
 
 ;----------------------------------------------------------------------------
@@ -466,13 +454,11 @@ IRQ:
         ldx     #MOUSE_BTN_LEFT
 @L0:    stx     Buttons
 
-        ldx     visible
-        beq     @L1
-        jsr     CHIDE
+        jsr     CPREP
 
 ; Limit the X coordinate to the bounding box
 
-@L1:    lda     XPosWrk+1
+        lda     XPosWrk+1
         ldy     XPosWrk
         tax
         cpy     XMin
@@ -518,13 +504,11 @@ IRQ:
         tya
         jsr     CMOVEY
 
-        ldx     visible
-        beq     @Done
+        jsr     CDRAW
 
-        jsr     CSHOW
-
-@Done:  clc
+        clc
         rts
+
 
 ;----------------------------------------------------------------------------
 ; T1Han: Local IRQ routine to poll mouse

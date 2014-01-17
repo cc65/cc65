@@ -6,8 +6,6 @@
 
 .export         cartinit
 
-.segment        "STARTUP"
-
 cartinit:       rts
 
 .endif  ; .ifndef __ATARIXL__

@@ -5,8 +5,9 @@
 
 .ifndef __ATARIXL__
 
-.import         __CARTSIZE__, __CARTFLAGS__, cartinit, cartstart
 .export         __CART_HEADER__: absolute = 1
+
+.import         __CARTSIZE__, __CARTFLAGS__, cartinit, cartstart
 
 .include        "atari.inc"
 

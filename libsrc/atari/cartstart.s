@@ -7,7 +7,6 @@
 .export         cartstart
 
 .import         start, copydata
-.importzp       ptr1, ptr2, tmp1, tmp2
 
 .include        "atari.inc"
 

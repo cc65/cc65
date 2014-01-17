@@ -5,7 +5,7 @@
 
 .ifndef __ATARIXL__
 
-.import         __CARTFLAGS__, cartinit, cartstart
+.import         __CARTSIZE__, __CARTFLAGS__, cartinit, cartstart
 .export         __CART_HEADER__: absolute = 1
 
 .include        "atari.inc"
@@ -16,5 +16,7 @@
                 .byte   0               ; must be zero
                 .byte   <__CARTFLAGS__
                 .word   cartinit        ; init routine
+
+.assert         (__CARTSIZE__ = $2000 || __CARTSIZE__ = $4000), error, "Cartridge size must either be $2000 or $4000"
 
 .endif  ; .ifndef __ATARIXL__

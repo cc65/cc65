@@ -49,6 +49,8 @@ LIBREF: .addr   $0000
 
 CHIDE:  jmp     $0000                   ; Hide the cursor
 CSHOW:  jmp     $0000                   ; Show the cursor
+CPREP:  jmp     $0000                   ; Prepare to move the cursor
+CDRAW:  jmp     $0000                   ; Draw the cursor
 CMOVEX: jmp     $0000                   ; Move the cursor to X co-ord.
 CMOVEY: jmp     $0000                   ; Move the cursor to Y co-ord.
 
@@ -343,7 +345,7 @@ IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioctls, for now
 ; MUST return carry clear.
 ;
 
-IRQ:
+IRQ:    jsr     CPREP
 
 ; Record the state of the buttons.
 ; Try to avoid crosstalk between the keyboard and the lightpen.
@@ -441,7 +443,8 @@ IRQ:
 
 ; Done
 
-@SkipX: clc                             ; Interrupt not "handled"
+@SkipX: jsr     CDRAW
+        clc                             ; Interrupt not "handled"
         rts
 
 ; Move the lightpen pointer to the new Y pos.

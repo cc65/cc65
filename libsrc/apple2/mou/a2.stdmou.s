@@ -57,6 +57,8 @@ status          := $0778
         ; Callback table, set by the kernel before INSTALL is called
 CHIDE:  jmp     $0000                   ; Hide the cursor
 CSHOW:  jmp     $0000                   ; Show the cursor
+CPREP:  jmp     $0000                   ; Prepare to move the cursor
+CDRAW:  jmp     $0000                   ; Draw the cursor
 CMOVEX: jmp     $0000                   ; Move the cursor to X coord
 CMOVEY: jmp     $0000                   ; Move the cursor to Y coord
 
@@ -67,7 +69,6 @@ CMOVEY: jmp     $0000                   ; Move the cursor to Y coord
 box:    .tag    MOUSE_BOX
 info:   .tag    MOUSE_INFO
 slot:   .res    1
-visible:.res    1
 
 ; ------------------------------------------------------------------------
 
@@ -321,7 +322,6 @@ MOVE:
 ; no special action is required besides hiding the mouse cursor.
 ; No return code required.
 HIDE:
-        dec     visible
         sei
         jsr     CHIDE
         cli
@@ -333,7 +333,9 @@ HIDE:
 ; no special action is required besides enabling the mouse cursor.
 ; No return code required.
 SHOW:
-        inc     visible
+        sei
+        jsr     CSHOW
+        cli
         rts
 
 ; BUTTONS: Return the button mask in A/X.
@@ -409,7 +411,7 @@ done:   rts
         beq     :+
 
         ; Remove the cursor at the old position
-update: jsr     CHIDE
+update: jsr     CPREP
 
         ; Get and set the new X position
         ldy     slot
@@ -427,11 +429,7 @@ update: jsr     CHIDE
         stx     info + MOUSE_POS::YCOORD+1
         jsr     CMOVEY
 
-        ; Check for visibility
-:       lda     visible
-        beq     :+
-
         ; Draw the cursor at the new position
-        jsr     CSHOW
-:       sec                     ; Interrupt handled
+:       jsr     CDRAW
+        sec                     ; Interrupt handled
         rts

@@ -22,37 +22,41 @@ MOUSE_SPR_NMASK = .lobyte(.not MOUSE_SPR_MASK)  ; Negative mask
 VIC_SPR_X       = (VIC_SPR0_X + 2*MOUSE_SPR)    ; Sprite X register
 VIC_SPR_Y       = (VIC_SPR0_Y + 2*MOUSE_SPR)    ; Sprite Y register
 
-.code
-
 ; --------------------------------------------------------------------------
 ; Hide the mouse pointer. Always called with interrupts disabled.
 
-.proc   hide
-
+hide:
         lda     #MOUSE_SPR_NMASK
         and     VIC_SPR_ENA
         sta     VIC_SPR_ENA
         rts
 
-.endproc
-
 ; --------------------------------------------------------------------------
 ; Show the mouse pointer. Always called with interrupts disabled.
 
-.proc   show
-
+show:
         lda     #MOUSE_SPR_MASK
         ora     VIC_SPR_ENA
         sta     VIC_SPR_ENA
-        rts
+        ; Fall through
 
-.endproc
+; --------------------------------------------------------------------------
+; Prepare to move the mouse pointer. Always called with interrupts disabled.
+
+prep:
+        ; Fall through
+
+; --------------------------------------------------------------------------
+; Draw the mouse pointer. Always called with interrupts disabled.
+
+draw:
+        rts
 
 ; --------------------------------------------------------------------------
 ; Move the mouse pointer X position to the value in a/x. Always called with
 ; interrupts disabled.
 
-.proc   movex
+movex:
 
 ; Add the X correction and set the low byte. This frees A.
 
@@ -74,19 +78,14 @@ VIC_SPR_Y       = (VIC_SPR0_Y + 2*MOUSE_SPR)    ; Sprite Y register
         sta     VIC_SPR_HI_X
         rts
 
-.endproc
-
 ; --------------------------------------------------------------------------
 ; Move the mouse pointer Y position to the value in a/x. Always called with
 ; interrupts disabled.
 
-.proc   movey
-
+movey:
         add     #50                     ; Y correction (first visible line)
         sta     VIC_SPR_Y               ; Set Y position
         rts
-
-.endproc
 
 ; --------------------------------------------------------------------------
 ; Callback structure
@@ -96,7 +95,7 @@ VIC_SPR_Y       = (VIC_SPR0_Y + 2*MOUSE_SPR)    ; Sprite Y register
 _mouse_def_callbacks:
         .addr   hide
         .addr   show
+        .addr   prep
+        .addr   draw
         .addr   movex
         .addr   movey
-
-

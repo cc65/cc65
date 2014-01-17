@@ -49,6 +49,8 @@ HEADER:
 
 CHIDE:  jmp     $0000                   ; Hide the cursor
 CSHOW:  jmp     $0000                   ; Show the cursor
+CPREP:  jmp     $0000                   ; Prepare to move the cursor
+CDRAW:  jmp     $0000                   ; Draw the cursor
 CMOVEX: jmp     $0000                   ; Move the cursor to X coord
 CMOVEY: jmp     $0000                   ; Move the cursor to Y coord
 
@@ -87,9 +89,10 @@ Buttons:        .res    1               ; Button mask
 
 Temp:           .res    1
 
-; Default values for above variables
-
 .rodata
+
+; Default values for above variables
+; (We use ".proc" because we want to define both a label and a scope.)
 
 .proc   DefVars
         .word   SCREEN_HEIGHT/2         ; YPos
@@ -301,7 +304,8 @@ IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioclts for now
 ; MUST return carry clear.
 ;
 
-IRQ:    lda     #$7F
+IRQ:    jsr     CPREP
+        lda     #$7F
         sta     CIA1_PRA
         lda     CIA1_PRB                ; Read joystick #0
         and     #$1F
@@ -414,6 +418,6 @@ IRQ:    lda     #$7F
 
 ; Done
 
-@SkipY: clc                             ; Interrupt not "handled"
+@SkipY: jsr     CDRAW
+        clc                             ; Interrupt not "handled"
         rts
-

@@ -69,6 +69,8 @@ HEADER:
 
 CHIDE:  jmp     $0000                   ; Hide the cursor
 CSHOW:  jmp     $0000                   ; Show the cursor
+CPREP:  jmp     $0000                   ; Prepare to move the cursor
+CDRAW:  jmp     $0000                   ; Draw the cursor
 CMOVEX: jmp     $0000                   ; Move the cursor to X coord
 CMOVEY: jmp     $0000                   ; Move the cursor to Y coord
 
@@ -101,10 +103,9 @@ Buttons:        .res    1               ; button status bits
 OldValue:       .res    1               ; Temp for MoveCheck routine
 NewValue:       .res    1               ; Temp for MoveCheck routine
 
-; Default values for above variables
-
 .rodata
 
+; Default values for above variables
 ; (We use ".proc" because we want to define both a label and a scope.)
 
 .proc   DefVars
@@ -315,7 +316,7 @@ IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioclts for now
 ; MUST return carry clear.
 ;
 
-IRQ:
+IRQ:    jsr     CPREP
 
 ; Record the state of the buttons.
 ; Avoid crosstalk between the keyboard and the mouse.
@@ -418,8 +419,9 @@ IRQ:
 
 ; Done
 
+@SkipY: jsr     CDRAW
         clc                             ; Interrupt not "handled"
-@SkipY: rts
+        rts
 
 ; --------------------------------------------------------------------------
 ;

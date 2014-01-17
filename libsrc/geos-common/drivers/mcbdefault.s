@@ -33,24 +33,30 @@ hide := MouseOff
 show := MouseUp
 
 ; --------------------------------------------------------------------------
+; Prepare to move the mouse pointer. Always called with interrupts disabled.
+
+prep:
+        ; Fall through
+
+; --------------------------------------------------------------------------
+; Draw the mouse pointer. Always called with interrupts disabled.
+
+draw:
+        ; Fall through
+
+; --------------------------------------------------------------------------
 ; Move the mouse pointer X position to the value in .XA. Always called with
 ; interrupts disabled.
 
-.proc   movex
-
-        rts
-
-.endproc
+movex:
+        ; Fall through
 
 ; --------------------------------------------------------------------------
 ; Move the mouse pointer Y position to the value in .XA. Always called with
 ; interrupts disabled.
 
-.proc   movey
-
+movey:
         rts
-
-.endproc
 
 ; --------------------------------------------------------------------------
 ; Callback structure
@@ -60,7 +66,7 @@ show := MouseUp
 _mouse_def_callbacks:
         .addr   hide
         .addr   show
+        .addr   prep
+        .addr   draw
         .addr   movex
         .addr   movey
-
-

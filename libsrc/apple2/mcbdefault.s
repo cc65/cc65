@@ -26,8 +26,8 @@ visible:.res    1
 _mouse_def_callbacks:
         .addr   hide
         .addr   show
+        .addr   prep
         .addr   draw
-        .addr   move
         .addr   movex
         .addr   movey
 
@@ -76,7 +76,7 @@ hide:
         ; Fall through
 
 ; Prepare to move the mouse cursor.
-move:
+prep:
         jsr     getcursor       ; Cursor visible at current position?
         bne     done            ; No, we're done
         lda     backup          ; Get character at cursor position

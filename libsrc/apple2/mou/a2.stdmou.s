@@ -57,8 +57,8 @@ status          := $0778
         ; Callback table, set by the kernel before INSTALL is called
 CHIDE:  jmp     $0000                   ; Hide the cursor
 CSHOW:  jmp     $0000                   ; Show the cursor
+CPREP:  jmp     $0000                   ; Prepare to move the cursor
 CDRAW:  jmp     $0000                   ; Draw the cursor
-CMOVE:  jmp     $0000                   ; Prepare to move the cursor
 CMOVEX: jmp     $0000                   ; Move the cursor to X coord
 CMOVEY: jmp     $0000                   ; Move the cursor to Y coord
 
@@ -411,7 +411,7 @@ done:   rts
         beq     :+
 
         ; Remove the cursor at the old position
-update: jsr     CMOVE
+update: jsr     CPREP
 
         ; Get and set the new X position
         ldy     slot

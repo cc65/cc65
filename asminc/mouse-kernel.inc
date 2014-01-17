@@ -78,9 +78,9 @@
                         .byte
             CSHOW       .addr
                         .byte
-            CDRAW       .addr
+            CPREP       .addr
                         .byte
-            CMOVE       .addr
+            CDRAW       .addr
                         .byte
             CMOVEX      .addr
                         .byte
@@ -94,8 +94,8 @@
 .struct MOUSE_CALLBACKS
         HIDE    .addr                   ; Hide the mouse cursor
         SHOW    .addr                   ; Show the mouse cursor
+        PREP    .addr                   ; Prepare to move the mouse cursor
         DRAW    .addr                   ; Draw the mouse cursor
-        MOVE    .addr                   ; Prepare to move the mouse cursor
         MOVEX   .addr                   ; Move the mouse cursor to X coord
         MOVEY   .addr                   ; Move the mouse cursor to Y coord
 .endstruct

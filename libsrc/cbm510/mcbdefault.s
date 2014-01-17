@@ -27,8 +27,7 @@ VIC_SPR_Y       = (VIC_SPR0_Y + 2*MOUSE_SPR)    ; Sprite Y register
 ; --------------------------------------------------------------------------
 ; Hide the mouse pointer. Always called with interrupts disabled.
 
-.proc   hide
-
+hide:
         ldy     #15
         sty     IndReg
 
@@ -41,13 +40,10 @@ VIC_SPR_Y       = (VIC_SPR0_Y + 2*MOUSE_SPR)    ; Sprite Y register
         sty     IndReg
         rts
 
-.endproc
-
 ; --------------------------------------------------------------------------
 ; Show the mouse pointer. Always called with interrupts disabled.
 
-.proc   show
-
+show:
         ldy     #15
         sty     IndReg
 
@@ -58,34 +54,25 @@ VIC_SPR_Y       = (VIC_SPR0_Y + 2*MOUSE_SPR)    ; Sprite Y register
 
         ldy     ExecReg
         sty     IndReg
-        rts
-
-.endproc
-
-; --------------------------------------------------------------------------
-; Draw the mouse pointer. Always called with interrupts disabled.
-
-.proc   draw
-
-        rts
-
-.endproc
+        ; Fall through
 
 ; --------------------------------------------------------------------------
 ; Prepare to move the mouse pointer. Always called with interrupts disabled.
 
-.proc   move
+prep:
+        ; Fall through
 
+; --------------------------------------------------------------------------
+; Draw the mouse pointer. Always called with interrupts disabled.
+
+draw:
         rts
-
-.endproc
 
 ; --------------------------------------------------------------------------
 ; Move the mouse pointer x position to the value in .XA. Always called with
 ; interrupts disabled.
 
-.proc   movex
-
+movex:
         ldy     #15
         sty     IndReg
 
@@ -112,16 +99,13 @@ VIC_SPR_Y       = (VIC_SPR0_Y + 2*MOUSE_SPR)    ; Sprite Y register
 @L1:    lda     (vic),y                 ; Get high x bits of all sprites
         ora     #MOUSE_SPR_MASK         ; Set high bit for sprite
         sta     (vic),y
-        bnz     @L0                     ; branch always
-
-.endproc
+        bnz     @L0                     ; Branch always
 
 ; --------------------------------------------------------------------------
 ; Move the mouse pointer y position to the value in .XA. Always called with
 ; interrupts disabled.
 
-.proc   movey
-
+movey:
         ldy     #15
         sty     IndReg
 
@@ -133,8 +117,6 @@ VIC_SPR_Y       = (VIC_SPR0_Y + 2*MOUSE_SPR)    ; Sprite Y register
         sty     IndReg
         rts
 
-.endproc
-
 ; --------------------------------------------------------------------------
 ; Callback structure
 
@@ -143,7 +125,7 @@ VIC_SPR_Y       = (VIC_SPR0_Y + 2*MOUSE_SPR)    ; Sprite Y register
 _mouse_def_callbacks:
         .addr   hide
         .addr   show
+        .addr   prep
         .addr   draw
-        .addr   move
         .addr   movex
         .addr   movey

@@ -88,7 +88,17 @@ struct mouse_callbacks {
     /* Hide the mouse cursor. */
 
     void (*show) (void);
-    /* Show the mouse cursor */
+    /* Show the mouse cursor. */
+
+    void (*prep) (void);
+    /* Prepare to move the mouse cursor. This function is called,
+     * even when the cursor is currently invisible.
+     */
+
+    void (*draw) (void);
+    /* Draw the mouse cursor. This function is called,
+     * even when the cursor is currently invisible.
+     */
 
     void __fastcall__ (*movex) (int x);
     /* Move the mouse cursor to the new X coordinate. This function is called,

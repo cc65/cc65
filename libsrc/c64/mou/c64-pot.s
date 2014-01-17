@@ -46,8 +46,8 @@ HEADER:
 
 CHIDE:  jmp     $0000                   ; Hide the cursor
 CSHOW:  jmp     $0000                   ; Show the cursor
+CPREP:  jmp     $0000                   ; Prepare to move the cursor
 CDRAW:  jmp     $0000                   ; Draw the cursor
-CMOVE:  jmp     $0000                   ; Prepare to move the cursor
 CMOVEX: jmp     $0000                   ; Move the cursor to X coord
 CMOVEY: jmp     $0000                   ; Move the cursor to Y coord
 
@@ -299,7 +299,7 @@ IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioclts for now
 ; (so be careful).
 ;
 
-IRQ:    jsr     CMOVE
+IRQ:    jsr     CPREP
         lda     #$7F
         sta     CIA1_PRA
         lda     CIA1_PRB                ; Read port #1

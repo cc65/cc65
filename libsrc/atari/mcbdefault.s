@@ -21,6 +21,7 @@
         .bss
 
 backup: .res    1
+visible:.res    1
 
 ; ------------------------------------------------------------------------
 
@@ -36,6 +37,8 @@ scrptr: .res    2
 _mouse_def_callbacks:
         .addr   hide
         .addr   show
+        .addr   prep
+        .addr   draw
         .addr   movex
         .addr   movey
 
@@ -66,6 +69,9 @@ done:
 
 ; Hide the mouse cursor.
 hide:
+        dec     visible
+
+prep:
         jsr     getcursor       ; Get character at cursor position
         cmp     #cursor         ; "mouse" character
         bne     overwr          ; no, probably program has overwritten it
@@ -76,6 +82,11 @@ overwr: sta     backup
 
 ; Show the mouse cursor.
 show:
+        inc     visible
+
+draw:
+        lda     visible
+        beq     done
         jsr     getcursor       ; Cursor visible at current position?
         sta     backup          ; Save character at cursor position
         lda     #cursor

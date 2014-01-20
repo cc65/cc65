@@ -6,7 +6,7 @@
 ; uses tmp4
 
         .importzp       tmp4
-        .export         mul40
+        .export         mul40,loc_tmp
 
 .proc   mul40
 

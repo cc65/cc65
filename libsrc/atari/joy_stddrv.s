@@ -10,4 +10,9 @@
 
 .rodata
 
-_joy_stddrv:    .asciiz "atrstd.joy"
+_joy_stddrv:
+        .ifdef  __ATARIXL__
+                .asciiz "atrxstd.joy"
+        .else
+                .asciiz "atrstd.joy"
+        .endif

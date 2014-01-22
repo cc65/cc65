@@ -263,12 +263,21 @@ flexibility. All program segments (<CODE>CODE</CODE>, <CODE>DATA</CODE>, etc.) a
 optional.</P>
 <P>By default it creates regular DOS executable files, which have a default
 load address of $2E00. It's also possible to generate an image of
-just the program data without load address or start address. To generate
-a "plain" binary file, pass the options "<CODE>-D__AUTOSTART__=1 -D__EXEHDR__=1</CODE>"
-to the linker.</P>
+just the program data without EXE header, load address, or (auto-)start address.
+To you so, you have to define the symbols <CODE>__AUTOSTART__</CODE> and <CODE>__EXEHDR__</CODE>
+when linking the program. Therefore, to generate a "plain" binary file, pass the
+options "<CODE>-D__AUTOSTART__=1 -D__EXEHDR__=1</CODE>" to the linker.
+It's also possible to create a non auto-starting program file, by defining
+only the <CODE>__AUTOSTART__</CODE> symbol. Such a program has to be run manually
+after being loaded by DOS (for example by using the "M" option of DOS 2.5).
+Defining only the <CODE>__EXEHDR__</CODE> symbol will create a (useless) file which
+doesn't conform to the DOS executable file format (like a "plain" binary file)
+but still has the "autostart" load chunk appended.</P>
+<P>The sections of the file which the defines refer to (<CODE>__AUTOSTART__</CODE> for
+the autostart trailer, <CODE>__EXEHDR__</CODE> for the EXE header and load address)
+is <I>left out</I>, keep this in mind.</P>
 <P>The values you assign to the two symbols <CODE>__AUTOSTART__</CODE> and <CODE>__EXEHDR__</CODE>
-don't matter. If one of these symbols is defined, its part of the EXE file
-isn't included in the outut file.</P>
+don't matter.</P>
 
 <H3><CODE>atari-cart.cfg</CODE></H3>
 

@@ -16,6 +16,6 @@ initreboot:
         ; Quit to PWRUP
         lda     #<$FAA6
         ldx     #>$FAA6
-        sta     done
-        stx     done+1
+        sta     done+1
+        stx     done+2
         rts

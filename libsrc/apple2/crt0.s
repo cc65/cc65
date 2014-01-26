@@ -107,7 +107,7 @@ exit:   ldx     #$02
         txs                     ; Re-init stack pointer
 
         ; We're done
-        jmp     (done)
+        jmp     done
 
         .segment        "INIT"
 
@@ -148,8 +148,8 @@ init:   ldx     #zpspace-1
         ; No BASIC.SYSTEM so quit to ProDOS dispatcher instead
         lda     #<quit
         ldx     #>quit
-        sta     done
-        stx     done+1
+        sta     done+1
+        stx     done+2
         
         ; No BASIC.SYSTEM so use addr of ProDOS system global page
         lda     #<$BF00
@@ -202,8 +202,8 @@ q_param:.byte   $04             ; param_count
 
         .data
 
-        ; Location to jump to when we're done
-done:   .addr   DOSWARM
+        ; Final jump when we're done
+done:   jmp     DOSWARM         ; Potentially patched at runtime
 
         .segment        "ZPSAVE"
 

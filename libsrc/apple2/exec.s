@@ -161,8 +161,8 @@ setbuf: lda     #$00            ; Low byte
         ; Call loader stub after C libary shutdown
         lda     #<target
         ldx     #>target
-        sta     done
-        stx     done+1
+        sta     done+1
+        stx     done+2
 
         ; Initiate C libary shutdown
         jmp     _exit

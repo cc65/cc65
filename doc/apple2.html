@@ -26,7 +26,7 @@ implemented for the cc65 C compiler.</EM>
 <H2><A NAME="toc4">4.</A> <A HREF="apple2.html#s4">Linker configurations</A></H2>
 
 <UL>
-<LI><A NAME="toc4.1">4.1</A> <A HREF="apple2.html#ss4.1">builtin config file</A>
+<LI><A NAME="toc4.1">4.1</A> <A HREF="apple2.html#ss4.1">default config file (<CODE>apple2.cfg</CODE>)</A>
 <LI><A NAME="toc4.2">4.2</A> <A HREF="apple2.html#ss4.2"><CODE>apple2-dos33.cfg</CODE></A>
 <LI><A NAME="toc4.3">4.3</A> <A HREF="apple2.html#ss4.3"><CODE>apple2-system.cfg</CODE></A>
 <LI><A NAME="toc4.4">4.4</A> <A HREF="apple2.html#ss4.4"><CODE>apple2-loader.cfg</CODE></A>
@@ -148,13 +148,13 @@ on the chosen
 <H2><A NAME="s4">4.</A> <A HREF="#toc4">Linker configurations</A></H2>
 
 
-<P>The ld65 linker comes with a builtin config file for the Apple&nbsp;][,
-which is used via <CODE>-t apple2</CODE> (and displayed via <CODE>--dump-config apple2</CODE>).
+<P>The ld65 linker comes with a default config file for the Apple&nbsp;][,
+which is used via <CODE>-t apple2</CODE>.
 The apple2 package comes with additional secondary linker config files, which
-are used via <CODE>-C &lt;configfile&gt;</CODE>.</P>
+are used via <CODE>-t apple2 -C &lt;configfile&gt;</CODE>.</P>
 
 
-<H2><A NAME="ss4.1">4.1</A> <A HREF="#toc4.1">builtin config file</A>
+<H2><A NAME="ss4.1">4.1</A> <A HREF="#toc4.1">default config file (<CODE>apple2.cfg</CODE>)</A>
 </H2>
 
 

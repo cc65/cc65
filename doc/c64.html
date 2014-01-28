@@ -26,7 +26,7 @@ compiler.</EM>
 <H2><A NAME="toc4">4.</A> <A HREF="c64.html#s4">Linker configurations</A></H2>
 
 <UL>
-<LI><A NAME="toc4.1">4.1</A> <A HREF="c64.html#ss4.1">builtin config file</A>
+<LI><A NAME="toc4.1">4.1</A> <A HREF="c64.html#ss4.1">default config file (<CODE>c64.cfg</CODE>)</A>
 <LI><A NAME="toc4.2">4.2</A> <A HREF="c64.html#ss4.2"><CODE>c64-asm.cfg</CODE></A>
 </UL>
 <P>
@@ -117,17 +117,17 @@ runtime stack.</P>
 <H2><A NAME="s4">4.</A> <A HREF="#toc4">Linker configurations</A></H2>
 
 
-<P>The ld65 linker comes with a builtin config file for the Commodore&nbsp;64,
-which is used via <CODE>-t c64</CODE> (and displayed via <CODE>--dump-config c64</CODE>). The
+<P>The ld65 linker comes with a default config file for the Commodore&nbsp;64,
+which is used via <CODE>-t c64</CODE>. The
 c64 package comes with additional secondary linker config files, which are
-used via <CODE>-C &lt;configfile&gt;</CODE>.</P>
+used via <CODE>-t c64 -C &lt;configfile&gt;</CODE>.</P>
 
 
-<H2><A NAME="ss4.1">4.1</A> <A HREF="#toc4.1">builtin config file</A>
+<H2><A NAME="ss4.1">4.1</A> <A HREF="#toc4.1">default config file (<CODE>c64.cfg</CODE>)</A>
 </H2>
 
 
-<P>The builtin configuration is tailored to C programs. It supplies the load
+<P>The default configuration is tailored to C programs. It supplies the load
 address and a small BASIC stub that starts the compiled program using a SYS
 command.</P>
 

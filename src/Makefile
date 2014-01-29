@@ -12,19 +12,14 @@ PROGS = ar65  \
         sim65 \
         sp65
 
-ifdef prefix
-  CA65_INC = $(prefix)/lib/cc65/asminc
-  CC65_INC = $(prefix)/lib/cc65/include
-  LD65_LIB = $(prefix)/lib/cc65/lib
-  LD65_OBJ = $(prefix)/lib/cc65/lib
-  LD65_CFG = $(prefix)/lib/cc65/cfg
-else
-  CA65_INC := $(abspath ../asminc)
-  CC65_INC := $(abspath ../include)
-  LD65_LIB := $(abspath ../lib)
-  LD65_OBJ := $(abspath ../lib)
-  LD65_CFG := $(abspath ../cfg)
-endif
+bindir  := $(prefix)/bin
+datadir := $(if $(prefix),$(prefix)/share/cc65,$(abspath ..))
+
+CA65_INC = $(datadir)/asminc
+CC65_INC = $(datadir)/include
+LD65_LIB = $(datadir)/lib
+LD65_OBJ = $(datadir)/lib
+LD65_CFG = $(datadir)/cfg
 
 CFLAGS += -MMD -MP -O -std=c89 -I common \
           -Wall -Wextra -Wno-char-subscripts -Werror $(USER_CFLAGS) \
@@ -33,9 +28,11 @@ CFLAGS += -MMD -MP -O -std=c89 -I common \
 
 LDLIBS += -lm
 
+INSTALL = install
+
 .SUFFIXES:
 
-.PHONY: all bin $(PROGS) mostlyclean clean avail unavail
+.PHONY: all bin $(PROGS) mostlyclean clean install avail unavail
 
 all bin: $(PROGS)
 
@@ -44,6 +41,11 @@ mostlyclean:
 
 clean:
 	$(RM) -r ../wrk ../bin
+
+install:
+	$(if $(prefix),,$(error variable `prefix' must be set))
+	$(INSTALL) -d $(DESTDIR)$(bindir)
+	$(INSTALL) ../bin/* $(DESTDIR)$(bindir)
 
 avail:
 	$(foreach prog,$(PROGS),$(AVAIL_recipe))

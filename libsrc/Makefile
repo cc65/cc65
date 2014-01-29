@@ -50,9 +50,17 @@ endif
 
 .SUFFIXES:
 
-.PHONY: all lib $(TARGETS) mostlyclean clean
+.PHONY: all lib $(TARGETS) mostlyclean clean install
 
 ifndef TARGET
+
+datadir = $(prefix)/share/cc65
+
+INSTALLDIRS = ../asminc ../cfg ../include \
+              $(filter-out $(wildcard ../include/*.*),$(wildcard ../include/*)) \
+              ../lib ../targetutil $(addprefix ../,$(DRVTYPES))
+
+INSTALL = install
 
 all lib: $(TARGETS)
 
@@ -64,6 +72,21 @@ mostlyclean:
 
 clean:
 	$(call RMDIR,../wrk ../lib ../targetutil $(addprefix ../,$(DRVTYPES)))
+
+install:
+	$(foreach dir,$(INSTALLDIRS),$(INSTALL_recipe))
+
+##########
+
+define INSTALL_recipe
+
+$(if $(prefix),,$(error variable `prefix' must be set))
+$(INSTALL) -d $(subst ..,$(DESTDIR)$(datadir),$(dir))
+$(INSTALL) -m644 $(dir)/* $(subst ..,$(DESTDIR)$(datadir),$(dir))
+
+endef
+
+##########
 
 else # TARGET
 

@@ -26,7 +26,7 @@ implemented for the cc65 C compiler.</EM>
 <H2><A NAME="toc4">4.</A> <A HREF="apple2enh.html#s4">Linker configurations</A></H2>
 
 <UL>
-<LI><A NAME="toc4.1">4.1</A> <A HREF="apple2enh.html#ss4.1">builtin config file</A>
+<LI><A NAME="toc4.1">4.1</A> <A HREF="apple2enh.html#ss4.1">default config file (<CODE>apple2enh.cfg</CODE>)</A>
 <LI><A NAME="toc4.2">4.2</A> <A HREF="apple2enh.html#ss4.2"><CODE>apple2enh-dos33.cfg</CODE></A>
 <LI><A NAME="toc4.3">4.3</A> <A HREF="apple2enh.html#ss4.3"><CODE>apple2enh-system.cfg</CODE></A>
 <LI><A NAME="toc4.4">4.4</A> <A HREF="apple2enh.html#ss4.4"><CODE>apple2enh-loader.cfg</CODE></A>
@@ -149,13 +149,13 @@ on the chosen
 <H2><A NAME="s4">4.</A> <A HREF="#toc4">Linker configurations</A></H2>
 
 
-<P>The ld65 linker comes with a builtin config file for the enhanced&nbsp;Apple&nbsp;//e,
-which is used via <CODE>-t apple2enh</CODE> (and displayed via <CODE>--dump-config apple2enh</CODE>).
+<P>The ld65 linker comes with a default config file for the enhanced&nbsp;Apple&nbsp;//e,
+which is used via <CODE>-t apple2enh</CODE>.
 The apple2enh package comes with additional secondary linker config files, which
-are used via <CODE>-C &lt;configfile&gt;</CODE>.</P>
+are used via <CODE>-t apple2enh -C &lt;configfile&gt;</CODE>.</P>
 
 
-<H2><A NAME="ss4.1">4.1</A> <A HREF="#toc4.1">builtin config file</A>
+<H2><A NAME="ss4.1">4.1</A> <A HREF="#toc4.1">default config file (<CODE>apple2enh.cfg</CODE>)</A>
 </H2>
 
 

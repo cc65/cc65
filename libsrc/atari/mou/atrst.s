@@ -446,6 +446,14 @@ IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioclts for now
 
 IRQ:
 
+; Turn mouse polling IRQ back on in case it disabled itself due to CRITIC
+; flag being set.
+
+        lda     POKMSK
+        ora     #%00000001              ; timer 1 enable
+        sta     POKMSK
+        sta     IRQEN
+
 ; Check for a pressed button and place the result into Buttons
 
         ldx     #0
@@ -514,7 +522,12 @@ IRQ:
 ; T1Han: Local IRQ routine to poll mouse
 ;
 
-T1Han:  tya
+T1Han:  lda     CRITIC                  ; if CRITIC flag is set, disable the
+        bne     disable_me              ; high frequency polling IRQ, in order
+                                        ; not to interfere with SIO I/O (e.g.
+                                        ; floppy access)
+
+        tya
         pha
         txa
         pha
@@ -689,6 +702,25 @@ mmexit: sty     oldval
         tax
         pla
         tay
+.ifdef  __ATARIXL__
+        rts
+.else
+        pla
+        rti
+.endif
+
+
+; Disable the interrupt source which caused us to be called.
+; The interrupt will be enabled again by the "IRQ" routine.
+; The "IRQ" routine, despite its name, is called from the
+; vertical blank NMI interrupt *only* if the CRITIC flag has
+; been cleared.
+
+disable_me:
+        lda     POKMSK
+        and     #%11111110              ; timer 1 disable
+        sta     IRQEN
+        sta     POKMSK
 .ifdef  __ATARIXL__
         rts
 .else

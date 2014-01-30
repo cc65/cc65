@@ -1,4 +1,4 @@
-all mostlyclean clean:
+all mostlyclean clean install:
 	@$(MAKE) -C src    --no-print-directory $@
 	@$(MAKE) -C libsrc --no-print-directory $@
 
@@ -14,6 +14,6 @@ lib:
 %:
 	@$(MAKE) -C libsrc --no-print-directory $@
 
-.PHONY: all mostlyclean clean avail unavail bin lib
+.PHONY: all mostlyclean clean install avail unavail bin lib
 
 .SUFFIXES:

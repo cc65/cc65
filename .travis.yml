@@ -1,2 +1,6 @@
-language: c
-script: make
+language:
+- c
+before_script:
+- sudo apt-get install linuxdoc-tools
+script:
+- make

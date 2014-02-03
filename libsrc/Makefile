@@ -222,6 +222,19 @@ endef
 
 ##########
 
+##########
+# From here: http://blog.melski.net/2012/01/03/makefile-hacks-automatically-split-long-command-lines/
+define max_args
+  $(eval _args:=)
+  $(foreach obj,$3,$(eval _args+=$(obj))$(if $(word $2,$(_args)),$1$(_args)$(EOL)$(eval _args:=)))
+  $(if $(_args),$1$(_args))
+endef
+define EOL
+
+
+endef
+##########
+
 $(foreach drvtype,$(DRVTYPES),$(eval $(call DRVTYPE_template,$(drvtype))))
 
 AR65 := $(if $(wildcard ../bin/ar65*),../bin/ar65,ar65)
@@ -264,7 +277,7 @@ $(EXTRA_OBJPAT): $(EXTRA_SRCPAT) | ../lib
 	@$(CA65) -t $(TARGET) $(CA65FLAGS) -o $@ $<
 
 ../lib/$(TARGET).lib: $(OBJS) | ../lib
-	$(AR65) a $@ $?
+	$(call max_args,$(AR65) a $@,50,$?)
 
 ../wrk/$(TARGET) ../lib ../targetutil:
 	@$(call MKDIR,$@)

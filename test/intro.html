@@ -1,0 +1,602 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>cc65 Compiler Intro</TITLE>
+</HEAD>
+<BODY>
+<H1>cc65 Compiler Intro</H1>
+
+<H2>Ullrich von Bassewitz, 
+<A HREF="mailto:uz@cc65.org">uz@cc65.org</A>,</H2>
+<H2>CbmNut, 
+<A HREF="mailto:cbmnut@hushmail.com">cbmnut@hushmail.com</A>,</H2>
+<H2>
+<A HREF="mailto:gngking@erols.com">Greg King</A></H2>2005-7-22
+<HR>
+<EM>How to use the cc65 C language system -- an introduction.</EM>
+<HR>
+<P>
+<H2><A NAME="toc1">1.</A> <A HREF="intro.html#s1">Overview</A></H2>
+
+<UL>
+<LI><A NAME="toc1.1">1.1</A> <A HREF="intro.html#ss1.1">Before we start</A>
+<LI><A NAME="toc1.2">1.2</A> <A HREF="intro.html#ss1.2">The sample modules</A>
+<LI><A NAME="toc1.3">1.3</A> <A HREF="intro.html#ss1.3">Translation phases</A>
+</UL>
+<P>
+<H2><A NAME="toc2">2.</A> <A HREF="intro.html#s2">The compiler</A></H2>
+
+<P>
+<H2><A NAME="toc3">3.</A> <A HREF="intro.html#s3">The assembler</A></H2>
+
+<P>
+<H2><A NAME="toc4">4.</A> <A HREF="intro.html#s4">The linker</A></H2>
+
+<P>
+<H2><A NAME="toc5">5.</A> <A HREF="intro.html#s5">The easy way (using the cl65 utility)</A></H2>
+
+<P>
+<H2><A NAME="toc6">6.</A> <A HREF="intro.html#s6">Running The Executable</A></H2>
+
+<UL>
+<LI><A NAME="toc6.1">6.1</A> <A HREF="intro.html#ss6.1">Apple</A>
+<LI><A NAME="toc6.2">6.2</A> <A HREF="intro.html#ss6.2">Atari</A>
+<LI><A NAME="toc6.3">6.3</A> <A HREF="intro.html#ss6.3">Atmos</A>
+<LI><A NAME="toc6.4">6.4</A> <A HREF="intro.html#ss6.4">Commodore</A>
+<LI><A NAME="toc6.5">6.5</A> <A HREF="intro.html#ss6.5">GEOS</A>
+<LI><A NAME="toc6.6">6.6</A> <A HREF="intro.html#ss6.6">Contributions wanted</A>
+</UL>
+
+<HR>
+<H2><A NAME="s1">1.</A> <A HREF="#toc1">Overview</A></H2>
+
+
+<P>This is a short intro of how to use the compiler and the bin-utils. It contains
+a step-by-step example of how to build a complete application from one C and
+one assembly modules. This file does <EM>not</EM> contain a complete reference for
+the tools used in the process. There are separate files describing those tools,
+in detail (see 
+<A HREF="index.html">index.html</A>).</P>
+<P>I do assume that you have downloaded and installed the compiler and
+target-specific files. Windows users should use the friendly .exe installer
+(named cc65-2.13.0-1.exe for version 2.13.0 of the package - adjust the
+version number if necessary). It does not only install the target files, but
+will also set up necessary environment variables for you.</P>
+<P>If you're going for the .ZIP archives, please note that there is one file for
+the host platform (Windows, DOS or OS/2), one file for each target platform
+(C64 or whatever) and a separate file containing the docs (which include the
+file you're currently reading). So for most uses, you will need at least 3
+files and unpack all three into one directory. In case of the .ZIP archives,
+you will also need to set the environment variables <CODE>CC65_INC</CODE>,
+<CODE>LD65_LIB</CODE> and <CODE>LD65_CFG</CODE> as described below.</P>
+<P><B>Note</B>: There is a much simpler way to compile this example, by using the
+<B>cl65</B> compile-and-link utility. However, it makes sense to understand how
+the separate steps work. How to do the example with the <B>cl65</B> utility is
+described 
+<A HREF="#using-cl65">later</A>.</P>
+
+
+<H2><A NAME="ss1.1">1.1</A> <A HREF="#toc1.1">Before we start</A>
+</H2>
+
+
+<P>You will find a copy of the sample modules, used in the next section, in the
+"<CODE>cc65/samples/tutorial</CODE>" directory. If you encounter problems with
+missing include files and/or libraries, please check the environment variables
+<CODE>CC65_INC</CODE>, <CODE>LD65_LIB</CODE> and <CODE>LD65_CFG</CODE>. They should point to the
+<CODE>include</CODE>, <CODE>lib</CODE> and <CODE>cfg</CODE> subdirectories of the directory, where you
+installed cc65.</P>
+
+
+<H2><A NAME="ss1.2">1.2</A> <A HREF="#toc1.2">The sample modules</A>
+</H2>
+
+
+<P>To explain the development flow, I will use the following example modules:</P>
+<P>hello.c:
+<BLOCKQUOTE><CODE>
+<HR>
+<PRE>
+        #include &lt;stdio.h>
+        #include &lt;stdlib.h>
+
+        extern const char text[];       /* In text.s */
+
+        int main (void)
+        {
+            printf ("%s\n", text);
+            return EXIT_SUCCESS;
+        }
+</PRE>
+<HR>
+</CODE></BLOCKQUOTE>
+</P>
+<P>text.s:
+<BLOCKQUOTE><CODE>
+<HR>
+<PRE>
+        .export _text
+        _text:  .asciiz "Hello world!"
+</PRE>
+<HR>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+<H2><A NAME="ss1.3">1.3</A> <A HREF="#toc1.3">Translation phases</A>
+</H2>
+
+
+<P>We assume that the target file should be named "hello", and the target system
+is the C64.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+    +---------+
+    | hello.c |
+    +---------+
+         |
+        cc65
+         \/
+    +---------+       +---------+       +---------+
+    | hello.s |       | text.s  |       | crt0.o  |
+    +---------+       +---------+       +---------+
+         |                 |                 |
+        ca65              ca65              ar65
+         \/                \/                \/
+    +---------+       +---------+       +---------+
+    | hello.o |       | text.o  |       | c64.lib |
+    +---------+       +---------+       +---------+
+         |                    \          /
+         |                     \        /
+         |                      \      /
+         +----------------------->ld65&lt;
+                                   \/
+                                 hello
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P><CODE>crt0.o</CODE> (the startup code) and <CODE>c64.lib</CODE> (the C64 version of the runtime
+and C library) are provided in binary form in the cc65 package. Actually, the
+startup code is contained in the library, so you won't need to care about it.</P>
+
+
+
+<H2><A NAME="s2">2.</A> <A HREF="#toc2">The compiler</A></H2>
+
+
+<P>The compiler translates one C source into one assembly source, for each
+invocation. It does <EM>not</EM> create object files directly, and it is <EM>not</EM>
+able to translate more than one file per run.</P>
+<P>In the example above, we would use the following command line, to translate
+<CODE>hello.c</CODE> into <CODE>hello.s</CODE>:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        cc65 -O -t c64 hello.c
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The <CODE>-O</CODE> switch tells the compiler to do an additional optimizer run, which
+is usually a good idea, since it makes the code smaller. If you don't care
+about the size, but want to have slightly faster code, use <CODE>-Oi</CODE> to inline
+some runtime functions.</P>
+<P>The <CODE>-t</CODE> switch is followed by the target system name.</P>
+<P>If the compiler does not complain about errors in our "hello world" program, we
+will have a file named "<CODE>hello.s</CODE>", in our directory, that contains the
+assembly source for the <B>hello</B> module.</P>
+<P>For more information about the compiler, see 
+<A HREF="cc65.html">cc65.html</A>.</P>
+
+
+
+<H2><A NAME="s3">3.</A> <A HREF="#toc3">The assembler</A></H2>
+
+
+<P>The assembler translates one assembly source into an object file, for each
+invocation. The assembler is <EM>not</EM> able to translate more than one source
+file per run.</P>
+<P>Let's translate the "hello.s" and "text.s" files from our example:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        ca65 hello.s
+        ca65 -t c64 text.s
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The <CODE>-t</CODE> switch is needed when translating the <CODE>text.s</CODE> file, so the
+text is converted from the input character-set (usually ISO-8859-1) into the
+target character-set (PETSCII, in this example) by the assembler. The
+compiler-generated file <CODE>hello.s</CODE> does not contain any character constants,
+so specification of a target is not necessary (it wouldn't do any harm,
+however).</P>
+<P>If the assembler does not complain, we should now have two object files (named
+<CODE>hello.o</CODE> and <CODE>text.o</CODE>) in the current directory.</P>
+<P>For more information about the assembler, see 
+<A HREF="ca65.html">ca65.html</A>.</P>
+
+
+
+<H2><A NAME="s4">4.</A> <A HREF="#toc4">The linker</A></H2>
+
+
+<P>The linker combines several object and library files into one output file.
+<B>ld65</B> is very configurable, but fortunately has built-in configurations,
+so we don't need to mess with configuration files, here.</P>
+<P>The compiler uses small functions to do things that cannot be done inline
+without a big impact on code size. Those runtime functions, together with the
+C library, are in an object-file archive named after the system, in this case,
+"<CODE>c64.lib</CODE>". We have to specify that file on the command line, so that the
+linker can resolve those functions.</P>
+<P>Let's link our files to get the final executable:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        ld65 -o hello -t c64 hello.o text.o c64.lib
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The argument after <CODE>-o</CODE> specifies the name of the output file, the argument
+after <CODE>-t</CODE> gives the target system. The following arguments are object
+files or libraries. Since the target library resolves imports in <CODE>hello.o</CODE>
+and <CODE>text.o</CODE>, it must be specified <EM>after</EM> those files.</P>
+<P>After a successful linker run, we have a file named "<CODE>hello</CODE>", ready for
+our C64!</P>
+<P>For more information about the linker, see 
+<A HREF="ld65.html">ld65.html</A>.</P>
+
+
+
+<H2><A NAME="using-cl65"></A> <A NAME="s5">5.</A> <A HREF="#toc5">The easy way (using the cl65 utility)</A></H2>
+
+
+<P>The <B>cl65</B> utility is able to do all of the steps described above, in just
+one command line, and it has defaults for some options that are very
+well-suited for our example.</P>
+<P>To compile both files into one executable, enter:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        cl65 -O hello.c text.s
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The <B>cl65</B> utility knows how to translate C files into object files (it will
+call the compiler, and then the assembler). It does know also how to create
+object files from assembly files (it will call only the assembler, for that).
+It knows how to build an executable (it will pass all object files to the
+linker). And finally, it has the C64 as a default target, and will supply the
+correct startup file and runtime library names to the linker, so you don't
+have to care about that.</P>
+<P>The one-liner above should give you a C64 executable named "<CODE>hello</CODE>" in the
+current directory.</P>
+<P>For more information about the compile &amp; link utility, see 
+<A HREF="cl65.html">cl65.html</A>.</P>
+
+
+
+<H2><A NAME="s6">6.</A> <A HREF="#toc6">Running The Executable</A></H2>
+
+
+<P><EM>Note: this section is incomplete!</EM></P>
+<P>Depending on the target, cc65 chooses several methods of making a program
+available for execution. Here, we list sample emulators and instructions for
+running the program. Unless noted, similar instructions would also apply to a
+real machine. One word of advice: we suggest you clear the screen at the
+start, and wait for a keypress at the end of your program, as each target
+varies in its start and exit conditions.</P>
+
+
+<H2><A NAME="ss6.1">6.1</A> <A HREF="#toc6.1">Apple</A>
+</H2>
+
+<H3>AppleWin</H3>
+
+<P>Available at 
+<A HREF="http://applewin.berlios.de/">http://applewin.berlios.de/</A>:</P>
+<P>Emulates Apple&nbsp;][/enhanced&nbsp;Apple&nbsp;//e computers, with
+sound, video, joysticks, serial port, and disk images. Includes monitor. Only
+for Windows. The package comes with a DOS 3.3 disk (called "master.dsk") image;
+however, you will need <B>AppleCommander 1.3.5</B> or later (available at 
+<A HREF="http://applecommander.sourceforge.net/">http://applecommander.sourceforge.net/</A>).</P>
+<P>Compile the tutorial with</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+cl65 -O -t apple2 hello.c text.s
+</PRE>
+</CODE></BLOCKQUOTE>
+
+for the Apple&nbsp;][, or:
+<BLOCKQUOTE><CODE>
+<PRE>
+cl65 -O -t apple2enh hello.c text.s
+</PRE>
+</CODE></BLOCKQUOTE>
+
+for the enhanced&nbsp;Apple&nbsp;//e.</P>
+<P>Then, put the file onto an Apple disk image, for use with an emulator.  Copy
+the <CODE>master.dsk</CODE> which comes with <B>AppleWin</B>, and rename it to
+<CODE>cc65.dsk</CODE>, then use <B>AppleCommander</B>:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+java -jar ac.jar -cc65 cc65.dsk test B &lt; hello
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Note that a convention in the Apple world is that "hello" is the file which is
+run automatically upon booting a DOS disk, sort of like the "autoexec.bat" of
+the MSDOS/Windows world.  We've avoided that in the example, however.  Also,
+the <CODE>B</CODE> parameter must be in caps., and "test" is the name of the program as
+it will appear on the Apple disk.</P>
+<P>Start the emulator, click on the <B>Disk 1</B> icon, and point to <B>cc65.dsk</B>;
+then, click the big Apple logo, to boot the system.  Then, type this on the
+Apple:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+BRUN TEST
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>You will see the "Hello, World!" appear on the same line.  Thanks to Oliver
+Schmidt, 
+<A HREF="mailto:ol.sc@web.de">ol.sc@web.de</A> for his help
+in completing this section.</P>
+
+
+<H2><A NAME="ss6.2">6.2</A> <A HREF="#toc6.2">Atari</A>
+</H2>
+
+<H3>Atari800Win PLus</H3>
+
+<P>Available at 
+<A HREF="http://www.atari.org.pl/PLus/index_us.htm">http://www.atari.org.pl/PLus/index_us.htm</A>:</P>
+<P>Emulates Atari 400/800/65XE/130XE/800XL/1200XL/5200, with stereo sound, disk
+images, scanline-exact NTSC/PAL video, joysticks, mouse, cartridges, and RAM
+expansions. Includes monitor. Unfortunately, only for Windows. You will need
+the emulator, "atarixl.rom" or "atariosb.rom"/"ataribas.rom", and "dos25.xfd"
+files (not supplied).</P>
+<P>Compile the tutorial with</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+cl65 -O -t atari hello.c text.s
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Start the emulator, choose <B>File&gt;Autoboot image</B> or <B>File&gt;Load
+executable</B>, and point to the "<B>hello</B>" executable.  It is customary to
+rename executables of that type to "<B>hello.xex</B>".  The file has a 7-byte
+header meant to be loaded directly from Atari DOS 2/2.5 or compatibles.</P>
+<P>On a real Atari, you would need a disk drive, and Atari DOS 2.5 or compatible.
+Turn on the computer, type</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+DOS
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>at the BASIC prompt, then choose <B>N. CREATE MEM.SAV</B>,
+then choose <B>L. BINARY LOAD</B>, and enter <CODE>HELLO</CODE>.</P>
+<P>The emulation, also, supports that method.  Look at <B>Atari&gt;Settings</B>, and
+check <B>Enable H: Patch for Hard Disk Devices</B>, then <B>Atari&gt;Hard
+disks</B>, and set the path of <B>H1:</B> to your executables directory, then use
+"<B>H0:HELLO.XEX</B>" in the above procedure (after pressing <CODE>L</CODE>), to access
+your harddrive directly.</P>
+<P><B>Note</B>: There is no delay after the program exits, as you are returned
+to the DOS menu.  Your C program should wait for a keypress if you want to see
+any output.</P>
+
+
+<H2><A NAME="ss6.3">6.3</A> <A HREF="#toc6.3">Atmos</A>
+</H2>
+
+<H3>Oricutron</H3>
+
+<P>Available at 
+<A HREF="http://code.google.com/p/oriculator/">http://code.google.com/p/oriculator/</A>:</P>
+<P>Emulates Oric-1 and Atmos computers, with sound, disk images,
+scanline-exact NTSC/PAL video, and movie export. Includes monitor.
+Fortunately for all SDL platforms. You will just need the emulator, all
+ROMs are supplied.</P>
+<P>Compile the tutorial with</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+cl65 -O -t atmos hello.c text.s -o hello.tap
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Start the emulator, choose <B>F1</B> and <B>Insert tape...</B>, and point to
+the "<B>hello.tap</B>" executable. The file has an auto start header meant to
+be loaded directly from tape.</P>
+<P>On a real Atmos, you would need a tape drive.
+Turn on the computer, type</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+CLOAD""
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>at the BASIC prompt.</P>
+<P>The emulation, also, supports that method.</P>
+
+
+<H2><A NAME="ss6.4">6.4</A> <A HREF="#toc6.4">Commodore</A>
+</H2>
+
+<H3>VICE</H3>
+
+<P>Available at 
+<A HREF="http://vice-emu.sourceforge.net/">http://vice-emu.sourceforge.net/</A>:</P>
+<P>Emulates Commodore 64/128/VIC-20/PET/CBM II/Plus 4 computers. Supports
+printers, serial port and adapters, stereo sound, disk drives and images, RAM expansions,
+cartridges, ethernet connection, cycle-exact NTSC/PAL video, mice, graphics tablet,
+lightpens, and joysticks. Includes monitor. Runs on MSDOS/PCDOS, Win9x/ME/NT/2000/XP, OS2,
+BeOS x86, Acorn RISC OS, and most Unixes.</P>
+<P>Compile the tutorial with
+<BLOCKQUOTE><CODE>
+<PRE>
+cl65 -O -t &lt;sys&gt; hello.c text.s
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Substitute the name of a Commodore computer for that <CODE>&lt;sys&gt;</CODE>:
+<UL>
+<LI><CODE>c128</CODE></LI>
+<LI><CODE>c16</CODE></LI>
+<LI><CODE>c64</CODE></LI>
+<LI><CODE>cbm510</CODE></LI>
+<LI><CODE>cbm610</CODE></LI>
+<LI><CODE>pet</CODE></LI>
+<LI><CODE>plus4</CODE></LI>
+<LI><CODE>vic20</CODE></LI>
+</UL>
+</P>
+<P>Start the desired version of the emulator (CBM610 programs run on
+the CBM II [<CODE>xcbm2</CODE>] emulator).</P>
+<P>In the Windows versions of VICE, choose <B>File&gt;Autoboot disk/tape
+image...</B>, choose your executable, and click <B>OK</B>.</P>
+<P>In the Unix versions, hold down the mouse's first button. Move the pointer to
+<B>Smart-attach disk/tape...</B>, and release the button. Choose your
+executable, and click <B>Autostart</B>.</P>
+<P>The file has a 14-byte header which corresponds to a PRG-format BASIC program,
+consisting of a single line, similar to this:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<HR>
+<PRE>
+1000 sys2061
+</PRE>
+<HR>
+</CODE></BLOCKQUOTE>
+</P>
+<P>On a real Commodore with attached disk drive, you would type:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+LOAD "0:HELLO",8
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>for VIC-20/C64, or:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+DLOAD "HELLO"
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>on PET/CBM II/C128/C16/Plus 4; then, type</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+RUN
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>On a Commodore 128, you can combine those two commands:
+<BLOCKQUOTE><CODE>
+<PRE>
+RUN "HELLO"
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The output will appear on a separate line, and you will be returned to a BASIC
+prompt.</P>
+
+
+<H2><A NAME="ss6.5">6.5</A> <A HREF="#toc6.5">GEOS</A>
+</H2>
+
+<P>Available at <I>Click Here Software's</I> 
+<A HREF="http://cbmfiles.com/geos/index.html">GEOS download section</A>:</P>
+<P><I><B>G</B>raphics <B>E</B>nvironment <B>O</B>perating <B>S</B>ystem.</I>
+It provides a WIMP GUI (Windows, Icons, and Mouse-Pointer Graphical User
+Interface) for Commodore's computer models <B>64</B> and <B>128</B>.  It can be
+controlled by many different types of input devices:
+<UL>
+<LI>keyboard</LI>
+<LI>joysticks</LI>
+<LI>mice</LI>
+<LI>trackballs</LI>
+<LI>graphics drawing tablets</LI>
+<LI>light-pens</LI>
+</UL>
+</P>
+<P>The tutorial files are different for GEOS.  You will find them "next door," in
+"<CODE>cc65/samples/geos</CODE>"; they are called "<CODE>hello1.c</CODE>" and
+"<CODE>hello1res.grc</CODE>".</P>
+<P>Compile the tutorial with
+<BLOCKQUOTE><CODE>
+<PRE>
+cl65 -t geos-cbm -O -o hello1 hello1res.grc hello1.c
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Copy the resulting file "<CODE>hello1</CODE>" onto a (GEOS-format) disk.</P>
+<P>Boot the GEOS master disk/image.</P>
+<P>
+<BLOCKQUOTE>
+When you want to run GEOS in an emulator, you must adjust that emulator so that
+it does a "true drive" emulation. Each emulator has its own way of turning that
+feature on.
+</BLOCKQUOTE>
+</P>
+<P>
+<BLOCKQUOTE>
+VICE even has different ways that depend on which operating system is running
+the emulator.
+<UL>
+<LI>In Windows, you must click on <B>Options</B> (in an always visible menu).
+Then, you must click on <B>True drive emulation</B>.</LI>
+<LI>In Unix, you must <EM>hold down</EM> the second button on your mouse.  Move
+the pointer down to <B>Drive settings</B>.  Then, move the pointer over to
+<B>Enable true drive emulation</B>.  (If there is a check-mark in front of
+those words, that feature already is turned on -- then, move the pointer
+off of that menu.) Release the mouse button.</LI>
+</UL>
+</BLOCKQUOTE>
+</P>
+<P>Find the <B>CONVERT</B> program on the boot disk [tap the 6-key; then, you
+should see its icon in the fourth position on the <B>deskTop</B>'s directory
+notePad].  Move GEOS's pointer over to <B>CONVERT</B>'s icon; double-click
+it to run that program.  Click on the <B>Disk</B> icon; put the disk with
+"<CODE>hello1</CODE>" into the drive; and, click the <B>OK</B> icon.  Use the little
+icons under the list of file-names to move through that list until you find
+"<CODE>hello1</CODE>".  Click on it; and then, click on the <B>Convrt</B> icon.
+<B>CONVERT</B> will ask you to confirm that you choose the correct file; click
+<B>YES</B> if you did (or, click <B>NO</B> if you made a mistake).  After the
+program has converted "<CODE>hello1</CODE>" from a CBM file into a GEOS file, it will
+announce what it did -- click on <B>OK</B>.  <B>CONVERT</B> will show the file list
+again.  This time, click on <B>Quit</B>.</P>
+<P>(You might need to put the boot disk back into the drive, in order to reload
+<B>deskTop</B>.  Then, you must swap back to the disk with the tutorial program
+on it, and click on its disk icon [on the right side of the screen].)</P>
+<P>Now, you must find <B>hello1</B>.  Click on the lower left-hand corner of the
+directory notePad.  Look at the eight file-positions on each page until you see
+<B>hello1</B>.  Double-click on its icon.</P>
+<P>The output is shown in a GEOS dialog box; click <B>OK</B> when you have finished
+reading it.</P>
+
+
+<H2><A NAME="ss6.6">6.6</A> <A HREF="#toc6.6">Contributions wanted</A>
+</H2>
+
+
+<P>We need your help! Recommended emulators and instructions for other targets
+are missing.  We suggest that you choose emulators with good compatibility.
+Also, being able to run all computers in the target series is good for
+target compatibility testing. A machine-language monitor is almost essential
+for debugging, but a native debugger could be used, as well.</P>
+<P>Finally, emulators which run on Unix or Windows would help to reach a wider
+audience.</P>
+
+</BODY>
+</HTML>

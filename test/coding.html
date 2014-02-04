@@ -1,0 +1,343 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>cc65 coding hints</TITLE>
+</HEAD>
+<BODY>
+<H1>cc65 coding hints</H1>
+
+<H2>Ullrich von Bassewitz, 
+<A HREF="mailto:uz@cc65.org">uz@cc65.org</A></H2>2000-12-03, 2009-09-01
+<HR>
+<EM>How to generate the most effective code with cc65.</EM>
+<HR>
+<H2><A NAME="s1">1. Use prototypes</A></H2>
+
+
+<P>This will not only help to find errors between separate modules, it will also
+generate better code, since the compiler must not assume that a variable sized
+parameter list is in place and must not pass the argument count to the called
+function. This will lead to shorter and faster code.</P>
+
+
+
+<H2><A NAME="s2">2. Don't declare auto variables in nested function blocks</A></H2>
+
+
+<P>Variable declarations in nested blocks are usually a good thing. But with
+cc65, there is a drawback: Since the compiler generates code in one pass, it
+must create the variables on the stack each time the block is entered and
+destroy them when the block is left. This causes a speed penalty and larger
+code.</P>
+
+
+
+<H2><A NAME="s3">3. Remember that the compiler does no high level optimizations</A></H2>
+
+
+<P>The compiler needs hints from you about the code to generate. It will try to
+optimize the generated code, but follow the outline you gave in your C
+program. So for example, when accessing indexed data structures, get a pointer
+to the element and use this pointer instead of calculating the index again and
+again. If you want to have your loops unrolled, or loop invariant code moved
+outside the loop, you have to do that yourself.</P>
+
+
+
+<H2><A NAME="s4">4. Longs are slow!</A></H2>
+
+
+<P>While long support is necessary for some things, it's really, really slow on
+the 6502. Remember that any long variable will use 4 bytes of memory, and any
+operation works on double the data compared to an int.</P>
+
+
+
+<H2><A NAME="s5">5. Use unsigned types wherever possible</A></H2>
+
+
+<P>The 6502 CPU has no opcodes to handle signed values greater than 8 bit. So
+sign extension, test of signedness etc. has to be done with extra code. As a
+consequence, the code to handle signed operations is usually a bit larger and
+slower than the same code for unsigned types.</P>
+
+
+
+<H2><A NAME="s6">6. Use chars instead of ints if possible</A></H2>
+
+
+<P>While in arithmetic operations, chars are immidiately promoted to ints, they
+are passed as chars in parameter lists and are accessed as chars in variables.
+The code generated is usually not much smaller, but it is faster, since
+accessing chars is faster. For several operations, the generated code may be
+better if intermediate results that are known not to be larger than 8 bit are
+casted to chars.</P>
+<P>You should especially use unsigned chars for loop control variables if the
+loop is known not to execute more than 255 times.</P>
+
+
+
+<H2><A NAME="s7">7. Make the size of your array elements one of 1, 2, 4, 8</A></H2>
+
+
+<P>When indexing into an array, the compiler has to calculate the byte offset
+into the array, which is the index multiplied by the size of one element. When
+doing the multiplication, the compiler will do a strength reduction, that is,
+replace the multiplication by a shift if possible. For the values 2, 4 and 8,
+there are even more specialized subroutines available. So, array access is
+fastest when using one of these sizes.</P>
+
+
+
+<H2><A NAME="s8">8. Expressions are evaluated from left to right</A></H2>
+
+
+<P>Since cc65 is not building an explicit expression tree when parsing an
+expression, constant subexpressions may not be detected and optimized properly
+if you don't help. Look at this example:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+      #define OFFS   4
+      int  i;
+      i = i + OFFS + 3;
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The expression is parsed from left to right, that means, the compiler sees 'i',
+and puts it contents into the secondary register. Next is OFFS, which is
+constant. The compiler emits code to add a constant to the secondary register.
+Same thing again for the constant 3. So the code produced contains a fetch
+of 'i', two additions of constants, and a store (into 'i'). Unfortunately, the
+compiler does not see, that "OFFS + 3" is a constant for itself, since it does
+its evaluation from left to right. There are some ways to help the compiler
+to recognize expression like this:</P>
+<P>
+<OL>
+<LI>Write "i = OFFS + 3 + i;". Since the first and second operand are
+constant, the compiler will evaluate them at compile time reducing the code to
+a fetch, one addition (secondary + constant) and one store.
+</LI>
+<LI>Write "i = i + (OFFS + 3)". When seeing the opening parenthesis, the
+compiler will start a new expression evaluation for the stuff in the braces,
+and since all operands in the subexpression are constant, it will detect this
+and reduce the code to one fetch, one addition and one store.
+</LI>
+</OL>
+</P>
+
+
+<H2><A NAME="s9">9. Use the preincrement and predecrement operators</A></H2>
+
+
+<P>The compiler is not always smart enough to figure out, if the rvalue of an
+increment is used or not. So it has to save and restore that value when
+producing code for the postincrement and postdecrement operators, even if this
+value is never used. To avoid the additional overhead, use the preincrement
+and predecrement operators if you don't need the resulting value. That means,
+use</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        ...
+        ++i;
+        ...
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>instead of</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        ...
+        i++;
+        ...
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+
+<H2><A NAME="s10">10. Use constants to access absolute memory locations</A></H2>
+
+
+<P>The compiler produces optimized code, if the value of a pointer is a constant.
+So, to access direct memory locations, use</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        #define VDC_STATUS 0xD601
+        *(char*)VDC_STATUS = 0x01;
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>That will be translated to</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        lda     #$01
+        sta     $D601
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The constant value detection works also for struct pointers and arrays, if the
+subscript is a constant. So</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        #define VDC     ((unsigned char*)0xD600)
+        #define STATUS  0x01
+        VDC[STATUS] = 0x01;
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>will also work.</P>
+<P>If you first load the constant into a variable and use that variable to access
+an absolute memory location, the generated code will be much slower, since the
+compiler does not know anything about the contents of the variable.</P>
+
+
+
+<H2><A NAME="s11">11. Use initialized local variables</A></H2>
+
+
+<P>Initialization of local variables when declaring them gives shorter and faster
+code. So, use</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        int i = 1;
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>instead of</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        int i;
+        i = 1;
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>But beware: To maximize your savings, don't mix uninitialized and initialized
+variables. Create one block of initialized variables and one of uniniitalized
+ones. The reason for this is, that the compiler will sum up the space needed
+for uninitialized variables as long as possible, and then allocate the space
+once for all these variables. If you mix uninitialized and initialized
+variables, you force the compiler to allocate space for the uninitialized
+variables each time, it parses an initialized one. So do this:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        int i, j;
+        int a = 3;
+        int b = 0;
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>instead of</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        int i;
+        int a = 3;
+        int j;
+        int b = 0;
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The latter will work, but will create larger and slower code.</P>
+
+
+
+<H2><A NAME="s12">12. Use the array operator [] even for pointers</A></H2>
+
+
+<P>When addressing an array via a pointer, don't use the plus and dereference
+operators, but the array operator. This will generate better code in some
+common cases.</P>
+<P>Don't use</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        char* a;
+        char b, c;
+        char b = *(a + c);
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Use</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        char* a;
+        char b, c;
+        char b = a[c];
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>instead.</P>
+
+
+
+<H2><A NAME="s13">13. Use register variables with care</A></H2>
+
+
+<P>Register variables may give faster and shorter code, but they do also have an
+overhead. Register variables are actually zero page locations, so using them
+saves roughly one cycle per access. The calling routine may also use register
+variables, so the old values have to be saved on function entry and restored
+on exit. Saving an d restoring has an overhead of about 70 cycles per 2 byte
+variable. It is easy to see, that - apart from the additional code that is
+needed to save and restore the values - you need to make heavy use of a
+variable to justify the overhead.</P>
+<P>As a general rule: Use register variables only for pointers that are
+dereferenced several times in your function, or for heavily used induction
+variables in a loop (with several 100 accesses).</P>
+<P>When declaring register variables, try to keep them together, because this
+will allow the compiler to save and restore the old values in one chunk, and
+not in several.</P>
+<P>And remember: Register variables must be enabled with <CODE>-r</CODE> or <CODE>-Or</CODE>.</P>
+
+
+
+<H2><A NAME="s14">14. Decimal constants greater than 0x7FFF are actually long ints</A></H2>
+
+
+<P>The language rules for constant numeric values specify that decimal constants
+without a type suffix that are not in integer range must be of type long int
+or unsigned long int. So a simple constant like 40000 is of type long int!
+This is often unexpected and may cause an expression to be evaluated with 32
+bits. While in many cases the compiler takes care about it, in some places it
+can't. So be careful when you get a warning like</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        test.c(7): Warning: Constant is long
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Use the <CODE>U</CODE>, <CODE>L</CODE> or <CODE>UL</CODE> suffixes to tell the compiler the desired
+type of a numeric constant.</P>
+
+
+
+<H2><A NAME="s15">15. Access to parameters in variadic functions is expensive</A></H2>
+
+
+<P>Since cc65 has the "wrong" calling order, the location of the fixed parameters
+in a variadic function (a function with a variable parameter list) depends on
+the number and size of variable arguments passed. Since this number and size
+is unknown at compile time, the compiler will generate code to calculate the
+location on the stack when needed.</P>
+<P>Because of this additional code, accessing the fixed parameters in a variadic
+function is much more expensive than access to parameters in a "normal"
+function. Unfortunately, this additional code is also invisible to the
+programmer, so it is easy to forget.</P>
+<P>As a rule of thumb, if you access such a parameter more than once, you should
+think about copying it into a normal variable and using this variable instead.</P>
+
+
+</BODY>
+</HTML>

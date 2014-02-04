@@ -4,6 +4,7 @@ install:
   - sudo apt-get install linuxdoc-tools
 script:
   - make
+  - make -C doc gh-pages
 env:
   global:
     - secure: "h+hoQdEHGPLNwaqGKmSaM8NBRDLc2X+W05VsnNG2Feq/wPv/AiBjONNlzN7jRf6D6f3aoPXaQ2Lc3bYWdxGvFRCmwiofdxkJI9n5L8HPHLZ2lf37MQsXmGJzoTFOvjPLj73H6HlbI9Ux0El3zO6hvalxiXj6TfoZ41dbhNyvpYk="

@@ -651,15 +651,6 @@ directives explained above:
 
 
 
-<sect>Bugs/Feedback<p>
-
-If you have problems using the disassembler, if you find any bugs, or if
-you're doing something interesting with the assembler, I would be glad to hear
-from you. Feel free to contact me by email (<htmlurl url="mailto:uz@cc65.org"
-name="uz@cc65.org">).
-
-
-
 <sect>Copyright<p>
 
 da65 (and all cc65 binutils) are (C) Copyright 1998-2007 Ullrich von

@@ -112,14 +112,14 @@ The names in the parentheses denote the symbols to be used for static linking of
 
 <descrip>
 
-  <tag><tt/atmos-228-200-3.tgi (atmos_228_200_3)/</tag>
+  <tag><tt/atmos-228-200-3.tgi (atmos_228_200_3_tgi)/</tag>
   This driver was written by Greg King and Stefan Haubenthal.
   It features a resolution of 228&times;200 with a palette of two colors that
   can be chosen from the Atmos's eight colors.  The driver supports a third
   palette-"color" that actually "flips" the pixel (it becomes the other color)
   that is on the screen under the graphics cursor.
 
-  <tag><tt/atmos-240-200-2.tgi (atmos_240_200_2)/</tag>
+  <tag><tt/atmos-240-200-2.tgi (atmos_240_200_2_tgi)/</tag>
   This driver was written by Stefan Haubenthal and Greg King.
   It features a resolution of 240&times;200 with black and white colors.
   It is the default graphics driver for the Atmos.
@@ -136,7 +136,7 @@ No extended memory drivers are currently available for the Atmos.
 
 <descrip>
 
-  <tag><tt/atmos-pase.joy (atmos_pase)/</tag>
+  <tag><tt/atmos-pase.joy (atmos_pase_joy)/</tag>
   Supports two standard joysticks connected to the P.A.S.E. interface of the Atmos.
 
 </descrip><p>
@@ -151,7 +151,7 @@ No mouse drivers are currently available for the Atmos.
 
 <descrip>
 
-  <tag><tt/atmos-acia.ser (atmos_acia)/</tag>
+  <tag><tt/atmos-acia.ser (atmos_acia_ser)/</tag>
   Driver for the Telestrat integrated serial controller and the Atmos with a
   serial add-on.
   Note that because of the peculiarities of the 6551 chip together with the
@@ -221,15 +221,6 @@ interrupt handlers. Such routines must be written as simple machine language
 subroutines and will be called automatically by the interrupt handler code
 when they are linked into a program. See the discussion of the <tt/.CONDES/
 feature in the <htmlurl url="ca65.html" name="assembler manual">.
-
-
-
-<sect>Bugs/Feedback<p>
-
-If you have problems using the library, if you find any bugs, or if you're
-doing something interesting with it, I would be glad to hear from you. Feel
-free to contact me by email (<htmlurl url="mailto:uz@cc65.org"
-name="uz@cc65.org">).
 
 
 

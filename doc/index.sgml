@@ -2,12 +2,8 @@
 
 <article>
 <title>cc65 Documentation Overview
-<author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
-<date>2005-8-6
-
-<abstract>
-Main documentation page, contains links to other available stuff.
-</abstract>
+<author><htmlurl url="https://github.com/oliverschmidt/cc65" name="">
+<date>
 
 <sect>Program documentation<p>
 
@@ -59,9 +55,6 @@ Main documentation page, contains links to other available stuff.
 
   <tag><htmlurl url="coding.html" name="coding.html"></tag>
   Contains hints on creating the most effective code with cc65.
-
-  <tag><htmlurl url="compile.txt" name="compile.txt"></tag>
-  How to compile cc65 and the support tools.
 
   <tag><htmlurl url="using-make.html" name="using-make.html"></tag>
   Build programs, using the GNU Make utility.
@@ -158,22 +151,6 @@ Main documentation page, contains links to other available stuff.
 
 </descrip>
 
-
-<sect>Miscellaneous<p>
-
-<descrip>
-
-  <tag><htmlurl url="newvers.txt" name="newvers.txt"></tag>
-  Somewhat outdated.  Lists the differences between my cc65 releases
-  and the original Atari version that was created by J. R. Dunning.
-
-  <tag><htmlurl url="BUGS" name="BUGS"></tag>
-  Known cc65 bugs.
-
-  <tag><htmlurl url="CREDITS" name="CREDITS"></tag>
-  Here is who helped with the compiler and other tools.
-
-</descrip>
 
 </article>
 

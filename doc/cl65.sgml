@@ -88,7 +88,6 @@ Long options:
   --debug-info                  Add debug info
   --feature name                Set an emulation feature
   --force-import sym            Force an import of symbol `sym'
-  --forget-inc-paths            Forget include search paths (compiler)
   --help                        Help (this text)
   --include-dir dir             Set a compiler include directory path
   --ld-args options             Pass options to the linker
@@ -274,14 +273,6 @@ especially in makefiles to build object files directly from C files. Use
 </verb></tscreen>
 
 to do this.
-
-
-
-<sect>Bugs/Feedback<p>
-
-If you have problems using the utility, if you find any bugs, or if you're
-doing something interesting with it, I would be glad to hear from you. Feel
-free to contact me by email (<htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">).
 
 
 

@@ -187,15 +187,6 @@ t.o:
 </verb></tscreen>
 
 
-<sect>Bugs/Feedback<p>
-
-If you have problems using the converter, if you find any bugs, or if you're
-doing something interesting with the code, I would be glad to hear from you.
-Feel free to contact me by email (<htmlurl url="mailto:uz@cc65.org"
-name="uz@cc65.org">).
-
-
-
 <sect>Copyright<p>
 
 od65 is (C) Copyright 2000-2009, Ullrich von Bassewitz. For usage of the

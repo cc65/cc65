@@ -150,13 +150,13 @@ No extended memory drivers are currently available for the PET.
 
 <descrip>
 
-  <tag><tt/pet-ptvjoy.joy (pet_ptvjoy)/</tag>
+  <tag><tt/pet-ptvjoy.joy (pet_ptvjoy_joy)/</tag>
   Driver for the Protovision 4-player adapter contributed by Groepaz. See
   <htmlurl url="http://www.protovision-online.de/hardw/hardwstart.htm"
   name="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices and
   building instructions. Up to two joysticks are supported.
 
-  <tag><tt/pet-stdjoy.joy (pet_stdjoy)/</tag>
+  <tag><tt/pet-stdjoy.joy (pet_stdjoy_joy)/</tag>
   Driver for the standard PET userport joystick.
 
 </descrip><p>
@@ -226,15 +226,6 @@ the following code:
         _heapadd ((void *) 0x9000, 0x2000);
     }
 </verb></tscreen>
-
-
-<sect>Bugs/Feedback<p>
-
-If you have problems using the library, if you find any bugs, or if you're
-doing something interesting with it, I would be glad to hear from you. Feel
-free to contact me by email (<htmlurl url="mailto:uz@cc65.org"
-name="uz@cc65.org">).
-
 
 
 <sect>License<p>

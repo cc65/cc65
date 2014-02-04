@@ -164,6 +164,7 @@ portable. conio implementations exist for the following targets:
   <item>apple2
   <item>apple2enh
   <item>atari
+  <item>atarixl
   <item>atmos
   <item>c16 (works also for the c116 with up to 32K memory)
   <item>c64
@@ -187,8 +188,7 @@ which define constants for special characters and keys.
 
 For systems that have a joystick, <tt/joystick.h/ will define a subroutine to
 read the current value, including constants to evaluate the result of this
-function. To help in writing portable code, the header file will define the
-symbol <tt/__JOYSTICK__/ on systems that have a joystick.
+function.
 
 
 
@@ -201,23 +201,12 @@ the following targets:
   <item>apple2
   <item>apple2enh
   <item>atari
+  <item>atarixl
   <item>c64
   <item>c128
-  <item>cbm510
   </itemize>
 
-The available functions are declared in <tt/mouse.h/ To help writing portable
-code, the header file will define the symbol <tt/__MOUSE__/ in systems that
-support a mouse.
-
-
-<sect>Bugs/Feedback<p>
-
-If you have problems using the library, if you find any bugs, or if you're
-doing something interesting with it, I would be glad to hear from you. Feel
-free to contact me by email (<htmlurl url="mailto:uz@cc65.org"
-name="uz@cc65.org">).
-
+The available functions are declared in <tt/mouse.h/.
 
 
 <sect>Copyright<p>

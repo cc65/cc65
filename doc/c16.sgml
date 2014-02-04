@@ -160,7 +160,7 @@ No graphics drivers are currently available for the C16/C116.
 
 <descrip>
 
-  <tag><tt/c16-ram.emd (c16_ram)/</tag>
+  <tag><tt/c16-ram.emd (c16_ram_emd)/</tag>
   A driver for the hidden RAM below the BASIC and KERNAL ROMs. Supports 125
   pages with 256 bytes each if the machine is equipped with 64K of memory
   (a Plus/4 or a memory extended C16/116).
@@ -173,7 +173,7 @@ No graphics drivers are currently available for the C16/C116.
 
 <descrip>
 
-  <tag><tt/c16-stdjoy.joy (c16_stdjoy)/</tag>
+  <tag><tt/c16-stdjoy.joy (c16_stdjoy_joy)/</tag>
   Supports up to two joysticks connected to the standard joysticks port of
   the Commodore 16/116.
 
@@ -183,8 +183,7 @@ No graphics drivers are currently available for the C16/C116.
 
 <sect1>Mouse drivers<p>
 
-Currently no drivers available (in fact, the API for loadable mouse drivers
-does not exist).
+No mouse drivers are currently available for the C16/C116.
 
 
 <sect1>RS232 device drivers<p>
@@ -234,15 +233,6 @@ interrupt handlers. Such routines must be written as simple machine language
 subroutines and will be called automatically by the interrupt handler code
 when they are linked into a program. See the discussion of the <tt/.CONDES/
 feature in the <htmlurl url="ca65.html" name="assembler manual">.
-
-
-
-<sect>Bugs/Feedback<p>
-
-If you have problems using the library, if you find any bugs, or if you're
-doing something interesting with it, I would be glad to hear from you. Feel
-free to contact me by email (<htmlurl url="mailto:uz@cc65.org"
-name="uz@cc65.org">).
 
 
 

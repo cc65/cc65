@@ -161,15 +161,6 @@ following functions (and a few others):
 
 
 
-<sect>Bugs/Feedback<p>
-
-If you have problems using the library, if you find any bugs, or if you're
-doing something interesting with it, I would be glad to hear from you. Feel
-free to contact me by email (<htmlurl url="mailto:uz@cc65.org"
-name="uz@cc65.org">).
-
-
-
 <sect>License<p>
 
 This software is provided 'as-is', without any expressed or implied

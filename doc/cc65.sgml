@@ -88,7 +88,6 @@ Long options:
   --dep-target target           Use this dependency target
   --disable-opt name            Disable an optimization step
   --enable-opt name             Enable an optimization step
-  --forget-inc-paths            Forget include search paths
   --help                        Help (this text)
   --include-dir dir             Set an include directory search path
   --list-opt-steps              List all optimizer steps and exit
@@ -202,13 +201,6 @@ Here is a description of all the command line options:
 
   Define a macro on the command line. If no definition is given, the macro
   is defined to the value "1".
-
-
-  <tag><tt>--forget-inc-paths</tt></tag>
-
-  Forget the builtin include paths. This is most useful when building
-  customized C or runtime libraries, in which case the standard header
-  files should be ignored.
 
 
   <tag><tt>-g, --debug-info</tt></tag>
@@ -344,6 +336,7 @@ Here is a description of all the command line options:
   <item>apple2
   <item>apple2enh
   <item>atari
+  <item>atarixl
   <item>atmos
   <item>c16 (works also for the c116 with memory up to 32K)
   <item>c64
@@ -357,6 +350,8 @@ Here is a description of all the command line options:
   <item>nes
   <item>pet (all CBM PET systems except the 2001)
   <item>plus4
+  <item>sim6502
+  <item>sim65c02
   <item>supervision
   <item>vic20
   </itemize>
@@ -514,24 +509,23 @@ Here is a description of all the command line options:
 
 The compiler will accept one C file per invocation and create a file with
 the same base name, but with the extension replaced by ".s". The output
-file contains assembler code suitable for the use with the ca65 macro
+file contains assembler code suitable for use with the ca65 macro
 assembler.
 
-Include files in single quotes are searched in the following places:
+Include files in quotes are searched in the following places:
 <enum>
-<item>The current directory.
-<item>The value of the environment variable <tt/CC65_INC/ if it is defined.
+<item>The current file's directory.
 <item>Any directory added with the <tt/-I/ option on the command line.
+<item>The value of the environment variable <tt/CC65_INC/ if it is defined.
 </enum>
 
 Include files in angle brackets are searched in the following places:
 <enum>
-<item>A compiled in directory which is often <tt>/usr/lib/cc65/include</tt> on
-      Linux systems.
+<item>Any directory added with the <tt/-I/ option on the command line.
 <item>The value of the environment variable <tt/CC65_INC/ if it is defined.
 <item>A subdirectory named <tt/include/ of the directory defined in the
       environment variable <tt/CC65_HOME/, if it is defined.
-<item>Any directory added with the <tt/-I/ option on the command line.
+<item>An optionally compiled-in directory.
 </enum>
 
 
@@ -709,7 +703,7 @@ The compiler defines several macros at startup:
 <descrip>
   <tag><tt>__APPLE2__</tt></tag>
 
-  This macro is defined if the target is the Apple ][ (-t apple2).
+  This macro is defined if the target is the Apple ][ (-t apple2) or the enhanced Apple //e (-t apple2enh).
 
   <tag><tt>__APPLE2ENH__</tt></tag>
 
@@ -717,8 +711,11 @@ The compiler defines several macros at startup:
 
   <tag><tt>__ATARI__</tt></tag>
 
-  This macro is defined if the target is one of the Atari computers
-  (400/800/130XL/800XL).
+  This macro is defined if the target is the Atari 400/800 (-t atari) or the Atari 800XL/130XE (-t atarixl).
+
+  <tag><tt>__ATARIXL__</tt></tag>
+
+  This macro is defined if the target is the Atari 800XL/130XE (-t atarixl).
 
   <tag><tt>__ATMOS__</tt></tag>
 
@@ -726,15 +723,15 @@ The compiler defines several macros at startup:
 
   <tag><tt>__C128__</tt></tag>
 
-  This macro is defined if the target is the c128 (-t c128).
+  This macro is defined if the target is the Commodore 128 (-t c128).
 
   <tag><tt>__C16__</tt></tag>
 
-  This macro is defined if the target is the c16 (-t c16).
+  This macro is defined if the target is the Commodore 16/116 (-t c16) or the Commodore Plus/4 (-t plus4).
 
   <tag><tt>__C64__</tt></tag>
 
-  This macro is defined if the target is the c64 (-t c64).
+  This macro is defined if the target is the Commodore 64 (-t c64).
 
   <tag><tt>__CBM__</tt></tag>
 
@@ -776,7 +773,15 @@ The compiler defines several macros at startup:
 
   <tag><tt>__GEOS__</tt></tag>
 
-  This macro is defined if you are compiling for the GEOS system (-t geos).
+  This macro is defined if you are compiling for one of the GEOS systems.
+
+  <tag><tt>__GEOS_APPLE__</tt></tag>
+
+  This macro is defined if you are compiling for the Apple GEOS system (-t geos-apple).
+
+  <tag><tt>__GEOS_CBM__</tt></tag>
+
+  This macro is defined if you are compiling for the GEOS 64/128 system (-t geos-cbm).
 
   <tag><tt>__LINE__</tt></tag>
 
@@ -792,7 +797,7 @@ The compiler defines several macros at startup:
 
   <tag><tt>__NES__</tt></tag>
 
-  This macro is defined if the target is the NES (-t nes).
+  This macro is defined if the target is the Nintendo Entertainment System (-t nes).
 
   <tag><tt>__OPT__</tt></tag>
 
@@ -816,15 +821,22 @@ The compiler defines several macros at startup:
 
   <tag><tt>__PLUS4__</tt></tag>
 
-  This macro is defined if the target is the plus/4 (-t plus4).
+  This macro is defined if the target is the Commodore Plus/4 (-t plus4).
 
   <tag><tt>__STDC_HOSTED__</tt></tag>
 
   This macro is expands to the integer constant 1.
 
+  <tag><tt>__SIM6502__</tt></tag>
+
+  This macro is defined if the target is sim65 in 6502 mode (-t sim6502).
+
+  <tag><tt>__SIM65C02__</tt></tag>
+  This macro is defined if the target is sim65 in 65C02 mode (-t sim65c02).
+
   <tag><tt>__SUPERVISION__</tt></tag>
 
-  This macro is defined if the target is the supervision (-t supervision).
+  This macro is defined if the target is the Supervision (-t supervision).
 
   <tag><tt>__TIME__</tt></tag>
 
@@ -833,7 +845,7 @@ The compiler defines several macros at startup:
 
   <tag><tt>__VIC20__</tt></tag>
 
-  This macro is defined if the target is the vic20 (-t vic20).
+  This macro is defined if the target is the Commodore VIC20 (-t vic20).
 </descrip>
 
 
@@ -1307,15 +1319,6 @@ This section describes the behavior of cc65 when the standard describes the
 behavior as implementation-defined.
 
 (to be done)
-
-<sect>Bugs/Feedback<p>
-
-If you have problems using the compiler, if you find any bugs, or if you're
-doing something interesting with it, I would be glad to hear from you. Feel
-free to contact me by email (<htmlurl url="mailto:uz@cc65.org"
-name="uz@cc65.org">).
-
-
 
 <sect>Copyright<p>
 

@@ -117,14 +117,6 @@ operation does update the library. This is only a warning, the linker
 will ignore one of the duplicate symbols (which one is unspecified).
 
 
-<sect>Bugs/Feedback<p>
-
-If you have problems using the archiver, if you find any bugs, or if you're
-doing something interesting with it, I would be glad to hear from you. Feel
-free to contact me by email (<htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">).
-
-
-
 <sect>Copyright<p>
 
 ar65 (and all cc65 binutils) are (C) Copyright 1998-2000 Ullrich von

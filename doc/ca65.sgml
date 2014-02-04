@@ -112,14 +112,12 @@ Long options:
   --debug                       Debug mode
   --debug-info                  Add debug info to object file
   --feature name                Set an emulation feature
-  --forget-inc-paths            Forget include search paths
   --help                        Help (this text)
   --ignore-case                 Ignore case of symbols
   --include-dir dir             Set an include directory search path
   --large-alignment             Don't warn about large alignments
   --listing name                Create a listing file if assembly was ok
   --list-bytes n                Maximum number of bytes per listing line
-  --macpack-dir dir             Set a macro package directory
   --memory-model model          Set the memory model
   --pagelength n                Set the page length for the listing
   --relax-checks                Relax some checks (see docs)
@@ -195,14 +193,6 @@ Here is a description of all the command line options:
   command for a list of emulation features.
 
 
-  <label id="option--forget-inc-paths">
-  <tag><tt>--forget-inc-paths</tt></tag>
-
-  Forget the builtin include paths. This is most useful when building
-  customized assembler modules, in which case the standard header files should
-  be ignored.
-
-
   <label id="option-g">
   <tag><tt>-g, --debug-info</tt></tag>
 
@@ -249,17 +239,6 @@ Here is a description of all the command line options:
   input. See the <tt><ref id=".LISTBYTES" name=".LISTBYTES"></tt> directive
   for more information. The value zero can be used to encode an unlimited
   number of printed bytes.
-
-
-  <label id="option--macpack-dir">
-  <tag><tt>--macpack-dir dir</tt></tag>
-
-  This options allows to specify a directory containing macro files that are
-  used instead of the builtin images when a <tt><ref id=".MACPACK"
-  name=".MACPACK"></tt> directive is encountered. If <tt>--macpack-dir</tt>
-  was specified, a <tt>.mac</tt> extension is added to the package name and
-  the resulting file is loaded from the given directory. This is most useful
-  when debugging the builtin macro packages.
 
 
   <label id="option-mm">
@@ -393,20 +372,19 @@ Here is a description of all the command line options:
 Normal include files are searched in the following places:
 
 <enum>
-<item>The current directory.
-<item>A compiled-in directory, which is often <tt>/usr/lib/cc65/asminc</tt>
-      on Linux systems.
+<item>The current file's directory.
+<item>Any directory added with the <tt/<ref id="option-I" name="-I">/ option
+on the command line.
 <item>The value of the environment variable <tt/CA65_INC/ if it is defined.
 <item>A subdirectory named <tt/asminc/ of the directory defined in the
       environment variable <tt/CC65_HOME/, if it is defined.
-<item>Any directory added with the <tt/<ref id="option-I" name="-I">/ option
-on the command line.
+<item>An optionally compiled-in directory.
 </enum>
 
 Binary include files are searched in the following places:
 
 <enum>
-<item>The current directory.
+<item>The current file's directory.
 <item>Any directory added with the <tt/<ref id="option--bin-include-dir"
 name="--bin-include-dir">/ option on the command line.
 </enum>
@@ -4319,6 +4297,15 @@ Currently defined macros are:
                 beq     Arg
                 bcc     Arg
         .endmacro
+
+        .macro  bnz     Arg
+                bne     Arg
+        .endmacro
+
+        .macro  bze     Arg
+                beq     Arg
+        .endmacro
+
 </verb></tscreen>
 
 
@@ -4430,22 +4417,28 @@ For better orthogonality, the assembler defines similar symbols as the
 compiler, depending on the target system selected:
 
 <itemize>
-<item><tt/__APPLE2__/ - Target system is <tt/apple2/
+<item><tt/__APPLE2__/ - Target system is <tt/apple2/ or <tt/apple2enh/
 <item><tt/__APPLE2ENH__/ - Target system is <tt/apple2enh/
-<item><tt/__ATARI__/ - Target system is <tt/atari/
+<item><tt/__ATARI__/ - Target system is <tt/atari/ or <tt/atarixl/
+<item><tt/__ATARIXL__/ - Target system is <tt/atarixl/
 <item><tt/__ATMOS__/ - Target system is <tt/atmos/
 <item><tt/__BBC__/ - Target system is <tt/bbc/
 <item><tt/__C128__/ - Target system is <tt/c128/
-<item><tt/__C16__/ - Target system is <tt/c16/
+<item><tt/__C16__/ - Target system is <tt/c16/ or <tt/plus4/
 <item><tt/__C64__/ - Target system is <tt/c64/
 <item><tt/__CBM__/ - Target is a Commodore system
 <item><tt/__CBM510__/ - Target system is <tt/cbm510/
 <item><tt/__CBM610__/ - Target system is <tt/cbm610/
-<item><tt/__GEOS__/ - Target system is <tt/geos/
+<item><tt/__GEOS__/ - Target is a GEOS system
+<item><tt/__GEOS_APPLE__/ - Target system is <tt/geos-apple/
+<item><tt/__GEOS_CBM__/ - Target system is <tt/geos-cbm/
 <item><tt/__LUNIX__/ - Target system is <tt/lunix/
+<item><tt/__LYNX__/ - Target system is <tt/lynx/
 <item><tt/__NES__/ - Target system is <tt/nes/
 <item><tt/__PET__/ - Target system is <tt/pet/
 <item><tt/__PLUS4__/ - Target system is <tt/plus4/
+<item><tt/__SIM6502__/ - Target system is <tt/sim6502/
+<item><tt/__SIM65C02__/ - Target system is <tt/sim65c02/
 <item><tt/__SUPERVISION__/ - Target system is <tt/supervision/
 <item><tt/__VIC20__/ - Target system is <tt/vic20/
 </itemize>
@@ -4742,15 +4735,6 @@ Note that you need to use the actual start address minus two, since two bytes
 are used for the cbm load address.
 
 </enum>
-
-
-<sect>Bugs/Feedback<p>
-
-If you have problems using the assembler, if you find any bugs, or if
-you're doing something interesting with the assembler, I would be glad to
-hear from you. Feel free to contact me by email
-(<htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">).
-
 
 
 <sect>Copyright<p>

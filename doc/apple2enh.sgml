@@ -87,13 +87,13 @@ on the chosen <htmlurl url="apple2enh-4.html" name="linker configuration">.
 
 <sect>Linker configurations<p>
 
-The ld65 linker comes with a builtin config file for the enhanced&nbsp;Apple&nbsp;//e,
-which is used via <tt/-t apple2enh/ (and displayed via <tt/--dump-config apple2enh/).
+The ld65 linker comes with a default config file for the enhanced&nbsp;Apple&nbsp;//e,
+which is used via <tt/-t apple2enh/.
 The apple2enh package comes with additional secondary linker config files, which
-are used via <tt/-C &lt;configfile&gt;/.
+are used via <tt/-t apple2enh -C &lt;configfile&gt;/.
 
 
-<sect1>builtin config file<p>
+<sect1>default config file (<tt/apple2enh.cfg/)<p>
 
 Default configuration optimized for a binary program running on ProDOS 8 with
 BASIC.SYSTEM. A plain vanilla ProDOS 8 doesn't actually use the Language Card
@@ -320,13 +320,13 @@ The names in the parentheses denote the symbols to be used for static linking of
 
 <descrip>
 
-  <tag><tt/a2e.lo.tgi (apple2_40_48_16)/</tag>
+  <tag><tt/a2e.lo.tgi (a2e_lo_tgi)/</tag>
   This driver features a resolution of 40&times;48 with 16 colors.
 
   The function <tt/tgi_apple2_mix()/ allows to activate 4 lines of text. The
   function clears the corresponding area at the bottom of the screen.
 
-  <tag><tt/a2e.hi.tgi (apple2_280_192_8)/</tag>
+  <tag><tt/a2e.hi.tgi (a2e_hi_tgi)/</tag>
   This driver features a resolution of 280&times;192 with 8 colors and two
   hires pages. Note that programs using this driver will have to be linked
   with <tt/--start-addr $4000/ to reserve the first hires page or with
@@ -352,7 +352,7 @@ The names in the parentheses denote the symbols to be used for static linking of
 
 <descrip>
 
-  <tag><tt/a2e.auxmem.emd (apple2_auxmem)/</tag>
+  <tag><tt/a2e.auxmem.emd (a2e_auxmem_emd)/</tag>
   Gives access to 47.5 KB RAM (190 pages of 256 bytes each) on an Extended
   80-Column Text Card.
   
@@ -366,7 +366,7 @@ The names in the parentheses denote the symbols to be used for static linking of
 
 <descrip>
 
-  <tag><tt/a2e.stdjoy.joy (apple2_stdjoy)/</tag>
+  <tag><tt/a2e.stdjoy.joy (a2e_stdjoy_joy)/</tag>
   Supports up to two standard analog joysticks connected to the game port of
   the enhanced&nbsp;Apple&nbsp;//e.
 
@@ -377,7 +377,7 @@ The names in the parentheses denote the symbols to be used for static linking of
 
 <descrip>
 
-  <tag><tt/a2e.stdmou.mou (apple2_stdmou)/</tag>
+  <tag><tt/a2e.stdmou.mou (a2e_stdmou_mou)/</tag>
   Driver for the AppleMouse&nbsp;II Card. Searches all Apple&nbsp;II slots
   for an AppleMouse&nbsp;II Card compatible firmware. The default bounding
   box is &lsqb;0..279,0..191&rsqb;.
@@ -392,7 +392,7 @@ The names in the parentheses denote the symbols to be used for static linking of
 
 <descrip>
 
-  <tag><tt/a2e.ssc.ser (apple2_ssc)/</tag>
+  <tag><tt/a2e.ssc.ser (a2e_ssc_ser)/</tag>
   Driver for the Apple&nbsp;II Super Serial Card. Supports up to 19200 baud,
   hardware flow control (RTS/CTS) and interrupt driven receives. Note
   that because of the peculiarities of the 6551 chip transmits are not
@@ -422,9 +422,8 @@ BASIC.SYSTEM) there are some limitations for DOS 3.3:
   <tag>Disk File I/O</tag>
   There's no disk file I/O support. Any attempt to use it yields an error with
   <tt/errno/ set to <tt/ENOSYS/. This implicitly means that loadable drivers
-  are in general not functional as they depend on disk file I/O. However they
-  may be converted to statically linked drivers using the co65 object-file
-  converter.
+  are in general not functional as they depend on disk file I/O. Therefore the statically
+  linked drivers have to be used instead.
 
   <tag/Interrupts/
   There's no <tt/interruptor/ support. Any attempt to use it yields the message
@@ -441,13 +440,11 @@ BASIC.SYSTEM) there are some limitations for DOS 3.3:
 
   <tag/Color/
   The enhanced&nbsp;Apple&nbsp;//e has no color text mode. Therefore the functions
-  <htmlurl url="funcref-205.html" name="textcolor()">,
-  <htmlurl url="funcref-68.html" name="bgcolor()"> and
-  <htmlurl url="funcref-69.html" name="bordercolor()"> have no effect.
+  textcolor(), bgcolor() and bordercolor() have no effect.
 
   <tag/Cursor/
   The enhanced&nbsp;Apple&nbsp;//e has no hardware cursor. Therefore the function
-  <htmlurl url="funcref-88.html" name="cursor()"> has no effect.
+  cursor() has no effect.
 
 </descrip><p>
 
@@ -514,15 +511,6 @@ url="ca65.html" name="assembler manual">.
   This condition is indicated by the <tt/_oserror/ value 82.
 
 </descrip><p>
-
-
-
-<sect>Bugs/Feedback<p>
-
-If you have problems using the library, if you find any bugs, or if you're
-doing something interesting with it, I would be glad to hear from you. Feel
-free to contact me by email (<htmlurl url="mailto:uz@cc65.org"
-name="uz@cc65.org">).
 
 
 

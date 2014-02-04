@@ -65,15 +65,15 @@ Special locations:
 
 <sect>Linker configurations<p>
 
-The ld65 linker comes with a builtin config file for the Commodore&nbsp;64,
-which is used via <tt/-t c64/ (and displayed via <tt/--dump-config c64/). The
+The ld65 linker comes with a default config file for the Commodore&nbsp;64,
+which is used via <tt/-t c64/. The
 c64 package comes with additional secondary linker config files, which are
-used via <tt/-C &lt;configfile&gt;/.
+used via <tt/-t c64 -C &lt;configfile&gt;/.
 
 
-<sect1>builtin config file<p>
+<sect1>default config file (<tt/c64.cfg/)<p>
 
-The builtin configuration is tailored to C programs. It supplies the load
+The default configuration is tailored to C programs. It supplies the load
 address and a small BASIC stub that starts the compiled program using a SYS
 command.
 
@@ -210,7 +210,7 @@ the standard setup without any memory loss or need for a changed
 configuration.
 
 <descrip>
-  <tag><tt/c64-hi.tgi (c64_320_200_2)/</tag>
+  <tag><tt/c64-hi.tgi (c64_hi_tgi)/</tag>
   This driver features a resolution of 320*200 with two colors and an
   adjustable palette (that means that the two colors can be chosen out of a
   palette of the 16 C64 colors).
@@ -221,45 +221,45 @@ configuration.
 
 <descrip>
 
-  <tag><tt/c64-c256k.emd (c64_c256k)/</tag>
+  <tag><tt/c64-c256k.emd (c64_c256k_emd)/</tag>
   A driver for the C64 256K memory expansion. This driver offers 768 pages of
   256 bytes each. Written and contributed by Marco van den Heuvel.
 
-  <tag><tt/c64-dqbb.emd (c64_dqbb)/</tag>
+  <tag><tt/c64-dqbb.emd (c64_dqbb_emd)/</tag>
   A driver for the Double Quick Brown Box cartridge. This driver offers
   64 pages of 256 bytes each. Written and contributed by Marco van den Heuvel.
 
-  <tag><tt/c64-georam.emd (c64_georam)/</tag>
+  <tag><tt/c64-georam.emd (c64_georam_emd)/</tag>
   A driver for the Berkeley Softworks GeoRam cartridge. The driver will
   determine the available RAM from the connected cartridge. It supports 64KB
   up to 2048KB of RAM.
 
-  <tag><tt/c64-isepic.emd (c64_isepic)/</tag>
+  <tag><tt/c64-isepic.emd (c64_isepic_emd)/</tag>
   A driver for the ISEPIC cartridge. This driver offers just 8 pages of 256
   bytes each. Written and contributed by Marco van den Heuvel.
 
-  <tag><tt/c64-ram.emd (c64_ram)/</tag>
+  <tag><tt/c64-ram.emd (c64_ram_emd)/</tag>
   A driver for the hidden RAM below the I/O area and kernal ROM. Supports 48
   256 byte pages. Please note that this driver is incompatible with any of the
   graphics drivers!
 
-  <tag><tt/c64-ramcart.emd (c64_ramcart)/</tag>
+  <tag><tt/c64-ramcart.emd (c64_ramcart_emd)/</tag>
   A driver for the RamCart 64/128 written and contributed by Maciej Witkowiak.
   Will test the hardware for the available RAM.
 
-  <tag><tt/c64-reu.emd (c64_reu)/</tag>
+  <tag><tt/c64-reu.emd (c64_reu_emd)/</tag>
   A driver for the CBM REUs. The driver will determine from the connected REU
   if it supports 128KB of RAM or more. In the latter case, 256KB are assumed,
   but since there are no range checks, the application can use more memory if
   it has better knowledge about the hardware than the driver.
 
-  <tag><tt/c64-vdc.emd (c64_vdc)/</tag>
+  <tag><tt/c64-vdc.emd (c64_vdc_emd)/</tag>
   A driver for the VDC memory of the C128. Written and contributed by Maciej
   Witkowiak. Can be used if the program is running in C64 mode of the C128.
   Autodetects the amount of memory available (16 or 64K) and offers 64 or 256
   pages of 256 bytes each.
 
-  <tag><tt/dtv-himem.emd (dtv_himem)/</tag>
+  <tag><tt/dtv-himem.emd (dtv_himem_emd)/</tag>
   A driver for the C64 D2TV (the second or PAL version). This driver offers
   indeed 7680 pages of 256 bytes each.
 
@@ -270,23 +270,23 @@ configuration.
 
 <descrip>
 
-  <tag><tt/c64-hitjoy.joy (c64_hitjoy)/</tag>
+  <tag><tt/c64-hitjoy.joy (c64_hitjoy_joy)/</tag>
   Driver for the Digital Excess & Hitmen adapter contributed by Groepaz. See
   <htmlurl url="http://www.digitalexcess.de/downloads/productions.php"
   name="http://www.digitalexcess.de/downloads/productions.php"> on
   instructions how to build one. Up to four joysticks are supported.
 
-  <tag><tt/c64-ptvjoy.joy (c64_ptvjoy)/</tag>
+  <tag><tt/c64-ptvjoy.joy (c64_ptvjoy_joy)/</tag>
   Driver for the Protovision 4-player adapter contributed by Groepaz. See
   <htmlurl url="http://www.protovision-online.de/hardw/hardwstart.htm"
   name="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices and
   building instructions. Up to four joysticks are supported.
 
-  <tag><tt/c64-stdjoy.joy (c64_stdjoy)/</tag>
+  <tag><tt/c64-stdjoy.joy (c64_stdjoy_joy)/</tag>
   Supports up to two standard joysticks connected to the joysticks port of
   the C64.
 
-  <tag><tt/c64-numpad.joy (c64_numpad)/</tag>
+  <tag><tt/c64-numpad.joy (c64_numpad_joy)/</tag>
   Supports one joystick emulated by the numberpad of the C128 in C64 mode,
   the firebutton is labeled &dquot;5&dquot; and ENTER.
 
@@ -297,14 +297,20 @@ configuration.
 
 <descrip>
 
-  <tag><tt/c64-1351.mou (c64_1351)/</tag>
+  <tag><tt/c64-1351.mou (c64_1351_mou)/</tag>
   Supports a standard mouse connected to port #0 of the C64.
 
-  <tag><tt/c64-joy.mou (c64_joymouse)/</tag>
+  <tag><tt/c64-inkwell.mou (c64_inkwell_mou)/</tag>
+  Supports the Inkwell Systems lightpens, connected to port #0 of the C64.
+  It can read both the one-button 170-C and the two-button 184-C pens.  (It can
+  read other lightpens and light-guns that send their button signal to the
+  joystick left-button pin or the paddle Y [up/down] pin.)
+
+  <tag><tt/c64-joy.mou (c64_joy_mou)/</tag>
   Supports a mouse emulated by a standard joystick e.g. 1350 mouse in port
   #1 of the C64.
 
-  <tag><tt/c64-pot.mou (c64_potmouse)/</tag>
+  <tag><tt/c64-pot.mou (c64_pot_mou)/</tag>
   Supports a potentiometer device e.g. Koala Pad connected to port #1 of
   the C64.
 
@@ -315,7 +321,7 @@ configuration.
 
 <descrip>
 
-  <tag><tt/c64-swlink.ser (c64_swlink)/</tag>
+  <tag><tt/c64-swlink.ser (c64_swlink_ser)/</tag>
   Driver for the SwiftLink cartridge. Supports up to 38400 baud, hardware flow
   control (RTS/CTS) and interrupt driven receives. Note that because of the
   peculiarities of the 6551 chip together with the use of the NMI, transmits
@@ -369,15 +375,6 @@ interrupt handlers. Such routines must be written as simple machine language
 subroutines and will be called automatically by the interrupt handler code
 when they are linked into a program. See the discussion of the <tt/.CONDES/
 feature in the <htmlurl url="ca65.html" name="assembler manual">.
-
-
-
-<sect>Bugs/Feedback<p>
-
-If you have problems using the library, if you find any bugs, or if you're
-doing something interesting with it, I would be glad to hear from you. Feel
-free to contact me by email (<htmlurl url="mailto:uz@cc65.org"
-name="uz@cc65.org">).
 
 
 

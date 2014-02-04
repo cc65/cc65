@@ -194,7 +194,7 @@ The names in the parentheses denote the symbols to be used for static linking of
 
 <descrip>
 
-  <tag><tt/lynx-160-102-16.tgi (lynx_160_102_16)/</tag>
+  <tag><tt/lynx-160-102-16.tgi (lynx_160_102_16_tgi)/</tag>
   A TGI driver for the standard graphics mode (160&times;102 in 16 colors).
 
   The TGI driver is implemented as an interrupt driven dual buffering device.
@@ -243,7 +243,7 @@ No extended memory drivers are currently available for the Lynx.
 
 <descrip>
 
-  <tag><tt/lynx-stdjoy.joy (lynx_stdjoy)/</tag>
+  <tag><tt/lynx-stdjoy.joy (lynx_stdjoy_joy)/</tag>
   A joystick driver for the standard buttons.
 
 </descrip><p>
@@ -258,7 +258,7 @@ No mouse drivers are currently available for the Lynx.
 
 <descrip>
 
-  <tag><tt/lynx-comlynx.ser (lynx_comlynx)/</tag>
+  <tag><tt/lynx-comlynx.ser (lynx_comlynx_ser)/</tag>
   A serial driver for the ComLynx port.
 
   The ComLynx port has Tx and Rx wired together. Every byte is sent
@@ -325,15 +325,6 @@ has support for the cart filesystem and an abcmusic sound module.
 At some point in time we may find a way to rewrite these to fit the way the
 cc65 drivers require. But for the time being you can create less portable
 applications using these Lynx specific modules in <tt/lynx-cart-demo/.
-
-
-<sect>Bugs/Feedback<p>
-
-If you have problems using the library, if you find any bugs, or if you're
-doing something interesting with it, I would be glad to hear from you. Feel
-free to contact me by email (<htmlurl url="mailto:uz@cc65.org"
-name="uz@cc65.org">).
-
 
 
 <sect>License<p>

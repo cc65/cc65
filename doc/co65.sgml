@@ -316,15 +316,6 @@ will get an "undefined external" error for the _c64_hi symbol.
 
 
 
-<sect>Bugs/Feedback<p>
-
-If you have problems using the converter, if you find any bugs, or if you're
-doing something interesting with the code, I would be glad to hear from you.
-Feel free to contact me by email (<htmlurl url="mailto:uz@cc65.org"
-name="uz@cc65.org">).
-
-
-
 <sect>Copyright<p>
 
 co65 is (C) Copyright 2003 Ullrich von Bassewitz. For usage of the binaries

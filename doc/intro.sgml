@@ -371,12 +371,12 @@ The emulation, also, supports that method.
 
 <sect2>VICE<p>
 Available at <url
-url="http://www.viceteam.org/">:
+url="http://vice-emu.sourceforge.net/">:
 
 Emulates Commodore 64/128/VIC-20/PET/CBM II/Plus 4 computers. Supports
-printers, serial port and adapters, stereo sound, disk drives and images, RAM
-expansions, cartridges, ethernet connection, cycle-exact NTSC/PAL video, mice,
-and joysticks. Includes monitor. Runs on MSDOS/PCDOS, Win9x/ME/NT/2000/XP, OS2,
+printers, serial port and adapters, stereo sound, disk drives and images, RAM expansions,
+cartridges, ethernet connection, cycle-exact NTSC/PAL video, mice, graphics tablet,
+lightpens, and joysticks. Includes monitor. Runs on MSDOS/PCDOS, Win9x/ME/NT/2000/XP, OS2,
 BeOS x86, Acorn RISC OS, and most Unixes.
 
 Compile the tutorial with
@@ -395,7 +395,7 @@ Substitute the name of a Commodore computer for that <tt/&lt;sys&gt;/:
 <item><tt/vic20/
 </itemize>
 
-Start the desired version of the emulator (CBM510 and CBM610 programs run on
+Start the desired version of the emulator (CBM610 programs run on
 the CBM II &lsqb;<tt/xcbm2/&rsqb; emulator).
 
 In the Windows versions of VICE, choose <bf>File&gt;Autoboot disk/tape

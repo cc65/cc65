@@ -3,9 +3,10 @@
 <article>
 
 <title>Commodore 510 (aka P500) specific information for cc65
-<author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
-Stefan A. Haubenthal, <htmlurl url="mailto:polluks@sdf.lonestar.org" name="polluks@sdf.lonestar.org">
-<date>2006-05-22
+<author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">&nl;
+Stefan A. Haubenthal, <htmlurl url="mailto:polluks@sdf.lonestar.org" name="polluks@sdf.lonestar.org">&nl;
+<htmlurl url="mailto:greg.king5@verizon.net" name="Greg King">
+<date>2013-08-23
 
 <abstract>
 An overview over the Commodore 510 runtime system as it is implemented for the
@@ -184,7 +185,7 @@ No graphics drivers are currently available for the Commodore 510.
 <sect1>Extended memory drivers<p>
 
 <descrip>
-  <tag><tt/cbm510-ram.emd (cbm510_ram)/</tag>
+  <tag><tt/cbm510-ram.emd (cbm510_ram_emd)/</tag>
   A driver for the RAM in bank 1. Supports up to 255 pages with 256 bytes
   each.
 </descrip><p>
@@ -194,7 +195,7 @@ No graphics drivers are currently available for the Commodore 510.
 
 <descrip>
 
-  <tag><tt/cbm510-std.joy (cbm510_stdjoy)/</tag>
+  <tag><tt/cbm510-std.joy (cbm510_std_joy)/</tag>
   Supports up to two standard joysticks connected to the joysticks port of
   the Commodore 510.
 
@@ -203,14 +204,27 @@ No graphics drivers are currently available for the Commodore 510.
 
 <sect1>Mouse drivers<p>
 
-No mouse drivers are currently available for the Commodore 510.
+<descrip>
 
+  <tag><tt/cbm510-joy.mou (cbm510_joy_mou)/</tag>
+  Supports a mouse that is emulated by a standard joystick, e.g. 1350
+  mouse, in joystick port #2 of the CBM510. That stick's fire button acts as
+  the left mouse button. The fire button of a stick in joystick port #1 can
+  act as the right mouse button.
+
+  <tag><tt/cbm510-inkwl.mou (cbm510_inkwl_mou)/</tag>
+  Supports the Inkwell Systems lightpens, connected to port #1 of the CBM510.
+  It can read both the 170-C and one button of the 184-C pens.  (It can
+  read other lightpens and light-guns that send their button signal to the
+  joystick left-button pin.)
+
+</descrip><p>
 
 <sect1>RS232 device drivers<p>
 
 <descrip>
 
-  <tag><tt/cbm510-std.ser (cbm510_stdser)/</tag>
+  <tag><tt/cbm510-std.ser (cbm510_std_ser)/</tag>
   Driver for the 6551 ACIA chip built into the Commodore 510. Supports up to
   19200 baud, hardware flow control (RTS/CTS) and interrupt driven receives.
   Note that because of the peculiarities of the 6551 chip transmits are not
@@ -265,15 +279,6 @@ for interrupt handlers. Such routines must be written as simple machine
 language subroutines and will be called automatically by the interrupt handler
 code when they are linked into a program. See the discussion of the
 <tt/.CONDES/ feature in the <htmlurl url="ca65.html" name="assembler manual">.
-
-
-
-<sect>Bugs/Feedback<p>
-
-If you have problems using the library, if you find any bugs, or if you're
-doing something interesting with it, I would be glad to hear from you. Feel
-free to contact me by email (<htmlurl url="mailto:uz@cc65.org"
-name="uz@cc65.org">).
 
 
 

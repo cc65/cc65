@@ -76,7 +76,6 @@ Long options:
   --config name         Use linker config file
   --dbgfile name        Generate debug information
   --define sym=val      Define a symbol
-  --dump-config name    Dump a builtin configuration
   --end-group           End a library group
   --force-import sym    Force an import of symbol `sym'
   --help                Help (this text)
@@ -140,7 +139,7 @@ Here is a description of all the command line options:
 
   The -o switch is used to give the name of the default output file.
   Depending on your output configuration, this name may NOT be used as
-  name for the output file. However, for the builtin configurations, this
+  name for the output file. However, for the default configurations, this
   name is used for the output file name.
 
 
@@ -148,7 +147,7 @@ Here is a description of all the command line options:
   <tag><tt>-t sys, --target sys</tt></tag>
 
   The argument for the -t switch is the name of the target system. Since this
-  switch will activate a builtin configuration, it may not be used together
+  switch will activate a default configuration, it may not be used together
   with the <tt><ref id="option-C" name="-C"></tt> option. The following target
   systems are currently supported:
 
@@ -158,6 +157,7 @@ Here is a description of all the command line options:
   <item>apple2
   <item>apple2enh
   <item>atari
+  <item>atarixl
   <item>atmos
   <item>c16 (works also for the c116 with memory up to 32K)
   <item>c64
@@ -171,6 +171,8 @@ Here is a description of all the command line options:
   <item>nes
   <item>pet (all CBM PET systems except the 2001)
   <item>plus4
+  <item>sim6502
+  <item>sim65c02
   <item>supervision
   <item>vic20
   </itemize>
@@ -252,9 +254,9 @@ Here is a description of all the command line options:
   <tag><tt>-S addr, --start-addr addr</tt></tag>
 
   Using -S you may define the default starting address. If and how this
-  address is used depends on the config file in use. For the builtin
+  address is used depends on the config file in use. For the default
   configurations, only the "none", "apple2" and "apple2enh" systems honor an
-  explicit start address, all other builtin config provide their own.
+  explicit start address, all other default configs provide their own.
 
 
   <tag><tt>-V, --version</tt></tag>
@@ -313,56 +315,53 @@ Here is a description of all the command line options:
 
 <sect>Search paths<p>
 
-Starting with version 2.10 there are now several search paths for files needed
-by the linker: One for libraries, one for object files and one for config
+Starting with version 2.10, there are now several search-path lists for files needed
+by the linker: one for libraries, one for object files, and one for config
 files.
 
 
 <sect1>Library search path<p>
 
-The library search path contains in this order:
+The library search-path list contains in this order:
 
 <enum>
 <item>The current directory.
-<item>A compiled in library path which is often <tt>/usr/lib/cc65/lib</tt> on
-      Linux systems.
+<item>Any directory added with the <tt><ref id="option--lib-path"
+      name="--lib-path"></tt> option on the command line.
 <item>The value of the environment variable <tt/LD65_LIB/ if it is defined.
 <item>A subdirectory named <tt/lib/ of the directory defined in the environment
       variable <tt/CC65_HOME/, if it is defined.
-<item>Any directory added with the <tt><ref id="option--lib-path"
-      name="--lib-path"></tt> option on the command line.
+<item>An optionally compiled-in library path.
 </enum>
 
 
 <sect1>Object file search path<p>
 
-The object file search path contains in this order:
+The object file search-path list contains in this order:
 
 <enum>
 <item>The current directory.
-<item>A compiled in directory which is often <tt>/usr/lib/cc65/obj</tt> on
-      Linux systems.
+<item>Any directory added with the <tt><ref id="option--obj-path"
+      name="--obj-path"></tt> option on the command line.
 <item>The value of the environment variable <tt/LD65_OBJ/ if it is defined.
 <item>A subdirectory named <tt/obj/ of the directory defined in the environment
       variable <tt/CC65_HOME/, if it is defined.
-<item>Any directory added with the <tt><ref id="option--obj-path"
-      name="--obj-path"></tt> option on the command line.
+<item>An optionally compiled-in directory.
 </enum>
 
 
 <sect1>Config file search path<p>
 
-The config file search path contains in this order:
+The config file search-path list contains in this order:
 
 <enum>
 <item>The current directory.
-<item>A compiled in directory which is often <tt>/usr/lib/cc65/cfg</tt> on
-      Linux systems.
+<item>Any directory added with the <tt><ref id="option--cfg-path"
+      name="--cfg-path"></tt> option on the command line.
 <item>The value of the environment variable <tt/LD65_CFG/ if it is defined.
 <item>A subdirectory named <tt/cfg/ of the directory defined in the environment
       variable <tt/CC65_HOME/, if it is defined.
-<item>Any directory added with the <tt><ref id="option--cfg-path"
-      name="--cfg-path"></tt> option on the command line.
+<item>An optionally compiled-in directory.
 </enum>
 
 
@@ -1025,24 +1024,6 @@ __STACKSIZE__=xxx/ on the command line.
 
 
 
-<sect1>Builtin configurations<p>
-
-The builtin configurations are part of the linker source. They can be retrieved
-with <tt/--dump-config/ and don't have a special format. So if you need a
-special configuration, it's a good idea to start with the builtin configuration
-for your system. In a first step, just replace <tt/-t target/ by <tt/-C
-configfile/. Then go on and modify the config file to suit your needs.
-
-
-
-<sect1>Secondary configurations<p>
-
-Several machine specific binary packages are distributed together with secondary
-configurations (in the cfg directory). These configurations can be used with
-<tt/-C configfile/ too.
-
-
-
 <sect>Special segments<p>
 
 The builtin config files do contain segments that have a special meaning for
@@ -1072,15 +1053,6 @@ loaded at the lowest possible program address on several platforms.
 The ZPSAVE segment contains the original values of the zeropage locations used
 by the ZEROPAGE segment. It is placed in its own segment because it must not be
 initialized.
-
-
-
-<sect>Bugs/Feedback<p>
-
-If you have problems using the linker, if you find any bugs, or if you're
-doing something interesting with it, I would be glad to hear from you. Feel
-free to contact me by email (<htmlurl url="mailto:uz@cc65.org"
-name="uz@cc65.org">).
 
 
 

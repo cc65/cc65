@@ -28,6 +28,7 @@ gh-pages: html
 	git --work-tree=$(GH_PAGES) --git-dir=$(GH_PAGES)/.git config user.name "Oliver Schmidt"
 	git --work-tree=$(GH_PAGES) --git-dir=$(GH_PAGES)/.git config user.email "ol.sc@web.de"
 	rm -rf $(GH_PAGES)/test
+	mkdir $(GH_PAGES)/test
 	cp -R ../html/* $(GH_PAGES)/test
 	git --work-tree=$(GH_PAGES) --git-dir=$(GH_PAGES)/.git add -A
 	git --work-tree=$(GH_PAGES) --git-dir=$(GH_PAGES)/.git commit -m "Updated doc from commit $(TRAVIS_COMMIT)."

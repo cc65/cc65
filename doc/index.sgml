@@ -15,9 +15,6 @@
   <tag><htmlurl url="ca65.html" name="ca65.html"></tag>
   Describes the ca65 macro assembler.
 
-  <tag><htmlurl url="ca65html.html" name="ca65html.html"></tag>
-  Describes the ca65html assembler-source-to-HTML converter.
-
   <tag><htmlurl url="cc65.html" name="cc65.html"></tag>
   Describes the cc65 C compiler.
 

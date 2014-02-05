@@ -1,3 +1,7 @@
+.SUFFIXES:
+
+.PHONY: all bin $(PROGS) mostlyclean clean install avail unavail
+
 ifeq ($(shell echo),)
 
 PROGS = ar65  \
@@ -29,10 +33,6 @@ CFLAGS += -MMD -MP -O -std=c89 -I common \
 LDLIBS += -lm
 
 INSTALL = install
-
-.SUFFIXES:
-
-.PHONY: all bin $(PROGS) mostlyclean clean install avail unavail
 
 all bin: $(PROGS)
 
@@ -116,10 +116,6 @@ $(foreach prog,$(PROGS),$(eval $(call PROG_template,$(prog))))
 
 else # cmd.exe
 
-.SUFFIXES:
-
-.PHONY: all bin mostlyclean clean
-
 all bin:
 	msbuild cc65.sln /p:configuration=release /consoleloggerparameters:disableconsolecolor
 
@@ -128,5 +124,7 @@ mostlyclean:
 
 clean:
 	msbuild cc65.sln /p:configuration=release /consoleloggerparameters:disableconsolecolor /target:$@
+
+install avail unavail:
 
 endif # cmd.exe

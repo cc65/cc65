@@ -6,6 +6,11 @@ ifeq ($(shell echo),)
 
 SGMLS := $(wildcard *.sgml)
 
+../html/coding.html ../html/index.html: \
+TOC_LEVEL = 0
+
+TOC_LEVEL = 2
+
 GH_PAGES = ../../gh-pages
 
 all:
@@ -23,7 +28,7 @@ html: $(addprefix ../html/,$(SGMLS:.sgml=.html))
 	mkdir $@
 
 ../html/%.html: %.sgml | ../html
-	linuxdoc -B html --split=0 --toc=2 $<
+	linuxdoc -B html --split=0 --toc=$(TOC_LEVEL) $<
 	mv $(@F) ../html
 
 gh-pages: html

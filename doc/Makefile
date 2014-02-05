@@ -30,6 +30,6 @@ gh-pages: html
 	rm -rf $(GH_PAGES)/test
 	mkdir $(GH_PAGES)/test
 	cp -R ../html/* $(GH_PAGES)/test
-	git --work-tree=$(GH_PAGES) --git-dir=$(GH_PAGES)/.git add -A
-	git --work-tree=$(GH_PAGES) --git-dir=$(GH_PAGES)/.git commit -m "Updated doc from commit $(TRAVIS_COMMIT)."
+	git --work-tree=$(GH_PAGES) --git-dir=$(GH_PAGES)/.git add -A .
+	git --work-tree=$(GH_PAGES) --git-dir=$(GH_PAGES)/.git commit --allow-empty -m "Updated doc from commit $(TRAVIS_COMMIT)."
 	git --work-tree=$(GH_PAGES) --git-dir=$(GH_PAGES)/.git push

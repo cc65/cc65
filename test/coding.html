@@ -12,54 +12,7 @@
 <HR>
 <EM>How to generate the most effective code with cc65.</EM>
 <HR>
-<P>
-<H2><A NAME="toc1">1.</A> <A HREF="coding.html#s1">Use prototypes</A></H2>
-
-<P>
-<H2><A NAME="toc2">2.</A> <A HREF="coding.html#s2">Don't declare auto variables in nested function blocks</A></H2>
-
-<P>
-<H2><A NAME="toc3">3.</A> <A HREF="coding.html#s3">Remember that the compiler does no high level optimizations</A></H2>
-
-<P>
-<H2><A NAME="toc4">4.</A> <A HREF="coding.html#s4">Longs are slow!</A></H2>
-
-<P>
-<H2><A NAME="toc5">5.</A> <A HREF="coding.html#s5">Use unsigned types wherever possible</A></H2>
-
-<P>
-<H2><A NAME="toc6">6.</A> <A HREF="coding.html#s6">Use chars instead of ints if possible</A></H2>
-
-<P>
-<H2><A NAME="toc7">7.</A> <A HREF="coding.html#s7">Make the size of your array elements one of 1, 2, 4, 8</A></H2>
-
-<P>
-<H2><A NAME="toc8">8.</A> <A HREF="coding.html#s8">Expressions are evaluated from left to right</A></H2>
-
-<P>
-<H2><A NAME="toc9">9.</A> <A HREF="coding.html#s9">Use the preincrement and predecrement operators</A></H2>
-
-<P>
-<H2><A NAME="toc10">10.</A> <A HREF="coding.html#s10">Use constants to access absolute memory locations</A></H2>
-
-<P>
-<H2><A NAME="toc11">11.</A> <A HREF="coding.html#s11">Use initialized local variables</A></H2>
-
-<P>
-<H2><A NAME="toc12">12.</A> <A HREF="coding.html#s12">Use the array operator [] even for pointers</A></H2>
-
-<P>
-<H2><A NAME="toc13">13.</A> <A HREF="coding.html#s13">Use register variables with care</A></H2>
-
-<P>
-<H2><A NAME="toc14">14.</A> <A HREF="coding.html#s14">Decimal constants greater than 0x7FFF are actually long ints</A></H2>
-
-<P>
-<H2><A NAME="toc15">15.</A> <A HREF="coding.html#s15">Access to parameters in variadic functions is expensive</A></H2>
-
-
-<HR>
-<H2><A NAME="s1">1.</A> <A HREF="#toc1">Use prototypes</A></H2>
+<H2><A NAME="s1">1. Use prototypes</A></H2>
 
 
 <P>This will not only help to find errors between separate modules, it will also
@@ -69,7 +22,7 @@ function. This will lead to shorter and faster code.</P>
 
 
 
-<H2><A NAME="s2">2.</A> <A HREF="#toc2">Don't declare auto variables in nested function blocks</A></H2>
+<H2><A NAME="s2">2. Don't declare auto variables in nested function blocks</A></H2>
 
 
 <P>Variable declarations in nested blocks are usually a good thing. But with
@@ -80,7 +33,7 @@ code.</P>
 
 
 
-<H2><A NAME="s3">3.</A> <A HREF="#toc3">Remember that the compiler does no high level optimizations</A></H2>
+<H2><A NAME="s3">3. Remember that the compiler does no high level optimizations</A></H2>
 
 
 <P>The compiler needs hints from you about the code to generate. It will try to
@@ -92,7 +45,7 @@ outside the loop, you have to do that yourself.</P>
 
 
 
-<H2><A NAME="s4">4.</A> <A HREF="#toc4">Longs are slow!</A></H2>
+<H2><A NAME="s4">4. Longs are slow!</A></H2>
 
 
 <P>While long support is necessary for some things, it's really, really slow on
@@ -101,7 +54,7 @@ operation works on double the data compared to an int.</P>
 
 
 
-<H2><A NAME="s5">5.</A> <A HREF="#toc5">Use unsigned types wherever possible</A></H2>
+<H2><A NAME="s5">5. Use unsigned types wherever possible</A></H2>
 
 
 <P>The 6502 CPU has no opcodes to handle signed values greater than 8 bit. So
@@ -111,7 +64,7 @@ slower than the same code for unsigned types.</P>
 
 
 
-<H2><A NAME="s6">6.</A> <A HREF="#toc6">Use chars instead of ints if possible</A></H2>
+<H2><A NAME="s6">6. Use chars instead of ints if possible</A></H2>
 
 
 <P>While in arithmetic operations, chars are immidiately promoted to ints, they
@@ -125,7 +78,7 @@ loop is known not to execute more than 255 times.</P>
 
 
 
-<H2><A NAME="s7">7.</A> <A HREF="#toc7">Make the size of your array elements one of 1, 2, 4, 8</A></H2>
+<H2><A NAME="s7">7. Make the size of your array elements one of 1, 2, 4, 8</A></H2>
 
 
 <P>When indexing into an array, the compiler has to calculate the byte offset
@@ -137,7 +90,7 @@ fastest when using one of these sizes.</P>
 
 
 
-<H2><A NAME="s8">8.</A> <A HREF="#toc8">Expressions are evaluated from left to right</A></H2>
+<H2><A NAME="s8">8. Expressions are evaluated from left to right</A></H2>
 
 
 <P>Since cc65 is not building an explicit expression tree when parsing an
@@ -175,7 +128,7 @@ and reduce the code to one fetch, one addition and one store.
 </P>
 
 
-<H2><A NAME="s9">9.</A> <A HREF="#toc9">Use the preincrement and predecrement operators</A></H2>
+<H2><A NAME="s9">9. Use the preincrement and predecrement operators</A></H2>
 
 
 <P>The compiler is not always smart enough to figure out, if the rvalue of an
@@ -206,7 +159,7 @@ use</P>
 
 
 
-<H2><A NAME="s10">10.</A> <A HREF="#toc10">Use constants to access absolute memory locations</A></H2>
+<H2><A NAME="s10">10. Use constants to access absolute memory locations</A></H2>
 
 
 <P>The compiler produces optimized code, if the value of a pointer is a constant.
@@ -246,7 +199,7 @@ compiler does not know anything about the contents of the variable.</P>
 
 
 
-<H2><A NAME="s11">11.</A> <A HREF="#toc11">Use initialized local variables</A></H2>
+<H2><A NAME="s11">11. Use initialized local variables</A></H2>
 
 
 <P>Initialization of local variables when declaring them gives shorter and faster
@@ -298,7 +251,7 @@ variables each time, it parses an initialized one. So do this:</P>
 
 
 
-<H2><A NAME="s12">12.</A> <A HREF="#toc12">Use the array operator [] even for pointers</A></H2>
+<H2><A NAME="s12">12. Use the array operator [] even for pointers</A></H2>
 
 
 <P>When addressing an array via a pointer, don't use the plus and dereference
@@ -328,7 +281,7 @@ common cases.</P>
 
 
 
-<H2><A NAME="s13">13.</A> <A HREF="#toc13">Use register variables with care</A></H2>
+<H2><A NAME="s13">13. Use register variables with care</A></H2>
 
 
 <P>Register variables may give faster and shorter code, but they do also have an
@@ -349,7 +302,7 @@ not in several.</P>
 
 
 
-<H2><A NAME="s14">14.</A> <A HREF="#toc14">Decimal constants greater than 0x7FFF are actually long ints</A></H2>
+<H2><A NAME="s14">14. Decimal constants greater than 0x7FFF are actually long ints</A></H2>
 
 
 <P>The language rules for constant numeric values specify that decimal constants
@@ -370,7 +323,7 @@ type of a numeric constant.</P>
 
 
 
-<H2><A NAME="s15">15.</A> <A HREF="#toc15">Access to parameters in variadic functions is expensive</A></H2>
+<H2><A NAME="s15">15. Access to parameters in variadic functions is expensive</A></H2>
 
 
 <P>Since cc65 has the "wrong" calling order, the location of the fixed parameters

@@ -39,7 +39,7 @@ ifdef GH_TOKEN
 	$(RM) -r $(GH_PAGES)/doc
 	mkdir $(GH_PAGES)/doc
 	cp -R ../html/* $(GH_PAGES)/doc
-	git --work-tree=$(GH_PAGES) --git-dir=$(GH_PAGES)/.git add -A .
+	git --work-tree=$(GH_PAGES) --git-dir=$(GH_PAGES)/.git add -A doc
 	-git --work-tree=$(GH_PAGES) --git-dir=$(GH_PAGES)/.git commit -m "Updated doc from commit $(TRAVIS_COMMIT)."
 	git --work-tree=$(GH_PAGES) --git-dir=$(GH_PAGES)/.git push
 endif

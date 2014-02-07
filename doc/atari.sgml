@@ -449,7 +449,7 @@ All mouse devices connect to joystick port #0.
 <sect1>RS232 device drivers<p>
 
 Currently there is one RS232 driver.  It uses the R: device (therefore
-a R: driver needs to be installed) and was tested with the 850
+an R: driver needs to be installed) and was tested with the 850
 interface module.
 
 <table>

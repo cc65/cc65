@@ -244,7 +244,6 @@ typedef enum token_t {
     TOK_STRING,
     TOK_STRLEN,
     TOK_STRUCT,
-    TOK_SUNPLUS,
     TOK_TAG,
     TOK_TCOUNT,
     TOK_TIME,

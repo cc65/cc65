@@ -1810,14 +1810,6 @@ static void DoSmart (void)
 
 
 
-static void DoSunPlus (void)
-/* Switch to the SUNPLUS CPU */
-{
-    SetCPU (CPU_SUNPLUS);
-}
-
-
-
 static void DoTag (void)
 /* Allocate space for a struct */
 {
@@ -2093,7 +2085,6 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoUnexpected    },      /* .STRING */
     { ccNone,           DoUnexpected    },      /* .STRLEN */
     { ccNone,           DoStruct        },
-    { ccNone,           DoSunPlus       },
     { ccNone,           DoTag           },
     { ccNone,           DoUnexpected    },      /* .TCOUNT */
     { ccNone,           DoUnexpected    },      /* .TIME */

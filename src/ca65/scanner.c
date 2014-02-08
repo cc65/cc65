@@ -276,7 +276,6 @@ struct DotKeyword {
     { ".STRING",        TOK_STRING      },
     { ".STRLEN",        TOK_STRLEN      },
     { ".STRUCT",        TOK_STRUCT      },
-    { ".SUNPLUS",       TOK_SUNPLUS     },
     { ".TAG",           TOK_TAG         },
     { ".TCOUNT",        TOK_TCOUNT      },
     { ".TIME",          TOK_TIME        },

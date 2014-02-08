@@ -151,10 +151,7 @@ Here is a description of all the command line options:
   Set the default for the CPU type. The option takes a parameter, which
   may be one of
 
-       	6502, 65SC02, 65C02, 65816, sunplus, sweet16, HuC6280
-
-  The sunplus cpu is not available in the freeware version, because the
-  instruction set is "proprietary and confidential".
+       	6502, 65SC02, 65C02, 65816, sweet16, HuC6280
 
 
   <label id="option-create-dep">
@@ -428,8 +425,6 @@ The assembler accepts
       <tt><ref id=".PC02" name=".PC02"></tt> command was given).
 <item>all valid 65618 mnemonics when in 65816 mode (after the
       <tt><ref id=".P816" name=".P816"></tt> command was given).
-<item>all valid SunPlus mnemonics when in SunPlus mode (after the
-      <tt><ref id=".SUNPLUS" name=".SUNPLUS"></tt> command was given).
 </itemize>
 
 
@@ -3652,10 +3647,7 @@ Here's a list of all control commands and a description, what they do:
   Switch the CPU instruction set. The command is followed by a string that
   specifies the CPU. Possible values are those that can also be supplied to
   the <tt><ref id="option--cpu" name="--cpu"></tt> command line option,
-  namely: 6502, 6502X, 65SC02, 65C02, 65816, sunplus and HuC6280. Please
-  note that support for the sunplus CPU is not available in the freeware
-  version, because the instruction set of the sunplus CPU is "proprietary
-  and confidential".
+  namely: 6502, 6502X, 65SC02, 65C02, 65816and HuC6280.
 
   See: <tt><ref id=".CPU" name=".CPU"></tt>,
        <tt><ref id=".IFP02" name=".IFP02"></tt>,
@@ -3712,17 +3704,6 @@ Here's a list of all control commands and a description, what they do:
   See also: <tt><ref id=".ENDSTRUCT" name=".ENDSTRUCT"></tt>,
             <tt><ref id=".ENDUNION" name=".ENDUNION"></tt>,
             <tt><ref id=".UNION" name=".UNION"></tt>
-
-
-<sect1><tt>.SUNPLUS</tt><label id=".SUNPLUS"><p>
-
-  Enable the SunPlus instructions set. This command will not work in the
-  freeware version of the assembler, because the instruction set is
-  "proprietary and confidential".
-
-  See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
-  name=".PSC02"></tt>, <tt><ref id=".PC02" name=".PC02"></tt>, and
-  <tt><ref id=".P816" name=".P816"></tt>
 
 
 <sect1><tt>.TAG</tt><label id=".TAG"><p>
@@ -4365,7 +4346,6 @@ each supported CPU a constant similar to
     CPU_65SC02
     CPU_65C02
     CPU_65816
-    CPU_SUNPLUS
     CPU_SWEET16
     CPU_HUC6280
 </verb></tscreen>
@@ -4379,7 +4359,6 @@ another constant is defined:
     CPU_ISET_65SC02
     CPU_ISET_65C02
     CPU_ISET_65816
-    CPU_ISET_SUNPLUS
     CPU_ISET_SWEET16
     CPU_ISET_HUC6280
 </verb></tscreen>

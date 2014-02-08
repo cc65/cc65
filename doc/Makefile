@@ -28,8 +28,7 @@ clean:
 	@mkdir $@
 
 ../html/%.html: %.sgml | ../html
-	@linuxdoc -B html --split=0 --toc=$(TOC_LEVEL) $<
-	@mv $(@F) ../html
+	@cd ../html && linuxdoc -B html --split=0 --toc=$(TOC_LEVEL) ../doc/$<
 
 gh-pages: html
 ifdef GH_TOKEN

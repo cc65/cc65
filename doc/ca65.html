@@ -224,13 +224,12 @@ used as a standalone product.</EM>
 <LI><A NAME="toc11.94">11.94</A> <A HREF="ca65.html#ss11.94"><CODE>.SETCPU</CODE></A>
 <LI><A NAME="toc11.95">11.95</A> <A HREF="ca65.html#ss11.95"><CODE>.SMART</CODE></A>
 <LI><A NAME="toc11.96">11.96</A> <A HREF="ca65.html#ss11.96"><CODE>.STRUCT</CODE></A>
-<LI><A NAME="toc11.97">11.97</A> <A HREF="ca65.html#ss11.97"><CODE>.SUNPLUS</CODE></A>
-<LI><A NAME="toc11.98">11.98</A> <A HREF="ca65.html#ss11.98"><CODE>.TAG</CODE></A>
-<LI><A NAME="toc11.99">11.99</A> <A HREF="ca65.html#ss11.99"><CODE>.UNDEF, .UNDEFINE</CODE></A>
-<LI><A NAME="toc11.100">11.100</A> <A HREF="ca65.html#ss11.100"><CODE>.UNION</CODE></A>
-<LI><A NAME="toc11.101">11.101</A> <A HREF="ca65.html#ss11.101"><CODE>.WARNING</CODE></A>
-<LI><A NAME="toc11.102">11.102</A> <A HREF="ca65.html#ss11.102"><CODE>.WORD</CODE></A>
-<LI><A NAME="toc11.103">11.103</A> <A HREF="ca65.html#ss11.103"><CODE>.ZEROPAGE</CODE></A>
+<LI><A NAME="toc11.97">11.97</A> <A HREF="ca65.html#ss11.97"><CODE>.TAG</CODE></A>
+<LI><A NAME="toc11.98">11.98</A> <A HREF="ca65.html#ss11.98"><CODE>.UNDEF, .UNDEFINE</CODE></A>
+<LI><A NAME="toc11.99">11.99</A> <A HREF="ca65.html#ss11.99"><CODE>.UNION</CODE></A>
+<LI><A NAME="toc11.100">11.100</A> <A HREF="ca65.html#ss11.100"><CODE>.WARNING</CODE></A>
+<LI><A NAME="toc11.101">11.101</A> <A HREF="ca65.html#ss11.101"><CODE>.WORD</CODE></A>
+<LI><A NAME="toc11.102">11.102</A> <A HREF="ca65.html#ss11.102"><CODE>.ZEROPAGE</CODE></A>
 </UL>
 <P>
 <H2><A NAME="toc12">12.</A> <A HREF="ca65.html#s12">Macros</A></H2>
@@ -433,9 +432,7 @@ additional directories. See also the section about
 <DT><B><CODE>--cpu type</CODE></B><DD>
 <P>Set the default for the CPU type. The option takes a parameter, which
 may be one of</P>
-<P>6502, 65SC02, 65C02, 65816, sunplus, sweet16, HuC6280</P>
-<P>The sunplus cpu is not available in the freeware version, because the
-instruction set is "proprietary and confidential".</P>
+<P>6502, 65SC02, 65C02, 65816, sweet16, HuC6280</P>
 
 <P>
 <A NAME="option-create-dep"></A> </P>
@@ -704,9 +701,6 @@ it is ignored).</P>
 <LI>all valid 65618 mnemonics when in 65816 mode (after the
 <CODE>
 <A HREF="#.P816">.P816</A></CODE> command was given).</LI>
-<LI>all valid SunPlus mnemonics when in SunPlus mode (after the
-<CODE>
-<A HREF="#.SUNPLUS">.SUNPLUS</A></CODE> command was given).</LI>
 </UL>
 </P>
 
@@ -4584,10 +4578,7 @@ segment specified as zeropage cannot be declared as being absolute later.</P>
 specifies the CPU. Possible values are those that can also be supplied to
 the <CODE>
 <A HREF="#option--cpu">--cpu</A></CODE> command line option,
-namely: 6502, 6502X, 65SC02, 65C02, 65816, sunplus and HuC6280. Please
-note that support for the sunplus CPU is not available in the freeware
-version, because the instruction set of the sunplus CPU is "proprietary
-and confidential".</P>
+namely: 6502, 6502X, 65SC02, 65C02, 65816and HuC6280.</P>
 <P>See: <CODE>
 <A HREF="#.CPU">.CPU</A></CODE>,
 <CODE>
@@ -4666,22 +4657,7 @@ memory model used.</LI>
 <A HREF="#.UNION">.UNION</A></CODE></P>
 
 
-<H2><A NAME=".SUNPLUS"></A> <A NAME="ss11.97">11.97</A> <A HREF="#toc11.97"><CODE>.SUNPLUS</CODE></A>
-</H2>
-
-
-<P>Enable the SunPlus instructions set. This command will not work in the
-freeware version of the assembler, because the instruction set is
-"proprietary and confidential".</P>
-<P>See: <CODE>
-<A HREF="#.P02">.P02</A></CODE>, <CODE>
-<A HREF="#.PSC02">.PSC02</A></CODE>, <CODE>
-<A HREF="#.PC02">.PC02</A></CODE>, and
-<CODE>
-<A HREF="#.P816">.P816</A></CODE></P>
-
-
-<H2><A NAME=".TAG"></A> <A NAME="ss11.98">11.98</A> <A HREF="#toc11.98"><CODE>.TAG</CODE></A>
+<H2><A NAME=".TAG"></A> <A NAME="ss11.97">11.97</A> <A HREF="#toc11.97"><CODE>.TAG</CODE></A>
 </H2>
 
 
@@ -4703,7 +4679,7 @@ freeware version of the assembler, because the instruction set is
 </P>
 
 
-<H2><A NAME=".UNDEFINE"></A> <A NAME="ss11.99">11.99</A> <A HREF="#toc11.99"><CODE>.UNDEF, .UNDEFINE</CODE></A>
+<H2><A NAME=".UNDEFINE"></A> <A NAME="ss11.98">11.98</A> <A HREF="#toc11.98"><CODE>.UNDEF, .UNDEFINE</CODE></A>
 </H2>
 
 
@@ -4717,7 +4693,7 @@ section
 <A HREF="#macros">Macros</A>.</P>
 
 
-<H2><A NAME=".UNION"></A> <A NAME="ss11.100">11.100</A> <A HREF="#toc11.100"><CODE>.UNION</CODE></A>
+<H2><A NAME=".UNION"></A> <A NAME="ss11.99">11.99</A> <A HREF="#toc11.99"><CODE>.UNION</CODE></A>
 </H2>
 
 
@@ -4731,7 +4707,7 @@ section
 <A HREF="#.STRUCT">.STRUCT</A></CODE></P>
 
 
-<H2><A NAME=".WARNING"></A> <A NAME="ss11.101">11.101</A> <A HREF="#toc11.101"><CODE>.WARNING</CODE></A>
+<H2><A NAME=".WARNING"></A> <A NAME="ss11.100">11.100</A> <A HREF="#toc11.100"><CODE>.WARNING</CODE></A>
 </H2>
 
 
@@ -4769,7 +4745,7 @@ the source file.</P>
 <A HREF="#.OUT">.OUT</A></CODE></P>
 
 
-<H2><A NAME=".WORD"></A> <A NAME="ss11.102">11.102</A> <A HREF="#toc11.102"><CODE>.WORD</CODE></A>
+<H2><A NAME=".WORD"></A> <A NAME="ss11.101">11.101</A> <A HREF="#toc11.101"><CODE>.WORD</CODE></A>
 </H2>
 
 
@@ -4786,7 +4762,7 @@ but not necessarily constant) expressions.</P>
 </P>
 
 
-<H2><A NAME=".ZEROPAGE"></A> <A NAME="ss11.103">11.103</A> <A HREF="#toc11.103"><CODE>.ZEROPAGE</CODE></A>
+<H2><A NAME=".ZEROPAGE"></A> <A NAME="ss11.102">11.102</A> <A HREF="#toc11.102"><CODE>.ZEROPAGE</CODE></A>
 </H2>
 
 
@@ -5452,7 +5428,6 @@ each supported CPU a constant similar to</P>
     CPU_65SC02
     CPU_65C02
     CPU_65816
-    CPU_SUNPLUS
     CPU_SWEET16
     CPU_HUC6280
 </PRE>
@@ -5468,7 +5443,6 @@ another constant is defined:</P>
     CPU_ISET_65SC02
     CPU_ISET_65C02
     CPU_ISET_65816
-    CPU_ISET_SUNPLUS
     CPU_ISET_SWEET16
     CPU_ISET_HUC6280
 </PRE>

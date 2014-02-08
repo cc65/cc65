@@ -35,6 +35,7 @@ ifdef GH_TOKEN
 	git clone --branch=gh-pages https://$(GH_TOKEN)@github.com/oliverschmidt/cc65.git $(GH_PAGES)
 	git --work-tree=$(GH_PAGES) --git-dir=$(GH_PAGES)/.git config user.name "Oliver Schmidt"
 	git --work-tree=$(GH_PAGES) --git-dir=$(GH_PAGES)/.git config user.email "ol.sc@web.de"
+	git --work-tree=$(GH_PAGES) --git-dir=$(GH_PAGES)/.git config push.default simple
 	$(RM) -r $(GH_PAGES)/doc
 	mkdir $(GH_PAGES)/doc
 	cp ../html/* $(GH_PAGES)/doc

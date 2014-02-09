@@ -17,7 +17,7 @@ all:
 
 doc: html
 
-html: $(addprefix ../html/,$(SGMLS:.sgml=.html))
+html: $(addprefix ../html/,$(SGMLS:.sgml=.html) doc.css doc.png)
 
 mostlyclean:
 
@@ -28,7 +28,10 @@ clean:
 	@mkdir $@
 
 ../html/%.html: %.sgml | ../html
-	@cd ../html && linuxdoc -B html --split=0 --toc=$(TOC_LEVEL) ../doc/$<
+	@cd ../html && linuxdoc -B html -s=0 -T=$(TOC_LEVEL) -H ../doc/header.html ../doc/$<
+
+../html/doc.%: doc.% | ../html
+	cp $< ../html
 
 gh-pages: html
 ifdef GH_TOKEN

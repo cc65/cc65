@@ -64,10 +64,11 @@
 
 /* Name of the library file */
 const char*             LibName = 0;
+static const char*      NewLibName = 0;
 
 /* File descriptor for the library file */
-FILE*                   NewLib = 0;
 static FILE*            Lib = 0;
+static FILE*            NewLib = 0;
 
 /* The library header */
 static LibHeader        Header = {
@@ -246,10 +247,17 @@ void LibOpen (const char* Name, int MustExist, int NeedTemp)
     }
 
     if (NeedTemp) {
+
+        /* Create the temporary library name */
+        NewLibName = tempnam (NULL, NULL);
+        if (NewLibName == 0) {
+            Error ("Cannot create temporary library file name: %s", strerror (errno));
+        }
+
         /* Create the temporary library */
-        NewLib = tmpfile ();
+        NewLib = fopen (NewLibName, "w+b");
         if (NewLib == 0) {
-            Error ("Cannot create temporary file: %s", strerror (errno));
+            Error ("Cannot create temporary library file: %s", strerror (errno));
         }
 
         /* Write a dummy header to the temp file */
@@ -393,6 +401,9 @@ void LibClose (void)
     }
     if (NewLib && fclose (NewLib) != 0) {
         Error ("Problem closing temporary library file: %s", strerror (errno));
+    }
+    if (NewLibName && remove (NewLibName) != 0) {
+        Error ("Problem deleting temporary library file: %s", strerror (errno));
     }
 }
 

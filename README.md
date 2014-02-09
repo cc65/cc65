@@ -1,4 +1,4 @@
-[documentation](http://oliverschmidt.github.io/cc65/)
+[documentation](http://oliverschmidt.github.io/cc65/doc)
 
 [![build status](https://travis-ci.org/oliverschmidt/cc65.png)](https://travis-ci.org/oliverschmidt/cc65/builds)
 

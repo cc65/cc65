@@ -27,7 +27,7 @@ clean:
 ../html:
 	@mkdir $@
 
-../html/%.html: %.sgml | ../html
+../html/%.html: %.sgml header.html | ../html
 	@cd ../html && linuxdoc -B html -s 0 -T $(TOC_LEVEL) -H ../doc/header.html ../doc/$<
 
 ../html/doc.%: doc.% | ../html

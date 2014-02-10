@@ -64,7 +64,7 @@
 
 /* Name of the library file */
 const char*             LibName = 0;
-static const char*      NewLibName = 0;
+static char*            NewLibName = 0;
 
 /* File descriptor for the library file */
 static FILE*            Lib = 0;
@@ -249,10 +249,9 @@ void LibOpen (const char* Name, int MustExist, int NeedTemp)
     if (NeedTemp) {
 
         /* Create the temporary library name */
-        NewLibName = tempnam (NULL, NULL);
-        if (NewLibName == 0) {
-            Error ("Cannot create temporary library file name: %s", strerror (errno));
-        }
+        NewLibName = xmalloc (strlen (Name) + strlen (".temp") + 1);
+        strcpy (NewLibName, Name);
+        strcat (NewLibName, ".temp");
 
         /* Create the temporary library */
         NewLib = fopen (NewLibName, "w+b");
@@ -386,7 +385,7 @@ void LibClose (void)
                    LibName, strerror (errno));
         }
 
-        /* Copy the new library to the new one */
+        /* Copy the temporary library to the new one */
         fseek (NewLib, 0, SEEK_SET);
         while ((Count = fread (Buf, 1, sizeof (Buf), NewLib)) != 0) {
             if (fwrite (Buf, 1, Count, Lib) != Count) {

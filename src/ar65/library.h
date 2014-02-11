@@ -51,9 +51,6 @@
 /* Name of the library file */
 extern const char* LibName;
 
-/* File descriptor for the new library file */
-extern FILE*    NewLib;
-
 
 
 /*****************************************************************************/

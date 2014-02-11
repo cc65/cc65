@@ -82,7 +82,7 @@ define INSTALL_recipe
 
 $(if $(prefix),,$(error variable `prefix' must be set))
 $(INSTALL) -d $(subst ..,$(DESTDIR)$(datadir),$(dir))
-$(INSTALL) -m644 $(dir)/* $(subst ..,$(DESTDIR)$(datadir),$(dir))
+$(INSTALL) -m644 $(dir)/*.* $(subst ..,$(DESTDIR)$(datadir),$(dir))
 
 endef
 

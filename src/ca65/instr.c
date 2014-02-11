@@ -585,11 +585,6 @@ static const struct {
     }
 };
 
-#ifdef SUNPLUS
-/* Table for the SUNPLUS CPU */
-#include "sunplus.inc"
-#endif
-
 /* Instruction table for the SWEET16 pseudo CPU */
 static const struct {
     unsigned Count;
@@ -781,11 +776,6 @@ static const InsTable* InsTabs[CPU_COUNT] = {
     (const InsTable*) &InsTab65SC02,
     (const InsTable*) &InsTab65C02,
     (const InsTable*) &InsTab65816,
-#ifdef SUNPLUS
-    (const InsTable*) &InsTabSunPlus,
-#else
-    0,
-#endif
     (const InsTable*) &InsTabSweet16,
     (const InsTable*) &InsTabHuC6280,
     0,                                  /* Mitsubishi 740 */

@@ -110,7 +110,7 @@ void GetEA (EffAddr* A)
             A->AddrModeSet = AM65_DIR_IND_LONG_Y;
         } else {
             /* [dir] */
-            A->AddrModeSet = AM65_DIR_IND_LONG;
+            A->AddrModeSet = AM65_DIR_IND_LONG | AM65_ABS_IND_LONG;
         }
 
     } else if (CurTok.Tok == TOK_LPAREN) {

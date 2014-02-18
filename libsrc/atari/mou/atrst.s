@@ -11,6 +11,13 @@
 ; is being built.
 ;
 
+;DEBUG           =       1
+
+DISABLE_TIMEOUT =       30              ; # of vertical blank interrupts after which, if
+                                        ; no mouse motion occurred, the polling IRQ gets
+                                        ; disabled.
+                                        ; VBI frequency is 50Hz for PAL and 60Hz for NTSC
+
         .include        "zeropage.inc"
         .include        "mouse-kernel.inc"
         .include        "atari.inc"
@@ -97,6 +104,10 @@ Buttons:        .res    1               ; Button mask
 
 XPosWrk:        .res    2
 YPosWrk:        .res    2
+
+irq_enabled:    .res    1               ; flag indicating that the high frequency polling interrupt is enabled
+old_porta_vbi:  .res    1               ; previous PORTA value of the VBI interrupt (IRQ)
+how_long:       .res    1               ; counter for how many VBI interrupts the mouse hasn't been moved
 
 .if .defined (AMIGA_MOUSE) .or .defined (ST_MOUSE)
 dumx:           .res    1
@@ -226,10 +237,17 @@ INSTALL:
         sta     AUDF1
         sta     STIMER
 
+.if 0   ; the IRQ will now be dynamically enabled when the mouse is moved
         lda     POKMSK
         ora     #%00000001              ; timer 1 enable
         sta     POKMSK
         sta     IRQEN
+        sta     irq_enabled
+.endif
+
+        lda     PORTA
+        and     #$0f
+        sta     old_porta_vbi
 
 ; Done, return zero (= MOUSE_ERR_OK)
 
@@ -444,23 +462,60 @@ IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioclts for now
 ; MUST return carry clear.
 ;
 
-IRQ:
+IRQ:    lda     PORTA                   ; mouse port contents
+        and     #$0f                    ; check port 1 only
+        ldx     irq_enabled
+        bne     @L1
 
-; Turn mouse polling IRQ back on in case it disabled itself due to CRITIC
-; flag being set.
+; IRQ is disabled, check for mouse motion and enable IRQ if mouse motion detected
+
+        cmp     old_porta_vbi
+        beq     @L3                     ; no motion
+
+; Turn mouse polling IRQ back on
 
         lda     POKMSK
         ora     #%00000001              ; timer 1 enable
         sta     POKMSK
         sta     IRQEN
+        sta     irq_enabled
+        bne     @L3
+        ; not reached
+
+; IRQ is enabled
+
+@L1:    cmp     old_porta_vbi           ; mouse motion since last VBI?
+        sta     old_porta_vbi
+        beq     @L2                     ; no, increment timeout to disable IRQ
+
+        lda     #0
+        sta     how_long                ; yes, reinitialize wait counter
+        beq     @L3
+        ; not reached
+
+@L2:    inc     how_long                ; no motion, increment wait counter
+        lda     how_long
+        cmp     #DISABLE_TIMEOUT        ; timeout?
+        bcc     @L3                     ; no
+
+        lda     #0                      ; yes, turn off IRQ
+        sta     how_long
+
+; no mouse input -- turn IRQ off
+
+        sta     irq_enabled
+        lda     POKMSK
+        and     #%11111110              ; timer 1 disable
+        sta     IRQEN
+        sta     POKMSK
 
 ; Check for a pressed button and place the result into Buttons
 
-        ldx     #0
+@L3:    ldx     #0
         lda     TRIG0                   ; joystick #0 trigger
-        bne     @L0                     ; not pressed
+        bne     @L4                     ; not pressed
         ldx     #MOUSE_BTN_LEFT
-@L0:    stx     Buttons
+@L4:    stx     Buttons
 
         jsr     CPREP
 
@@ -471,20 +526,19 @@ IRQ:
         tax
         cpy     XMin
         sbc     XMin+1
-        bpl     @L2
+        bpl     @L5
         ldy     XMin
         ldx     XMin+1
-        jmp     @L3
-@L2:    txa
+        jmp     @L6
 
+@L5:    txa
         cpy     XMax
         sbc     XMax+1
-        bmi     @L3
+        bmi     @L6
         ldy     XMax
         ldx     XMax+1
-@L3:    sty     XPos
+@L6:    sty     XPos
         stx     XPos+1
-
         tya
         jsr     CMOVEX
 
@@ -495,24 +549,34 @@ IRQ:
         tax
         cpy     YMin
         sbc     YMin+1
-        bpl     @L4
+        bpl     @L7
         ldy     YMin
         ldx     YMin+1
-        jmp     @L5
-@L4:    txa
+        jmp     @L8
 
+@L7:    txa
         cpy     YMax
         sbc     YMax+1
-        bmi     @L5
+        bmi     @L8
         ldy     YMax
         ldx     YMax+1
-@L5:    sty     YPos
+@L8:    sty     YPos
         stx     YPos+1
-
         tya
         jsr     CMOVEY
 
         jsr     CDRAW
+
+.ifdef  DEBUG
+        ; print on upper right corner 'E' or 'D', indicating the IRQ is enabled or disabled
+        ldy     irq_enabled
+        beq     @L9
+        lda     #37                     ; screen code for 'E'
+        .byte   $2c                     ; bit opcode, eats next 2 bytes
+@L9:    lda     #36                     ; screen code for 'D'
+        ldy     #39
+        sta     (SAVMSC),y
+.endif
 
         clc
         rts
@@ -721,6 +785,11 @@ disable_me:
         and     #%11111110              ; timer 1 disable
         sta     IRQEN
         sta     POKMSK
+        lda     #0
+        sta     irq_enabled
+        lda     PORTA
+        and     #$0f
+        sta     old_porta_vbi
 .ifdef  __ATARIXL__
         rts
 .else

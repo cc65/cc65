@@ -84,6 +84,7 @@
 #define AM65_IMM_IMPLICIT       0x00800000UL
 #define AM65_BLOCKMOVE          0x01000000UL
 #define AM65_BLOCKXFER          0x02000000UL
+#define AM65_ABS_IND_LONG       0x04000000UL
 
 /* Bitmask for all ZP operations that have correspondent ABS ops */
 #define AM65_SET_ZP     (AM65_DIR | AM65_DIR_X | AM65_DIR_Y | AM65_DIR_IND | AM65_DIR_X_IND)
@@ -107,7 +108,7 @@
 #define AM65I_IMM_ACCU          21
 #define AM65I_IMM_INDEX         22
 #define AM65I_IMM_IMPLICIT      23
-#define AM65I_COUNT             26
+#define AM65I_COUNT             27
 
 
 

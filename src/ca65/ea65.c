@@ -150,7 +150,7 @@ void GetEA (EffAddr* A)
                 A->AddrModeSet = AM65_DIR_IND_Y;
             } else {
                 /* (adr) */
-                A->AddrModeSet = AM65_ABS_IND | AM65_DIR_IND;
+                A->AddrModeSet = AM65_ABS_IND | AM65_ABS_IND_LONG | AM65_DIR_IND;
             }
         }
 

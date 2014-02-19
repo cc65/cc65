@@ -48,13 +48,13 @@ _inviocb:
         .segment        "EXTZP" : zeropage
 
 index:  .res    1               ; index into line buffer
-buflen: .res    1               ; length of used part of buffer
 cbs:    .res    1               ; current buffer size: buflen - index
 dataptr:.res    2               ; temp pointer to user buffer
 copylen:.res    1               ; temp counter
 
         .bss
 
+buflen: .res    1               ; length of used part of buffer
 linebuf:.res    LINEBUF         ; the line buffer
 
         .code

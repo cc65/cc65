@@ -61,7 +61,7 @@ __heapmaxavail:
 
 ; F = F->next;
 
-@L2:    iny                             ; Points to F->next
+@L2:    iny                     ; Points to F->next
         lda     (ptr1),y
         tax
         iny
@@ -69,8 +69,17 @@ __heapmaxavail:
         stx     ptr1
         jmp     @L1
 
-; return Size;
+; if (Size < HEAP_ADMIN_SPACE) return 0;
 
 @L3:    lda     ptr2
+        sub     #HEAP_ADMIN_SPACE
         ldx     ptr2+1
+        bcs     @L5
+        bne     @L4
+        txa
         rts
+
+; return Size - HEAP_ADMIN_SPACE;
+
+@L4:    dex
+@L5:    rts

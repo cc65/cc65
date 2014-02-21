@@ -70,7 +70,7 @@ int main(int argc, char **argv)
     /* allocate buffer */
     buffer = malloc(buflen);
     if (! buffer) {
-        buflen = _heapmaxavail() - 8; /* get as much as we can */
+        buflen = _heapmaxavail(); /* get as much as we can */
         buffer = malloc(buflen);
         if (! buffer) {
             fprintf(stderr, "cannot alloc %ld bytes -- aborting...\n", (long)buflen);

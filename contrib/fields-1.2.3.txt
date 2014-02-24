@@ -44,6 +44,14 @@ History:
 	*	Selection of 40- and 80-column modes now available on the
 		C128 and Apple2e.
 
+1.2.3:
+	*	Plenty of optimizations
+	*	I cleaned up the disabled code I left in during debugging.
+	*	C128 and Apple2enh targets are now hard-coded for an 80-column
+		screen.
+	*	Removed the insert key support for text and number fields for
+		efficiency
+
 Known bugs:
 	*	Support for pre-C64 CBM computers and Apple 2 non-enhanced 
 		untested.
@@ -58,9 +66,9 @@ To Do:
 		field change)
 	*	Windows
 	*	Menu routine calls menu code directly
-	*	40-column C128 and 80-column Apple
-
+	*	Field information update code called upon field edit.
 ------------------------------------------------------------------
+
 To install:
 1.	Download the ZIP file.
 2.	Uncompress it, keeping directory structure intact, to a

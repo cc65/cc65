@@ -1,4 +1,4 @@
-.PHONY: all doc html gh-pages mostlyclean clean install
+.PHONY: all doc html info gh-pages mostlyclean clean install
 
 .SUFFIXES:
 
@@ -15,16 +15,18 @@ GH_PAGES = ../../gh-pages
 
 all:
 
-doc: html
+doc: html info
 
 html: $(addprefix ../html/,$(SGMLS:.sgml=.html) doc.css doc.png)
+
+info: $(addprefix ../info/,$(SGMLS:.sgml=.info))
 
 mostlyclean:
 
 clean:
-	$(RM) -r ../html
+	$(RM) -r ../html ../info
 
-../html:
+../html ../info:
 	@mkdir $@
 
 ../html/%.html: %.sgml header.html | ../html
@@ -32,6 +34,9 @@ clean:
 
 ../html/doc.%: doc.% | ../html
 	cp $< ../html
+
+../info/%.info: %.sgml | ../info
+	@cd ../info && linuxdoc -B info ../doc/$<
 
 gh-pages: html
 ifdef GH_TOKEN

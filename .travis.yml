@@ -1,7 +1,7 @@
 language:
   - c
 install:
-  - sudo apt-get install linuxdoc-tools
+  - sudo apt-get install linuxdoc-tools linuxdoc-tools-info
 script:
   - make all doc
 after_success:

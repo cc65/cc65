@@ -762,7 +762,15 @@ DOS     = $0700
 
 CARTCS  = $BFFA         ;##rev2## 2-byte cartridge coldstart address
 CART    = $BFFC         ;##rev2## 1-byte cartridge present indicator
+                        ;0=Cart Exists
 CARTFG  = $BFFD         ;##rev2## 1-byte cartridge flags
+                        ;D7  0=Not a Diagnostic Cart
+                        ;    1=Is a Diagnostic cart and control is 
+                        ;      given to cart before any OS is init.
+                        ;D2  0=Init but Do not Start Cart
+                        ;    1=Init and Start Cart
+                        ;D0  0=Do not boot disk
+                        ;    1=Boot Disk
 CARTAD  = $BFFE         ;##rev2## 2-byte cartridge start vector
 
 ;-------------------------------------------------------------------------
@@ -770,83 +778,7 @@ CARTAD  = $BFFE         ;##rev2## 2-byte cartridge start vector
 ;-------------------------------------------------------------------------
 
 GTIA    = $D000         ;CTIA/GTIA area
-
-; Read/Write Addresses
-
-CONSOL  = $D01F         ;console switches and speaker control
-
-; Read Addresses
-
-M0PF    = $D000         ;missile 0 and playfield collision
-M1PF    = $D001         ;missile 1 and playfield collision
-M2PF    = $D002         ;missile 2 and playfield collision
-M3PF    = $D003         ;missile 3 and playfield collision
-
-P0PF    = $D004         ;player 0 and playfield collision
-P1PF    = $D005         ;player 1 and playfield collision
-P2PF    = $D006         ;player 2 and playfield collision
-P3PF    = $D007         ;player 3 and playfield collision
-
-M0PL    = $D008         ;missile 0 and player collision
-M1PL    = $D009         ;missile 1 and player collision
-M2PL    = $D00A         ;missile 2 and player collision
-M3PL    = $D00B         ;missile 3 and player collision
-
-P0PL    = $D00C         ;player 0 and player collision
-P1PL    = $D00D         ;player 1 and player collision
-P2PL    = $D00E         ;player 2 and player collision
-P3PL    = $D00F         ;player 3 and player collision
-
-TRIG0   = $D010         ;joystick trigger 0
-TRIG1   = $D011         ;joystick trigger 1
-
-TRIG2   = $D012         ;cartridge interlock
-TRIG3   = $D013         ;ACMI module interlock
-
-PAL     = $D014         ;##rev2## PAL/NTSC indicator
-
-; Write Addresses
-
-HPOSP0  = $D000         ;player 0 horizontal position
-HPOSP1  = $D001         ;player 1 horizontal position
-HPOSP2  = $D002         ;player 2 horizontal position
-HPOSP3  = $D003         ;player 3 horizontal position
-
-HPOSM0  = $D004         ;missile 0 horizontal position
-HPOSM1  = $D005         ;missile 1 horizontal position
-HPOSM2  = $D006         ;missile 2 horizontal position
-HPOSM3  = $D007         ;missile 3 horizontal position
-
-SIZEP0  = $D008         ;player 0 size
-SIZEP1  = $D009         ;player 1 size
-SIZEP2  = $D00A         ;player 2 size
-SIZEP3  = $D00B         ;player 3 size
-
-SIZEM   = $D00C         ;missile sizes
-
-GRAFP0  = $D00D         ;player 0 graphics
-GRAFP1  = $D00E         ;player 1 graphics
-GRAFP2  = $D00F         ;player 2 graphics
-GRAFP3  = $D010         ;player 3 graphics
-
-GRAFM   = $D011         ;missile graphics
-
-COLPM0  = $D012         ;player-missile 0 color/luminance
-COLPM1  = $D013         ;player-missile 1 color/luminance
-COLPM2  = $D014         ;player-missile 2 color/luminance
-COLPM3  = $D015         ;player-missile 3 color/luminance
-
-COLPF0  = $D016         ;playfield 0 color/luminance
-COLPF1  = $D017         ;playfield 1 color/luminance
-COLPF2  = $D018         ;playfield 2 color/luminance
-COLPF3  = $D019         ;playfield 3 color/luminance
-
-COLBK   = $D01A         ;background color/luminance
-
-PRIOR   = $D01B         ;priority select
-VDELAY  = $D01C         ;vertical delay
-GRACTL  = $D01D         ;graphic control
-HITCLR  = $D01E         ;collision clear
+.include "_gtia.inc"
 
 ;-------------------------------------------------------------------------
 ; PBI Address Equates
@@ -862,6 +794,20 @@ PDVI    = $D1FF         ;##rev2## parallel device IRQ status
 
 PDVS    = $D1FF         ;##rev2## parallel device select
 
+;-------------------------------------------------------------------------
+; POKEY Address Equates
+;-------------------------------------------------------------------------
+
+POKEY     = $D200         ;POKEY area
+.include  "_pokey.inc"
+
+;-------------------------------------------------------------------------
+; ANTIC Address Equates
+;-------------------------------------------------------------------------
+
+ANTIC     = $D400         ;ANTIC area
+.include  "_antic.inc"
+
 ; PBI RAM Address Equates
 
 PBIRAM  = $D600         ;##rev2## parallel bus interface RAM area
@@ -875,52 +821,6 @@ PDID2   = $D80B         ;##rev2## parallel device ID 2
 PDVV    = $D80D         ;##rev2## parallel device vector table
 
 ;-------------------------------------------------------------------------
-; POKEY Address Equates
-;-------------------------------------------------------------------------
-
-POKEY   = $D200         ;POKEY area
-
-; Read Addresses
-
-POT0    = $D200         ;potentiometer 0
-POT1    = $D201         ;potentiometer 1
-POT2    = $D202         ;potentiometer 2
-POT3    = $D203         ;potentiometer 3
-POT4    = $D204         ;potentiometer 4
-POT5    = $D205         ;potentiometer 5
-POT6    = $D206         ;potentiometer 6
-POT7    = $D207         ;potentiometer 7
-
-ALLPOT  = $D208         ;potentiometer port status
-KBCODE  = $D209         ;keyboard code
-RANDOM  = $D20A         ;random number generator
-SERIN   = $D20D         ;serial port input
-IRQST   = $D20E         ;IRQ interrupt status
-SKSTAT  = $D20F         ;serial port and keyboard status
-
-; Write Addresses
-
-AUDF1   = $D200         ;channel 1 audio frequency
-AUDC1   = $D201         ;channel 1 audio control
-
-AUDF2   = $D202         ;channel 2 audio frequency
-AUDC2   = $D203         ;channel 2 audio control
-
-AUDF3   = $D204         ;channel 3 audio frequency
-AUDC3   = $D205         ;channel 3 audio control
-
-AUDF4   = $D206         ;channel 4 audio frequency
-AUDC4   = $D207         ;channel 4 audio control
-
-AUDCTL  = $D208         ;audio control
-STIMER  = $D209         ;start timers
-SKRES   = $D20A         ;reset SKSTAT status
-POTGO   = $D20B         ;start potentiometer scan sequence
-SEROUT  = $D20D         ;serial port output
-IRQEN   = $D20E         ;IRQ interrupt enable
-SKCTL   = $D20F         ;serial port and keyboard control
-
-;-------------------------------------------------------------------------
 ; PIA Address Equates
 ;-------------------------------------------------------------------------
 
@@ -931,33 +831,6 @@ PORTB   = $D301         ;port B direction register or memory management
 
 PACTL   = $D302         ;port A control
 PBCTL   = $D303         ;port B control
-
-;-------------------------------------------------------------------------
-; ANTIC Address Equates
-;-------------------------------------------------------------------------
-
-ANTIC   = $D400         ;ANTIC area
-
-; Read Addresses
-
-VCOUNT  = $D40B         ;vertical line counter
-PENH    = $D40C         ;light pen horizontal position
-PENV    = $D40D         ;light pen vertical position
-NMIST   = $D40F         ;NMI interrupt status
-
-; Write Addresses
-
-DMACTL  = $D400         ;DMA control
-CHACTL  = $D401         ;character control
-DLISTL  = $D402         ;low display list address
-DLISTH  = $D403         ;high display list address
-HSCROL  = $D404         ;horizontal scroll
-VSCROL  = $D405         ;vertical scroll
-PMBASE  = $D407         ;player-missile base address
-CHBASE  = $D409         ;character base address
-WSYNC   = $D40A         ;wait for HBLANK synchronization
-NMIEN   = $D40E         ;NMI enable
-NMIRES  = $D40F         ;NMI interrupt reset
 
 ;-------------------------------------------------------------------------
 ; Floating Point Package Address Equates
@@ -1130,74 +1003,6 @@ OSADOS       = 2        ; OS/A+
 MYDOS        = 3
 XDOS         = 4
 NODOS        = 255
-
-;-------------------------------------------------------------------------
-; Antic opcodes
-;-------------------------------------------------------------------------
-
-; usage example:
-;
-; ScreenDL:
-; .byte DL_BLK8
-; .byte DL_BLK8
-; .byte DL_CHR40x8x1 + DL_LMS + DL_DLI
-; .word ScreenAlignment
-; .byte DL_BLK1 + DL_DLI
-; .byte DL_MAP320x1x1 + DL_LMS
-; .word Screen
-;
-; .repeat 99
-; .byte DL_MAP320x1x1
-; .endrepeat
-; .byte DL_MAP320x1x1 + DL_LMS
-; .word Screen + 40 * 100       ; 100 lines a 40 byte, 'Screen' has to be aligned correctly!
-; .repeat 92
-; .byte DL_MAP320x1x1
-; .endrepeat
-;
-; .byte DL_JVB
-
-; absolute instructions (non mode lines)
-
-DL_JMP  = 1
-DL_JVB  = 65
-
-DL_BLK1  = 0
-DL_BLK2  = 16
-DL_BLK3  = 32
-DL_BLK4  = 48
-DL_BLK5  = 64
-DL_BLK6  = 80
-DL_BLK7  = 96
-DL_BLK8  = 112
-
-; absolute instructions (mode lines)
-
-DL_CHR40x8x1  = 2               ; monochrome, 40 character & 8 scanlines per mode line (GR. 0)
-DL_CHR40x10x1 = 3               ; monochrome, 40 character & 10 scanlines per mode line
-DL_CHR40x8x4  = 4               ; colour, 40 character & 8 scanlines per mode line (GR. 12)
-DL_CHR40x16x4 = 5               ; colour, 40 character & 16 scanlines per mode line (GR. 13)
-DL_CHR20x8x2  = 6               ; colour (duochrome per character), 20 character & 8 scanlines per mode line (GR. 1)
-DL_CHR20x16x2 = 7               ; colour (duochrome per character), 20 character & 16 scanlines per mode line (GR. 2)
-
-DL_MAP40x8x4  = 8               ; colour, 40 pixel & 8 scanlines per mode line (GR. 3)
-DL_MAP80x4x2  = 9               ; 'duochrome', 80 pixel & 4 scanlines per mode line (GR.4) 
-DL_MAP80x4x4  = 10              ; colour, 80 pixel & 4 scanlines per mode line (GR.5) 
-DL_MAP160x2x2 = 11              ; 'duochrome', 160 pixel & 2 scanlines per mode line (GR.6) 
-DL_MAP160x1x2 = 12              ; 'duochrome', 160 pixel & 1 scanline per mode line (GR.14) 
-DL_MAP160x2x4 = 13              ; 4 colours, 160 pixel & 2 scanlines per mode line (GR.7) 
-DL_MAP160x1x4 = 14              ; 4 colours, 160 pixel & 1 scanline per mode line (GR.15) 
-DL_MAP320x1x1 = 15              ; monochrome, 320 pixel & 1 scanline per mode line (GR.8) 
-
-; modifiers on mode lines...
-
-DL_HSCROL = 16
-DL_VSCROL = 32
-DL_LMS    = 64
-
-; general modifier...
-
-DL_DLI    = 128
 
 ;-------------------------------------------------------------------------
 ; End of atari.inc

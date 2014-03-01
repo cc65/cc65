@@ -160,6 +160,10 @@ static void SetSys (const char* Sys)
             AbEnd ("Cannot use `module' as a target for the compiler");
             break;
 
+        case TGT_ATARI5200:
+            DefineNumericMacro ("__ATARI5200__", 1);
+            break;
+
         case TGT_ATARI:
             DefineNumericMacro ("__ATARI__", 1);
             break;

@@ -102,6 +102,7 @@ MKINC = $(GEOS) \
         nes
 
 TARGETUTIL = apple2 \
+             atari \
              geos-apple
 
 GEOSDIRS = common      \

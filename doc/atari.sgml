@@ -230,7 +230,7 @@ The size of a cassette boot file is restricted to 32K. Larger programs
 would need to be split in more parts and the parts to be loaded manually.
 
 To write the generated file to a cassette, a utility to run
-on an Atari is provided (<tt/util&sol;atari&sol;w2cas.c/).
+on an Atari is provided (<tt/W2CAS.COM/).
 
 <sect1><tt/atarixl/ config files<p>
 

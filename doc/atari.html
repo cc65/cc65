@@ -295,6 +295,15 @@ that the cartridge doesn't prevent the booting of DOS.</P>
 <P>The option byte will be located at address $BFFD. For more information
 about its use, see e.g. "Mapping the Atari".</P>
 
+<H3><CODE>atari-cassette.cfg</CODE></H3>
+
+
+<P>This config file can be used to create cassette boot files. It's suited both
+for C and assembly language programs.</P>
+<P>The size of a cassette boot file is restricted to 32K. Larger programs
+would need to be split in more parts and the parts to be loaded manually.</P>
+<P>To write the generated file to a cassette, a utility to run
+on an Atari is provided in the <CODE>targetutil</CODE> directory (<CODE>w2cas.com</CODE>).</P>
 
 <H2><A NAME="ss4.2">4.2</A> <A HREF="#toc4.2"><CODE>atarixl</CODE> config files</A>
 </H2>

@@ -13,15 +13,13 @@ TOC_LEVEL = 2
 
 GH_PAGES = ../../gh-pages
 
-all:
+all mostlyclean install:
 
 doc: html info
 
 html: $(addprefix ../html/,$(SGMLS:.sgml=.html) doc.css doc.png)
 
 info: $(addprefix ../info/,$(SGMLS:.sgml=.info))
-
-mostlyclean:
 
 clean:
 	$(RM) -r ../html ../info

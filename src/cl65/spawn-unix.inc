@@ -81,7 +81,7 @@ int spawnvp (int Mode attribute ((unused)), const char* File, const char* const 
     } else if (pid == 0) {
 
         /* The son - exec the program */
-        if (execvp (File, argv) < 0) {
+        if (execvp (File, (char* const *) argv) < 0) {
             Error ("Cannot exec `%s': %s", File, strerror (errno));
         }
 

@@ -54,7 +54,7 @@
 
 int spawnvp (int Mode attribute ((unused)),
              const char* File attribute ((unused)),
-             char* const argv [])
+             const char* const argv [])
 /* Execute the given program searching and wait til it terminates. The Mode
  * argument is ignored (compatibility only). The result of the function is
  * the return code of the program. The function will terminate the program

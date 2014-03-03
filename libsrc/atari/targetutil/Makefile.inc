@@ -2,7 +2,6 @@ ifeq ($(TARGET),atari)
 
 DEPS += ../wrk/$(TARGET)/w2cas.d
 
-../wrk/$(TARGET)/w2cas.o: CC65FLAGS:=-O -W error
 ../wrk/$(TARGET)/w2cas.o: $(SRCDIR)/targetutil/w2cas.c | ../wrk/$(TARGET)
 	$(COMPILE_recipe)
 

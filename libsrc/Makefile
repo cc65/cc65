@@ -91,7 +91,7 @@ endef
 else # TARGET
 
 CA65FLAGS =
-CC65FLAGS = -Osir -W error
+CC65FLAGS = -Or -W error
 
 EXTZP = cbm510 \
         cbm610 \

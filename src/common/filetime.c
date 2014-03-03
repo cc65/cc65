@@ -2,7 +2,7 @@
 /*                                                                           */
 /*                                filetime.c                                 */
 /*                                                                           */
-/*                   Replacement for buggy Microsoft code                    */
+/*                       Replacement for Windows code                        */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -42,18 +42,12 @@
 
 
 
-#if defined(__WATCOMC__) && defined(__NT__)
-#define BUGGY_OS 1
+#if defined(_WIN32)
 #include <errno.h>
 #include <windows.h>
 #else
-#if defined(__WATCOMC__) || defined(_MSC_VER) || defined(__MINGW32__)
-/* The Windows compilers have the file in the wrong directory */
-#  include <sys/utime.h>
-#else
-#  include <sys/types.h>                /* FreeBSD needs this */
-#  include <utime.h>
-#endif
+#include <sys/types.h>                          /* FreeBSD needs this */
+#include <utime.h>
 #endif
 
 
@@ -68,7 +62,7 @@
 
 
 
-#if defined(BUGGY_OS)
+#if defined(_WIN32)
 
 
 
@@ -82,7 +76,7 @@ static FILETIME* UnixTimeToFileTime (time_t T, FILETIME* FT)
      * way to express a number > 32 bit (known to me) but is able to do
      * calculations with 64 bit integers, so we need to do it this way.
      */
-    static const ULARGE_INTEGER Offs = { 0xB6109100UL, 0x00000020UL };
+    static const ULARGE_INTEGER Offs = { { 0xB6109100UL, 0x00000020UL } };
     ULARGE_INTEGER V;
     V.QuadPart = ((unsigned __int64) T + Offs.QuadPart) * 10000000U;
     FT->dwLowDateTime  = V.LowPart;
@@ -150,6 +144,3 @@ int SetFileTimes (const char* Path, time_t T)
 
 
 #endif
-
-
-

@@ -36,10 +36,10 @@
 /* Check out if we have a spawn() function on the system, or if we must use
  * our own.
  */
-#if defined(__WATCOMC__) || defined(_MSC_VER) || defined(__MINGW32__) || defined(__DJGPP__)
-#  define HAVE_SPAWN    1
+#if defined(_WIN32)
+#  define HAVE_SPAWN 1
 #else
-#  define NEED_SPAWN   1
+#  define NEED_SPAWN 1
 #endif
 #if defined(_MSC_VER)
 #  pragma warning(disable : 4996)
@@ -375,7 +375,7 @@ static void ExecProgram (CmdDesc* Cmd)
     }
 
     /* Call the program */
-    Status = spawnvp (P_WAIT, Cmd->Name, Cmd->Args);
+    Status = spawnvp (P_WAIT, Cmd->Name, (const char* const *) Cmd->Args);
 
     /* Check the result code */
     if (Status < 0) {

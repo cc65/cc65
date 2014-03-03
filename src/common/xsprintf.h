@@ -41,7 +41,11 @@
  * and precision to such a StrBuf, but *not* using %p would bring up a warning
  * about a wrong argument type each time. Maybe gcc will one day allow custom
  * format specifiers and we can change this ...
+ * However this cheat doesn't work with MinGW as there's no support for %m :-(
  */
+#if defined( __MINGW32__)
+#  pragma GCC diagnostic ignored "-Wformat"
+#endif
 
 
 

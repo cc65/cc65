@@ -2,7 +2,7 @@
 /*                                                                           */
 /*                                filestat.h                                 */
 /*                                                                           */
-/*                   Replacement for buggy Microsoft code                    */
+/*                       Replacement for Windows code                        */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */

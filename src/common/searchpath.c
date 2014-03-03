@@ -35,6 +35,9 @@
 
 #include <stdlib.h>
 #include <string.h>
+#if defined(_WIN32)
+#  include <windows.h>
+#endif
 #if defined(_MSC_VER)
 /* Microsoft compiler */
 #  include <io.h>
@@ -83,7 +86,7 @@ static char* CleanupPath (const char* Path)
 
 
 
-static void Add (SearchPath* P, const char* New)
+static void Add (SearchPaths* P, const char* New)
 /* Cleanup a new search path and add it to the list */
 {
     /* Add a clean copy of the path to the collection */
@@ -92,7 +95,7 @@ static void Add (SearchPath* P, const char* New)
 
 
 
-SearchPath* NewSearchPath (void)
+SearchPaths* NewSearchPath (void)
 /* Create a new, empty search path list */
 {
     return NewCollection ();
@@ -100,7 +103,7 @@ SearchPath* NewSearchPath (void)
 
 
 
-void AddSearchPath (SearchPath* P, const char* NewPath)
+void AddSearchPath (SearchPaths* P, const char* NewPath)
 /* Add a new search path to the end of an existing list */
 {
     /* Allow a NULL path */
@@ -111,7 +114,7 @@ void AddSearchPath (SearchPath* P, const char* NewPath)
 
 
 
-void AddSearchPathFromEnv (SearchPath* P, const char* EnvVar)
+void AddSearchPathFromEnv (SearchPaths* P, const char* EnvVar)
 /* Add a search path from an environment variable to the end of an existing
  * list.
  */
@@ -121,7 +124,7 @@ void AddSearchPathFromEnv (SearchPath* P, const char* EnvVar)
 
 
 
-void AddSubSearchPathFromEnv (SearchPath* P, const char* EnvVar, const char* SubDir)
+void AddSubSearchPathFromEnv (SearchPaths* P, const char* EnvVar, const char* SubDir)
 /* Add a search path from an environment variable, adding a subdirectory to
  * the environment variable value.
  */
@@ -157,21 +160,20 @@ void AddSubSearchPathFromEnv (SearchPath* P, const char* EnvVar, const char* Sub
 
 
 
-void AddSubSearchPathFromWinBin (SearchPath* P, const char* SubDir)
+void AddSubSearchPathFromWinBin (SearchPaths* P, const char* SubDir)
 {
 /* Windows only:
  * Add a search path from the running binary, adding a subdirectory to
  * the parent directory of the directory containing the binary.
  */
-#if defined(_MSC_VER)
+#if defined(_WIN32)
 
     char Dir[_MAX_PATH];
     char* Ptr;
 
-    if (_get_pgmptr (&Ptr) != 0) {
+    if (GetModuleFileName (NULL, Dir, _MAX_PATH) == 0) {
         return;
     }
-    strcpy (Dir, Ptr);
 
     /* Remove binary name */
     Ptr = strrchr (Dir, '\\');
@@ -204,7 +206,7 @@ void AddSubSearchPathFromWinBin (SearchPath* P, const char* SubDir)
 }
 
 
-int PushSearchPath (SearchPath* P, const char* NewPath)
+int PushSearchPath (SearchPaths* P, const char* NewPath)
 /* Add a new search path to the head of an existing search path list, provided
  * that it's not already there. If the path is already at the first position,
  * return zero, otherwise return a non zero value.
@@ -227,7 +229,7 @@ int PushSearchPath (SearchPath* P, const char* NewPath)
 
 
 
-void PopSearchPath (SearchPath* P)
+void PopSearchPath (SearchPaths* P)
 /* Remove a search path from the head of an existing search path list */
 {
     /* Remove the path at position 0 */
@@ -237,7 +239,7 @@ void PopSearchPath (SearchPath* P)
 
 
 
-char* SearchFile (const SearchPath* P, const char* File)
+char* SearchFile (const SearchPaths* P, const char* File)
 /* Search for a file in a list of directories. Return a pointer to a malloced
  * area that contains the complete path, if found, return 0 otherwise.
  */
@@ -271,6 +273,3 @@ char* SearchFile (const SearchPath* P, const char* File)
     SB_Done (&PathName);
     return Name;
 }
-
-
-

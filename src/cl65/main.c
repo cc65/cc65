@@ -51,7 +51,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
-#ifdef HAVE_SPAWN
+#if defined(HAVE_SPAWN)
 #  include <process.h>
 #endif
 

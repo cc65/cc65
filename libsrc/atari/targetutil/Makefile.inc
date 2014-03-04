@@ -1,5 +1,3 @@
-ifeq ($(TARGET),atari)
-
 DEPS += ../wrk/$(TARGET)/w2cas.d
 
 ../wrk/$(TARGET)/w2cas.o: $(SRCDIR)/targetutil/w2cas.c | ../wrk/$(TARGET)
@@ -9,5 +7,3 @@ DEPS += ../wrk/$(TARGET)/w2cas.d
 	$(LD65) -o $@ -t $(TARGET) $^
 
 $(TARGET): ../targetutil/w2cas.com
-
-endif

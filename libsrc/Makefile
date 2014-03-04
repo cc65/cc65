@@ -99,10 +99,12 @@ EXTZP = cbm510 \
 
 MKINC = $(GEOS) \
         atari   \
+        atarixl \
         nes
 
-TARGETUTIL = apple2 \
-             atari \
+TARGETUTIL = apple2    \
+             apple2enh \
+             atari     \
              geos-apple
 
 GEOSDIRS = common      \
@@ -173,11 +175,11 @@ ifeq ($(TARGET),$(filter $(TARGET),$(EXTZP)))
   ZPOBJ += ../wrk/$(TARGET)/extzp.o
 endif
 
-ifeq ($(SRCDIR),$(filter $(SRCDIR),$(MKINC)))
+ifeq ($(TARGET),$(filter $(TARGET),$(MKINC)))
   include $(SRCDIR)/Makefile.inc
 endif
 
-ifeq ($(SRCDIR),$(filter $(SRCDIR),$(TARGETUTIL)))
+ifeq ($(TARGET),$(filter $(TARGET),$(TARGETUTIL)))
   include $(SRCDIR)/targetutil/Makefile.inc
 endif
 

@@ -2080,6 +2080,3 @@ void CfgWriteTarget (void)
         }
     }
 }
-
-
-

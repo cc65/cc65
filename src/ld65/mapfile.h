@@ -71,6 +71,3 @@ void CreateLabelFile (void);
 /* End of mapfile.h */
 
 #endif
-
-
-

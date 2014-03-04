@@ -88,6 +88,3 @@ unsigned OptSub3 (CodeSeg* S);
 /* End of coptsub.h */
 
 #endif
-
-
-

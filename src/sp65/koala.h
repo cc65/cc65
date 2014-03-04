@@ -64,6 +64,3 @@ StrBuf* GenKoala (const Bitmap* B, const Collection* A);
 /* End of koala.h */
 
 #endif
-
-
-

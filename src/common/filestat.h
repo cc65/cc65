@@ -68,6 +68,3 @@ int FileStat (const char* Path, struct stat* Buf);
 /* End of filestat.h */
 
 #endif
-
-
-

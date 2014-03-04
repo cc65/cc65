@@ -102,7 +102,5 @@ char* SearchFile (const SearchPaths* P, const char* File);
 
 
 /* End of searchpath.h */
+
 #endif
-
-
-

@@ -62,6 +62,3 @@ int StrCaseCmp (const char* S1, const char* S2);
 /* End of strutil.h */
 
 #endif
-
-
-

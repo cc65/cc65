@@ -245,6 +245,3 @@ void PrintDbgSpans (FILE* F)
     /* Free the string buffer */
     SB_Done (&SpanType);
 }
-
-
-

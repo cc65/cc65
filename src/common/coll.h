@@ -301,7 +301,3 @@ void CollSort (Collection* C,
 /* End of coll.h */
 
 #endif
-
-
-
-

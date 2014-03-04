@@ -61,7 +61,5 @@ int IsAnonName (const StrBuf* Name);
       
 
 /* End of anonname.h */
+
 #endif
-
-
-

@@ -44,6 +44,3 @@
 
 
 unsigned What   = 0;            /* What should get dumped? */
-
-
-

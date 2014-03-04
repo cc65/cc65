@@ -63,7 +63,5 @@ long CfgCheckedConstExpr (long Min, long Max);
 
 
 /* End of cfgexpr.h */
+
 #endif
-
-
-

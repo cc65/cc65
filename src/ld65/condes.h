@@ -121,6 +121,3 @@ void ConDesDump (void);
 /* End of condes.h */
 
 #endif
-
-
-

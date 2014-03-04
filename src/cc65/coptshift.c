@@ -742,6 +742,3 @@ NextEntry:
     /* Return the number of changes made */
     return Changes;
 }
-
-
-

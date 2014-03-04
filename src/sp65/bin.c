@@ -83,6 +83,3 @@ void WriteBinFile (const StrBuf* Data, const Collection* A,
         Error ("Error closing output file `%s': %s", Name, strerror (errno));
     }
 }
-
-
-

@@ -837,9 +837,3 @@ void ReadInfoFile (void)
         InfoCloseInput ();
     }
 }
-
-
-
-
-
-

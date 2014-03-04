@@ -152,7 +152,3 @@ const char* GT_AsString (const StrBuf* Type, StrBuf* String);
 /* End of gentype.h */
 
 #endif
-
-
-
-

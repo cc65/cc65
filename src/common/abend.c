@@ -69,6 +69,3 @@ void AbEnd (const char* Format, ...)
     /* Terminate the program */
     exit (EXIT_FAILURE);
 }
-
-
-

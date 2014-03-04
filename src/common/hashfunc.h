@@ -64,6 +64,3 @@ unsigned HashBuf (const StrBuf* S) attribute ((const));
 /* End of hashfunc.h */
 
 #endif
-
-
-

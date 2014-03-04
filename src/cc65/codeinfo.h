@@ -177,8 +177,5 @@ cmp_t FindTosCmpCond (const char* Name);
 
 
 /* End of codeinfo.h */
+
 #endif
-
-
-
-

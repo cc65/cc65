@@ -50,9 +50,5 @@ void DoPragma (void);
 
 
 /* End of pragma.h */
+
 #endif
-
-
-
-
-

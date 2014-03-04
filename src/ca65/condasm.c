@@ -523,7 +523,3 @@ void CleanupIfStack (unsigned SP)
     /* Calculate the new overall .IF condition */
     CalcOverallIfCond ();
 }
-
-
-
-

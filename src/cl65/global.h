@@ -51,6 +51,3 @@ extern unsigned char Debug;             /* Debug mode enabled? */
 /* End of global.h */
 
 #endif
-
-
-

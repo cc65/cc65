@@ -72,6 +72,3 @@ void* ReadData (FILE* F, void* Data, unsigned Size);
 /* End of fileio.h */
 
 #endif
-
-
-

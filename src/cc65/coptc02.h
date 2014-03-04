@@ -61,7 +61,5 @@ unsigned Opt65C02Stores (CodeSeg* S);
 
 
 /* End of coptc02.h */
+
 #endif
-
-
-

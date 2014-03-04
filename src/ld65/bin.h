@@ -73,6 +73,3 @@ void BinWriteTarget (BinDesc* D, File* F);
 /* End of bin.h */
 
 #endif
-
-
-

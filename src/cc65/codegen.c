@@ -4362,6 +4362,3 @@ void g_asmcode (struct StrBuf* B)
 {
     AddCodeLine ("%.*s", (int) SB_GetLen (B), SB_GetConstBuf (B));
 }
-
-
-

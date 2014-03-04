@@ -64,6 +64,3 @@ StrBuf* GenVic2Sprite (const Bitmap* B, const Collection* A);
 /* End of vic2sprite.h */
 
 #endif
-
-
-

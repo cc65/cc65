@@ -75,7 +75,3 @@ typecmp_t TypeCmp (const Type* lhs, const Type* rhs);
 /* End of typecmp.h */
 
 #endif
-
-
-
-

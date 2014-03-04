@@ -498,6 +498,3 @@ Literal* AddLiteralStr (const StrBuf* S)
 {
     return AddLiteralBuf (SB_GetConstBuf (S), SB_GetLen (S));
 }
-
-
-

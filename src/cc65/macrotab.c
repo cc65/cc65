@@ -302,6 +302,3 @@ void PrintMacroStats (FILE* F)
         }
     }
 }
-
-
-

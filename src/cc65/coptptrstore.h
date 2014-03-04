@@ -175,8 +175,5 @@ unsigned OptPtrStore3 (CodeSeg* S);
 
 
 /* End of coptptrstore.h */
+
 #endif
-
-
-
-

@@ -152,6 +152,3 @@ void CreateLabelFile (void)
         Error ("Error closing label file `%s': %s", LabelFileName, strerror (errno));
     }
 }
-
-
-

@@ -3545,6 +3545,3 @@ void ConstAbsIntExpr (void (*Func) (ExprDesc*), ExprDesc* Expr)
         ED_MakeConstAbsInt (Expr, 1);
     }
 }
-
-
-

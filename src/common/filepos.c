@@ -76,6 +76,3 @@ int CompareFilePos (const FilePos* P1, const FilePos* P2)
         return 0;
     }
 }
-
-
-

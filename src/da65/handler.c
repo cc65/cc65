@@ -662,6 +662,3 @@ void OH_JmpAbsoluteIndirect (const OpcDesc* D)
     }
     SeparatorLine ();
 }
-
-
-

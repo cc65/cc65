@@ -55,6 +55,3 @@ void CheckPseudo (void);
 /* End of pseudo.h */
 
 #endif
-
-
-

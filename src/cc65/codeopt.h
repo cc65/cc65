@@ -64,7 +64,5 @@ void RunOpt (CodeSeg* S);
 
 
 /* End of codeopt.h */
+
 #endif
-
-
-

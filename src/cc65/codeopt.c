@@ -1432,6 +1432,3 @@ void RunOpt (CodeSeg* S)
         WriteOptStats (StatFileName);
     }
 }
-
-
-

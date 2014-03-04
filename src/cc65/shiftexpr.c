@@ -235,6 +235,3 @@ Next:
         Expr->Type = ResultType;
     }
 }
-
-
-

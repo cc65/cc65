@@ -72,6 +72,3 @@ void CopyToken (Token* Dst, const Token* Src)
     SB_Copy (&Dst->SVal, &Src->SVal);
     Dst->Pos  = Src->Pos;
 }
-
-
-

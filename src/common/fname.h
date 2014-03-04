@@ -64,6 +64,3 @@ char* MakeFilename (const char* Origin, const char* Ext);
 /* End of fname.h */
 
 #endif
-
-
-

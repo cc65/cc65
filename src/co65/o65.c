@@ -434,6 +434,3 @@ const char* GetO65OptionText (const O65Option* O)
     Buf[I] = '\0';
     return Buf;
 }
-
-
-

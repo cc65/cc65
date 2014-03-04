@@ -175,6 +175,3 @@ Pixel GetPixel (const Bitmap* B, unsigned X, unsigned Y)
     /* Return the pixel */
     return B->Data[Y * B->Width + X];
 }
-
-
-

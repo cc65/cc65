@@ -92,6 +92,3 @@ void PrintDbgScopes (FILE* F);
 /* End of scopes.h */
 
 #endif
-
-
-

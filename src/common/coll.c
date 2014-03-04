@@ -504,6 +504,3 @@ void CollSort (Collection* C,
         QuickSort (C, 0, C->Count-1, Compare, Data);
     }
 }
-
-
-

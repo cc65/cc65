@@ -82,8 +82,5 @@ Fragment* NewFragment (unsigned char Type, unsigned short Len);
 
 
 /* End of fragment.h */
+
 #endif
-
-
-
-

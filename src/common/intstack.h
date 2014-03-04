@@ -116,7 +116,5 @@ long IS_Pop (IntStack* S);
 
 
 /* End of intstack.h */
+
 #endif
-
-
-

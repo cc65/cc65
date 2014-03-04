@@ -88,7 +88,5 @@ void DS_Output (const DataSeg* S);
 
 
 /* End of dataseg.h */
+
 #endif
-
-
-

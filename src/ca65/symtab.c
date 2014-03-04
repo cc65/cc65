@@ -1031,6 +1031,3 @@ void WriteScopes (void)
     /* Done writing the scopes */
     ObjEndScopes ();
 }
-
-
-

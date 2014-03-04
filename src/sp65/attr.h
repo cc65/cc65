@@ -126,6 +126,3 @@ void FreeAttrList (Collection* C);
 /* End of attr.h */
 
 #endif
-
-
-

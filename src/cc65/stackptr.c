@@ -68,7 +68,3 @@ void SP_Pop (const Type* T)
 {
     StackPtr += SizeOf (T);
 }
-
-
-
-

@@ -1003,7 +1003,3 @@ void CircularRefError (const Export* E)
            GetSourceName (LI),
            GetSourceLine (LI));
 }
-
-
-
-

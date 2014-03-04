@@ -102,6 +102,3 @@ cpu_t FindCPU (const char* Name);
 /* End of cpu.h */
 
 #endif
-
-
-

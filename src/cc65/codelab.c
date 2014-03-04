@@ -132,7 +132,3 @@ void CL_Output (const CodeLabel* L)
         WriteOutput ("\n");
     }
 }
-
-
-
-

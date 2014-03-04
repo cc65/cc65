@@ -69,7 +69,5 @@ void FinishIncludePaths (void);
 
 
 /* End of incpath.h */
+
 #endif
-
-
-

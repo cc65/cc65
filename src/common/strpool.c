@@ -281,6 +281,3 @@ unsigned SP_GetCount (const StringPool* P)
 {
     return CollCount (&P->Entries);
 }
-
-
-

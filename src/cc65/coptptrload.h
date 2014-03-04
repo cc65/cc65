@@ -359,7 +359,5 @@ unsigned OptPtrLoad17 (CodeSeg* S);
 
 
 /* End of coptptrload.h */
+
 #endif
-
-
-

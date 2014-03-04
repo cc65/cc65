@@ -125,6 +125,3 @@ unsigned long shr_l (unsigned long l, unsigned count)
     }
     return l;
 }
-
-
-

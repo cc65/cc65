@@ -45,6 +45,3 @@
 
 
 unsigned char Debug             = 0;    /* Debug mode */
-
-
-

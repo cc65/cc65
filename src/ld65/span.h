@@ -103,7 +103,5 @@ void PrintDbgSpans (FILE* F);
 
 
 /* End of span.h */
+
 #endif
-
-
-

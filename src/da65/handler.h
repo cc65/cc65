@@ -103,7 +103,5 @@ void OH_JmpAbsoluteIndirect (const OpcDesc* D);
 
 
 /* End of handler.h */
+
 #endif
-
-
-

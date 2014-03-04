@@ -128,7 +128,5 @@ unsigned InsertCaseValue (Collection* Nodes, unsigned long Val, unsigned Depth);
 
 
 /* End of casenode.h */
+
 #endif
-
-
-

@@ -89,6 +89,3 @@ void InitStrPool (void)
     /* Insert an empty string. It will have string id 0 */
     SP_AddStr (StrPool, "");
 }
-
-
-

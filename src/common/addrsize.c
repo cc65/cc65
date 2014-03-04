@@ -92,6 +92,3 @@ unsigned char AddrSizeFromStr (const char* Str)
     /* Not found */
     return ADDR_SIZE_INVALID;
 }
-
-
-

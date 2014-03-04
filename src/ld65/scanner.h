@@ -239,7 +239,5 @@ void CfgCloseInput (void);
 
 
 /* End of scanner.h */
+
 #endif
-
-
-

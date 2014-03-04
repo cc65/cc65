@@ -167,6 +167,3 @@ void DelObjData (const char* Module)
     /* Not found! */
     Warning ("Module `%s' not found in library `%s'", Module, LibName);
 }
-
-
-

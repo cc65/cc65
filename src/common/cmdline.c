@@ -307,7 +307,3 @@ void LongOption (unsigned* ArgNum, const LongOpt* OptTab, unsigned OptCount)
     /* Invalid option */
     UnknownOption (Opt);
 }
-
-
-
-

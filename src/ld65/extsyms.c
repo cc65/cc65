@@ -233,7 +233,3 @@ const ExtSym* ExtSymNext (const ExtSym* E)
 {
     return E->List;
 }
-
-
-
-

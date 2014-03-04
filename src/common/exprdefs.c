@@ -232,6 +232,3 @@ void DumpExpr (const ExprNode* Expr, const ExprNode* (*ResolveSym) (const struct
     InternalDumpExpr (Expr, ResolveSym);
     printf ("\n");
 }
-
-
-

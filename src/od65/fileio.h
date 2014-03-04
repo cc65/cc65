@@ -97,6 +97,3 @@ void ReadStrPool (FILE* F, Collection* C);
 /* End of fileio.h */
 
 #endif
-
-
-

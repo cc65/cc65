@@ -90,6 +90,3 @@ extern unsigned char    UnderlineInNumbers; /* Allow underlines in numbers */
 /* End of global.h */
 
 #endif
-
-
-

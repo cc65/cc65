@@ -119,6 +119,3 @@ Bitmap* ReadInputFile (const Collection* A)
     /* Call the format specific read */
     return InputFormatTable[F->Id].Read (A);
 }
-
-
-

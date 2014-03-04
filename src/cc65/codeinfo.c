@@ -828,6 +828,3 @@ cmp_t FindTosCmpCond (const char* Name)
         return CMP_INV;
     }
 }
-
-
-

@@ -151,7 +151,3 @@ void DoEnum (void)
     /* Free the base expression */
     FreeExpr (BaseExpr);
 }
-
-
-
-

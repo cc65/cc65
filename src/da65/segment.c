@@ -107,6 +107,3 @@ void AddAbsSegment (unsigned Start, unsigned End, const char* Name)
     /* Mark the addresses within the segment */
     MarkRange (Start, End, atSegment);
 }
-
-
-

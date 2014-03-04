@@ -69,7 +69,5 @@ void SetOpcTable (cpu_t CPU);
 
 
 /* End of opctable.h */
+
 #endif
-
-
-

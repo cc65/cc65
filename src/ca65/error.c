@@ -400,6 +400,3 @@ void Internal (const char* Format, ...)
 
     exit (EXIT_FAILURE);
 }
-
-
-

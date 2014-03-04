@@ -2237,6 +2237,3 @@ unsigned ParseInit (Type* T)
     /* Return the size needed for the initialization */
     return Size;
 }
-
-
-

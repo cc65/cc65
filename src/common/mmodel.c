@@ -124,5 +124,3 @@ void SetMemoryModel (mmodel_t Model)
     /* Zeropage is always zeropage */
     ZpAddrSize = ADDR_SIZE_ZP;
 }
-
-

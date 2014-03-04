@@ -83,6 +83,3 @@ unsigned long AlignCount (unsigned long Addr, unsigned long Alignment);
 /* End of alignment.h */
 
 #endif
-
-
-

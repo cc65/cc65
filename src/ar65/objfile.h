@@ -74,6 +74,3 @@ void ObjExtract (const char* Name);
 /* End of objfile.h */
 
 #endif
-
-
-

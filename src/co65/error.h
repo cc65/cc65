@@ -63,6 +63,3 @@ void Internal (const char* Format, ...) attribute((noreturn, format(printf,1,2))
 /* End of error.h */
 
 #endif
-
-
-

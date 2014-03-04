@@ -1034,6 +1034,3 @@ unsigned OptSize2 (CodeSeg* S)
     /* Return the number of changes made */
     return Changes;
 }
-
-
-

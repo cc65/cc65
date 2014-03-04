@@ -238,6 +238,3 @@ int MatchPattern (const char* Source, const char* Pattern)
     /* Do the real thing */
     return RecursiveMatch ((const unsigned char*) Source, (const unsigned char*) Pattern);
 }
-
-
-

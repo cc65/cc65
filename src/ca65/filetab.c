@@ -336,5 +336,3 @@ void CreateDependencies (void)
                        FT_MAIN | FT_INCLUDE | FT_BINARY | FT_DBGINFO);
     }
 }
-
-

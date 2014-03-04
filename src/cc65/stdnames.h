@@ -56,6 +56,3 @@ extern const char Func_strlen[];        /* Asm name of "strlen" */
 /* End of stdnames.h */
 
 #endif
-
-
-

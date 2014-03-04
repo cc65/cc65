@@ -53,7 +53,5 @@ void DoLabel (void);
 
 
 /* End of goto.h */
+
 #endif
-
-
-

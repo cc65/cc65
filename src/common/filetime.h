@@ -68,6 +68,3 @@ int SetFileTimes (const char* Path, time_t T);
 /* End of filestat.h */
 
 #endif
-
-
-

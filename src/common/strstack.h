@@ -100,7 +100,5 @@ void SS_Push (StrStack* S, const char* Val);
 
 
 /* End of strstack.h */
+
 #endif
-
-
-

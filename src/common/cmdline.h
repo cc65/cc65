@@ -102,6 +102,3 @@ void LongOption (unsigned* ArgNum, const LongOpt* OptTab, unsigned OptCount);
 /* End of cmdline.h */
 
 #endif
-
-
-

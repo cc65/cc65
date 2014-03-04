@@ -266,6 +266,3 @@ void Assignment (ExprDesc* Expr)
     /* Value is still in primary and not an lvalue */
     ED_MakeRValExpr (Expr);
 }
-
-
-

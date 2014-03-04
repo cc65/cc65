@@ -61,6 +61,3 @@ void WriteCFile (const StrBuf* Data, const Collection* A, const Bitmap* B);
 /* End of c.h */
 
 #endif
-
-
-

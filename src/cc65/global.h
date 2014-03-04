@@ -81,7 +81,3 @@ extern StrBuf           DepTarget;              /* Name of dependency target */
 /* End of global.h */
 
 #endif
-
-
-
-

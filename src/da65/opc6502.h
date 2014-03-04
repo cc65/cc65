@@ -54,7 +54,5 @@ extern const OpcDesc OpcTable_6502[256];
 
 
 /* End of opc6502.h */
+
 #endif
-
-
-

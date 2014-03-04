@@ -627,7 +627,3 @@ void WriteSegments (void)
     /* Done writing segments */
     ObjEndSegments ();
 }
-
-
-
-

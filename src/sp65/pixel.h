@@ -67,6 +67,3 @@ union Pixel {
 /* End of pixel.h */
 
 #endif
-
-
-

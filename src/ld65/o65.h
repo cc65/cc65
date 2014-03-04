@@ -124,6 +124,3 @@ void O65WriteTarget (O65Desc* D, File* F);
 /* End of o65.h */
 
 #endif
-
-
-

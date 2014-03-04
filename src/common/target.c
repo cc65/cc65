@@ -232,4 +232,3 @@ const char* GetTargetName (target_t Target)
     /* Return the array entry */
     return GetTargetProperties (Target)->Name;
 }
-

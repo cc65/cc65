@@ -47,8 +47,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #if defined(_WIN32)
-#include <errno.h>
-#include <windows.h>
+#  include <errno.h>
+#  include <windows.h>
 #endif
 
 /* common */

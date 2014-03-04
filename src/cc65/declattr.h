@@ -75,6 +75,3 @@ void ParseAttribute (struct Declaration* D);
 /* End of declattr.h */
 
 #endif
-
-
-

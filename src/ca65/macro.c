@@ -1049,6 +1049,3 @@ void EnableDefineStyleMacros (void)
     PRECONDITION (DisableDefines > 0);
     --DisableDefines;
 }
-
-
-

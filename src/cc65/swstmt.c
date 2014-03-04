@@ -315,6 +315,3 @@ void DefaultLabel (void)
     /* Skip the colon */
     ConsumeColon ();
 }
-
-
-

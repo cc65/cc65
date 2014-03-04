@@ -145,6 +145,3 @@ void DumpRegInfo (const char* Desc, const RegInfo* RI)
     fprintf (stdout, "Out: ");
     RC_Dump (stdout, &RI->Out);
 }
-
-
-

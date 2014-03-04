@@ -182,6 +182,3 @@ unsigned long AlignCount (unsigned long Addr, unsigned long Alignment)
 {
     return AlignAddr (Addr, Alignment) - Addr;
 }
-
-
-

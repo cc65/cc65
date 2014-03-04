@@ -72,6 +72,3 @@ struct Option {
 /* End of optdefs.h */
 
 #endif
-
-
-

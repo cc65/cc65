@@ -65,6 +65,3 @@ void WriteOutputFile (const StrBuf* Data, const Collection* A, const Bitmap* B);
 /* End of output.h */
 
 #endif
-
-
-

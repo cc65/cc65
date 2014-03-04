@@ -177,6 +177,3 @@ void HT_Walk (HashTable* T, int (*F) (void* Entry, void* Data), void* Data);
 /* End of hashtab.h */
 
 #endif
-
-
-

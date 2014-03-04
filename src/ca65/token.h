@@ -314,6 +314,3 @@ void CopyToken (Token* Dst, const Token* Src);
 /* End of token.h */
 
 #endif
-
-
-

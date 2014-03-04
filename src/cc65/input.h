@@ -55,9 +55,9 @@
  * choosen so that it is possible to combine them to bitsets
  */
 typedef enum {
-    IT_MAIN     = 0x01,         /* Main input file */
-    IT_SYSINC   = 0x02,         /* System include file (using <>) */
-    IT_USRINC  = 0x04,          /* User include file (using "") */
+    IT_MAIN   = 0x01,           /* Main input file */
+    IT_SYSINC = 0x02,           /* System include file (using <>) */
+    IT_USRINC = 0x04,           /* User include file (using "") */
 } InputType;
 
 /* Forward for an IFile structure */
@@ -116,7 +116,5 @@ void CreateDependencies (void);
 
 
 /* End of input.h */
+
 #endif
-
-
-

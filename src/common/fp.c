@@ -236,6 +236,3 @@ Double FP_D_Div (Double Left, Double Right)
     D.V = Left.V / Right.V;
     return D;
 }
-
-
-

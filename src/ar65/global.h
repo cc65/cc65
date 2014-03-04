@@ -47,6 +47,3 @@
 /* End of global.h */
 
 #endif
-
-
-

@@ -662,6 +662,3 @@ void CheckSegments (void)
         }
     }
 }
-
-
-

@@ -54,7 +54,5 @@ extern const OpcDesc OpcTable_65SC02[256];
 
 
 /* End of opc65sc02.h */
+
 #endif
-
-
-

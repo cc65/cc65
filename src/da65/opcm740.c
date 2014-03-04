@@ -305,6 +305,3 @@ const OpcDesc OpcTable_M740[256] = {
     {   "inc",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $fe */
     {   "clb",  2,  flUseLabel,               OH_ZeroPageBit           }, /* $ff */
 };
-
-
-

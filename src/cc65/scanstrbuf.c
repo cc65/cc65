@@ -346,6 +346,3 @@ int SB_GetNumber (StrBuf* B, long* Val)
     *Val *= Sign;
     return 1;
 }
-
-
-

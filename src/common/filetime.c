@@ -43,11 +43,11 @@
 
 
 #if defined(_WIN32)
-#include <errno.h>
-#include <windows.h>
+#  include <errno.h>
+#  include <windows.h>
 #else
-#include <sys/types.h>                          /* FreeBSD needs this */
-#include <utime.h>
+#  include <sys/types.h>                          /* FreeBSD needs this */
+#  include <utime.h>
 #endif
 
 

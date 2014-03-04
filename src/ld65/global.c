@@ -56,6 +56,3 @@ unsigned char VerboseMap    = 0;        /* Verbose map file */
 const char* MapFileName     = 0;        /* Name of the map file */
 const char* LabelFileName   = 0;        /* Name of the label file */
 const char* DbgFileName     = 0;        /* Name of the debug file */
-
-
-

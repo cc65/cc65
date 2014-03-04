@@ -332,7 +332,3 @@ void* ReadData (FILE* F, void* Data, unsigned Size)
     }
     return Data;
 }
-
-
-
-

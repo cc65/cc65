@@ -156,6 +156,3 @@ void CheckInputStack (void)
         Error ("Open %s", IStack->Desc);
     }
 }
-
-
-

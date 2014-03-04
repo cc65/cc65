@@ -125,8 +125,3 @@ void CfgWriteTarget (void);
 /* End of config.h */
 
 #endif
-
-
-
-
-

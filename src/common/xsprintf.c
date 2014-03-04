@@ -676,6 +676,3 @@ int xvsprintf (char* Buf, size_t BufSize, const char* Format, va_list ap)
     CHECK (Res >= 0 && (unsigned) (Res+1) < BufSize);
     return Res;
 }
-
-
-

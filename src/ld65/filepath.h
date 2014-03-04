@@ -71,7 +71,5 @@ void InitSearchPaths (void);
 
 
 /* End of filepath.h */
+
 #endif
-
-
-

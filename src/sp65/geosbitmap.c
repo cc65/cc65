@@ -229,6 +229,3 @@ StrBuf* GenGeosBitmap (const Bitmap* B, const Collection* A attribute ((unused))
     /* Return the converted bitmap */
     return D;
 }
-
-
-

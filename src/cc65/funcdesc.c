@@ -73,6 +73,3 @@ void FreeFuncDesc (FuncDesc* F)
     /* Free the structure */
     xfree (F);
 }
-
-
-

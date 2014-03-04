@@ -179,6 +179,3 @@ ExprNode* BoundedExpr (ExprNode* (*ExprFunc) (void), unsigned Size);
 /* End of expr.h */
 
 #endif
-
-
-

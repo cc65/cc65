@@ -405,6 +405,3 @@ void LibClose (void)
         Error ("Problem deleting temporary library file: %s", strerror (errno));
     }
 }
-
-
-

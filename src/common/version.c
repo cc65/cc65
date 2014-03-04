@@ -77,6 +77,3 @@ unsigned GetVersionAsNumber (void)
 {
     return ((VER_MAJOR * 0x100) + (VER_MINOR * 0x10) + VER_PATCH);
 }
-
-
-

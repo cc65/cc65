@@ -72,6 +72,3 @@ unsigned char AddrSizeFromStr (const char* Str);
 /* End of addrsize.h */
 
 #endif
-
-
-

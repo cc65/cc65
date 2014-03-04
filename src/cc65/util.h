@@ -54,6 +54,3 @@ int PowerOf2 (unsigned long Val);
 /* End of util.h */
 
 #endif
-
-
-

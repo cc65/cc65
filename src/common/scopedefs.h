@@ -76,6 +76,3 @@ enum {
 /* End of scopedefs.h */
 
 #endif
-
-
-

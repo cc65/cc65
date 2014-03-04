@@ -1402,4 +1402,3 @@ Done:
                 (int) SB_GetLen (Line), SB_GetConstBuf (Line));
     }
 }
-

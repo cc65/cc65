@@ -92,6 +92,3 @@ void ObjAdd (FILE* F, const char* Name);
 /* End of objfile.h */
 
 #endif
-
-
-

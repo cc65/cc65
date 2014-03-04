@@ -214,7 +214,5 @@ void InfoCloseInput (void);
 
 
 /* End of scanner.h */
+
 #endif
-
-
-

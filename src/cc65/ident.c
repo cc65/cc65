@@ -52,6 +52,3 @@ int IsIdent (char c)
 {
     return (IsAlpha (c) || c == '_');
 }
-
-
-

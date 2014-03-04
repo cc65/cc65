@@ -103,6 +103,3 @@ int spawnvp (int Mode attribute ((unused)), const char* File, const char* const 
      */
     return WEXITSTATUS (Status);
 }
-
-
-

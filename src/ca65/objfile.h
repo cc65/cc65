@@ -160,6 +160,3 @@ void ObjEndSpans (void);
 /* End of objfile.h */
 
 #endif
-
-
-

@@ -54,7 +54,5 @@ extern const OpcDesc OpcTable_HuC6280[256];
 
 
 /* End of opchuc6280.h */
+
 #endif
-
-
-

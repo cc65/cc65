@@ -71,7 +71,5 @@ FILETYPE GetFileType (const char* Name);
 
 
 /* End of filetype.h */
+
 #endif
-
-
-

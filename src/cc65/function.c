@@ -601,6 +601,3 @@ void NewFunc (SymEntry* Func)
     FreeFunction (CurrentFunc);
     CurrentFunc = 0;
 }
-
-
-

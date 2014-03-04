@@ -746,6 +746,3 @@ TypeCode AddrSizeQualifier (unsigned AddrSize)
 
     }
 }
-
-
-

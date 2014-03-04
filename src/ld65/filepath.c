@@ -103,6 +103,3 @@ void InitSearchPaths (void)
     AddSubSearchPathFromWinBin (ObjDefaultPath, "lib");
     AddSubSearchPathFromWinBin (CfgDefaultPath, "cfg");
 }
-
-
-

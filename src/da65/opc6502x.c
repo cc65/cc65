@@ -306,7 +306,3 @@ const OpcDesc OpcTable_6502X[256] = {
     {   "inc",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $fe */
     {   "isc",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $ff */
 };
-
-
-
-

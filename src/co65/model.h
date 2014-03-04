@@ -81,6 +81,3 @@ O65Model FindModel (const char* ModelName);
 /* End of model.h */
 
 #endif
-
-
-

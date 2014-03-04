@@ -174,7 +174,5 @@ unsigned OptIndLoads2 (CodeSeg* S);
 
 
 /* End of coptind.h */
+
 #endif
-
-
-

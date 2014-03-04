@@ -744,6 +744,3 @@ unsigned GetSymInfoFlags (const SymEntry* S, long* ConstVal)
     /* Return the result */
     return Flags;
 }
-
-
-

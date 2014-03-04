@@ -164,6 +164,3 @@ int WriteOutput (const char* Format, ...)
     /* Return the number of chars written */
     return CharCount;
 }
-
-
-

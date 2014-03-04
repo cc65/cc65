@@ -278,6 +278,3 @@ void EmitFill (unsigned long Count)
         GenFragment (FRAG_FILL, Chunk);
     }
 }
-
-
-

@@ -169,6 +169,3 @@ void CreateDbgFile (void)
         Error ("Error closing debug file `%s': %s", DbgFileName, strerror (errno));
     }
 }
-
-
-

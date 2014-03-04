@@ -951,7 +951,3 @@ void DumpObjSegSize (FILE* F, unsigned long Offset)
     /* Destroy the string pool */
     DestroyStrPool (&StrPool);
 }
-
-
-
-

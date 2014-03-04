@@ -486,6 +486,5 @@ void g_asmcode (struct StrBuf* B);
 
 
 /* End of codegen.h */
+
 #endif
-
-

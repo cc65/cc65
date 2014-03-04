@@ -130,6 +130,3 @@ void WriteAsmOutput (void)
         Entry = Entry->NextSym;
     }
 }
-
-
-

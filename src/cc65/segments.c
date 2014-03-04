@@ -300,6 +300,3 @@ void OutputSegments (const Segments* S)
     /* Output the code segment epiloque */
     CS_OutputEpilogue (S->Code);
 }
-
-
-

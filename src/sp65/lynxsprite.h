@@ -64,6 +64,3 @@ StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A);
 /* End of lynxsprite.h */
 
 #endif
-
-
-

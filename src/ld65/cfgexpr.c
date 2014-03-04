@@ -244,6 +244,3 @@ long CfgCheckedConstExpr (long Min, long Max)
     /* Return the value */
     return Val;
 }
-
-
-

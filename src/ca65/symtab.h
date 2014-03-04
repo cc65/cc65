@@ -178,6 +178,3 @@ void WriteScopes (void);
 /* End of symtab.h */
 
 #endif
-
-
-

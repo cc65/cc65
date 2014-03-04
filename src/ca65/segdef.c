@@ -77,7 +77,3 @@ SegDef* DupSegDef (const SegDef* Def)
 {
     return NewSegDef (Def->Name, Def->AddrSize);
 }
-
-
-
-

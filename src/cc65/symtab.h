@@ -196,6 +196,3 @@ void EmitDebugInfo (void);
 /* End of symtab.h */
 
 #endif
-
-
-

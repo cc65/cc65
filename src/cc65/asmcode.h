@@ -88,8 +88,5 @@ void WriteAsmOutput (void);
 
 
 /* End of asmcode.h */
+
 #endif
-
-
-
-

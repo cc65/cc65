@@ -73,7 +73,3 @@ MemoryArea* NewMemoryArea (const FilePos* Pos, unsigned Name)
     /* ...and return it */
     return M;
 }
-
-
-
-

@@ -178,6 +178,3 @@ attr_t GetLabelAttr (unsigned Addr)
     /* Return the attribute */
     return (AttrTab[Addr] & atLabelMask);
 }
-
-
-

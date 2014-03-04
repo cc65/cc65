@@ -246,6 +246,3 @@ void ReadStrPool (FILE* F, Collection* C)
         CollAppend (C, ReadStr (F));
     }
 }
-
-
-

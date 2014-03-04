@@ -361,6 +361,3 @@ int main (int argc, char* argv [])
     /* Success */
     return EXIT_SUCCESS;
 }
-
-
-

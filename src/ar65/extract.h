@@ -52,7 +52,3 @@ void ExtractObjFiles (int argc, char* argv []);
 /* End of extract.h */
 
 #endif
-
-
-
-

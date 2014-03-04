@@ -61,6 +61,3 @@ int MatchPattern (const char* Source, const char* Pattern);
 /* End of matchpat.h */
 
 #endif
-
-
-

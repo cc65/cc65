@@ -117,7 +117,5 @@ void CL_Output (const CodeLabel* L);
 
 
 /* End of codelab.h */
+
 #endif
-
-
-

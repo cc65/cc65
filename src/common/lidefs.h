@@ -62,6 +62,3 @@
 /* End of lidefs.h */
 
 #endif
-
-
-

@@ -54,7 +54,5 @@ extern const OpcDesc OpcTable_65816[256];
 
 
 /* End of opc65816.h */
+
 #endif
-
-
-

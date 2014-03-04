@@ -816,6 +816,3 @@ void LeaveRawTokenMode (void)
     PRECONDITION (RawMode > 0);
     --RawMode;
 }
-
-
-

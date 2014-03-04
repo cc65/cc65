@@ -52,6 +52,3 @@ void AddAbsSegment (unsigned Start, unsigned End, const char* Name);
 /* End of segment.h */
 
 #endif
-
-
-

@@ -175,6 +175,3 @@ Done:
     /* Switch out of raw token mode */
     LeaveRawTokenMode ();
 }
-
-
-

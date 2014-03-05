@@ -1,7 +1,7 @@
 language:
   - c
 install:
-  - sudo apt-get install linuxdoc-tools linuxdoc-tools-info binutils-mingw
+  - sudo apt-get install linuxdoc-tools linuxdoc-tools-info mingw32-binutils
 script:
   - make all doc
 after_success:

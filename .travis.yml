@@ -1,7 +1,7 @@
 language:
   - c
 install:
-  - sudo apt-get install linuxdoc-tools linuxdoc-tools-info gcc-mingw-w64-i686
+  - sudo apt-get install linuxdoc-tools linuxdoc-tools-info binutils-mingw-w64-i686
 script:
   - make all doc
 after_success:

@@ -2,6 +2,8 @@ language:
   - c
 install:
   - sudo apt-get install linuxdoc-tools linuxdoc-tools-info mingw32-binutils
+  - which gcc
+  - which i686-w64-mingw32-gcc
 script:
   - make all doc
 after_success:

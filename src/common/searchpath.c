@@ -41,7 +41,6 @@
 #if defined(_MSC_VER)
 /* Microsoft compiler */
 #  include <io.h>
-#  pragma warning(disable : 4996)
 #else
 /* Anyone else */
 #  include <unistd.h>

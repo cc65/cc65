@@ -68,10 +68,10 @@ $(TARGETS):
 	@$(MAKE) --no-print-directory $@
 
 mostlyclean:
-	$(call RMDIR,../wrk)
+	$(call RMDIR,../libwrk)
 
 clean:
-	$(call RMDIR,../wrk ../lib ../targetutil $(addprefix ../,$(DRVTYPES)))
+	$(call RMDIR,../libwrk ../lib ../targetutil $(addprefix ../,$(DRVTYPES)))
 
 install:
 	$(foreach dir,$(INSTALLDIRS),$(INSTALL_recipe))
@@ -162,7 +162,7 @@ vpath %.c $(SRCDIRS)
 OBJS := $(patsubst %.s,%.o,$(foreach dir,$(SRCDIRS),$(wildcard $(dir)/*.s)))
 OBJS += $(patsubst %.c,%.o,$(foreach dir,$(SRCDIRS),$(wildcard $(dir)/*.c)))
 
-OBJS := $(addprefix ../wrk/$(TARGET)/,$(sort $(notdir $(OBJS))))
+OBJS := $(addprefix ../libwrk/$(TARGET)/,$(sort $(notdir $(OBJS))))
 
 DEPS = $(OBJS:.o=.d)
 
@@ -170,9 +170,9 @@ EXTRA_SRCPAT = $(SRCDIR)/extra/%.s
 EXTRA_OBJPAT = ../lib/$(TARGET)-%.o
 EXTRA_OBJS := $(patsubst $(EXTRA_SRCPAT),$(EXTRA_OBJPAT),$(wildcard $(SRCDIR)/extra/*.s))
 
-ZPOBJ = ../wrk/$(TARGET)/zeropage.o
+ZPOBJ = ../libwrk/$(TARGET)/zeropage.o
 ifeq ($(TARGET),$(filter $(TARGET),$(EXTZP)))
-  ZPOBJ += ../wrk/$(TARGET)/extzp.o
+  ZPOBJ += ../libwrk/$(TARGET)/extzp.o
 endif
 
 ifeq ($(TARGET),$(filter $(TARGET),$(MKINC)))
@@ -188,12 +188,12 @@ endif
 define DRVTYPE_template
 
 $1_SRCDIR = $$(SRCDIR)/$1
-$1_OBJDIR = ../wrk/$$(TARGET)/$1
+$1_OBJDIR = ../libwrk/$$(TARGET)/$1
 $1_DRVDIR = ../$1
 
 $1_OBJPAT = $$($1_OBJDIR)/$$(OBJPFX)%.o
 $1_DRVPAT = $$($1_DRVDIR)/$$(DRVPFX)%.$1
-$1_STCPAT = ../wrk/$$(TARGET)/$$(DRVPFX)%-$1.o
+$1_STCPAT = ../libwrk/$$(TARGET)/$$(DRVPFX)%-$1.o
 
 $1_OBJS := $$(patsubst $$($1_SRCDIR)/%.s,$$($1_OBJDIR)/%.o,$$(wildcard $$($1_SRCDIR)/*.s))
 
@@ -256,10 +256,10 @@ endef
 
 ##########
 
-../wrk/$(TARGET)/%.o: %.s | ../wrk/$(TARGET)
+../libwrk/$(TARGET)/%.o: %.s | ../libwrk/$(TARGET)
 	$(ASSEMBLE_recipe)
 
-../wrk/$(TARGET)/%.o: %.c | ../wrk/$(TARGET)
+../libwrk/$(TARGET)/%.o: %.c | ../libwrk/$(TARGET)
 	$(COMPILE_recipe)
 
 $(EXTRA_OBJPAT): $(EXTRA_SRCPAT) | ../lib
@@ -269,7 +269,7 @@ $(EXTRA_OBJPAT): $(EXTRA_SRCPAT) | ../lib
 ../lib/$(TARGET).lib: $(OBJS) | ../lib
 	$(AR65) a $@ $?
 
-../wrk/$(TARGET) ../lib ../targetutil:
+../libwrk/$(TARGET) ../lib ../targetutil:
 	@$(call MKDIR,$@)
 
 $(TARGET): $(EXTRA_OBJS) ../lib/$(TARGET).lib

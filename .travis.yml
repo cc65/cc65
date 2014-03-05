@@ -2,10 +2,9 @@ language:
   - c
 install:
   - sudo apt-get install linuxdoc-tools linuxdoc-tools-info binutils-mingw-w64-i686 gcc-mingw-w64-i686
-  - which gcc
-  - which i686-w64-mingw32-gcc
 script:
   - make all doc
+  - make clean bin CC=i686-w64-mingw32-gcc AR=i686-w64-mingw32-ar PROGEXT=.exe
 after_success:
   - make -C doc gh-pages
 env:

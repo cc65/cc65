@@ -25,8 +25,8 @@ LD65_LIB = $(datadir)/lib
 LD65_OBJ = $(datadir)/lib
 LD65_CFG = $(datadir)/cfg
 
-CFLAGS += -MMD -MP -O -std=c89 -I common \
-          -Wall -Wextra -Wno-char-subscripts $(USER_CFLAGS) \
+CFLAGS += -MMD -MP -O -I common $(USER_CFLAGS) \
+          -Wall -Wextra -Wno-char-subscripts \
           -DCA65_INC=$(CA65_INC) -DCC65_INC=$(CC65_INC) \
           -DLD65_LIB=$(LD65_LIB) -DLD65_OBJ=$(LD65_OBJ) -DLD65_CFG=$(LD65_CFG)
 

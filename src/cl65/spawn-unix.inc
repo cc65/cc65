@@ -62,7 +62,7 @@
 
 
 
-int spawnvp (int Mode attribute ((unused)), const char* File, const char* const argv [])
+int spawnvp (int Mode attribute ((unused)), const char* File, char* const argv [])
 /* Execute the given program searching and wait til it terminates. The Mode
  * argument is ignored (compatibility only). The result of the function is
  * the return code of the program. The function will terminate the program
@@ -81,7 +81,7 @@ int spawnvp (int Mode attribute ((unused)), const char* File, const char* const 
     } else if (pid == 0) {
 
         /* The son - exec the program */
-        if (execvp (File, (char* const *) argv) < 0) {
+        if (execvp (File, argv) < 0) {
             Error ("Cannot exec `%s': %s", File, strerror (errno));
         }
 

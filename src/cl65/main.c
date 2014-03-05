@@ -41,8 +41,20 @@
 #else
 #  define NEED_SPAWN 1
 #endif
-#if defined(_MSC_VER)
-#  pragma warning(disable : 4996)
+
+/* GCC strictly follows http://c-faq.com/ansi/constmismatch.html and issues an
+ * 'incompatible pointer type' warning - that can't be suppressed via #pragma.
+ * The spawnvp() prototype of MinGW (http://www.mingw.org/) differs from the
+ * one of MinGW-w64 (http://mingw-w64.sourceforge.net/) regarding constness.
+ * So there's no alternative to actually distinguish these environments :-(
+ */
+#define SPAWN_ARGV_CONST_CAST
+#if defined(__MINGW32__)
+#  include <_mingw.h>
+#  if !defined(__MINGW64_VERSION_MAJOR)
+#    undef  SPAWN_ARGV_CONST_CAST
+#    define SPAWN_ARGV_CONST_CAST (const char* const *)
+#  endif
 #endif
 
 
@@ -375,7 +387,7 @@ static void ExecProgram (CmdDesc* Cmd)
     }
 
     /* Call the program */
-    Status = spawnvp (P_WAIT, Cmd->Name, (const char* const *) Cmd->Args);
+    Status = spawnvp (P_WAIT, Cmd->Name, SPAWN_ARGV_CONST_CAST Cmd->Args);
 
     /* Check the result code */
     if (Status < 0) {

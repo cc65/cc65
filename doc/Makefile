@@ -1,8 +1,18 @@
-.PHONY: all doc html info gh-pages mostlyclean clean install
+ifneq ($(shell echo),)
+  CMD_EXE = 1
+endif
+
+.PHONY: all mostlyclean clean install doc html info gh-pages
 
 .SUFFIXES:
 
-ifeq ($(shell echo),)
+all mostlyclean install:
+
+ifdef CMD_EXE
+
+clean doc:
+
+else # CMD_EXE
 
 SGMLS := $(wildcard *.sgml)
 
@@ -13,16 +23,14 @@ TOC_LEVEL = 2
 
 GH_PAGES = ../../gh-pages
 
-all mostlyclean install:
+clean:
+	$(RM) -r ../html ../info
 
 doc: html info
 
 html: $(addprefix ../html/,$(SGMLS:.sgml=.html) doc.css doc.png)
 
 info: $(addprefix ../info/,$(SGMLS:.sgml=.info))
-
-clean:
-	$(RM) -r ../html ../info
 
 ../html ../info:
 	@mkdir $@
@@ -50,8 +58,4 @@ ifdef GH_TOKEN
 	git --work-tree=$(GH_PAGES) --git-dir=$(GH_PAGES)/.git push
 endif
 
-else # cmd.exe
-
-all doc mostlyclean clean install:
-
-endif # cmd.exe
+endif # CMD_EXE

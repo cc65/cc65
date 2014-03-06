@@ -1,3 +1,11 @@
+ifneq ($(shell echo),)
+  CMD_EXE = 1
+endif
+
+.PHONY: all mostlyclean clean install lib $(TARGETS)
+
+.SUFFIXES:
+
 CBMS = c128   \
        c16    \
        c64    \
@@ -29,6 +37,15 @@ DRVTYPES = emd \
            ser \
            tgi
 
+ifdef CMD_EXE
+  DIRLIST = $(strip $(foreach dir,$1,$(wildcard $(dir))))
+  MKDIR = mkdir $(subst /,\,$1)
+  RMDIR = $(if $(DIRLIST),rmdir /s /q $(subst /,\,$(DIRLIST)))
+else
+  MKDIR = mkdir -p $1
+  RMDIR = $(RM) -r $1
+endif
+
 # Every target requires its individual vpath setting but the vpath directive
 # acts globally. Therefore each target is built in a separate make instance.
 
@@ -38,34 +55,11 @@ ifeq ($(words $(MAKECMDGOALS)),1)
   endif
 endif
 
-DIRLIST = $(strip $(foreach dir,$1,$(wildcard $(dir))))
-
-ifeq ($(shell echo),)
-  MKDIR = mkdir -p $1
-  RMDIR = $(RM) -r $1
-else
-  MKDIR = mkdir $(subst /,\,$1)
-  RMDIR = $(if $(DIRLIST),rmdir /s /q $(subst /,\,$(DIRLIST)))
-endif
-
-.SUFFIXES:
-
-.PHONY: all lib $(TARGETS) mostlyclean clean install
-
 ifndef TARGET
 
 datadir = $(prefix)/share/cc65
 
-INSTALLDIRS = ../asminc ../cfg ../include \
-              $(filter-out $(wildcard ../include/*.*),$(wildcard ../include/*)) \
-              ../lib ../targetutil $(addprefix ../,$(DRVTYPES))
-
-INSTALL = install
-
 all lib: $(TARGETS)
-
-$(TARGETS):
-	@$(MAKE) --no-print-directory $@
 
 mostlyclean:
 	$(call RMDIR,../libwrk)
@@ -73,10 +67,17 @@ mostlyclean:
 clean:
 	$(call RMDIR,../libwrk ../lib ../targetutil $(addprefix ../,$(DRVTYPES)))
 
-install:
-	$(foreach dir,$(INSTALLDIRS),$(INSTALL_recipe))
+ifdef CMD_EXE
 
-##########
+install:
+
+else # CMD_EXE
+
+INSTALL = install
+
+INSTALLDIRS = ../asminc ../cfg ../include \
+              $(filter-out $(wildcard ../include/*.*),$(wildcard ../include/*)) \
+              ../lib ../targetutil $(addprefix ../,$(DRVTYPES))
 
 define INSTALL_recipe
 
@@ -84,9 +85,15 @@ $(if $(prefix),,$(error variable `prefix' must be set))
 $(INSTALL) -d $(subst ..,$(DESTDIR)$(datadir),$(dir))
 $(INSTALL) -m644 $(dir)/*.* $(subst ..,$(DESTDIR)$(datadir),$(dir))
 
-endef
+endef # INSTALL_recipe
 
-##########
+install:
+	$(foreach dir,$(INSTALLDIRS),$(INSTALL_recipe))
+
+endif # CMD_EXE
+
+$(TARGETS):
+	@$(MAKE) --no-print-directory $@
 
 else # TARGET
 
@@ -183,8 +190,6 @@ ifeq ($(TARGET),$(filter $(TARGET),$(TARGETUTIL)))
   include $(SRCDIR)/targetutil/Makefile.inc
 endif
 
-##########
-
 define DRVTYPE_template
 
 $1_SRCDIR = $$(SRCDIR)/$1
@@ -221,9 +226,7 @@ OBJS += $$($1_STCS)
 
 DEPS += $$($1_OBJS:.o=.d)
 
-endef
-
-##########
+endef # DRVTYPE_template
 
 $(foreach drvtype,$(DRVTYPES),$(eval $(call DRVTYPE_template,$(drvtype))))
 
@@ -235,16 +238,12 @@ LD65 := $(if $(wildcard ../bin/ld65*),../bin/ld65,ld65)
 
 export CC65_HOME := $(abspath ..)
 
-##########
-
 define ASSEMBLE_recipe
 
 $(if $(TRAVIS),,@echo $(TARGET) - $<)
 @$(CA65) -t $(TARGET) $(CA65FLAGS) --create-dep $(@:.o=.d) -o $@ $<
 
-endef
-
-##########
+endef # ASSEMBLE_recipe
 
 define COMPILE_recipe
 
@@ -252,9 +251,7 @@ $(if $(TRAVIS),,@echo $(TARGET) - $<)
 @$(CC65) -t $(TARGET) $(CC65FLAGS) --create-dep $(@:.o=.d) --dep-target $@ -o $(@:.o=.s) $<
 @$(CA65) -t $(TARGET) -o $@ $(@:.o=.s)
 
-endef
-
-##########
+endef # COMPILE_recipe
 
 ../libwrk/$(TARGET)/%.o: %.s | ../libwrk/$(TARGET)
 	$(ASSEMBLE_recipe)

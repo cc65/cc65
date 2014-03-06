@@ -1,8 +1,10 @@
+ifneq ($(shell echo),)
+  CMD_EXE = 1
+endif
+
+.PHONY: all mostlyclean clean install avail unavail bin $(PROGS)
+
 .SUFFIXES:
-
-.PHONY: all bin $(PROGS) mostlyclean clean install avail unavail
-
-ifeq ($(shell echo),)
 
 PROGS = ar65  \
         ca65  \
@@ -25,6 +27,9 @@ LD65_LIB = $(datadir)/lib
 LD65_OBJ = $(datadir)/lib
 LD65_CFG = $(datadir)/cfg
 
+CC = $(CROSS_COMPILE)gcc
+AR = $(CROSS_COMPILE)ar
+
 CFLAGS += -MMD -MP -O -I common $(USER_CFLAGS) \
           -Wall -Wextra -Wno-char-subscripts \
           -DCA65_INC=$(CA65_INC) -DCC65_INC=$(CC65_INC) \
@@ -34,15 +39,50 @@ CFLAGS += $(if $(TRAVIS),-Werror)
 
 LDLIBS += -lm
 
-INSTALL = install
+ifdef CMD_EXE
+  EXE_SUFFIX=.exe
+endif
+
+ifdef CROSS_COMPILE
+  EXE_SUFFIX=.exe
+endif
+
+ifdef CMD_EXE
+  DIRLIST = $(strip $(foreach dir,$1,$(wildcard $(dir))))
+  MKDIR = mkdir $(subst /,\,$1)
+  RMDIR = $(if $(DIRLIST),rmdir /s /q $(subst /,\,$(DIRLIST)))
+else
+  MKDIR = mkdir -p $1
+  RMDIR = $(RM) -r $1
+endif
 
 all bin: $(PROGS)
 
 mostlyclean:
-	$(RM) -r ../wrk
+	$(call RMDIR,../wrk)
 
 clean:
-	$(RM) -r ../wrk ../bin
+	$(call RMDIR,../wrk ../bin)
+
+ifdef CMD_EXE
+
+install avail unavail:
+
+else # CMD_EXE
+
+INSTALL = install
+
+define AVAIL_recipe
+
+ln -s $(abspath ../bin/$(prog)) /usr/local/bin/$(prog)
+
+endef # AVAIL_recipe
+
+define UNAVAIL_recipe
+
+$(RM) /usr/local/bin/$(prog)
+
+endef # UNAVAIL_recipe
 
 install:
 	$(if $(prefix),,$(error variable `prefix' must be set))
@@ -55,23 +95,7 @@ avail:
 unavail:
 	$(foreach prog,$(PROGS),$(UNAVAIL_recipe))
 
-##########
-
-define AVAIL_recipe
-
-ln -s $(abspath ../bin/$(prog)) /usr/local/bin/$(prog)
-
-endef
-
-##########
-
-define UNAVAIL_recipe
-
-$(RM) /usr/local/bin/$(prog)
-
-endef
-
-##########
+endif # CMD_EXE
 
 define OBJS_template
 
@@ -80,53 +104,35 @@ $1_OBJS := $$(patsubst %.c,../wrk/%.o,$$(wildcard $1/*.c))
 $$($1_OBJS): | ../wrk/$1
 
 ../wrk/$1:
-	@mkdir -p $$@
+	@$$(call MKDIR,$$@)
 
 DEPS += $$($1_OBJS:.o=.d)
 
-endef
-
-##########
+endef # OBJS_template
 
 define PROG_template
 
 $$(eval $$(call OBJS_template,$1))
 
-../bin/$1$(PROGEXT): $$($1_OBJS) ../wrk/common/common.a | ../bin
+../bin/$1$(EXE_SUFFIX): $$($1_OBJS) ../wrk/common/common.a | ../bin
 	$$(CC) $$(LDFLAGS) -o $$@ $$^ $$(LDLIBS)
 
-$1: ../bin/$1$(PROGEXT)
+$1: ../bin/$1$(EXE_SUFFIX)
 
-endef
-
-##########
+endef # PROG_template
 
 ../wrk/%.o: %.c
 	@echo $<
 	@$(CC) -c $(CFLAGS) -o $@ $<
 
 ../bin:
-	@mkdir $@
+	@$(call MKDIR,$@)
 
 $(eval $(call OBJS_template,common))
+
 ../wrk/common/common.a: $(common_OBJS)
 	$(AR) r $@ $?
 
 $(foreach prog,$(PROGS),$(eval $(call PROG_template,$(prog))))
 
 -include $(DEPS)
-
-else # cmd.exe
-
-all bin:
-	msbuild cc65.sln /p:configuration=release /consoleloggerparameters:disableconsolecolor
-
-mostlyclean:
-	$(if $(wildcard ../wrk),rmdir /s /q ..\wrk)
-
-clean:
-	msbuild cc65.sln /p:configuration=release /consoleloggerparameters:disableconsolecolor /target:$@
-
-install avail unavail:
-
-endif # cmd.exe

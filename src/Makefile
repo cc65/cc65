@@ -2,10 +2,6 @@ ifneq ($(shell echo),)
   CMD_EXE = 1
 endif
 
-.PHONY: all mostlyclean clean install avail unavail bin $(PROGS)
-
-.SUFFIXES:
-
 PROGS = ar65  \
         ca65  \
         cc65  \
@@ -17,6 +13,10 @@ PROGS = ar65  \
         od65  \
         sim65 \
         sp65
+
+.PHONY: all mostlyclean clean install avail unavail bin $(PROGS)
+
+.SUFFIXES:
 
 bindir  := $(prefix)/bin
 datadir := $(if $(prefix),$(prefix)/share/cc65,$(abspath ..))

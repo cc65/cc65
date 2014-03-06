@@ -2,10 +2,6 @@ ifneq ($(shell echo),)
   CMD_EXE = 1
 endif
 
-.PHONY: all mostlyclean clean install lib $(TARGETS)
-
-.SUFFIXES:
-
 CBMS = c128   \
        c16    \
        c64    \
@@ -36,6 +32,10 @@ DRVTYPES = emd \
            mou \
            ser \
            tgi
+
+.PHONY: all mostlyclean clean install lib $(TARGETS)
+
+.SUFFIXES:
 
 ifdef CMD_EXE
   DIRLIST = $(strip $(foreach dir,$1,$(wildcard $(dir))))

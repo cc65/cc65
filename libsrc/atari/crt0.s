@@ -100,8 +100,8 @@ start:
 
 ; Initialize conio stuff
 
-        dey                             ; Set Y to $FF
-        sty     CH                      ; remove keypress which might be in the input buffer
+        dey                     ; Set Y to $FF
+        sty     CH              ; remove keypress which might be in the input buffer
 
 ; Push arguments and call main
 

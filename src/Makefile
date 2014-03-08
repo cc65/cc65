@@ -14,7 +14,7 @@ PROGS = ar65  \
         sim65 \
         sp65
 
-.PHONY: all mostlyclean clean install avail unavail bin $(PROGS)
+.PHONY: all mostlyclean clean install zip avail unavail bin $(PROGS)
 
 .SUFFIXES:
 
@@ -96,6 +96,9 @@ unavail:
 	$(foreach prog,$(PROGS),$(UNAVAIL_recipe))
 
 endif # CMD_EXE
+
+zip:
+	cd .. && zip cc65 bin/*
 
 define OBJS_template
 

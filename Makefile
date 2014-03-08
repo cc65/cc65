@@ -1,8 +1,8 @@
-.PHONY: all mostlyclean clean install avail unavail bin lib doc
+.PHONY: all mostlyclean clean install zip avail unavail bin lib doc
 
 .SUFFIXES:
 
-all mostlyclean clean install:
+all mostlyclean clean install zip:
 	@$(MAKE) -C src    --no-print-directory $@
 	@$(MAKE) -C libsrc --no-print-directory $@
 	@$(MAKE) -C doc    --no-print-directory $@

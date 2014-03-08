@@ -2,7 +2,7 @@ ifneq ($(shell echo),)
   CMD_EXE = 1
 endif
 
-.PHONY: all mostlyclean clean install doc html info gh-pages
+.PHONY: all mostlyclean clean install zip doc html info gh-pages
 
 .SUFFIXES:
 
@@ -10,7 +10,7 @@ all mostlyclean install:
 
 ifdef CMD_EXE
 
-clean doc:
+clean zip doc:
 
 else # CMD_EXE
 
@@ -25,6 +25,9 @@ GH_PAGES = ../../gh-pages
 
 clean:
 	$(RM) -r ../html ../info
+
+zip:
+	cd .. && zip cc65 html/*.*
 
 doc: html info
 

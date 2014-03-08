@@ -33,7 +33,15 @@ DRVTYPES = emd \
            ser \
            tgi
 
-.PHONY: all mostlyclean clean install lib $(TARGETS)
+OUTPUTDIRS = lib         \
+             $(DRVTYPES) \
+             targetutil  \
+             asminc      \
+             cfg         \
+             include     \
+             $(subst ../,,$(filter-out $(wildcard ../include/*.*),$(wildcard ../include/*)))
+
+.PHONY: all mostlyclean clean install zip lib $(TARGETS)
 
 .SUFFIXES:
 
@@ -75,22 +83,27 @@ else # CMD_EXE
 
 INSTALL = install
 
-INSTALLDIRS = ../asminc ../cfg ../include \
-              $(filter-out $(wildcard ../include/*.*),$(wildcard ../include/*)) \
-              ../lib ../targetutil $(addprefix ../,$(DRVTYPES))
-
 define INSTALL_recipe
 
 $(if $(prefix),,$(error variable `prefix' must be set))
-$(INSTALL) -d $(subst ..,$(DESTDIR)$(datadir),$(dir))
-$(INSTALL) -m644 $(dir)/*.* $(subst ..,$(DESTDIR)$(datadir),$(dir))
+$(INSTALL) -d $(DESTDIR)$(datadir)/$(dir)
+$(INSTALL) -m644 ../$(dir)/*.* $(DESTDIR)$(datadir)/$(dir)
 
 endef # INSTALL_recipe
 
 install:
-	$(foreach dir,$(INSTALLDIRS),$(INSTALL_recipe))
+	$(foreach dir,$(OUTPUTDIRS),$(INSTALL_recipe))
 
 endif # CMD_EXE
+
+define ZIP_recipe
+
+cd .. && zip cc65 $(dir)/*.*
+
+endef # ZIP_recipe
+
+zip:
+	$(foreach dir,$(OUTPUTDIRS),$(ZIP_recipe))
 
 $(TARGETS):
 	@$(MAKE) --no-print-directory $@

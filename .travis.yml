@@ -3,8 +3,9 @@ language:
 install:
   - sudo apt-get install linuxdoc-tools linuxdoc-tools-info binutils-mingw-w64-i686 gcc-mingw-w64-i686
 script:
-  - make all doc
+  - make
   - make -C src clean all CROSS_COMPILE=i686-w64-mingw32-
+  - make doc zip
 after_success:
   - make -C doc gh-pages
 env:

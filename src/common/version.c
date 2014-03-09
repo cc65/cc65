@@ -46,9 +46,6 @@
 
 #define VER_MAJOR       2U
 #define VER_MINOR       14U
-#define VER_PATCH       0U
-#define VER_RC          0U
-
 
 
 
@@ -61,12 +58,8 @@
 const char* GetVersionAsString (void)
 /* Returns the version number as a string in a static buffer */
 {
-    static char Buf[20];
-#if defined(VER_RC) && (VER_RC > 0U)
-    xsnprintf (Buf, sizeof (Buf), "%u.%u.%u-rc%u", VER_MAJOR, VER_MINOR, VER_PATCH, VER_RC);
-#else
-    xsnprintf (Buf, sizeof (Buf), "%u.%u.%u", VER_MAJOR, VER_MINOR, VER_PATCH);
-#endif
+    static char Buf[40];
+    xsnprintf (Buf, sizeof (Buf), "%u.%u - %s", VER_MAJOR, VER_MINOR, __DATE__);
     return Buf;
 }
 
@@ -75,5 +68,5 @@ const char* GetVersionAsString (void)
 unsigned GetVersionAsNumber (void)
 /* Returns the version number as a combined unsigned for use in a #define */
 {
-    return ((VER_MAJOR * 0x100) + (VER_MINOR * 0x10) + VER_PATCH);
+    return ((VER_MAJOR * 0x100) + (VER_MINOR * 0x10));
 }

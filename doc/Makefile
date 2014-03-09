@@ -21,13 +21,11 @@ TOC_LEVEL = 0
 
 TOC_LEVEL = 2
 
-GH_PAGES = ../../gh-pages
-
 clean:
 	$(RM) -r ../html ../info
 
 zip:
-	cd .. && zip cc65 html/*.*
+	@cd .. && zip cc65 html/*.*
 
 doc: html info
 
@@ -46,19 +44,5 @@ info: $(addprefix ../info/,$(SGMLS:.sgml=.info))
 
 ../info/%.info: %.sgml | ../info
 	@cd ../info && linuxdoc -B info ../doc/$<
-
-gh-pages: html
-ifdef GH_TOKEN
-	git clone --branch=gh-pages https://$(GH_TOKEN)@github.com/oliverschmidt/cc65.git $(GH_PAGES)
-	git --work-tree=$(GH_PAGES) --git-dir=$(GH_PAGES)/.git config user.name "Oliver Schmidt"
-	git --work-tree=$(GH_PAGES) --git-dir=$(GH_PAGES)/.git config user.email "ol.sc@web.de"
-	git --work-tree=$(GH_PAGES) --git-dir=$(GH_PAGES)/.git config push.default simple
-	$(RM) -r $(GH_PAGES)/doc
-	mkdir $(GH_PAGES)/doc
-	cp ../html/* $(GH_PAGES)/doc
-	git --work-tree=$(GH_PAGES) --git-dir=$(GH_PAGES)/.git add -A doc
-	-git --work-tree=$(GH_PAGES) --git-dir=$(GH_PAGES)/.git commit -m "Updated doc from commit $(TRAVIS_COMMIT)."
-	git --work-tree=$(GH_PAGES) --git-dir=$(GH_PAGES)/.git push
-endif
 
 endif # CMD_EXE

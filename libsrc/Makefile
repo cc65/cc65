@@ -98,7 +98,7 @@ endif # CMD_EXE
 
 define ZIP_recipe
 
-cd .. && zip cc65 $(dir)/*.*
+@cd .. && zip cc65 $(dir)/*.*
 
 endef # ZIP_recipe
 

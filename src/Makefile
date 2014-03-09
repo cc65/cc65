@@ -98,7 +98,7 @@ unavail:
 endif # CMD_EXE
 
 zip:
-	cd .. && zip cc65 bin/*
+	@cd .. && zip cc65 bin/*
 
 define OBJS_template
 

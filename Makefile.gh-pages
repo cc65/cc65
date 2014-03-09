@@ -5,7 +5,7 @@
 GH_PAGES = ../gh-pages
 
 all:
-	date +%D | zip -z cc65
+	date +%F | zip -z cc65
 ifdef GH_TOKEN
 	git clone --branch=gh-pages https://$(GH_TOKEN)@github.com/oliverschmidt/cc65.git $(GH_PAGES)
 	cd $(GH_PAGES) && git config user.name "Oliver Schmidt"
@@ -14,7 +14,7 @@ ifdef GH_TOKEN
 	cd $(GH_PAGES) && $(RM) -r doc download
 	cd $(GH_PAGES) && mkdir doc download
 	cp html/*.* $(GH_PAGES)/doc
-	cp cc65.zip $(GH_PAGES)/download/cc65-snapshot.zip
+	cp cc65.zip $(GH_PAGES)/download/cc65-snapshot-win32.zip
 	cd $(GH_PAGES) && git add -A doc download
 	cd $(GH_PAGES) && git commit -m "Updated from commit $(TRAVIS_COMMIT)."
 	cd $(GH_PAGES) && git push

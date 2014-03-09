@@ -33,13 +33,13 @@ DRVTYPES = emd \
            ser \
            tgi
 
-OUTPUTDIRS = lib         \
-             $(DRVTYPES) \
-             targetutil  \
-             asminc      \
-             cfg         \
-             include     \
-             $(subst ../,,$(filter-out $(wildcard ../include/*.*),$(wildcard ../include/*)))
+OUTPUTDIRS := lib         \
+              $(DRVTYPES) \
+              targetutil  \
+              asminc      \
+              cfg         \
+              include     \
+              $(subst ../,,$(filter-out $(wildcard ../include/*.*),$(wildcard ../include/*)))
 
 .PHONY: all mostlyclean clean install zip lib $(TARGETS)
 

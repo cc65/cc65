@@ -47,8 +47,8 @@
        </ul>
        <ul class="bullet">
         <li>
-          <p>Download pre-built packages for RPM based systems (OpenSUSE) or
-             DEB based systems (Debian) from the
+          <p>Install one of the pre-built packages for RPM based systems
+             (OpenSUSE) or DEB based systems (Debian) from the
              <a href="http://software.opensuse.org/download.html?project=home%3Astrik&package=cc65">
              openSUSE Build Service download page for cc65</a>.
           </p>
@@ -56,60 +56,17 @@
       </ul>
     </p>
     <h2><a name="Windows">Microsoft Windows</a></h2>
-    <p><u>Note:</u> If you have used cc65 before then you need to make sure
-       to remove all environment variables related to cc65 (like CC65_HOME).
-    </p>
-    <p>Download the
-       <a href="https://github.com/oliverschmidt/cc65/archive/master.zip">
-       current cc65 source code</a> and unzip it to a path of your choice that
-       <u>doesn't contain spaces</u> (let's presume 'c:\cc65' here). Download
-       the 'Make for Windows'
-       <a href="http://gnuwin32.sourceforge.net/downlinks/make-bin-zip.php">
-       binary</a> and its
-       <a href="http://gnuwin32.sourceforge.net/downlinks/make-dep-zip.php">
-       dependencies</a> and unzip them both to the <u>same</u> path of your
-       choice (let's presume 'c:\cc65\gnu' here). Now you have two options...
-       <ul class="bullet">
-         <li>
-           <p>Build the cc65 binaries using Microsoft Visual C++ 2010 Express:
-              <br/>
-              Open a 'Visual Studio Command Prompt (2010)', change the current
-              working directory to 'c:\cc65\cc65-master' and enter
-              'c:\cc65\gnu\bin\make'. This builds both the cc65 binaries
-              (located in 'c:\cc65\cc65-master\bin') and the cc65 libraries.
-              Now cc65 is fully functional without further steps.
-           </p>
-           <p><u>Note:</u> If you receive an error message complaining about
-              a permission denied then you need to run the Visual Studio
-              Command Prompt as administrator.
-           </p>
-         </li>
-       </ul>
-       <ul class="bullet">
-         <li>
-           <p>Use prebuilt cc65 binaries:
-              <br/>
-              Download the
-              <a href="http://sourceforge.net/projects/cc65/files/latest/download">
-              latest cc65 binaries</a> for Microsoft Windows and unzip the them to
-              'c:\cc65\cc65-master'. Rename the directory 'c:\cc65\cc65-master\drop'
-              to 'c:\cc65\cc65-master\bin'. Open a Command Prompt, change the
-              current working directory to 'c:\cc65\cc65-master' and enter
-              'c:\cc65\gnu\bin\make lib'. This builds the cc65 libraries. Now
-              cc65 is fully functional without further steps.
-           </p>
-           <p><u>Note:</u>
-              If you receive an error message complaining about 'MSVCR100.dll'
-              missing then you need to install the
-              <a href="http://www.microsoft.com/en-us/download/details.aspx?id=8328">
-              Microsoft Visual C++ 2010 SP1 Redistributable Package (x86)</a>.
-           </p>
-         </li>
-       </ul>
+    <p>Download the <a href="download/cc65-snapshot-win32.zip"> current cc65
+       snapshot</a> and unzip it to a path of your choice  that <u>doesn't
+       contain spaces</u> (let's presume 'c:\cc65' here).  Now cc65 is fully
+       functional without further steps.
     </p>
     <p>If you want to be able to run the cc65 binaries without providing their
-       path you may additionally add 'c:\cc65\cc65-master\bin' to your 'Path'
-       environment variable.
+       path you may additionally add 'c:\cc65\bin' to your 'Path' environment
+       variable.
+    </p>
+    <p><u>Note:</u> If you have used cc65 before then you need to make sure
+       to remove all environment variables related to cc65 (like CC65_HOME).
     </p>
   </body>
 </html>

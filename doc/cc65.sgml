@@ -749,8 +749,8 @@ The compiler defines several macros at startup:
   <tag><tt>__CC65__</tt></tag>
 
   This macro is always defined. Its value is the version number of the
-  compiler in hex.  For example, version 2.10.1 of the compiler has this macro
-  defined as <tt/0x02A1/.
+  compiler in hex.  For example, version 2.14 of the compiler has this macro
+  defined as <tt/0x02E0/.
 
   <tag><tt>__CC65_STD__</tt></tag>
 

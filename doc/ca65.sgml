@@ -1263,14 +1263,14 @@ writable.
   Reading this pseudo variable will give the assembler version according to
   the following formula:
 
-        VER_MAJOR*$100 + VER_MINOR*$10 + VER_PATCH
+        VER_MAJOR*$100 + VER_MINOR*$10
 
   It may be used to encode the assembler version or check the assembler for
   special features not available with older versions.
 
   Example:
 
-  Version 2.11.1 of the assembler will return $2B1 as numerical constant when
+  Version 2.14 of the assembler will return $2E0 as numerical constant when
   reading the pseudo variable <tt/.VERSION/.
 
 

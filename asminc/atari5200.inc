@@ -1,5 +1,27 @@
 
 ;-------------------------------------------------------------------------
+; ATASCII CHARACTER DEFS
+;-------------------------------------------------------------------------
+
+ATCLR   = $7D           ;CLEAR SCREEN CHARACTER
+ATRUB   = $7E           ;BACK SPACE (RUBOUT)
+ATTAB   = $7F           ;TAB
+ATEOL   = $9B           ;END-OF-LINE
+ATDELL  = $9C           ;delete line
+ATINSL  = $9D           ;insert line
+ATCTAB  = $9E           ;clear TAB
+ATSTAB  = $9F           ;set TAB
+ATBEL   = $FD           ;CONSOLE BELL
+ATDEL   = $FE           ;delete char.
+ATINS   = $FF           ;insert char.
+ATURW   = $1C           ;UP-ARROW
+ATDRW   = $1D           ;DOWN-ARROW
+ATLRW   = $1E           ;LEFT-ARROW
+ATRRW   = $1F           ;RIGHT-ARROW
+ATESC   = $1B           ;ESCAPE
+
+
+;-------------------------------------------------------------------------
 ; Zero Page
 ;-------------------------------------------------------------------------
 
@@ -32,6 +54,10 @@ PADDL4  =  $15   ;POT4  "
 PADDL5  =  $16   ;POT5  "
 PADDL6  =  $17   ;POT6  "
 PADDL7  =  $18   ;POT7  "
+
+
+.importzp COLCRS_5200
+.importzp ROWCRS_5200
 
 
 ;-------------------------------------------------------------------------

@@ -107,7 +107,7 @@ that allows to put binary files with a DOS 3.3 header onto disk images
 containing DOS 3.3 as well as ProDOS 8.</P>
 <P>For ProDOS 8 system programs the load address is fixed to $2000 so there
 is no need for a header. Thus the linker configuration
-<A HREF="apple2enh-4.html#ss4.3">apple2enh-system.cfg</A> for those programs
+<A HREF="apple2enh.html#ss4.3">apple2enh-system.cfg</A> for those programs
 omits the DOS 3.3 header. The right AppleCommander option to put system files
 without a header on a ProDOS 8 disk image is <CODE>-p</CODE>.</P>
 
@@ -143,7 +143,7 @@ cc65 runtime system takes care of actually moving the code into the Language
 Card.</P>
 <P>The amount of memory available in the Language Card for generated code depends
 on the chosen 
-<A HREF="apple2enh-4.html">linker configuration</A>.</P>
+<A HREF="apple2enh.html#s4">linker configuration</A>.</P>
 
 
 
@@ -314,10 +314,9 @@ range.</P>
 <P>The easiest (and for really large programs in fact the only) way to have a cc65
 program use the memory from $800 to $2000 is to link it as binary
 (as opposed to system) program using the linker configuration
-<A HREF="apple2enh-4.html#ss4.4">apple2enh-loader.cfg</A> with start address
-$800 and load it with <B>LOADER.SYSTEM - an Apple&nbsp;][
-ProDOS 8 loader for cc65 programs</B>. The program then works like a system program
-(i.e. quits to the ProDOS dispatcher).</P>
+<A HREF="apple2enh.html#ss4.4">apple2enh-loader.cfg</A> with start address
+$803 and load it with the targetutil LOADER.SYSTEM. The program then works
+like a system program (i.e. quits to the ProDOS dispatcher).</P>
 <P>Using LOADER.SYSTEM is as simple as copying it to the ProDOS 8 directory of the
 program to load under name &lt;program&gt;.SYSTEM as a system program. For
 example the program <CODE>MYPROG</CODE> is loaded by <CODE>MYPROG.SYSTEM</CODE>.</P>
@@ -329,7 +328,7 @@ example the program <CODE>MYPROG</CODE> is loaded by <CODE>MYPROG.SYSTEM</CODE>.
 
 <P>If the cc65 program can be successfully linked as system program using the linker
 configuration 
-<A HREF="apple2enh-4.html#ss4.3">apple2enh-system.cfg</A> but
+<A HREF="apple2enh.html#ss4.3">apple2enh-system.cfg</A> but
 uses the heap either explicitly or implicitly (i.e. by loading a driver) then
 the memory from $800 to $2000 can be added to the heap by calling
 <CODE>_heapadd ((void *) 0x0800, 0x1800);</CODE> at the beginning of <CODE>main()</CODE>.</P>
@@ -633,7 +632,7 @@ program. See the discussion of the <CODE>.CONDES</CODE> feature in the
 
 <DT><B>Drive ID</B><DD>
 <P>The function 
-<A HREF="dio-1.html">dio_open()</A> has the single
+<A HREF="dio.html#s1">dio_open()</A> has the single
 parameter <CODE>device</CODE> to identify the device to be opened. Therefore an
 Apple&nbsp;II slot and drive pair is mapped to that <CODE>drive_id</CODE> according
 to the formula</P>
@@ -646,7 +645,7 @@ device = slot + (drive - 1) * 8
 
 <DT><B>Sector count</B><DD>
 <P>The function 
-<A HREF="dio-3.html">dio_query_sectcount()</A> returns
+<A HREF="dio.html#s3">dio_query_sectcount()</A> returns
 the correct sector count for all ProDOS 8 disks. However for any non-ProDOS 8
 disk it simply always returns 280 (which is only correct for a 140 KB disk).
 This condition is indicated by the <CODE>_oserror</CODE> value 82.</P>

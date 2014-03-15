@@ -232,9 +232,8 @@ The easiest (and for really large programs in fact the only) way to have a cc65
 program use the memory from &dollar;800 to &dollar;2000 is to link it as binary
 (as opposed to system) program using the linker configuration
 <htmlurl url="apple2.html#ss4.4" name="apple2-loader.cfg"> with start address
-&dollar;800 and load it with <bf/LOADER.SYSTEM - an Apple&nbsp;&rsqb;&lsqb;
-ProDOS 8 loader for cc65 programs/. The program then works like a system program
-(i.e. quits to the ProDOS dispatcher).
+&dollar;803 and load it with the targetutil LOADER.SYSTEM. The program then works
+like a system program (i.e. quits to the ProDOS dispatcher).
 
 Using LOADER.SYSTEM is as simple as copying it to the ProDOS 8 directory of the
 program to load under name &lt;program&gt;.SYSTEM as a system program. For

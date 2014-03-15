@@ -178,7 +178,7 @@ GEOS support in cc65 is based on the <em/Convert v2.5/ format, well-known in
 the GEOS world.  It means that each file built with the cc65 package has to be
 deconverted in GEOS, before it can be run.  You can read a step-by-step
 description of that in the <url name="GEOS section of the cc65 Compiler Intro"
-url="intro-6.html#ss6.5">.
+url="intro.html#ss6.5">.
 
 Each project consists of four parts, two are provided by cc65.  Those parts
 are:<enum>

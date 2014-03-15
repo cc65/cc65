@@ -1,6 +1,6 @@
-[documentation](http://oliverschmidt.github.io/cc65/doc)
+[documentation](http://cc65.github.io/cc65/doc)
 
-[![build status](https://travis-ci.org/oliverschmidt/cc65.png)](https://travis-ci.org/oliverschmidt/cc65/builds)
+[![build status](https://travis-ci.org/cc65/cc65.png)](https://travis-ci.org/cc65/cc65/builds)
 
 cc65 is a complete cross development package for 65(C)02 systems, including
 a powerful macro assembler, a C compiler, linker, librarian and several

@@ -30,12 +30,19 @@ LD65_CFG = $(datadir)/cfg
 CC = $(CROSS_COMPILE)gcc
 AR = $(CROSS_COMPILE)ar
 
+ifdef CROSS_COMPILE
+  $(info CC: $(CC))
+  $(info AR: $(AR))
+endif
+
+ifdef USER_CFLAGS
+  $(info USER_CFLAGS: $(USER_CFLAGS))
+endif
+
 CFLAGS += -MMD -MP -O -I common \
           -Wall -Wextra -Wno-char-subscripts $(USER_CFLAGS) \
           -DCA65_INC=$(CA65_INC) -DCC65_INC=$(CC65_INC) \
           -DLD65_LIB=$(LD65_LIB) -DLD65_OBJ=$(LD65_OBJ) -DLD65_CFG=$(LD65_CFG)
-
-CFLAGS += $(if $(TRAVIS),-Werror)
 
 LDLIBS += -lm
 

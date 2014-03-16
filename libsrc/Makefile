@@ -253,14 +253,14 @@ export CC65_HOME := $(abspath ..)
 
 define ASSEMBLE_recipe
 
-$(if $(TRAVIS),,@echo $(TARGET) - $<)
+$(if $(QUIET),,@echo $(TARGET) - $<)
 @$(CA65) -t $(TARGET) $(CA65FLAGS) --create-dep $(@:.o=.d) -o $@ $<
 
 endef # ASSEMBLE_recipe
 
 define COMPILE_recipe
 
-$(if $(TRAVIS),,@echo $(TARGET) - $<)
+$(if $(QUIET),,@echo $(TARGET) - $<)
 @$(CC65) -t $(TARGET) $(CC65FLAGS) --create-dep $(@:.o=.d) --dep-target $@ -o $(@:.o=.s) $<
 @$(CA65) -t $(TARGET) -o $@ $(@:.o=.s)
 

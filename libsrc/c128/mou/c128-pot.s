@@ -1,8 +1,9 @@
 ;
-; Driver for a potentiometer "mouse" e.g. Koala Pad
+; Driver for a potentiometer "mouse", e.g. Koala Pad
 ;
-; Ullrich von Bassewitz, 2004-03-29, 2009-09-26
-; Stefan Haubenthal, 2006-08-20
+; 2006-08-20, Stefan Haubenthal
+; 2009-09-26, Ullrich von Bassewitz
+; 2014-03-15, Greg King
 ;
 
         .include        "zeropage.inc"
@@ -82,6 +83,8 @@ XMax:           .res    2               ; X2 value of bounding box
 YMax:           .res    2               ; Y2 value of bounding box
 Buttons:        .res    1               ; Button mask
 
+INIT_save:      .res    1
+
 ; Temporary value used in the int handler
 
 Temp:           .res    1
@@ -109,6 +112,14 @@ Temp:           .res    1
 ; Must return an MOUSE_ERR_xx code in a/x.
 
 INSTALL:
+
+; Disable the BASIC interpreter's interrupt-driven sprite-motion code.
+; That allows direct access to the VIC-IIe's sprite registers.
+
+        lda     INIT_STATUS
+        sta     INIT_save
+        lda     #%11000000
+        sta     INIT_STATUS
 
 ; Initialize variables. Just copy the default stuff over
 
@@ -142,7 +153,11 @@ INSTALL:
 ; UNINSTALL routine. Is called before the driver is removed from memory.
 ; No return code required (the driver is removed from memory on return).
 
-UNINSTALL       = HIDE                  ; Hide cursor on exit
+UNINSTALL:
+        jsr     HIDE                    ; Hide cursor on exit
+        lda     INIT_save
+        sta     INIT_STATUS
+        rts
 
 ;----------------------------------------------------------------------------
 ; HIDE routine. Is called to hide the mouse pointer. The mouse kernel manages

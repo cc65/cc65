@@ -33,8 +33,10 @@
 
 
 
-#include "version.h"
+/* common */
 #include "xsprintf.h"
+#include "searchpath.h"
+#include "version.h"
 
 
 
@@ -58,8 +60,12 @@
 const char* GetVersionAsString (void)
 /* Returns the version number as a string in a static buffer */
 {
-    static char Buf[40];
-    xsnprintf (Buf, sizeof (Buf), "%u.%u - %s", VER_MAJOR, VER_MINOR, __DATE__);
+    static char Buf[60];
+#if defined(GIT_SHA)
+    xsnprintf (Buf, sizeof (Buf), "%u.%u - Git %s", VER_MAJOR, VER_MINOR, STRINGIZE (GIT_SHA));
+#else
+    xsnprintf (Buf, sizeof (Buf), "%u.%u", VER_MAJOR, VER_MINOR);
+#endif
     return Buf;
 }
 

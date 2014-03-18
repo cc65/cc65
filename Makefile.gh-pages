@@ -5,7 +5,7 @@
 GH_PAGES = ../gh-pages
 
 all:
-	date +%F | zip -z cc65
+	echo $(TRAVIS_COMMIT) | zip -z cc65
 ifdef GH_TOKEN
 	git clone --branch=gh-pages https://$(GH_TOKEN)@github.com/cc65/cc65.git $(GH_PAGES)
 	cd $(GH_PAGES) && git config user.name "Oliver Schmidt"

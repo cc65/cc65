@@ -39,9 +39,17 @@ ifdef USER_CFLAGS
   $(info USER_CFLAGS: $(USER_CFLAGS))
 endif
 
+ifndef GIT_SHA
+  GIT_SHA := $(if $(wildcard ../.git),$(shell git rev-parse --short HEAD))
+  ifneq ($(words $(GIT_SHA)),1)
+    GIT_SHA := N/A
+  endif
+endif
+$(info GIT_SHA: $(GIT_SHA))
+
 CFLAGS += -MMD -MP -O -I common \
           -Wall -Wextra -Wno-char-subscripts $(USER_CFLAGS) \
-          -DCA65_INC=$(CA65_INC) -DCC65_INC=$(CC65_INC) \
+          -DGIT_SHA=$(GIT_SHA) -DCA65_INC=$(CA65_INC) -DCC65_INC=$(CC65_INC) \
           -DLD65_LIB=$(LD65_LIB) -DLD65_OBJ=$(LD65_OBJ) -DLD65_CFG=$(LD65_CFG)
 
 LDLIBS += -lm

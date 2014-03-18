@@ -2,7 +2,7 @@
 ; Driver for a "joystick mouse".
 ;
 ; Ullrich von Bassewitz, 2004-03-29, 2009-09-26
-; 2010-02-08, Greg King
+; 2014-03-17, Greg King
 ;
 ; The driver prevents the keyboard from interfering by changing the
 ; keyboard's output port into an input port while the driver reads its
@@ -118,8 +118,8 @@ Temp:           .res    1
         .word   SCREEN_WIDTH/2          ; XPos
         .word   0                       ; XMin
         .word   0                       ; YMin
-        .word   SCREEN_WIDTH            ; XMax
-        .word   SCREEN_HEIGHT           ; YMax
+        .word   SCREEN_WIDTH - 1        ; XMax
+        .word   SCREEN_HEIGHT - 1       ; YMax
         .byte   0                       ; Buttons
 .endproc
 

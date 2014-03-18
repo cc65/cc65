@@ -3,7 +3,7 @@
 ;
 ; 2006-08-20, Stefan Haubenthal
 ; 2009-09-26, Ullrich von Bassewitz
-; 2014-03-15, Greg King
+; 2014-03-17, Greg King
 ;
 
         .include        "zeropage.inc"
@@ -99,8 +99,8 @@ Temp:           .res    1
         .word   SCREEN_WIDTH/2          ; XPos
         .word   0                       ; XMin
         .word   0                       ; YMin
-        .word   SCREEN_WIDTH            ; XMax
-        .word   SCREEN_HEIGHT           ; YMax
+        .word   SCREEN_WIDTH - 1        ; XMax
+        .word   SCREEN_HEIGHT - 1       ; YMax
         .byte   0                       ; Buttons
 .endproc
 

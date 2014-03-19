@@ -379,7 +379,5 @@ Type* ReplaceType (ExprDesc* Expr, const Type* NewType);
 
 
 /* End of exprdesc.h */
+
 #endif
-
-
-

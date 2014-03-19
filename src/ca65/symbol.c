@@ -262,6 +262,3 @@ SymEntry* ParseAnySymName (SymFindAction Action)
     /* Return the symbol found */
     return Sym;
 }
-
-
-

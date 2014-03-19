@@ -81,6 +81,3 @@ unsigned OptTest2 (CodeSeg* S);
 /* End of copttest.h */
 
 #endif
-
-
-

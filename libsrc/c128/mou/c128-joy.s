@@ -1,7 +1,8 @@
 ;
 ; Driver for a "joystick mouse".
 ;
-; Ullrich von Bassewitz, 2004-04-05, 2009-09-26
+; 2009-09-26, Ullrich von Bassewitz
+; 2014-03-17, Greg King
 ;
 
         .include        "zeropage.inc"
@@ -85,6 +86,8 @@ XMax:           .res    2               ; X2 value of bounding box
 YMax:           .res    2               ; Y2 value of bounding box
 Buttons:        .res    1               ; Button mask
 
+INIT_save:      .res    1
+
 ; Temporary value used in the int handler
 
 Temp:           .res    1
@@ -99,8 +102,8 @@ Temp:           .res    1
         .word   SCREEN_WIDTH/2          ; XPos
         .word   0                       ; XMin
         .word   0                       ; YMin
-        .word   SCREEN_WIDTH            ; XMax
-        .word   SCREEN_HEIGHT           ; YMax
+        .word   SCREEN_WIDTH - 1        ; XMax
+        .word   SCREEN_HEIGHT - 1       ; YMax
         .byte   0                       ; Buttons
 .endproc
 
@@ -112,6 +115,14 @@ Temp:           .res    1
 ; Must return an MOUSE_ERR_xx code in a/x.
 
 INSTALL:
+
+; Disable the BASIC interpreter's interrupt-driven sprite-motion code.
+; That allows direct access to the VIC-IIe's sprite registers.
+
+        lda     INIT_STATUS
+        sta     INIT_save
+        lda     #%11000000
+        sta     INIT_STATUS
 
 ; Initialize variables. Just copy the default stuff over
 
@@ -145,7 +156,11 @@ INSTALL:
 ; UNINSTALL routine. Is called before the driver is removed from memory.
 ; No return code required (the driver is removed from memory on return).
 
-UNINSTALL       = HIDE                  ; Hide cursor on exit
+UNINSTALL:
+        jsr     HIDE                    ; Hide cursor on exit
+        lda     INIT_save
+        sta     INIT_STATUS
+        rts
 
 ;----------------------------------------------------------------------------
 ; HIDE routine. Is called to hide the mouse pointer. The mouse kernel manages

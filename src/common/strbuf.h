@@ -421,6 +421,3 @@ void SB_Printf (StrBuf* S, const char* Format, ...) attribute ((format (printf, 
 /* End of strbuf.h */
 
 #endif
-
-
-

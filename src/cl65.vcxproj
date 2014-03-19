@@ -82,7 +82,6 @@
   <ItemGroup>
     <ClInclude Include="cl65\error.h" />
     <ClInclude Include="cl65\global.h" />
-    <ClInclude Include="cl65\spawn.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cl65\spawn-amiga.inc" />

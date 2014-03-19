@@ -1016,6 +1016,3 @@ int main (int argc, char* argv[])
     /* Return an apropriate exit code */
     return (ErrorCount > 0)? EXIT_FAILURE : EXIT_SUCCESS;
 }
-
-
-

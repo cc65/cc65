@@ -54,6 +54,3 @@
 /* End of inline.h */
 
 #endif
-
-
-

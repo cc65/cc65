@@ -304,10 +304,5 @@ int ConsumeRCurly (void);
 
 
 /* End of scanner.h */
+
 #endif
-
-
-
-
-
-

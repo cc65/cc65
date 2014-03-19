@@ -112,6 +112,3 @@ int IsQuote (char C);
 /* End of chartype.h */
 
 #endif
-
-
-

@@ -63,6 +63,3 @@ void Convert (const struct O65Data* D);
 /* End of convert.h */
 
 #endif
-
-
-

@@ -171,6 +171,3 @@ void PrintDbgScopes (FILE* F)
         }
     }
 }
-
-
-

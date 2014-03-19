@@ -428,6 +428,3 @@ void FinishCompile (void)
     /* Leave the main lexical level */
     LeaveGlobalLevel ();
 }
-
-
-

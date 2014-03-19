@@ -104,8 +104,5 @@ unsigned GetInputLine (const LineInfo* LI);
 
 
 /* End of lineinfo.h */
+
 #endif
-
-
-
-

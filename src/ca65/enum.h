@@ -52,6 +52,3 @@ void DoEnum (void);
 /* End of enum.h */
 
 #endif
-
-
-

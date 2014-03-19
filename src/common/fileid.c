@@ -74,6 +74,3 @@ const FileId* GetFileId (const char* Name, const FileId* Table, unsigned Count)
     /* Search for a table entry and return it */
     return bsearch (Ext+1, Table, Count, sizeof (FileId), CompareFileId);
 }
-
-
-

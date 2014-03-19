@@ -66,6 +66,3 @@ Fragment* NewFragment (unsigned char Type, unsigned short Len)
     /* And return it */
     return F;
 }
-
-
-

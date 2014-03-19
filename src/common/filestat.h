@@ -2,7 +2,7 @@
 /*                                                                           */
 /*                                filestat.h                                 */
 /*                                                                           */
-/*                   Replacement for buggy Microsoft code                    */
+/*                       Replacement for Windows code                        */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -68,6 +68,3 @@ int FileStat (const char* Path, struct stat* Buf);
 /* End of filestat.h */
 
 #endif
-
-
-

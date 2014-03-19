@@ -223,7 +223,3 @@ void ULabDone (void)
         ReleaseFullLineInfo (&L->LineInfos);
     }
 }
-
-
-
-

@@ -383,6 +383,3 @@ void OutputSettings (void)
     LineFeed ();
     LineFeed ();
 }
-
-
-

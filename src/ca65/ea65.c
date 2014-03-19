@@ -200,7 +200,3 @@ void GetEA (EffAddr* A)
     /* Apply addressing mode overrides */
     A->AddrModeSet &= Restrictions;
 }
-
-
-
-

@@ -55,6 +55,3 @@ void AsmStatement (void);
 /* End of asmstmt.h */
 
 #endif
-
-
-

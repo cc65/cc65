@@ -147,6 +147,3 @@ const ObjData* ExpFind (const char* Name)
     /* Not found */
     return 0;
 }
-
-
-

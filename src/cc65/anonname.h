@@ -55,7 +55,5 @@ int IsAnonName (const char* Name);
 
 
 /* End of anonname.h */
+
 #endif
-
-
-

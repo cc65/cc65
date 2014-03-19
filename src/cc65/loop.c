@@ -98,6 +98,3 @@ void DelLoop (void)
     LoopStack = LoopStack->Next;
     xfree (L);
 }
-
-
-

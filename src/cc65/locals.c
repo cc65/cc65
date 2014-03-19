@@ -545,6 +545,3 @@ void DeclareLocals (void)
         g_cstackcheck ();
     }
 }
-
-
-

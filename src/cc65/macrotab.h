@@ -127,7 +127,5 @@ void PrintMacroStats (FILE* F);
 
 
 /* End of macrotab.h */
+
 #endif
-
-
-

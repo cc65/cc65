@@ -74,6 +74,3 @@ void ULabDone (void);
 /* End of ulabel.h */
 
 #endif
-
-
-

@@ -99,8 +99,3 @@ MemoryArea* NewMemoryArea (const FilePos* Pos, unsigned Name);
 /* End of memarea.h */
 
 #endif
-
-
-
-
-

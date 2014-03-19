@@ -85,6 +85,3 @@ const char* GetComment (unsigned Addr)
     /* Return the label if any */
     return CommentTab[Addr];
 }
-
-
-

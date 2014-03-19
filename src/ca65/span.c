@@ -407,7 +407,3 @@ void WriteSpans (void)
     /* Done writing the spans */
     ObjEndSpans ();
 }
-
-
-
-

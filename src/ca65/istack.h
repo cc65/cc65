@@ -68,7 +68,3 @@ void CheckInputStack (void);
 /* End of istack.h */
 
 #endif
-
-
-
-

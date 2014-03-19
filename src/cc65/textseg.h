@@ -90,7 +90,5 @@ void TS_Output (const TextSeg* S);
 
 
 /* End of textseg.h */
+
 #endif
-
-
-

@@ -100,7 +100,5 @@ void DefOutOfRangeLabels (void);
 
 
 /* End of labels.h */
+
 #endif
-
-
-

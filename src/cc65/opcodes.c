@@ -812,7 +812,3 @@ bc_t GetInverseCond (bc_t BC)
             return 0;
     }
 }
-
-
-
-

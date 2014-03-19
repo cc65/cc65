@@ -94,6 +94,3 @@ Fragment* NewFragment (unsigned char Type, unsigned Size, Section* S)
     /* Return the new fragment */
     return F;
 }
-
-
-

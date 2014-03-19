@@ -372,7 +372,3 @@ void ObjAdd (FILE* Obj, const char* Name)
      */
     FreeObjStrings (O);
 }
-
-
-
-

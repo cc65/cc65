@@ -691,6 +691,3 @@ INLINE TypeCode DataAddrSizeQualifier (void)
 /* End of datatype.h */
 
 #endif
-
-
-

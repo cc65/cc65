@@ -410,6 +410,3 @@ void DefOutOfRangeLabels (void)
 
     SeparatorLine ();
 }
-
-
-

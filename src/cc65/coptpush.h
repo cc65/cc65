@@ -81,6 +81,3 @@ unsigned OptPush2 (CodeSeg* S);
 /* End of coptpush.h */
 
 #endif
-
-
-

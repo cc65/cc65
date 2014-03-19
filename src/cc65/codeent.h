@@ -238,8 +238,5 @@ void CE_Output (const CodeEntry* E);
 
 
 /* End of codeent.h */
+
 #endif
-
-
-
-

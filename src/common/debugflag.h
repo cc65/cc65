@@ -49,7 +49,5 @@ extern unsigned char    Debug;                  /* Debug mode */
 
 
 /* End of debugflag.h */
+
 #endif
-
-
-

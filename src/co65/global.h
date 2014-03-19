@@ -72,6 +72,3 @@ extern unsigned char    NoOutput;           /* Suppress the actual conversion */
 /* End of global.h */
 
 #endif
-
-
-

@@ -512,6 +512,3 @@ void ObjEndSpans (void)
 {
     Header.SpanSize = ftell (F) - Header.SpanOffs;
 }
-
-
-

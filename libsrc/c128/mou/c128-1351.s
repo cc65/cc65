@@ -2,7 +2,8 @@
 ; Driver for the 1351 proportional mouse. Parts of the code are from
 ; the Commodore 1351 mouse users guide.
 ;
-; Ullrich von Bassewitz, 2003-12-29, 2009-09-26
+; 2009-09-26, Ullrich von Bassewitz
+; 2014-03-17, Greg King
 ;
 
         .include        "zeropage.inc"
@@ -83,6 +84,8 @@ YMax:           .res    2               ; Y2 value of bounding box
 OldValue:       .res    1               ; Temp for MoveCheck routine
 NewValue:       .res    1               ; Temp for MoveCheck routine
 
+INIT_save:      .res    1
+
 .rodata
 
 ; Default values for above variables
@@ -94,8 +97,8 @@ NewValue:       .res    1               ; Temp for MoveCheck routine
         .word   SCREEN_WIDTH/2          ; XPos
         .word   0                       ; XMin
         .word   0                       ; YMin
-        .word   SCREEN_WIDTH            ; XMax
-        .word   SCREEN_HEIGHT           ; YMax
+        .word   SCREEN_WIDTH - 1        ; XMax
+        .word   SCREEN_HEIGHT - 1       ; YMax
 .endproc
 
 .code
@@ -106,6 +109,14 @@ NewValue:       .res    1               ; Temp for MoveCheck routine
 ; Must return an MOUSE_ERR_xx code in a/x.
 
 INSTALL:
+
+; Disable the BASIC interpreter's interrupt-driven sprite-motion code.
+; That allows direct access to the VIC-IIe's sprite registers.
+
+        lda     INIT_STATUS
+        sta     INIT_save
+        lda     #%11000000
+        sta     INIT_STATUS
 
 ; Initialize variables. Just copy the default stuff over
 
@@ -133,13 +144,17 @@ INSTALL:
 
         ldx     #$00
         txa
-        rts                             ; Run into UNINSTALL instead
+        rts
 
 ;----------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.
 ; No return code required (the driver is removed from memory on return).
 
-UNINSTALL       = HIDE                  ; Hide cursor on exit
+UNINSTALL:
+        jsr     HIDE                    ; Hide cursor on exit
+        lda     INIT_save
+        sta     INIT_STATUS
+        rts
 
 ;----------------------------------------------------------------------------
 ; HIDE routine. Is called to hide the mouse pointer. The mouse kernel manages

@@ -1326,6 +1326,3 @@ void HandleStdFunc (int Index, FuncDesc* F, ExprDesc* lval)
     /* Call the handler function */
     D->Handler (F, lval);
 }
-
-
-

@@ -134,6 +134,3 @@ cpu_t FindCPU (const char* Name)
     /* Not found */
     return CPU_UNKNOWN;
 }
-
-
-

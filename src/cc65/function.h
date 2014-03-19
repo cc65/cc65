@@ -124,7 +124,5 @@ void NewFunc (struct SymEntry* Func);
 
 
 /* End of function.h */
+
 #endif
-
-
-

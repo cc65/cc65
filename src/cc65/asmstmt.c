@@ -447,6 +447,3 @@ void AsmStatement (void)
     /* Closing paren needed */
     ConsumeRParen ();
 }
-
-
-

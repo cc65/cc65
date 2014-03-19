@@ -1424,7 +1424,3 @@ void O65WriteTarget (O65Desc* D, File* F)
     D->F        = 0;
     D->Filename = 0;
 }
-
-
-
-

@@ -123,6 +123,3 @@ const char* GT_AsString (const StrBuf* Type, StrBuf* String)
     /* Return the contents of String */
     return SB_GetConstBuf (String);
 }
-
-
-

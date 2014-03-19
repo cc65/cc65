@@ -552,6 +552,3 @@ StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
     /* Return the converted bitmap */
     return D;
 }
-
-
-

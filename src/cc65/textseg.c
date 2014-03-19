@@ -116,6 +116,3 @@ void TS_Output (const TextSeg* S)
     /* Add an additional newline after the segment output */
     WriteOutput ("\n");
 }
-
-
-

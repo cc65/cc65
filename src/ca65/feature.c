@@ -125,6 +125,3 @@ feature_t SetFeature (const StrBuf* Key)
     /* Return the value found */
     return Feature;
 }
-
-
-

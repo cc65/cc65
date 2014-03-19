@@ -1505,7 +1505,3 @@ void DoneScanner (void)
 {
     DoneCharSource ();
 }
-
-
-
-

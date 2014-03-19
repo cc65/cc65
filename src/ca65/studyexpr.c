@@ -1539,6 +1539,3 @@ void StudyExpr (ExprNode* Expr, ExprDesc* D)
     printf ("%u sections:\n", D->SecCount);
 #endif
 }
-
-
-

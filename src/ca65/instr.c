@@ -1521,6 +1521,3 @@ void HandleInstruction (unsigned Index)
     /* Call the handler */
     InsTab->Ins[Index].Emit (&InsTab->Ins[Index]);
 }
-
-
-

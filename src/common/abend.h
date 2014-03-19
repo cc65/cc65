@@ -58,6 +58,3 @@ void AbEnd (const char* Format, ...) attribute ((format (printf, 1, 2), noreturn
 /* End of abend.h */
 
 #endif
-
-
-

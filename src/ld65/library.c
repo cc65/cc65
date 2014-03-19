@@ -553,7 +553,3 @@ void PrintDbgLibraries (FILE* F)
         fprintf (F, "lib\tid=%u,name=\"%s\"\n", L->Id, GetString (L->Name));
     }
 }
-
-
-
-

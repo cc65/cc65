@@ -61,7 +61,5 @@ StrBuf* GenRaw (const Bitmap* B, const Collection* A);
 
 
 /* End of raw.h */
+
 #endif
-
-
-

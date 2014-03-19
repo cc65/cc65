@@ -214,6 +214,3 @@ unsigned Opt65C02Stores (CodeSeg* S)
     /* Return the number of changes made */
     return Changes;
 }
-
-
-

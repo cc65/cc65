@@ -63,6 +63,3 @@ Bitmap* ReadInputFile (const Collection* A);
 /* End of input.h */
 
 #endif
-
-
-

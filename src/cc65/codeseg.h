@@ -297,7 +297,5 @@ void CS_GenRegInfo (CodeSeg* S);
 
 
 /* End of codeseg.h */
+
 #endif
-
-
-

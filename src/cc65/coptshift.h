@@ -120,7 +120,5 @@ unsigned OptShift6 (CodeSeg* S);
 
 
 /* End of coptshift.h */
+
 #endif
-
-
-

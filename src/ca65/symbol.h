@@ -88,6 +88,3 @@ struct SymEntry* ParseAnySymName (SymFindAction Action);
 /* End of symbol.h */
 
 #endif
-
-
-

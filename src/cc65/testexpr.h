@@ -72,8 +72,5 @@ unsigned TestInParens (unsigned Label, int Invert);
 
 
 /* End of testexpr.h */
+
 #endif
-
-
-
-

@@ -117,6 +117,3 @@ void WriteSpans (void);
 /* End of span.h */
 
 #endif
-
-
-

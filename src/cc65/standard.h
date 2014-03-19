@@ -82,7 +82,3 @@ standard_t FindStandard (const char* Name);
 /* End of standard.h */
 
 #endif
-
-
-
-

@@ -119,7 +119,5 @@ const char* GetTargetName (target_t Target);
 
 
 /* End of target.h */
+
 #endif
-
-
-

@@ -283,6 +283,3 @@ void PushTokList (TokList* List, const char* Desc)
     ++PushCounter;
     PushInput (ReplayTokList, List, Desc);
 }
-
-
-

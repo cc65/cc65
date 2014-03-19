@@ -130,8 +130,5 @@ Literal* AddLiteralStr (const StrBuf* S);
 
 
 /* End of litpool.h */
+
 #endif
-
-
-
-

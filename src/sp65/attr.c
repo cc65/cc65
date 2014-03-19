@@ -304,6 +304,3 @@ void FreeAttrList (Collection* C)
     /* Free the collection itself */
     FreeCollection (C);
 }
-
-
-

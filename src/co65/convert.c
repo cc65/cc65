@@ -502,6 +502,3 @@ void Convert (const O65Data* D)
     fprintf (F, ".end\n");
     fclose (F);
 }
-
-
-

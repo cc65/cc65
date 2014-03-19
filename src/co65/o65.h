@@ -230,8 +230,5 @@ const char* GetO65OptionText (const O65Option* O);
 
 
 /* End of o65.h */
+
 #endif
-
-
-
-

@@ -82,6 +82,3 @@ void SetMemoryModel (mmodel_t Model);
 /* End of mmodel.h */
 
 #endif
-
-
-

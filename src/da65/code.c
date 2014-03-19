@@ -219,6 +219,3 @@ void ResetCode (void)
 {
     PC = CodeStart;
 }
-
-
-

@@ -140,8 +140,3 @@ Double FP_D_Div (Double Left, Double Right);
 /* End of fp.h */
 
 #endif
-
-
-
-
-

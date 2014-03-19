@@ -77,6 +77,3 @@ unsigned ACol                 = 17;     /* Argument column */
 unsigned CCol                 = 49;     /* Comment column */
 unsigned TCol                 = 81;     /* Text bytes column */
 unsigned BytesPerLine         = 8;      /* Max. number of data bytes per line */
-
-
-

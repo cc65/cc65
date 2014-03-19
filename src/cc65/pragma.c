@@ -851,6 +851,3 @@ void DoPragma (void)
     /* Closing paren needed */
     ConsumeRParen ();
 }
-
-
-

@@ -74,7 +74,5 @@ const FileId* GetFileId (const char* Name, const FileId* Table, unsigned Count);
 
 
 /* End of fileid.h */
+
 #endif
-
-
-

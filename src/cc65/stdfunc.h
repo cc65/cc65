@@ -63,6 +63,3 @@ void HandleStdFunc (int Index, struct FuncDesc* F, ExprDesc* lval);
 /* End of stdfunc.h */
 
 #endif
-
-
-

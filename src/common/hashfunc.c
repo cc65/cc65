@@ -89,6 +89,3 @@ unsigned HashBuf (const StrBuf* S)
     }
     return H;
 }
-
-
-

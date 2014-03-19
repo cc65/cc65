@@ -122,6 +122,3 @@ int EqualExpr (ExprNode* E1, ExprNode* E2);
 /* End of expr.h */
 
 #endif
-
-
-

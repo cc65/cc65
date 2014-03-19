@@ -60,6 +60,3 @@ Bitmap* ReadPCXFile (const Collection* A);
 /* End of pcx.h */
 
 #endif
-
-
-

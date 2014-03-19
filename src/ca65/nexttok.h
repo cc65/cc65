@@ -90,7 +90,3 @@ void LeaveRawTokenMode (void);
 /* End of nexttok.h */
 
 #endif
-
-
-
-

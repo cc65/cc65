@@ -138,6 +138,3 @@ void DumpPalette (FILE* F, const Palette* P)
                  (((unsigned long) C->R) <<  0));
     }
 }
-
-
-

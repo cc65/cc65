@@ -95,7 +95,5 @@ struct SymEntry* DefSizeOfSymbol (struct SymEntry* Sym, long Size);
 
 
 /* End of sizeof.h */
+
 #endif
-
-
-

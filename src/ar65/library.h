@@ -83,6 +83,3 @@ void LibClose (void);
 /* End of library.h */
 
 #endif
-
-
-

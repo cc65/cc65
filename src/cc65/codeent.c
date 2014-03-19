@@ -1490,9 +1490,3 @@ void CE_Output (const CodeEntry* E)
     /* Terminate the line */
     WriteOutput ("\n");
 }
-
-
-
-
-
-

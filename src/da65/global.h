@@ -112,6 +112,3 @@ extern unsigned         BytesPerLine;
 /* End of global.h */
 
 #endif
-
-
-

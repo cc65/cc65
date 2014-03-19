@@ -389,6 +389,3 @@ void ConDesDump (void)
         printf ("CONDES(%u): %u symbols\n", Type, CollCount (ExpList));
     }
 }
-
-
-

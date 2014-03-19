@@ -77,6 +77,3 @@ int CompareFilePos (const FilePos* P1, const FilePos* P2);
 /* End of filepos.h */
 
 #endif
-
-
-

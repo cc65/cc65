@@ -493,6 +493,3 @@ void SB_Printf (StrBuf* S, const char* Format, ...)
     SB_VPrintf (S, Format, ap);
     va_end (ap);
 }
-
-
-

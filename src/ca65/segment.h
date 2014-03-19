@@ -174,6 +174,3 @@ void WriteSegments (void);
 /* End of segment.h */
 
 #endif
-
-
-

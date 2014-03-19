@@ -62,7 +62,5 @@ typedef unsigned long uintmax_t;
 
 
 /* End of inttypes.h */
+
 #endif
-
-
-

@@ -59,7 +59,5 @@ int IsLocalLabelName (const char* Name);
 
 
 /* End of asmlabel.h */
+
 #endif
-
-
-

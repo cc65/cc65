@@ -114,7 +114,3 @@ void InitStrPool (void);
 /* End of spool.h */
 
 #endif
-
-
-
-

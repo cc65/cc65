@@ -233,6 +233,3 @@ void AsmInc (const char* Filename, char CommentStart, int IgnoreUnknown)
     /* Close the include file ignoring errors (we were just reading). */
     (void) fclose (F);
 }
-
-
-

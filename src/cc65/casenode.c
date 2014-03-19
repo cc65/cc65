@@ -182,6 +182,3 @@ unsigned InsertCaseValue (Collection* Nodes, unsigned long Val, unsigned Depth)
     /* Return the label of the node we found/created */
     return CaseLabel;
 }
-
-
-

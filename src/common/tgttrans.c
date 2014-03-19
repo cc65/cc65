@@ -127,8 +127,3 @@ void TgtTranslateSet (unsigned Index, unsigned char C)
     CHECK (Index > 0 && Index < sizeof (Tab));
     Tab[Index] = C;
 }
-
-
-
-
-

@@ -87,6 +87,3 @@ long IS_Pop (IntStack* S)
     PRECONDITION (S->Count > 0);
     return S->Stack[--S->Count];
 }
-
-
-

@@ -110,6 +110,3 @@ void EnableDefineStyleMacros (void);
 /* End of macro.h */
 
 #endif
-
-
-

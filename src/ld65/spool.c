@@ -65,7 +65,3 @@ void InitStrPool (void)
      */
     SP_AddStr (StrPool, "<invalid message #0>");
 }
-
-
-
-

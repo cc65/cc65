@@ -984,6 +984,3 @@ void EmitDebugInfo (void)
         }
     }
 }
-
-
-

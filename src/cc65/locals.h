@@ -62,7 +62,5 @@ void RestoreRegVars (int HaveResult);
 
 
 /* End of locals.h */
+
 #endif
-
-
-

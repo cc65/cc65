@@ -56,7 +56,5 @@ void DefaultLabel (void);
 
 
 /* End of swstmt.h */
+
 #endif
-
-
-

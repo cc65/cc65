@@ -55,7 +55,3 @@ unsigned GetVersionAsNumber (void);
 /* End of version.h */
 
 #endif
-
-
-
-

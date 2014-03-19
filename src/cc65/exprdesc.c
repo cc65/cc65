@@ -373,6 +373,3 @@ Type* ReplaceType (ExprDesc* Expr, const Type* NewType)
     Expr->Type = TypeDup (NewType);
     return OldType;
 }
-
-
-

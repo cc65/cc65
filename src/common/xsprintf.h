@@ -88,7 +88,3 @@ int xvsprintf (char* Buf, size_t BufSize, const char* Format, va_list ap)
 /* End of xsprintf.h */
 
 #endif
-
-
-
-

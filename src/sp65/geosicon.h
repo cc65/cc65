@@ -64,6 +64,3 @@ StrBuf* GenGeosIcon (const Bitmap* B, const Collection* A);
 /* End of geosicon.h */
 
 #endif
-
-
-

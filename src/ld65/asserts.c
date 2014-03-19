@@ -157,6 +157,3 @@ void CheckAssertions (void)
         }
     }
 }
-
-
-

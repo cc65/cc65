@@ -80,6 +80,3 @@ void CleanupIfStack (unsigned SP);
 /* End of condasm.h */
 
 #endif
-
-
-

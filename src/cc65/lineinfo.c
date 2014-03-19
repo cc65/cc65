@@ -192,6 +192,3 @@ unsigned GetInputLine (const LineInfo* LI)
     PRECONDITION (LI != 0);
     return LI->LineNum;
 }
-
-
-

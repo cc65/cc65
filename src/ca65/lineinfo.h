@@ -115,8 +115,5 @@ void WriteLineInfos (void);
 
 
 /* End of lineinfo.h */
+
 #endif
-
-
-
-

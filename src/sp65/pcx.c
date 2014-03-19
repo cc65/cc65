@@ -440,6 +440,3 @@ Bitmap* ReadPCXFile (const Collection* A)
     /* Return the bitmap */
     return B;
 }
-
-
-

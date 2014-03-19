@@ -108,7 +108,3 @@ void DoneScanner (void);
 /* End of scanner.h */
 
 #endif
-
-
-
-

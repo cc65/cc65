@@ -79,6 +79,3 @@ int IsAnonName (const StrBuf* Name)
     }
     return (strncmp (SB_GetConstBuf (Name), AnonTag, sizeof (AnonTag) - 1) == 0);
 }
-
-
-

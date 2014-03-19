@@ -49,8 +49,8 @@
 
 
 
-extern SearchPath*      IncSearchPath;          /* Standard include path */
-extern SearchPath*      BinSearchPath;          /* Binary include path */
+extern SearchPaths*     IncSearchPath;          /* Standard include path */
+extern SearchPaths*     BinSearchPath;          /* Binary include path */
 
 
 
@@ -71,6 +71,3 @@ void FinishIncludePaths (void);
 /* End of incpath.h */
 
 #endif
-
-
-

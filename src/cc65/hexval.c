@@ -62,6 +62,3 @@ unsigned HexVal (int C)
         return toupper (C) - 'A' + 10;
     }
 }
-
-
-

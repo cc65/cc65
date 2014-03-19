@@ -109,6 +109,3 @@ unsigned OptStore5 (CodeSeg* S);
 /* End of coptstore.h */
 
 #endif
-
-
-

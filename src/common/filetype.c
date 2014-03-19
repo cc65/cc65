@@ -104,6 +104,3 @@ FILETYPE GetFileType (const char* Name)
     /* Return the result */
     return F? F->Id : FILETYPE_UNKNOWN;
 }
-
-
-

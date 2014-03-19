@@ -75,6 +75,3 @@ void TgtTranslateSet (unsigned Index, unsigned char C);
 /* End of tgttrans.h */
 
 #endif
-
-
-

@@ -337,6 +337,3 @@ void ObjExtract (const char* Name)
         Error ("Cannot set mod time on `%s': %s", Name, strerror (errno));
     }
 }
-
-
-

@@ -118,6 +118,3 @@ unsigned ParseInit (Type* T);
 /* End of declare.h */
 
 #endif
-
-
-

@@ -79,6 +79,3 @@ standard_t FindStandard (const char* Name)
     /* Not found */
     return STD_UNKNOWN;
 }
-
-
-

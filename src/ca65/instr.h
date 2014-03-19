@@ -179,8 +179,3 @@ void HandleInstruction (unsigned Index);
 /* End of instr.h */
 
 #endif
-
-
-
-
-

@@ -80,6 +80,3 @@ void SS_Push (StrStack* S, const char* Val)
     CHECK (S->Count < sizeof (S->Stack) / sizeof (S->Stack[0]));
     S->Stack[S->Count++] = xstrdup (Val);
 }
-
-
-

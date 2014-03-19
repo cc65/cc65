@@ -258,7 +258,5 @@ bc_t GetInverseCond (bc_t BC);
 
 
 /* End of opcodes.h */
+
 #endif
-
-
-

@@ -63,6 +63,3 @@ int RelocatableBinFmt (unsigned Format);
 /* End of binfmt.h */
 
 #endif
-
-
-

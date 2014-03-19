@@ -1142,6 +1142,3 @@ int ConsumeRCurly (void)
 {
     return Consume (TOK_RCURLY, "`}' expected");
 }
-
-
-

@@ -183,6 +183,3 @@ unsigned OptComplAX1 (CodeSeg* S);
 /* End of coptneg.h */
 
 #endif
-
-
-

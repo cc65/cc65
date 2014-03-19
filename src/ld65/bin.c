@@ -316,8 +316,3 @@ void BinWriteTarget (BinDesc* D, struct File* F)
     D->F        = 0;
     D->Filename = 0;
 }
-
-
-
-
-

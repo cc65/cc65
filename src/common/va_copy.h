@@ -74,7 +74,5 @@
 
 
 /* End of va_copy.h */
+
 #endif
-
-
-

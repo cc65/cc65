@@ -1942,6 +1942,3 @@ ExprNode* BoundedExpr (ExprNode* (*ExprFunc) (void), unsigned Size)
 {
     return MakeBoundedExpr (ExprFunc (), Size);
 }
-
-
-

@@ -91,7 +91,5 @@ int WriteOutput (const char* Format, ...) attribute ((format (printf, 1, 2)));
 
 
 /* End of output.h */
+
 #endif
-
-
-

@@ -94,6 +94,3 @@ feature_t SetFeature (const StrBuf* Key);
 /* End of feature.h */
 
 #endif
-
-
-

@@ -359,7 +359,3 @@ unsigned GetSymInfoFlags (const SymEntry* Sym, long* ConstVal);
 /* End of symentry.h */
 
 #endif
-
-
-
-

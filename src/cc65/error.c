@@ -321,6 +321,3 @@ void ErrorReport (void)
 {
     Print (stdout, 1, "%u errors, %u warnings\n", ErrorCount, WarningCount);
 }
-
-
-

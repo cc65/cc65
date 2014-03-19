@@ -129,7 +129,7 @@ extern void c128_reu_emd[];
 extern void c128_vdc_emd[];
 extern void c128_ptvjoy_joy[];
 extern void c128_stdjoy_joy[];  /* Referred to by joy_static_stddrv[] */
-extern void c128_1351_mous[];   /* Referred to by mouse_static_stddrv[] */
+extern void c128_1351_mou[];    /* Referred to by mouse_static_stddrv[] */
 extern void c128_joy_mou[];
 extern void c128_inkwell_mou[];
 extern void c128_pot_mou[];

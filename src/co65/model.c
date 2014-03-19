@@ -91,6 +91,3 @@ O65Model FindModel (const char* ModelName)
     }
     return O65_MODEL_INVALID;
 }
-
-
-

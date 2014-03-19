@@ -299,6 +299,3 @@ void DoUnion (void)
 {
     DoStructInternal (0, UNION);
 }
-
-
-

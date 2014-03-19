@@ -262,6 +262,3 @@ int HasAnonName (const SymEntry* Entry)
 {
     return IsAnonName (Entry->Name);
 }
-
-
-

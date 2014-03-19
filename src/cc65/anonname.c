@@ -78,6 +78,3 @@ int IsAnonName (const char* Name)
 {
     return (strncmp (Name, AnonTag, sizeof (AnonTag) - 1) == 0);
 }
-
-
-

@@ -184,6 +184,3 @@ INLINE unsigned GetBitmapColors (const Bitmap* B)
 /* End of bitmap.h */
 
 #endif
-
-
-

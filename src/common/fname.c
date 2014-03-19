@@ -115,6 +115,3 @@ char* MakeFilename (const char* Origin, const char* Ext)
     }
     return Out;
 }
-
-
-

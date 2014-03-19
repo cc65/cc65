@@ -373,6 +373,3 @@ unsigned TextTable (void)
     /* Return the number of bytes output */
     return ByteCount;
 }
-
-
-

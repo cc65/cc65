@@ -76,6 +76,3 @@ void CheckAssertions (void);
 /* End of asserts.h */
 
 #endif
-
-
-

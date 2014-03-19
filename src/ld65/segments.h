@@ -168,7 +168,3 @@ void CheckSegments (void);
 /* End of segments.h */
 
 #endif
-
-
-
-

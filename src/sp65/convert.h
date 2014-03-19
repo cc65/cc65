@@ -70,6 +70,3 @@ void ListConversionTargets (FILE* F);
 /* End of convert.h */
 
 #endif
-
-
-

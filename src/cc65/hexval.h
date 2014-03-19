@@ -52,9 +52,5 @@ unsigned HexVal (int C);
 
 
 /* End of hexval.h */
+
 #endif
-
-
-
-
-

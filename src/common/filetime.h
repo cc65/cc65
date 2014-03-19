@@ -2,7 +2,7 @@
 /*                                                                           */
 /*                                filetime.h                                 */
 /*                                                                           */
-/*                   Replacement for buggy Microsoft code                    */
+/*                       Replacement for Windows code                        */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -68,6 +68,3 @@ int SetFileTimes (const char* Path, time_t T);
 /* End of filestat.h */
 
 #endif
-
-
-

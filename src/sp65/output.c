@@ -140,6 +140,3 @@ void WriteOutputFile (const StrBuf* Data, const Collection* A, const Bitmap* B)
     /* Call the format specific write */
     OutputFormatTable[F->Id].Write (Data, A, B);
 }
-
-
-

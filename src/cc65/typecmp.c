@@ -420,7 +420,3 @@ typecmp_t TypeCmp (const Type* lhs, const Type* rhs)
     /* Return the result */
     return Result;
 }
-
-
-
-

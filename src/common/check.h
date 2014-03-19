@@ -86,7 +86,5 @@ extern void (*CheckFailed) (const char* Msg, const char* Cond,
 
 
 /* End of check.h */
+
 #endif
-
-
-

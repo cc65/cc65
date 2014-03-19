@@ -79,6 +79,3 @@ unsigned long shr_l (unsigned long l, unsigned count);
 /* End of shift.h */
 
 #endif
-
-
-

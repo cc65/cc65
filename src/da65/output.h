@@ -111,8 +111,5 @@ void OutputSettings (void);
 
 
 /* End of output.h */
+
 #endif
-
-
-
-

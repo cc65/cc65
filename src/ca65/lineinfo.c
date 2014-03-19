@@ -501,6 +501,3 @@ void WriteLineInfos (void)
     /* End of line infos */
     ObjEndLineInfos ();
 }
-
-
-

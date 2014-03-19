@@ -123,4 +123,3 @@ void ListConversionTargets (FILE* F)
         fprintf (F, "  %s\n", ConverterMap[I].Format);
     }
 }
-

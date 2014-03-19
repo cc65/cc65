@@ -64,7 +64,5 @@ unsigned OptSize2 (CodeSeg* S);
 
 
 /* End of coptsize.h */
+
 #endif
-
-
-

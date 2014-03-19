@@ -171,6 +171,3 @@ unsigned OptCmp9 (CodeSeg* S);
 /* End of coptcmp.h */
 
 #endif
-
-
-

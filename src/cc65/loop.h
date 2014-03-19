@@ -74,6 +74,3 @@ void DelLoop (void);
 /* End of loop.h */
 
 #endif
-
-
-

@@ -452,6 +452,3 @@ void CreateListing (void)
     /* Close the listing file */
     (void) fclose (F);
 }
-
-
-

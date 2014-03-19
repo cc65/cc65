@@ -2145,6 +2145,3 @@ void CheckPseudo (void)
         Warning (1, "CPU stack is not empty");
     }
 }
-
-
-

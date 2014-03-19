@@ -123,6 +123,3 @@ void CreateListing (void);
 /* End of listing.h */
 
 #endif
-
-
-

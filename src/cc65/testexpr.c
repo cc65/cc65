@@ -123,7 +123,3 @@ unsigned TestInParens (unsigned Label, int Invert)
     /* Return the result of the expression */
     return Result;
 }
-
-
-
-

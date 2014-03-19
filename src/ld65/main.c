@@ -722,6 +722,3 @@ int main (int argc, char* argv [])
     /* Return an apropriate exit code */
     return EXIT_SUCCESS;
 }
-
-
-

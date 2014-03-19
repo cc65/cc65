@@ -2,7 +2,7 @@
 /*                                                                           */
 /*                                filestat.c                                 */
 /*                                                                           */
-/*                   Replacement for buggy Microsoft code                    */
+/*                       Replacement for Windows code                        */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -46,10 +46,9 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#if defined(__WATCOMC__) && defined(__NT__)
-#define BUGGY_OS 1
-#include <errno.h>
-#include <windows.h>
+#if defined(_WIN32)
+#  include <errno.h>
+#  include <windows.h>
 #endif
 
 /* common */
@@ -63,7 +62,7 @@
 
 
 
-#if defined(BUGGY_OS)
+#if defined(_WIN32)
 
 
 
@@ -77,7 +76,7 @@ static time_t FileTimeToUnixTime (const FILETIME* T)
      * way to express a number > 32 bit (known to me) but is able to do
      * calculations with 64 bit integers, so we need to do it this way.
      */
-    static const ULARGE_INTEGER Offs = { 0xB6109100UL, 0x00000020UL };
+    static const ULARGE_INTEGER Offs = { { 0xB6109100UL, 0x00000020UL } };
     ULARGE_INTEGER V;
     V.LowPart  = T->dwLowDateTime;
     V.HighPart = T->dwHighDateTime;

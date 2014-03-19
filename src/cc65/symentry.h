@@ -272,7 +272,5 @@ int HasAnonName (const SymEntry* Entry);
 
 
 /* End of symentry.h */
+
 #endif
-
-
-

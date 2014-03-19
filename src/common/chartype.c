@@ -147,6 +147,3 @@ int IsQuote (char C)
 {
     return (C == '"' || C == '\'');
 }
-
-
-

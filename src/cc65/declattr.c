@@ -247,6 +247,3 @@ void ParseAttribute (Declaration* D)
     ConsumeRParen ();
     ConsumeRParen ();
 }
-
-
-

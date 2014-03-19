@@ -59,6 +59,3 @@ int PowerOf2 (unsigned long Val)
     }
     return -1;
 }
-
-
-

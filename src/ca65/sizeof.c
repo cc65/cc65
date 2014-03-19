@@ -130,6 +130,3 @@ SymEntry* DefSizeOfSymbol (SymEntry* Sym, long Size)
     SymDef (SizeSym, GenLiteralExpr (Size), ADDR_SIZE_DEFAULT, SF_NONE);
     return SizeSym;
 }
-
-
-

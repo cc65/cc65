@@ -295,8 +295,3 @@ void TypeCast (ExprDesc* Expr)
     /* Convert the value. */
     DoConversion (Expr, NewType);
 }
-
-
-
-
-

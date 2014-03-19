@@ -98,7 +98,3 @@ int IsLocalLabelName (const char* Name)
     /* Local label name */
     return 1;
 }
-
-
-
-

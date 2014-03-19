@@ -1680,6 +1680,3 @@ void CS_GenRegInfo (CodeSeg* S)
     } while (!Done);
 
 }
-
-
-

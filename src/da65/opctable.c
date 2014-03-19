@@ -76,7 +76,3 @@ void SetOpcTable (cpu_t CPU)
         default:          Error ("Unsupported CPU");
     }
 }
-
-
-
-

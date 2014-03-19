@@ -65,6 +65,3 @@ extern unsigned         What;           /* What should get dumped? */
 /* End of global.h */
 
 #endif
-
-
-

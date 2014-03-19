@@ -45,7 +45,7 @@ containing DOS 3.3 as well as ProDOS 8.
 
 For ProDOS 8 system programs the load address is fixed to &dollar;2000 so there
 is no need for a header. Thus the linker configuration
-<htmlurl url="apple2-4.html#ss4.3" name="apple2-system.cfg"> for those programs
+<htmlurl url="apple2.html#ss4.3" name="apple2-system.cfg"> for those programs
 omits the DOS 3.3 header. The right AppleCommander option to put system files
 without a header on a ProDOS 8 disk image is <tt/-p/.
 
@@ -81,7 +81,7 @@ cc65 runtime system takes care of actually moving the code into the Language
 Card.
 
 The amount of memory available in the Language Card for generated code depends
-on the chosen <htmlurl url="apple2-4.html" name="linker configuration">.
+on the chosen <htmlurl url="apple2.html#s4" name="linker configuration">.
 
 
 
@@ -231,10 +231,9 @@ range.
 The easiest (and for really large programs in fact the only) way to have a cc65
 program use the memory from &dollar;800 to &dollar;2000 is to link it as binary
 (as opposed to system) program using the linker configuration
-<htmlurl url="apple2-4.html#ss4.4" name="apple2-loader.cfg"> with start address
-&dollar;800 and load it with <bf/LOADER.SYSTEM - an Apple&nbsp;&rsqb;&lsqb;
-ProDOS 8 loader for cc65 programs/. The program then works like a system program
-(i.e. quits to the ProDOS dispatcher).
+<htmlurl url="apple2.html#ss4.4" name="apple2-loader.cfg"> with start address
+&dollar;803 and load it with the targetutil LOADER.SYSTEM. The program then works
+like a system program (i.e. quits to the ProDOS dispatcher).
 
 Using LOADER.SYSTEM is as simple as copying it to the ProDOS 8 directory of the
 program to load under name &lt;program&gt;.SYSTEM as a system program. For
@@ -244,7 +243,7 @@ example the program <tt/MYPROG/ is loaded by <tt/MYPROG.SYSTEM/.
 <sect1>Heap<p>
 
 If the cc65 program can be successfully linked as system program using the linker
-configuration <htmlurl url="apple2-4.html#ss4.3" name="apple2-system.cfg"> but
+configuration <htmlurl url="apple2.html#ss4.3" name="apple2-system.cfg"> but
 uses the heap either explicitly or implicitly (i.e. by loading a driver) then
 the memory from &dollar;800 to &dollar;2000 can be added to the heap by calling
 <tt/_heapadd ((void *) 0x0800, 0x1800);/ at the beginning of <tt/main()/.
@@ -487,7 +486,7 @@ url="ca65.html" name="assembler manual">.
 <descrip>
 
   <tag/Drive ID/
-  The function <htmlurl url="dio-1.html" name="dio_open()"> has the single
+  The function <htmlurl url="dio.html#s1" name="dio_open()"> has the single
   parameter <tt/device/ to identify the device to be opened. Therefore an
   Apple&nbsp;II slot and drive pair is mapped to that <tt/device/ according
   to the formula
@@ -499,7 +498,7 @@ url="ca65.html" name="assembler manual">.
   so that for example slot 6 drive 2 is mapped to <tt/device/ 14.
 
   <tag/Sector count/
-  The function <htmlurl url="dio-3.html" name="dio_query_sectcount()"> returns
+  The function <htmlurl url="dio.html#s3" name="dio_query_sectcount()"> returns
   the correct sector count for all ProDOS 8 disks. However for any non-ProDOS 8
   disk it simply always returns 280 (which is only correct for a 140 KB disk).
   This condition is indicated by the <tt/_oserror/ value 82.

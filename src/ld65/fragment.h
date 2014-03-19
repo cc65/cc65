@@ -112,7 +112,3 @@ INLINE unsigned GetFragmentSourceLine (const Fragment* F)
 /* End of fragment.h */
 
 #endif
-
-
-
-

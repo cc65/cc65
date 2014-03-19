@@ -72,6 +72,3 @@ void Print (FILE* F, unsigned V, const char* Format, ...)
     vfprintf (F, Format, ap);
     va_end (ap);
 }
-
-
-

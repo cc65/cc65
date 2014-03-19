@@ -108,6 +108,3 @@ void DelObjData (const char* Module);
 /* End of objdata.h */
 
 #endif
-
-
-

@@ -101,6 +101,3 @@ unsigned SP_GetCount (const StringPool* P);
 /* End of strpool.h */
 
 #endif
-
-
-

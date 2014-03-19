@@ -153,6 +153,3 @@ unsigned OptAdd6 (CodeSeg* S);
 /* End of coptadd.h */
 
 #endif
-
-
-

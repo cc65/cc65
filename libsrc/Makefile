@@ -1,3 +1,7 @@
+ifneq ($(shell echo),)
+  CMD_EXE = 1
+endif
+
 CBMS = c128   \
        c16    \
        c64    \
@@ -30,6 +34,27 @@ DRVTYPES = emd \
            ser \
            tgi
 
+OUTPUTDIRS := lib         \
+              $(DRVTYPES) \
+              targetutil  \
+              asminc      \
+              cfg         \
+              include     \
+              $(subst ../,,$(filter-out $(wildcard ../include/*.*),$(wildcard ../include/*)))
+
+.PHONY: all mostlyclean clean install zip lib $(TARGETS)
+
+.SUFFIXES:
+
+ifdef CMD_EXE
+  DIRLIST = $(strip $(foreach dir,$1,$(wildcard $(dir))))
+  MKDIR = mkdir $(subst /,\,$1)
+  RMDIR = $(if $(DIRLIST),rmdir /s /q $(subst /,\,$(DIRLIST)))
+else
+  MKDIR = mkdir -p $1
+  RMDIR = $(RM) -r $1
+endif
+
 # Every target requires its individual vpath setting but the vpath directive
 # acts globally. Therefore each target is built in a separate make instance.
 
@@ -39,60 +64,55 @@ ifeq ($(words $(MAKECMDGOALS)),1)
   endif
 endif
 
-DIRLIST = $(strip $(foreach dir,$1,$(wildcard $(dir))))
-
-ifeq ($(shell echo),)
-  MKDIR = mkdir -p $1
-  RMDIR = $(RM) -r $1
-else
-  MKDIR = mkdir $(subst /,\,$1)
-  RMDIR = $(if $(DIRLIST),rmdir /s /q $(subst /,\,$(DIRLIST)))
-endif
-
-.SUFFIXES:
-
-.PHONY: all lib $(TARGETS) mostlyclean clean install
-
 ifndef TARGET
 
 datadir = $(prefix)/share/cc65
 
-INSTALLDIRS = ../asminc ../cfg ../include \
-              $(filter-out $(wildcard ../include/*.*),$(wildcard ../include/*)) \
-              ../lib ../targetutil $(addprefix ../,$(DRVTYPES))
-
-INSTALL = install
-
 all lib: $(TARGETS)
 
-$(TARGETS):
-	@$(MAKE) --no-print-directory $@
-
 mostlyclean:
-	$(call RMDIR,../wrk)
+	$(call RMDIR,../libwrk)
 
 clean:
-	$(call RMDIR,../wrk ../lib ../targetutil $(addprefix ../,$(DRVTYPES)))
+	$(call RMDIR,../libwrk ../lib ../targetutil $(addprefix ../,$(DRVTYPES)))
+
+ifdef CMD_EXE
 
 install:
-	$(foreach dir,$(INSTALLDIRS),$(INSTALL_recipe))
 
-##########
+else # CMD_EXE
+
+INSTALL = install
 
 define INSTALL_recipe
 
 $(if $(prefix),,$(error variable `prefix' must be set))
-$(INSTALL) -d $(subst ..,$(DESTDIR)$(datadir),$(dir))
-$(INSTALL) -m644 $(dir)/*.* $(subst ..,$(DESTDIR)$(datadir),$(dir))
+$(INSTALL) -d $(DESTDIR)$(datadir)/$(dir)
+$(INSTALL) -m644 ../$(dir)/*.* $(DESTDIR)$(datadir)/$(dir)
 
-endef
+endef # INSTALL_recipe
 
-##########
+install:
+	$(foreach dir,$(OUTPUTDIRS),$(INSTALL_recipe))
+
+endif # CMD_EXE
+
+define ZIP_recipe
+
+@cd .. && zip cc65 $(dir)/*.*
+
+endef # ZIP_recipe
+
+zip:
+	$(foreach dir,$(OUTPUTDIRS),$(ZIP_recipe))
+
+$(TARGETS):
+	@$(MAKE) --no-print-directory $@
 
 else # TARGET
 
 CA65FLAGS =
-CC65FLAGS = -Osir -W error
+CC65FLAGS = -Or -W error
 
 EXTZP = cbm510 \
         cbm610 \
@@ -100,9 +120,12 @@ EXTZP = cbm510 \
 
 MKINC = $(GEOS) \
         atari   \
+        atarixl \
         nes
 
-TARGETUTIL = apple2 \
+TARGETUTIL = apple2    \
+             apple2enh \
+             atari     \
              geos-apple
 
 GEOSDIRS = common      \
@@ -160,7 +183,7 @@ vpath %.c $(SRCDIRS)
 OBJS := $(patsubst %.s,%.o,$(foreach dir,$(SRCDIRS),$(wildcard $(dir)/*.s)))
 OBJS += $(patsubst %.c,%.o,$(foreach dir,$(SRCDIRS),$(wildcard $(dir)/*.c)))
 
-OBJS := $(addprefix ../wrk/$(TARGET)/,$(sort $(notdir $(OBJS))))
+OBJS := $(addprefix ../libwrk/$(TARGET)/,$(sort $(notdir $(OBJS))))
 
 DEPS = $(OBJS:.o=.d)
 
@@ -168,30 +191,28 @@ EXTRA_SRCPAT = $(SRCDIR)/extra/%.s
 EXTRA_OBJPAT = ../lib/$(TARGET)-%.o
 EXTRA_OBJS := $(patsubst $(EXTRA_SRCPAT),$(EXTRA_OBJPAT),$(wildcard $(SRCDIR)/extra/*.s))
 
-ZPOBJ = ../wrk/$(TARGET)/zeropage.o
+ZPOBJ = ../libwrk/$(TARGET)/zeropage.o
 ifeq ($(TARGET),$(filter $(TARGET),$(EXTZP)))
-  ZPOBJ += ../wrk/$(TARGET)/extzp.o
+  ZPOBJ += ../libwrk/$(TARGET)/extzp.o
 endif
 
-ifeq ($(SRCDIR),$(filter $(SRCDIR),$(MKINC)))
+ifeq ($(TARGET),$(filter $(TARGET),$(MKINC)))
   include $(SRCDIR)/Makefile.inc
 endif
 
-ifeq ($(SRCDIR),$(filter $(SRCDIR),$(TARGETUTIL)))
+ifeq ($(TARGET),$(filter $(TARGET),$(TARGETUTIL)))
   include $(SRCDIR)/targetutil/Makefile.inc
 endif
-
-##########
 
 define DRVTYPE_template
 
 $1_SRCDIR = $$(SRCDIR)/$1
-$1_OBJDIR = ../wrk/$$(TARGET)/$1
+$1_OBJDIR = ../libwrk/$$(TARGET)/$1
 $1_DRVDIR = ../$1
 
 $1_OBJPAT = $$($1_OBJDIR)/$$(OBJPFX)%.o
 $1_DRVPAT = $$($1_DRVDIR)/$$(DRVPFX)%.$1
-$1_STCPAT = ../wrk/$$(TARGET)/$$(DRVPFX)%-$1.o
+$1_STCPAT = ../libwrk/$$(TARGET)/$$(DRVPFX)%-$1.o
 
 $1_OBJS := $$(patsubst $$($1_SRCDIR)/%.s,$$($1_OBJDIR)/%.o,$$(wildcard $$($1_SRCDIR)/*.s))
 
@@ -219,9 +240,7 @@ OBJS += $$($1_STCS)
 
 DEPS += $$($1_OBJS:.o=.d)
 
-endef
-
-##########
+endef # DRVTYPE_template
 
 $(foreach drvtype,$(DRVTYPES),$(eval $(call DRVTYPE_template,$(drvtype))))
 
@@ -233,31 +252,25 @@ LD65 := $(if $(wildcard ../bin/ld65*),../bin/ld65,ld65)
 
 export CC65_HOME := $(abspath ..)
 
-##########
-
 define ASSEMBLE_recipe
 
-$(if $(TRAVIS),,@echo $(TARGET) - $<)
+$(if $(QUIET),,@echo $(TARGET) - $<)
 @$(CA65) -t $(TARGET) $(CA65FLAGS) --create-dep $(@:.o=.d) -o $@ $<
 
-endef
-
-##########
+endef # ASSEMBLE_recipe
 
 define COMPILE_recipe
 
-$(if $(TRAVIS),,@echo $(TARGET) - $<)
+$(if $(QUIET),,@echo $(TARGET) - $<)
 @$(CC65) -t $(TARGET) $(CC65FLAGS) --create-dep $(@:.o=.d) --dep-target $@ -o $(@:.o=.s) $<
 @$(CA65) -t $(TARGET) -o $@ $(@:.o=.s)
 
-endef
+endef # COMPILE_recipe
 
-##########
-
-../wrk/$(TARGET)/%.o: %.s | ../wrk/$(TARGET)
+../libwrk/$(TARGET)/%.o: %.s | ../libwrk/$(TARGET)
 	$(ASSEMBLE_recipe)
 
-../wrk/$(TARGET)/%.o: %.c | ../wrk/$(TARGET)
+../libwrk/$(TARGET)/%.o: %.c | ../libwrk/$(TARGET)
 	$(COMPILE_recipe)
 
 $(EXTRA_OBJPAT): $(EXTRA_SRCPAT) | ../lib
@@ -267,7 +280,7 @@ $(EXTRA_OBJPAT): $(EXTRA_SRCPAT) | ../lib
 ../lib/$(TARGET).lib: $(OBJS) | ../lib
 	$(AR65) a $@ $?
 
-../wrk/$(TARGET) ../lib ../targetutil:
+../libwrk/$(TARGET) ../lib ../targetutil:
 	@$(call MKDIR,$@)
 
 $(TARGET): $(EXTRA_OBJS) ../lib/$(TARGET).lib

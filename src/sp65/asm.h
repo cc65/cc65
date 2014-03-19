@@ -61,6 +61,3 @@ void WriteAsmFile (const StrBuf* Data, const Collection* A, const Bitmap* B);
 /* End of asm.h */
 
 #endif
-
-
-

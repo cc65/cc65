@@ -61,7 +61,5 @@ void TypeCast (ExprDesc* Expr);
 
 
 /* End of typeconv.h */
+
 #endif
-
-
-

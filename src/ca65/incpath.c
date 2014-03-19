@@ -44,8 +44,8 @@
 
 
 
-SearchPath*     IncSearchPath;          /* Standard include path */
-SearchPath*     BinSearchPath;          /* Binary include path */
+SearchPaths*    IncSearchPath;          /* Standard include path */
+SearchPaths*    BinSearchPath;          /* Binary include path */
 
 
 
@@ -75,13 +75,10 @@ void FinishIncludePaths (void)
     AddSubSearchPathFromEnv (IncSearchPath, "CC65_HOME", "asminc");
 
     /* Add some compiled-in search paths if defined at compile time. */
-#ifdef CA65_INC
+#if defined(CA65_INC) && !defined(_WIN32)
     AddSearchPath (IncSearchPath, STRINGIZE (CA65_INC));
 #endif
 
     /* Add paths relative to the parent directory of the Windows binary. */
     AddSubSearchPathFromWinBin (IncSearchPath, "asminc");
 }
-
-
-

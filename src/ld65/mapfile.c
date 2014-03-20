@@ -119,8 +119,8 @@ void CreateMapFile (int ShortMap)
 
         /* Write the exports list by value */
         fprintf (F, "\n\n"
-                    "Exports list by value\n"
-                    "---------------------\n");
+                    "Exports list by value:\n"
+                    "----------------------\n");
         PrintExportMapByValue (F);
 
         /* Write the imports list */

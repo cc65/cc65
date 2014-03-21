@@ -1,232 +1,283 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <cc65.h>
 #include <conio.h>
 #include <ctype.h>
 #include <modload.h>
-#include <tgi.h>
 #include <tgi/tgi-kernel.h>
 
+#include <stdlib.h>
+#include <unistd.h>
+#include <tgi.h>
 
-
-#ifndef DYN_DRV
-#  define DYN_DRV       1
-#endif
-
-#define COLOR_BACK      TGI_COLOR_BLACK
-#define COLOR_FORE      TGI_COLOR_WHITE
-
-
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
-
-
-
-/* Driver stuff */
-static unsigned MaxX;
-static unsigned MaxY;
-static unsigned AspectRatio;
-
-
-
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
-
-
-
-static void CheckError (const char* S)
+static void showinfo()
 {
-    unsigned char Error = tgi_geterror ();
-    if (Error != TGI_ERR_OK) {
-        printf ("%s: %d\n", S, Error);
-        exit (EXIT_FAILURE);
+    char buf[6];
+    unsigned char x, y, nextline;
+
+    tgi_clear();
+    tgi_setcolor(TGI_COLOR_WHITE);
+    x = 10;
+    y = 10;
+
+    // Find lineheight
+    if (tgi_gettextheight("0") > 6) {
+        nextline = tgi_gettextheight("0") + 2;
+    } else {
+        nextline = 8 + 2;
     }
+
+    // Number of pixels
+    tgi_outtextxy(x, y, "Screen ");
+    utoa(tgi_getxres(), buf, 10);
+    tgi_outtext(buf);
+    tgi_outtext("x");
+    utoa(tgi_getyres(), buf, 10);
+    tgi_outtext(buf);
+    y += nextline;
+
+    tgi_outtextxy(x, y, "Index  ");
+    utoa(tgi_getmaxx(), buf, 10);
+    tgi_outtext(buf);
+    tgi_outtext(" ");
+    utoa(tgi_getmaxy(), buf, 10);
+    tgi_outtext(buf);
+    y += nextline;
+
+    // Text properties
+    tgi_outtextxy(x, y, "Text   ");
+    utoa(tgi_gettextwidth("0"), buf, 10);
+    tgi_outtext(buf);
+    tgi_outtext("x");
+    utoa(tgi_gettextheight("0"), buf, 10);
+    tgi_outtext(buf);
+    y += nextline;
+
+    // Colors
+    tgi_outtextxy(x, y, "Colors ");
+    utoa(tgi_getcolorcount(), buf, 10);
+    tgi_outtext(buf);
+    sleep(5);
+
+
 }
 
-
-
-static void DoWarning (void)
-/* Warn the user that the TGI driver is needed for this program */
+static void showbar()
 {
-    printf ("Warning: This program needs the TGI\n"
-            "driver on disk! Press 'y' if you have\n"
-            "it - any other key exits.\n");
-    if (tolower (cgetc ()) != 'y') {
-        exit (EXIT_SUCCESS);
-    }
-    printf ("Ok. Please wait patiently...\n");
+    tgi_clear();
+    tgi_setcolor(TGI_COLOR_WHITE);
+    tgi_bar(10, 10, tgi_getmaxx()-10, tgi_getmaxy()-10);
+    tgi_outtextxy(2, 1, "Bar");
+    sleep(5);
 }
 
-
-
-static void DoCircles (void)
+static void showcircle()
 {
-    static const unsigned char Palette[2] = { TGI_COLOR_WHITE, TGI_COLOR_ORANGE };
-    unsigned char I;
-    unsigned char Color = COLOR_FORE;
-    unsigned X = MaxX / 2;
-    unsigned Y = MaxY / 2;
+    tgi_clear();
+    tgi_setcolor(TGI_COLOR_WHITE);
+    tgi_circle(tgi_getxres() / 2, tgi_getyres() / 2, tgi_getxres() < tgi_getyres() ? tgi_getxres() / 2 - 10 : tgi_getyres() / 2 - 10);
+    tgi_outtextxy(2, 1, "Circle");
+    sleep(5);
+}
 
-    tgi_setpalette (Palette);
-    while (!kbhit ()) {
-        tgi_setcolor (COLOR_FORE);
-        tgi_line (0, 0, MaxX, MaxY);
-        tgi_line (0, MaxY, MaxX, 0);
-        tgi_setcolor (Color);
-        for (I = 10; I < 240; I += 10) {
-            tgi_ellipse (X, Y, I, tgi_imulround (I, AspectRatio));
-        }
-        Color = Color == COLOR_FORE ? COLOR_BACK : COLOR_FORE;
+static void showellipse()
+{
+    tgi_clear();
+    tgi_setcolor(TGI_COLOR_WHITE);
+    tgi_ellipse(tgi_getxres() / 2, tgi_getyres() / 2, tgi_getxres() / 2 - 10, tgi_getyres() / 2 - 10);
+    tgi_outtextxy(2, 1, "Ellipse");
+    sleep(5);
+}
+
+static void showline()
+{
+    tgi_clear();
+    tgi_setcolor(TGI_COLOR_WHITE);
+    tgi_line(10, tgi_getyres() - 10, tgi_getxres() - 10, 10);
+    tgi_outtextxy(2, 1, "Line");
+    sleep(5);
+}
+
+static void showpixel()
+{
+    tgi_clear();
+    tgi_setcolor(TGI_COLOR_WHITE);
+    tgi_setpixel(tgi_getxres() / 2, tgi_getyres() / 2);
+    tgi_outtextxy(2, 1, "Pixel");
+    sleep(5);
+}
+
+static void showarc()
+{
+    tgi_clear();
+    tgi_setcolor(TGI_COLOR_WHITE);
+    tgi_arc(tgi_getxres() / 2, tgi_getyres() / 2, tgi_getxres() / 2 - 10, tgi_getyres() / 2 - 10, 10, 70);
+    tgi_outtextxy(2, 1, "Arc");
+    sleep(5);
+}
+
+static void showpie()
+{
+    tgi_clear();
+    tgi_setcolor(TGI_COLOR_WHITE);
+    tgi_pieslice(tgi_getxres() / 2, tgi_getyres() / 2, tgi_getxres() / 2 - 10, tgi_getyres() / 2 - 10, 10, 70);
+    tgi_outtextxy(2, 1, "Pie");
+    sleep(5);
+}
+
+static void showpalette()
+{
+    unsigned char i;
+    tgi_clear();
+    for (i = 0; i < tgi_getcolorcount(); i++) {
+        unsigned char x, y;
+        tgi_setcolor(i);
+        x = (i % 8) * 10 + 10;
+        y = (i / 8) * 10 + 10;
+        tgi_bar(x, y, x + 9, y + 9);
     }
+    tgi_setcolor(TGI_COLOR_WHITE);
+    tgi_outtextxy(2, 1, "Palette");
+    sleep(5);
+}
 
-    cgetc ();
+static void randomcircles(void)
+{
+    unsigned char i;
+
     tgi_clear ();
-}
-
-
-
-static void DoCheckerboard (void)
-{
-    static const unsigned char Palette[2] = { TGI_COLOR_WHITE, TGI_COLOR_BLACK };
-    unsigned X, Y;
-    unsigned char Color;
-
-    tgi_setpalette (Palette);
-    Color = COLOR_BACK;
-    while (1) {
-        for (Y = 0; Y <= MaxY; Y += 10) {
-            for (X = 0; X <= MaxX; X += 10) {
-                tgi_setcolor (Color);
-                tgi_bar (X, Y, X+9, Y+9);
-                Color = Color == COLOR_FORE ? COLOR_BACK : COLOR_FORE;
-                if (kbhit ()) {
-                    cgetc ();
-                    tgi_clear ();
-                    return;
-                }
-            }
-            Color = Color == COLOR_FORE ? COLOR_BACK : COLOR_FORE;
-        }
-        Color = Color == COLOR_FORE ? COLOR_BACK : COLOR_FORE;
+    for (i = 0; i < 10; i++) {
+        tgi_setcolor(rand() % tgi_getcolorcount());
+        tgi_circle(
+            rand() % (tgi_getxres() / 3) + tgi_getxres() / 3,
+            rand() % (tgi_getyres() / 3) + tgi_getyres() / 3,
+            rand() % (tgi_getxres() / 6));
     }
+    tgi_setcolor(TGI_COLOR_WHITE);
+    tgi_outtextxy(2, 1, "Random circles");
+    sleep(5);
 }
 
-
-
-static void DoDiagram (void)
+static void randomboxes(void)
 {
-    static const unsigned char Palette[2] = { TGI_COLOR_WHITE, TGI_COLOR_BLACK };
+    unsigned char i;
+
+    tgi_clear ();
+    for (i = 0; i < 10; i++) {
+        unsigned char x, y;
+        tgi_setcolor(rand() % tgi_getcolorcount());
+        x = rand() % (tgi_getxres() / 2) + 10;
+        y = rand() % (tgi_getyres() / 2) + 10;
+        tgi_bar(
+            x,
+            y,
+            x + rand() % (tgi_getxres() / 4),
+            y + rand() % (tgi_getyres() / 4));
+    }
+    tgi_setcolor(TGI_COLOR_WHITE);
+    tgi_outtextxy(2, 1, "Random boxes");
+    sleep(5);
+}
+
+static void checkerboard(void)
+{
+    unsigned char x, y;
+
+    tgi_clear ();
+    for (y = 10; y < tgi_getmaxy() - 20; y += 10) {
+        for (x = 10; x < tgi_getmaxx() - 20; x += 10) {
+            tgi_setcolor(((x/10) & 1) ^ ((y/10) & 1) ? TGI_COLOR_BLACK : TGI_COLOR_WHITE);
+            tgi_bar(x, y, x + 9, y + 9);
+        }
+    }
+    tgi_setcolor(TGI_COLOR_WHITE);
+    tgi_outtextxy(2, 1, "Checkerboard");
+    sleep(5);
+}
+
+static void diagram()
+{
     int XOrigin, YOrigin;
     int Amp;
     int X, Y;
     unsigned I;
 
-    tgi_setpalette (Palette);
-    tgi_setcolor (COLOR_FORE);
+    tgi_clear ();
+    tgi_setcolor(TGI_COLOR_WHITE);
 
     /* Determine zero and aplitude */
-    YOrigin = MaxY / 2;
+    YOrigin = (tgi_getmaxy() - 19) / 2 + 10;
     XOrigin = 10;
-    Amp     = (MaxY - 19) / 2;
+    Amp     = (tgi_getmaxy() - 19) / 2;
 
     /* Y axis */
-    tgi_line (XOrigin, 10, XOrigin, MaxY-10);
+    tgi_line (XOrigin, 10, XOrigin, tgi_getmaxy()-10);
     tgi_line (XOrigin-2, 12, XOrigin, 10);
     tgi_lineto (XOrigin+2, 12);
 
     /* X axis */
-    tgi_line (XOrigin, YOrigin, MaxX-10, YOrigin);
-    tgi_line (MaxX-12, YOrigin-2, MaxX-10, YOrigin);
-    tgi_lineto (MaxX-12, YOrigin+2);
+    tgi_line (XOrigin, YOrigin, tgi_getmaxx()-10, YOrigin);
+    tgi_line (tgi_getmaxx()-12, YOrigin-2, tgi_getmaxx()-10, YOrigin);
+    tgi_lineto (tgi_getmaxx()-12, YOrigin+2);
 
     /* Sine */
     tgi_gotoxy (XOrigin, YOrigin);
     for (I = 0; I <= 360; I += 5) {
 
         /* Calculate the next points */
-        X = (int) (((long) (MaxX - 19) * I) / 360);
+        X = (int) (((long) (tgi_getmaxx() - 19) * I) / 360);
         Y = (int) (((long) Amp * -cc65_sin (I)) / 256);
 
         /* Draw the line */
         tgi_lineto (XOrigin + X, YOrigin + Y);
     }
-
-    cgetc ();
-    tgi_clear ();
+    tgi_setcolor(TGI_COLOR_WHITE);
+    tgi_outtextxy(2, 1, "Diagram");
+    sleep(5);
 }
-
-
-
-static void DoLines (void)
-{
-    static const unsigned char Palette[2] = { TGI_COLOR_WHITE, TGI_COLOR_BLACK };
-    unsigned X;
-
-    tgi_setpalette (Palette);
-    tgi_setcolor (COLOR_FORE);
-
-    for (X = 0; X <= MaxY; X += 10) {
-        tgi_line (0, 0, MaxY, X);
-        tgi_line (0, 0, X, MaxY);
-        tgi_line (MaxY, MaxY, 0, MaxY-X);
-        tgi_line (MaxY, MaxY, MaxY-X, 0);
-    }
-
-    cgetc ();
-    tgi_clear ();
-}
-
-
 
 int main (void)
 {
-    unsigned char Border;
-
-#if DYN_DRV
-    /* Warn the user that the tgi driver is needed */
-    DoWarning ();
-
-    /* Load and initialize the driver */
-    tgi_load_driver (tgi_stddrv);
-    CheckError ("tgi_load_driver");
-#else
     /* Install the driver */
-    tgi_install (tgi_static_stddrv);
-    CheckError ("tgi_install");
-#endif
+    tgi_install(tgi_static_stddrv);
+    if (tgi_geterror() != TGI_ERR_OK) {
+        return EXIT_FAILURE;
+    }
 
-    tgi_init ();
-    CheckError ("tgi_init");
-    tgi_clear ();
+    /* Initialize the driver and clear the screen */
+    tgi_init();
+    if (tgi_geterror() != TGI_ERR_OK) {
+        return EXIT_FAILURE;
+    }
 
-    /* Get stuff from the driver */
-    MaxX = tgi_getmaxx ();
-    MaxY = tgi_getmaxy ();
-    AspectRatio = tgi_getaspectratio ();
+    showinfo();
 
-    /* Set the palette, set the border color */
-    Border = bordercolor (COLOR_BLACK);
+    showbar();
 
-    /* Do graphics stuff */
-    DoCircles ();
-    DoCheckerboard ();
-    DoDiagram ();
-    DoLines ();
+    showcircle();
 
-#if DYN_DRV
-    /* Unload the driver */
-    tgi_unload ();
-#else
+    showellipse();
+
+    showline();
+
+    showpixel();
+
+    showarc();
+
+    showpie();
+
+    showpalette();
+
+    randomcircles();
+
+    randomboxes();
+
+    checkerboard();
+
+    diagram();
+
     /* Uninstall the driver */
     tgi_uninstall ();
-#endif
-
-    /* Reset the border */
-    (void) bordercolor (Border);
 
     /* Done */
-    printf ("Done\n");
     return EXIT_SUCCESS;
 }

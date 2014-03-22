@@ -412,6 +412,8 @@ The values of "1" are needed because the graphics command crashes if
 it doesn't have at least one byte available. This seems to be a bug of
 the Atari ROM code.
 
+Default drivers: <tt/atr8.tgi (atr8_tgi) and /<tt/atrx8.tgi (atrx8_tgi)/.
+
 <sect1>Extended memory drivers<p>
 
 Currently there is only one extended memory driver.  It manages the second 64K of a 130XE.
@@ -436,6 +438,7 @@ Currently there are two joystick drivers available:
 <caption>
 </table>
 
+Default drivers: <tt/atrstd.joy (atrstd_joy)/ and <tt/atrxstd.joy (atrxstd_joy)/.
 
 <sect1>Mouse drivers<p>
 
@@ -455,6 +458,7 @@ Currently there are five mouse drivers available:
 
 All mouse devices connect to joystick port #0.
 
+Default drivers: <tt/atrst.mou (atrst_mou)/ and <tt/atrxst.mou (atrxst_mou)/.
 
 <sect1>RS232 device drivers<p>
 

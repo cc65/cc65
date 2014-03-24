@@ -81,7 +81,7 @@ LDFLAGS_tgidemo_atari = -D __RESERVED_MEMORY__=0x2000
 .PRECIOUS: %.o
 
 .o:
-	$(LD) $(LDFLAGS_$(basename $@)_$(SYS)) -o $@ -t $(SYS) -m $@.map $^ $(CLIB)
+	@$(LD) $(LDFLAGS_$(basename $@)_$(SYS)) -o $@ -t $(SYS) -m $@.map $^ $(CLIB)
 
 # --------------------------------------------------------------------------
 # List of executables. This list could be made target dependent by checking

@@ -520,9 +520,21 @@ static void OptVersion (const char* Opt attribute ((unused)),
 
 
 
-int main (int argc, char* argv [])
-/* Assembler main program */
+static void ParseCommandLine(void)
 {
+/* struct InputFile.Flag definitions */
+#define INPUT_FILES_FILE       0        /* Entry is a file */
+#define INPUT_FILES_SGROUP     1        /* Entry is 'StartGroup' */
+#define INPUT_FILES_EGROUP     2        /* Entry is 'EndGroup' */
+
+#define MAX_INPUTFILES         256
+
+    struct InputFile {
+        const char *FileName;
+        unsigned Flag;
+    }                       *InputFiles;
+    unsigned         InputFilesCount = 0;
+
     /* Program long options */
     static const LongOpt OptTab[] = {
         { "--cfg-path",         1,      OptCfgPath              },
@@ -545,21 +557,14 @@ int main (int argc, char* argv [])
     };
 
     unsigned I;
-    unsigned MemoryAreaOverflows;
+    unsigned OutNameGiven = 0, CfgFileGiven = 0, TargetGiven = 0, StartAddressGiven = 0,
+             MapFileGiven = 0;
+    const char *CfgFile = NULL, *Target = NULL;
 
-    /* Initialize the cmdline module */
-    InitCmdLine (&argc, &argv, "ld65");
+    /* Allocate memory for input file array */
+    InputFiles = xmalloc (MAX_INPUTFILES * sizeof (struct InputFile));
 
-    /* Initialize the input file search paths */
-    InitSearchPaths ();
-
-    /* Initialize the string pool */
-    InitStrPool ();
-
-    /* Initialize the type pool */
-    InitTypePool ();
-
-    /* Check the parameters */
+    /* Defer setting of config/target and input files until all options are parsed */
     I = 1;
     while (I < ArgCount) {
 
@@ -577,11 +582,17 @@ int main (int argc, char* argv [])
                     break;
 
                 case '(':
-                    OptStartGroup (Arg, 0);
+                    InputFiles[InputFilesCount].Flag = INPUT_FILES_SGROUP;
+                    InputFiles[InputFilesCount].FileName = Arg;  /* Unused */
+                    if (++InputFilesCount >= MAX_INPUTFILES)
+                        Error ("Too many input files");
                     break;
 
                 case ')':
-                    OptEndGroup (Arg, 0);
+                    InputFiles[InputFilesCount].Flag = INPUT_FILES_EGROUP;
+                    InputFiles[InputFilesCount].FileName = Arg;  /* Unused */
+                    if (++InputFilesCount >= MAX_INPUTFILES)
+                        Error ("Too many input files");
                     break;
 
                 case 'h':
@@ -590,18 +601,27 @@ int main (int argc, char* argv [])
                     break;
 
                 case 'm':
+                    if (MapFileGiven) {
+                        Error ("Cannot use -m twice");
+                    }
+                    MapFileGiven = 1;
                     OptMapFile (Arg, GetArg (&I, 2));
                     break;
 
                 case 'o':
-                    OptOutputName (Arg, GetArg (&I, 2));
+                    if (OutNameGiven) {
+                        Error ("Cannot use -o twice");
+                    }
+                    OutNameGiven = 1;
+                    OptOutputName (NULL, GetArg (&I, 2));
                     break;
 
                 case 't':
-                    if (CfgAvail ()) {
+                    if (TargetGiven || CfgFileGiven) {
                         Error ("Cannot use -C/-t twice");
                     }
-                    OptTarget (Arg, GetArg (&I, 2));
+                    TargetGiven = 1;
+                    Target = GetArg (&I, 2);
                     break;
 
                 case 'u':
@@ -617,7 +637,11 @@ int main (int argc, char* argv [])
                     break;
 
                 case 'C':
-                    OptConfig (Arg, GetArg (&I, 2));
+                    if (TargetGiven || CfgFileGiven) {
+                        Error ("Cannot use -C/-t twice");
+                    }
+                    CfgFileGiven = 1;
+                    CfgFile = GetArg (&I, 2);
                     break;
 
                 case 'D':
@@ -633,6 +657,10 @@ int main (int argc, char* argv [])
                     break;
 
                 case 'S':
+                    if (StartAddressGiven) {
+                        Error ("Cannot use -S twice");
+                    }
+                    StartAddressGiven = 1;
                     OptStartAddr (Arg, GetArg (&I, 2));
                     break;
 
@@ -648,13 +676,69 @@ int main (int argc, char* argv [])
         } else {
 
             /* A filename */
-            LinkFile (Arg, FILETYPE_UNKNOWN);
+            InputFiles[InputFilesCount].Flag = INPUT_FILES_FILE;
+            InputFiles[InputFilesCount].FileName = Arg;
+            if (++InputFilesCount >= MAX_INPUTFILES)
+                Error ("Too many input files");
 
         }
 
         /* Next argument */
         ++I;
     }
+
+    if (OutNameGiven == 0) {
+        Error ("No output file specified");
+    }
+
+    if (TargetGiven) {
+        OptTarget (NULL, Target);
+    } else if (CfgFileGiven) {
+        OptConfig (NULL, CfgFile);
+    }
+
+    /* Process input files */
+    for (I = 0; I < InputFilesCount; ++I) {
+        switch (InputFiles[I].Flag) {
+            case INPUT_FILES_FILE:
+                LinkFile (InputFiles[I].FileName, FILETYPE_UNKNOWN);
+                break;
+            case INPUT_FILES_SGROUP:
+                OptStartGroup (NULL, 0);
+                break;
+            case INPUT_FILES_EGROUP:
+                OptEndGroup (NULL, 0);
+                break;
+            default:
+                abort ();
+        }
+    }
+
+    /* Free memory used for input file array */
+    xfree (InputFiles);
+}
+
+
+
+int main (int argc, char* argv [])
+/* Linker main program */
+{
+    unsigned MemoryAreaOverflows;
+
+    /* Initialize the cmdline module */
+    InitCmdLine (&argc, &argv, "ld65");
+
+    /* Initialize the input file search paths */
+    InitSearchPaths ();
+
+    /* Initialize the string pool */
+    InitStrPool ();
+
+    /* Initialize the type pool */
+    InitTypePool ();
+
+    /* Parse the command line */
+    ParseCommandLine ();
 
     /* Check if we had any object files */
     if (ObjFiles == 0) {

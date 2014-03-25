@@ -522,18 +522,19 @@ static void OptVersion (const char* Opt attribute ((unused)),
 
 static void ParseCommandLine(void)
 {
-/* struct InputFile.Flag definitions */
+/* struct InputFile.Type definitions */
 #define INPUT_FILES_FILE       0        /* Entry is a file */
 #define INPUT_FILES_SGROUP     1        /* Entry is 'StartGroup' */
 #define INPUT_FILES_EGROUP     2        /* Entry is 'EndGroup' */
+#define INPUT_FILES_LIBPATH    3        /* Entry is a library search path */
 
 #define MAX_INPUTFILES         256
 
     struct InputFile {
         const char *FileName;
-        unsigned Flag;
-    }                       *InputFiles;
-    unsigned         InputFilesCount = 0;
+        unsigned Type;
+    }                          *InputFiles;
+    unsigned                   InputFilesCount = 0;
 
     /* Program long options */
     static const LongOpt OptTab[] = {
@@ -558,7 +559,7 @@ static void ParseCommandLine(void)
 
     unsigned I;
     unsigned OutNameGiven = 0, CfgFileGiven = 0, TargetGiven = 0, StartAddressGiven = 0,
-             MapFileGiven = 0;
+             MapFileGiven = 0, LabelFileGiven = 0;
     const char *CfgFile = NULL, *Target = NULL;
 
     /* Allocate memory for input file array */
@@ -582,14 +583,14 @@ static void ParseCommandLine(void)
                     break;
 
                 case '(':
-                    InputFiles[InputFilesCount].Flag = INPUT_FILES_SGROUP;
+                    InputFiles[InputFilesCount].Type = INPUT_FILES_SGROUP;
                     InputFiles[InputFilesCount].FileName = Arg;  /* Unused */
                     if (++InputFilesCount >= MAX_INPUTFILES)
                         Error ("Too many input files");
                     break;
 
                 case ')':
-                    InputFiles[InputFilesCount].Flag = INPUT_FILES_EGROUP;
+                    InputFiles[InputFilesCount].Type = INPUT_FILES_EGROUP;
                     InputFiles[InputFilesCount].FileName = Arg;  /* Unused */
                     if (++InputFilesCount >= MAX_INPUTFILES)
                         Error ("Too many input files");
@@ -650,9 +651,20 @@ static void ParseCommandLine(void)
 
                 case 'L':
                     switch (Arg [2]) {
-                        /* ## The first one is obsolete and will go */
-                        case 'n': LabelFileName = GetArg (&I, 3);   break;
-                        default:  OptLibPath (Arg, GetArg (&I, 2)); break;
+                        case 'n':
+                            /* ## This one is obsolete and will go */
+                            if (LabelFileGiven) {
+                                Error ("Cannot use -Ln twice");
+                            }
+                            LabelFileGiven = 1;
+                            LabelFileName = GetArg (&I, 3);
+                            break;
+                        default:
+                            InputFiles[InputFilesCount].Type = INPUT_FILES_LIBPATH;
+                            InputFiles[InputFilesCount].FileName = GetArg (&I, 2);
+                            if (++InputFilesCount >= MAX_INPUTFILES)
+                                Error ("Too many input files");
+                            break;
                     }
                     break;
 
@@ -676,7 +688,7 @@ static void ParseCommandLine(void)
         } else {
 
             /* A filename */
-            InputFiles[InputFilesCount].Flag = INPUT_FILES_FILE;
+            InputFiles[InputFilesCount].Type = INPUT_FILES_FILE;
             InputFiles[InputFilesCount].FileName = Arg;
             if (++InputFilesCount >= MAX_INPUTFILES)
                 Error ("Too many input files");
@@ -699,7 +711,7 @@ static void ParseCommandLine(void)
 
     /* Process input files */
     for (I = 0; I < InputFilesCount; ++I) {
-        switch (InputFiles[I].Flag) {
+        switch (InputFiles[I].Type) {
             case INPUT_FILES_FILE:
                 LinkFile (InputFiles[I].FileName, FILETYPE_UNKNOWN);
                 break;
@@ -708,6 +720,9 @@ static void ParseCommandLine(void)
                 break;
             case INPUT_FILES_EGROUP:
                 OptEndGroup (NULL, 0);
+                break;
+            case INPUT_FILES_LIBPATH:
+                OptLibPath (NULL, InputFiles[I].FileName);
                 break;
             default:
                 abort ();

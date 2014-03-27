@@ -80,6 +80,24 @@
 static unsigned         ObjFiles   = 0; /* Count of object files linked */
 static unsigned         LibFiles   = 0; /* Count of library files linked */
 
+/* struct InputFile.Type definitions */
+#define INPUT_FILES_FILE       0        /* Entry is a file (unknown type) */
+#define INPUT_FILES_FILE_OBJ   1        /* Entry is a object file */
+#define INPUT_FILES_FILE_LIB   2        /* Entry is a library file */
+#define INPUT_FILES_SGROUP     3        /* Entry is 'StartGroup' */
+#define INPUT_FILES_EGROUP     4        /* Entry is 'EndGroup' */
+
+#define MAX_INPUTFILES         256
+
+/* Array of inputs (libraries and object files) */
+static struct InputFile {
+    const char *FileName;
+    unsigned Type;
+}                              *InputFiles;
+static unsigned                InputFilesCount = 0;
+static const char              *CmdlineCfgFile = NULL,
+                               *CmdlineTarget = NULL;
+
 
 
 /*****************************************************************************/
@@ -390,7 +408,10 @@ static void OptHelp (const char* Opt attribute ((unused)),
 static void OptLib (const char* Opt attribute ((unused)), const char* Arg)
 /* Link a library */
 {
-    LinkFile (Arg, FILETYPE_LIB);
+    InputFiles[InputFilesCount].Type = INPUT_FILES_FILE_LIB;
+    InputFiles[InputFilesCount].FileName = Arg;
+    if (++InputFilesCount >= MAX_INPUTFILES)
+        Error ("Too many input files");
 }
 
 
@@ -406,6 +427,9 @@ static void OptLibPath (const char* Opt attribute ((unused)), const char* Arg)
 static void OptMapFile (const char* Opt attribute ((unused)), const char* Arg)
 /* Give the name of the map file */
 {
+    if (MapFileName) {
+        Error ("Cannot use -m twice");
+    }
     MapFileName = Arg;
 }
 
@@ -426,7 +450,10 @@ static void OptModuleId (const char* Opt, const char* Arg)
 static void OptObj (const char* Opt attribute ((unused)), const char* Arg)
 /* Link an object file */
 {
-    LinkFile (Arg, FILETYPE_OBJ);
+    InputFiles[InputFilesCount].Type = INPUT_FILES_FILE_OBJ;
+    InputFiles[InputFilesCount].FileName = Arg;
+    if (++InputFilesCount >= MAX_INPUTFILES)
+        Error ("Too many input files");
 }
 
 
@@ -439,16 +466,14 @@ static void OptObjPath (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
-static void OptOutputName (const char* Opt, const char* Arg)
+static void OptOutputName (const char* Opt attribute ((unused)), const char* Arg)
 /* Give the name of the output file */
 {
-    /* If the name of the output file has been used in the config before
-     * (by using %O) we're actually changing it later, which - in most cases -
-     * gives unexpected results, so emit a warning in this case.
-     */
-    if (OutputNameUsed) {
-        Warning ("Option `%s' should precede options `-t' or `-C'", Opt);
+    static int OutputNameSeen = 0;
+    if (OutputNameSeen) {
+        Error ("Cannot use -o twice");
     }
+    OutputNameSeen = 1;
     OutputName = Arg;
 }
 
@@ -457,6 +482,9 @@ static void OptOutputName (const char* Opt, const char* Arg)
 static void OptStartAddr (const char* Opt, const char* Arg)
 /* Set the default start address */
 {
+    if (HaveStartAddr) {
+        Error ("Cannot use -S twice");
+    }
     StartAddr = CvtNumber (Opt, Arg);
     HaveStartAddr = 1;
 }
@@ -520,29 +548,61 @@ static void OptVersion (const char* Opt attribute ((unused)),
 
 
 
+static void CmdlOptStartGroup (const char* Opt attribute ((unused)),
+                               const char* Arg attribute ((unused)))
+/* Remember 'start group' occurrence in input files array */
+{
+    InputFiles[InputFilesCount].Type = INPUT_FILES_SGROUP;
+    InputFiles[InputFilesCount].FileName = Arg;  /* Unused */
+    if (++InputFilesCount >= MAX_INPUTFILES)
+        Error ("Too many input files");
+}
+
+
+
+static void CmdlOptEndGroup (const char* Opt attribute ((unused)),
+                             const char* Arg attribute ((unused)))
+/* Remember 'end group' occurrence in input files array */
+{
+    InputFiles[InputFilesCount].Type = INPUT_FILES_EGROUP;
+    InputFiles[InputFilesCount].FileName = Arg;  /* Unused */
+    if (++InputFilesCount >= MAX_INPUTFILES)
+        Error ("Too many input files");
+}
+
+
+
+static void CmdlOptConfig (const char* Opt attribute ((unused)), const char* Arg)
+/* Set 'config file' command line parameter */
+{
+    if (CmdlineCfgFile || CmdlineTarget) {
+        Error ("Cannot use -C/-t twice");
+    }
+    CmdlineCfgFile = Arg;
+}
+
+
+
+static void CmdlOptTarget (const char* Opt attribute ((unused)), const char* Arg)
+/* Set 'target' command line parameter */
+{
+    if (CmdlineCfgFile || CmdlineTarget) {
+        Error ("Cannot use -C/-t twice");
+    }
+    CmdlineTarget = Arg;
+}
+
+
+
 static void ParseCommandLine(void)
 {
-/* struct InputFile.Type definitions */
-#define INPUT_FILES_FILE       0        /* Entry is a file */
-#define INPUT_FILES_SGROUP     1        /* Entry is 'StartGroup' */
-#define INPUT_FILES_EGROUP     2        /* Entry is 'EndGroup' */
-#define INPUT_FILES_LIBPATH    3        /* Entry is a library search path */
-
-#define MAX_INPUTFILES         256
-
-    struct InputFile {
-        const char *FileName;
-        unsigned Type;
-    }                          *InputFiles;
-    unsigned                   InputFilesCount = 0;
-
     /* Program long options */
     static const LongOpt OptTab[] = {
         { "--cfg-path",         1,      OptCfgPath              },
-        { "--config",           1,      OptConfig               },
+        { "--config",           1,      CmdlOptConfig           },
         { "--dbgfile",          1,      OptDbgFile              },
         { "--define",           1,      OptDefine               },
-        { "--end-group",        0,      OptEndGroup             },
+        { "--end-group",        0,      CmdlOptEndGroup         },
         { "--force-import",     1,      OptForceImport          },
         { "--help",             0,      OptHelp                 },
         { "--lib",              1,      OptLib                  },
@@ -552,15 +612,13 @@ static void ParseCommandLine(void)
         { "--obj",              1,      OptObj                  },
         { "--obj-path",         1,      OptObjPath              },
         { "--start-addr",       1,      OptStartAddr            },
-        { "--start-group",      0,      OptStartGroup           },
-        { "--target",           1,      OptTarget               },
+        { "--start-group",      0,      CmdlOptStartGroup       },
+        { "--target",           1,      CmdlOptTarget           },
         { "--version",          0,      OptVersion              },
     };
 
     unsigned I;
-    unsigned OutNameGiven = 0, CfgFileGiven = 0, TargetGiven = 0, StartAddressGiven = 0,
-             MapFileGiven = 0, LabelFileGiven = 0;
-    const char *CfgFile = NULL, *Target = NULL;
+    unsigned LabelFileGiven = 0;
 
     /* Allocate memory for input file array */
     InputFiles = xmalloc (MAX_INPUTFILES * sizeof (struct InputFile));
@@ -583,17 +641,11 @@ static void ParseCommandLine(void)
                     break;
 
                 case '(':
-                    InputFiles[InputFilesCount].Type = INPUT_FILES_SGROUP;
-                    InputFiles[InputFilesCount].FileName = Arg;  /* Unused */
-                    if (++InputFilesCount >= MAX_INPUTFILES)
-                        Error ("Too many input files");
+                    CmdlOptStartGroup (Arg, 0);
                     break;
 
                 case ')':
-                    InputFiles[InputFilesCount].Type = INPUT_FILES_EGROUP;
-                    InputFiles[InputFilesCount].FileName = Arg;  /* Unused */
-                    if (++InputFilesCount >= MAX_INPUTFILES)
-                        Error ("Too many input files");
+                    CmdlOptEndGroup (Arg, 0);
                     break;
 
                 case 'h':
@@ -602,27 +654,15 @@ static void ParseCommandLine(void)
                     break;
 
                 case 'm':
-                    if (MapFileGiven) {
-                        Error ("Cannot use -m twice");
-                    }
-                    MapFileGiven = 1;
                     OptMapFile (Arg, GetArg (&I, 2));
                     break;
 
                 case 'o':
-                    if (OutNameGiven) {
-                        Error ("Cannot use -o twice");
-                    }
-                    OutNameGiven = 1;
                     OptOutputName (NULL, GetArg (&I, 2));
                     break;
 
                 case 't':
-                    if (TargetGiven || CfgFileGiven) {
-                        Error ("Cannot use -C/-t twice");
-                    }
-                    TargetGiven = 1;
-                    Target = GetArg (&I, 2);
+                    CmdlOptTarget (Arg, GetArg (&I, 2));
                     break;
 
                 case 'u':
@@ -638,11 +678,7 @@ static void ParseCommandLine(void)
                     break;
 
                 case 'C':
-                    if (TargetGiven || CfgFileGiven) {
-                        Error ("Cannot use -C/-t twice");
-                    }
-                    CfgFileGiven = 1;
-                    CfgFile = GetArg (&I, 2);
+                    CmdlOptConfig (Arg, GetArg (&I, 2));
                     break;
 
                 case 'D':
@@ -660,19 +696,12 @@ static void ParseCommandLine(void)
                             LabelFileName = GetArg (&I, 3);
                             break;
                         default:
-                            InputFiles[InputFilesCount].Type = INPUT_FILES_LIBPATH;
-                            InputFiles[InputFilesCount].FileName = GetArg (&I, 2);
-                            if (++InputFilesCount >= MAX_INPUTFILES)
-                                Error ("Too many input files");
+                            OptLibPath (Arg, InputFiles[I].FileName);
                             break;
                     }
                     break;
 
                 case 'S':
-                    if (StartAddressGiven) {
-                        Error ("Cannot use -S twice");
-                    }
-                    StartAddressGiven = 1;
                     OptStartAddr (Arg, GetArg (&I, 2));
                     break;
 
@@ -699,14 +728,10 @@ static void ParseCommandLine(void)
         ++I;
     }
 
-    if (OutNameGiven == 0) {
-        Error ("No output file specified");
-    }
-
-    if (TargetGiven) {
-        OptTarget (NULL, Target);
-    } else if (CfgFileGiven) {
-        OptConfig (NULL, CfgFile);
+    if (CmdlineTarget) {
+        OptTarget (NULL, CmdlineTarget);
+    } else if (CmdlineCfgFile) {
+        OptConfig (NULL, CmdlineCfgFile);
     }
 
     /* Process input files */
@@ -715,14 +740,17 @@ static void ParseCommandLine(void)
             case INPUT_FILES_FILE:
                 LinkFile (InputFiles[I].FileName, FILETYPE_UNKNOWN);
                 break;
+            case INPUT_FILES_FILE_LIB:
+                LinkFile (InputFiles[I].FileName, FILETYPE_LIB);
+                break;
+            case INPUT_FILES_FILE_OBJ:
+                LinkFile (InputFiles[I].FileName, FILETYPE_OBJ);
+                break;
             case INPUT_FILES_SGROUP:
                 OptStartGroup (NULL, 0);
                 break;
             case INPUT_FILES_EGROUP:
                 OptEndGroup (NULL, 0);
-                break;
-            case INPUT_FILES_LIBPATH:
-                OptLibPath (NULL, InputFiles[I].FileName);
                 break;
             default:
                 abort ();

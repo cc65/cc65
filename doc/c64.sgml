@@ -2,9 +2,9 @@
 
 <article>
 
-<title>Commodore 64 specific information for cc65
+<title>Commodore 64-specific information for CC65
 <author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
-<date>2003-09-23
+<date>2014-03-24
 
 <abstract>
 An overview over the C64 runtime system as it is implemented for the cc65 C
@@ -19,11 +19,11 @@ compiler.
 <sect>Overview<p>
 
 This file contains an overview of the C64 runtime system as it comes with the
-cc65 C compiler. It describes the memory layout, C64 specific header files,
+cc65 C compiler. It describes the memory layout, C64-specific header files,
 available drivers, and any pitfalls specific to that platform.
 
-Please note that C64 specific functions are just mentioned here, they are
-described in detail in the separate <htmlurl url="funcref.html" name="function
+Please note that C64-specific functions are just mentioned here, they are
+described in detail in the separate <url url="funcref.html" name="function
 reference">. Even functions marked as "platform dependent" may be available on
 more than one platform. Please see the function reference for more
 information.
@@ -117,17 +117,17 @@ Please note that in this case a changed start address doesn't make sense,
 since the program must be loaded to the BASIC start address.
 
 
-<sect>Platform specific header files<p>
+<sect>Platform-specific header files<p>
 
-Programs containing C64 specific code may use the <tt/c64.h/ or <tt/cbm.h/
+Programs containing C64-specific code may use the <tt/c64.h/ or <tt/cbm.h/
 header files. Using the later may be an option when writing code for more than
 one CBM platform, since it includes <tt/c64.h/ and declares several functions
 common to all CBM platforms.
 
 
-<sect1>C64 specific functions<p>
+<sect1>C64-specific functions<p>
 
-The functions listed below are special for the C64. See the <htmlurl
+The functions listed below are special for the C64. See the <url
 url="funcref.html" name="function reference"> for declaration and usage.
 
 <itemize>
@@ -135,10 +135,10 @@ url="funcref.html" name="function reference"> for declaration and usage.
 </itemize>
 
 
-<sect1>CBM specific functions<p>
+<sect1>CBM-specific functions<p>
 
 Some functions are available for all (or at least most) of the Commodore
-machines. See the <htmlurl url="funcref.html" name="function reference"> for
+machines. See the <url url="funcref.html" name="function reference"> for
 declaration and usage.
 
 <itemize>
@@ -268,10 +268,12 @@ configuration.
 
 <sect1>Joystick drivers<p>
 
+The default drivers, <tt/joy_stddrv (joy_static_stddrv)/, point to <tt/c64-stdjoy.joy (c64_stdjoy_joy)/.
+
 <descrip>
 
   <tag><tt/c64-hitjoy.joy (c64_hitjoy_joy)/</tag>
-  Driver for the Digital Excess & Hitmen adapter contributed by Groepaz. See
+  Driver for the Digital Excess &amp; Hitmen adapter contributed by Groepaz. See
   <htmlurl url="http://www.digitalexcess.de/downloads/productions.php"
   name="http://www.digitalexcess.de/downloads/productions.php"> on
   instructions how to build one. Up to four joysticks are supported.
@@ -295,6 +297,8 @@ configuration.
 
 <sect1>Mouse drivers<p>
 
+The default drivers, <tt/mouse_stddrv (mouse_static_stddrv)/, point to <tt/c64-1351.mou (c64_1351_mou)/.
+
 <descrip>
 
   <tag><tt/c64-1351.mou (c64_1351_mou)/</tag>
@@ -307,11 +311,11 @@ configuration.
   joystick left-button pin or the paddle Y [up/down] pin.)
 
   <tag><tt/c64-joy.mou (c64_joy_mou)/</tag>
-  Supports a mouse emulated by a standard joystick e.g. 1350 mouse in port
+  Supports a mouse emulated by a standard joystick, e.g. 1350 mouse, in port
   #1 of the C64.
 
   <tag><tt/c64-pot.mou (c64_pot_mou)/</tag>
-  Supports a potentiometer device e.g. Koala Pad connected to port #1 of
+  Supports a potentiometer device, e.g. Koala Pad, connected to port #1 of
   the C64.
 
 </descrip><p>
@@ -322,10 +326,10 @@ configuration.
 <descrip>
 
   <tag><tt/c64-swlink.ser (c64_swlink_ser)/</tag>
-  Driver for the SwiftLink cartridge. Supports up to 38400 baud, hardware flow
-  control (RTS/CTS) and interrupt driven receives. Note that because of the
-  peculiarities of the 6551 chip together with the use of the NMI, transmits
-  are not interrupt driven, and the transceiver blocks if the receiver asserts
+  Driver for the SwiftLink cartridge. Supports up to 38400 BPS, hardware flow
+  control (RTS/CTS), and interrupt-driven receives. Note that, because of the
+  peculiarities of the 6551 chip, together with the use of the NMI, transmits
+  are not interrupt driven; and, the transceiver blocks if the receiver asserts
   flow control because of a full buffer.
 
 </descrip><p>
@@ -338,14 +342,16 @@ configuration.
 
 <sect>Other hints<p>
 
+
 <sect1>Escape code<p>
 
-For an Esc press CTRL and [ key.
+For an Esc, press CTRL and the <tt/[/ key.
+
 
 <sect1>Passing arguments to the program<p>
 
-Command line arguments can be passed to <tt/main()/. Since this is not
-supported by BASIC, the following syntax was chosen:
+Command-line arguments can be passed to <tt/main()/. Since this is not
+supported directly by BASIC, the following syntax was chosen:
 
 <tscreen><verb>
     RUN:REM ARG1 " ARG2 IS QUOTED" ARG3 "" ARG5
@@ -356,7 +362,7 @@ supported by BASIC, the following syntax was chosen:
 <item>Arguments may be quoted.
 <item>Leading and trailing spaces around an argument are ignored. Spaces within
       a quoted argument are allowed.
-<item>The first argument passed to <tt/main/ is the program name.
+<item>The first argument passed to <tt/main()/ is the program name.
 <item>A maximum number of 10 arguments (including the program name) are
       supported.
 </enum>
@@ -374,7 +380,7 @@ The runtime for the C64 uses routines marked as <tt/.INTERRUPTOR/ for
 interrupt handlers. Such routines must be written as simple machine language
 subroutines and will be called automatically by the interrupt handler code
 when they are linked into a program. See the discussion of the <tt/.CONDES/
-feature in the <htmlurl url="ca65.html" name="assembler manual">.
+feature in the <url url="ca65.html" name="assembler manual">.
 
 
 

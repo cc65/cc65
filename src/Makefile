@@ -33,7 +33,7 @@ ifdef CMD_EXE
   MKDIR = mkdir $(subst /,\,$1)
   RMDIR = $(if $(DIRLIST),rmdir /s /q $(subst /,\,$(DIRLIST)))
 else
-  NULLDEV = /dev/nul
+  NULLDEV = /dev/null
   MKDIR = mkdir -p $1
   RMDIR = $(RM) -r $1
 endif

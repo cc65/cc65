@@ -275,6 +275,11 @@ unsigned __fastcall__ tgi_ioctl (unsigned char code, void* data);
  * for unknown codes or values.
  */
 
+int __fastcall__ tgi_imulround (int rhs, int lhs);
+/* Helper function for functions using sine/cosine: Multiply two values, one
+ * being an 8.8 fixed point one, and return the rounded and scaled result.
+ */
+
 
 
 /* End of tgi.h */

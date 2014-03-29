@@ -2,11 +2,11 @@
 
 <article>
 
-<title>Oric Atmos specific information for cc65
+<title>Oric Atmos-specific information for CC65
 <author>Ullrich von Bassewitz <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org"><newline>
 Stefan A. Haubenthal <htmlurl url="mailto:polluks@sdf.lonestar.org" name="polluks@sdf.lonestar.org"><newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2013-01-08
+<date>2014-03-27
 
 <abstract>
 An overview over the Atmos runtime system as it is implemented for the cc65 C
@@ -21,11 +21,11 @@ compiler.
 <sect>Overview<p>
 
 This file contains an overview of the Atmos runtime system as it comes with the
-cc65 C compiler. It describes the memory layout, Atmos specific header files,
+cc65 C compiler. It describes the memory layout, Atmos-specific header files,
 available drivers, and any pitfalls specific to that platform.
 
-Please note that Atmos specific functions are just mentioned here, they are
-described in detail in the separate <htmlurl url="funcref.html" name="function
+Please note that Atmos-specific functions are just mentioned here, they are
+described in detail in the separate <url url="funcref.html" name="function
 reference">. Even functions marked as "platform dependent" may be available on
 more than one platform. Please see the function reference for more
 information.
@@ -58,19 +58,25 @@ Special locations:
 
 
 
-<sect>Platform specific header files<p>
+<sect>Platform-specific header files<p>
 
-Programs containing Atmos specific code may use the <tt/atmos.h/ header file.
+Programs containing Atmos-specific code may use the <tt/atmos.h/ header file.
 
 
-<sect1>Atmos specific functions<p>
+<sect1>Atmos-specific functions<p>
 
-The functions listed below are special for the Atmos. See the <htmlurl
+The functions listed below are special for the Atmos. See the <url
 url="funcref.html" name="function reference"> for declaration and usage.
 
 <itemize>
 <item>atmos_load
 <item>atmos_save
+<item>atmos_explode
+<item>atmos_ping
+<item>atmos_shoot
+<item>atmos_tick
+<item>atmos_tock
+<item>atmos_zap
 </itemize>
 
 
@@ -78,7 +84,7 @@ url="funcref.html" name="function reference"> for declaration and usage.
 
 The following pseudo variables declared in the <tt/atmos.h/ header file do allow
 access to hardware located in the address space. Some variables are
-structures, accessing the struct fields will access the chip registers.
+structures; accessing the struct fields will access the chip registers.
 
 <descrip>
 
@@ -109,6 +115,8 @@ The names in the parentheses denote the symbols to be used for static linking of
 
 
 <sect1>Graphics drivers<p>
+
+The default drivers, <tt/tgi_stddrv (tgi_static_stddrv)/, point to <tt/atmos-240-200-2.tgi (atmos_240_200_2_tgi)/.
 
 <descrip>
 
@@ -154,8 +162,8 @@ No mouse drivers are currently available for the Atmos.
   <tag><tt/atmos-acia.ser (atmos_acia_ser)/</tag>
   Driver for the Telestrat integrated serial controller and the Atmos with a
   serial add-on.
-  Note that because of the peculiarities of the 6551 chip together with the
-  use of the NMI, transmits are not interrupt driven, and the transceiver
+  Note that, because of the peculiarities of the 6551 chip, together with the
+  use of the NMI, transmits are not interrupt driven; and, the transceiver
   blocks if the receiver asserts flow control because of a full buffer.
 
 </descrip><p>
@@ -167,12 +175,12 @@ No mouse drivers are currently available for the Atmos.
 <sect1>Disk I/O<p>
 
 The existing library for the Atmos doesn't implement C file
-I/O. There is one hack for the <tt/write()/ routine in
-place, which will make functions work that write to <tt/stdout/
-(like <tt/printf()/). However, this function has some shortcomings which
-won't be fixed, because it's going to be replaced anyway.
+I/O. There are hacks for the <tt/read()/ and <tt/write()/ routines in
+place, which will make functions work that read from and write to <tt/stdout/
+(like <tt/printf()/). However, those functions have some shortcomings which
+won't be fixed, because they're going to be replaced anyway.
 
-To be more concrete, this limitation means that you cannot use any of the
+To be more concrete, the limitation means that you cannot use any of the
 following functions (and a few others):
 
 <itemize>
@@ -190,14 +198,16 @@ following functions (and a few others):
 
 <sect>Other hints<p>
 
+
 <sect1>Function keys<p>
 
 These are defined to be FUNCT + number key.
 
+
 <sect1>Passing arguments to the program<p>
 
-Command line arguments can be passed to <tt/main()/. Since this is not
-supported by BASIC, the following syntax was chosen:
+Command-line arguments can be passed to <tt/main()/. Since that is not
+supported directly by BASIC, the following syntax was chosen:
 
 <tscreen><verb>
     CALL#500:REM ARG1 " ARG2 IS QUOTED" ARG3 "" ARG5
@@ -208,7 +218,7 @@ supported by BASIC, the following syntax was chosen:
 <item>Arguments may be quoted.
 <item>Leading and trailing spaces around an argument are ignored. Spaces within
       a quoted argument are allowed.
-<item>The first argument passed to <tt/main/ is the program name.
+<item>The first argument passed to <tt/main()/ is the program name.
 <item>A maximum number of 10 arguments (including the program name) are
       supported.
 </enum>
@@ -220,7 +230,7 @@ The runtime for the Atmos uses routines marked as <tt/.INTERRUPTOR/ for
 interrupt handlers. Such routines must be written as simple machine language
 subroutines and will be called automatically by the interrupt handler code
 when they are linked into a program. See the discussion of the <tt/.CONDES/
-feature in the <htmlurl url="ca65.html" name="assembler manual">.
+feature in the <url url="ca65.html" name="assembler manual">.
 
 
 
@@ -246,6 +256,3 @@ freely, subject to the following restrictions:
 </enum>
 
 </article>
-
-
-

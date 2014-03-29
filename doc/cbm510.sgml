@@ -2,11 +2,11 @@
 
 <article>
 
-<title>Commodore 510 (aka P500) specific information for cc65
-<author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">&nl;
-Stefan A. Haubenthal, <htmlurl url="mailto:polluks@sdf.lonestar.org" name="polluks@sdf.lonestar.org">&nl;
-<htmlurl url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2013-08-23
+<title>Commodore 510 (aka P500) specific information for CC65
+<author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org"><newline>
+Stefan A. Haubenthal, <htmlurl url="mailto:polluks@sdf.lonestar.org" name="polluks@sdf.lonestar.org"><newline>
+<url url="mailto:greg.king5@verizon.net" name="Greg King">
+<date>2014-03-26
 
 <abstract>
 An overview over the Commodore 510 runtime system as it is implemented for the
@@ -21,11 +21,11 @@ cc65 C compiler.
 <sect>Overview<p>
 
 This file contains an overview of the CBM 510 runtime system as it comes with
-the cc65 C compiler. It describes the memory layout, CBM 510 specific header
+the cc65 C compiler. It describes the memory layout, CBM 510-specific header
 files, available drivers, and any pitfalls specific to that platform.
 
-Please note that CBM 510 specific functions are just mentioned here, they are
-described in detail in the separate <htmlurl url="funcref.html" name="function
+Please note that CBM 510-specific functions are just mentioned here, they are
+described in detail in the separate <url url="funcref.html" name="function
 reference">. Even functions marked as "platform dependent" may be available on
 more than one platform. Please see the function reference for more
 information.
@@ -75,16 +75,16 @@ Special locations:
 
 
 
-<sect>Platform specific header files<p>
+<sect>Platform-specific header files<p>
 
-Programs containing CBM 510 specific code may use the <tt/cbm510.h/ or
+Programs containing CBM 510-specific code may use the <tt/cbm510.h/ or
 <tt/cbm.h/ header files. Using the later may be an option when writing code
 for more than one CBM platform, since it includes <tt/cbm510.h/ and declares
 several functions common to all CBM platforms.
 
-<sect1>CBM 510 specific functions<p>
+<sect1>CBM 510-specific functions<p>
 
-The functions listed below are special for the CBM 510. See the <htmlurl
+The functions listed below are special for the CBM 510. See the <url
 url="funcref.html" name="function reference"> for declaration and usage.
 
 <itemize>
@@ -95,10 +95,10 @@ url="funcref.html" name="function reference"> for declaration and usage.
 </itemize>
 
 
-<sect1>CBM specific functions<p>
+<sect1>CBM-specific functions<p>
 
 Some functions are available for all (or at least most) of the Commodore
-machines. See the <htmlurl url="funcref.html" name="function reference"> for
+machines. See the <url url="funcref.html" name="function reference"> for
 declaration and usage.
 
 
@@ -204,6 +204,8 @@ No graphics drivers are currently available for the Commodore 510.
 
 <sect1>Mouse drivers<p>
 
+The default drivers, <tt/mouse_stddrv (mouse_static_stddrv)/, point to <tt/cbm510-joy.mou (cbm510_joy_mou)/.
+
 <descrip>
 
   <tag><tt/cbm510-joy.mou (cbm510_joy_mou)/</tag>
@@ -220,18 +222,20 @@ No graphics drivers are currently available for the Commodore 510.
 
 </descrip><p>
 
+
 <sect1>RS232 device drivers<p>
 
 <descrip>
 
   <tag><tt/cbm510-std.ser (cbm510_std_ser)/</tag>
   Driver for the 6551 ACIA chip built into the Commodore 510. Supports up to
-  19200 baud, hardware flow control (RTS/CTS) and interrupt driven receives.
-  Note that because of the peculiarities of the 6551 chip transmits are not
-  interrupt driven, and the transceiver blocks if the receiver asserts flow
+  19200 BPS, hardware flow control (RTS/CTS), and interrupt-driven receives.
+  Note that, because of the peculiarities of the 6551 chip, transmits are not
+  interrupt driven; and, the transceiver blocks if the receiver asserts flow
   control because of a full buffer.
 
 </descrip><p>
+
 
 
 <sect>Limitations<label id="limitations"><p>
@@ -246,6 +250,7 @@ While this simplifies things, it should be noted that the wrappers do have
 quite an impact on performance: A cross bank call has an extra 300&micro;s
 penalty added by the wrapper.
 
+
 <sect1>Interrupts<p>
 
 Compiled programs contain an interrupt handler that runs in the program bank.
@@ -258,7 +263,9 @@ Since the cc65 runtime does only call the kernal for disk I/O, this means that
 a program should not do file I/O while it depends on interrupts.
 
 
+
 <sect>Other hints<p>
+
 
 <sect1>Passing arguments to the program<p>
 
@@ -278,7 +285,7 @@ The runtime for the Commodore 510 uses routines marked as <tt/.INTERRUPTOR/
 for interrupt handlers. Such routines must be written as simple machine
 language subroutines and will be called automatically by the interrupt handler
 code when they are linked into a program. See the discussion of the
-<tt/.CONDES/ feature in the <htmlurl url="ca65.html" name="assembler manual">.
+<tt/.CONDES/ feature in the <url url="ca65.html" name="assembler manual">.
 
 
 

@@ -3,13 +3,13 @@
 <HEAD>
  <LINK REL="stylesheet" TYPE="text/css" HREF="doc.css">
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
- <TITLE>Commodore 128 specific information for cc65</TITLE>
+ <TITLE>Commodore 128-specific information for CC65</TITLE>
 </HEAD>
 <BODY>
-<H1>Commodore 128 specific information for cc65</H1>
+<H1>Commodore 128-specific information for CC65</H1>
 
 <H2>Ullrich von Bassewitz, 
-<A HREF="mailto:uz@cc65.org">uz@cc65.org</A></H2>2003-12-14
+<A HREF="mailto:uz@cc65.org">uz@cc65.org</A></H2>2014-03-24
 <HR>
 <EM>An overview over the C128 runtime system as it is implemented for the cc65 C
 compiler.</EM>
@@ -24,11 +24,11 @@ compiler.</EM>
 <H2><A NAME="toc3">3.</A> <A HREF="c128.html#s3">Memory layout</A></H2>
 
 <P>
-<H2><A NAME="toc4">4.</A> <A HREF="c128.html#s4">Platform specific header files</A></H2>
+<H2><A NAME="toc4">4.</A> <A HREF="c128.html#s4">Platform-specific header files</A></H2>
 
 <UL>
-<LI><A NAME="toc4.1">4.1</A> <A HREF="c128.html#ss4.1">C128 specific functions</A>
-<LI><A NAME="toc4.2">4.2</A> <A HREF="c128.html#ss4.2">CBM specific functions</A>
+<LI><A NAME="toc4.1">4.1</A> <A HREF="c128.html#ss4.1">C128-specific functions</A>
+<LI><A NAME="toc4.2">4.2</A> <A HREF="c128.html#ss4.2">CBM-specific functions</A>
 <LI><A NAME="toc4.3">4.3</A> <A HREF="c128.html#ss4.3">Hardware access</A>
 </UL>
 <P>
@@ -61,9 +61,9 @@ compiler.</EM>
 
 
 <P>This file contains an overview of the C128 runtime system as it comes with the
-cc65 C compiler. It describes the memory layout, C128 specific header files,
+cc65 C compiler. It describes the memory layout, C128-specific header files,
 available drivers, and any pitfalls specific to that platform.</P>
-<P>Please note that C128 specific functions are just mentioned here, they are
+<P>Please note that C128-specific functions are just mentioned here, they are
 described in detail in the separate 
 <A HREF="funcref.html">function reference</A>. Even functions marked as "platform dependent" may be available on
 more than one platform. Please see the function reference for more
@@ -100,10 +100,10 @@ directly, but using the BASIC ROM is not possible without additional code.</P>
 <P>The text screen is located at $400 (as in the standard setup).</P>
 
 <DT><B>Stack</B><DD>
-<P>The C runtime stack is located at $BFFF and growing downwards.</P>
+<P>The C runtime stack is located at $BFFF, and growing downwards.</P>
 
 <DT><B>Heap</B><DD>
-<P>The C heap is located at the end of the program and grows towards the C
+<P>The C heap is located at the end of the program, and grows towards the C
 runtime stack.</P>
 
 </DL>
@@ -112,16 +112,16 @@ runtime stack.</P>
 
 
 
-<H2><A NAME="s4">4.</A> <A HREF="#toc4">Platform specific header files</A></H2>
+<H2><A NAME="s4">4.</A> <A HREF="#toc4">Platform-specific header files</A></H2>
 
 
-<P>Programs containing C128 specific code may use the <CODE>c128.h</CODE> or <CODE>cbm.h</CODE>
+<P>Programs containing C128-specific code may use the <CODE>c128.h</CODE> or <CODE>cbm.h</CODE>
 header files. Using the later may be an option when writing code for more than
 one CBM platform, since it includes <CODE>c128.h</CODE> and declares several functions
 common to all CBM platforms.</P>
 
 
-<H2><A NAME="ss4.1">4.1</A> <A HREF="#toc4.1">C128 specific functions</A>
+<H2><A NAME="ss4.1">4.1</A> <A HREF="#toc4.1">C128-specific functions</A>
 </H2>
 
 
@@ -137,7 +137,7 @@ common to all CBM platforms.</P>
 </P>
 
 
-<H2><A NAME="ss4.2">4.2</A> <A HREF="#toc4.2">CBM specific functions</A>
+<H2><A NAME="ss4.2">4.2</A> <A HREF="#toc4.2">CBM-specific functions</A>
 </H2>
 
 
@@ -222,27 +222,28 @@ is explained in <CODE>_6526.h</CODE>.</P>
 </H2>
 
 
+<P>The default drivers, <CODE>tgi_stddrv (tgi_static_stddrv)</CODE>, point to <CODE>c128-vdc.tgi (c128_vdc_tgi)</CODE>.</P>
 <P>Note: The graphics drivers for the VDC are incompatible with the extended
 memory drivers using the VDC memory!</P>
 <P>
 <DL>
 <DT><B><CODE>c128-vdc.tgi (c128_vdc_tgi)</CODE></B><DD>
-<P>This driver was written by Maciej Witkowiak. It uses the 80 column display
+<P>This driver was written by Maciej Witkowiak. It uses the 80-column display,
 and features a resolution of 640*200 with two colors and an adjustable
 palette (that means that the two colors can be chosen out of the 16 VDC
 colors).</P>
 
 <DT><B><CODE>c128-vdc2.tgi (c128_vdc2_tgi)</CODE></B><DD>
-<P>This driver was written by Maciej Witkowiak. This driver uses the 80 column
-display and features a resolution of 640*480 with two colors and an
+<P>This driver was written by Maciej Witkowiak. This driver uses the 80-column
+display, and features a resolution of 640*480 with two colors and an
 adjustable palette (that means that the two colors can be chosen out of the
-16 VDC colors). The driver requires 64KB VDC RAM.</P>
+16 VDC colors). The driver requires 64KiB VDC RAM.</P>
 </DL>
 </P>
 
-<P>Note: The colors are translated from definitions in headers to correct VDC values
-so please use definitions or VIC color numbers only. Colors <CODE>GRAY3</CODE> and <CODE>BROWN</CODE> are
-missing on VDC and are translated to the two colors missing from VIC palette.</P>
+<P>Note: The colors are translated from definitions in headers to correct VDC values;
+so, please use definitions or VIC color numbers only. Colors <CODE>GRAY3</CODE> and <CODE>BROWN</CODE> are
+missing on VDC, and are translated to the two colors missing from the VIC palette.</P>
 
 <H2><A NAME="ss5.2">5.2</A> <A HREF="#toc5.2">Extended memory drivers</A>
 </H2>
@@ -274,13 +275,13 @@ Will test the hardware for the available RAM.</P>
 
 <DT><B><CODE>c128-reu.emd (c128_reu_emd)</CODE></B><DD>
 <P>A driver for the CBM REUs. The driver will determine from the connected REU
-if it supports 128KB of RAM or more. In the latter case, 256KB are assumed,
+if it supports 128KiB of RAM or more. In the latter case, 256KiB are assumed,
 but since there are no range checks, the application can use more memory if
 it has better knowledge about the hardware than the driver.</P>
 
 <DT><B><CODE>c128-vdc.emd (c128_vdc_emd)</CODE></B><DD>
-<P>A driver for the VDC memory of the C128 written and contributed by Maciej
-Witkowiak. Autodetects the amount of memory available (16 or 64K) and offers
+<P>A driver for the VDC memory of the C128, written and contributed by Maciej
+Witkowiak. Autodetects the amount of memory available (16 or 64Ki), and offers
 64 or 256 pages of 256 bytes each. Note: This driver is incompatible with
 any of the graphics drivers using the VDC!</P>
 
@@ -293,17 +294,18 @@ any of the graphics drivers using the VDC!</P>
 </H2>
 
 
+<P>The default drivers, <CODE>joy_stddrv (joy_static_stddrv)</CODE>, point to <CODE>c128-stdjoy.joy (c128_stdjoy_joy)</CODE>.</P>
 <P>
 <DL>
 
 <DT><B><CODE>c128-ptvjoy.joy (c128_ptvjoy_joy)</CODE></B><DD>
 <P>Driver for the Protovision 4-player adapter originally written by Groepaz
-for the C64 and converted for the C128 by me. See 
+for the C64, and converted for the C128 by me. See 
 <A HREF="http://www.protovision-online.de/hardw/hardwstart.htm">http://www.protovision-online.de/hardw/hardwstart.htm</A> for prices and
 building instructions. Up to four joysticks are supported.</P>
 
 <DT><B><CODE>c128-stdjoy.joy (c128_stdjoy_joy)</CODE></B><DD>
-<P>Supports up to two joysticks connected to the standard joysticks port of
+<P>Supports up to two joysticks connected to the standard joysticks ports of
 the C128.</P>
 
 </DL>
@@ -316,6 +318,7 @@ the C128.</P>
 </H2>
 
 
+<P>The default drivers, <CODE>mouse_stddrv (mouse_static_stddrv)</CODE>, point to <CODE>c128-1351.mou (c128_1351_mou)</CODE>.</P>
 <P>
 <DL>
 
@@ -330,11 +333,11 @@ the joystick left-button pin or the paddle Y [up/down] pin.)  It works on
 only the 40-column screen.</P>
 
 <DT><B><CODE>c128-joy.mou (c128_joy_mou)</CODE></B><DD>
-<P>Supports a mouse emulated by a standard joystick e.g. 1350 mouse in port
+<P>Supports a mouse emulated by a standard joystick, e.g. 1350 mouse, in port
 #1 of the C128.</P>
 
 <DT><B><CODE>c128-pot.mou (c128_pot_mou)</CODE></B><DD>
-<P>Supports a potentiometer device e.g. Koala Pad connected to port #1 of
+<P>Supports a potentiometer device, e.g. Koala Pad, connected to port #1 of
 the C128.</P>
 
 </DL>
@@ -350,10 +353,10 @@ the C128.</P>
 <DL>
 
 <DT><B><CODE>c128-swlink.ser (c128_swlink_ser)</CODE></B><DD>
-<P>Driver for the SwiftLink cartridge. Supports up to 38400 baud, hardware flow
-control (RTS/CTS) and interrupt driven receives. Note that because of the
-peculiarities of the 6551 chip together with the use of the NMI, transmits
-are not interrupt driven, and the transceiver blocks if the receiver asserts
+<P>Driver for the SwiftLink cartridge. Supports up to 38400 BPS, hardware flow
+control (RTS/CTS), and interrupt-driven receives. Note that, because of the
+peculiarities of the 6551 chip, together with the use of the NMI, transmits
+are not interrupt driven; and, the transceiver blocks if the receiver asserts
 flow control because of a full buffer.</P>
 <P>The driver uses the RS232 variables and buffers of the kernal (buffers at
 $C00 and $D00).</P>
@@ -374,12 +377,13 @@ $C00 and $D00).</P>
 
 
 
+
 <H2><A NAME="ss7.1">7.1</A> <A HREF="#toc7.1">Passing arguments to the program</A>
 </H2>
 
 
-<P>Command line arguments can be passed to <CODE>main()</CODE>. Since this is not
-supported by BASIC, the following syntax was chosen:</P>
+<P>Command-line arguments can be passed to <CODE>main()</CODE>. Since this is not
+supported directly by BASIC, the following syntax was chosen:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -393,7 +397,7 @@ supported by BASIC, the following syntax was chosen:</P>
 <LI>Arguments may be quoted.</LI>
 <LI>Leading and trailing spaces around an argument are ignored. Spaces within
 a quoted argument are allowed.</LI>
-<LI>The first argument passed to <CODE>main</CODE> is the program name.</LI>
+<LI>The first argument passed to <CODE>main()</CODE> is the program name.</LI>
 <LI>A maximum number of 10 arguments (including the program name) are
 supported.</LI>
 </OL>

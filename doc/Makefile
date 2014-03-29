@@ -6,11 +6,14 @@ endif
 
 .SUFFIXES:
 
-all mostlyclean install:
+htmldir = $(prefix)/share/doc/cc65$(DESTPACKAGE_SUFFIX)/html
+infodir = $(prefix)/share/info
+
+all mostlyclean:
 
 ifdef CMD_EXE
 
-clean zip doc:
+clean install zip doc:
 
 else # CMD_EXE
 
@@ -21,8 +24,21 @@ TOC_LEVEL = 0
 
 TOC_LEVEL = 2
 
+INSTALL = install
+
 clean:
 	$(RM) -r ../html ../info
+
+install:
+	$(if $(prefix),,$(error variable `prefix' must be set))
+ifeq ($(wildcard ../html),../html)
+	$(INSTALL) -d $(DESTDIR)$(htmldir)
+	$(INSTALL) -m644 ../html/*.* $(DESTDIR)$(htmldir)
+endif
+ifeq ($(wildcard ../info),../info)
+	$(INSTALL) -d $(DESTDIR)$(infodir)
+	$(INSTALL) -m644 ../info/*.* $(DESTDIR)$(infodir)
+endif
 
 zip:
 	@cd .. && zip cc65 html/*.*

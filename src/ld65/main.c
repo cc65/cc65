@@ -696,7 +696,7 @@ static void ParseCommandLine(void)
                             LabelFileName = GetArg (&I, 3);
                             break;
                         default:
-                            OptLibPath (Arg, InputFiles[I].FileName);
+                            OptLibPath (Arg, GetArg (&I, 2));
                             break;
                     }
                     break;

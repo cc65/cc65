@@ -2,7 +2,7 @@
 
 <article>
 
-<title>Commodore 128-specific information for CC65
+<title>Commodore 128-specific information for cc65
 <author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
 <date>2014-03-24
 
@@ -180,7 +180,7 @@ memory drivers using the VDC memory!
   This driver was written by Maciej Witkowiak. This driver uses the 80-column
   display, and features a resolution of 640*480 with two colors and an
   adjustable palette (that means that the two colors can be chosen out of the
-  16 VDC colors). The driver requires 64KiB VDC RAM.
+  16 VDC colors). The driver requires 64KB VDC RAM.
 </descrip><p>
 
 Note: The colors are translated from definitions in headers to correct VDC values;
@@ -214,13 +214,13 @@ missing on VDC, and are translated to the two colors missing from the VIC palett
 
   <tag><tt/c128-reu.emd (c128_reu_emd)/</tag>
   A driver for the CBM REUs. The driver will determine from the connected REU
-  if it supports 128KiB of RAM or more. In the latter case, 256KiB are assumed,
+  if it supports 128KB of RAM or more. In the latter case, 256KB are assumed,
   but since there are no range checks, the application can use more memory if
   it has better knowledge about the hardware than the driver.
 
   <tag><tt/c128-vdc.emd (c128_vdc_emd)/</tag>
   A driver for the VDC memory of the C128, written and contributed by Maciej
-  Witkowiak. Autodetects the amount of memory available (16 or 64Ki), and offers
+  Witkowiak. Autodetects the amount of memory available (16 or 64K), and offers
   64 or 256 pages of 256 bytes each. Note: This driver is incompatible with
   any of the graphics drivers using the VDC!
 

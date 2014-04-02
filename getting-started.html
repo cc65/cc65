@@ -31,17 +31,22 @@
     <p>You have two options...
       <ul class="bullet">
         <li>
-          <p>Download the
-             <a href="https://github.com/oliverschmidt/cc65/archive/master.zip">
-             current cc65 source code</a> and unzip it to a path of your
-             choice. Change the current working directory to the 'cc65-master'
-             subdirectory of that path and enter 'make'. This builds both the
-             cc65 binaries (located in the 'bin' subdirectory) and the cc65
-             libraries. Now cc65 is fully functional without further steps.
+          <p>Change the current working directory to a path of your choice and
+             enter...
+          </p>
+          <p>
+            <kbd>git clone https://github.com/cc65/cc65.git<br>
+                  cd cc65<br>
+                  make<br>
+            </kbd>
+          </p>
+          <p>This builds both the cc65 binaries (located in the 'bin'
+             subdirectory) and the cc65 libraries. Now cc65 is fully functional
+             without further steps.
           </p>
           <p>If you want to be able to run the cc65 binaries without providing
-             their path you may additionally enter 'sudo make avail'. This
-             creates symbolic links to the binaries in '/usr/local/bin'.
+             their path you may additionally enter <kbd>sudo make avail</kbd>.
+             This creates symbolic links to the binaries in '/usr/local/bin'.
           </p>
         </li>
        </ul>

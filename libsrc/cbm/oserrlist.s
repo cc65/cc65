@@ -48,7 +48,7 @@ __sys_oserrlist:
         sys_oserr_entry          6, "File not input"
         sys_oserr_entry          7, "File not output"
         sys_oserr_entry          8, "Filename missing"
-        sys_oserr_entry          9, "Ilegal device"
+        sys_oserr_entry          9, "Illegal device"
         sys_oserr_entry         20, "Read error"
         sys_oserr_entry         21, "Read error"
         sys_oserr_entry         22, "Read error"

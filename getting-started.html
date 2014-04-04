@@ -24,6 +24,8 @@
     <ul class="down">
       <li><a href="#GNU">GNU/Linux</a>
       </li>
+      <li><a href="#OSX">OS X</a>
+      </li>
       <li><a href="#Windows">Microsoft Windows</a>
       </li>
     </ul>
@@ -59,6 +61,28 @@
           </p>
         </li>
       </ul>
+    </p>
+    <h2><a name="OSX">OS X</a></h2>
+    <p>
+          <p>Provided that you have all necessary development tools installed (see Wiki),
+              open Terminal.app, and - similarly to the first option for GNU/Linux -
+              change the current working directory to a path
+              of your choice and enter...
+          </p>
+          <p>
+            <kbd>git clone https://github.com/cc65/cc65.git<br>
+                  cd cc65<br>
+                  make<br>
+            </kbd>
+          </p>
+          <p>This builds both the cc65 binaries (located in the 'bin'
+             subdirectory) and the cc65 libraries. Now cc65 is fully functional
+             without further steps.
+          </p>
+          <p>If you want to be able to run the cc65 binaries without providing
+             their path you may additionally enter <kbd>sudo make avail</kbd>.
+             This creates symbolic links to the binaries in '/usr/local/bin'.
+          </p>
     </p>
     <h2><a name="Windows">Microsoft Windows</a></h2>
     <p>Download the <a href="download/cc65-snapshot-win32.zip"> current cc65

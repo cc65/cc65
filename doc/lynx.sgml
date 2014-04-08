@@ -3,8 +3,9 @@
 <article>
 
 <title>Atari Lynx specific information for cc65
-<author>Karri Kaksonen, <htmlurl url="mailto:karri@sipo.fi" name="karri@sipo.fi">
-Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
+<author>
+<url url="mailto:karri@sipo.fi" name="Karri Kaksonen">,<newline>
+<url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
 <date>2011-04-01
 
 <abstract>

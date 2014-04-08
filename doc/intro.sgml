@@ -3,9 +3,10 @@
 <article>
 
 <title>cc65 Compiler Intro
-<author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">,
-<and>CbmNut, <htmlurl url="mailto:cbmnut@hushmail.com" name="cbmnut@hushmail.com">,
-<and><url name="Greg King" url="mailto:gngking@erols.com">
+<author>
+<url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
+<url url="mailto:cbmnut@hushmail.com" name="CbmNut">,<newline>
+<url url="mailto:greg.king5@verizon.net" name="Greg King">
 <date>2005-7-22
 
 <abstract>
@@ -285,8 +286,8 @@ Apple:
 BRUN TEST
 </verb></tscreen>
 
-You will see the "Hello, World!" appear on the same line.  Thanks to Oliver
-Schmidt, <htmlurl url="mailto:ol.sc@web.de" name="ol.sc@web.de"> for his help
+You will see "Hello, World!" appear on the same line.  Thanks to
+<url url="mailto:ol.sc@web.de" name="Oliver Schmidt"> for his help
 in completing this section.
 
 

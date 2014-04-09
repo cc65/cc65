@@ -5,7 +5,7 @@
 <!-- Title information -->
 
 <title>GEOSLib docs
-<author>Maciej Witkowiak, <htmlurl url="mailto:ytm@elysium.pl" name="ytm@elysium.pl">
+<author><url url="mailto:ytm@elysium.pl" name="Maciej Witkowiak">
 <date>v1.5, 26.12.1999, 2000, 2001, 2002, 2003, 2005
 <abstract>
 This is the documentation of cc65's GEOSLib, but information contained here may be also

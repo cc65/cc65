@@ -3,9 +3,10 @@
 <article>
 
 <title>Commodore 610-specific information for cc65
-<author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org"><newline>
+<author>
+<url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2004-04-02
+<date>2014-04-02
 
 <abstract>
 An overview over the Commodore 610 runtime system as it is implemented for the

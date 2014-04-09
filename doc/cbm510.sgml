@@ -3,8 +3,9 @@
 <article>
 
 <title>Commodore 510 (aka P500) specific information for cc65
-<author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org"><newline>
-Stefan A. Haubenthal, <htmlurl url="mailto:polluks@sdf.lonestar.org" name="polluks@sdf.lonestar.org"><newline>
+<author>
+<url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
+<url url="mailto:polluks@sdf.lonestar.org" name="Stefan A. Haubenthal">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
 <date>2014-04-02
 

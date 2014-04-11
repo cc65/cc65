@@ -1,42 +1,48 @@
 ;
 ; P/M mouse callbacks for the Ataris
 ;
-; Christian Groessler, 07.04.2014
+; Christian Groessler, 11.04.2014
 ;
 ; All functions in this module should be interrupt safe, because they may
 ; be called from an interrupt handler
 ;
 
         .include        "atari.inc"
-	.importzp	sp
+        .importzp       sp
+        .export         _mouse_pm_callbacks
         .constructor    pm_init,27
         .destructor     pm_down,7
-        .export         _mouse_pm_callbacks
+
+; get mouse shape data
+        .import mouse_pm_bits
+        .import mouse_pm_height
+        .import mouse_pm_hotspot_x
+        .import mouse_pm_hotspot_y
 
 
 ; P/M definitions. The first value can be changed to adjust the number
 ; of the P/M used for the mouse. All others depend on this value.
 ; Valid P/M numbers are 0 to 4. When 4 is used, the missiles are used
 ; as a player.
-MOUSE_PM_NUM    = 4                             ; P/M used for the mouse
-MOUSE_PM_BASE   = pm_base
+MOUSE_PM_NUM    = 2                             ; P/M used for the mouse
+MOUSE_PM_BASE   = pm_base                       ; ZP location pointing to the hw area used by the selected P/M
 
 .if MOUSE_PM_NUM = 4
-MOUSE_PM_RAW	= 0
-.macro	set_mouse_x
-	; assume CF = 0
-	sta	HPOSM3
-	adc	#2
-	sta	HPOSM2
-	adc	#2
-	sta	HPOSM1
-	adc	#2
-	sta	HPOSM0
+MOUSE_PM_RAW    = 0                             ; MOUSE_PM_RAW is the hardware P/M number for MOUSE_PM_NUM
+.macro  set_mouse_x
+        ; assume CF = 0
+        sta     HPOSM3
+        adc     #2
+        sta     HPOSM2
+        adc     #2
+        sta     HPOSM1
+        adc     #2
+        sta     HPOSM0
 .endmacro
 .else
-MOUSE_PM_RAW	= MOUSE_PM_NUM + 1
-.macro	set_mouse_x
-	sta     HPOSP0 + MOUSE_PM_NUM
+MOUSE_PM_RAW    = MOUSE_PM_NUM + 1
+.macro  set_mouse_x
+        sta     HPOSP0 + MOUSE_PM_NUM
 .endmacro
 .endif
 
@@ -57,7 +63,8 @@ _mouse_pm_callbacks:
 
         .bss
 
-omy:    .res    1                       ; Old Mouse Y position
+omy:    .res    1                       ; old Mouse Y position
+colhlp: .res    1                       ; helper variable to set P/M color
 
 ; ------------------------------------------------------------------------
 
@@ -72,7 +79,7 @@ pm_base:.res    2
 ; Hide the mouse cursor.
 hide:   lda     #0
         sta     GRACTL
-	rts
+        rts
 
 ; Show the mouse cursor.
 show:
@@ -82,88 +89,100 @@ show:
         lda     #1
 .endif
         sta     GRACTL
-        ;rts
+        ;rts                            ; optimized out
 
 prep:
 draw:
         rts
 
 ; Move the mouse cursor x position to the value in A/X.
-movex:	cpx	#1
-	ror	a
-	clc
-	adc	#48
-	set_mouse_x
-        rts
+movex:  cpx     #1
+        ror     a
+        clc
+        adc     #48
+        sbc     #<(mouse_pm_hotspot_x - 1)
+        set_mouse_x
+        jmp     update_colors
 
 ; Move the mouse cursor y position to the value in A/X.
 movey:  clc
-	adc	#32
-	pha
+        adc     #32
+        sbc     #<(mouse_pm_hotspot_y - 1)
+        pha
         lda     omy
         jsr     clr_pm                  ; remove player at old position
+        jsr     update_colors
         pla
         sta     omy
         ;jmp    set_pm                  ; put player to new position
+        ; fall thru
 
-; Set P/M data from 'mouse_bits'
+; Set P/M data from 'mouse_pm_bits'
 set_pm: tay
         ldx     #0
-set_l:  lda     mouse_bits,x
+set_l:  lda     mouse_pm_bits,x
         sta     (MOUSE_PM_BASE),y
         inx
         iny
-        cpx     #mouse_height
+        beq     set_end
+        cpx     #<mouse_pm_height
         bcc     set_l
-        rts
+set_end:rts
 
 ; Clear (zero) P/M data
-clr_pm: ldx     #mouse_height
+clr_pm: ldx     #<mouse_pm_height
         tay
         lda     #0
 clr_l:  sta     (MOUSE_PM_BASE),y
         iny
+        beq     clr_end
         dex
         bne     clr_l
+clr_end:rts
+
+
+pm_down = hide
+
+
+; this assumes a GRAPHICS 0 screen
+update_colors:
+        lda     COLOR2                  ; get background color
+        and     #$F0
+        sta     colhlp
+        lda     COLOR1
+        and     #$0F
+        ora     colhlp
+
+.if MOUSE_PM_NUM = 4
+        sta     PCOLR0
+        sta     PCOLR1
+        sta     PCOLR2
+        sta     PCOLR3
+        sta     SIZEM
+.else
+        sta     PCOLR0 + MOUSE_PM_NUM
+        sta     SIZEP0 + MOUSE_PM_NUM
+.endif
         rts
-
-
-pm_down	= hide
-
 
 ; ------------------------------------------------------------------------
 
-	.segment "INIT"
+        .segment "INIT"
 
-pm_init:lda	#0
-	sta	sp
-	sta	MOUSE_PM_BASE
-	lda	sp+1
-	and	#7			; offset within 2K
-	cmp	#3 + MOUSE_PM_RAW + 1	; can we use it?
-	bcc	@decr			; no
+pm_init:lda     #0
+        sta     MOUSE_PM_BASE
+        ldx     #6                      ; page 6
+        stx     MOUSE_PM_BASE+1
+        tay
+@iniloo:sta     (MOUSE_PM_BASE),y
+        iny
+        bne     @iniloo
 
-	lda	sp+1
-	and	#$F8
-@set:	adc	#3 + MOUSE_PM_RAW - 1	; CF is set, so adding MOUSE_PM_RAW + 3
-	sta	MOUSE_PM_BASE+1
-	sta	sp+1
-	bne	@cont
-
-@decr:	lda	sp+1
-	and	#$F8
-	sbc	#8 - 1			; CF is clear, subtracts 8
-	bcs	@set			; jump always
-
-@cont:	lda	#0
-	tay
-@iniloo:sta	(MOUSE_PM_BASE),y
-	iny
-	bne	@iniloo
-
-	lda	MOUSE_PM_BASE+1
-	and	#$F8
-	sta	PMBASE
+.if 0   ; enable if not using page 6 for P/M data
+        lda     MOUSE_PM_BASE+1
+        and     #$F8
+.endif
+        sta     PMBASE
 
         lda     #62
         sta     SDMCTL
@@ -171,34 +190,4 @@ pm_init:lda	#0
         lda     #1 + 16
         sta     GPRIOR
 
-        lda     #0
-
-.if MOUSE_PM_NUM = 4
-	sta	PCOLR0
-	sta	PCOLR1
-	sta	PCOLR2
-	sta	PCOLR3
-	sta	SIZEM
-.else
-        sta     PCOLR0 + MOUSE_PM_NUM
-        sta     SIZEP0 + MOUSE_PM_NUM
-.endif
-        rts
-
-
-; ------------------------------------------------------------------------
-
-        .data
-
-mouse_bits:
-        .byte   %11110000
-        .byte   %11000000
-        .byte   %10100000
-        .byte   %10010000
-        .byte   %10001000
-        .byte   %00000100
-        .byte   %00000010
-;       .byte   %00000000
-
-mouse_height = * - mouse_bits
-
+        jmp     update_colors

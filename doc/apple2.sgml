@@ -4,7 +4,7 @@
 
 <title>Apple&nbsp;&rsqb;&lsqb; specific information for cc65
 <author><url url="mailto:ol.sc@web.de" name="Oliver Schmidt">
-<date>2009-10-07
+<date>2014-04-10
 
 <abstract>
 An overview over the Apple&nbsp;&rsqb;&lsqb; runtime system as it is
@@ -24,7 +24,7 @@ Apple&nbsp;&rsqb;&lsqb; specific header files, available drivers, and any
 pitfalls specific to that platform.
 
 Please note that Apple&nbsp;&rsqb;&lsqb; specific functions are just mentioned
-here, they are described in detail in the separate <htmlurl url="funcref.html"
+here, they are described in detail in the separate <url url="funcref.html"
 name="function reference">. Even functions marked as "platform dependent" may
 be available on more than one platform. Please see the function reference for
 more information.
@@ -45,7 +45,7 @@ containing DOS 3.3 as well as ProDOS 8.
 
 For ProDOS 8 system programs the load address is fixed to &dollar;2000 so there
 is no need for a header. Thus the linker configuration
-<htmlurl url="apple2.html#ss4.3" name="apple2-system.cfg"> for those programs
+<ref id="apple-sys-cfg" name="apple2-system.cfg"> for those programs
 omits the DOS 3.3 header. The right AppleCommander option to put system files
 without a header on a ProDOS 8 disk image is <tt/-p/.
 
@@ -81,11 +81,11 @@ cc65 runtime system takes care of actually moving the code into the Language
 Card.
 
 The amount of memory available in the Language Card for generated code depends
-on the chosen <htmlurl url="apple2.html#s4" name="linker configuration">.
+on the chosen <ref id="link-configs" name="linker configuration">.
 
 
 
-<sect>Linker configurations<p>
+<sect>Linker configurations<label id="link-configs"><p>
 
 The ld65 linker comes with a default config file for the Apple&nbsp;&rsqb;&lsqb;,
 which is used via <tt/-t apple2/.
@@ -138,7 +138,7 @@ vanilla DOS 3.3 doesn't make use of the Language Card at all.
 </descrip><p>
 
 
-<sect1><tt/apple2-system.cfg/<p>
+<sect1><tt/apple2-system.cfg/<label id="apple-sys-cfg"><p>
 
 Configuration for a system program running on ProDOS 8.
 
@@ -159,7 +159,7 @@ Configuration for a system program running on ProDOS 8.
 </descrip><p>
 
 
-<sect1><tt/apple2-loader.cfg/<p>
+<sect1><tt/apple2-loader.cfg/<label id="apple-load-cfg"><p>
 
 Configuration optimized for a binary program running on ProDOS 8 without
 BASIC.SYSTEM. Intended to be used with <bf/LOADER.SYSTEM - an
@@ -231,7 +231,7 @@ range.
 The easiest (and for really large programs in fact the only) way to have a cc65
 program use the memory from &dollar;800 to &dollar;2000 is to link it as binary
 (as opposed to system) program using the linker configuration
-<htmlurl url="apple2.html#ss4.4" name="apple2-loader.cfg"> with start address
+<ref id="apple-load-cfg" name="apple2-loader.cfg"> with start address
 &dollar;803 and load it with the targetutil LOADER.SYSTEM. The program then works
 like a system program (i.e. quits to the ProDOS dispatcher).
 
@@ -243,7 +243,7 @@ example the program <tt/MYPROG/ is loaded by <tt/MYPROG.SYSTEM/.
 <sect1>Heap<p>
 
 If the cc65 program can be successfully linked as system program using the linker
-configuration <htmlurl url="apple2.html#ss4.3" name="apple2-system.cfg"> but
+configuration <ref id="apple-sys-cfg" name="apple2-system.cfg">, but
 uses the heap either explicitly or implicitly (i.e. by loading a driver) then
 the memory from &dollar;800 to &dollar;2000 can be added to the heap by calling
 <tt/_heapadd ((void *) 0x0800, 0x1800);/ at the beginning of <tt/main()/.
@@ -268,7 +268,7 @@ default I/O buffer allocation basically yields the same placement of I/O buffers
 in memory the primary benefit of <tt/apple2-iobuf-0800.o/ is a reduction in code
 size - and thus program file size - of more than 1400 bytes.
 
-Using <tt/apple2-iobuf-0800.o/ is as simple as placing it on the linker command 
+Using <tt/apple2-iobuf-0800.o/ is as simple as placing it on the linker command
 line like this:
 
 <tscreen><verb>
@@ -286,7 +286,7 @@ Programs containing Apple&nbsp;&rsqb;&lsqb; specific code may use the
 <sect1>Apple&nbsp;&rsqb;&lsqb; specific functions<p>
 
 The functions listed below are special for the Apple&nbsp;&rsqb;&lsqb;. See
-the <htmlurl url="funcref.html" name="function reference"> for declaration and
+the <url url="funcref.html" name="function reference"> for declaration and
 usage.
 
 <itemize>
@@ -347,7 +347,7 @@ The names in the parentheses denote the symbols to be used for static linking of
   <tag><tt/a2.auxmem.emd (a2_auxmem_emd)/</tag>
   Gives access to 47.5 KB RAM (190 pages of 256 bytes each) on an Extended
   80-Column Text Card.
-  
+
   Note that this driver doesn't check for the actual existence of the memory
   and that it doesn't check for ProDOS 8 RAM disk content!
 
@@ -373,7 +373,7 @@ The names in the parentheses denote the symbols to be used for static linking of
   Driver for the AppleMouse&nbsp;II Card. Searches all Apple&nbsp;II slots
   for an AppleMouse&nbsp;II Card compatible firmware. The default bounding
   box is &lsqb;0..279,0..191&rsqb;.
-  
+
   Programs using this driver will have to be linked with <tt/--start-addr $4000/
   to reserve the first hires page if they are intended to run on an
   Apple&nbsp;&rsqb;&lsqb; (in contrast to an Apple&nbsp;//e) because the
@@ -428,7 +428,7 @@ BASIC.SYSTEM) there are some limitations for DOS 3.3:
   'FAILED TO ALLOC INTERRUPT' on program startup. This implicitly means that
   <tt/a2.stdmou.mou/ and <tt/a2.ssc.ser/ are not functional as they depend on
   interrupts.
-  
+
 </descrip><p>
 
 
@@ -477,7 +477,7 @@ The runtime for the Apple&nbsp;&rsqb;&lsqb; uses routines marked as
 <tt/.INTERRUPTOR/ for ProDOS 8 interrupt handlers. Such routines must be
 written as simple machine language subroutines and will be called
 automatically by the interrupt handler code when they are linked into a
-program. See the discussion of the <tt/.CONDES/ feature in the <htmlurl
+program. See the discussion of the <tt/.CONDES/ feature in the <url
 url="ca65.html" name="assembler manual">.
 
 
@@ -486,7 +486,7 @@ url="ca65.html" name="assembler manual">.
 <descrip>
 
   <tag/Drive ID/
-  The function <htmlurl url="dio.html#s1" name="dio_open()"> has the single
+  The function <url url="dio.html#s1" name="dio_open()"> has the single
   parameter <tt/device/ to identify the device to be opened. Therefore an
   Apple&nbsp;II slot and drive pair is mapped to that <tt/device/ according
   to the formula
@@ -498,7 +498,7 @@ url="ca65.html" name="assembler manual">.
   so that for example slot 6 drive 2 is mapped to <tt/device/ 14.
 
   <tag/Sector count/
-  The function <htmlurl url="dio.html#s3" name="dio_query_sectcount()"> returns
+  The function <url url="dio.html#s3" name="dio_query_sectcount()"> returns
   the correct sector count for all ProDOS 8 disks. However for any non-ProDOS 8
   disk it simply always returns 280 (which is only correct for a 140 KB disk).
   This condition is indicated by the <tt/_oserror/ value 82.

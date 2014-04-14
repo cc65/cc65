@@ -4,7 +4,7 @@
 
 <title>Using GNU Make with cc65
 <author><url url="mailto:ol.sc@web.de" name="Oliver Schmidt">
-<date>2009-06-26
+<date>2014-04-12
 
 <abstract>
 How to build your program using the GNU Make utility.
@@ -114,10 +114,10 @@ of creating a <tt/CC65_HOME/ environment variable.
 <sect1>Understanding the sample Makefile<p>
 
 Most parts of the sample Makefile follow the guidelines in the
-<htmlurl url="http://www.gnu.org/software/make/manual/make.html" name="GNU Make Manual">
+<url url="http://www.gnu.org/software/make/manual/make.html" name="GNU Make Manual">
 that can be searched online for background information. The automatic generation of
 dependency however rather works as described by the GNU Make maintainer Paul D. Smith in
-<htmlurl url="http://make.paulandlesley.org/autodep.html#advanced" name="Advanced Auto-Dependencies">.
+<url url="http://make.paulandlesley.org/autodep.html#advanced" name="&dquot;Advanced Auto-Dependencies&dquot;">.
 Fortunately both GCC and cc65 directly support this method in the meantime.
 
 
@@ -133,8 +133,8 @@ then the sample Makefile may be invoked from the Windows Command Prompt (cmd.exe
 by downloading the following programs:
 
 <itemize>
-<item>make.exe: <url url="http://gnuwin32.sourceforge.net/packages/make.htm">
-<item>rm.exe: <url url="http://gnuwin32.sourceforge.net/packages/coreutils.htm">
+<item><url name="make.exe" url="http://gnuwin32.sourceforge.net/packages/make.htm">
+<item><url name="rm.exe" url="http://gnuwin32.sourceforge.net/packages/coreutils.htm">
 </itemize>
 
 
@@ -144,9 +144,9 @@ by downloading the following programs:
 The very limited resources of the cc65 target machines now and then require
 manual optimization of the build process by compiling individual source files
 with different compiler options. GNU Make offers
-<htmlurl url="http://www.gnu.org/software/make/manual/html_node/Target_002dspecific.html" name="Target-specific Variable Values">
+<url url="http://www.gnu.org/software/make/manual/html_node/Target_002dspecific.html" name="Target-specific Variable Values">
 perfectly suited for doing so. For example placing the code of the two modules 
-<tt/foo/ and <tt/bar/ in the segment <tt/FOOBAR/ can be archived with this
+<tt/foo/ and <tt/bar/ in the segment <tt/FOOBAR/ can be achieved with this
 target-specific variable definition:
 
 <tscreen><verb>

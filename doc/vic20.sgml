@@ -6,7 +6,7 @@
 <author>
 <url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:polluks@sdf.lonestar.org" name="Stefan A. Haubenthal">
-<date>2014-03-26
+<date>2014-04-12
 
 <abstract>
 An overview over the VIC20 runtime system as it is implemented for the cc65 C
@@ -161,8 +161,7 @@ The default drivers, <tt/joy_stddrv (joy_static_stddrv)/, point to <tt/vic20-std
 
   <tag><tt/vic20-ptvjoy.joy (vic20_ptvjoy_joy)/</tag>
   Driver for the Protovision 4-player adapter contributed by Groepaz. See
-  <htmlurl url="http://www.protovision-online.de/hardw/hardwstart.htm"
-  name="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices and
+  <url url="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices and
   building instructions. Up to three joysticks are supported.
 
 </descrip><p>

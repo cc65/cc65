@@ -4,7 +4,7 @@
 
 <title>Commodore 16/116 specific information for cc65
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2003-12-15
+<date>2014-04-10
 
 <abstract>
 An overview over the C16 runtime system as it is implemented for the cc65 C
@@ -23,13 +23,13 @@ cc65 C compiler. It describes the memory layout, C16/116 specific header
 files, available drivers, and any pitfalls specific to that platform.
 
 Please note that C16 specific functions are just mentioned here, they are
-described in detail in the separate <htmlurl url="funcref.html" name="function
+described in detail in the separate <url url="funcref.html" name="function
 reference">. Even functions marked as "platform dependent" may be available on
 more than one platform. Please see the function reference for more
 information.
 
 Since the C16/C116 and the Commodore Plus/4 are almost identical (the former
-don't have the 6551 ACIA and only 16KB of memory), the <htmlurl
+don't have the 6551 ACIA and only 16KB of memory), the <url
 url="plus4.html" name="Plus/4 documentation"> is also worth a look. The
 difference between both cc65 targets is that the Plus/4 runtime uses banking
 to support full 64K RAM, while the C16 does not use banking and supports up to
@@ -97,7 +97,7 @@ There are currently no special C16/C116 functions.
 <sect1>CBM specific functions<p>
 
 Some functions are available for all (or at least most) of the Commodore
-machines. See the <htmlurl url="funcref.html" name="function reference"> for
+machines. See the <url url="funcref.html" name="function reference"> for
 declaration and usage.
 
 <itemize>
@@ -232,7 +232,7 @@ The runtime for the C16 uses routines marked as <tt/.INTERRUPTOR/ for
 interrupt handlers. Such routines must be written as simple machine language
 subroutines and will be called automatically by the interrupt handler code
 when they are linked into a program. See the discussion of the <tt/.CONDES/
-feature in the <htmlurl url="ca65.html" name="assembler manual">.
+feature in the <url url="ca65.html" name="assembler manual">.
 
 
 

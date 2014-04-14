@@ -6,7 +6,7 @@
 <author>
 <url url="mailto:shawnjefferson@24fightingchickens.com" name="Shawn Jefferson"> and<newline>
 <url url="mailto:chris@groessler.org" name="Christian Groessler">
-<date>2014-03-27
+<date>2014-04-10
 
 <abstract>
 An overview over the Atari runtime system as it is implemented for the cc65 C
@@ -36,7 +36,7 @@ recommended to use the <tt/atari/ target unless lack of memory dictates the
 use of the <tt/atarixl/ target.
 
 Please note that Atari specific functions are just mentioned here, they are
-described in detail in the separate <htmlurl url="funcref.html" name="function
+described in detail in the separate <url url="funcref.html" name="function
 reference">. Even functions marked as "platform dependent" may be available on
 more than one platform. Please see the function reference for more
 information.
@@ -264,7 +264,7 @@ header file.
 <sect1>Atari specific functions<p>
 
 The functions and global variable listed below are special for the Atari.
-See the <htmlurl url="funcref.html" name="function reference"> for declaration and usage.
+See the <url url="funcref.html" name="function reference"> for declaration and usage.
 
 <itemize>
 <item>get_ostype
@@ -666,7 +666,7 @@ The runtime for the Atari uses routines marked as <tt/.INTERRUPTOR/ for
 interrupt handlers. Such routines must be written as simple machine language
 subroutines and will be called automatically by the VBI handler code
 when they are linked into a program. See the discussion of the <tt/.CONDES/
-feature in the <htmlurl url="ca65.html" name="assembler manual">.
+feature in the <url url="ca65.html" name="assembler manual">.
 
 
 <sect1>Reserving a memory area inside a program<label id="memhole"><p>

@@ -4,7 +4,7 @@
 
 <title>Commodore 128-specific information for cc65
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2014-03-24
+<date>2014-04-12
 
 <abstract>
 An overview over the C128 runtime system as it is implemented for the cc65 C
@@ -235,9 +235,8 @@ The default drivers, <tt/joy_stddrv (joy_static_stddrv)/, point to <tt/c128-stdj
 
   <tag><tt/c128-ptvjoy.joy (c128_ptvjoy_joy)/</tag>
   Driver for the Protovision 4-player adapter originally written by Groepaz
-  for the C64, and converted for the C128 by me. See <htmlurl
-  url="http://www.protovision-online.de/hardw/hardwstart.htm"
-  name="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices and
+  for the C64, and converted for the C128 by Uz. See <url
+  url="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices and
   building instructions. Up to four joysticks are supported.
 
   <tag><tt/c128-stdjoy.joy (c128_stdjoy_joy)/</tag>

@@ -4,7 +4,7 @@
 
 <title>cc65 Library Overview
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2000-12-02, 2002-11-26
+<date>2014-04-12
 
 <abstract>
 An overview over the runtime and C libraries that come with the cc65 compiler,
@@ -19,7 +19,7 @@ including a discussion of the differences to the ISO standard.
 <sect>Overview<p>
 
 This file contains a short overview of the libraries available for the cc65 C
-compiler. Please have a look at the <htmlurl url="funcref.html" name="function
+compiler. Please have a look at the <url url="funcref.html" name="function
 reference"> for a list function by function. Since the function reference is
 not complete (I'm working on that) it may happen that you don't find a
 specific function. In this case, have a look into the header files. All

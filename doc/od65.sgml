@@ -3,11 +3,11 @@
 <article>
 <title>od65 Users Guide
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2010-07-30
+<date>2014-04-14
 
 <abstract>
 od65 is the object file dump utility. It is able to output most parts of
-<htmlurl url="ca65.html" name="ca65"> generated object files in readable form.
+<htmlurl url="ca65.html" name="ca65-generated"> object files in readable form.
 </abstract>
 
 <!-- Table of contents -->
@@ -19,7 +19,7 @@ od65 is the object file dump utility. It is able to output most parts of
 <sect>Overview<p>
 
 od65 is an object file dump utility. It is able to output most parts of
-<htmlurl url="ca65.html" name="ca65"> generated object files in readable form.
+<htmlurl url="ca65.html" name="ca65-generated"> object files in readable form.
 Since the contents and format of the object files are not documented
 elsewhere and may change at any time, this tool is a portable way to look at
 the contents.

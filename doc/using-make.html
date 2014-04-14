@@ -9,7 +9,7 @@
 <H1>Using GNU Make with cc65</H1>
 
 <H2>
-<A HREF="mailto:ol.sc@web.de">Oliver Schmidt</A></H2>2009-06-26
+<A HREF="mailto:ol.sc@web.de">Oliver Schmidt</A></H2>2014-04-12
 <HR>
 <EM>How to build your program using the GNU Make utility.</EM>
 <HR>
@@ -142,7 +142,7 @@ of creating a <CODE>CC65_HOME</CODE> environment variable.</P>
 <A HREF="http://www.gnu.org/software/make/manual/make.html">GNU Make Manual</A>
 that can be searched online for background information. The automatic generation of
 dependency however rather works as described by the GNU Make maintainer Paul D. Smith in
-<A HREF="http://make.paulandlesley.org/autodep.html#advanced">Advanced Auto-Dependencies</A>.
+<A HREF="http://make.paulandlesley.org/autodep.html#advanced">&#34;Advanced Auto-Dependencies&#34;</A>.
 Fortunately both GCC and cc65 directly support this method in the meantime.</P>
 
 
@@ -159,10 +159,10 @@ then the sample Makefile may be invoked from the Windows Command Prompt (cmd.exe
 by downloading the following programs:</P>
 <P>
 <UL>
-<LI>make.exe: 
-<A HREF="http://gnuwin32.sourceforge.net/packages/make.htm">http://gnuwin32.sourceforge.net/packages/make.htm</A></LI>
-<LI>rm.exe: 
-<A HREF="http://gnuwin32.sourceforge.net/packages/coreutils.htm">http://gnuwin32.sourceforge.net/packages/coreutils.htm</A></LI>
+<LI>
+<A HREF="http://gnuwin32.sourceforge.net/packages/make.htm">make.exe</A></LI>
+<LI>
+<A HREF="http://gnuwin32.sourceforge.net/packages/coreutils.htm">rm.exe</A></LI>
 </UL>
 </P>
 
@@ -176,7 +176,7 @@ manual optimization of the build process by compiling individual source files
 with different compiler options. GNU Make offers
 <A HREF="http://www.gnu.org/software/make/manual/html_node/Target_002dspecific.html">Target-specific Variable Values</A>
 perfectly suited for doing so. For example placing the code of the two modules 
-<CODE>foo</CODE> and <CODE>bar</CODE> in the segment <CODE>FOOBAR</CODE> can be archived with this
+<CODE>foo</CODE> and <CODE>bar</CODE> in the segment <CODE>FOOBAR</CODE> can be achieved with this
 target-specific variable definition:</P>
 <P>
 <BLOCKQUOTE><CODE>

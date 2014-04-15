@@ -7,6 +7,8 @@
 ; be called from an interrupt handler
 ;
 
+USE_PAGE6  =  1
+
         .include        "atari.inc"
         .importzp       sp
         .export         _mouse_pm_callbacks
@@ -14,17 +16,28 @@
         .destructor     pm_down,7
 
 ; get mouse shape data
-        .import mouse_pm_bits
-        .import mouse_pm_height
-        .import mouse_pm_hotspot_x
-        .import mouse_pm_hotspot_y
+        .import   mouse_pm_bits
+        .importzp mouse_pm_height
+        .importzp mouse_pm_hotspot_x
+        .importzp mouse_pm_hotspot_y
 
 
-; P/M definitions. The first value can be changed to adjust the number
-; of the P/M used for the mouse. All others depend on this value.
+; P/M definitions. The MOUSE_PM_NUM value can be changed to adjust the
+; number of the P/M used for the mouse. All others depend on this value.
 ; Valid P/M numbers are 0 to 4. When 4 is used, the missiles are used
 ; as a player.
+.if USE_PAGE6
 MOUSE_PM_NUM    = 2                             ; P/M used for the mouse
+                                                ; This cannot be changed since only player #2 uses the memory at $600.
+.else
+MOUSE_PM_NUM    = 4                             ; P/M used for the mouse
+                                                ; Using player #4 (missiles) wastes the least amount of memory on the
+                                                ; atari target, since top of memory is typically at $xC20, and the
+                                                ; missiles use the space at $xB00-$xBFF.
+                                                ; On the atarixl target this configuration (not using page 6) is not
+                                                ; really satisfying since the top of memory typically lies beneath
+                                                ; the ROM and there is flickering visible while the ROM is banked in.
+.endif
 MOUSE_PM_BASE   = pm_base                       ; ZP location pointing to the hw area used by the selected P/M
 
 .if MOUSE_PM_NUM = 4
@@ -100,14 +113,14 @@ movex:  cpx     #1
         ror     a
         clc
         adc     #48
-        sbc     #<(mouse_pm_hotspot_x - 1)
+        sbc     #(mouse_pm_hotspot_x - 1) & $FF
         set_mouse_x
         jmp     update_colors
 
 ; Move the mouse cursor y position to the value in A/X.
 movey:  clc
         adc     #32
-        sbc     #<(mouse_pm_hotspot_y - 1)
+        sbc     #(mouse_pm_hotspot_y - 1) & $FF
         pha
         lda     omy
         jsr     clr_pm                  ; remove player at old position
@@ -125,12 +138,12 @@ set_l:  lda     mouse_pm_bits,x
         inx
         iny
         beq     set_end
-        cpx     #<mouse_pm_height
+        cpx     #mouse_pm_height
         bcc     set_l
 set_end:rts
 
 ; Clear (zero) P/M data
-clr_pm: ldx     #<mouse_pm_height
+clr_pm: ldx     #mouse_pm_height
         tay
         lda     #0
 clr_l:  sta     (MOUSE_PM_BASE),y
@@ -158,9 +171,11 @@ update_colors:
         sta     PCOLR1
         sta     PCOLR2
         sta     PCOLR3
+        lda     #0
         sta     SIZEM
 .else
         sta     PCOLR0 + MOUSE_PM_NUM
+        lda     #0
         sta     SIZEP0 + MOUSE_PM_NUM
 .endif
         rts
@@ -169,16 +184,47 @@ update_colors:
 
         .segment "INIT"
 
-pm_init:lda     #0
+pm_init:
+        lda     #0
+
+.if USE_PAGE6
+
         sta     MOUSE_PM_BASE
         ldx     #6                      ; page 6
         stx     MOUSE_PM_BASE+1
+
+.else
+
+; use top of memory and lower sp accordingly
+        sta     sp
+        sta     MOUSE_PM_BASE
+        lda     sp+1
+        and     #7                      ; offset within 2K
+        cmp     #3 + MOUSE_PM_RAW + 1   ; can we use it?
+        bcc     @decr                   ; no
+
+        lda     sp+1
+        and     #$F8
+@set:   adc     #3 + MOUSE_PM_RAW - 1   ; CF is set, so adding MOUSE_PM_RAW + 3
+        sta     MOUSE_PM_BASE+1
+        sta     sp+1
+        bne     @cont                   ; jump always
+
+@decr:  lda     sp+1
+        and     #$F8
+        sbc     #8 - 1                  ; CF is clear, subtracts 8
+        bcs     @set                    ; jump always
+
+@cont:  lda     #0
+
+.endif
+
         tay
 @iniloo:sta     (MOUSE_PM_BASE),y
         iny
         bne     @iniloo
 
-.if 0   ; enable if not using page 6 for P/M data
+.if ! USE_PAGE6
         lda     MOUSE_PM_BASE+1
         and     #$F8
 .endif
@@ -187,7 +233,7 @@ pm_init:lda     #0
         lda     #62
         sta     SDMCTL
 
-        lda     #1 + 16
+        lda     #1
         sta     GPRIOR
 
         jmp     update_colors

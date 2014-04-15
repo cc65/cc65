@@ -9,9 +9,9 @@
 ;
 
         .export mouse_pm_bits
-        .export mouse_pm_height    : absolute
-        .export mouse_pm_hotspot_x : absolute
-        .export mouse_pm_hotspot_y : absolute
+        .export mouse_pm_height    : zeropage
+        .export mouse_pm_hotspot_x : zeropage
+        .export mouse_pm_hotspot_y : zeropage
 
 
         .data

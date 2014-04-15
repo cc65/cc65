@@ -13,7 +13,7 @@
         .export         _mouse_txt_callbacks
         .importzp       tmp4
         .import         mul40,loc_tmp
-        .import         mouse_txt_char          ; screen code of mouse cursor
+        .importzp       mouse_txt_char          ; screen code of mouse cursor
 
         .include        "atari.inc"
 
@@ -72,7 +72,7 @@ hide:
 
 prep:
         jsr     getcursor       ; Get character at cursor position
-        cmp     #<mouse_txt_char; "mouse" character
+        cmp     #mouse_txt_char ; "mouse" character
         bne     overwr          ; no, probably program has overwritten it
         lda     backup          ; 
         jmp     setcursor       ; Draw character
@@ -88,7 +88,7 @@ draw:
         beq     done
         jsr     getcursor       ; Cursor visible at current position?
         sta     backup          ; Save character at cursor position
-        lda     #<mouse_txt_char
+        lda     #mouse_txt_char
         jmp     setcursor       ; Draw cursor
 
 

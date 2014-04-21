@@ -7,8 +7,6 @@
 ; be called from an interrupt handler
 ;
 
-USE_PAGE6  =  1
-
         .include        "atari.inc"
         .importzp       sp
         .export         _mouse_pm_callbacks
@@ -26,7 +24,7 @@ USE_PAGE6  =  1
 ; number of the P/M used for the mouse. All others depend on this value.
 ; Valid P/M numbers are 0 to 4. When 4 is used, the missiles are used
 ; as a player.
-.if USE_PAGE6
+.ifdef USE_PAGE6
 MOUSE_PM_NUM    = 2                             ; P/M used for the mouse
                                                 ; This cannot be changed since only player #2 uses the memory at $600.
 .else
@@ -102,7 +100,7 @@ show:
         lda     #1
 .endif
         sta     GRACTL
-        ;rts                            ; optimized out
+        jmp     update_colors
 
 prep:
 draw:
@@ -187,7 +185,7 @@ update_colors:
 pm_init:
         lda     #0
 
-.if USE_PAGE6
+.ifdef USE_PAGE6
 
         sta     MOUSE_PM_BASE
         ldx     #6                      ; page 6
@@ -224,7 +222,7 @@ pm_init:
         iny
         bne     @iniloo
 
-.if ! USE_PAGE6
+.ifndef USE_PAGE6
         lda     MOUSE_PM_BASE+1
         and     #$F8
 .endif

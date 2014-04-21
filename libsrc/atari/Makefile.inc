@@ -31,3 +31,7 @@ CA65FLAGS += -D NUMDRVS=4 -D LINEBUF=80 -D UCASE_FILENAME=1 -D DEFAULT_DEVICE=1 
 # Disabled by default, you should enable it if the linker script relocates the
 # character generator (like atarixl-largehimem.cfg).
 #CA65FLAGS += -D CHARGEN_RELOC -D USEWSYNC
+
+# Disable if you don't want to use page 6 for mouse P/M data.
+# If disabled, top of the RAM is used for P/M data.
+CA65FLAGS += -D USE_PAGE6

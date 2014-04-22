@@ -11,6 +11,8 @@
 
         .macpack        generic
 
+IRQInd  = $2FD
+
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
@@ -25,6 +27,7 @@ HEADER:
 
 ; Library reference
 
+libref:
         .addr   $0000
 
 ; Jump table
@@ -71,6 +74,15 @@ SCREEN_WIDTH    = 320
 .endenum
 
 ;----------------------------------------------------------------------------
+; data segment
+
+.data
+
+chainIRQ:
+        .byte   $4c                     ; JMP opcode
+        .word   0                       ; pointer to ROM IRQ handler (will be set at runtime)
+
+;----------------------------------------------------------------------------
 ; Global variables. The bounding box values are sorted so that they can be
 ; written with the least effort in the SETBOX and GETBOX routines, so don't
 ; reorder them.
@@ -91,6 +103,10 @@ INIT_save:      .res    1
 ; Temporary value used in the int handler
 
 Temp:           .res    1
+
+; Keyboard buffer fill level at start of interrupt
+
+old_key_count:  .res    1
 
 .rodata
 
@@ -146,6 +162,35 @@ INSTALL:
         jsr     CMOVEY
         cli
 
+; Initialize our IRQ magic
+
+        lda     IRQInd+1
+        sta     chainIRQ+1
+        lda     IRQInd+2
+        sta     chainIRQ+2
+        lda     libref
+        sta     ptr3
+        lda     libref+1
+        sta     ptr3+1
+        ldy     #2
+        lda     (ptr3),y
+        sta     IRQInd+1
+        iny
+        lda     (ptr3),y
+        sta     IRQInd+2
+        iny
+        lda     #<(callback-1)
+        sta     (ptr3),y
+        iny
+        lda     #>(callback-1)
+        sta     (ptr3),y
+        iny
+        lda     #<(chainIRQ-1)
+        sta     (ptr3),y
+        iny
+        lda     #>(chainIRQ-1)
+        sta     (ptr3),y
+
 ; Done, return zero (= MOUSE_ERR_OK)
 
         ldx     #$00
@@ -157,6 +202,12 @@ INSTALL:
 ; No return code required (the driver is removed from memory on return).
 
 UNINSTALL:
+
+        lda     chainIRQ+1
+        sta     IRQInd+1
+        lda     chainIRQ+2
+        sta     IRQInd+2
+
         jsr     HIDE                    ; Hide cursor on exit
         lda     INIT_save
         sta     INIT_STATUS
@@ -320,6 +371,8 @@ IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioclts for now
 ;
 
 IRQ:    jsr     CPREP
+        lda     KEY_COUNT
+        sta     old_key_count
         lda     #$7F
         sta     CIA1_PRA
         lda     CIA1_PRB                ; Read joystick #0
@@ -436,3 +489,29 @@ IRQ:    jsr     CPREP
 @SkipY: jsr     CDRAW
         clc                             ; Interrupt not "handled"
         rts
+
+;----------------------------------------------------------------------------
+; Called after ROM IRQ handler has been run.
+; Check if there was joystick activity before and/or after the ROM handler.
+; If there was activity, discard the key presses since they are most
+; probably "phantom" key presses.
+
+callback:
+        ldx     old_key_count
+        cpx     KEY_COUNT
+        beq     @nokey
+
+        lda     Temp                    ; keypress before?
+        bne     @discard_key            ; yes, discard key
+
+        lda     #$7F
+        sta     CIA1_PRA
+        lda     CIA1_PRB                ; Read joystick #0
+        and     #$1F
+        eor     #$1F                    ; keypress after
+        beq     @nokey                  ; no, probably a real key press
+
+@discard_key:
+        stx     KEY_COUNT               ; set old keyboard buffer fill level
+
+@nokey: rts

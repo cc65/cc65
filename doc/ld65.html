@@ -9,7 +9,7 @@
 <H1>ld65 Users Guide</H1>
 
 <H2>
-<A HREF="mailto:uz@cc65.org">Ullrich von Bassewitz</A></H2>2014-04-13
+<A HREF="mailto:uz@cc65.org">Ullrich von Bassewitz</A></H2>2014-04-20
 <HR>
 <EM>The ld65 linker combines object files into an executable file. ld65 is highly
 configurable and uses configuration files for high flexibility.</EM>
@@ -21,8 +21,8 @@ configurable and uses configuration files for high flexibility.</EM>
 <H2><A NAME="toc2">2.</A> <A HREF="ld65.html#s2">Usage</A></H2>
 
 <UL>
-<LI><A NAME="toc2.1">2.1</A> <A HREF="ld65.html#ss2.1">Command line option overview</A>
-<LI><A NAME="toc2.2">2.2</A> <A HREF="ld65.html#ss2.2">Command line options in detail</A>
+<LI><A NAME="toc2.1">2.1</A> <A HREF="ld65.html#ss2.1">Command-line option overview</A>
+<LI><A NAME="toc2.2">2.2</A> <A HREF="ld65.html#ss2.2">Command-line options in detail</A>
 </UL>
 <P>
 <H2><A NAME="toc3">3.</A> <A HREF="ld65.html#s3">Search paths</A></H2>
@@ -85,7 +85,7 @@ tell you the exact location in the original assembler source, where
 the symbol was referenced.
 </LI>
 <LI>    Flexible output. The output of ld65 is highly configurable by a config
-file. More common platforms are supported by builtin configurations
+file. Some more-common platforms are supported by default configurations
 that may be activated by naming the target system. The output
 generation was designed with different output formats in mind, so
 adding other formats shouldn't be a great problem.
@@ -99,7 +99,7 @@ adding other formats shouldn't be a great problem.
 
 
 
-<H2><A NAME="ss2.1">2.1</A> <A HREF="#toc2.1">Command line option overview</A>
+<H2><A NAME="ss2.1">2.1</A> <A HREF="#toc2.1">Command-line option overview</A>
 </H2>
 
 
@@ -150,11 +150,11 @@ Long options:
 </P>
 
 
-<H2><A NAME="ss2.2">2.2</A> <A HREF="#toc2.2">Command line options in detail</A>
+<H2><A NAME="ss2.2">2.2</A> <A HREF="#toc2.2">Command-line options in detail</A>
 </H2>
 
 
-<P>Here is a description of all the command line options:</P>
+<P>Here is a description of all of the command-line options:</P>
 <P>
 <DL>
 <P>
@@ -162,7 +162,7 @@ Long options:
 <DT><B><CODE>-(, --start-group</CODE></B><DD>
 <P>Start a library group. The libraries specified within a group are searched
 multiple times to resolve crossreferences within the libraries. Normally,
-crossreferences are only resolved within a library, that is the library is
+crossreferences are resolved only within a library, that is the library is
 searched multiple times. Libraries specified later on the command line
 cannot reference otherwise unreferenced symbols in libraries specified
 earlier, because the linker has already handled them. Library groups are
@@ -192,7 +192,7 @@ symbols.</P>
 <A NAME="option-o"></A> </P>
 <DT><B><CODE>-o name</CODE></B><DD>
 <P>The -o switch is used to give the name of the default output file.
-Depending on your output configuration, this name may NOT be used as
+Depending on your output configuration, this name <EM>might not</EM> be used as the
 name for the output file. However, for the default configurations, this
 name is used for the output file name.</P>
 
@@ -216,8 +216,8 @@ systems are currently supported:</P>
 <LI>c16 (works also for the c116 with memory up to 32K)</LI>
 <LI>c64</LI>
 <LI>c128</LI>
-<LI>cbm510 (CBM-II series with 40 column video)</LI>
-<LI>cbm610 (all CBM series-II computers with 80 column video)</LI>
+<LI>cbm510 (CBM-II series with 40-column video)</LI>
+<LI>cbm610 (all CBM series-II computers with 80-column video)</LI>
 <LI>geos-apple</LI>
 <LI>geos-cbm</LI>
 <LI>lunix</LI>
@@ -239,13 +239,13 @@ supported.</P>
 <P>Force an import of a symbol. While object files are always linked to the
 output file, regardless if there are any references, object modules from
 libraries get only linked in if an import can be satisfied by this module.
-The <CODE>--fore-import</CODE> option may be used to add a reference to a symbol and
+The <CODE>--force-import</CODE> option may be used to add a reference to a symbol and
 as a result force linkage of the module that exports the identifier.</P>
-<P>The name of the symbol may optionally be followed by a colon and an address
-size specifier. If no address size is specified, the default address size
+<P>The name of the symbol may optionally be followed by a colon and an address-size
+specifier. If no address size is specified, the default address size
 for the target machine is used.</P>
 <P>Please note that the symbol name needs to have the internal representation,
-meaning you have to prepend an underline for C identifiers.</P>
+meaning you have to prepend an underscore for C identifiers.</P>
 
 <P>
 <A NAME="option-v"></A> </P>
@@ -261,7 +261,9 @@ and line) for this symbol.</P>
 <A HREF="#option-m">-m</A></CODE>
 (generate map file). Normally the map file will not include empty segments
 and sections, or unreferenced symbols. Using this option, you can force the
-linker to include all this information into the map file.</P>
+linker to include all that information into the map file.  Also, it will
+include a second <CODE>Exports</CODE> list.  The first list is sorted by name;
+the second one is sorted by value.</P>
 
 <P>
 <A NAME="option-C"></A> </P>
@@ -275,25 +277,25 @@ information about config files. -C may not be used together with <CODE>
 <DT><B><CODE>-D sym=value, --define sym=value</CODE></B><DD>
 <P>This option allows to define an external symbol on the command line. Value
 may start with a '$' sign or with <CODE>0x</CODE> for hexadecimal values,
-otherwise a leading zero denotes octal values. See also the 
-<A HREF="#SYMBOLS">SYMBOLS section</A> in the configuration file.</P>
+otherwise a leading zero denotes octal values. See also 
+<A HREF="#SYMBOLS">the SYMBOLS section</A> in the configuration file.</P>
 
 <P>
 <A NAME="option--lib-path"></A> </P>
 <DT><B><CODE>-L path, --lib-path path</CODE></B><DD>
 <P>Specify a library search path. This option may be used more than once. It
 adds a directory to the search path for library files. Libraries specified
-without a path are searched in current directory, in the directory given in
-the <CODE>LD65_LIB</CODE> environment variable, and in the list of directories
-specified using <CODE>--lib-path</CODE>.</P>
+without a path are searched in the current directory, in the list of
+directories specified using <CODE>--lib-path</CODE>, in directories given by
+environment variables, and in a built-in default directory.</P>
 
 
 <DT><B><CODE>-Ln</CODE></B><DD>
 <P>This option allows you to create a file that contains all global labels and
-may be loaded into VICE emulator using the <CODE>ll</CODE> (load label) command. You
+may be loaded into the VICE emulator using the <CODE>ll</CODE> (load label) command. You
 may use this to debug your code with VICE. Note: Older versions had some
-bugs in the label code. If you have problems, please get the latest VICE
-version.</P>
+bugs in the label code. If you have problems, please get the latest 
+<A HREF="http://vice-emu.sourceforge.net/">VICE</A> version.</P>
 
 <P>
 <A NAME="option-S"></A> </P>
@@ -305,7 +307,7 @@ explicit start address, all other default configs provide their own.</P>
 
 
 <DT><B><CODE>-V, --version</CODE></B><DD>
-<P>This option print the version number of the linker. If you send any
+<P>This option prints the version number of the linker. If you send any
 suggestions or bugfixes, please include this number.</P>
 
 <P>
@@ -315,9 +317,9 @@ suggestions or bugfixes, please include this number.</P>
 It adds a directory to the search path for config files. A config file given
 with the <CODE>
 <A HREF="#option-C">-C</A></CODE> option that has no path in
-its name is searched in the current directory, in the directory given in the
-<CODE>LD65_CFG</CODE> environment variable, and in the list of directories specified
-using <CODE>--cfg-path</CODE>.</P>
+its name is searched in the current directory, in the list of directories
+specified using <CODE>--cfg-path</CODE>, in directories given by environment variables,
+and in a built-in default directory.</P>
 
 <P>
 <A NAME="option--dbgfile"></A> </P>
@@ -330,13 +332,13 @@ file and its contents are subject to change without further notice.</P>
 
 
 <DT><B><CODE>--lib file</CODE></B><DD>
-<P>Links a library to the output. Use this command line option instead of just
+<P>Links a library to the output. Use this command-line option instead of just
 naming the library file, if the linker is not able to determine the file
 type because of an unusual extension.</P>
 
 
 <DT><B><CODE>--obj file</CODE></B><DD>
-<P>Links an object file to the output. Use this command line option instead
+<P>Links an object file to the output. Use this command-line option instead
 of just naming the object file, if the linker is not able to determine the
 file type because of an unusual extension.</P>
 
@@ -345,9 +347,9 @@ file type because of an unusual extension.</P>
 <DT><B><CODE>--obj-path path</CODE></B><DD>
 <P>Specify an object file search path. This option may be used more than once.
 It adds a directory to the search path for object files. An object file
-passed to the linker that has no path in its name is searched in current
-directory, in the directory given in the <CODE>LD65_OBJ</CODE> environment variable,
-and in the list of directories specified using <CODE>--obj-path</CODE>.</P>
+passed to the linker that has no path in its name is searched in the current
+directory, in the list of directories specified using <CODE>--obj-path</CODE>, in
+directories given by environment variables, and in a built-in default directory.</P>
 
 </DL>
 </P>
@@ -429,8 +431,8 @@ name is given (libraries are also recognized by a magic word, there are no
 special naming conventions), all modules in the library are checked if an
 export from this module would satisfy an import from other modules. All
 modules where this is the case are marked. If duplicate identifiers are
-found, the linker issues a warning.</P>
-<P>This procedure (parsing and reading from left to right) does mean, that a
+found, the linker issues warnings.</P>
+<P>That procedure (parsing and reading from left to right) does mean that a
 library may only satisfy references for object modules (given directly or from
 a library) named <EM>before</EM> that library. With the command line</P>
 <P>
@@ -440,8 +442,8 @@ a library) named <EM>before</EM> that library. With the command line</P>
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>the module test.o may not contain references to modules in the library
-clib.lib. If this is the case, you have to change the order of the modules
+<P>the module <CODE>test.o</CODE> must not contain references to modules in the library
+<CODE>clib.lib</CODE>.  But, if it does, you have to change the order of the modules
 on the command line:</P>
 <P>
 <BLOCKQUOTE><CODE>
@@ -456,7 +458,7 @@ for the segments and define any linker symbols (see
 <P>After that, the linker is ready to produce an output file. Before doing that,
 it checks its data for consistency. That is, it checks for unresolved
 externals (if the output format is not relocatable) and for symbol type
-mismatches (for example a zero page symbol is imported by a module as absolute
+mismatches (for example a zero-page symbol is imported by a module as an absolute
 symbol).</P>
 <P>Step four is, to write the actual target files. In this step, the linker will
 resolve any expressions contained in the segment data. Circular references are
@@ -467,7 +469,7 @@ segments and symbols encountered.</P>
 <P>And, last step, if you give the <CODE>
 <A HREF="#option-v">-v</A></CODE> switch
 twice, you get a dump of the segment data. However, this may be quite
-unreadable if you're not a developer:-)</P>
+unreadable if you're not a developer. :-)</P>
 
 
 
@@ -487,7 +489,7 @@ several other attributes may be specified.</P>
 </H2>
 
 
-<P>Memory areas are specified in a <CODE>MEMORY</CODE> section. Lets have a look at an
+<P>Memory areas are specified in a <CODE>MEMORY</CODE> section. Let's have a look at an
 example (this one describes the usable memory layout of the C64):</P>
 <P>
 <BLOCKQUOTE><CODE>
@@ -501,11 +503,11 @@ example (this one describes the usable memory layout of the C64):</P>
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>As you can see, there are two ram areas and two rom areas. The names
+<P>As you can see, there are two RAM areas and two ROM areas. The names
 (before the colon) are arbitrary names that must start with a letter, with
 the remaining characters being letters or digits. The names of the memory
 areas are used when assigning segments. As mentioned above, case is
-significant for these names.</P>
+significant for those names.</P>
 <P>The syntax above is used in all sections of the config file. The name
 (<CODE>ROM1</CODE> etc.) is said to be an identifier, the remaining tokens up to the
 semicolon specify attributes for this identifier. You may use the equal sign
@@ -567,7 +569,7 @@ section:</P>
 <CODE>RAM1</CODE> memory area in the order specified in the <CODE>SEGMENTS</CODE> section. So
 the linker will first write the <CODE>CODE</CODE> segment, then the <CODE>RODATA</CODE>
 segment, then the <CODE>DATA</CODE> segment - but it will not write the <CODE>BSS</CODE>
-segment. Why? Enter the segment type: For each segment specified, you may also
+segment. Why? Here enters the segment type: For each segment specified, you may also
 specify a segment attribute. There are four possible segment attributes:</P>
 <P>
 <BLOCKQUOTE><CODE>
@@ -591,7 +593,7 @@ this segment does only contain uninitialized data (that is, zeroes), and issue
 a warning if this is not the case.</P>
 <P>For a <CODE>bss</CODE> type segment to be useful, it must be cleared somehow by your
 program (this happens usually in the startup code - for example the startup
-code for cc65 generated programs takes care about that). But how does your
+code for cc65-generated programs takes care about that). But how does your
 code know, where the segment starts, and how big it is? The linker is able to
 give that information, but you must request it. This is, what we're doing with
 the "<CODE>define = yes</CODE>" attribute in the <CODE>BSS</CODE> definitions. For each
@@ -626,10 +628,10 @@ write the area data into. If there is no file name given, the linker will
 assign the default file name. This is "a.out" or the one given with the
 <CODE>
 <A HREF="#option-o">-o</A></CODE> option on the command line. Since the
-default behaviour is ok for our purposes, I did not use the attribute in the
+default behaviour is OK for our purposes, I did not use the attribute in the
 example above. Let's have a look at it now.</P>
 <P>The "file" attribute (the keyword may also be written as "FILE" if you like
-that better) takes a string enclosed in double quotes (`"') that specifies the
+that better) takes a string enclosed in double quotes (`&#34;') that specifies the
 file, where the data is written. You may specify the same file several times,
 in that case the data for all memory areas having this file name is written
 into this file, in the order of the memory areas defined in the <CODE>MEMORY</CODE>
@@ -691,8 +693,8 @@ Remember the default segments (you may of course specify your own):</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-        CODE            read only code
-        RODATA          read only data
+        CODE            read-only code
+        RODATA          read-only data
         DATA            read/write data
         BSS             uninitialized data, read/write
 </PRE>
@@ -701,8 +703,8 @@ Remember the default segments (you may of course specify your own):</P>
 <P>Since <CODE>BSS</CODE> is not initialized, we must not care about it now, but what
 about <CODE>DATA</CODE>? <CODE>DATA</CODE> contains initialized data, that is, data that was
 explicitly assigned a value. And your program will rely on these values on
-startup. Since there's no other way to remember the contents of the data
-segment, than storing it into one of the ROMs, we have to put it there. But
+startup. Since there's no way to remember the contents of the data segment,
+other than storing it into one of the ROMs, we have to put it there. But
 unfortunately, ROM is not writable, so we have to copy it into RAM before
 running the actual code.</P>
 <P>The linker won't copy the data from ROM into RAM for you (this must be done by
@@ -763,7 +765,7 @@ look at it's inner workings before using it!</P>
 <P>There are some other attributes not covered above. Before starting the
 reference section, I will discuss the remaining things here.</P>
 <P>You may request symbols definitions also for memory areas. This may be
-useful for things like a software stack, or an i/o area.</P>
+useful for things like a software stack, or an I/O area.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -781,7 +783,7 @@ useful for things like a software stack, or an i/o area.</P>
                                 area, $C000 in this example.
         __STACK_SIZE__          The size of the area, here $1000.
         __STACK_LAST__          This is NOT the same as START+SIZE.
-                                Instead, it it defined as the first
+                                Instead, it is defined as the first
                                 address that is not used by data. If we
                                 don't define any segments for this area,
                                 the value will be the same as START.
@@ -808,16 +810,16 @@ you don't like this, you may specify a byte value that is used to fill these
 areas with the "<CODE>fillval</CODE>" attribute. If there is no "<CODE>fillval</CODE>"
 attribute for the segment, the "<CODE>fillval</CODE>" attribute of the memory area (or
 its default) is used instead. This means that the value may also be used to
-fill unfilled areas generated by the assemblers <CODE>.ALIGN</CODE> and <CODE>.RES</CODE>
+fill unfilled areas generated by the assembler's <CODE>.ALIGN</CODE> and <CODE>.RES</CODE>
 directives.</P>
 <P>The symbol <CODE>%S</CODE> may be used to access the default start address (that is,
-the one defined in the 
-<A HREF="#FEATURES">FEATURES</A> section, or the
+the one defined in 
+<A HREF="#FEATURES">the FEATURES section</A>, or the
 value given on the command line with the <CODE>
 <A HREF="#option-S">-S</A></CODE>
 option).</P>
 <P>To support systems with banked memory, a special attribute named <CODE>bank</CODE> is
-available. The attribute value is an arbitrary 32 bit integer. The assembler
+available. The attribute value is an arbitrary 32-bit integer. The assembler
 has a builtin function named <CODE>.BANK</CODE> which may be used with an argument
 that has a segment reference (for example a symbol). The result of this
 function is the value of the bank attribute for the run memory area of the
@@ -892,12 +894,12 @@ been specified. There are no special attributes to set start or offset for
 just the load memory area.</P>
 <P>A "<CODE>fillval</CODE>" attribute may not only be specified for a memory area, but
 also for a segment. The value must be an integer between 0 and 255. It is used
-as fill value for space reserved by the assemblers <CODE>.ALIGN</CODE> and <CODE>.RES</CODE>
-commands. It is also used as fill value for space between sections (part of a
+as the fill value for space reserved by the assembler's <CODE>.ALIGN</CODE> and <CODE>.RES</CODE>
+commands. It is also used as the fill value for space between sections (part of a
 segment that comes from one object file) caused by alignment, but not for
 space that preceeds the first section.</P>
 <P>To suppress the warning, the linker issues if it encounters a segment that is
-not found in any of the input files, use "<CODE>optional=yes</CODE>" as additional
+not found in any of the input files, use "<CODE>optional=yes</CODE>" as an additional
 segment attribute. Be careful when using this attribute, because a missing
 segment may be a sign of a problem, and if you're suppressing the warning,
 there is no one left to tell you about it.</P>
@@ -934,11 +936,11 @@ Fachat (see the
 </CODE></BLOCKQUOTE>
 </P>
 <P>The necessary o65 attributes are defined in a special section labeled
-<CODE>FORMAT</CODE>.</P>
+<A HREF="#FORMAT">FORMAT</A>.</P>
 
 
 
-<H2><A NAME="ss5.8">5.8</A> <A HREF="#toc5.8">The FORMAT section</A>
+<H2><A NAME="FORMAT"></A> <A NAME="ss5.8">5.8</A> <A HREF="#toc5.8">The FORMAT section</A>
 </H2>
 
 
@@ -1004,7 +1006,7 @@ a numeric value between 0 and 6.</P>
 
 <DT><B><CODE>label</CODE></B><DD>
 <P>This specifies the label to use for the table. The label points to the start
-of the table in memory and may be used from within user written code.</P>
+of the table in memory and may be used from within user-written code.</P>
 
 
 <DT><B><CODE>count</CODE></B><DD>
@@ -1015,7 +1017,7 @@ it is often useful to define it.</P>
 
 
 <DT><B><CODE>order</CODE></B><DD>
-<P>Optional attribute that takes one of the keywords <CODE>increasing</CODE> or
+<P>An optional attribute that takes one of the keywords <CODE>increasing</CODE> or
 <CODE>decreasing</CODE> as an argument. Specifies the sorting order of the entries
 within the table. The default is <CODE>increasing</CODE>, which means that the
 entries are sorted with increasing priority (the first entry has the lowest
@@ -1027,7 +1029,7 @@ order of entries is reversed in this case.</P>
 
 <DT><B><CODE>import</CODE></B><DD>
 <P>This attribute defines a valid symbol name, that is added as an import
-to the modules defining a constructor/desctructor of the given type.
+to the modules defining a constructor/destructor of the given type.
 This can be used to force linkage of a module if this module exports the
 requested symbol.</P>
 

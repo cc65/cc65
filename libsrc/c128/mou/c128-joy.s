@@ -160,7 +160,6 @@ INSTALL:
         lda     YPos
         ldx     YPos+1
         jsr     CMOVEY
-        cli
 
 ; Initialize our IRQ magic
 
@@ -190,6 +189,7 @@ INSTALL:
         iny
         lda     #>(chainIRQ-1)
         sta     (ptr3),y
+        cli
 
 ; Done, return zero (= MOUSE_ERR_OK)
 
@@ -202,11 +202,12 @@ INSTALL:
 ; No return code required (the driver is removed from memory on return).
 
 UNINSTALL:
-
         lda     chainIRQ+1
+        sei
         sta     IRQInd+1
         lda     chainIRQ+2
         sta     IRQInd+2
+        cli
 
         jsr     HIDE                    ; Hide cursor on exit
         lda     INIT_save

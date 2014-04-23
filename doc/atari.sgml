@@ -30,7 +30,7 @@ The <tt/atari/ target supports all Atari 8-bit computers, the <tt/atarixl/ only
 supports XL type or newer machines (excluding the 600XL).
 
 The <tt/atarixl/ runtime makes the whole 64K of memory available, with the
-exception of the I/O area at &dollar;D000 - &dollar;D7FFF. Since the
+exception of the I/O area at &dollar;D000 - &dollar;D7FF. Since the
 <tt/atarixl/ runtime has some <ref name="limitations" id="limitations">, it is
 recommended to use the <tt/atari/ target unless lack of memory dictates the
 use of the <tt/atarixl/ target.

@@ -3,7 +3,7 @@
 <article>
 <title>ld65 Users Guide
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2014-04-13
+<date>2014-04-20
 
 <abstract>
 The ld65 linker combines object files into an executable file. ld65 is highly
@@ -36,7 +36,7 @@ It complements the features that are built into the ca65 macroassembler:
 	the symbol was referenced.
 
 <item>	Flexible output. The output of ld65 is highly configurable by a config
-	file. More common platforms are supported by builtin configurations
+	file. Some more-common platforms are supported by default configurations
 	that may be activated by naming the target system. The output
 	generation was designed with different output formats in mind, so
 	adding other formats shouldn't be a great problem.
@@ -47,7 +47,7 @@ It complements the features that are built into the ca65 macroassembler:
 <sect>Usage<p>
 
 
-<sect1>Command line option overview<p>
+<sect1>Command-line option overview<p>
 
 The linker is called as follows:
 
@@ -93,9 +93,9 @@ Long options:
 </verb></tscreen>
 
 
-<sect1>Command line options in detail<p>
+<sect1>Command-line options in detail<p>
 
-Here is a description of all the command line options:
+Here is a description of all of the command-line options:
 
 <descrip>
 
@@ -104,7 +104,7 @@ Here is a description of all the command line options:
 
   Start a library group. The libraries specified within a group are searched
   multiple times to resolve crossreferences within the libraries. Normally,
-  crossreferences are only resolved within a library, that is the library is
+  crossreferences are resolved only within a library, that is the library is
   searched multiple times. Libraries specified later on the command line
   cannot reference otherwise unreferenced symbols in libraries specified
   earlier, because the linker has already handled them. Library groups are
@@ -138,7 +138,7 @@ Here is a description of all the command line options:
   <tag><tt>-o name</tt></tag>
 
   The -o switch is used to give the name of the default output file.
-  Depending on your output configuration, this name may NOT be used as
+  Depending on your output configuration, this name <em/might not/ be used as the
   name for the output file. However, for the default configurations, this
   name is used for the output file name.
 
@@ -162,8 +162,8 @@ Here is a description of all the command line options:
   <item>c16 (works also for the c116 with memory up to 32K)
   <item>c64
   <item>c128
-  <item>cbm510 (CBM-II series with 40 column video)
-  <item>cbm610 (all CBM series-II computers with 80 column video)
+  <item>cbm510 (CBM-II series with 40-column video)
+  <item>cbm610 (all CBM series-II computers with 80-column video)
   <item>geos-apple
   <item>geos-cbm
   <item>lunix
@@ -186,15 +186,15 @@ Here is a description of all the command line options:
   Force an import of a symbol. While object files are always linked to the
   output file, regardless if there are any references, object modules from
   libraries get only linked in if an import can be satisfied by this module.
-  The <tt/--fore-import/ option may be used to add a reference to a symbol and
+  The <tt/--force-import/ option may be used to add a reference to a symbol and
   as a result force linkage of the module that exports the identifier.
 
-  The name of the symbol may optionally be followed by a colon and an address
-  size specifier. If no address size is specified, the default address size
+  The name of the symbol may optionally be followed by a colon and an address-size
+  specifier. If no address size is specified, the default address size
   for the target machine is used.
 
   Please note that the symbol name needs to have the internal representation,
-  meaning you have to prepend an underline for C identifiers.
+  meaning you have to prepend an underscore for C identifiers.
 
 
   <label id="option-v">
@@ -211,7 +211,9 @@ Here is a description of all the command line options:
   Must be used in conjunction with <tt><ref id="option-m" name="-m"></tt>
   (generate map file). Normally the map file will not include empty segments
   and sections, or unreferenced symbols. Using this option, you can force the
-  linker to include all this information into the map file.
+  linker to include all that information into the map file.  Also, it will
+  include a second <tt/Exports/ list.  The first list is sorted by name;
+  the second one is sorted by value.
 
 
   <label id="option-C">
@@ -227,8 +229,8 @@ Here is a description of all the command line options:
 
   This option allows to define an external symbol on the command line. Value
   may start with a '&dollar;' sign or with <tt/0x/ for hexadecimal values,
-  otherwise a leading zero denotes octal values. See also the <ref
-  id="SYMBOLS" name="SYMBOLS section"> in the configuration file.
+  otherwise a leading zero denotes octal values. See also <ref
+  id="SYMBOLS" name="the SYMBOLS section"> in the configuration file.
 
 
   <label id="option--lib-path">
@@ -236,18 +238,18 @@ Here is a description of all the command line options:
 
   Specify a library search path. This option may be used more than once. It
   adds a directory to the search path for library files. Libraries specified
-  without a path are searched in current directory, in the directory given in
-  the <tt/LD65_LIB/ environment variable, and in the list of directories
-  specified using <tt/--lib-path/.
+  without a path are searched in the current directory, in the list of
+  directories specified using <tt/--lib-path/, in directories given by
+  environment variables, and in a built-in default directory.
 
 
   <tag><tt>-Ln</tt></tag>
 
   This option allows you to create a file that contains all global labels and
-  may be loaded into VICE emulator using the <tt/ll/ (load label) command. You
+  may be loaded into the VICE emulator using the <tt/ll/ (load label) command. You
   may use this to debug your code with VICE. Note: Older versions had some
-  bugs in the label code. If you have problems, please get the latest VICE
-  version.
+  bugs in the label code. If you have problems, please get the latest <url
+  url="http://vice-emu.sourceforge.net/" name="VICE"> version.
 
 
   <label id="option-S">
@@ -261,7 +263,7 @@ Here is a description of all the command line options:
 
   <tag><tt>-V, --version</tt></tag>
 
-  This option print the version number of the linker. If you send any
+  This option prints the version number of the linker. If you send any
   suggestions or bugfixes, please include this number.
 
 
@@ -271,9 +273,9 @@ Here is a description of all the command line options:
   Specify a config file search path. This option may be used more than once.
   It adds a directory to the search path for config files. A config file given
   with the <tt><ref id="option-C" name="-C"></tt> option that has no path in
-  its name is searched in the current directory, in the directory given in the
-  <tt/LD65_CFG/ environment variable, and in the list of directories specified
-  using <tt/--cfg-path/.
+  its name is searched in the current directory, in the list of directories
+  specified using <tt/--cfg-path/, in directories given by environment variables,
+  and in a built-in default directory.
 
 
   <label id="option--dbgfile">
@@ -288,14 +290,14 @@ Here is a description of all the command line options:
 
   <tag><tt>--lib file</tt></tag>
 
-  Links a library to the output. Use this command line option instead of just
+  Links a library to the output. Use this command-line option instead of just
   naming the library file, if the linker is not able to determine the file
   type because of an unusual extension.
 
 
   <tag><tt>--obj file</tt></tag>
 
-  Links an object file to the output. Use this command line option instead
+  Links an object file to the output. Use this command-line option instead
   of just naming the object file, if the linker is not able to determine the
   file type because of an unusual extension.
 
@@ -305,9 +307,9 @@ Here is a description of all the command line options:
 
   Specify an object file search path. This option may be used more than once.
   It adds a directory to the search path for object files. An object file
-  passed to the linker that has no path in its name is searched in current
-  directory, in the directory given in the <tt/LD65_OBJ/ environment variable,
-  and in the list of directories specified using <tt/--obj-path/.
+  passed to the linker that has no path in its name is searched in the current
+  directory, in the list of directories specified using <tt/--obj-path/, in
+  directories given by environment variables, and in a built-in default directory.
 
 </descrip>
 
@@ -378,22 +380,22 @@ name is given (libraries are also recognized by a magic word, there are no
 special naming conventions), all modules in the library are checked if an
 export from this module would satisfy an import from other modules. All
 modules where this is the case are marked. If duplicate identifiers are
-found, the linker issues a warning.
+found, the linker issues warnings.
 
-This procedure (parsing and reading from left to right) does mean, that a
+That procedure (parsing and reading from left to right) does mean that a
 library may only satisfy references for object modules (given directly or from
 a library) named <em/before/ that library. With the command line
 
 <tscreen><verb>
-	ld65 crt0.o clib.lib test.o
+        ld65 crt0.o clib.lib test.o
 </verb></tscreen>
 
-the module test.o may not contain references to modules in the library
-clib.lib. If this is the case, you have to change the order of the modules
+the module <tt/test.o/ must not contain references to modules in the library
+<tt/clib.lib/.  But, if it does, you have to change the order of the modules
 on the command line:
 
 <tscreen><verb>
-	ld65 crt0.o test.o clib.lib
+        ld65 crt0.o test.o clib.lib
 </verb></tscreen>
 
 Step two is, to read the configuration file, and assign start addresses
@@ -403,7 +405,7 @@ name="Configuration files">).
 After that, the linker is ready to produce an output file. Before doing that,
 it checks its data for consistency. That is, it checks for unresolved
 externals (if the output format is not relocatable) and for symbol type
-mismatches (for example a zero page symbol is imported by a module as absolute
+mismatches (for example a zero-page symbol is imported by a module as an absolute
 symbol).
 
 Step four is, to write the actual target files. In this step, the linker will
@@ -416,7 +418,7 @@ segments and symbols encountered.
 
 And, last step, if you give the <tt><ref id="option-v" name="-v"></tt> switch
 twice, you get a dump of the segment data. However, this may be quite
-unreadable if you're not a developer:-)
+unreadable if you're not a developer. :-)
 
 
 
@@ -434,23 +436,23 @@ Case is ignored for keywords, that is, section or attribute names, but it is
 
 <sect1>Memory areas<p>
 
-Memory areas are specified in a <tt/MEMORY/ section. Lets have a look at an
+Memory areas are specified in a <tt/MEMORY/ section. Let's have a look at an
 example (this one describes the usable memory layout of the C64):
 
 <tscreen><verb>
-	MEMORY {
-	    RAM1:  start = $0800, size = $9800;
-	    ROM1:  start = $A000, size = $2000;
-     	    RAM2:  start = $C000, size = $1000;
-     	    ROM2:  start = $E000, size = $2000;
-     	}
+        MEMORY {
+            RAM1:  start = $0800, size = $9800;
+            ROM1:  start = $A000, size = $2000;
+            RAM2:  start = $C000, size = $1000;
+            ROM2:  start = $E000, size = $2000;
+        }
 </verb></tscreen>
 
-As you can see, there are two ram areas and two rom areas. The names
+As you can see, there are two RAM areas and two ROM areas. The names
 (before the colon) are arbitrary names that must start with a letter, with
 the remaining characters being letters or digits. The names of the memory
 areas are used when assigning segments. As mentioned above, case is
-significant for these names.
+significant for those names.
 
 The syntax above is used in all sections of the config file. The name
 (<tt/ROM1/ etc.) is said to be an identifier, the remaining tokens up to the
@@ -461,22 +463,22 @@ mark the end of the attributes for one identifier. The section above may also
 have looked like this:
 
 <tscreen><verb>
-	# Start of memory section
-	MEMORY
-	{
-	    RAM1:
-	    	start $0800
-	    	size $9800;
-	    ROM1:
-	    	start $A000
-	    	size $2000;
-	    RAM2:
-	    	start $C000
-	        size $1000;
-	    ROM2:
-	    	start $E000
-	    	size $2000;
-	}
+        # Start of memory section
+        MEMORY
+        {
+            RAM1:
+                start $0800
+                size $9800;
+            ROM1:
+                start $A000
+                size $2000;
+            RAM2:
+                start $C000
+                size $1000;
+            ROM2:
+                start $E000
+                size $2000;
+        }
 </verb></tscreen>
 
 There are of course more attributes for a memory section than just start and
@@ -495,26 +497,26 @@ we will start to assign segments to memory sections in the <tt/SEGMENTS/
 section:
 
 <tscreen><verb>
-	SEGMENTS {
-	    CODE:   load = RAM1, type = ro;
-	    RODATA: load = RAM1, type = ro;
-	    DATA:   load = RAM1, type = rw;
-	    BSS:    load = RAM1, type = bss, define = yes;
-	}
+        SEGMENTS {
+            CODE:   load = RAM1, type = ro;
+            RODATA: load = RAM1, type = ro;
+            DATA:   load = RAM1, type = rw;
+            BSS:    load = RAM1, type = bss, define = yes;
+        }
 </verb></tscreen>
 
 What we are doing here is telling the linker, that all segments go into the
 <tt/RAM1/ memory area in the order specified in the <tt/SEGMENTS/ section. So
 the linker will first write the <tt/CODE/ segment, then the <tt/RODATA/
 segment, then the <tt/DATA/ segment - but it will not write the <tt/BSS/
-segment. Why? Enter the segment type: For each segment specified, you may also
+segment. Why? Here enters the segment type: For each segment specified, you may also
 specify a segment attribute. There are four possible segment attributes:
 
 <tscreen><verb>
-	ro   	means readonly
-      	rw   	means read/write
-      	bss  	means that this is an uninitialized segment
-      	zp	a zeropage segment
+        ro      means readonly
+        rw      means read/write
+        bss     means that this is an uninitialized segment
+        zp      a zeropage segment
 </verb></tscreen>
 
 So, because we specified that the segment with the name BSS is of type bss,
@@ -531,19 +533,19 @@ a warning if this is not the case.
 
 For a <tt/bss/ type segment to be useful, it must be cleared somehow by your
 program (this happens usually in the startup code - for example the startup
-code for cc65 generated programs takes care about that). But how does your
+code for cc65-generated programs takes care about that). But how does your
 code know, where the segment starts, and how big it is? The linker is able to
 give that information, but you must request it. This is, what we're doing with
 the "<tt/define = yes/" attribute in the <tt/BSS/ definitions. For each
 segment, where this attribute is true, the linker will export three symbols.
 
 <tscreen><verb>
-     	__NAME_LOAD__  	This is set to the address where the
-	 	  	segment is loaded.
-     	__NAME_RUN__   	This is set to the run address of the
-	 	  	segment. We will cover run addresses
-	 	  	later.
-     	__NAME_SIZE__  	This is set to the segment size.
+        __NAME_LOAD__   This is set to the address where the
+                        segment is loaded.
+        __NAME_RUN__    This is set to the run address of the
+                        segment. We will cover run addresses
+                        later.
+        __NAME_SIZE__   This is set to the segment size.
 </verb></tscreen>
 
 Replace <tt/NAME/ by the name of the segment, in the example above, this would
@@ -562,23 +564,23 @@ simple configuration like the one above. There is an additional attribute
 write the area data into. If there is no file name given, the linker will
 assign the default file name. This is "a.out" or the one given with the
 <tt><ref id="option-o" name="-o"></tt> option on the command line. Since the
-default behaviour is ok for our purposes, I did not use the attribute in the
+default behaviour is OK for our purposes, I did not use the attribute in the
 example above. Let's have a look at it now.
 
 The "file" attribute (the keyword may also be written as "FILE" if you like
-that better) takes a string enclosed in double quotes (`"') that specifies the
+that better) takes a string enclosed in double quotes (`&dquot;') that specifies the
 file, where the data is written. You may specify the same file several times,
 in that case the data for all memory areas having this file name is written
 into this file, in the order of the memory areas defined in the <tt/MEMORY/
 section. Let's specify some file names in the <tt/MEMORY/ section used above:
 
 <tscreen><verb>
-      	MEMORY {
-      	    RAM1:  start = $0800, size = $9800, file = %O;
-      	    ROM1:  start = $A000, size = $2000, file = "rom1.bin";
-      	    RAM2:  start = $C000, size = $1000, file = %O;
-      	    ROM2:  start = $E000, size = $2000, file = "rom2.bin";
-      	}
+        MEMORY {
+            RAM1:  start = $0800, size = $9800, file = %O;
+            ROM1:  start = $A000, size = $2000, file = "rom1.bin";
+            RAM2:  start = $C000, size = $1000, file = %O;
+            ROM2:  start = $E000, size = $2000, file = "rom2.bin";
+        }
 </verb></tscreen>
 
 The <tt/%O/ used here is a way to specify the default behaviour explicitly:
@@ -603,10 +605,10 @@ name to that memory area.
 The <tt/%O/ sequence is also allowed inside a string. So using
 
 <tscreen><verb>
-      	MEMORY {
-       	    ROM1:  start = $A000, size = $2000, file = "%O-1.bin";
-      	    ROM2:  start = $E000, size = $2000, file = "%O-2.bin";
-      	}
+        MEMORY {
+            ROM1:  start = $A000, size = $2000, file = "%O-1.bin";
+            ROM2:  start = $E000, size = $2000, file = "%O-2.bin";
+        }
 </verb></tscreen>
 
 would write two files that start with the name of the output file specified on
@@ -624,17 +626,17 @@ read/write data. But now, if the code is in ROM, we must care about it.
 Remember the default segments (you may of course specify your own):
 
 <tscreen><verb>
-     	CODE		read only code
-     	RODATA		read only data
-     	DATA		read/write data
-     	BSS		uninitialized data, read/write
+        CODE            read-only code
+        RODATA          read-only data
+        DATA            read/write data
+        BSS             uninitialized data, read/write
 </verb></tscreen>
 
 Since <tt/BSS/ is not initialized, we must not care about it now, but what
 about <tt/DATA/? <tt/DATA/ contains initialized data, that is, data that was
 explicitly assigned a value. And your program will rely on these values on
-startup. Since there's no other way to remember the contents of the data
-segment, than storing it into one of the ROMs, we have to put it there. But
+startup. Since there's no way to remember the contents of the data segment,
+other than storing it into one of the ROMs, we have to put it there. But
 unfortunately, ROM is not writable, so we have to copy it into RAM before
 running the actual code.
 
@@ -648,12 +650,12 @@ you don't specify a "<tt/run/" attribute, the linker assumes that load area
 and run area are the same. We will use this feature for our data area:
 
 <tscreen><verb>
-     	SEGMENTS {
-     	    CODE:   load = ROM1, type = ro;
-     	    RODATA: load = ROM2, type = ro;
-     	    DATA:   load = ROM2, run = RAM2, type = rw, define = yes;
-     	    BSS:    load = RAM2, type = bss, define = yes;
-     	}
+        SEGMENTS {
+            CODE:   load = ROM1, type = ro;
+            RODATA: load = ROM2, type = ro;
+            DATA:   load = ROM2, run = RAM2, type = rw, define = yes;
+            BSS:    load = RAM2, type = bss, define = yes;
+        }
 </verb></tscreen>
 
 Let's have a closer look at this <tt/SEGMENTS/ section. We specify that the
@@ -670,12 +672,12 @@ Since we have set this attribute to true, the linker will define three
 external symbols for the data segment that may be accessed from your code:
 
 <tscreen><verb>
-       	__DATA_LOAD__	This is set to the address where the segment
-	 		is loaded, in this case, it is an address in
-	 	  	ROM2.
-     	__DATA_RUN__	This is set to the run address of the segment,
-	 		in this case, it is an address in RAM2.
-     	__DATA_SIZE__	This is set to the segment size.
+        __DATA_LOAD__   This is set to the address where the segment
+                        is loaded, in this case, it is an address in
+                        ROM2.
+        __DATA_RUN__    This is set to the run address of the segment,
+                        in this case, it is an address in RAM2.
+        __DATA_SIZE__   This is set to the segment size.
 </verb></tscreen>
 
 So, what your startup code must do, is to copy <tt/__DATA_SIZE__/ bytes from
@@ -694,25 +696,25 @@ There are some other attributes not covered above. Before starting the
 reference section, I will discuss the remaining things here.
 
 You may request symbols definitions also for memory areas. This may be
-useful for things like a software stack, or an i/o area.
+useful for things like a software stack, or an I/O area.
 
 <tscreen><verb>
-     	MEMORY {
-     	    STACK:  start = $C000, size = $1000, define = yes;
-     	}
+        MEMORY {
+            STACK:  start = $C000, size = $1000, define = yes;
+        }
 </verb></tscreen>
 
 This will define some external symbols that may be used in your code:
 
 <tscreen><verb>
-       	__STACK_START__	  	This is set to the start of the memory
-     	     	      	  	area, $C000 in this example.
-     	__STACK_SIZE__	  	The size of the area, here $1000.
-        __STACK_LAST__		This is NOT the same as START+SIZE.
-     	     	      		Instead, it it defined as the first
-     	     	      		address that is not used by data. If we
-     	     	      		don't define any segments for this area,
-     	     	      		the value will be the same as START.
+        __STACK_START__         This is set to the start of the memory
+                                area, $C000 in this example.
+        __STACK_SIZE__          The size of the area, here $1000.
+        __STACK_LAST__          This is NOT the same as START+SIZE.
+                                Instead, it is defined as the first
+                                address that is not used by data. If we
+                                don't define any segments for this area,
+                                the value will be the same as START.
         __STACK_FILEOFFS__      The binary offset in the output file. This
                                 is not defined for relocatable output file
                                 formats (o65).
@@ -721,8 +723,8 @@ This will define some external symbols that may be used in your code:
 A memory section may also have a type. Valid types are
 
 <tscreen><verb>
-     	ro   	for readonly memory
-	rw   	for read/write memory.
+        ro      for readonly memory
+        rw      for read/write memory.
 </verb></tscreen>
 
 The linker will assure, that no segment marked as read/write or bss is put
@@ -734,16 +736,16 @@ you don't like this, you may specify a byte value that is used to fill these
 areas with the "<tt/fillval/" attribute. If there is no "<tt/fillval/"
 attribute for the segment, the "<tt/fillval/" attribute of the memory area (or
 its default) is used instead. This means that the value may also be used to
-fill unfilled areas generated by the assemblers <tt/.ALIGN/ and <tt/.RES/
+fill unfilled areas generated by the assembler's <tt/.ALIGN/ and <tt/.RES/
 directives.
 
 The symbol <tt/%S/ may be used to access the default start address (that is,
-the one defined in the <ref id="FEATURES" name="FEATURES"> section, or the
+the one defined in <ref id="FEATURES" name="the FEATURES section">, or the
 value given on the command line with the <tt><ref id="option-S" name="-S"></tt>
 option).
 
 To support systems with banked memory, a special attribute named <tt/bank/ is
-available. The attribute value is an arbitrary 32 bit integer. The assembler
+available. The attribute value is an arbitrary 32-bit integer. The assembler
 has a builtin function named <tt/.BANK/ which may be used with an argument
 that has a segment reference (for example a symbol). The result of this
 function is the value of the bank attribute for the run memory area of the
@@ -757,13 +759,13 @@ request this feature. Num must be a power of two. To align all segments on a
 page boundary, use
 
 <tscreen><verb>
-     	SEGMENTS {
-     	    CODE:   load = ROM1, type = ro, align = $100;
-     	    RODATA: load = ROM2, type = ro, align = $100;
-     	    DATA:   load = ROM2, run = RAM2, type = rw, define = yes,
-     	     	    align = $100;
-     	    BSS:    load = RAM2, type = bss, define = yes, align = $100;
-     	}
+        SEGMENTS {
+            CODE:   load = ROM1, type = ro, align = $100;
+            RODATA: load = ROM2, type = ro, align = $100;
+            DATA:   load = ROM2, run = RAM2, type = rw, define = yes,
+                    align = $100;
+            BSS:    load = RAM2, type = bss, define = yes, align = $100;
+        }
 </verb></tscreen>
 
 If an alignment is requested, the linker will add enough space to the output
@@ -788,17 +790,17 @@ specified offset (this may happen if other segments in this area are too
 large). Here's an example:
 
 <tscreen><verb>
-     	SEGMENTS {
-     	    VECTORS: load = ROM2, type = ro, start = $FFFA;
-     	}
+        SEGMENTS {
+            VECTORS: load = ROM2, type = ro, start = $FFFA;
+        }
 </verb></tscreen>
 
 or (for the segment definitions from above)
 
 <tscreen><verb>
-     	SEGMENTS {
-     	    VECTORS: load = ROM2, type = ro, offset = $1FFA;
-     	}
+        SEGMENTS {
+            VECTORS: load = ROM2, type = ro, offset = $1FFA;
+        }
 </verb></tscreen>
 
 The "<tt/align/", "<tt/start/" and "<tt/offset/" attributes change placement
@@ -812,13 +814,13 @@ just the load memory area.
 
 A "<tt/fillval/" attribute may not only be specified for a memory area, but
 also for a segment. The value must be an integer between 0 and 255. It is used
-as fill value for space reserved by the assemblers <tt/.ALIGN/ and <tt/.RES/
-commands. It is also used as fill value for space between sections (part of a
+as the fill value for space reserved by the assembler's <tt/.ALIGN/ and <tt/.RES/
+commands. It is also used as the fill value for space between sections (part of a
 segment that comes from one object file) caused by alignment, but not for
 space that preceeds the first section.
 
 To suppress the warning, the linker issues if it encounters a segment that is
-not found in any of the input files, use "<tt/optional=yes/" as additional
+not found in any of the input files, use "<tt/optional=yes/" as an additional
 segment attribute. Be careful when using this attribute, because a missing
 segment may be a sign of a problem, and if you're suppressing the warning,
 there is no one left to tell you about it.
@@ -834,9 +836,9 @@ each output file. Assigning binary format to the default output file would
 look like this:
 
 <tscreen><verb>
-     	FILES {
-     	    %O: format = bin;
-     	}
+        FILES {
+            %O: format = bin;
+        }
 </verb></tscreen>
 
 The only other available output format is the o65 format specified by Andre
@@ -844,17 +846,17 @@ Fachat (see the <url url="http://www.6502.org/users/andre/o65/fileformat.html"
 name="6502 binary relocation format specification">). It is defined like this:
 
 <tscreen><verb>
-     	FILES {
-     	    %O: format = o65;
-     	}
+        FILES {
+            %O: format = o65;
+        }
 </verb></tscreen>
 
 The necessary o65 attributes are defined in a special section labeled
-<tt/FORMAT/.
+<ref id="FORMAT" name="FORMAT">.
 
 
 
-<sect1>The FORMAT section<p>
+<sect1>The FORMAT section<label id="FORMAT"><p>
 
 The <tt/FORMAT/ section is used to describe file formats. The default (binary)
 format has currently no attributes, so, while it may be listed in this
@@ -885,12 +887,12 @@ linker has features that may be enabled by an additional section labeled
 tables.
 
 <tscreen><verb>
-	FEATURES {
-	    CONDES: segment = RODATA,
-	       	    type = constructor,
-	       	    label = __CONSTRUCTOR_TABLE__,
-	       	    count = __CONSTRUCTOR_COUNT__;
-	}
+        FEATURES {
+            CONDES: segment = RODATA,
+                    type = constructor,
+                    label = __CONSTRUCTOR_TABLE__,
+                    count = __CONSTRUCTOR_COUNT__;
+        }
 </verb></tscreen>
 
 The <tt/CONDES/ feature has several attributes:
@@ -913,7 +915,7 @@ The <tt/CONDES/ feature has several attributes:
   <tag><tt>label</tt></tag>
 
   This specifies the label to use for the table. The label points to the start
-  of the table in memory and may be used from within user written code.
+  of the table in memory and may be used from within user-written code.
 
 
   <tag><tt>count</tt></tag>
@@ -926,7 +928,7 @@ The <tt/CONDES/ feature has several attributes:
 
   <tag><tt>order</tt></tag>
 
-  Optional attribute that takes one of the keywords <tt/increasing/ or
+  An optional attribute that takes one of the keywords <tt/increasing/ or
   <tt/decreasing/ as an argument. Specifies the sorting order of the entries
   within the table. The default is <tt/increasing/, which means that the
   entries are sorted with increasing priority (the first entry has the lowest
@@ -940,7 +942,7 @@ The <tt/CONDES/ feature has several attributes:
   <tag><tt>import</tt></tag>
 
   This attribute defines a valid symbol name, that is added as an import
-  to the modules defining a constructor/desctructor of the given type.
+  to the modules defining a constructor/destructor of the given type.
   This can be used to force linkage of a module if this module exports the
   requested symbol.
 
@@ -960,10 +962,10 @@ which can be referenced by the <tt/%S/ symbol. The builtin default for the
 linker is &dollar;200.
 
 <tscreen><verb>
-       	FEATURES {
+        FEATURES {
             # Default start address is $1000
-       	    STARTADDRESS:       default = $1000;
-       	}
+            STARTADDRESS:       default = $1000;
+        }
 </verb></tscreen>
 
 Please note that order is important: The default start address must be defined
@@ -1016,10 +1018,10 @@ the programmer to override the value by specifying <tt/--define
 __STACKSIZE__=xxx/ on the command line.
 
 <tscreen><verb>
-       	SYMBOLS {
+        SYMBOLS {
             # Define the stack size for the application
-       	    __STACKSIZE__:  type = weak, value = $800;
-       	}
+            __STACKSIZE__:  type = weak, value = $800;
+        }
 </verb></tscreen>
 
 

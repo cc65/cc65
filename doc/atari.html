@@ -129,7 +129,7 @@ detailed information about the load chunks see the chapter
 <A HREF="#techdetail">Technical details</A>. For the discussion here it's
 sufficient to know that the first load chunk(s) do preparation work and the
 main part of the program is in the last load chunk.</P>
-<P>The values determining the size of the main part of the program (the only load
+<P>The values determining the size of the main part of the program (the second load
 chunk for <CODE>atari</CODE>, the third load chunk for <CODE>atarixl</CODE>) are calculated in
 the crt0.s file from the __STARTUP_LOAD__ and __BSS_LOAD__ values.
 Be aware of that if you create a custom linker config file and start moving segments around (see section
@@ -201,12 +201,11 @@ areas available, [$D800-$DFFF] and [$E400-$FFF9].</LI>
 </OL>
 </P>
 <P>With the default load address of $2400 this gives a usable memory range of
-[$2400-$CFFF].  Note that the default load address for <CODE>atarixl</CODE> is
-different (and lower) that the default load address for <CODE>atari</CODE>.  This is no problem since
-on the <CODE>atarixl</CODE> target the first load chunk makes sure that the loaded prgram won't overwrite
-memory below MEMLO. See 
-<A HREF="#xlchunks">atarixl load chunks</A>.</P>
-
+[$2400-$CFFF].</P>
+<P>Please note that the first load chunk (which checks the system
+compatibilty and available memory) will always be loaded at
+$2E00, regardless of the specified start address. This address
+can only be changed by a custom linker config file.</P>
 <P>Special locations:</P>
 <P>
 <DL>
@@ -553,6 +552,52 @@ the Atari ROM code.</P>
 <P>All mouse devices connect to joystick port #0.</P>
 <P>Default drivers: <CODE>atrst.mou (atrst_mou)</CODE> and <CODE>atrxst.mou (atrxst_mou)</CODE>.</P>
 
+<H3>Mouse callbacks</H3>
+
+
+<P>There are two mouse callbacks available.</P>
+<P>The "text mode" callbacks (<CODE>mouse_txt_callbacks</CODE>) display the mouse cursor as a "diamond" character
+on the standard "GRAPHICS 0" text mode screen. The mouse cursor character can be changed by an
+assembly file defining the character by exporting the zeropage symbol <CODE>mouse_txt_char</CODE>.
+The default file looks like this:
+<BLOCKQUOTE><CODE>
+<PRE>
+        .export mouse_txt_char : zp = 96     ; 'diamond' screen code
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The "P/M" callbacks (<CODE>mouse_pm_callbacks</CODE>) use Player-Missile graphics for the mouse cursor.
+The cursor shape can be changed, too, by an assembly file. Here's the default shape definition:
+<BLOCKQUOTE><CODE>
+<PRE>
+        .export mouse_pm_bits
+        .export mouse_pm_height    : zeropage
+        .export mouse_pm_hotspot_x : zeropage
+        .export mouse_pm_hotspot_y : zeropage
+        .rodata
+mouse_pm_bits:
+        .byte   %11110000
+        .byte   %11000000
+        .byte   %10100000
+        .byte   %10010000
+        .byte   %10001000
+        .byte   %00000100
+        .byte   %00000010
+mouse_pm_height = * - mouse_pm_bits
+; hot spot is upper left corner
+mouse_pm_hotspot_x = 0
+mouse_pm_hotspot_y = 0
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P><CODE>mouse_pm_bits</CODE> defines the shape of the cursor, <CODE>mouse_pm_height</CODE> defines the number of
+bytes in <CODE>mouse_pm_bits</CODE>. <CODE>mouse_pm_hotspot_x</CODE> and <CODE>mouse_pm_hotspot_y</CODE> define the
+position in the shape where "the mouse points to". When using this callback page #6 ($600
+- $6FF) is used for the P/M graphics data and no P/M graphics can otherwise be used
+by the program. The height of the shape (<CODE>mouse_pm_height</CODE>)
+must not exceed 32 lines since the callback routines cannot handle more than 32 lines.</P>
+<P>The default callbacks definition (<CODE>mouse_def_callbacks</CODE>) is an alias for the "P/M" callbacks.</P>
+
 <H2><A NAME="ss6.5">6.5</A> <A HREF="#toc6.5">RS232 device drivers</A>
 </H2>
 
@@ -768,7 +813,7 @@ and recompile the <CODE>atarixl</CODE> runtime library.</P>
 </H2>
 
 
-<P>Command line arguments can be passed to <CODE>main()</CODE> when DOS supports it.</P>
+<P>Command line arguments can be passed to <CODE>main()</CODE> when the used DOS supports it.</P>
 <P>
 <OL>
 <LI>Arguments are separated by spaces.</LI>
@@ -790,7 +835,8 @@ subroutines and will be called automatically by the VBI handler code
 when they are linked into a program. See the discussion of the <CODE>.CONDES</CODE>
 feature in the 
 <A HREF="ca65.html">assembler manual</A>.</P>
-
+<P>Please note that on the Atari targets the <CODE>.INTERRUPTOR</CODE>s are being
+run in NMI context. The other targets run them in IRQ context.</P>
 
 <H2><A NAME="memhole"></A> <A NAME="ss11.4">11.4</A> <A HREF="#toc11.4">Reserving a memory area inside a program</A>
 </H2>

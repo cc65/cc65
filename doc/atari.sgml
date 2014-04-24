@@ -63,7 +63,7 @@ detailed information about the load chunks see the chapter
 sufficient to know that the first load chunk(s) do preparation work and the
 main part of the program is in the last load chunk.
 
-The values determining the size of the main part of the program (the only load
+The values determining the size of the main part of the program (the second load
 chunk for <tt/atari/, the third load chunk for <tt/atarixl/) are calculated in
 the crt0.s file from the __STARTUP_LOAD__ and __BSS_LOAD__ values.
 Be aware of that if you create a custom linker config file and start moving segments around (see section
@@ -130,11 +130,12 @@ areas available, &lsqb;&dollar;D800-&dollar;DFFF&rsqb; and &lsqb;&dollar;E400-&d
 </enum>
 
 With the default load address of &dollar;2400 this gives a usable memory range of
-&lsqb;&dollar;2400-&dollar;CFFF&rsqb;.  Note that the default load address for <tt/atarixl/ is
-different (and lower) that the default load address for <tt/atari/.  This is no problem since
-on the <tt/atarixl/ target the first load chunk makes sure that the loaded prgram won't overwrite
-memory below MEMLO. See <ref name="atarixl load chunks" id="xlchunks">.
+&lsqb;&dollar;2400-&dollar;CFFF&rsqb;.
 
+Please note that the first load chunk (which checks the system
+compatibilty and available memory) will always be loaded at
+&dollar;2E00, regardless of the specified start address. This address
+can only be changed by a custom linker config file.
 
 Special locations:
 
@@ -459,6 +460,49 @@ All mouse devices connect to joystick port #0.
 
 Default drivers: <tt/atrst.mou (atrst_mou)/ and <tt/atrxst.mou (atrxst_mou)/.
 
+<sect2>Mouse callbacks<p>
+
+There are two mouse callbacks available.
+<p>
+The "text mode" callbacks (<tt/mouse_txt_callbacks/) display the mouse cursor as a "diamond" character
+on the standard "GRAPHICS 0" text mode screen. The mouse cursor character can be changed by an
+assembly file defining the character by exporting the zeropage symbol <tt/mouse_txt_char/.
+The default file looks like this:
+<tscreen><verb>
+        .export mouse_txt_char : zp = 96     ; 'diamond' screen code
+</verb></tscreen>
+<p>
+The "P/M" callbacks (<tt/mouse_pm_callbacks/) use Player-Missile graphics for the mouse cursor.
+The cursor shape can be changed, too, by an assembly file. Here's the default shape definition:
+<tscreen><verb>
+        .export mouse_pm_bits
+        .export mouse_pm_height    : zeropage
+        .export mouse_pm_hotspot_x : zeropage
+        .export mouse_pm_hotspot_y : zeropage
+        .rodata
+mouse_pm_bits:
+        .byte   %11110000
+        .byte   %11000000
+        .byte   %10100000
+        .byte   %10010000
+        .byte   %10001000
+        .byte   %00000100
+        .byte   %00000010
+mouse_pm_height = * - mouse_pm_bits
+; hot spot is upper left corner
+mouse_pm_hotspot_x = 0
+mouse_pm_hotspot_y = 0
+</verb></tscreen>
+<p>
+<tt/mouse_pm_bits/ defines the shape of the cursor, <tt/mouse_pm_height/ defines the number of
+bytes in <tt/mouse_pm_bits/. <tt/mouse_pm_hotspot_x/ and <tt/mouse_pm_hotspot_y/ define the
+position in the shape where "the mouse points to". When using this callback page #6 (&dollar;600
+ - &dollar;6FF) is used for the P/M graphics data and no P/M graphics can otherwise be used
+by the program. The height of the shape (<tt/mouse_pm_height/)
+must not exceed 32 lines since the callback routines cannot handle more than 32 lines.
+<p>
+The default callbacks definition (<tt/mouse_def_callbacks/) is an alias for the "P/M" callbacks.
+
 <sect1>RS232 device drivers<p>
 
 Currently there is one RS232 driver.  It uses the R: device (therefore
@@ -649,7 +693,7 @@ Function keys are mapped to Atari + number key.
 
 <sect1>Passing arguments to the program<p>
 
-Command line arguments can be passed to <tt/main()/ when DOS supports it.
+Command line arguments can be passed to <tt/main()/ when the used DOS supports it.
 
 <enum>
 <item>Arguments are separated by spaces.
@@ -668,6 +712,8 @@ subroutines and will be called automatically by the VBI handler code
 when they are linked into a program. See the discussion of the <tt/.CONDES/
 feature in the <url url="ca65.html" name="assembler manual">.
 
+Please note that on the Atari targets the <tt/.INTERRUPTOR/s are being
+run in NMI context. The other targets run them in IRQ context.
 
 <sect1>Reserving a memory area inside a program<label id="memhole"><p>
 

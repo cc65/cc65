@@ -13,8 +13,7 @@
         .export mouse_pm_hotspot_x : zeropage
         .export mouse_pm_hotspot_y : zeropage
 
-
-        .data
+        .rodata
 
 mouse_pm_bits:
         .byte   %11110000

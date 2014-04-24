@@ -491,28 +491,5 @@ IRQ:    jsr     CPREP
         clc                             ; Interrupt not "handled"
         rts
 
-;----------------------------------------------------------------------------
-; Called after ROM IRQ handler has been run.
-; Check if there was joystick activity before and/or after the ROM handler.
-; If there was activity, discard the key presses since they are most
-; probably "phantom" key presses.
-
-callback:
-        ldx     old_key_count
-        cpx     KEY_COUNT
-        beq     @nokey
-
-        lda     Temp                    ; keypress before?
-        bne     @discard_key            ; yes, discard key
-
-        lda     #$7F
-        sta     CIA1_PRA
-        lda     CIA1_PRB                ; Read joystick #0
-        and     #$1F
-        eor     #$1F                    ; keypress after
-        beq     @nokey                  ; no, probably a real key press
-
-@discard_key:
-        stx     KEY_COUNT               ; set old keyboard buffer fill level
-
-@nokey: rts
+.define  OLD_BUTTONS Temp               ; tells callback.inc where the old port status is stored
+.include "callback.inc"

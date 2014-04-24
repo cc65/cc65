@@ -12,6 +12,8 @@
 
         .macpack        generic
 
+IRQInd  = $2FD
+
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
@@ -26,6 +28,7 @@ HEADER:
 
 ; Library reference
 
+libref:
         .addr   $0000
 
 ; Jump table
@@ -64,6 +67,15 @@ SCREEN_HEIGHT   = 200
 SCREEN_WIDTH    = 320
 
 ;----------------------------------------------------------------------------
+; data segment
+
+.data
+
+chainIRQ:
+        .byte   $4c                     ; JMP opcode
+        .word   0                       ; pointer to ROM IRQ handler (will be set at runtime)
+
+;----------------------------------------------------------------------------
 ; Global variables. The bounding box values are sorted so that they can be
 ; written with the least effort in the SETBOX and GETBOX routines, so don't
 ; reorder them.
@@ -85,6 +97,11 @@ OldValue:       .res    1               ; Temp for MoveCheck routine
 NewValue:       .res    1               ; Temp for MoveCheck routine
 
 INIT_save:      .res    1
+Buttons:        .res    1               ; Button mask
+
+; Keyboard buffer fill level at start of interrupt
+
+old_key_count:  .res    1
 
 .rodata
 
@@ -138,6 +155,35 @@ INSTALL:
         lda     YPos
         ldx     YPos+1
         jsr     CMOVEY
+
+; Initialize our IRQ magic
+
+        lda     IRQInd+1
+        sta     chainIRQ+1
+        lda     IRQInd+2
+        sta     chainIRQ+2
+        lda     libref
+        sta     ptr3
+        lda     libref+1
+        sta     ptr3+1
+        ldy     #2
+        lda     (ptr3),y
+        sta     IRQInd+1
+        iny
+        lda     (ptr3),y
+        sta     IRQInd+2
+        iny
+        lda     #<(callback-1)
+        sta     (ptr3),y
+        iny
+        lda     #>(callback-1)
+        sta     (ptr3),y
+        iny
+        lda     #<(chainIRQ-1)
+        sta     (ptr3),y
+        iny
+        lda     #>(chainIRQ-1)
+        sta     (ptr3),y
         cli
 
 ; Done, return zero (= MOUSE_ERR_OK)
@@ -151,6 +197,13 @@ INSTALL:
 ; No return code required (the driver is removed from memory on return).
 
 UNINSTALL:
+        lda     chainIRQ+1
+        sei
+        sta     IRQInd+1
+        lda     chainIRQ+2
+        sta     IRQInd+2
+        cli
+
         jsr     HIDE                    ; Hide cursor on exit
         lda     INIT_save
         sta     INIT_STATUS
@@ -250,14 +303,8 @@ MOVE:   sei                             ; No interrupts
 ; BUTTONS: Return the button mask in a/x.
 
 BUTTONS:
-        lda     #$7F
-        sei
-        sta     CIA1_PRA
-        lda     CIA1_PRB                ; Read joystick #0
-        cli
-        ldx     #0
-        and     #$1F
-        eor     #$1F
+        lda     Buttons
+        ldx     #$00
         rts
 
 ;----------------------------------------------------------------------------
@@ -320,6 +367,15 @@ IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioclts for now
 ;
 
 IRQ:    jsr     CPREP
+        lda     KEY_COUNT
+        sta     old_key_count
+        lda     #$7F
+        sta     CIA1_PRA
+        lda     CIA1_PRB                ; Read joystick #0
+        and     #$1F
+        eor     #$1F                    ; Make all bits active high
+        sta     Buttons
+
         lda     SID_ADConv1             ; Get mouse X movement
         ldy     OldPotX
         jsr     MoveCheck               ; Calculate movement vector
@@ -450,3 +506,5 @@ MoveCheck:
         clc
         rts
 
+.define  OLD_BUTTONS Buttons            ; tells callback.inc where the old port status is stored
+.include "callback.inc"

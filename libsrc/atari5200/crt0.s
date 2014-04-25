@@ -1,7 +1,7 @@
 ;
 ; Startup code for cc65 (Atari5200 version)
 ;
-; by Christian Groessler (chris@groessler.org), 2014
+; Christian Groessler (chris@groessler.org), 2014
 ;
 
         .export         _exit, start
@@ -14,12 +14,6 @@
 
         .include        "zeropage.inc"
         .include        "atari5200.inc"
-
-
-; ------------------------------------------------------------------------
-; Place the startup code in a special segment.
-
-.segment        "STARTUP"
 
 start:
 
@@ -49,7 +43,6 @@ start:
 
 _exit:  jsr     donelib         ; Run module destructors
 
-; Reset the NES
+; A 5200 program isn't supposed to exit.
 
-        jmp start
-
+halt:   jmp halt

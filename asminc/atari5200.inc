@@ -55,10 +55,11 @@ PADDL5  =  $16   ;POT5  "
 PADDL6  =  $17   ;POT6  "
 PADDL7  =  $18   ;POT7  "
 
+; cc65 runtime zero page variables
 
-.importzp COLCRS_5200
-.importzp ROWCRS_5200
-
+COLCRS_5200	=	$19
+ROWCRS_5200	=	$1A
+SAVMSC		=	$1B		; pointer to screen memory (conio)
 
 ;-------------------------------------------------------------------------
 ; Page #2

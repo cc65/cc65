@@ -5,7 +5,6 @@
 #include <ctype.h>
 #include <modload.h>
 #include <tgi.h>
-#include <tgi/tgi-kernel.h>
 
 
 

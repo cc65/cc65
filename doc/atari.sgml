@@ -3,11 +3,10 @@
 <article>
 
 <title>Atari specific information for cc65
-<author>Shawn Jefferson, <htmlurl
-url="mailto:shawnjefferson@24fightingchickens.com"
-name="shawnjefferson@24fightingchickens.com"> and
-Christian Groessler, <htmlurl url="mailto:chris@groessler.org" name="chris@groessler.org">
-<date>03-Jan-2006
+<author>
+<url url="mailto:shawnjefferson@24fightingchickens.com" name="Shawn Jefferson"> and<newline>
+<url url="mailto:chris@groessler.org" name="Christian Groessler">
+<date>2014-04-10
 
 <abstract>
 An overview over the Atari runtime system as it is implemented for the cc65 C
@@ -31,13 +30,13 @@ The <tt/atari/ target supports all Atari 8-bit computers, the <tt/atarixl/ only
 supports XL type or newer machines (excluding the 600XL).
 
 The <tt/atarixl/ runtime makes the whole 64K of memory available, with the
-exception of the I/O area at &dollar;D000 - &dollar;D7FFF. Since the
+exception of the I/O area at &dollar;D000 - &dollar;D7FF. Since the
 <tt/atarixl/ runtime has some <ref name="limitations" id="limitations">, it is
 recommended to use the <tt/atari/ target unless lack of memory dictates the
 use of the <tt/atarixl/ target.
 
 Please note that Atari specific functions are just mentioned here, they are
-described in detail in the separate <htmlurl url="funcref.html" name="function
+described in detail in the separate <url url="funcref.html" name="function
 reference">. Even functions marked as "platform dependent" may be available on
 more than one platform. Please see the function reference for more
 information.
@@ -64,7 +63,7 @@ detailed information about the load chunks see the chapter
 sufficient to know that the first load chunk(s) do preparation work and the
 main part of the program is in the last load chunk.
 
-The values determining the size of the main part of the program (the only load
+The values determining the size of the main part of the program (the second load
 chunk for <tt/atari/, the third load chunk for <tt/atarixl/) are calculated in
 the crt0.s file from the __STARTUP_LOAD__ and __BSS_LOAD__ values.
 Be aware of that if you create a custom linker config file and start moving segments around (see section
@@ -131,11 +130,12 @@ areas available, &lsqb;&dollar;D800-&dollar;DFFF&rsqb; and &lsqb;&dollar;E400-&d
 </enum>
 
 With the default load address of &dollar;2400 this gives a usable memory range of
-&lsqb;&dollar;2400-&dollar;CFFF&rsqb;.  Note that the default load address for <tt/atarixl/ is
-different (and lower) that the default load address for <tt/atari/.  This is no problem since
-on the <tt/atarixl/ target the first load chunk makes sure that the loaded prgram won't overwrite
-memory below MEMLO. See <ref name="atarixl load chunks" id="xlchunks">.
+&lsqb;&dollar;2400-&dollar;CFFF&rsqb;.
 
+Please note that the first load chunk (which checks the system
+compatibilty and available memory) will always be loaded at
+&dollar;2E00, regardless of the specified start address. This address
+can only be changed by a custom linker config file.
 
 Special locations:
 
@@ -265,7 +265,7 @@ header file.
 <sect1>Atari specific functions<p>
 
 The functions and global variable listed below are special for the Atari.
-See the <htmlurl url="funcref.html" name="function reference"> for declaration and usage.
+See the <url url="funcref.html" name="function reference"> for declaration and usage.
 
 <itemize>
 <item>get_ostype
@@ -412,6 +412,8 @@ The values of "1" are needed because the graphics command crashes if
 it doesn't have at least one byte available. This seems to be a bug of
 the Atari ROM code.
 
+Default drivers: <tt/atr8.tgi (atr8_tgi)/ and <tt/atrx8.tgi (atrx8_tgi)/.
+
 <sect1>Extended memory drivers<p>
 
 Currently there is only one extended memory driver.  It manages the second 64K of a 130XE.
@@ -436,6 +438,7 @@ Currently there are two joystick drivers available:
 <caption>
 </table>
 
+Default drivers: <tt/atrstd.joy (atrstd_joy)/ and <tt/atrxstd.joy (atrxstd_joy)/.
 
 <sect1>Mouse drivers<p>
 
@@ -455,6 +458,50 @@ Currently there are five mouse drivers available:
 
 All mouse devices connect to joystick port #0.
 
+Default drivers: <tt/atrst.mou (atrst_mou)/ and <tt/atrxst.mou (atrxst_mou)/.
+
+<sect2>Mouse callbacks<p>
+
+There are two mouse callbacks available.
+<p>
+The "text mode" callbacks (<tt/mouse_txt_callbacks/) display the mouse cursor as a "diamond" character
+on the standard "GRAPHICS 0" text mode screen. The mouse cursor character can be changed by an
+assembly file defining the character by exporting the zeropage symbol <tt/mouse_txt_char/.
+The default file looks like this:
+<tscreen><verb>
+        .export mouse_txt_char : zp = 96     ; 'diamond' screen code
+</verb></tscreen>
+<p>
+The "P/M" callbacks (<tt/mouse_pm_callbacks/) use Player-Missile graphics for the mouse cursor.
+The cursor shape can be changed, too, by an assembly file. Here's the default shape definition:
+<tscreen><verb>
+        .export mouse_pm_bits
+        .export mouse_pm_height    : zeropage
+        .export mouse_pm_hotspot_x : zeropage
+        .export mouse_pm_hotspot_y : zeropage
+        .rodata
+mouse_pm_bits:
+        .byte   %11110000
+        .byte   %11000000
+        .byte   %10100000
+        .byte   %10010000
+        .byte   %10001000
+        .byte   %00000100
+        .byte   %00000010
+mouse_pm_height = * - mouse_pm_bits
+; hot spot is upper left corner
+mouse_pm_hotspot_x = 0
+mouse_pm_hotspot_y = 0
+</verb></tscreen>
+<p>
+<tt/mouse_pm_bits/ defines the shape of the cursor, <tt/mouse_pm_height/ defines the number of
+bytes in <tt/mouse_pm_bits/. <tt/mouse_pm_hotspot_x/ and <tt/mouse_pm_hotspot_y/ define the
+position in the shape where "the mouse points to". When using this callback page #6 (&dollar;600
+ - &dollar;6FF) is used for the P/M graphics data and no P/M graphics can otherwise be used
+by the program. The height of the shape (<tt/mouse_pm_height/)
+must not exceed 32 lines since the callback routines cannot handle more than 32 lines.
+<p>
+The default callbacks definition (<tt/mouse_def_callbacks/) is an alias for the "P/M" callbacks.
 
 <sect1>RS232 device drivers<p>
 
@@ -646,14 +693,14 @@ Function keys are mapped to Atari + number key.
 
 <sect1>Passing arguments to the program<p>
 
-Command line arguments can be passed to <tt/main()/ when DOS supports it.
+Command line arguments can be passed to <tt/main()/ when the used DOS supports it.
 
 <enum>
 <item>Arguments are separated by spaces.
 <item>Leading and trailing spaces around an argument are ignored.
 <item>The first argument passed to <tt/main/ is the program name.
 <item>A maximum number of 16 arguments (including the program name) are
-      supported.                                                       
+      supported.
 </enum>
 
 
@@ -663,8 +710,10 @@ The runtime for the Atari uses routines marked as <tt/.INTERRUPTOR/ for
 interrupt handlers. Such routines must be written as simple machine language
 subroutines and will be called automatically by the VBI handler code
 when they are linked into a program. See the discussion of the <tt/.CONDES/
-feature in the <htmlurl url="ca65.html" name="assembler manual">.
+feature in the <url url="ca65.html" name="assembler manual">.
 
+Please note that on the Atari targets the <tt/.INTERRUPTOR/s are being
+run in NMI context. The other targets run them in IRQ context.
 
 <sect1>Reserving a memory area inside a program<label id="memhole"><p>
 
@@ -696,7 +745,7 @@ segments should go above &dollar;7FFF.
 <p>
 The main problem is that the EXE header generated by the cc65 runtime
 lib is wrong. It defines a single load chunk with the sizes/addresses
-of the STARTUP, LOWCODE, INIT, CODE, RODATA, and DATA segments, in 
+of the STARTUP, LOWCODE, INIT, CODE, RODATA, and DATA segments, in
 fact, the whole user program (we're disregarding the "system check"
 load chunk here).
 <p>

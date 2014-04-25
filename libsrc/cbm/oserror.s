@@ -40,7 +40,7 @@ ErrTab:
         .byte   6, EINVAL       ; File not input
         .byte   7, EINVAL       ; File not output
         .byte   8, EINVAL       ; Filename missing
-        .byte   9, ENODEV       ; Ilegal device
+        .byte   9, ENODEV       ; Illegal device
 ;       .byte  20,              ; Read error
 ;       .byte  21,              ; Read error
 ;       .byte  22,              ; Read error

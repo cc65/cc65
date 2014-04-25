@@ -2,10 +2,11 @@
 
 <article>
 
-<title>Commodore PET specific information for cc65
-<author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
-Stefan A. Haubenthal, <htmlurl url="mailto:polluks@sdf.lonestar.org" name="polluks@sdf.lonestar.org">
-<date>2005-05-24
+<title>Commodore PET-specific information for cc65
+<author>
+<url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
+<url url="mailto:polluks@sdf.lonestar.org" name="Stefan A. Haubenthal">
+<date>2014-04-12
 
 <abstract>
 An overview over the PET runtime system as it is implemented for the cc65 C
@@ -20,11 +21,11 @@ compiler.
 <sect>Overview<p>
 
 This file contains an overview of the PET runtime system as it comes with the
-cc65 C compiler. It describes the memory layout, PET specific header files,
+cc65 C compiler. It describes the memory layout, PET-specific header files,
 available drivers, and any pitfalls specific to that platform.
 
-Please note that PET specific functions are just mentioned here, they are
-described in detail in the separate <htmlurl url="funcref.html" name="function
+Please note that PET-specific functions are just mentioned here, they are
+described in detail in the separate <url url="funcref.html" name="function
 reference">. Even functions marked as "platform dependent" may be available on
 more than one platform. Please see the function reference for more
 information.
@@ -63,24 +64,24 @@ Special locations:
 
 
 
-<sect>Platform specific header files<p>
+<sect>Platform-specific header files<p>
 
-Programs containing PET specific code may use the <tt/pet.h/ or <tt/cbm.h/
+Programs containing PET-specific code may use the <tt/pet.h/ or <tt/cbm.h/
 header files. Using the later may be an option when writing code for more than
 one CBM platform, since it includes <tt/pet.h/ and declares several functions
 common to all CBM platforms.
 
 
-<sect1>PET specific functions<p>
+<sect1>PET-specific functions<p>
 
 There are currently no special PET functions.
 
 
 
-<sect1>CBM specific functions<p>
+<sect1>CBM-specific functions<p>
 
 Some functions are available for all (or at least most) of the Commodore
-machines. See the <htmlurl url="funcref.html" name="function reference"> for
+machines. See the <url url="funcref.html" name="function reference"> for
 declaration and usage.
 
 <itemize>
@@ -148,12 +149,13 @@ No extended memory drivers are currently available for the PET.
 
 <sect1>Joystick drivers<p>
 
+The default drivers, <tt/joy_stddrv (joy_static_stddrv)/, point to <tt/pet-stdjoy.joy (pet_stdjoy_joy)/.
+
 <descrip>
 
   <tag><tt/pet-ptvjoy.joy (pet_ptvjoy_joy)/</tag>
   Driver for the Protovision 4-player adapter contributed by Groepaz. See
-  <htmlurl url="http://www.protovision-online.de/hardw/hardwstart.htm"
-  name="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices and
+  <url url="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices and
   building instructions. Up to two joysticks are supported.
 
   <tag><tt/pet-stdjoy.joy (pet_stdjoy_joy)/</tag>
@@ -179,10 +181,11 @@ No serial drivers are currently available for the PET.
 
 <sect>Other hints<p>
 
+
 <sect1>Passing arguments to the program<p>
 
-Command line arguments can be passed to <tt/main()/. Since this is not
-supported by BASIC, the following syntax was chosen:
+Command-line arguments can be passed to <tt/main()/. Since that is not
+supported directly by BASIC, the following syntax was chosen:
 
 <tscreen><verb>
     RUN:REM ARG1 " ARG2 IS QUOTED" ARG3 "" ARG5
@@ -193,7 +196,7 @@ supported by BASIC, the following syntax was chosen:
 <item>Arguments may be quoted.
 <item>Leading and trailing spaces around an argument are ignored. Spaces within
       a quoted argument are allowed.
-<item>The first argument passed to <tt/main/ is the program name.
+<item>The first argument passed to <tt/main()/ is the program name.
 <item>A maximum number of 10 arguments (including the program name) are
       supported.
 </enum>
@@ -211,7 +214,7 @@ The runtime for the PET uses routines marked as <tt/.INTERRUPTOR/ for
 interrupt handlers. Such routines must be written as simple machine language
 subroutines and will be called automatically by the interrupt handler code
 when they are linked into a program. See the discussion of the <tt/.CONDES/
-feature in the <htmlurl url="ca65.html" name="assembler manual">.
+feature in the <url url="ca65.html" name="assembler manual">.
 
 
 <sect1>Using extended memory<p>
@@ -226,6 +229,7 @@ the following code:
         _heapadd ((void *) 0x9000, 0x2000);
     }
 </verb></tscreen>
+
 
 
 <sect>License<p>

@@ -1,5 +1,5 @@
 /*
-** These programs test CC65's exec() program-chaining function.
+** These programs test cc65's exec() program-chaining function.
 ** exec-test1 runs exec-test2 -- that tests the loading and starting of another
 ** program.  Then, exec-test2 runs arg-test -- that tests command-line argument
 ** passing.

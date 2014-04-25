@@ -74,7 +74,7 @@ init:   txa
 
 ; Return with error in A
 
-err:    lda     #9              ; "Ilegal device"
+err:    lda     #9              ; "Illegal device"
 done:   rts
 
 .endproc

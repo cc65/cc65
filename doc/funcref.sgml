@@ -2,8 +2,8 @@
 
 <article>
 <title>cc65 function reference
-<author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
-<date>07.11.2002
+<author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
+<date>2014-04-10
 
 <abstract>
 cc65 is a C compiler for 6502 based systems. This function reference describes
@@ -23,7 +23,7 @@ just some of the supported machines. This function refrence describes the
 available functions together with any limitations.
 
 For an overview about the available libraries, their purpose, and any
-differences to the ISO standard, please have a look at the <htmlurl
+differences to the ISO standard, please have a look at the <url
 url="library.html" name="cc65 Library Overview">.
 
 <bf/Note:/ Standard C functions are listed here, but not described in detail.
@@ -276,8 +276,7 @@ function.
 
 <sect1><tt/dio.h/<label id="dio.h"><p>
 
-<htmlurl url="dio.html" name="dio.html">
-Low-level disk I/O API.
+<url url="dio.html" name="Low-level disk I/O API">.
 
 
 <sect1><tt/dirent.h/<label id="dirent.h"><p>
@@ -416,8 +415,8 @@ Low-level disk I/O API.
 <sect1><tt/o65.h/<label id="o65.h"><p>
 
 The <tt/o65.h/ header file contains structure and constant definitions that
-may be used when dealing with files in <htmlurl
-url="http://www.6502.org/users/andre/o65/fileformat.html" name="o65 format">.
+may be used when dealing with files in <url
+url="http://www.6502.org/users/andre/o65/fileformat.html" name="the o65 format">.
 It does not declare any functions.
 
 

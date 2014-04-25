@@ -5,8 +5,8 @@
 <!-- Title information -->
 
 <title>GEOSLib docs
-<author>Maciej Witkowiak, <htmlurl url="mailto:ytm@elysium.pl" name="ytm@elysium.pl">
-<date>v1.5, 26.12.1999, 2000, 2001, 2002, 2003, 2005
+<author><url url="mailto:ytm@elysium.pl" name="Maciej Witkowiak">
+<date>2014-04-11
 <abstract>
 This is the documentation of cc65's GEOSLib, but information contained here may be also
 useful for writing GEOS applications in general.
@@ -71,22 +71,19 @@ programs.
 The software needed:
 <itemize>
     <item><em/cc65/ Excellent package containing a C crosscompiler, a crossassembler and a linker, you
-		can get it from: <htmlurl url="http://www.cc65.org/"
-		name="http://www.cc65.org/">
+		can get it from: <url url="http://cc65.github.io/cc65/">.
     <item><em/VICE/ This is a portable C64, C128 and few other Commodore computers emulator, you
-		can obtain it from: <htmlurl url="http://www.viceteam.org/"
-		name="http://www.viceteam.org/">. The VICE package contains the
-		c1541 program that is able to convert/unconvert GEOS files to disk images.
+		can obtain it from: <url url="http://vice-emu.sourceforge.net/">.
+		The VICE package contains the <em/c1541/ program that is able
+		to convert/unconvert GEOS files to disk images.
     <item><em/The Star Commander/ This tool is only for DOS. You will need it for transferring
 		object files from a PC to a 1541. There's also one important ability of this
 		tool - it automatically un-converts .cvt files into GEOS native format on
-		disk image files. Check out: <htmlurl url="http://sta.c64.org/sc.html"
-		name="http://sta.c64.org/sc.html">
-    <item><em/cbm4linux/ A Linux kernel module that allows for communication with a 1541 and
+		disk image files. Check out: <url url="http://sta.c64.org/sc.html">.
+    <item><em/opencbm/ A package that allows for communication directly with a 1541 and
 		other Commodore IEC bus drives. It can be a replacement for Star Commander if
 		you only want to transfer files to a disk and unconvert using GEOS program for
-		this purpose. Check out: <htmlurl url="http://www.lb.shuttle.de/puffin/cbm4linux/"
-		name="http://www.lb.shuttle.de/puffin/cbm4linux">
+		this purpose. Check out: <url url="http://opencbm.sourceforge.net/">.
 </itemize>
 <p>
 VICE and cc65 are portable - they run on variety of platforms - DOS, Win32 and UNIX. GEOSLib only

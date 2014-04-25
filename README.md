@@ -1,5 +1,7 @@
 [documentation](http://cc65.github.io/cc65/doc)
 
+[wiki](https://github.com/cc65/wiki/wiki)
+
 [![build status](https://travis-ci.org/cc65/cc65.png)](https://travis-ci.org/cc65/cc65/builds)
 
 cc65 is a complete cross development package for 65(C)02 systems, including

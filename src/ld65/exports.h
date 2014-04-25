@@ -186,8 +186,11 @@ void CheckUnresolvedImports (ExpCheckFunc F, void* Data);
  * called (see the comments on ExpCheckFunc in the data section).
  */
 
-void PrintExportMap (FILE* F);
-/* Print an export map to the given file */
+void PrintExportMapByName (FILE* F);
+/* Print an export map to the given file (sorted by symbol name) */
+
+void PrintExportMapByValue (FILE* F);
+/* Print an export map to the given file (sorted by export value) */
 
 void PrintImportMap (FILE* F);
 /* Print an import map to the given file */

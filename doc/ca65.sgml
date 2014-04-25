@@ -2,8 +2,8 @@
 
 <article>
 <title>ca65 Users Guide
-<author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
-<date>2000-07-19, 2000-11-29, 2001-10-02, 2005-09-08
+<author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
+<date>2014-04-10
 
 <abstract>
 ca65 is a powerful macro assembler for the 6502, 65C02 and 65816 CPUs. It is
@@ -453,9 +453,8 @@ mnemonics:
 6502X mode is an extension to the normal 6502 mode. In this mode, several
 mnemonics for illegal instructions of the NMOS 6502 CPUs are accepted. Since
 these instructions are illegal, there are no official mnemonics for them. The
-unofficial ones are taken from <htmlurl
-url="http://www.oxyron.de/html/opcodes02.html"
-name="http://www.oxyron.de/html/opcodes02.html">. Please note that only the
+unofficial ones are taken from <url
+url="http://www.oxyron.de/html/opcodes02.html">. Please note that only the
 ones marked as "stable" are supported. The following table uses information
 from the mentioned web page, for more information, see there.
 
@@ -502,8 +501,7 @@ nor does it call the interpreter. All this must be done by your program. Apple
 ][ programmers do probably know how to use sweet16 mode.
 
 For more information about SWEET 16, see
-<htmlurl url="http://www.6502.org/source/interpreters/sweet16.htm"
-name="http://www.6502.org/source/interpreters/sweet16.htm">.
+<url url="http://www.6502.org/source/interpreters/sweet16.htm">.
 
 
 <sect1>Number format<p>

@@ -2,8 +2,8 @@
 
 <article>
 <title>Diskette Sector I/O Routines
-<author>Christian Groessler, <htmlurl url="mailto:chris@groessler.org" name="chris@groessler.org">
-<date>20-Feb-2005
+<author><url url="mailto:chris@groessler.org" name="Christian Groessler">
+<date>2014-04-10
 
 <abstract>
 The cc65 library provides functions to read and write raw disk sectors.
@@ -89,8 +89,8 @@ The following function returns the sector size of the currently inserted disk:
 </verb></tscreen>
 
 On the Atari platform, the sector size is handled specially. Please refer
-to the DIO section in the <htmlurl url="atari.html" name="Atari">
-specific platform documentation.
+to the DIO section in the <url url="atari.html" name="Atari-specific
+platform documentation">.
 <p>
 
 The following function returns the sector count of the currently inserted disk:

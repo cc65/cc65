@@ -3,8 +3,8 @@
 <article>
 
 <title>Using emulators with cc65
-<author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
-<date>03.12.2000
+<author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
+<date>2014-04-11
 
 <abstract>
 How to debug your code using the VICE and Oricutron emulators.
@@ -29,7 +29,7 @@ Win32, OS/2, Acorn RISC OS, BeOS, QNX 6.x, Amiga, GP2X and Mac OS X. It emulates
 the Commodore 64, 128, VIC20, PET and the 600/700 machines. For more information
 see the VICE home page:
 
-<htmlurl url="http://www.viceteam.org/">
+<url url="http://vice-emu.sourceforge.net/">.
 
 VICE has a builtin machine language monitor that may be used for debugging
 your programs. Using an emulator for debugging has some advantages:

@@ -870,8 +870,8 @@ static char GetAddrSizeCode (unsigned char AddrSize)
 
 
 
-void PrintExportMap (FILE* F)
-/* Print an export map to the given file */
+void PrintExportMapByName (FILE* F)
+/* Print an export map, sorted by symbol name, to the given file */
 {
     unsigned I;
     unsigned Count;
@@ -898,6 +898,61 @@ void PrintExportMap (FILE* F)
         }
     }
     fprintf (F, "\n");
+}
+
+
+
+static int CmpExpValue (const void* I1, const void* I2)
+/* Compare function for qsort */
+{
+    long V1 = GetExportVal (ExpPool [*(unsigned *)I1]);
+    long V2 = GetExportVal (ExpPool [*(unsigned *)I2]);
+
+    return V1 < V2 ? -1 : V1 == V2 ? 0 : 1;
+}
+
+
+
+void PrintExportMapByValue (FILE* F)
+/* Print an export map, sorted by symbol value, to the given file */
+{
+    unsigned I;
+    unsigned Count;
+    unsigned *ExpValXlat;
+
+    /* Create a translation table where the symbols are sorted by value. */
+    ExpValXlat = xmalloc (ExpCount * sizeof (unsigned));
+    for (I = 0; I < ExpCount; ++I) {
+        /* Initialize table with current sort order.  */
+        ExpValXlat [I] = I;
+    }
+
+    /* Sort them by value */
+    qsort (ExpValXlat, ExpCount, sizeof (unsigned), CmpExpValue);
+
+    /* Print all exports */
+    Count = 0;
+    for (I = 0; I < ExpCount; ++I) {
+        const Export* E = ExpPool [ExpValXlat [I]];
+
+        /* Print unreferenced symbols only if explictly requested */
+        if (VerboseMap || E->ImpCount > 0 || SYM_IS_CONDES (E->Type)) {
+            fprintf (F,
+                     "%-25s %06lX %c%c%c%c   ",
+                     GetString (E->Name),
+                     GetExportVal (E),
+                     E->ImpCount? 'R' : ' ',
+                     SYM_IS_LABEL (E->Type)? 'L' : 'E',
+                     GetAddrSizeCode ((unsigned char) E->AddrSize),
+                     SYM_IS_CONDES (E->Type)? 'I' : ' ');
+            if (++Count == 2) {
+                Count = 0;
+                fprintf (F, "\n");
+            }
+        }
+    }
+    fprintf (F, "\n");
+    xfree (ExpValXlat);
 }
 
 

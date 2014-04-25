@@ -67,19 +67,6 @@ extern unsigned      tgi_charheight;    /* Height of scaled bitmap font */
 
 
 
-/*****************************************************************************/
-/*                                     Code                                  */
-/*****************************************************************************/
-
-
-
-int __fastcall__ tgi_imulround (int rhs, int lhs);
-/* Helper function for functions using sine/cosine: Multiply two values, one
- * being an 8.8 fixed point one, and return the rounded and scaled result.
- */
-
-
-
 /* End of tgi-kernel.h */
 #endif
 

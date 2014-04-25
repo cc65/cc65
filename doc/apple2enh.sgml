@@ -3,8 +3,8 @@
 <article>
 
 <title>Enhanced&nbsp;Apple&nbsp;//e specific information for cc65
-<author>Oliver Schmidt, <htmlurl url="mailto:ol.sc@web.de" name="ol.sc@web.de">
-<date>2009-10-07
+<author><url url="mailto:ol.sc@web.de" name="Oliver Schmidt">
+<date>2014-04-10
 
 <abstract>
 An overview over the enhanced&nbsp;Apple&nbsp;//e runtime system as it is
@@ -24,7 +24,7 @@ enhanced&nbsp;Apple&nbsp;//e specific header files, available drivers, and any
 pitfalls specific to that platform.
 
 Please note that enhanced&nbsp;Apple&nbsp;//e specific functions are just mentioned
-here, they are described in detail in the separate <htmlurl url="funcref.html"
+here, they are described in detail in the separate <url url="funcref.html"
 name="function reference">. Even functions marked as "platform dependent" may
 be available on more than one platform. Please see the function reference for
 more information.
@@ -45,7 +45,7 @@ containing DOS 3.3 as well as ProDOS 8.
 
 For ProDOS 8 system programs the load address is fixed to &dollar;2000 so there
 is no need for a header. Thus the linker configuration
-<htmlurl url="apple2enh.html#ss4.3" name="apple2enh-system.cfg"> for those programs
+<ref id="apple-sys-cfg" name="apple2enh-system.cfg"> for those programs
 omits the DOS 3.3 header. The right AppleCommander option to put system files
 without a header on a ProDOS 8 disk image is <tt/-p/.
 
@@ -81,11 +81,11 @@ cc65 runtime system takes care of actually moving the code into the Language
 Card.
 
 The amount of memory available in the Language Card for generated code depends
-on the chosen <htmlurl url="apple2enh.html#s4" name="linker configuration">.
+on the chosen <ref id="link-configs" name="linker configuration">.
 
 
 
-<sect>Linker configurations<p>
+<sect>Linker configurations<label id="link-configs"><p>
 
 The ld65 linker comes with a default config file for the enhanced&nbsp;Apple&nbsp;//e,
 which is used via <tt/-t apple2enh/.
@@ -138,7 +138,7 @@ vanilla DOS 3.3 doesn't make use of the Language Card at all.
 </descrip><p>
 
 
-<sect1><tt/apple2enh-system.cfg/<p>
+<sect1><tt/apple2enh-system.cfg/<label id="apple-sys-cfg"><p>
 
 Configuration for a system program running on ProDOS 8.
 
@@ -159,7 +159,7 @@ Configuration for a system program running on ProDOS 8.
 </descrip><p>
 
 
-<sect1><tt/apple2enh-loader.cfg/<p>
+<sect1><tt/apple2enh-loader.cfg/<label id="apple-load-cfg"><p>
 
 Configuration optimized for a binary program running on ProDOS 8 without
 BASIC.SYSTEM. Intended to be used with <bf/LOADER.SYSTEM - an
@@ -231,7 +231,7 @@ range.
 The easiest (and for really large programs in fact the only) way to have a cc65
 program use the memory from &dollar;800 to &dollar;2000 is to link it as binary
 (as opposed to system) program using the linker configuration
-<htmlurl url="apple2enh.html#ss4.4" name="apple2enh-loader.cfg"> with start address
+<ref id="apple-load-cfg" name="apple2enh-loader.cfg"> with start address
 &dollar;803 and load it with the targetutil LOADER.SYSTEM. The program then works
 like a system program (i.e. quits to the ProDOS dispatcher).
 
@@ -243,7 +243,7 @@ example the program <tt/MYPROG/ is loaded by <tt/MYPROG.SYSTEM/.
 <sect1>Heap<p>
 
 If the cc65 program can be successfully linked as system program using the linker
-configuration <htmlurl url="apple2enh.html#ss4.3" name="apple2enh-system.cfg"> but
+configuration <ref id="apple-sys-cfg" name="apple2enh-system.cfg">, but
 uses the heap either explicitly or implicitly (i.e. by loading a driver) then
 the memory from &dollar;800 to &dollar;2000 can be added to the heap by calling
 <tt/_heapadd ((void *) 0x0800, 0x1800);/ at the beginning of <tt/main()/.
@@ -286,7 +286,7 @@ Programs containing enhanced&nbsp;Apple&nbsp;//e specific code may use the
 <sect1>Enhanced&nbsp;Apple&nbsp;//e specific functions<p>
 
 The functions listed below are special for the enhanced&nbsp;Apple&nbsp;//e. See
-the <htmlurl url="funcref.html" name="function reference"> for declaration and
+the <url url="funcref.html" name="function reference"> for declaration and
 usage.
 
 <itemize>
@@ -483,7 +483,7 @@ The runtime for the enhanced&nbsp;Apple&nbsp;//e uses routines marked as
 <tt/.INTERRUPTOR/ for ProDOS 8 interrupt handlers. Such routines must be
 written as simple machine language subroutines and will be called
 automatically by the interrupt handler code when they are linked into a
-program. See the discussion of the <tt/.CONDES/ feature in the <htmlurl
+program. See the discussion of the <tt/.CONDES/ feature in the <url
 url="ca65.html" name="assembler manual">.
 
 
@@ -492,7 +492,7 @@ url="ca65.html" name="assembler manual">.
 <descrip>
 
   <tag/Drive ID/
-  The function <htmlurl url="dio.html#s1" name="dio_open()"> has the single
+  The function <url url="dio.html#s1" name="dio_open()"> has the single
   parameter <tt/device/ to identify the device to be opened. Therefore an
   Apple&nbsp;II slot and drive pair is mapped to that <tt/drive_id/ according
   to the formula
@@ -504,7 +504,7 @@ url="ca65.html" name="assembler manual">.
   so that for example slot 6 drive 2 is mapped to <tt/device/ 14.
 
   <tag/Sector count/
-  The function <htmlurl url="dio.html#s3" name="dio_query_sectcount()"> returns
+  The function <url url="dio.html#s3" name="dio_query_sectcount()"> returns
   the correct sector count for all ProDOS 8 disks. However for any non-ProDOS 8
   disk it simply always returns 280 (which is only correct for a 140 KB disk).
   This condition is indicated by the <tt/_oserror/ value 82.

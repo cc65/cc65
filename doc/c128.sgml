@@ -2,9 +2,9 @@
 
 <article>
 
-<title>Commodore 128 specific information for cc65
-<author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
-<date>2003-12-14
+<title>Commodore 128-specific information for cc65
+<author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
+<date>2014-04-12
 
 <abstract>
 An overview over the C128 runtime system as it is implemented for the cc65 C
@@ -19,11 +19,11 @@ compiler.
 <sect>Overview<p>
 
 This file contains an overview of the C128 runtime system as it comes with the
-cc65 C compiler. It describes the memory layout, C128 specific header files,
+cc65 C compiler. It describes the memory layout, C128-specific header files,
 available drivers, and any pitfalls specific to that platform.
 
-Please note that C128 specific functions are just mentioned here, they are
-described in detail in the separate <htmlurl url="funcref.html" name="function
+Please note that C128-specific functions are just mentioned here, they are
+described in detail in the separate <url url="funcref.html" name="function
 reference">. Even functions marked as "platform dependent" may be available on
 more than one platform. Please see the function reference for more
 information.
@@ -59,27 +59,27 @@ Special locations:
   The text screen is located at &dollar;400 (as in the standard setup).
 
   <tag/Stack/
-  The C runtime stack is located at &dollar;BFFF and growing downwards.
+  The C runtime stack is located at &dollar;BFFF, and growing downwards.
 
   <tag/Heap/
-  The C heap is located at the end of the program and grows towards the C
+  The C heap is located at the end of the program, and grows towards the C
   runtime stack.
 
 </descrip><p>
 
 
 
-<sect>Platform specific header files<p>
+<sect>Platform-specific header files<p>
 
-Programs containing C128 specific code may use the <tt/c128.h/ or <tt/cbm.h/
+Programs containing C128-specific code may use the <tt/c128.h/ or <tt/cbm.h/
 header files. Using the later may be an option when writing code for more than
 one CBM platform, since it includes <tt/c128.h/ and declares several functions
 common to all CBM platforms.
 
 
-<sect1>C128 specific functions<p>
+<sect1>C128-specific functions<p>
 
-The functions listed below are special for the C128. See the <htmlurl
+The functions listed below are special for the C128. See the <url
 url="funcref.html" name="function reference"> for declaration and usage.
 
 <itemize>
@@ -90,10 +90,10 @@ url="funcref.html" name="function reference"> for declaration and usage.
 </itemize>
 
 
-<sect1>CBM specific functions<p>
+<sect1>CBM-specific functions<p>
 
 Some functions are available for all (or at least most) of the Commodore
-machines. See the <htmlurl url="funcref.html" name="function reference"> for
+machines. See the <url url="funcref.html" name="function reference"> for
 declaration and usage.
 
 <itemize>
@@ -164,26 +164,28 @@ The names in the parentheses denote the symbols to be used for static linking of
 
 <sect1>Graphics drivers<p>
 
+The default drivers, <tt/tgi_stddrv (tgi_static_stddrv)/, point to <tt/c128-vdc.tgi (c128_vdc_tgi)/.
+
 Note: The graphics drivers for the VDC are incompatible with the extended
 memory drivers using the VDC memory!
 
 <descrip>
   <tag><tt/c128-vdc.tgi (c128_vdc_tgi)/</tag>
-  This driver was written by Maciej Witkowiak. It uses the 80 column display
+  This driver was written by Maciej Witkowiak. It uses the 80-column display,
   and features a resolution of 640*200 with two colors and an adjustable
   palette (that means that the two colors can be chosen out of the 16 VDC
   colors).
 
   <tag><tt/c128-vdc2.tgi (c128_vdc2_tgi)/</tag>
-  This driver was written by Maciej Witkowiak. This driver uses the 80 column
-  display and features a resolution of 640*480 with two colors and an
+  This driver was written by Maciej Witkowiak. This driver uses the 80-column
+  display, and features a resolution of 640*480 with two colors and an
   adjustable palette (that means that the two colors can be chosen out of the
   16 VDC colors). The driver requires 64KB VDC RAM.
 </descrip><p>
 
-Note: The colors are translated from definitions in headers to correct VDC values
-so please use definitions or VIC color numbers only. Colors <tt/GRAY3/ and <tt/BROWN/ are
-missing on VDC and are translated to the two colors missing from VIC palette.
+Note: The colors are translated from definitions in headers to correct VDC values;
+so, please use definitions or VIC color numbers only. Colors <tt/GRAY3/ and <tt/BROWN/ are
+missing on VDC, and are translated to the two colors missing from the VIC palette.
 
 <sect1>Extended memory drivers<p>
 
@@ -217,8 +219,8 @@ missing on VDC and are translated to the two colors missing from VIC palette.
   it has better knowledge about the hardware than the driver.
 
   <tag><tt/c128-vdc.emd (c128_vdc_emd)/</tag>
-  A driver for the VDC memory of the C128 written and contributed by Maciej
-  Witkowiak. Autodetects the amount of memory available (16 or 64K) and offers
+  A driver for the VDC memory of the C128, written and contributed by Maciej
+  Witkowiak. Autodetects the amount of memory available (16 or 64K), and offers
   64 or 256 pages of 256 bytes each. Note: This driver is incompatible with
   any of the graphics drivers using the VDC!
 
@@ -227,17 +229,18 @@ missing on VDC and are translated to the two colors missing from VIC palette.
 
 <sect1>Joystick drivers<p>
 
+The default drivers, <tt/joy_stddrv (joy_static_stddrv)/, point to <tt/c128-stdjoy.joy (c128_stdjoy_joy)/.
+
 <descrip>
 
   <tag><tt/c128-ptvjoy.joy (c128_ptvjoy_joy)/</tag>
   Driver for the Protovision 4-player adapter originally written by Groepaz
-  for the C64 and converted for the C128 by me. See <htmlurl
-  url="http://www.protovision-online.de/hardw/hardwstart.htm"
-  name="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices and
+  for the C64, and converted for the C128 by Uz. See <url
+  url="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices and
   building instructions. Up to four joysticks are supported.
 
   <tag><tt/c128-stdjoy.joy (c128_stdjoy_joy)/</tag>
-  Supports up to two joysticks connected to the standard joysticks port of
+  Supports up to two joysticks connected to the standard joysticks ports of
   the C128.
 
 </descrip><p>
@@ -245,6 +248,8 @@ missing on VDC and are translated to the two colors missing from VIC palette.
 
 
 <sect1>Mouse drivers<p>
+
+The default drivers, <tt/mouse_stddrv (mouse_static_stddrv)/, point to <tt/c128-1351.mou (c128_1351_mou)/.
 
 <descrip>
 
@@ -259,11 +264,11 @@ missing on VDC and are translated to the two colors missing from VIC palette.
   only the 40-column screen.
 
   <tag><tt/c128-joy.mou (c128_joy_mou)/</tag>
-  Supports a mouse emulated by a standard joystick e.g. 1350 mouse in port
+  Supports a mouse emulated by a standard joystick, e.g. 1350 mouse, in port
   #1 of the C128.
 
   <tag><tt/c128-pot.mou (c128_pot_mou)/</tag>
-  Supports a potentiometer device e.g. Koala Pad connected to port #1 of
+  Supports a potentiometer device, e.g. Koala Pad, connected to port #1 of
   the C128.
 
 </descrip><p>
@@ -274,10 +279,10 @@ missing on VDC and are translated to the two colors missing from VIC palette.
 <descrip>
 
   <tag><tt/c128-swlink.ser (c128_swlink_ser)/</tag>
-  Driver for the SwiftLink cartridge. Supports up to 38400 baud, hardware flow
-  control (RTS/CTS) and interrupt driven receives. Note that because of the
-  peculiarities of the 6551 chip together with the use of the NMI, transmits
-  are not interrupt driven, and the transceiver blocks if the receiver asserts
+  Driver for the SwiftLink cartridge. Supports up to 38400 BPS, hardware flow
+  control (RTS/CTS), and interrupt-driven receives. Note that, because of the
+  peculiarities of the 6551 chip, together with the use of the NMI, transmits
+  are not interrupt driven; and, the transceiver blocks if the receiver asserts
   flow control because of a full buffer.
 
   The driver uses the RS232 variables and buffers of the kernal (buffers at
@@ -293,10 +298,11 @@ missing on VDC and are translated to the two colors missing from VIC palette.
 
 <sect>Other hints<p>
 
+
 <sect1>Passing arguments to the program<p>
 
-Command line arguments can be passed to <tt/main()/. Since this is not
-supported by BASIC, the following syntax was chosen:
+Command-line arguments can be passed to <tt/main()/. Since this is not
+supported directly by BASIC, the following syntax was chosen:
 
 <tscreen><verb>
     RUN:REM ARG1 " ARG2 IS QUOTED" ARG3 "" ARG5
@@ -307,7 +313,7 @@ supported by BASIC, the following syntax was chosen:
 <item>Arguments may be quoted.
 <item>Leading and trailing spaces around an argument are ignored. Spaces within
       a quoted argument are allowed.
-<item>The first argument passed to <tt/main/ is the program name.
+<item>The first argument passed to <tt/main()/ is the program name.
 <item>A maximum number of 10 arguments (including the program name) are
       supported.
 </enum>
@@ -325,7 +331,7 @@ The runtime for the C128 uses routines marked as <tt/.INTERRUPTOR/ for
 interrupt handlers. Such routines must be written as simple machine language
 subroutines and will be called automatically by the interrupt handler code
 when they are linked into a program. See the discussion of the <tt/.CONDES/
-feature in the <htmlurl url="ca65.html" name="assembler manual">.
+feature in the <url url="ca65.html" name="assembler manual">.
 
 
 

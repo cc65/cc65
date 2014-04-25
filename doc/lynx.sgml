@@ -3,9 +3,10 @@
 <article>
 
 <title>Atari Lynx specific information for cc65
-<author>Karri Kaksonen, <htmlurl url="mailto:karri@sipo.fi" name="karri@sipo.fi">
-Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
-<date>2011-04-01
+<author>
+<url url="mailto:karri@sipo.fi" name="Karri Kaksonen">,<newline>
+<url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
+<date>2014-04-12
 
 <abstract>
 An overview over the Atari Lynx runtime system as it is implemented for the
@@ -24,7 +25,7 @@ with the cc65 C compiler. It describes the memory layout, Lynx specific header
 files, available drivers, and any pitfalls specific to that platform.
 
 Please note that Lynx specific functions are just mentioned here, they are
-described in detail in the separate <htmlurl url="funcref.html" name="function
+described in detail in the separate <url url="funcref.html" name="function
 reference">. Even functions marked as "platform dependent" may be available on
 more than one platform. Please see the function reference for more
 information.

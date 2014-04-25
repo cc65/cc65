@@ -6,7 +6,7 @@
 <author>
 <url url="mailto:shawnjefferson@24fightingchickens.com" name="Shawn Jefferson"> and<newline>
 <url url="mailto:chris@groessler.org" name="Christian Groessler">
-<date>2014-04-10
+<date>2014-04-24
 
 <abstract>
 An overview over the Atari runtime system as it is implemented for the cc65 C
@@ -435,7 +435,6 @@ Currently there are two joystick drivers available:
 <tt/atrstd.joy (atrstd_joy)/|<tt/atrxstd.joy (atrxstd_joy)/|Supports up to two/four standard joysticks connected to the joystick ports of the Atari. (Four on the pre-XL systems, two on XL or newer.)@
 <tt/atrmj8.joy (atrmj8_joy)/|<tt/atrxmj8.joy (atrxmj8_joy)/|Supports up to eight standard joysticks connected to a MultiJoy adapter.
 </tabular>
-<caption>
 </table>
 
 Default drivers: <tt/atrstd.joy (atrstd_joy)/ and <tt/atrxstd.joy (atrxstd_joy)/.
@@ -453,7 +452,6 @@ Currently there are five mouse drivers available:
 <tt/atrtrk.mou (atrtrk_mou)/|<tt/atrxtrk.mou (atrxtrk_mou)/|Supports an Atari trakball.@
 <tt/atrtt.mou (atrtt_mou)/|<tt/atrxtt.mou (atrxtt_mou)/|Supports an Atari touch tablet.
 </tabular>
-<caption>
 </table>
 
 All mouse devices connect to joystick port #0.

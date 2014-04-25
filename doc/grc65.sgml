@@ -7,7 +7,7 @@
 <author>
 <url url="mailto:ytm@elysium.pl" name="Maciej 'YTM/Elysium' Witkowiak">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>VII 2000; VI,VII 2002; 2005-8-3
+<date>2014-04-24
 <abstract>
 This document describes a compiler that can create GEOS headers and menues for
 cc65-compiled programs.
@@ -344,7 +344,7 @@ for addresses.
 
 
 
-<appendix>
+<!-- <appendix> -->
 <sect>Appendix A -- example.grc<label id="example-grc">
 <p><tscreen><verb>
 ; Note that MENU can define both menues and submenues.

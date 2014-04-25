@@ -24,7 +24,7 @@ mouse_pm_bits:
         .byte   %00000100
         .byte   %00000010
 
-mouse_pm_height = * - mouse_pm_bits
+mouse_pm_height = <(* - mouse_pm_bits)
 
 ; hot spot is upper left corner
 mouse_pm_hotspot_x = 0

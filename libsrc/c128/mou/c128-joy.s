@@ -74,15 +74,6 @@ SCREEN_WIDTH    = 320
 .endenum
 
 ;----------------------------------------------------------------------------
-; data segment
-
-.data
-
-chainIRQ:
-        .byte   $4c                     ; JMP opcode
-        .word   0                       ; pointer to ROM IRQ handler (will be set at runtime)
-
-;----------------------------------------------------------------------------
 ; Global variables. The bounding box values are sorted so that they can be
 ; written with the least effort in the SETBOX and GETBOX routines, so don't
 ; reorder them.
@@ -107,6 +98,10 @@ Temp:           .res    1
 ; Keyboard buffer fill level at start of interrupt
 
 old_key_count:  .res    1
+
+; original IRQ vector
+
+old_irq:        .res    2
 
 .rodata
 
@@ -163,20 +158,27 @@ INSTALL:
 
 ; Initialize our IRQ magic
 
-        lda     IRQInd+1
-        sta     chainIRQ+1
+        ; remember ROM IRQ continuation address
         lda     IRQInd+2
-        sta     chainIRQ+2
+        sta     old_irq+1
+        lda     IRQInd+1
+        sta     old_irq
+
         lda     libref
         sta     ptr3
         lda     libref+1
         sta     ptr3+1
+
+        ; set ROM IRQ continuation address to point to the provided routine
         ldy     #2
         lda     (ptr3),y
         sta     IRQInd+1
         iny
         lda     (ptr3),y
         sta     IRQInd+2
+
+        ; set address of our IRQ callback routine
+        ; since it's called via "rts" we have to use "address-1"
         iny
         lda     #<(callback-1)
         sta     (ptr3),y
@@ -184,10 +186,16 @@ INSTALL:
         lda     #>(callback-1)
         sta     (ptr3),y
         iny
-        lda     #<(chainIRQ-1)
+
+        ; set ROM entry point vector
+        ; since it's called via "rts" we have to decrement it by one
+        lda     old_irq
+        sec
+        sbc     #1
         sta     (ptr3),y
         iny
-        lda     #>(chainIRQ-1)
+        lda     old_irq+1
+        sbc     #0
         sta     (ptr3),y
         cli
 
@@ -202,10 +210,10 @@ INSTALL:
 ; No return code required (the driver is removed from memory on return).
 
 UNINSTALL:
-        lda     chainIRQ+1
+        lda     old_irq
         sei
         sta     IRQInd+1
-        lda     chainIRQ+2
+        lda     old_irq+1
         sta     IRQInd+2
         cli
 

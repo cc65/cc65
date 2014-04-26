@@ -26,7 +26,7 @@ _pen_adjuster:
         .addr   IRQStub2
 callback:                       ; callback into mouse driver after ROM IRQ handler has been run
         .addr   $0000           ; (filled in by mouse driver)
-jmp_rom_hdlr:                   ; "trampoline" to jump to ROM IRQ handler
+jmp_rom_hdlr:                   ; original ROM indirect IRQ handler address
         .addr   $0000           ; (filled in by mouse driver)
 
 
@@ -54,11 +54,17 @@ IRQStub2:
         lda     #MMU_CFG_CC65   ; MMU configuration which will be active after the ROM handler returns
         pha
 
+        ; map out ROM
+        ldy     MMU_CR
+        sta     MMU_CR
+
         ; push address of ROM handler on stack and jump to it
         lda     jmp_rom_hdlr+1
         pha
         lda     jmp_rom_hdlr
         pha
+
+        sty     MMU_CR          ; map in ROM
         rts                     ; jump to ROM handler
 
         ; our MMU configuration byte we pushed on the stack before (MMU_CFG_CC65) is now active

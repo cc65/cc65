@@ -3,7 +3,7 @@
 <article>
 <title>ca65 Macros for Self Modifying Code
 <author>Christian Kr&uuml;ger
-<date>2012-02-19
+<date>2014-04-24
 
 <abstract>
 The 'smc.inc' macro package for ca65 eases the use, increases the safeness and
@@ -546,9 +546,8 @@ Let's have a look on a quite sophisticated example for the usage of SMC. It
 not only modifies code, but also the modification of the code is modified -
 allowing reuse of some instructions.
 
-The code is from my 'memset()'implementation:
-
 <descrip>
+<tag/The code is from my 'memset()'implementation:/
 <tscreen><verb>
  1:     ...
  2:     SMC_StoreAddress StoreAccuFirstSection
@@ -568,8 +567,7 @@ The code is from my 'memset()'implementation:
 16:             ...
 </verb></tscreen>
 
-Some explanation:
-
+<tag/Some explanation:/
 Line 2: The register pair A/X contains an address, which is stored on the
 address location of a SMC line called 'StoreAccuFirstSection'. According to
 cc65's calling convention, the low-byte is in accu while the high-byte is in
@@ -593,4 +591,3 @@ changed in the future...
 Line 14,15: The original code from line 8 is reestablished.
 </descrip>
 </article>
-

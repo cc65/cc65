@@ -7,7 +7,7 @@
 <url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:cbmnut@hushmail.com" name="CbmNut">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2005-7-22
+<date>2014-4-24
 
 <abstract>
 How to use the cc65 C language system -- an introduction.
@@ -40,7 +40,7 @@ files and unpack all three into one directory. In case of the .ZIP archives,
 you will also need to set the environment variables <tt/CC65_INC/,
 <tt/LD65_LIB/ and <tt/LD65_CFG/ as described below.
 
-<bf/Note/: There is a much simpler way to compile this example, by using the
+<em/Note:/ There is a much simpler way to compile this example, by using the
 <bf/cl65/ compile-and-link utility. However, it makes sense to understand how
 the separate steps work. How to do the example with the <bf/cl65/ utility is
 described <ref id="using-cl65" name="later">.
@@ -330,7 +330,7 @@ disks/, and set the path of <bf/H1:/ to your executables directory, then use
 "<bf/H0:HELLO.XEX/" in the above procedure (after pressing <tt/L/), to access
 your harddrive directly.
 
-<bf/Note/: There is no delay after the program exits, as you are returned
+<em/Note:/ There is no delay after the program exits, as you are returned
 to the DOS menu.  Your C program should wait for a keypress if you want to see
 any output.
 

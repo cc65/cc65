@@ -3,7 +3,7 @@
 <article>
 <title>ca65 Users Guide
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2014-04-10
+<date>2014-04-24
 
 <abstract>
 ca65 is a powerful macro assembler for the 6502, 65C02 and 65816 CPUs. It is
@@ -814,7 +814,7 @@ to find branch targets (this is the reason why I for my part do
 prefer the "cheap" local labels). Nevertheless, unnamed labels are
 convenient in some situations, so it's your decision.
 
-<bf/Note:/ <ref id="scopes" name="Scopes"> organize named symbols, not
+<em/Note:/ <ref id="scopes" name="Scopes"> organize named symbols, not
 unnamed ones, so scopes don't have an effect on unnamed labels.
 
 
@@ -984,7 +984,7 @@ is actually the same as
 This is the reason why a procedure must have a name. If you want a scope
 without a name, use <tt/<ref id=".SCOPE" name=".SCOPE">/.
 
-<bf/Note:/ As you can see from the example above, scopes and symbols live in
+<em/Note:/ As you can see from the example above, scopes and symbols live in
 different namespaces. There can be a symbol named <tt/foo/ and a scope named
 <tt/foo/ without any conflicts (but see the section titled <ref
 id="scopesearch" name="&quot;Scope search order&quot;">).
@@ -2665,7 +2665,7 @@ Here's a list of all control commands and a description, what they do:
     <tscreen><verb>
         lda     #'a
     </verb></tscreen>
-    <bf/Note:/ This does not work in conjunction with <tt/.FEATURE
+    <em/Note:/ This does not work in conjunction with <tt/.FEATURE
     loose_string_term/, since in this case the input would be ambiguous.
 
   <tag><tt>org_per_seg</tt><label id="org_per_seg"></tag>

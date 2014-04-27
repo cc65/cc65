@@ -11,7 +11,7 @@
 <H2>
 <A HREF="mailto:uz@cc65.org">Ullrich von Bassewitz</A>,<BR>
 <A HREF="mailto:polluks@sdf.lonestar.org">Stefan A. Haubenthal</A>,<BR>
-<A HREF="mailto:greg.king5@verizon.net">Greg King</A></H2>2014-04-02
+<A HREF="mailto:greg.king5@verizon.net">Greg King</A></H2>2014-04-25
 <HR>
 <EM>An overview over the Commodore 510 runtime system as it is implemented for the
 cc65 C compiler.</EM>
@@ -190,7 +190,7 @@ declaration and usage.</P>
 <P>The following pseudo variables declared in the <CODE>cbm510.h</CODE> header file do
 allow access to hardware located in the address space. Some variables are
 structures; accessing the struct fields will access the chip registers.</P>
-<P><B>Note:</B> All I/O chips are located in the system bank (bank 15); and can
+<P><EM>Note:</EM> All I/O chips are located in the system bank (bank 15); and can
 therefore not be accessed like on other platforms. Please use one of the
 <CODE>peekbsys</CODE>, <CODE>peekwsys</CODE>, <CODE>pokebsys</CODE>, and <CODE>pokewsys</CODE> functions to
 access the I/O chips. Direct reads and writes to the structures named below

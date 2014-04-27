@@ -9,7 +9,7 @@
 <H1>ca65 Users Guide</H1>
 
 <H2>
-<A HREF="mailto:uz@cc65.org">Ullrich von Bassewitz</A></H2>2014-04-10
+<A HREF="mailto:uz@cc65.org">Ullrich von Bassewitz</A></H2>2014-04-24
 <HR>
 <EM>ca65 is a powerful macro assembler for the 6502, 65C02 and 65816 CPUs. It is
 used as a companion assembler for the cc65 crosscompiler, but it may also be
@@ -1137,7 +1137,7 @@ sections of code hard to understand, because you have to count labels
 to find branch targets (this is the reason why I for my part do
 prefer the "cheap" local labels). Nevertheless, unnamed labels are
 convenient in some situations, so it's your decision.</P>
-<P><B>Note:</B> 
+<P><EM>Note:</EM> 
 <A HREF="#scopes">Scopes</A> organize named symbols, not
 unnamed ones, so scopes don't have an effect on unnamed labels.</P>
 
@@ -1338,7 +1338,7 @@ So</P>
 <P>This is the reason why a procedure must have a name. If you want a scope
 without a name, use <CODE>
 <A HREF="#.SCOPE">.SCOPE</A></CODE>.</P>
-<P><B>Note:</B> As you can see from the example above, scopes and symbols live in
+<P><EM>Note:</EM> As you can see from the example above, scopes and symbols live in
 different namespaces. There can be a symbol named <CODE>foo</CODE> and a scope named
 <CODE>foo</CODE> without any conflicts (but see the section titled 
 <A HREF="#scopesearch">&#34;Scope search order&#34;</A>).</P>
@@ -3372,7 +3372,7 @@ missing.
 </PRE>
 </CODE></BLOCKQUOTE>
 
-<B>Note:</B> This does not work in conjunction with <CODE>.FEATURE
+<EM>Note:</EM> This does not work in conjunction with <CODE>.FEATURE
 loose_string_term</CODE>, since in this case the input would be ambiguous.</P>
 
 <DT><B><CODE>org_per_seg</CODE>

@@ -1,6 +1,9 @@
 /*
  * Extended memory overlay demo program.
  *
+ * Shows how to combine multiple cc65 features
+ * incl. overlays and extended memory drivers.
+ *
  * 2012-17-07, Oliver Schmidt (ol.sc@web.de)
  *
  */

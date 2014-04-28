@@ -1,6 +1,8 @@
 /*
  * Minimalistic overlay demo program.
  *
+ * Shows how to load overlay files from disk.
+ *
  * 2009-10-02, Oliver Schmidt (ol.sc@web.de)
  *
  */

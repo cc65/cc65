@@ -19,7 +19,7 @@ YSIZE   =       8               ; System font height
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table and constants.
 
-.segment        "JUMPTABLE"
+.segment        "HEADER"
 
 ; The first part of the header is a structure that has a signature,
 ; and defines the capabilities of the driver.

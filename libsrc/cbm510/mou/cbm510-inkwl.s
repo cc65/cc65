@@ -17,7 +17,7 @@
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table.
 
-.segment        "JUMPTABLE"
+.segment        "HEADER"
 
 HEADER:
 

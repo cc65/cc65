@@ -31,7 +31,7 @@ DISABLE_TIMEOUT =       30              ; # of vertical blank interrupts after w
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-.segment        "JUMPTABLE"
+.segment        "HEADER"
 
 HEADER:
 

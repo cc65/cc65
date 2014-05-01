@@ -16,7 +16,7 @@
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table and constants.
 
-.segment        "JUMPTABLE"
+.segment        "HEADER"
 
 ; First part of the header is a structure that has a magic and defines the
 ; capabilities of the driver

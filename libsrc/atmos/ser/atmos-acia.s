@@ -31,7 +31,7 @@
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-        .segment        "JUMPTABLE"
+        .segment        "HEADER"
 
         ; Driver signature
         .byte   $73, $65, $72           ; "ser"

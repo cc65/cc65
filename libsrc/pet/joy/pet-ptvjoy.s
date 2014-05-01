@@ -17,7 +17,7 @@ VIA_DDRA        := $E843                ; Data direction register A
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-        .segment "JUMPTABLE"
+        .segment "HEADER"
 
 ; Driver signature
 

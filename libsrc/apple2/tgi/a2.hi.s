@@ -68,7 +68,7 @@ Y2      :=      ptr4
 
 ; ------------------------------------------------------------------------
 
-        .segment        "JUMPTABLE"
+        .segment        "HEADER"
 
 ; Header. Includes jump table and constants.
 

@@ -33,7 +33,7 @@ VDC_DATA        = 31
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table and constants.
 
-.segment        "JUMPTABLE"
+.segment        "HEADER"
 
 ; First part of the header is a structure that has a magic signature,
 ; and defines the capabilities of the driver.

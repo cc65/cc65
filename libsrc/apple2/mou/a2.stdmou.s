@@ -28,7 +28,7 @@ status          := $0778
 
 ; ------------------------------------------------------------------------
 
-        .segment        "JUMPTABLE"
+        .segment        "HEADER"
 
         ; Driver signature
         .byte   $6D, $6F, $75           ; "mou"

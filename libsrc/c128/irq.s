@@ -7,8 +7,6 @@
 
         .include        "c128.inc"
 
-IRQInd  = $2FD          ; JMP $0000 - used as indirect IRQ vector
-
 ; ------------------------------------------------------------------------
 
 .segment        "INIT"

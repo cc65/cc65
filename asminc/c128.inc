@@ -32,6 +32,7 @@ FETCH           := $2A2         ; Fetch subroutine in RAM
 FETVEC          := $2AA         ; Vector patch location for FETCH
 STASH           := $2AF         ; Stash routine in RAM
 STAVEC          := $2B9         ; Vector patch location for STASH
+IRQInd          := $2FD         ; JMP $0000 -- used as indirect IRQ vector
 PALFLAG         := $A03         ; $FF=PAL, $00=NTSC
 INIT_STATUS     := $A04         ; Flags: Reset/Restore initiation status
 FKEY_LEN        := $1000        ; Function key lengths

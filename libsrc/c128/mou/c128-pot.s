@@ -3,6 +3,7 @@
 ;
 ; 2006-08-20, Stefan Haubenthal
 ; 2009-09-26, Ullrich von Bassewitz
+; 2014-04-26, Christian Groessler
 ; 2014-05-05, Greg King
 ;
 
@@ -26,7 +27,7 @@ HEADER:
 
 ; Library reference
 
-        .addr   $0000
+libref: .addr   $0000
 
 ; Jump table
 
@@ -89,9 +90,13 @@ Buttons:        .res    1               ; Button mask
 
 INIT_save:      .res    1
 
-; Temporary value used in the int handler
+; Keyboard buffer fill level at start of interrupt
 
-Temp:           .res    1
+old_key_count:  .res    1
+
+; Original IRQ vector
+
+old_irq:        .res    2
 
 .rodata
 
@@ -145,6 +150,47 @@ INSTALL:
         lda     YPos
         ldx     YPos+1
         jsr     CMOVEY
+
+; Initiate our IRQ magic.
+
+        ; Remember the ROM IRQ continuation address.
+        ldx     IRQInd+2
+        lda     IRQInd+1
+        stx     old_irq+1
+        sta     old_irq
+
+        lda     libref
+        ldx     libref+1
+        sta     ptr3
+        stx     ptr3+1
+
+        ; Set the ROM IRQ continuation address to point to the provided routine.
+        ldy     #2
+        lda     (ptr3),y
+        sta     IRQInd+1
+        iny
+        lda     (ptr3),y
+        sta     IRQInd+2
+
+        ; Set the address of our IRQ callback routine.
+        ; Because it's called via "rts", we must use "address-1".
+        iny
+        lda     #<(callback-1)
+        sta     (ptr3),y
+        iny
+        lda     #>(callback-1)
+        sta     (ptr3),y
+
+        ; Set the ROM entry-point vector.
+        ; Because it's called via "rts", we must decrement it by one.
+        iny
+        lda     old_irq
+        sub     #<1
+        sta     (ptr3),y
+        iny
+        lda     old_irq+1
+        sbc     #>1
+        sta     (ptr3),y
         cli
 
 ; Done, return zero (= MOUSE_ERR_OK)
@@ -158,6 +204,13 @@ INSTALL:
 ; No return code required (the driver is removed from memory on return).
 
 UNINSTALL:
+        lda     old_irq
+        ldx     old_irq+1
+        sei
+        sta     IRQInd+1
+        stx     IRQInd+2
+        ;cli
+
         jsr     HIDE                    ; Hide cursor on exit
         lda     INIT_save
         sta     INIT_STATUS
@@ -259,6 +312,15 @@ MOVE:   sei                             ; No interrupts
 BUTTONS:
         lda     Buttons
         ldx     #$00
+
+; Make the buttons look like a 1351 mouse.
+
+        and     #JOY::LEFT | JOY::RIGHT
+        lsr     a
+        lsr     a
+        ;clc
+        adc     #%00001110
+        and     #MOUSE_BTN_LEFT | MOUSE_BTN_RIGHT
         rts
 
 ;----------------------------------------------------------------------------
@@ -297,7 +359,7 @@ INFO:   jsr     POS
 
 ; Fill in the button state
 
-        lda     Buttons
+        jsr     BUTTONS
         ldy     #MOUSE_INFO::BUTTONS
         sta     (ptr1),y
 
@@ -309,7 +371,7 @@ INFO:   jsr     POS
 ; Must return an error code in a/x.
 ;
 
-IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioclts for now
+IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioctls for now
         ldx     #>MOUSE_ERR_INV_IOCTL
         rts
 
@@ -319,22 +381,17 @@ IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioclts for now
 ;
 
 IRQ:    jsr     CPREP
+        lda     KEY_COUNT
+        sta     old_key_count
         lda     #$7F
         sta     CIA1_PRA
         lda     CIA1_PRB                ; Read port #1
-        and     #%00001100
-        eor     #%00001100              ; Make all bits active high
-        asl
+        eor     #%11111111              ; Make all bits active high
         sta     Buttons
-        lsr
-        lsr
-        lsr
-        and     #%00000001
-        ora     Buttons
-        sta     Buttons
-        ldx     #%01000000
+
+        ldx     #%01000000              ; Read port 1 paddles
         stx     CIA1_PRA
-        ldy     #0
+        ldy     #<256
 :       dey
         bne     :-
         ldx     SID_ADConv1
@@ -418,3 +475,6 @@ IRQ:    jsr     CPREP
         jsr     CDRAW
         clc                             ; Interrupt not "handled"
         rts
+
+.define OLD_BUTTONS Buttons             ; Tells callback.inc where the old port status is stored
+.include        "callback.inc"

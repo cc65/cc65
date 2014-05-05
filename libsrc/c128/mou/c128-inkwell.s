@@ -240,7 +240,7 @@ UNINSTALL:
         sei
         sta     IRQInd+1
         stx     IRQInd+2
-        ;cli
+        ;cli                            ; This will be done at end of HIDE
 
         jsr     HIDE                    ; Hide cursor on exit
         lda     INIT_save
@@ -410,7 +410,7 @@ IRQ:    jsr     CPREP
         ldy     #%00000000              ; Set ports A and B to input
         sty     CIA1_DDRB
         sty     CIA1_DDRA               ; Keyboard won't look like buttons
-        ;lda     #%01111111
+        ;lda     #%01111111             ; (Keyboard scan leaves this in port A)
         ;sta     CIA1_PRA
         lda     CIA1_PRB                ; Read Control Port 1
         dec     CIA1_DDRA               ; Set port A back to output

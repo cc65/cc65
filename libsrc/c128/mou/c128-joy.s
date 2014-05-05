@@ -209,7 +209,7 @@ UNINSTALL:
         sta     IRQInd+1
         lda     old_irq+1
         sta     IRQInd+2
-        ;cli
+        ;cli                            ; This will be done at end of HIDE
 
         jsr     HIDE                    ; Hide cursor on exit
         lda     INIT_save

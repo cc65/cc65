@@ -209,7 +209,7 @@ UNINSTALL:
         sei
         sta     IRQInd+1
         stx     IRQInd+2
-        ;cli
+        ;cli                            ; This will be done at end of HIDE
 
         jsr     HIDE                    ; Hide cursor on exit
         lda     INIT_save
@@ -318,8 +318,8 @@ BUTTONS:
         and     #JOY::LEFT | JOY::RIGHT
         lsr     a
         lsr     a
-        ;clc
-        adc     #%00001110
+        ;clc                            ; ("lsr" shifted zero into carry flag)
+        adc     #%00001110              ; Shift bit 1 over to bit 4
         and     #MOUSE_BTN_LEFT | MOUSE_BTN_RIGHT
         rts
 

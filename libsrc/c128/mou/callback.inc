@@ -4,7 +4,7 @@
 ;
 ; Christian Groessler, 24.04.2014
 ;
-; Check if there was joystick activity before and/or after the ROM handler.
+; Check if there was button/joystick activity before and/or after the ROM handler.
 ; If there was activity, discard the key presses since they are most
 ; probably "phantom" key presses.
 

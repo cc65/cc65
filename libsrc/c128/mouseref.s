@@ -1,7 +1,11 @@
 ;
 ; Pointer for library references by device drivers.
 ;
+; Helper-routines for the interrupt handler that rejects bogus keypresses
+; that are caused by mouse-like devices.
+;
 ; 2013-07-25, Greg King
+; 2014-04-26, Christian Groessler
 ;
 
         .include        "c128.inc"
@@ -23,6 +27,7 @@ mouse_libref:                   ; generic label for mouse-kernel
 ;
 _pen_adjuster:
         .addr   $0000
+
         .addr   IRQStub2
 callback:                       ; callback into mouse driver after ROM IRQ handler has been run
         .addr   $0000           ; (filled in by mouse driver)
@@ -83,7 +88,7 @@ IRQStub2:
         rts                     ; jump to callback routine
 
 @IRQCont2:
-        
+
         ; return from interrupt
         ; We could just jump to $FF33, but since I don't know whether this address is valid in all
         ; ROM versions, duplicate that code here.

@@ -3,7 +3,8 @@
 ; the Commodore 1351 mouse users guide.
 ;
 ; 2009-09-26, Ullrich von Bassewitz
-; 2014-03-17, Greg King
+; 2014-04-26, Christian Groessler
+; 2014-04-30, Greg King
 ;
 
         .include        "zeropage.inc"
@@ -11,8 +12,6 @@
         .include        "c128.inc"
 
         .macpack        generic
-
-IRQInd  = $2FD
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
@@ -28,8 +27,7 @@ HEADER:
 
 ; Library reference
 
-libref:
-        .addr   $0000
+libref: .addr   $0000
 
 ; Jump table
 
@@ -210,7 +208,7 @@ UNINSTALL:
         sta     IRQInd+1
         lda     old_irq+1
         sta     IRQInd+2
-        cli
+        ;cli                            ; This will be done at end of HIDE
 
         jsr     HIDE                    ; Hide cursor on exit
         lda     INIT_save
@@ -351,7 +349,7 @@ INFO:   jsr     POS
 
 ; Fill in the button state
 
-        jsr     BUTTONS                 ; Will not touch ptr1
+        lda     Buttons
         ldy     #MOUSE_INFO::BUTTONS
         sta     (ptr1),y
 
@@ -363,7 +361,7 @@ INFO:   jsr     POS
 ; Must return an error code in a/x.
 ;
 
-IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioclts for now
+IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioctls, for now
         ldx     #>MOUSE_ERR_INV_IOCTL
         rts
 

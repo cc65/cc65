@@ -1,7 +1,8 @@
 ;
 ; Driver for the Inkwell Systems 170-C and 184-C lightpens.
 ;
-; 2013-07-01, Greg King
+; 2014-04-26, Christian Groessler
+; 2014-05-01, Greg King
 ;
 
         .include        "zeropage.inc"
@@ -24,7 +25,7 @@ HEADER:
 
 ; Library reference
 
-LIBREF: .addr   $0000
+libref: .addr   $0000
 
 ; Jump table
 
@@ -102,6 +103,14 @@ OldPenY:        .res    1
 
 INIT_save:      .res    1
 
+; Keyboard buffer fill level at start of interrupt
+
+old_key_count:  .res    1
+
+; Original IRQ vector
+
+old_irq:        .res    2
+
 .data
 
 ; Default Inkwell calibration.
@@ -131,7 +140,7 @@ INSTALL:
         lda     #%11000000
         sta     INIT_STATUS
 
-; Initiate variables. Just copy the default stuff over.
+; Initiate some variables. Just copy the default stuff over.
 
         ldx     #.sizeof (DefVars) - 1
 @L0:    lda     DefVars,x
@@ -144,18 +153,57 @@ INSTALL:
         stx     OldPenX
         sty     OldPenY
 
+; Initiate our IRQ magic.
+
+        ; Remember the ROM IRQ continuation address.
+        ldx     IRQInd+2
+        lda     IRQInd+1
+        stx     old_irq+1
+        sta     old_irq
+
+        lda     libref
+        ldx     libref+1
+        sta     ptr3                    ; Point to mouse_adjuster
+        stx     ptr3+1
+
+        ; Set the ROM IRQ continuation address to point to the provided routine.
+        ldy     #2
+        lda     (ptr3),y
+        iny
+        sei
+        sta     IRQInd+1
+        lda     (ptr3),y
+        sta     IRQInd+2
+
+        ; Set the address of our IRQ callback routine.
+        ; Because it's called via "rts", we must use "address-1".
+        iny
+        lda     #<(callback-1)
+        sta     (ptr3),y
+        iny
+        lda     #>(callback-1)
+        sta     (ptr3),y
+
+        ; Set the ROM entry-point vector.
+        ; Because it's called via "rts", we must decrement it by one.
+        iny
+        lda     old_irq
+        sub     #<1
+        sta     (ptr3),y
+        iny
+        lda     old_irq+1
+        sbc     #>1
+        sta     (ptr3),y
+        cli
+
 ; Call a calibration function through the library-reference.
 
-        lda     LIBREF
-        ldx     LIBREF+1
-        sta     ptr1                    ; Point to mouse_adjuster
-        stx     ptr1+1
         ldy     #1
-        lda     (ptr1),y
+        lda     (ptr3),y
         bze     @L1                     ; Don't call pointer if it's NULL
         sta     Calibrate+2             ; Point to function
         dey
-        lda     (ptr1),y
+        lda     (ptr3),y
         sta     Calibrate+1
         lda     #<XOffset               ; Function will set this variable
         ldx     #>XOffset
@@ -187,6 +235,13 @@ INSTALL:
 ; No return code required (the driver is removed from memory on return).
 
 UNINSTALL:
+        lda     old_irq
+        ldx     old_irq+1
+        sei
+        sta     IRQInd+1
+        stx     IRQInd+2
+        ;cli                            ; This will be done at end of HIDE
+
         jsr     HIDE                    ; Hide cursor on exit
         lda     INIT_save
         sta     INIT_STATUS
@@ -346,6 +401,8 @@ IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioctls, for now
 ;
 
 IRQ:    jsr     CPREP
+        lda     KEY_COUNT
+        sta     old_key_count
 
 ; Record the state of the buttons.
 ; Try to avoid crosstalk between the keyboard and the lightpen.
@@ -353,18 +410,16 @@ IRQ:    jsr     CPREP
         ldy     #%00000000              ; Set ports A and B to input
         sty     CIA1_DDRB
         sty     CIA1_DDRA               ; Keyboard won't look like buttons
-        lda     CIA1_PRB                ; Read Control-Port 1
+        ;lda     #%01111111             ; (Keyboard scan leaves this in port A)
+        ;sta     CIA1_PRA
+        lda     CIA1_PRB                ; Read Control Port 1
         dec     CIA1_DDRA               ; Set port A back to output
         eor     #%11111111              ; Bit goes up when button goes down
         sta     Buttons
-        bze     @L0
-        lda     #%11101111              ; (Don't change bit that feeds VIC-II)
-        sta     CIA1_DDRB               ; Buttons won't look like keyboard
-        sty     CIA1_PRB                ; Set "all keys pushed"
 
 ; Read the VIC-II lightpen registers.
 
-@L0:    lda     VIC_LPEN_Y
+        lda     VIC_LPEN_Y
         cmp     OldPenY
 
 ; Skip processing if nothing has changed.
@@ -458,3 +513,6 @@ MoveY:  sta     YPos
 MoveX:  sta     XPos
         stx     XPos+1
         jmp     CMOVEX
+
+.define OLD_BUTTONS Buttons             ; Tells callback.inc where the old port status is stored
+.include        "callback.inc"

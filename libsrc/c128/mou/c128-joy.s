@@ -2,7 +2,8 @@
 ; Driver for a "joystick mouse".
 ;
 ; 2009-09-26, Ullrich von Bassewitz
-; 2014-03-17, Greg King
+; 2014-04-26, Christian Groessler
+; 2014-05-01, Greg King
 ;
 
         .include        "zeropage.inc"
@@ -10,8 +11,6 @@
         .include        "c128.inc"
 
         .macpack        generic
-
-IRQInd  = $2FD
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
@@ -27,8 +26,7 @@ HEADER:
 
 ; Library reference
 
-libref:
-        .addr   $0000
+libref: .addr   $0000
 
 ; Jump table
 
@@ -90,10 +88,6 @@ YMax:           .res    2               ; Y2 value of bounding box
 Buttons:        .res    1               ; Button mask
 
 INIT_save:      .res    1
-
-; Temporary value used in the int handler
-
-Temp:           .res    1
 
 ; Keyboard buffer fill level at start of interrupt
 
@@ -215,7 +209,7 @@ UNINSTALL:
         sta     IRQInd+1
         lda     old_irq+1
         sta     IRQInd+2
-        cli
+        ;cli                            ; This will be done at end of HIDE
 
         jsr     HIDE                    ; Hide cursor on exit
         lda     INIT_save
@@ -318,6 +312,7 @@ MOVE:   sei                             ; No interrupts
 BUTTONS:
         lda     Buttons
         ldx     #$00
+        and     #MOUSE_BTN_LEFT         ; Left button -- same as JOY::FIRE
         rts
 
 ;----------------------------------------------------------------------------
@@ -356,7 +351,7 @@ INFO:   jsr     POS
 
 ; Fill in the button state
 
-        lda     Buttons
+        jsr     BUTTONS
         ldy     #MOUSE_INFO::BUTTONS
         sta     (ptr1),y
 
@@ -368,7 +363,7 @@ INFO:   jsr     POS
 ; Must return an error code in a/x.
 ;
 
-IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioclts for now
+IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioctls for now
         ldx     #>MOUSE_ERR_INV_IOCTL
         rts
 
@@ -387,19 +382,10 @@ IRQ:    jsr     CPREP
         lda     CIA1_PRB                ; Read joystick #0
         and     #$1F
         eor     #$1F                    ; Make all bits active high
-        sta     Temp
-
-; Check for a pressed button and place the result into Buttons
-
-        ldx     #$00                    ; Assume no button pressed
-        and     #JOY::FIRE              ; Check fire button
-        beq     @L0                     ; Jump if not pressed
-        ldx     #MOUSE_BTN_LEFT         ; Left (only) button is pressed
-@L0:    stx     Buttons
+        sta     Buttons
 
 ; Check left/right
 
-        lda     Temp                    ; Read joystick #0
         and     #(JOY::LEFT | JOY::RIGHT)
         beq     @SkipX                  ;
 
@@ -447,7 +433,7 @@ IRQ:    jsr     CPREP
 
 ; Calculate the Y movement vector
 
-@SkipX: lda     Temp                    ; Read joystick #0
+@SkipX: lda     Buttons                 ; Read joystick #0
         and     #(JOY::UP | JOY::DOWN)  ; Check up/down
         beq     @SkipY                  ;
 
@@ -499,5 +485,5 @@ IRQ:    jsr     CPREP
         clc                             ; Interrupt not "handled"
         rts
 
-.define  OLD_BUTTONS Temp               ; tells callback.inc where the old port status is stored
+.define OLD_BUTTONS Buttons             ; tells callback.inc where the old port status is stored
 .include "callback.inc"

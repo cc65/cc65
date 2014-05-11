@@ -13,14 +13,14 @@
 ;---------------------------------------------------------------------------
 ; 8x16 => 24 unsigned multiplication routine. Because the overhead for a
 ; 8x16 => 16 unsigned multiplication routine is small, we will tag it with
-; the matching labels as well.
+; the matching labels, as well.
 ;
-;  routine         lhs         rhs        result          result also in
+;  routine         LHS         RHS        result          result also in
 ; -----------------------------------------------------------------------
-;  umul8x16r24     ptr1-lo     ax         ax:sreg-lo      ptr1:sreg-lo
-;  umul8x16r24m    ptr1-lo     ptr3       ax:sreg-lo      ptr1:sreg-lo
+;  umul8x16r24     ax          ptr1-low   ax:sreg-low     ptr1:sreg-low
+;  umul8x16r24m    ptr3        ptr1-low   ax:sreg-low     ptr1:sreg-low
 ;
-; ptr3 ist left intact by the routine.
+; ptr3 is left intact by the routine.
 ;
 
 umul8x16r24:

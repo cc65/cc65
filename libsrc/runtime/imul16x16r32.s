@@ -13,9 +13,9 @@
 ;---------------------------------------------------------------------------
 ; 16x16 => 32 signed multiplication routine.
 ;
-;   lhs         rhs           result          result also in
+;   LHS         RHS           result          result also in
 ; -------------------------------------------------------------
-;   ptr1        ax            ax:sreg
+;   ax          ptr1          ax:sreg
 ;
 ; There is probably a faster way to do this.
 ;

@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 2010-11-02
 ;
-; CC65 runtime: 8x8 => 16 multiplication
+; CC65 runtime: 8x8 => 16 unsigned multiplication
 ;
 
         .export         umul8x8r16, umul8x8r16m
@@ -9,11 +9,11 @@
 
 
 ;---------------------------------------------------------------------------
-; 8x8 => 16 multiplication routine.
+; 8x8 => 16 unsigned multiplication routine.
 ;
-;   lhs         rhs           result          result also in
+;   LHS            RHS          result      result in also
 ; -------------------------------------------------------------
-;   ptr1-lo     ptr3-lo         ax              ptr1
+;   .A (ptr3-low)  ptr1-low     .XA             ptr1
 ;
 
 umul8x8r16:
@@ -21,7 +21,7 @@ umul8x8r16:
 umul8x8r16m:
         lda     #0              ; Clear byte 1
         ldy     #8              ; Number of bits
-        lsr     ptr1            ; Get first bit of lhs into carry
+        lsr     ptr1            ; Get first bit of RHS into carry
 @L0:    bcc     @L1
         clc
         adc     ptr3
@@ -30,8 +30,6 @@ umul8x8r16m:
         dey
         bne     @L0
         tax
-        stx     ptr1+1          ; Result in a/x and ptr1
+        stx     ptr1+1          ; Result in .XA and ptr1
         lda     ptr1            ; Load the result
         rts                     ; Done
-
-

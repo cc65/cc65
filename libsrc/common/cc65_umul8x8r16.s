@@ -5,9 +5,7 @@
 ;
 
         .export         _cc65_umul8x8r16
-        .import         umul8x8r16, popa
-
-        .include        "zeropage.inc"
+        .import         umul8x8r16, popa, ptr1:zp
 
 
 ;---------------------------------------------------------------------------

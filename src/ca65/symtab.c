@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2012, Ullrich von Bassewitz                                      */
+/* (C) 1998-2014, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -505,17 +505,7 @@ static void SymCheckUndefined (SymEntry* S)
                          "Symbol `%s' is already an import",
                          GetString (Sym->Name));
             }
-            if (Sym->Flags & SF_EXPORT) {
-                /* The symbol is already marked as an export. */
-                if (Sym->AddrSize > S->ExportSize) {
-                    /* We're exporting a symbol smaller than it actually is */
-                    LIWarning (&S->DefLines, 1,
-                               "Symbol `%m%p' is %s but exported %s",
-                              GetSymName (Sym),
-                              AddrSizeToStr (Sym->AddrSize),
-                              AddrSizeToStr (S->ExportSize));
-                }
-            } else {
+            if ((Sym->Flags & SF_EXPORT) == 0) {
                 /* Mark the symbol as an export */
                 Sym->Flags |= SF_EXPORT;
                 Sym->ExportSize = S->ExportSize;
@@ -525,7 +515,7 @@ static void SymCheckUndefined (SymEntry* S)
                 }
                 if (Sym->AddrSize > Sym->ExportSize) {
                     /* We're exporting a symbol smaller than it actually is */
-                    LIWarning (&S->DefLines, 1,
+                    LIWarning (&Sym->DefLines, 1,
                                "Symbol `%m%p' is %s but exported %s",
                                GetSymName (Sym),
                                AddrSizeToStr (Sym->AddrSize),

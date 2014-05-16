@@ -14,6 +14,4 @@ _gotoxy:                        ; Set the cursor position
         sta     ROWCRS_5200     ; Set Y
         jsr     popa            ; Get X
         sta     COLCRS_5200     ; Set X
-        lda     #0
-        sta     COLCRS_5200+1   ;
         jmp     setcursor

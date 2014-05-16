@@ -1,44 +1,57 @@
 
                 .include "atari5200.inc"
 
-SCREEN_BUF_SIZE	=	20 * 24
-SCREEN_BUF	=	$4000 - SCREEN_BUF_SIZE
+SCREEN_BUF_SIZE =       20 * 24
+SCREEN_BUF      =       $4000 - SCREEN_BUF_SIZE
 
                 .code
                 .export screen_setup_20x24
 
 screen_setup_20x24:
 
-		; initialize SAVMSC
-		lda	#<SCREEN_BUF
-		sta	SAVMSC
-		lda	#>SCREEN_BUF
-		sta	SAVMSC+1
+                ; initialize SAVMSC
+                lda     #<SCREEN_BUF
+                sta     SAVMSC
+                lda     #>SCREEN_BUF
+                sta     SAVMSC+1
 
-		; initialize cursor position
-		lda	#0
-		sta	COLCRS_5200
-		sta	ROWCRS_5200
+                ; initialize cursor position
+                lda     #0
+                sta     COLCRS_5200
+                sta     ROWCRS_5200
 
-		; clear screen buffer
-		ldy	#<(SCREEN_BUF_SIZE-1)
-		ldx	#>(SCREEN_BUF_SIZE-1)
-clrscr:		sta	(SAVMSC),y
-		dey
-		cpy	#$FF
-		bne	clrscr
-		dex
-		cpx	#$FF
-		bne	clrscr
+                ; clear screen buffer
+                ldy     #<(SCREEN_BUF_SIZE-1)
+                ldx     #>(SCREEN_BUF_SIZE-1)
+clrscr:         sta     (SAVMSC),y
+                dey
+                cpy     #$FF
+                bne     clrscr
+                dex
+                cpx     #$FF
+                bne     clrscr
 
-		; set display list
+                ; set default colors
 
-		lda	#<dlist
-		sta	SDLSTL
-		lda	#>dlist
-		sta	SDLSTH
+                lda     #40
+                sta     COLOR0
+                lda     #202
+                sta     COLOR1
+                lda     #148
+                sta     COLOR2
+                lda     #70
+                sta     COLOR3
+                lda     #0
+                sta     COLOR4
 
-		rts
+                ; set display list
+
+                lda     #<dlist
+                sta     SDLSTL
+                lda     #>dlist
+                sta     SDLSTH
+
+                rts
 
 
                 .segment "RODATA"

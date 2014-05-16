@@ -54,7 +54,7 @@ cputdirect:                     ; accepts screen code
 ; advance cursor
         inc     COLCRS_5200
         lda     COLCRS_5200
-        cmp     #40
+        cmp     #20
         bcc     plot
         lda     #0
         sta     COLCRS_5200
@@ -72,7 +72,6 @@ plot:   jsr     setcursor
         ldx     ROWCRS_5200
         rts
 
-; turn off cursor, update screen, turn on cursor
 putchar:
         pha                     ; save char
 

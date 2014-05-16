@@ -10,6 +10,4 @@
 
 _gotox:
         sta     COLCRS_5200     ; Set X
-        lda     #0
-        sta     COLCRS_5200+1
         jmp     setcursor

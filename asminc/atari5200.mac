@@ -1,7 +1,14 @@
 ; Convert characters to screen codes
-                                                              
+
 ; Helper macro that converts and outputs one character
 .macro _scrcode char
+.if 1
+        .if (char >= 96) .and (char <= 127)
+        .byte (char)
+        .else
+        .byte (char - 32)
+        .endif
+.else
         .if (char >= 0) .and (char <= 31)
                 .byte   (char + 64)
         .elseif (char >= 32) .and (char <= 95)
@@ -17,6 +24,7 @@
         .else
                 .error  "scrcode: Character constant out of range"
         .endif
+.endif
 .endmacro
 
 .macro  scrcode arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
@@ -56,4 +64,3 @@
         ; Call the macro recursively with the remaining args
         scrcode arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
 .endmacro
-

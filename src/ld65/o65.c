@@ -1320,16 +1320,24 @@ static void O65SetupHeader (O65Desc* D)
         SegDesc* FirstSeg = D->ZPSeg [0];
         D->Header.ZPBase  = FirstSeg->Seg->PC;
     }
+}
 
-    /* If we have byte wise relocation and an alignment of 1, we can set
-     * the "simple addressing" bit in the header.
+
+
+static void O65UpdateHeader  (O65Desc* D)
+/* Update mode word, currently only the "simple" bit */
+{
+    /* If we have byte wise relocation and an alignment of 1, and text
+     * and data are adjacent, we can set the "simple addressing" bit
+     * in the header.
      */
     if ((D->Header.Mode & MF_RELOC_MASK) == MF_RELOC_BYTE &&
-        (D->Header.Mode & MF_ALIGN_MASK) == MF_ALIGN_1) {
+        (D->Header.Mode & MF_ALIGN_MASK) == MF_ALIGN_1 &&
+        D->Header.TextBase + D->Header.TextSize == D->Header.DataBase &&
+        D->Header.DataBase + D->Header.DataSize == D->Header.BssBase) {
         D->Header.Mode = (D->Header.Mode & ~MF_ADDR_MASK) | MF_ADDR_SIMPLE;
     }
 }
-
 
 
 void O65WriteTarget (O65Desc* D, File* F)
@@ -1410,6 +1418,9 @@ void O65WriteTarget (O65Desc* D, File* F)
 
     /* Write the list of exports */
     O65WriteExports (D);
+
+    /* Update header flags */
+    O65UpdateHeader (D);
 
     /* Seek back to the start and write the updated header */
     fseek (D->F, 0, SEEK_SET);

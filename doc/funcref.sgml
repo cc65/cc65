@@ -608,6 +608,7 @@ communication.
 <item><ref id="strncat" name="strncat">
 <item><ref id="strncmp" name="strncmp">
 <item><ref id="strncpy" name="strncpy">
+<item><ref id="strqtok" name="strqtok">
 <item><ref id="strrchr" name="strrchr">
 <item><ref id="strspn" name="strspn">
 <item><ref id="strstr" name="strstr">
@@ -5733,6 +5734,7 @@ be used in presence of a prototype.
 </itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
+<ref id="strqtok" name="strqtok">,
 <ref id="strspn" name="strspn">,
 <ref id="strstr" name="strstr">,
 <ref id="strtok" name="strtok">
@@ -5965,6 +5967,38 @@ hello[5] = '\0';
 </quote>
 
 
+<sect1>strqtok<label id="strqtok"><p>
+
+<quote>
+<descrip>
+<tag/Function/Break a string into tokens.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/char* __fastcall__ strqtok (char* s1, const char* s2);/
+<tag/Description/<tt/strqtok()/ will break the string <tt/s1/ into a sequence of
+tokens, which are delimited by either quotation marks or characters from the
+string <tt/s2/. Tokens in quotation marks may contain characters from <tt/s2/
+(they aren't delimiters there). The first call to <tt/strqtok()/ will return a
+pointer to the first token in the string <tt/s1/. The following calls must pass
+a <tt/NULL/ pointer as <tt/s1/, in order to get the next token in the string.
+Different sets of delimiters may be used for the subsequent calls to <tt/strqtok()/.
+<tag/Limits/<itemize>
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
+<item><tt/strqtok()/ will modify the string <tt/s1/.
+<item>The function will forget where it is in the <tt/s1/ string if it is given
+a second <tt/s1/ string before it finishes the first one.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="strcspn" name="strcspn">,
+<!-- <ref id="strpbrk" name="strpbrk">, -->
+<ref id="strspn" name="strspn">,
+<ref id="strtok" name="strtok">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>strrchr<label id="strrchr"><p>
 
 <quote>
@@ -6041,21 +6075,25 @@ be used in presence of a prototype.
 <tag/Function/Break a string into tokens.
 <tag/Header/<tt/<ref id="string.h" name="string.h">/
 <tag/Declaration/<tt/char* __fastcall__ strtok (char* s1, const char* s2);/
-<tag/Description/<tt/strtok/ will break the string s1 into a sequence of
-tokens, which are delimited by characters from the string s2. The first call
-to <tt/strtok/ will return a pointer to the first token in the string s1.
-Following calls must pass a <tt/NULL/ pointer as s1 in order to get the next
-token in the string. Different sets of delimiters may be used for the
-subsequent calls to <tt/strtok/.
+<tag/Description/<tt/strtok()/ will break the string <tt/s1/ into a sequence of
+tokens, which are delimited by characters from the string <tt/s2/. The first call
+to <tt/strtok()/ will return a pointer to the first token in the string <tt/s1/.
+The following calls must pass a <tt/NULL/ pointer as <tt/s1/, in order to get
+the next token in the string. Different sets of delimiters may be used for the
+subsequent calls to <tt/strtok()/.
 <tag/Limits/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
-<item><tt/strtok/ will modify the string s1.
+<item><tt/strtok()/ will modify the string <tt/s1/.
+<item>The function will forget where it is in the <tt/s1/ string if it is given
+a second <tt/s1/ string before it finishes the first one.
 </itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="strcspn" name="strcspn">,
-<!-- <ref id="strpbrk" name="strpbrk"> -->
+<!-- <ref id="strpbrk" name="strpbrk">, -->
+<ref id="strqtok" name="strqtok">,
+<ref id="strspn" name="strspn">
 <tag/Example/None.
 </descrip>
 </quote>

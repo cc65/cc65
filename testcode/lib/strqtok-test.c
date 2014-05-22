@@ -1,5 +1,6 @@
 /* strqtok-test.c
 **
+** 2014-04-21, Paul Foerster
 ** 2014-05-20, Greg King
 **
 ** This program tests that strqtok() correctly will parse strings
@@ -21,7 +22,7 @@
 ** ><
 ** >strings,   EOT  <
 **
-** It shouldn"t show
+** It shouldn't show
 **
 ** >Bogus token<
 */

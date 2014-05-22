@@ -3,7 +3,7 @@
 <article>
 <title>cc65 function reference
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2014-04-24
+<date>2014-05-22
 
 <abstract>
 cc65 is a C compiler for 6502 based systems. This function reference describes
@@ -5976,7 +5976,7 @@ hello[5] = '\0';
 <tag/Declaration/<tt/char* __fastcall__ strqtok (char* s1, const char* s2);/
 <tag/Description/<tt/strqtok()/ will break the string <tt/s1/ into a sequence of
 tokens, which are delimited by either quotation marks or characters from the
-string <tt/s2/. Tokens in quotation marks may contain characters from <tt/s2/
+string <tt/s2/. Tokens inside quotation marks may contain characters from <tt/s2/
 (they aren't delimiters there). The first call to <tt/strqtok()/ will return a
 pointer to the first token in the string <tt/s1/. The following calls must pass
 a <tt/NULL/ pointer as <tt/s1/, in order to get the next token in the string.

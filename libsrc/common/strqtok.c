@@ -15,7 +15,7 @@
 #include <string.h>
 
 
-char * __fastcall__ strqtok (register char *s1, const char *s2)
+char* __fastcall__ strqtok (register char* s1, const char* s2)
 {
     static char c;
     static char *start;

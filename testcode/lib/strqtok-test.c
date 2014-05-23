@@ -30,7 +30,7 @@
 #include <string.h>
 #include <stdio.h>
 
-void main(void)
+void main (void)
 {
     /* b[] and s[] are declared as automatic, not static, variables
     ** because strqtok() will change them.
@@ -41,10 +41,10 @@ void main(void)
     char s[] = "  This ,  \"  is only    \"a   short   "
         "quoting\"test ,  honoring  blanks"
         ", commas\", and (4) empty \"\"\"\"\"\"\"\" \"strings,   EOT  ";
-    char *t = strqtok(s, " ,");
+    char *t = strqtok (s, " ,");
 
     while (t != NULL) {
-        printf(">%s<\n", t);
-        t = strqtok(NULL, " ,");
+        printf (">%s<\n", t);
+        t = strqtok (NULL, " ,");
     }
 }

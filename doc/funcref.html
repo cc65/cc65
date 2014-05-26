@@ -9,7 +9,7 @@
 <H1>cc65 function reference</H1>
 
 <H2>
-<A HREF="mailto:uz@cc65.org">Ullrich von Bassewitz</A></H2>2014-05-22
+<A HREF="mailto:uz@cc65.org">Ullrich von Bassewitz</A></H2>2014-05-26
 <HR>
 <EM>cc65 is a C compiler for 6502 based systems. This function reference describes
 the C functions available in the standard library.</EM>
@@ -481,6 +481,7 @@ function.</P>
 <A HREF="#atmos_save">atmos_save</A></LI>
 </UL>
 </P>
+<P>(incomplete)</P>
 
 
 <H2><A NAME="c128.h"></A> <A NAME="ss2.7">2.7</A> <A HREF="#toc2.7"><CODE>c128.h</CODE></A>
@@ -9543,19 +9544,20 @@ be used in presence of a prototype.</LI>
 <P><CODE>
 <A HREF="#string.h">string.h</A></CODE></P>
 <DT><B>Declaration</B><DD>
-<P><CODE>char* __fastcall__ strcpy (char* s1, const char* s2, size_t n);</CODE></P>
+<P><CODE>char* __fastcall__ strncpy (char* s1, const char* s2, size_t n);</CODE></P>
 <DT><B>Description</B><DD>
-<P>The <CODE>strncpy</CODE> function copies not more than n bytes from
+<P>The <CODE>strncpy</CODE> function copies not more than <CODE>n</CODE> bytes from
 the array pointed to by <CODE>s2</CODE> to the array pointed to by <CODE>s1</CODE>. If the array
-pointed to by <CODE>s2</CODE> is a string that is shorter than n bytes, null bytes are
+pointed to by <CODE>s2</CODE> is a string that is shorter than <CODE>n</CODE> bytes, null bytes are
 appended to the copy in the array pointed to by <CODE>s1</CODE>, until <CODE>n</CODE> bytes are
-written. The function will always return <CODE>s1</CODE>.</P>
+written. The function always will return <CODE>s1</CODE>.</P>
 <DT><B>Limits</B><DD>
 <P>
 <UL>
-<LI>The function is only available as fastcall function, so it may only
-be used in presence of a prototype. If there is no null byte in the first <CODE>n</CODE>
-bytes of the array pointed to by <CODE>s2</CODE>, the result is not null-terminated.</LI>
+<LI>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.</LI>
+<LI>If there is no null byte in the first <CODE>n</CODE> bytes of the array pointed
+to by <CODE>s2</CODE>, the result is <EM>not</EM> null-terminated!</LI>
 <LI>If copying takes place between objects that overlap, the behaviour is
 undefined.</LI>
 </UL>
@@ -9564,6 +9566,7 @@ undefined.</LI>
 <P>ISO 9899</P>
 <DT><B>See also</B><DD>
 <P>
+<A HREF="#memcpy">memcpy</A>,
 <A HREF="#strcat">strcat</A>,
 <A HREF="#strcpy">strcpy</A>,
 <A HREF="#strncat">strncat</A></P>
@@ -9574,8 +9577,7 @@ undefined.</LI>
 
 static char hello[6];
 
-strcpy (hello, "Hello world!\n", sizeof (hello) - 1);
-hello[5] = '\0';
+strncpy (hello, "Hello world!\n", sizeof hello - 1)[5] = '\0';
 </PRE>
 </P>
 </DL>

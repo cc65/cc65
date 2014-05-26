@@ -3,7 +3,7 @@
 <article>
 <title>cc65 function reference
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2014-05-22
+<date>2014-05-26
 
 <abstract>
 cc65 is a C compiler for 6502 based systems. This function reference describes
@@ -115,7 +115,15 @@ function.
 <itemize>
 <item><ref id="atmos_load" name="atmos_load">
 <item><ref id="atmos_save" name="atmos_save">
+<!-- <item><ref id="atmos_explode" name="atmos_explode"> -->
+<!-- <item><ref id="atmos_ping" name="atmos_ping"> -->
+<!-- <item><ref id="atmos_shoot" name="atmos_shoot"> -->
+<!-- <item><ref id="atmos_tick" name="atmos_tick"> -->
+<!-- <item><ref id="atmos_tock" name="atmos_tock"> -->
+<!-- <item><ref id="atmos_zap" name="atmos_zap"> -->
 </itemize>
+
+(incomplete)
 
 
 <sect1><tt/c128.h/<label id="c128.h"><p>
@@ -170,6 +178,7 @@ function.
 <!-- <item><ref id="cbm_readdir" name="cbm_readdir"> -->
 <!-- <item><ref id="cbm_save" name="cbm_save"> -->
 <!-- <item><ref id="cbm_write" name="cbm_write"> -->
+<!-- <item><ref id="get_tv" name="get_tv"> -->
 </itemize>
 
 (incomplete)
@@ -5936,21 +5945,23 @@ be used in presence of a prototype.
 <descrip>
 <tag/Function/Copy part of a string.
 <tag/Header/<tt/<ref id="string.h" name="string.h">/
-<tag/Declaration/<tt/char* __fastcall__ strcpy (char* s1, const char* s2, size_t n);/
-<tag/Description/The <tt/strncpy/ function copies not more than n bytes from
+<tag/Declaration/<tt/char* __fastcall__ strncpy (char* s1, const char* s2, size_t n);/
+<tag/Description/The <tt/strncpy/ function copies not more than <tt/n/ bytes from
 the array pointed to by <tt/s2/ to the array pointed to by <tt/s1/. If the array
-pointed to by <tt/s2/ is a string that is shorter than n bytes, null bytes are
+pointed to by <tt/s2/ is a string that is shorter than <tt/n/ bytes, null bytes are
 appended to the copy in the array pointed to by <tt/s1/, until <tt/n/ bytes are
-written. The function will always return <tt/s1/.
+written. The function always will return <tt/s1/.
 <tag/Limits/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype. If there is no null byte in the first <tt/n/
-bytes of the array pointed to by <tt/s2/, the result is not null-terminated.
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
+<item>If there is no null byte in the first <tt/n/ bytes of the array pointed
+to by <tt/s2/, the result is <em/not/ null-terminated!
 <item>If copying takes place between objects that overlap, the behaviour is
 undefined.
 </itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
+<ref id="memcpy" name="memcpy">,
 <ref id="strcat" name="strcat">,
 <ref id="strcpy" name="strcpy">,
 <ref id="strncat" name="strncat">
@@ -5960,8 +5971,7 @@ undefined.
 
 static char hello[6];
 
-strcpy (hello, "Hello world!\n", sizeof (hello) - 1);
-hello[5] = '\0';
+strncpy (hello, "Hello world!\n", sizeof hello - 1)[5] = '\0';
 </verb>
 </descrip>
 </quote>

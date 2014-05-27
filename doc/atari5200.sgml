@@ -5,7 +5,7 @@
 <title>Atari 5200 specific information for cc65
 <author>
 <url url="mailto:chris@groessler.org" name="Christian Groessler"><newline>
-<date>2014-05-15
+<date>2014-05-27
 
 <abstract>
 An overview over the Atari 5200 runtime system as it is implemented for the
@@ -39,18 +39,29 @@ config.
 
 <sect>Memory layout<p>
 
-cc65 generated programs with the default setup run with the I/O area and a
-CHR bank enabled, which gives a usable memory range of &dollar;8000 - &dollar;FFF3.
-All boot ROM entry points may be called directly without additional code.
+cc65 generated programs with the default setup use the RAM space from &dollar;021C to
+&dollar;3FFF. If you want to reserve memory for the display list and screen buffer
+you should define the __RESERVED_MEMORY__ linker variable. The number
+of bytes specified by __RESERVED_MEMORY__ are lowering the top of
+memory, therefore the available
+RAM memory for the program is &dollar;021C to &dollar;3FFF-__RESERVED_MEMORY__.
+The default linker config file sets __RESERVED_MEMORY__ to &dollar;1E0
+to reserve space for an optional CONIO text screen.
 
 Special locations:
 
 <descrip>
   <tag/Text screen/
-  The text screen is located at VRAM &dollar;2000.
+  The text screen is only enabled if any of the CONIO output routines
+  is used in the program. Its size is 20x24 characters (Antic mode 6,
+  BASIC mode 1). The text screen is located at &dollar;3E00. The
+  address of the screen memory is available at runtime in the variable
+  SAVMSC (&dollar;001B).<p>
+  If the program doesn't use any CONIO output functions it needs to setup its own
+  display list.
 
   <tag/Stack/
-  The C runtime stack is located at &dollar;7FFF and growing downwards.
+  The C runtime stack is located at &dollar;3FFF-__RESERVED_MEMORY__ and growing downwards.
 
   <tag/Heap/
   The C heap is located at the end of the program and grows towards the C
@@ -68,31 +79,43 @@ Programs containing Atari 5200 specific code may use the <tt/atari5200.h/ header
 <sect1>Atari 5200 specific functions<p>
 
 <itemize>
-<item>???
+<item>TBD.
 </itemize>
 
 
 
 <sect1>Hardware access<p>
 
-The following pseudo variables declared in the <tt/nes.inc/ include file do
-allow access to hardware located in the address space.
+The following pseudo variables declared in the <tt/atari5200.h/ header
+file do allow access to hardware located in the address space. Some
+variables are structures, accessing the struct fields will access the
+chip registers.
 
 <descrip>
 
-  <tag><tt/PPU/</tag>
-  The <tt/PPU/ defines allow access to the PPU chip.
+  <tag><tt/GTIA_READ/ and <tt/GTIA_WRITE/</tag>
+  The <tt/GTIA_READ/ structure allows read access to the GTIA. The
+  <tt/GTIA_WRITE/ structure allows write access to the GTIA.
+  See the <tt/_gtia.h/ header file located in the include directory
+  for the declaration of the structure.
 
-  <tag><tt/APU/</tag>
-  The <tt/APU/ defines allow access to the APU chip.
+  <tag><tt/POKEY_READ/ and <tt/POKEY_WRITE/</tag>
+  The <tt/POKEY_READ/ structure allows read access to the POKEY. The
+  <tt/POKEY_WRITE/ structure allows write access to the POKEY.
+  See the <tt/_pokey.h/ header file located in the include directory
+  for the declaration of the structure.
+
+  <tag><tt/ANTIC/</tag>
+  The <tt/ANTIC/ structure allows read access to the ANTIC.
+  See the <tt/_antic.h/ header file located in the include directory
+  for the declaration of the structure.
 
 </descrip><p>
 
 
-
 <sect>Loadable drivers<p>
 
-All drivers must be statically linked because no file I/O is available.
+All drivers must be statically linked because no disk I/O is available.
 The names in the parentheses denote the symbols to be used for static linking of the drivers.
 
 
@@ -135,11 +158,8 @@ No serial drivers are available for the Atari 5200.
 
 <sect1>Disk I/O<p>
 
-The existing library for the Atari 5200 doesn't implement C file
-I/O. There are no hacks for the <tt/read()/ and <tt/write()/ routines.
-
-To be more concrete, this limitation means that you cannot use any of the
-following functions (and a few others):
+Disk I/O is not supported by the <tt/atari5200/ target. This means that
+you cannot use any of the following functions (and a few others):
 
 <itemize>
 <item>fclose

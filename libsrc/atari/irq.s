@@ -23,8 +23,7 @@ initirq:
         lda     #7
         ldy     #<IRQStub
         ldx     #>IRQStub
-        jsr     SETVBV
-        rts
+        jmp     SETVBV
 
 ; ------------------------------------------------------------------------
 
@@ -34,8 +33,7 @@ doneirq:
         lda     #7
         ldy     IRQInd+1
         ldx     IRQInd+2
-        jsr     SETVBV
-        rts
+        jmp     SETVBV
 
 ; ------------------------------------------------------------------------
 

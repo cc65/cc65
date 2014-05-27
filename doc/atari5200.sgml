@@ -52,7 +52,7 @@ Special locations:
 
 <descrip>
   <tag/Text screen/
-  The text screen is only enabled if any of the CONIO output routines
+  The text screen is only enabled if any of the CONIO output functions
   is used in the program. Its size is 20x24 characters (Antic mode 6,
   BASIC mode 1). The text screen is located at &dollar;3E00. The
   address of the screen memory is available at runtime in the variable
@@ -138,7 +138,8 @@ No extended memory drivers are available for the Atari 5200.
 <descrip>
 
   <tag><tt/atr5200std.joy (atr5200std_joy)/</tag>
-  A joystick driver for the standard Atari 5200 joystick is available. Up to four joysticks can be attached.
+  A joystick driver for the standard Atari 5200 joystick is
+  available. Depending on the version of the 5200 console, two or four joysticks can be attached.
 
 </descrip><p>
 

@@ -1,7 +1,7 @@
 ;
 ; Standard joystick driver for the Atari 5200.
 ;
-; Christian Groessler, 2014-05-12
+; Christian Groessler, 2014-05-28
 ;
 
         .include        "zeropage.inc"
@@ -27,14 +27,14 @@
 
 ; Button state masks (8 values)
 
-        .byte   $01                     ; JOY_UP
-        .byte   $02                     ; JOY_DOWN
-        .byte   $04                     ; JOY_LEFT
-        .byte   $08                     ; JOY_RIGHT
-        .byte   $10                     ; JOY_FIRE
-        .byte   $20                     ; JOY_FIRE2
-        .byte   $00                     ; Future expansion
-        .byte   $00                     ; Future expansion
+        .byte   $01             ; JOY_UP
+        .byte   $02             ; JOY_DOWN
+        .byte   $04             ; JOY_LEFT
+        .byte   $08             ; JOY_RIGHT
+        .byte   $10             ; JOY_FIRE
+        .byte   $20             ; JOY_FIRE2
+        .byte   $00             ; Future expansion
+        .byte   $00             ; Future expansion
 
 ; Jump table.
 
@@ -42,13 +42,7 @@
         .addr   UNINSTALL
         .addr   COUNT
         .addr   READJOY
-        .addr   0                       ; IRQ entry not used
-
-; ------------------------------------------------------------------------
-; Constants
-
-JOY_COUNT       = 4             ; Number of joysticks we support
-
+        .addr   0               ; IRQ entry not used
 
 .code
 
@@ -78,7 +72,12 @@ UNINSTALL:
 ;
 
 COUNT:
-        lda     #JOY_COUNT
+        lda     $FD32           ; check ROM version
+        cmp     #$E8
+        bne     @2port
+        lda     #4
+        .byte   $2C             ; bit opcode, eats the next 2 bytes
+@2port: lda     #2
         ldx     #0
         rts
 
@@ -86,45 +85,46 @@ COUNT:
 ; READ: Read a particular joystick passed in A.
 ;
 
-CENTER	=	228 / 2
-SENSIVITY	= 16
+CENTER  =       228 / 2
+SENSIVITY       = 16
 
 READJOY:
-        and     #3              ; fix joystick number
-	asl	a
+        and     #3              ; put joystick number in range, just in case
+        tay
+        asl     a
         tax                     ; Joystick number * 2 (0-6) into X, index into ZP shadow registers
-	lda	#0		; Initialize return value
+
+        lda     #0              ; Initialize return value
+        cmp     TRIG0,y
+        bne     @notrg
+        lda     #$10            ; JOY_FIRE
 
 ; Read joystick
 
-	ldy	PADDL0,x	; get horizontal position
-	cpy	#CENTER-SENSIVITY
-	bcs	@chkleft
+@notrg: ldy     PADDL0,x        ; get horizontal position
+        cpy     #CENTER-SENSIVITY
+        bcs     @chkleft
 
-	ora	#4		; JOY_LEFT
-	bne	@updown
+        ora     #4              ; JOY_LEFT
+        bne     @updown
 
 @chkleft:
-	cpy	#CENTER+SENSIVITY
-	bcc	@updown
+        cpy     #CENTER+SENSIVITY
+        bcc     @updown
 
-	ora	#8		; JOY_RIGHT
+        ora     #8              ; JOY_RIGHT
 
-@updown:ldy	PADDL0+1,x	; get vertical position
-	cpy	#CENTER-SENSIVITY
-	bcs	@chkdown
+@updown:ldy     PADDL0+1,x      ; get vertical position
+        cpy     #CENTER-SENSIVITY
+        bcs     @chkdown
 
-	ora	#1		; JOY_UP
-	bne	@buttons
+        ora     #1              ; JOY_UP
+        bne     @done
 
 @chkdown:
-	cpy	#CENTER+SENSIVITY
-	bcc	@buttons
+        cpy     #CENTER+SENSIVITY
+        bcc     @done
 
-	ora	#2		; JOY_DOWN
+        ora     #2              ; JOY_DOWN
 
-@buttons:
-	; @@@ TODO: BOTTON STATE
-
-	rts
-
+@done:  rts

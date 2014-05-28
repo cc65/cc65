@@ -1,3 +1,6 @@
+; setup default CONIO screen (20x24, Antic mode 6, BASIC mode 1)
+;
+; 28-May-2014, Christian Groessler <chris@groessler.org>
 
                 .include "atari5200.inc"
 

@@ -14,9 +14,9 @@
         .importzp       ptr4
         .import         setcursor
 
-	.constructor	screen_setup, 26
-	.import		screen_setup_20x24
-screen_setup	= screen_setup_20x24
+        .constructor    screen_setup, 26
+        .import         screen_setup_20x24
+screen_setup    = screen_setup_20x24
 
 
 _cputcxy:

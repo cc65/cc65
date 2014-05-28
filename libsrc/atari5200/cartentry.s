@@ -3,8 +3,8 @@
 ; Christian Groessler, 01-Mar-2014
 
 .export         __CART_ENTRY__: absolute = 1
-.import		__CARTSIZE__, start
-.forceimport	__CART_YEAR__, __CART_NAME__
+.import         __CARTSIZE__, start
+.forceimport    __CART_YEAR__, __CART_NAME__
 
 .segment        "CARTENTRY"
 

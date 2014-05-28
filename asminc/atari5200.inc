@@ -1,24 +1,14 @@
+;-------------------------------------------------------------------------
+; Atari 5200 System Equates
+; by Christian Groessler <chris@groessler.org>
+; taken from EQUATES.INC from Atari Inc.
+;-------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------
 ; ATASCII CHARACTER DEFS
 ;-------------------------------------------------------------------------
-
-ATCLR   = $7D           ;CLEAR SCREEN CHARACTER
-ATRUB   = $7E           ;BACK SPACE (RUBOUT)
-ATTAB   = $7F           ;TAB
-ATEOL   = $9B           ;END-OF-LINE
-ATDELL  = $9C           ;delete line
-ATINSL  = $9D           ;insert line
-ATCTAB  = $9E           ;clear TAB
-ATSTAB  = $9F           ;set TAB
-ATBEL   = $FD           ;CONSOLE BELL
-ATDEL   = $FE           ;delete char.
-ATINS   = $FF           ;insert char.
-ATURW   = $1C           ;UP-ARROW
-ATDRW   = $1D           ;DOWN-ARROW
-ATLRW   = $1E           ;LEFT-ARROW
-ATRRW   = $1F           ;RIGHT-ARROW
-ATESC   = $1B           ;ESCAPE
+ 
+ATEOL   = $9B           ;END-OF-LINE, used by CONIO
 
 
 ;-------------------------------------------------------------------------
@@ -57,9 +47,9 @@ PADDL7  =  $18   ;POT7  "
 
 ; cc65 runtime zero page variables
 
-ROWCRS_5200	=	$19
-COLCRS_5200	=	$1A
-SAVMSC		=	$1B		; pointer to screen memory (conio)
+ROWCRS_5200     =       $19
+COLCRS_5200     =       $1A
+SAVMSC          =       $1B             ; pointer to screen memory (conio)
 
 ;-------------------------------------------------------------------------
 ; Page #2
@@ -124,4 +114,3 @@ GOCART  =  $BFFE   ;Cartridge Start Vector
 
 
 CHRORG  =  $F800   ;Character Generator Base
-

@@ -8,4 +8,6 @@
 
 .segment        "CARTNAME"
 
-                scrcode "   cc65 compiled"
+                scrcode "   cc"
+                .byte   '6' + 32, '5' + 32      ; use playfield 1
+                scrcode " compiled"

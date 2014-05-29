@@ -1,6 +1,6 @@
 ;
 ; 2000-05-17, Ullrich von Bassewitz
-; 2014-05-26, Greg King
+; 2014-05-28, Greg King
 ;
 ; int __fastcall__ _osmaperrno (unsigned char oserror);
 ; /* Map a system-specific error into a system-independent code. */
@@ -48,7 +48,7 @@ ErrTab:
         .byte  23, EIO          ; Checksum error
         .byte  24, EIO          ; Decode error
         .byte  25, EIO          ; Verify error
-        .byte  26, EACCES       ; Write protect on
+        .byte  26, EACCES       ; Write protected
         .byte  27, EIO          ; Checksum error
         .byte  28, EIO          ; Write overrun
         .byte  29, EBUSY        ; Disk ID mismatch
@@ -57,7 +57,8 @@ ErrTab:
         .byte  32, EINVAL       ; Command too long
         .byte  33, EINVAL       ; Invalid write filename
         .byte  34, EINVAL       ; No file given
-        .byte  39, ENOENT       ; File not found
+        .byte  39, ENOENT       ; System file not found
+        .byte  49, EACCES       ; Invalid format
         .byte  50, ESPIPE       ; Record not present
         .byte  51, ENOSPC       ; Overflow in record
         .byte  52, ENOSPC       ; File too large
@@ -74,5 +75,8 @@ ErrTab:
         .byte  72, ENOSPC       ; Disk full
         .byte  73, EACCES       ; DOS version mismatch
         .byte  74, ENODEV       ; Drive not ready
+        .byte  75, EIO          ; Format error
+        .byte  77, EINVAL       ; Illegal partition
+        .byte  78, EIO          ; Bad system area
 
 ErrTabSize = (* - ErrTab)

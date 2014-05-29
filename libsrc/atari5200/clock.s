@@ -5,7 +5,7 @@
 ; unsigned _clocks_per_sec (void);
 ;
 
-        .export         _clock, __clocks_per_sec
+        .export         _clock
         .importzp       sreg
 
         .include        "atari5200.inc"
@@ -21,15 +21,6 @@
         stx     sreg            ; Byte 2 is always zero, too
         lda     RTCLOK+1
         ldx     RTCLOK
-        rts
-
-.endproc
-
-
-.proc   __clocks_per_sec
-
-        ldx     #$00            ; Clear high byte of return value
-        lda     #60
         rts
 
 .endproc

@@ -23,7 +23,7 @@ including
 - the Atari 8 bit machines.
 - the Atari 5200 console.
 - GEOS for the C64 and C128.
-- the Nintendo Entertainment System (NES).
+- the Nintendo Entertainment System (NES) console.
 - the Supervision console.
 - the Oric Atmos.
 - the Lynx console.

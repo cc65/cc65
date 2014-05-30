@@ -16,9 +16,9 @@ GEOS = geos-apple \
 
 TARGETS = apple2    \
           apple2enh \
-          atari5200 \
           atari     \
           atarixl   \
+          atari5200 \
           atmos     \
           $(CBMS)   \
           $(GEOS)   \

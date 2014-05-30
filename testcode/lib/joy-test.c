@@ -5,6 +5,11 @@
 #include <conio.h>
 #include <joystick.h>
 
+#if defined(__NES__) || defined(__ATARI5200__)
+#define STATIC_DRIVER
+#define NO_OSERROR
+#endif
+
 
 int main (void)
 {
@@ -12,25 +17,40 @@ int main (void)
     unsigned char count;
     unsigned char i;
 
-#ifdef __NES__
-    extern void *co65_joy;
-    unsigned char Res = joy_install (&co65_joy);
+#ifdef STATIC_DRIVER
+    unsigned char Res = joy_install (&joy_static_stddrv);
 #else
     unsigned char Res = joy_load_driver (joy_stddrv);
 #endif
     if (Res != JOY_ERR_OK) {
         cprintf ("Error in joy_load_driver: %u\r\n", Res);
+#ifndef NO_OSERROR
         cprintf ("os: %u, %s\r\n", _oserror, _stroserror (_oserror));
+#endif
         exit (EXIT_FAILURE);
     }
 
     clrscr ();
     count = joy_count ();
+#ifdef __ATARI5200__
+    cprintf ("JOYSTICKS: %d", count);
+#else
     cprintf ("Driver supports %d joystick(s)", count);
+#endif
     while (1) {
         for (i = 0; i < count; ++i) {
             gotoxy (0, i+1);
             j = joy_read (i);
+#ifdef __ATARI5200__
+            cprintf ("%1d:%-3s%-3s%-3s%-3s%-3s%-3s",
+                     i,
+                     (j & joy_masks[JOY_UP])?    " U " : " u ",
+                     (j & joy_masks[JOY_DOWN])?  " D " : " d ",
+                     (j & joy_masks[JOY_LEFT])?  " L " : " l ",
+                     (j & joy_masks[JOY_RIGHT])? " R " : " r ",
+                     (j & joy_masks[JOY_FIRE])?  " 1 " : "   ",
+                     (j & joy_masks[JOY_FIRE2])? " 2 " : "   ");
+#else
             cprintf ("%2d: %-6s%-6s%-6s%-6s%-6s%-6s",
                      i,
                      (j & joy_masks[JOY_UP])?    "  up  " : " ---- ",
@@ -39,6 +59,7 @@ int main (void)
                      (j & joy_masks[JOY_RIGHT])? "right " : " ---- ",
                      (j & joy_masks[JOY_FIRE])?  " fire " : " ---- ",
                      (j & joy_masks[JOY_FIRE2])? "fire2 " : " ---- ");
+#endif
         }
     }
     return 0;

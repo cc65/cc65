@@ -778,7 +778,7 @@ CARTAD  = $BFFE         ;##rev2## 2-byte cartridge start vector
 ;-------------------------------------------------------------------------
 
 GTIA    = $D000         ;CTIA/GTIA area
-.include "_gtia.inc"
+.include "atari_gtia.inc"
 
 ;-------------------------------------------------------------------------
 ; PBI Address Equates
@@ -799,14 +799,14 @@ PDVS    = $D1FF         ;##rev2## parallel device select
 ;-------------------------------------------------------------------------
 
 POKEY     = $D200         ;POKEY area
-.include  "_pokey.inc"
+.include  "atari_pokey.inc"
 
 ;-------------------------------------------------------------------------
 ; ANTIC Address Equates
 ;-------------------------------------------------------------------------
 
 ANTIC     = $D400         ;ANTIC area
-.include  "_antic.inc"
+.include  "atari_antic.inc"
 
 ; PBI RAM Address Equates
 

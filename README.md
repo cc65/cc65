@@ -22,7 +22,7 @@ including
 - the Apple ][+ and successors.
 - the Atari 8 bit machines.
 - the Atari 5200 console.
-- GEOS for the C64 and C128.
+- GEOS for the C64, C128 and Apple //e.
 - the Nintendo Entertainment System (NES) console.
 - the Supervision console.
 - the Oric Atmos.

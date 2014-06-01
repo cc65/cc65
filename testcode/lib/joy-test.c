@@ -5,8 +5,15 @@
 #include <conio.h>
 #include <joystick.h>
 
+#ifdef MOUSE_DRIVER
+/* A statically linked driver was named on the compiler's command line.
+** Make sure that it is used instead of a dynamic one.
+*/
+#  undef DYN_DRV
+#  define DYN_DRV       0
+#endif
+
 #if defined(__NES__) || defined(__ATARI5200__)
-#define STATIC_DRIVER
 #define NO_OSERROR
 #endif
 
@@ -17,11 +24,14 @@ int main (void)
     unsigned char count;
     unsigned char i;
 
-#ifdef STATIC_DRIVER
-    unsigned char Res = joy_install (&joy_static_stddrv);
-#else
+#if DYN_DRV
     unsigned char Res = joy_load_driver (joy_stddrv);
+#elif defined(MOUSE_DRIVER)
+    unsigned char Res = joy_install (&MOUSE_DRIVER);
+#else
+    unsigned char Res = joy_install (&joy_static_stddrv);
 #endif
+
     if (Res != JOY_ERR_OK) {
         cprintf ("Error in joy_load_driver: %u\r\n", Res);
 #ifndef NO_OSERROR
@@ -64,4 +74,3 @@ int main (void)
     }
     return 0;
 }
-

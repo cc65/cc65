@@ -40,6 +40,11 @@
 #  error This module may only be used when compiling for the Atari 5200!
 #endif
 
+/* no support for dynamically loadable drivers */
+#define DYN_DRV 0
+
+/* the addresses of the static drivers */
+extern void atr5200std_joy[];        /* referred to by joy_static_stddrv[] */
 
 /* make GTIA color value */
 #define _gtia_mkcolor(hue,lum) (((hue) << 4) | ((lum) << 1))

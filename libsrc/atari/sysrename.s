@@ -45,13 +45,7 @@ iocbok: stx     tmp4            ; remember IOCB index
         ldy     #0
         sty     sspc+1          ; initialize stack space
 
-.ifndef  UCASE_FILENAME
-
-        sta     ptr3
-        stx     ptr3+1
-        sty     sspc
-
-.else
+.ifdef  UCASE_FILENAME
 
 ; uppercase first (old) name and prepend device if needed
 
@@ -99,6 +93,12 @@ ucok2:  sta     ptr2            ; remember pointer to uppercased new name
         bcc     ukok4
         inc     sspc+1
 ukok4:
+
+.else
+
+        sta     ptr3
+        stx     ptr3+1
+        sty     sspc
 
 .endif
 

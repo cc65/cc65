@@ -9,10 +9,10 @@
         .import         popa, _gotoxy, cputdirect, setcursor
         .importzp       tmp1
 
-.ifndef __ATARI5200__
-CHRCODE =       $12+64
-.else
+.ifdef __ATARI5200__
 CHRCODE =       14
+.else
+CHRCODE =       $12+64
 .endif
 
 _chlinexy:

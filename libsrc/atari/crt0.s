@@ -53,7 +53,14 @@ start:
         tsx
         stx     SP_save
 
-.ifndef __ATARIXL__
+.ifdef __ATARIXL__
+
+        lda     #<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
+        sta     sp
+        lda     #>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
+        sta     sp+1
+
+.else
 
 ; Report memory usage
 
@@ -71,13 +78,6 @@ start:
         sbc     #>__RESERVED_MEMORY__
         sta     APPMHI+1
         sta     sp+1                    ; setup runtime stack part 2
-
-.else
-
-        lda     #<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
-        sta     sp
-        lda     #>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
-        sta     sp+1
 
 .endif
 

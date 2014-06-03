@@ -14,10 +14,10 @@ _cgetc:
         jsr     setcursor
         lda     #12
         sta     ICAX1Z          ; fix problems with direct call to KEYBDV
-.ifndef __ATARIXL__
-        jsr     @1
-.else
+.ifdef __ATARIXL__
         jsr     KEYBDV_handler
+.else
+        jsr     @1
 .endif
         ldx     #0
         rts

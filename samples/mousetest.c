@@ -30,6 +30,12 @@
 */
 #  undef DYN_DRV
 #  define DYN_DRV       0
+#else
+
+/* Use a dynamically loaded driver, by default. */
+#  ifndef DYN_DRV
+#    define DYN_DRV     1
+#  endif
 #endif
 
 

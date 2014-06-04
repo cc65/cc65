@@ -14,12 +14,13 @@
         .include        "lynx.inc"
 
         .macpack        generic
+        .macpack        module
 
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-.segment        "HEADER"
+        module_header   _lynx_stdjoy_joy
 
 ; Driver signature
 

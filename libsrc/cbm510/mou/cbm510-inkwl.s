@@ -13,11 +13,13 @@
         .include        "cbm510.inc"
 
         .macpack        generic
+        .macpack        module
+
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table.
 
-.segment        "HEADER"
+        module_header   _cbm510_inkwl_mou
 
 HEADER:
 

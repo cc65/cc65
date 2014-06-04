@@ -11,11 +11,13 @@
         .include        "c64.inc"
 
         .macpack        generic
+        .macpack        module
+
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-.segment        "HEADER"
+        module_header   _c64_pot_mou
 
 HEADER:
 

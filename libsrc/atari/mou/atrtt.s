@@ -9,11 +9,16 @@
         .include        "atari.inc"
 
         .macpack        generic
+        .macpack        module
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-.segment        "HEADER"
+.ifdef __ATARIXL__
+        module_header   _atrxtt_mou
+.else
+        module_header   _atrtt_mou
+.endif
 
 HEADER:
 

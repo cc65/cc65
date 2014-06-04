@@ -10,11 +10,13 @@
         .include        "joy-error.inc"
         .include        "atari5200.inc"
 
+        .macpack        module
+
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-.segment        "HEADER"
+        module_header   _atr5200std_joy
 
 ; Driver signature
 

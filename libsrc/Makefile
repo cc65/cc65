@@ -207,38 +207,39 @@ endif
 define DRVTYPE_template
 
 $1_SRCDIR = $$(SRCDIR)/$1
-$1_OBJDIR = ../libwrk/$$(TARGET)/$1
+$1_STCDIR = ../libwrk/$$(TARGET)
+$1_DYNDIR = ../libwrk/$$(TARGET)/$1
 $1_DRVDIR = ../$1
 
-$1_OBJPAT = $$($1_OBJDIR)/$$(OBJPFX)%.o
+$1_SRCPAT = $$($1_SRCDIR)/$$(OBJPFX)%.s
+$1_STCPAT = $$($1_STCDIR)/$$(OBJPFX)%-$1.o
+$1_DYNPAT = $$($1_DYNDIR)/$$(OBJPFX)%.o
 $1_DRVPAT = $$($1_DRVDIR)/$$(DRVPFX)%.$1
-$1_STCPAT = ../libwrk/$$(TARGET)/$$(DRVPFX)%-$1.o
 
-$1_OBJS := $$(patsubst $$($1_SRCDIR)/%.s,$$($1_OBJDIR)/%.o,$$(wildcard $$($1_SRCDIR)/*.s))
+$1_SRCS := $$(wildcard $$($1_SRCDIR)/*.s)
+$1_STCS = $$(patsubst $$($1_SRCPAT),$$($1_STCPAT),$$($1_SRCS))
+$1_DYNS = $$(patsubst $$($1_SRCPAT),$$($1_DYNPAT),$$($1_SRCS))
+$1_DRVS = $$(patsubst $$($1_DYNPAT),$$($1_DRVPAT),$$($1_DYNS))
 
-$1_DRVS = $$(patsubst $$($1_OBJPAT),$$($1_DRVPAT),$$($1_OBJS))
+$$($1_STCPAT): $$($1_SRCPAT)
+	@echo $$(TARGET) - $$< - static
+	@$$(CA65) -t $$(TARGET) -D DYN_DRV=0 $$(CA65FLAGS) --create-dep $$(@:.o=.d) -o $$@ $$<
 
-$1_STCS = $$(patsubst $$($1_DRVPAT),$$($1_STCPAT),$$($1_DRVS))
+OBJS += $$($1_STCS)
+DEPS += $$($1_STCS:.o=.d)
 
-$$($1_OBJS): | $$($1_OBJDIR)
+$$($1_DYNS): | $$($1_DYNDIR)
 
-$$($1_DRVPAT): $$($1_OBJPAT) $$(ZPOBJ) | $$($1_DRVDIR)
+$$($1_DRVPAT): $$($1_DYNPAT) $$(ZPOBJ) | $$($1_DRVDIR)
 	@echo $$(TARGET) - $$(<F)
 	@$$(LD65) -o $$@ -t module $$^
 
-$$($1_OBJDIR) $$($1_DRVDIR):
+$$($1_DYNDIR) $$($1_DRVDIR):
 	@$$(call MKDIR,$$@)
 
 $(TARGET): $$($1_DRVS)
 
-$$($1_STCPAT): $$($1_DRVPAT)
-	@echo $$(TARGET) - $$(<F)
-	@$$(CO65) -o $$(@:.o=.s) --code-label _$$(subst -,_,$$(subst .,_,$$(<F))) $$<
-	@$$(CA65) -t $$(TARGET) -o $$@ $$(@:.o=.s)
-
-OBJS += $$($1_STCS)
-
-DEPS += $$($1_OBJS:.o=.d)
+DEPS += $$($1_DYNS:.o=.d)
 
 endef # DRVTYPE_template
 
@@ -247,7 +248,6 @@ $(foreach drvtype,$(DRVTYPES),$(eval $(call DRVTYPE_template,$(drvtype))))
 AR65 := $(if $(wildcard ../bin/ar65*),../bin/ar65,ar65)
 CA65 := $(if $(wildcard ../bin/ca65*),../bin/ca65,ca65)
 CC65 := $(if $(wildcard ../bin/cc65*),../bin/cc65,cc65)
-CO65 := $(if $(wildcard ../bin/co65*),../bin/co65,co65)
 LD65 := $(if $(wildcard ../bin/ld65*),../bin/ld65,ld65)
 
 export CC65_HOME := $(abspath ..)

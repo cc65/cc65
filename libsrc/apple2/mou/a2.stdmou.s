@@ -8,6 +8,8 @@
         .include        "mouse-kernel.inc"
         .include        "apple2.inc"
 
+        .macpack        module
+
 ; ------------------------------------------------------------------------
 
 SETMOUSE        = $12   ; Sets mouse mode
@@ -28,7 +30,11 @@ status          := $0778
 
 ; ------------------------------------------------------------------------
 
-        .segment        "HEADER"
+        .ifdef  __APPLE2ENH__
+        module_header   _a2e_stdmou_mou
+        .else
+        module_header   _a2_stdmou_mou
+        .endif
 
         ; Driver signature
         .byte   $6D, $6F, $75           ; "mou"

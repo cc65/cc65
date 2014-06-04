@@ -23,6 +23,7 @@ DISABLE_TIMEOUT =       30              ; # of vertical blank interrupts after w
         .include        "atari.inc"
 
         .macpack        generic
+        .macpack        module
 
 .if .not ( .defined (AMIGA_MOUSE) .or .defined (TRAK_MOUSE))
         ST_MOUSE = 1
@@ -31,7 +32,31 @@ DISABLE_TIMEOUT =       30              ; # of vertical blank interrupts after w
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-.segment        "HEADER"
+.if .defined (ST_MOUSE)
+
+.ifdef __ATARIXL__
+        module_header   _atrxst_mou
+.else
+        module_header   _atrst_mou
+.endif
+
+.elseif .defined (AMIGA_MOUSE)
+
+.ifdef __ATARIXL__
+        module_header   _atrxami_mou
+.else
+        module_header   _atrami_mou
+.endif
+
+.elseif .defined (TRAK_MOUSE)
+
+.ifdef __ATARIXL__
+        module_header   _atrxtrk_mou
+.else
+        module_header   _atrtrk_mou
+.endif
+
+.endif
 
 HEADER:
 

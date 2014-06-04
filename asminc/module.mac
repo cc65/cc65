@@ -1,0 +1,13 @@
+.ifndef DYN_DRV
+        DYN_DRV = 1
+.endif
+
+.macro  module_header   module_label
+        .if DYN_DRV
+                .segment        "HEADER"
+        .else
+                .data
+                .export         module_label
+                module_label:
+        .endif
+.endmacro

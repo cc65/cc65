@@ -10,11 +10,17 @@
         .include        "ser-error.inc"
         .include        "atari.inc"
 
+        .macpack        module
+
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-.segment        "HEADER"
+.ifdef __ATARIXL__
+        module_header   _atrxrdev_ser
+.else
+        module_header   _atrrdev_ser
+.endif
 
 ; Driver signature
 

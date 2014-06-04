@@ -4321,16 +4321,14 @@ The package defines the following macros:
 
 <sect1><tt>.MACPACK atari</tt><p>
 
-The atari macro package will define a macro named <tt/scrcode/. It takes a
-string as argument and places this string into memory translated into screen
-codes.
+This macro package defines a macro named <tt/scrcode/. It takes a string
+as argument and places this string into memory translated into screen codes.
 
 
 <sect1><tt>.MACPACK cbm</tt><p>
 
-The cbm macro package will define a macro named <tt/scrcode/. It takes a
-string as argument and places this string into memory translated into screen
-codes.
+This macro package defines a macro named <tt/scrcode/. It takes a string
+as argument and places this string into memory translated into screen codes.
 
 
 <sect1><tt>.MACPACK cpu</tt><p>
@@ -4385,6 +4383,13 @@ it is possible to determine if the
 
 instruction is supported, which is the case for the 65SC02, 65C02 and 65816
 CPUs (the latter two are upwards compatible to the 65SC02).
+
+  
+<sect1><tt>.MACPACK module</tt><p>
+
+This macro package defines a macro named <tt/module_header/. It takes an
+identifier as argument and is used to define the header of a module both
+in the dynamic and static variant.
 
 
 

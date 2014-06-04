@@ -12,6 +12,7 @@
         .include        "atmos.inc"
 
         .macpack        generic
+        .macpack        module
 
 XSIZE   =       6               ; System font width
 YSIZE   =       8               ; System font height
@@ -19,7 +20,7 @@ YSIZE   =       8               ; System font height
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table and constants.
 
-.segment        "HEADER"
+        module_header   _atmos_228_200_3_tgi
 
 ; The first part of the header is a structure that has a signature,
 ; and defines the capabilities of the driver.

@@ -1,13 +1,13 @@
 /*
- * _scanf.c
- *
- * (c) Copyright 2001-2005, Ullrich von Bassewitz <uz@cc65.org>
- * 2005-01-24, Greg King <gngking@erols.com>
- *
- * This is the basic layer for all scanf-type functions.  It should be
- * rewritten in assembly, at some time in the future.  So, some of the code
- * is not as elegant as it could be.
- */
+** _scanf.c
+**
+** (c) Copyright 2001-2005, Ullrich von Bassewitz <uz@cc65.org>
+** 2005-01-24, Greg King <greg.king5@ver5z6n.net>
+**
+** This is the basic layer for all scanf-type functions.  It should be
+** rewritten in assembly, at some time in the future.  So, some of the code
+** is not as elegant as it could be.
+*/
 
 
 
@@ -76,12 +76,12 @@ static const unsigned char Bits[CHAR_BIT] = {
 };
 
 /* We need C to be 16 bits since we cannot check for EOF otherwise.
- * Unfortunately, this causes the code to be quite larger, even if for most
- * purposes, checking the low byte would be enough, since if C is EOF, the
- * low byte will not match any useful character anyway (at least for the
- * supported platforms - I know that this is not portable). So the following
- * macro is used to access just the low byte of C.
- */
+** Unfortunately, this causes the code to be quite larger, even if for most
+** purposes, checking the low byte would be enough, since if C is EOF, the
+** low byte will not match any useful character anyway (at least for the
+** supported platforms - I know that this is not portable). So the following
+** macro is used to access just the low byte of C.
+*/
 #define CHAR(c)         (*((unsigned char*)&(c)))
 
 
@@ -93,16 +93,16 @@ static const unsigned char Bits[CHAR_BIT] = {
 
 
 /* We don't want the optimizer to ruin our "perfect" ;-)
- * assembly code!
- */
+** assembly code!
+*/
 #pragma optimize (push, off)
 
 static unsigned FindBit (void)
 /* Locate the character's bit in the charset array.
- * < .A - Argument character
- * > .X - Offset of the byte in the character-set mask
- * > .A - Bit-mask
- */
+** < .A - Argument character
+** > .X - Offset of the byte in the character-set mask
+** > .A - Bit-mask
+*/
 {
     asm ("pha");
     asm ("lsr a");              /* Divide by CHAR_BIT */
@@ -250,8 +250,8 @@ static void ReadChar (void)
     asm ("stx %v+1", C);
 
     /* If C is EOF, don't bump the character counter.
-     * Only the high-byte needs to be checked.
-     */
+    ** Only the high-byte needs to be checked.
+    */
     asm ("inx");
     asm ("beq %g", Done);
 
@@ -311,12 +311,12 @@ static void SkipWhite (void)
 
 static void ReadSign (void)
 /* Read an optional sign and skip it. Store 1 in Positive if the value is
- * positive, store 0 otherwise.
- */
+** positive, store 0 otherwise.
+*/
 {
     /* We can ignore the high byte of C here, since if it is EOF, the lower
-     * byte won't match anyway.
-     */
+    ** byte won't match anyway.
+    */
     asm ("lda %v", C);
     asm ("cmp #'-'");
     asm ("bne %g", NotNeg);
@@ -380,11 +380,11 @@ static void __fastcall__ ReadInt (unsigned char Base)
 
 static void AssignInt (void)
 /* Assign the integer value in Val to the next argument. The function makes
- * several non-portable assumptions, to reduce code size:
- *   - signed and unsigned types have the same representation.
- *   - short and int have the same representation.
- *   - all pointer types have the same representation.
- */
+** several non-portable assumptions, to reduce code size:
+**   - signed and unsigned types have the same representation.
+**   - short and int have the same representation.
+**   - all pointer types have the same representation.
+*/
 {
     if (NoAssign == false) {
 
@@ -416,8 +416,8 @@ Done:   ;
 
 static void __fastcall__ ScanInt (unsigned char Base)
 /* Scan an integer including white space, sign and optional base spec,
- * and store it into IntVal.
- */
+** and store it into IntVal.
+*/
 {
     /* Skip whitespace */
     SkipWhite ();
@@ -440,8 +440,8 @@ static void __fastcall__ ScanInt (unsigned char Base)
                     Base = 8;
 
                     /* Restart at the beginning of the number because it might
-                     * be only a single zero digit (which already was read).
-                     */
+                    ** be only a single zero digit (which already was read).
+                    */
                     PushBack ();
                     C = '0';
             }
@@ -483,8 +483,8 @@ static char GetFormat (void)
 int __fastcall__ _scanf (const struct scanfdata* D,
                          const char* format_, va_list ap_)
 /* This is the routine used to do the actual work. It is called from several
- * types of wrappers to implement the actual ISO xxscanf functions.
- */
+** types of wrappers to implement the actual ISO xxscanf functions.
+*/
 {
     register char* S;
              bool  HaveWidth;   /* True if a width was given */
@@ -492,9 +492,9 @@ int __fastcall__ _scanf (const struct scanfdata* D,
              char  Start;       /* Walks over a range */
 
     /* Place copies of the arguments into global variables. This is not very
-     * nice, but on a 6502 platform it gives better code, since the values
-     * do not have to be passed as parameters.
-     */
+    ** nice, but on a 6502 platform it gives better code, since the values
+    ** do not have to be passed as parameters.
+    */
     D_     = D;
     format = format_;
     ap     = ap_;
@@ -505,8 +505,8 @@ int __fastcall__ _scanf (const struct scanfdata* D,
     CharCount   = 0;
 
     /* Set up the jump "label".  CheckEnd() will use that label when EOF
-     * is reached.  ReadInt() will use it when number-conversion fails.
-     */
+    ** is reached.  ReadInt() will use it when number-conversion fails.
+    */
     if ((unsigned char) setjmp (JumpBuf) == RC_OK) {
 Again:
 
@@ -523,9 +523,9 @@ Again:
                 if ((bool) isspace ((int) F)) {
 
                     /* Special white space handling: Any whitespace in the
-                     * format string matches any amount of whitespace including
-                     * none(!). So this match will never fail.
-                     */
+                    ** format string matches any amount of whitespace including
+                    ** none(!). So this match will never fail.
+                    */
                     SkipWhite ();
                     continue;
                 }
@@ -537,8 +537,8 @@ Percent:
                 if (C != (int) F) {
 
                     /* A mismatch -- we will stop scanning the input,
-                     * and return the number of assigned conversions.
-                     */
+                    ** and return the number of assigned conversions.
+                    */
                     goto NoConv;
                 }
 
@@ -572,18 +572,18 @@ Percent:
                 if (Width == 0) {
                     /* Invalid specification */
                     /* Note:  This method of leaving the function might seem
-                     * to be crude, but it optimizes very well because
-                     * the four exits can share this code.
-                     */
+                    ** to be crude, but it optimizes very well because
+                    ** the four exits can share this code.
+                    */
                     _seterrno (EINVAL);
                     Assignments = EOF;
                     PushBack ();
                     return Assignments;
                 }
                 /* Increment-and-test makes better code than test-and-decrement
-                 * does.  So, change the width into a form that can be used in
-                 * that way.
-                 */
+                ** does.  So, change the width into a form that can be used in
+                ** that way.
+                */
                 Width = ~Width;
 
                 /* 3. Length modifier */
@@ -618,9 +618,9 @@ Percent:
                 /* 4. Conversion specifier */
                 switch (F) {
                     /* 'd' and 'u' conversions are actually the same, since the
-                     * standard says that even the 'u' modifier allows an
-                     * optionally signed integer.
-                     */
+                    ** standard says that even the 'u' modifier allows an
+                    ** optionally signed integer.
+                    */
                     case 'd':   /* Optionally signed decimal integer */
                     case 'u':
                         ScanInt (10);
@@ -676,9 +676,9 @@ Percent:
                         if (NoAssign == false) {
                             S = va_arg (ap, char*);
                             /* ## This loop is convenient for us, but it isn't
-                             * standard C.  The standard implies that a failure
-                             * shouldn't put anything into the array argument.
-                             */
+                            ** standard C.  The standard implies that a failure
+                            ** shouldn't put anything into the array argument.
+                            */
                             while (++Width) {
                                 CheckEnd ();  /* Is it a matching failure? */
                                 *S++ = C;
@@ -705,8 +705,8 @@ Percent:
                         }
                         if (F == ']') {
                             /* Empty sets aren't allowed; so, a right-bracket
-                             * at the beginning must be a member of the set.
-                             */
+                            ** at the beginning must be a member of the set.
+                            */
                             AddCharToSet (F);
                             GetFormat ();
                         }
@@ -725,8 +725,8 @@ Percent:
                                         break;
                                     default:
                                         /* Include all characters
-                                         * that are in the range.
-                                         */
+                                        ** that are in the range.
+                                        */
                                         while (1) {
                                             AddCharToSet (Start);
                                             if (Start == F) {
@@ -756,9 +756,9 @@ Percent:
                         }
 
                         /* We have the set in CharSet. Read characters and
-                         * store them into a string while they are part of
-                         * the set.
-                         */
+                        ** store them into a string while they are part of
+                        ** the set.
+                        */
                         Match = false;
                         if (NoAssign == false) {
                             S = va_arg (ap, char*);
@@ -782,10 +782,10 @@ Percent:
 
                     case 'p':
                         /* Pointer, general format is 0xABCD.
-                         * %hhp --> zero-page pointer
-                         * %hp --> near pointer
-                         * %lp --> far pointer
-                         */
+                        ** %hhp --> zero-page pointer
+                        ** %hp --> near pointer
+                        ** %lp --> far pointer
+                        */
                         SkipWhite ();
                         if (CHAR (C) != '0') {
                             goto NoConv;
@@ -806,8 +806,8 @@ Percent:
 
                     case 'n':
                         /* Store the number of characters consumed so far
-                         * (the read-ahead character hasn't been consumed).
-                         */
+                        ** (the read-ahead character hasn't been consumed).
+                        */
                         IntVal = (long) (CharCount - (C == EOF ? 0u : 1u));
                         AssignInt ();
                         /* Don't count it. */
@@ -849,9 +849,9 @@ Percent:
 NoConv:
 
         /* Coming here means a failure. If that happens at EOF, with no
-         * conversion attempts, then it is considered an error; otherwise,
-         * the number of assignments is returned (the default behaviour).
-         */
+        ** conversion attempts, then it is considered an error; otherwise,
+        ** the number of assignments is returned (the default behaviour).
+        */
         if (C == EOF && Converted == false) {
             Assignments = EOF;  /* Special case:  error */
         }

@@ -12,8 +12,8 @@
 ; ----------------------------------------------------------------------------
 ; int __fastcall__ _directerrno (unsigned char code);
 ; /* Set errno to a specific error code, clear _oserror and return -1. Used
-;  * by the library.
-;  */
+; ** by the library.
+; */
 
 __directerrno:
         jsr     __seterrno              ; Set errno, returns with A = 0
@@ -23,10 +23,10 @@ __directerrno:
 ; ----------------------------------------------------------------------------
 ; int __fastcall__ _mappederrno (unsigned char code);
 ; /* Set _oserror to the given platform specific error code. If it is a real
-;  * error code (not zero) set errno to the corresponding system error code
-;  * and return -1. Otherwise return zero.
-;  * Used by the library.
-;  */
+; ** error code (not zero) set errno to the corresponding system error code
+; ** and return -1. Otherwise return zero.
+; ** Used by the library.
+; */
 
 __mappederrno:
         sta     __oserror               ; Store the error code

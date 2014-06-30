@@ -33,8 +33,8 @@ long __fastcall__ strtol (const char* nptr, char** endptr, int base)
     }
 
     /* If base is zero, we may have a 0 or 0x prefix. If base is 16, we may
-     * have a 0x prefix.
-     */
+    ** have a 0x prefix.
+    */
     if (base == 0) {
         if (*S == '0') {
             ++S;
@@ -52,8 +52,8 @@ long __fastcall__ strtol (const char* nptr, char** endptr, int base)
     }
 
     /* Determine the maximum valid number and (if the number is equal to this
-     * value) the maximum valid digit.
-     */
+    ** value) the maximum valid digit.
+    */
     if (Minus) {
         MaxVal = LONG_MIN;
     } else {
@@ -98,8 +98,8 @@ long __fastcall__ strtol (const char* nptr, char** endptr, int base)
     }
 
     /* Store the end pointer. If no conversion was performed, the value of
-     * nptr is returned in endptr.
-     */
+    ** nptr is returned in endptr.
+    */
     if (endptr) {
         if (CvtCount > 0) {
             *endptr = (char*) S;

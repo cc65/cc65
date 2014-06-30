@@ -3,8 +3,8 @@
 ;
 ; unsigned char tgi_getmaxcolor (void);
 ; /* Return the maximum supported color number (the number of colors would
-;  * then be getmaxcolor()+1).
-;  */
+; ** then be getmaxcolor()+1).
+; */
 ;
 
         .include        "tgi-kernel.inc"

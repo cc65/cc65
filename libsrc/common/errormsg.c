@@ -1,11 +1,8 @@
 /*
- * errormsg.c
- *
- * Ullrich von Bassewitz, 17.05.2000
- *
- * Must be a C function, since we have otherwise problems with the different
- * character sets.
- */
+** errormsg.c
+**
+** Ullrich von Bassewitz, 17.05.2000
+*/
 
 
 

@@ -1,14 +1,14 @@
 /*
- * "Eine kleine Nachtmusik" by Wolfgang Amadeus Mozart, KV 525
- *
- * First version in 1987 by
- *   Joachim von Bassewitz (joachim@von-bassewitz.de) and
- *   Ullrich von Bassewitz (ullrich@von-bassewitz.de).
- *
- * C conversion in 1998 by
- *   Ullrich von Bassewitz (ullrich@von-bassewitz.de)
- *
- */
+** "Eine kleine Nachtmusik" by Wolfgang Amadeus Mozart, KV 525
+**
+** First version in 1987 by
+**   Joachim von Bassewitz (joachim@von-bassewitz.de) and
+**   Ullrich von Bassewitz (ullrich@von-bassewitz.de).
+**
+** C conversion in 1998 by
+**   Ullrich von Bassewitz (ullrich@von-bassewitz.de)
+**
+*/
 
 
 
@@ -28,17 +28,17 @@
 
 
 /* Tables with voice data.
- *
- *  Bit     Description
- * -------------------------------------------
- *  15      Pause bit.
- *  12-14   Octave
- *  8-11    Tone (index into frequency table)
- *  7       Unused. Was thought as a control bit in the original version to
- *          change SID parameters, but this was never implemented.
- *  0-6     Length of the tone in ticks.
- *
- */
+**
+**  Bit     Description
+** -------------------------------------------
+**  15      Pause bit.
+**  12-14   Octave
+**  8-11    Tone (index into frequency table)
+**  7       Unused. Was thought as a control bit in the original version to
+**          change SID parameters, but this was never implemented.
+**  0-6     Length of the tone in ticks.
+**
+*/
 
 
 
@@ -922,8 +922,8 @@ static clock_t StartTime;
 #define TICKS_PER_TONE  4
 
 /* Done flag. Contains one bit for each voice. Will contain 0x07 if all
- * voices have finished playing.
- */
+** voices have finished playing.
+*/
 static unsigned char Done;
 
 
@@ -1038,8 +1038,8 @@ static void DisplayTime (void)
 
 
 /* On the 510/610, the SID is in another bank (the system bank), so we cannot
- * just write to the memory space.
- */
+** just write to the memory space.
+*/
 #if defined(__CBM510__) || defined(__CBM610__)
 #  define outb(addr,val)        pokebsys ((unsigned)(addr), val)
 #  define outw(addr,val)        pokewsys ((unsigned)(addr), val)
@@ -1149,9 +1149,9 @@ int main (void)
                 }
             } else {
                 /* Decrement the ticks. If this is the last tick of a tone,
-                 * reset bit 0 of the trigger value and write it back to the
-                 * SID to start the release phase.
-                 */
+                ** reset bit 0 of the trigger value and write it back to the
+                ** SID to start the release phase.
+                */
                 if (--(VC->Ticks) == 0) {
                     outb (&Voice->ctrl, VC->Trigger & 0xFE);
                 }

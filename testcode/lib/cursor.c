@@ -1,9 +1,9 @@
 /*
- * test for conio cursor() function
- * CPG 2002
- *
- * the cursor should be in the same state as mentioned in the printfs
- */
+** test for conio cursor() function
+** CPG 2002
+**
+** the cursor should be in the same state as mentioned in the printfs
+*/
 
 #include <conio.h>
 

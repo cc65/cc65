@@ -79,9 +79,9 @@ struct mouse_box {
 };
 
 /* Structure containing mouse callback functions. These functions are declared
- * in C notation here, but they cannot be C functions (at least not easily),
- * since they may be called from within an interrupt.
- */
+** in C notation here, but they cannot be C functions (at least not easily),
+** since they may be called from within an interrupt.
+*/
 struct mouse_callbacks {
 
     void (*hide) (void);
@@ -92,23 +92,23 @@ struct mouse_callbacks {
 
     void (*prep) (void);
     /* Prepare to move the mouse cursor. This function is called,
-     * even when the cursor is currently invisible.
-     */
+    ** even when the cursor is currently invisible.
+    */
 
     void (*draw) (void);
     /* Draw the mouse cursor. This function is called,
-     * even when the cursor is currently invisible.
-     */
+    ** even when the cursor is currently invisible.
+    */
 
     void __fastcall__ (*movex) (int x);
     /* Move the mouse cursor to the new X coordinate. This function is called,
-     * even when the cursor is currently invisible.
-     */
+    ** even when the cursor is currently invisible.
+    */
 
     void __fastcall__ (*movey) (int y);
     /* Move the mouse cursor to the new Y coordinate. This function is called,
-     * even when the cursor is currently invisible.
-     */
+    ** even when the cursor is currently invisible.
+    */
 };
 
 
@@ -155,43 +155,43 @@ const char* __fastcall__ mouse_geterrormsg (unsigned char code);
 
 void mouse_hide (void);
 /* Hide the mouse. The function manages a counter and may be called more than
- * once. For each call to mouse_hide there must be a call to mouse_show to make
- * the mouse visible again.
- */
+** once. For each call to mouse_hide there must be a call to mouse_show to make
+** the mouse visible again.
+*/
 
 void mouse_show (void);
 /* Show the mouse. See mouse_hide() for more information. */
 
 void __fastcall__ mouse_setbox (const struct mouse_box* box);
 /* Set the bounding box for the mouse pointer movement. The mouse X and Y
- * coordinates will never go outside the given box.
- * NOTE: The function does *not* check if the mouse is currently inside the
- * given margins. The proper way to use this function therefore is:
- *
- *      - Hide the mouse
- *      - Set the bounding box
- *      - Place the mouse at the desired position
- *      - Show the mouse again.
- *
- * NOTE2: When setting the box to something that is larger than the actual
- * screen, the positioning of the mouse cursor can fail. If such margins
- * are really what you want, you have to use your own cursor routines.
- */
+** coordinates will never go outside the given box.
+** NOTE: The function does *not* check if the mouse is currently inside the
+** given margins. The proper way to use this function therefore is:
+**
+**      - Hide the mouse
+**      - Set the bounding box
+**      - Place the mouse at the desired position
+**      - Show the mouse again.
+**
+** NOTE2: When setting the box to something that is larger than the actual
+** screen, the positioning of the mouse cursor can fail. If such margins
+** are really what you want, you have to use your own cursor routines.
+*/
 
 void __fastcall__ mouse_getbox (struct mouse_box* box);
 /* Get the current bounding box for the mouse pointer movement. */
 
 void __fastcall__ mouse_move (int x, int y);
 /* Set the mouse cursor to the given position. If a mouse cursor is defined
- * and currently visible, the mouse cursor is also moved.
- * NOTE: This function does not check if the given position is valid and
- * inside the bounding box.
- */
+** and currently visible, the mouse cursor is also moved.
+** NOTE: This function does not check if the given position is valid and
+** inside the bounding box.
+*/
 
 unsigned char mouse_buttons (void);
 /* Return a bit mask encoding the states of the mouse buttons. Use the
- * MOUSE_BTN_XXX flags to decode a specific button.
- */
+** MOUSE_BTN_XXX flags to decode a specific button.
+*/
 
 void __fastcall__ mouse_pos (struct mouse_pos* pos);
 /* Return the current mouse position. */
@@ -201,8 +201,8 @@ void __fastcall__ mouse_info (struct mouse_info* info);
 
 unsigned char __fastcall__ mouse_ioctl (unsigned char code, void* data);
 /* Call the driver-specific ioctl function. Return an error code.
- * NON-PORTABLE!
- */
+** NON-PORTABLE!
+*/
 
 
 

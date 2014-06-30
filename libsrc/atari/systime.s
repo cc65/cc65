@@ -3,10 +3,10 @@
 ;
 ; time_t _systime (void);
 ; /* Similar to time(), but:
-;  *   - Is not ISO C
-;  *   - Does not take the additional pointer
-;  *   - Does not set errno when returning -1
-;  */
+; **   - Is not ISO C
+; **   - Does not take the additional pointer
+; **   - Does not set errno when returning -1
+; */
 ;
 
         .export         __systime

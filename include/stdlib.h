@@ -71,13 +71,13 @@ void __fastcall__ free (void* block);
 #if __CC65_STD__ == __CC65_STD_CC65__
 int __fastcall__ posix_memalign (void** memptr, size_t alignment, size_t size);
 /* Allocate a block of memory with the given "size", which is aligned to a
- * memory address that is a multiple of "alignment".  "alignment" MUST NOT be
- * zero, and MUST be a power of two; otherwise, this function will return
- * EINVAL.  The function returns ENOMEM if not enough memory is available
- * to satisfy the request.  "memptr" must point to a variable; that variable
- * will return the address of the allocated memory.  Use free() to release that
- * allocated block.
- */
+** memory address that is a multiple of "alignment".  "alignment" MUST NOT be
+** zero, and MUST be a power of two; otherwise, this function will return
+** EINVAL.  The function returns ENOMEM if not enough memory is available
+** to satisfy the request.  "memptr" must point to a variable; that variable
+** will return the address of the allocated memory.  Use free() to release that
+** allocated block.
+*/
 #endif
 
 void __fastcall__ _heapadd (void* mem, size_t size);

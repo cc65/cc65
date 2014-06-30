@@ -22,8 +22,8 @@ static unsigned int Failures = 0;
 
 static void IncStr (char* Buf)
 /* Increment a number represented as a string by one. The string MUST not
- * start with a '9', we cannot handle overflow in this case.
- */
+** start with a '9', we cannot handle overflow in this case.
+*/
 {
     int Len = strlen (Buf);
 

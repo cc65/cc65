@@ -1,8 +1,8 @@
 /*
- * getchar.c
- *
- * Ullrich von Bassewitz, 11.12.1998
- */
+** getchar.c
+**
+** Ullrich von Bassewitz, 11.12.1998
+*/
 
 
 

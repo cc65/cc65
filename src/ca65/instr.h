@@ -51,13 +51,13 @@
 
 
 /* Constants for the addressing mode. If an opcode is available in zero page
- * and absolut adressing mode, both bits are set. When checking for valid
- * modes, the zeropage bit is checked first. Similar, the implicit bit is set
- * on accu adressing modes, so the 'A' for accu adressing is not needed (but
- * may be specified).
- * When assembling for the 6502 or 65C02, all addressing modes that are not
- * available on these CPUs are removed before doing any checks.
- */
+** and absolut adressing mode, both bits are set. When checking for valid
+** modes, the zeropage bit is checked first. Similar, the implicit bit is set
+** on accu adressing modes, so the 'A' for accu adressing is not needed (but
+** may be specified).
+** When assembling for the 6502 or 65C02, all addressing modes that are not
+** available on these CPUs are removed before doing any checks.
+*/
 #define AM65_IMPLICIT           0x00000003UL
 #define AM65_ACCU               0x00000002UL
 #define AM65_DIR                0x00000004UL
@@ -168,8 +168,8 @@ cpu_t GetCPU (void);
 
 int FindInstruction (const StrBuf* Ident);
 /* Check if Ident is a valid mnemonic. If so, return the index in the
- * instruction table. If not, return -1.
- */
+** instruction table. If not, return -1.
+*/
 
 void HandleInstruction (unsigned Index);
 /* Handle the mnemonic with the given index */

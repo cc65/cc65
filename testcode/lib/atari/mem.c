@@ -1,8 +1,8 @@
 /*
- * show some memory stuff
- *
- * 04-Aug-2004, Christian Groessler
- */
+** show some memory stuff
+**
+** 04-Aug-2004, Christian Groessler
+*/
 
 #include <stdio.h>
 #include <stdlib.h>

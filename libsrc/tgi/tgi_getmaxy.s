@@ -3,8 +3,8 @@
 ;
 ; unsigned tgi_getmaxy (void);
 ; /* Return the maximum y coordinate. The resolution in y direction is
-;  * getmaxy() + 1
-;  */
+; ** getmaxy() + 1
+; */
 
         .include        "tgi-kernel.inc"
 

@@ -15,10 +15,10 @@
 ; void __fastcall__ tgi_settextstyle (unsigned width, unsigned height,
 ;                                     unsigned char dir, unsigned char font);
 ; /* Set the style for text output. The scaling factors for width and height
-;  * are 8.8 fixed point values. This means that $100 = 1 $200 = 2 etc.
-;  * dir is one of the TGI_TEXT_XXX constants. font is one of the TGI_FONT_XXX
-;  * constants.
-;  */
+; ** are 8.8 fixed point values. This means that $100 = 1 $200 = 2 etc.
+; ** dir is one of the TGI_TEXT_XXX constants. font is one of the TGI_FONT_XXX
+; ** constants.
+; */
 ;
 
 .proc   _tgi_settextstyle
@@ -36,8 +36,8 @@
 ;-----------------------------------------------------------------------------
 ; void __fastcall__ tgi_settextscale (unsigned width, unsigned height);
 ; /* Set the scaling for text output. The scaling factors for width and height
-;  * are 8.8 fixed point values. This means that $100 = 1 $200 = 2 etc.
-;  */
+; ** are 8.8 fixed point values. This means that $100 = 1 $200 = 2 etc.
+; */
 
 .proc   _tgi_settextscale
 

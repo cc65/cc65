@@ -1,8 +1,8 @@
 /*
- * simple clock test
- *
- * 06-Nov-2001, Christian Groessler
- */
+** simple clock test
+**
+** 06-Nov-2001, Christian Groessler
+*/
 
 #include <stdio.h>
 #include <conio.h>

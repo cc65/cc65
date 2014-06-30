@@ -83,9 +83,9 @@ unsigned MemReadWord (unsigned Addr)
 
 unsigned MemReadZPWord (unsigned char Addr)
 /* Read a word from the zero page. This function differs from ReadMemW in that
- * the read will always be in the zero page, even in case of an address
- * overflow.
- */
+** the read will always be in the zero page, even in case of an address
+** overflow.
+*/
 {
     unsigned W = MemReadByte (Addr++);
     return (W | (MemReadByte (Addr) << 8));

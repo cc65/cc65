@@ -1,15 +1,15 @@
 /*
- * strqtok() is like strtok():  It finds pieces of text, in a string, that are
- * surrounded by given delimiter characters.  It returns each piece, in turn,
- * as a string, until every piece has been found.  Then, it returns NULL.  But,
- * strqtok() recognizes quotation marks.  A mark makes delimiters look ordinary
- * until another quotation mark is seen.  That allows us to include delimiters
- * in tokens.  (This version doesn't allow escaped quotation marks.)
- *
- * 2014-04-19, Daniel Serpell
- * 2014-04-21, Paul Foerster
- * 2014-04-25, Greg King
- */
+** strqtok() is like strtok():  It finds pieces of text, in a string, that are
+** surrounded by given delimiter characters.  It returns each piece, in turn,
+** as a string, until every piece has been found.  Then, it returns NULL.  But,
+** strqtok() recognizes quotation marks.  A mark makes delimiters look ordinary
+** until another quotation mark is seen.  That allows us to include delimiters
+** in tokens.  (This version doesn't allow escaped quotation marks.)
+**
+** 2014-04-19, Daniel Serpell
+** 2014-04-21, Paul Foerster
+** 2014-04-25, Greg King
+*/
 
 
 #include <string.h>
@@ -49,8 +49,8 @@ char* __fastcall__ strqtok (register char* s1, const char* s2)
     }
     if (c == '\0') {
         /* The end of the last token is the end of the token list;
-         * don't go beyond it.
-         */
+        ** don't go beyond it.
+        */
         goto found;
     }
 
@@ -70,8 +70,8 @@ char* __fastcall__ strqtok (register char* s1, const char* s2)
     /* Search for the end of a quoted token. */
     if ((s1 = strchr (s1, '\"')) == NULL) {
         /* The quoted token ended with '\0'; therefore, point to a '\0',
-         * so that the next call will return NULL.
-         */
+        ** so that the next call will return NULL.
+        */
         next = "";
         return start;
     }

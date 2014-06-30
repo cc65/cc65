@@ -216,9 +216,9 @@ static void WriteIndex (void)
 
 void LibOpen (const char* Name, int MustExist, int NeedTemp)
 /* Open an existing library and a temporary copy. If MustExist is true, the
- * old library is expected to exist. If NeedTemp is true, a temporary library
- * is created.
- */
+** old library is expected to exist. If NeedTemp is true, a temporary library
+** is created.
+*/
 {
     /* Remember the name */
     LibName = xstrdup (Name);
@@ -268,8 +268,8 @@ void LibOpen (const char* Name, int MustExist, int NeedTemp)
 
 unsigned long LibCopyTo (FILE* F, unsigned long Bytes)
 /* Copy data from F to the temp library file, return the start position in
- * the temporary library file.
- */
+** the temporary library file.
+*/
 {
     unsigned char Buf [4096];
 
@@ -311,8 +311,8 @@ void LibCopyFrom (unsigned long Pos, unsigned long Bytes, FILE* F)
 
 static void LibCheckExports (ObjData* O)
 /* Insert all exports from the given object file into the global list
- * checking for duplicates.
- */
+** checking for duplicates.
+*/
 {
     unsigned I;
 
@@ -335,8 +335,8 @@ static void LibCheckExports (ObjData* O)
 
 void LibClose (void)
 /* Write remaining data, close both files and copy the temp file to the old
- * filename
- */
+** filename
+*/
 {
     /* Do we have a temporary library? */
     if (NewLib) {
@@ -346,9 +346,9 @@ void LibClose (void)
         size_t Count;
 
         /* Walk through the object file list, inserting exports into the
-         * export list checking for duplicates. Copy any data that is still
-         * in the old library into the new one.
-         */
+        ** export list checking for duplicates. Copy any data that is still
+        ** in the old library into the new one.
+        */
         for (I = 0; I < CollCount (&ObjPool); ++I) {
 
             /* Get a pointer to the object */

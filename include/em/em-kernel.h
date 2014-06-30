@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2002-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -45,8 +45,8 @@
 
 
 /* A structure that describes the header of an extended memory driver loaded
- * into memory.
- */
+** into memory.
+*/
 typedef struct {
 
     /* Driver header */

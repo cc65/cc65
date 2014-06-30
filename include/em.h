@@ -56,10 +56,10 @@
 #define EM_ERR_INSTALLED        5       /* A driver is already installed */
 
 /* Parameters for the em_copy_... functions. NOTE: The first seven bytes
- * have the same order and alignment as needed for the Commodore REU, so
- * don't change the order without changing the assembler file that defines
- * the struct offsets and the code in the REU driver.
- */
+** have the same order and alignment as needed for the Commodore REU, so
+** don't change the order without changing the assembler file that defines
+** the struct offsets and the code in the REU driver.
+*/
 struct em_copy {
     void*           buf;        /* Memory buffer to copy from or to */
     unsigned char   offs;       /* Offset into page */
@@ -87,44 +87,44 @@ unsigned char __fastcall__ em_install (void* driver);
 
 unsigned char em_uninstall (void);
 /* Uninstall the currently loaded driver and return an error code.
- * Note: This call does not free allocated memory.
- */
+** Note: This call does not free allocated memory.
+*/
 
 unsigned em_pagecount (void);
 /* Return the total number of 256 byte pages available in extended memory. */
 
 void* __fastcall__ em_map (unsigned page);
 /* Unmap the current page from memory and map a new one. The function returns
- * a pointer to the location of the page in memory. Note: Without calling
- * em_commit, the old contents of the memory window may be lost!
- */
+** a pointer to the location of the page in memory. Note: Without calling
+** em_commit, the old contents of the memory window may be lost!
+*/
 
 void* __fastcall__ em_use (unsigned page);
 /* Tell the driver that the memory window is associated with a given page.
- * This call is very similar to em_map. The difference is that the driver
- * does not necessarily transfer the current contents of the extended
- * memory into the returned window. If you're going to just write to the
- * window and the current contents of the window are invalid or no longer
- * use, this call may perform better than em_map.
- */
+** This call is very similar to em_map. The difference is that the driver
+** does not necessarily transfer the current contents of the extended
+** memory into the returned window. If you're going to just write to the
+** window and the current contents of the window are invalid or no longer
+** use, this call may perform better than em_map.
+*/
 
 void em_commit (void);
 /* Commit changes in the memory window to extended storage. If the contents
- * of the memory window have been changed, these changes may be lost if
- * em_map, em_copyfrom or em_copyto are called without calling em_commit
- * first. Note: Not calling em_commit does not mean that the changes are
- * discarded, it does just mean that some drivers will discard the changes.
- */
+** of the memory window have been changed, these changes may be lost if
+** em_map, em_copyfrom or em_copyto are called without calling em_commit
+** first. Note: Not calling em_commit does not mean that the changes are
+** discarded, it does just mean that some drivers will discard the changes.
+*/
 
 void __fastcall__ em_copyfrom (const struct em_copy* copy_data);
 /* Copy from extended into linear memory. Note: This may invalidate the
- * currently mapped page.
- */
+** currently mapped page.
+*/
 
 void __fastcall__ em_copyto (const struct em_copy* copy_data);
 /* Copy from linear into extended memory. Note: This may invalidate the
- * currently mapped page.
- */
+** currently mapped page.
+*/
 
 
 

@@ -101,8 +101,8 @@ void CL_AddRef (CodeLabel* L, struct CodeEntry* E)
 
 void CL_MoveRefs (CodeLabel* OldLabel, CodeLabel* NewLabel)
 /* Move all references to OldLabel to point to NewLabel. OldLabel will have no
- * more references on return.
- */
+** more references on return.
+*/
 {
     /* Walk through all instructions referencing the old label */
     unsigned Count = CL_GetRefCount (OldLabel);

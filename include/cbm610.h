@@ -138,9 +138,9 @@ void __fastcall__ pokewsys (unsigned addr, unsigned val);
 
 
 /* The following #defines will cause the matching functions calls in conio.h
- * to be overlaid by macros with the same names, saving the function call
- * overhead.
- */
+** to be overlaid by macros with the same names, saving the function call
+** overhead.
+*/
 #define _textcolor(color)       COLOR_WHITE
 #define _bgcolor(color)         COLOR_BLACK
 #define _bordercolor(color)     COLOR_BLACK

@@ -1,8 +1,8 @@
 /*
- * gets.c
- *
- * Ullrich von Bassewitz, 11.08.1998
- */
+** gets.c
+**
+** Ullrich von Bassewitz, 11.08.1998
+*/
 
 
 

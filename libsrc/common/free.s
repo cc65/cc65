@@ -10,8 +10,8 @@
 ;
 ; void free (void* block)
 ; /* Release an allocated memory block. The function will accept NULL pointers
-;  * (and do nothing in this case).
-;  */
+; ** (and do nothing in this case).
+; */
 ; {
 ;     unsigned* b;
 ;     unsigned size;
@@ -34,8 +34,8 @@
 ;         _hptr = (unsigned*) (((int) _hptr) - size);
 ;
 ;         /* Check if the last block in the freelist is now at heap top. If so,
-;          * remove this block from the freelist.
-;          */
+;         ** remove this block from the freelist.
+;         */
 ;         if (f = _hlast) {
 ;             if (((int) f) + f->size == (int) _hptr) {
 ;                 /* Remove the last block */
@@ -185,10 +185,10 @@ _free:  sta     ptr2
 ;
 ; void _hadd (void* mem, size_t size)
 ; /* Add an arbitrary memory block to the heap. This function is used by
-;  * free(), but it does also allow usage of otherwise unused memory
-;  * blocks as heap space. The given block is entered in the free list
-;  * without any checks, so beware!
-;  */
+; ** free(), but it does also allow usage of otherwise unused memory
+; ** blocks as heap space. The given block is entered in the free list
+; ** without any checks, so beware!
+; */
 ; {
 ;     struct freeblock* f;
 ;     struct freeblock* left;
@@ -212,10 +212,10 @@ _free:  sta     ptr2
 ;       } else {
 ;
 ;           /* We have to search the free list. As we are doing so, we check
-;            * if it is possible to combine this block with another already
-;            * existing block. Beware: The block may be the "missing link"
-;              * between *two* other blocks.
-;            */
+;           ** if it is possible to combine this block with another already
+;           ** existing block. Beware: The block may be the "missing link"
+;           ** between *two* other blocks.
+;           */
 ;           left = 0;
 ;           right = _hfirst;
 ;           while (right && f > right) {
@@ -224,10 +224,10 @@ _free:  sta     ptr2
 ;           }
 ;
 ;
-;           /* Ok, the current block must be inserted between left and right (but
-;            * beware: one of the two may be zero!). Also check for the condition
-;            * that we have to merge two or three blocks.
-;            */
+;           /* OK, the current block must be inserted between left and right (but
+;           ** beware: one of the two may be zero!). Also check for the condition
+;           ** that we have to merge two or three blocks.
+;           */
 ;           if (right) {
 ;               /* Check if we must merge the block with the right one */
 ;                       if (((unsigned) f) + size == (unsigned) right) {

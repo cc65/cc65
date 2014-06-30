@@ -99,8 +99,8 @@ unsigned char __fastcall__ joy_install (void* driver);
 
 unsigned char joy_uninstall (void);
 /* Uninstall the currently loaded driver and return an error code.
- * Note: This call does not free allocated memory.
- */
+** Note: This call does not free allocated memory.
+*/
 
 unsigned char joy_count (void);
 /* Return the number of joysticks supported by the driver */

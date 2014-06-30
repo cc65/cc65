@@ -115,8 +115,8 @@ void AddSearchPath (SearchPaths* P, const char* NewPath)
 
 void AddSearchPathFromEnv (SearchPaths* P, const char* EnvVar)
 /* Add a search path from an environment variable to the end of an existing
- * list.
- */
+** list.
+*/
 {
     AddSearchPath (P, getenv (EnvVar));
 }
@@ -125,8 +125,8 @@ void AddSearchPathFromEnv (SearchPaths* P, const char* EnvVar)
 
 void AddSubSearchPathFromEnv (SearchPaths* P, const char* EnvVar, const char* SubDir)
 /* Add a search path from an environment variable, adding a subdirectory to
- * the environment variable value.
- */
+** the environment variable value.
+*/
 {
     StrBuf Dir = AUTO_STRBUF_INITIALIZER;
 
@@ -162,9 +162,9 @@ void AddSubSearchPathFromEnv (SearchPaths* P, const char* EnvVar, const char* Su
 void AddSubSearchPathFromWinBin (SearchPaths* P, const char* SubDir)
 {
 /* Windows only:
- * Add a search path from the running binary, adding a subdirectory to
- * the parent directory of the directory containing the binary.
- */
+** Add a search path from the running binary, adding a subdirectory to
+** the parent directory of the directory containing the binary.
+*/
 #if defined(_WIN32)
 
     char Dir[_MAX_PATH];
@@ -207,9 +207,9 @@ void AddSubSearchPathFromWinBin (SearchPaths* P, const char* SubDir)
 
 int PushSearchPath (SearchPaths* P, const char* NewPath)
 /* Add a new search path to the head of an existing search path list, provided
- * that it's not already there. If the path is already at the first position,
- * return zero, otherwise return a non zero value.
- */
+** that it's not already there. If the path is already at the first position,
+** return zero, otherwise return a non zero value.
+*/
 {                                      
     /* Generate a clean copy of NewPath */
     char* Path = CleanupPath (NewPath);   
@@ -240,8 +240,8 @@ void PopSearchPath (SearchPaths* P)
 
 char* SearchFile (const SearchPaths* P, const char* File)
 /* Search for a file in a list of directories. Return a pointer to a malloced
- * area that contains the complete path, if found, return 0 otherwise.
- */
+** area that contains the complete path, if found, return 0 otherwise.
+*/
 {
     char* Name = 0;
     StrBuf PathName = AUTO_STRBUF_INITIALIZER;

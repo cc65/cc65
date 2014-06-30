@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -65,8 +65,8 @@ typedef enum {
 
 FILETYPE GetFileType (const char* Name);
 /* Determine the type of the given file by looking at the name. If the file
- * type could not be determined, the function returns FILETYPE_UNKOWN.
- */
+** type could not be determined, the function returns FILETYPE_UNKOWN.
+*/
 
 
 

@@ -1,8 +1,8 @@
 /*
- * puts.c
- *
- * Ullrich von Bassewitz, 11.08.1998
- */
+** puts.c
+**
+** Ullrich von Bassewitz, 11.08.1998
+*/
 
 
 

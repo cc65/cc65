@@ -1,8 +1,8 @@
 /*
- * locale.c
- *
- * Ullrich von Bassewitz, 11.12.1998
- */
+** locale.c
+**
+** Ullrich von Bassewitz, 11.12.1998
+*/
 
 
 

@@ -3,8 +3,8 @@
 ;
 ; unsigned char __fastcall__ mouse_ioctl (unsigned char code, void* data);
 ; /* Call the driver specific ioctl function. NON PORTABLE! Returns an error
-;  * code.
-;  */
+; ** code.
+; */
 ;
 
         .import         popa

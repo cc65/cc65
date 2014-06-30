@@ -1,10 +1,10 @@
 /*
- * sleep.c
- *
- * Stefan Haubenthal, 2003-06-11
- * Ullrich von Bassewitz, 2003-06-12
- *
- */
+** sleep.c
+**
+** Stefan Haubenthal, 2003-06-11
+** Ullrich von Bassewitz, 2003-06-12
+**
+*/
 
 
 

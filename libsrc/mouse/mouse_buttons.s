@@ -3,8 +3,8 @@
 ;
 ; unsigned char mouse_buttons (void);
 ; /* Return a bit mask encoding the states of the mouse buttons. Use the
-;  * MOUSE_BTN_XXX flags to decode a specific button.
-;  */
+; ** MOUSE_BTN_XXX flags to decode a specific button.
+; */
 ;
 
         .include        "mouse-kernel.inc"

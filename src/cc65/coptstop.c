@@ -192,8 +192,8 @@ static void ClearLoadInfo (LoadInfo* LI)
 
 static void AdjustLoadRegInfo (LoadRegInfo* RI, int Index, int Change)
 /* Adjust a load register info struct after deleting or inserting an entry
- * with a given index
- */
+** with a given index
+*/
 {
     CHECK (abs (Change) == 1);
     if (Change < 0) {
@@ -276,9 +276,9 @@ static void TrackLoads (LoadInfo* LI, CodeEntry* E, int I)
         CHECK (RI != 0);
 
         /* If we had a load or xfer op before, this is a duplicate load which
-         * can cause problems if it encountered between the pushax and the op,
-         * so remember it.
-         */
+        ** can cause problems if it encountered between the pushax and the op,
+        ** so remember it.
+        */
         if (RI->LoadIndex >= 0 || RI->XferIndex >= 0) {
             RI->Flags |= LI_DUP_LOAD;
         }
@@ -296,11 +296,11 @@ static void TrackLoads (LoadInfo* LI, CodeEntry* E, int I)
                    RegValIsKnown (E->RI->In.RegY) &&
                    strcmp (E->Arg, "sp") == 0) {
             /* A load from the stack with known offset is also ok, but in this
-             * case we must reload the index register later. Please note that
-             * a load indirect via other zero page locations is not ok, since
-             * these locations may change between the push and the actual
-             * operation.
-             */
+            ** case we must reload the index register later. Please note that
+            ** a load indirect via other zero page locations is not ok, since
+            ** these locations may change between the push and the actual
+            ** operation.
+            */
             RI->Offs  = (unsigned char) E->RI->In.RegY;
             RI->Flags |= (LI_DIRECT | LI_RELOAD_Y);
         }
@@ -322,9 +322,9 @@ static void TrackLoads (LoadInfo* LI, CodeEntry* E, int I)
         }
 
         /* If we had a load or xfer op before, this is a duplicate load which
-         * can cause problems if it encountered between the pushax and the op,
-         * so remember it.
-         */
+        ** can cause problems if it encountered between the pushax and the op,
+        ** so remember it.
+        */
         if (Tgt->LoadIndex >= 0 || Tgt->XferIndex >= 0) {
             Tgt->Flags |= LI_DUP_LOAD;
         }
@@ -339,9 +339,9 @@ static void TrackLoads (LoadInfo* LI, CodeEntry* E, int I)
     } else if (CE_IsCallTo (E, "ldaxysp") && RegValIsKnown (E->RI->In.RegY)) {
 
         /* If we had a load or xfer op before, this is a duplicate load which
-         * can cause problems if it encountered between the pushax and the op,
-         * so remember it for both registers involved.
-         */
+        ** can cause problems if it encountered between the pushax and the op,
+        ** so remember it for both registers involved.
+        */
         if (LI->A.LoadIndex >= 0 || LI->A.XferIndex >= 0) {
             LI->A.Flags |= LI_DUP_LOAD;
         }
@@ -378,8 +378,8 @@ static void TrackLoads (LoadInfo* LI, CodeEntry* E, int I)
 
 static void InsertEntry (StackOpData* D, CodeEntry* E, int Index)
 /* Insert a new entry. Depending on Index, D->PushIndex and D->OpIndex will
- * be adjusted by this function.
- */
+** be adjusted by this function.
+*/
 {
     /* Insert the entry into the code segment */
     CS_InsertEntry (D->Code, E, Index);
@@ -401,8 +401,8 @@ static void InsertEntry (StackOpData* D, CodeEntry* E, int Index)
 
 static void DelEntry (StackOpData* D, int Index)
 /* Delete an entry. Depending on Index, D->PushIndex and D->OpIndex will be
- * adjusted by this function, and PushEntry/OpEntry may get invalidated.
- */
+** adjusted by this function, and PushEntry/OpEntry may get invalidated.
+*/
 {
     /* Delete the entry from the code segment */
     CS_DelEntry (D->Code, Index);
@@ -428,8 +428,8 @@ static void DelEntry (StackOpData* D, int Index)
 
 static void AdjustStackOffset (StackOpData* D, unsigned Offs)
 /* Adjust the offset for all stack accesses in the range PushIndex to OpIndex.
- * OpIndex is adjusted according to the insertions.
- */
+** OpIndex is adjusted according to the insertions.
+*/
 {
     /* Walk over all entries */
     int I = D->PushIndex + 1;
@@ -457,8 +457,8 @@ static void AdjustStackOffset (StackOpData* D, unsigned Offs)
         if (NeedCorrection) {
 
             /* Get the code entry before this one. If it's a LDY, adjust the
-             * value.
-             */
+            ** value.
+            */
             CodeEntry* P = CS_GetPrevEntry (D->Code, I);
             if (P && P->OPC == OP65_LDY && CE_IsConstImm (P)) {
 
@@ -490,8 +490,8 @@ static void AdjustStackOffset (StackOpData* D, unsigned Offs)
     }
 
     /* If we have rhs load insns that load from stack, we'll have to adjust
-     * the offsets for these also.
-     */
+    ** the offsets for these also.
+    */
     if (D->Rhs.A.Flags & LI_RELOAD_Y) {
         D->Rhs.A.Offs -= Offs;
     }
@@ -522,14 +522,14 @@ static void AddStoreX (StackOpData* D)
 
 static void ReplacePushByStore (StackOpData* D)
 /* Replace the call to the push subroutine by a store into the zero page
- * location (actually, the push is not replaced, because we need it for
- * later, but the name is still ok since the push will get removed at the
- * end of each routine).
- */
+** location (actually, the push is not replaced, because we need it for
+** later, but the name is still ok since the push will get removed at the
+** end of each routine).
+*/
 {
     /* Store the value into the zeropage instead of pushing it. Check high
-     * byte first so that the store is later in A/X order.
-     */
+    ** byte first so that the store is later in A/X order.
+    */
     if ((D->Lhs.X.Flags & LI_DIRECT) == 0) {
         AddStoreX (D);
     }
@@ -542,16 +542,16 @@ static void ReplacePushByStore (StackOpData* D)
 
 static void AddOpLow (StackOpData* D, opc_t OPC, LoadInfo* LI)
 /* Add an op for the low byte of an operator. This function honours the
- * OP_DIRECT and OP_RELOAD_Y flags and generates the necessary instructions.
- * All code is inserted at the current insertion point.
- */
+** OP_DIRECT and OP_RELOAD_Y flags and generates the necessary instructions.
+** All code is inserted at the current insertion point.
+*/
 {
     CodeEntry* X;
 
     if ((LI->A.Flags & LI_DIRECT) != 0) {
         /* Op with a variable location. If the location is on the stack, we
-         * need to reload the Y register.
-         */
+        ** need to reload the Y register.
+        */
         if ((LI->A.Flags & LI_RELOAD_Y) == 0) {
 
             /* opc ... */
@@ -588,9 +588,9 @@ static void AddOpLow (StackOpData* D, opc_t OPC, LoadInfo* LI)
 
 static void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI, int KeepResult)
 /* Add an op for the high byte of an operator. Special cases (constant values
- * or similar) have to be checked separately, the function covers only the
- * generic case. Code is inserted at the insertion point.
- */
+** or similar) have to be checked separately, the function covers only the
+** generic case. Code is inserted at the insertion point.
+*/
 {
     CodeEntry* X;
 
@@ -651,8 +651,8 @@ static void RemoveRegLoads (StackOpData* D, LoadInfo* LI)
 /* Remove register load insns */
 {
     /* Both registers may be loaded with one insn, but DelEntry will in this
-     * case clear the other one.
-     */
+    ** case clear the other one.
+    */
     if ((LI->A.Flags & (LI_REMOVE | LI_DONT_REMOVE)) == LI_REMOVE) {
         if (LI->A.LoadIndex >= 0) {
             DelEntry (D, LI->A.LoadIndex);
@@ -689,9 +689,9 @@ static void RemoveRemainders (StackOpData* D)
 
 static int IsRegVar (StackOpData* D)
 /* If the value pushed is that of a zeropage variable, replace ZPLo and ZPHi
- * in the given StackOpData struct by the variable and return true. Otherwise
- * leave D untouched and return false.
- */
+** in the given StackOpData struct by the variable and return true. Otherwise
+** leave D untouched and return false.
+*/
 {
     CodeEntry*  LoadA = D->Lhs.A.LoadEntry;
     CodeEntry*  LoadX = D->Lhs.X.LoadEntry;
@@ -735,16 +735,16 @@ static unsigned Opt_toseqax_tosneax (StackOpData* D, const char* BoolTransformer
     CodeLabel* L;
 
     /* Create a call to the boolean transformer function and a label for this
-     * insn. This is needed for all variants. Other insns are inserted *before*
-     * the call.
-     */
+    ** insn. This is needed for all variants. Other insns are inserted *before*
+    ** the call.
+    */
     X = NewCodeEntry (OP65_JSR, AM65_ABS, BoolTransformer, 0, D->OpEntry->LI);
     InsertEntry (D, X, D->OpIndex + 1);
     L = CS_GenLabel (D->Code, X);
 
     /* If the lhs is direct (but not stack relative), encode compares with lhs
-     * effectively reverting the order (which doesn't matter for ==).
-     */
+    ** effectively reverting the order (which doesn't matter for ==).
+    */
     if ((D->Lhs.A.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT &&
         (D->Lhs.X.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT) {
 
@@ -848,8 +848,8 @@ static unsigned Opt_tosshift (StackOpData* D, const char* Name)
     ReplacePushByStore (D);
 
     /* If the lhs is direct (but not stack relative), we can just reload the
-     * data later.
-     */
+    ** data later.
+    */
     if ((D->Lhs.A.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT &&
         (D->Lhs.X.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT) {
 
@@ -882,8 +882,8 @@ static unsigned Opt_tosshift (StackOpData* D, const char* Name)
         AddStoreA (D);
 
         /* Be sure to setup IP after adding the stores, otherwise it will get
-         * messed up.
-         */
+        ** messed up.
+        */
         D->IP = D->OpIndex+1;
 
         /* tay */
@@ -928,8 +928,8 @@ static unsigned Opt___bzero (StackOpData* D)
     }
 
     /* If the return value of __bzero is used, we have to add code to reload
-     * a/x from the pointer variable.
-     */
+    ** a/x from the pointer variable.
+    */
     if (RegAXUsed (D->Code, D->OpIndex+1)) {
         X = NewCodeEntry (OP65_LDA, AM65_ZP, D->ZPLo, 0, D->OpEntry->LI);
         InsertEntry (D, X, D->OpIndex+1);
@@ -938,8 +938,8 @@ static unsigned Opt___bzero (StackOpData* D)
     }
 
     /* X is always zero, A contains the size of the data area to zero.
-     * Note: A may be zero, in which case the operation is null op.
-     */
+    ** Note: A may be zero, in which case the operation is null op.
+    */
     if (D->OpEntry->RI->In.RegA != 0) {
 
         /* lda #$00 */
@@ -1074,8 +1074,8 @@ static unsigned Opt_staxspidx (StackOpData* D)
     InsertEntry (D, X, D->OpIndex+4);
 
     /* If we remove staxspidx, we must restore the Y register to what the
-     * function would return.
-     */
+    ** function would return.
+    */
     X = NewCodeEntry (OP65_LDY, AM65_IMM, "$00", 0, D->OpEntry->LI);
     InsertEntry (D, X, D->OpIndex+5);
 
@@ -1098,16 +1098,16 @@ static unsigned Opt_tosaddax (StackOpData* D)
     CHECK (D->NextEntry != 0);
 
     /* Check if the X register is known and zero when the add is done, and
-     * if the add is followed by
-     *
-     *  ldy     #$00
-     *  jsr     ldauidx         ; or ldaidx
-     *
-     * If this is true, the addition does actually add an offset to a pointer
-     * before it is dereferenced. Since both subroutines take an offset in Y,
-     * we can pass the offset (instead of #$00) and remove the addition
-     * alltogether.
-     */
+    ** if the add is followed by
+    **
+    **  ldy     #$00
+    **  jsr     ldauidx         ; or ldaidx
+    **
+    ** If this is true, the addition does actually add an offset to a pointer
+    ** before it is dereferenced. Since both subroutines take an offset in Y,
+    ** we can pass the offset (instead of #$00) and remove the addition
+    ** alltogether.
+    */
     if (D->OpEntry->RI->In.RegX == 0                            &&
         D->NextEntry->OPC == OP65_LDY                           &&
         CE_IsKnownImm (D->NextEntry, 0)                         &&
@@ -1123,17 +1123,17 @@ static unsigned Opt_tosaddax (StackOpData* D)
         AddStoreA (D);
 
         /* Replace the ldy by a tay. Be sure to create the new entry before
-         * deleting the ldy, since we will reference the line info from this
-         * insn.
-         */
+        ** deleting the ldy, since we will reference the line info from this
+        ** insn.
+        */
         X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, D->NextEntry->LI);
         DelEntry (D, D->OpIndex + 1);
         InsertEntry (D, X, D->OpIndex + 1);
 
         /* Replace the call to ldaidx/ldauidx. Since X is already zero, and
-         * the ptr is in the zero page location, we just need to load from
-         * the pointer, and fix X in case of ldaidx.
-         */
+        ** the ptr is in the zero page location, we just need to load from
+        ** the pointer, and fix X in case of ldaidx.
+        */
         X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, D->ZPLo, 0, N->LI);
         DelEntry (D, D->OpIndex + 2);
         InsertEntry (D, X, D->OpIndex + 2);
@@ -1194,8 +1194,8 @@ static unsigned Opt_tosaddax (StackOpData* D)
                 X = NewCodeEntry (OP65_LDX, AM65_IMM, Arg, 0, D->OpEntry->LI);
             } else {
                 /* Value of first op high byte is unknown. Load from ZP or
-                 * original storage.
-                 */
+                ** original storage.
+                */
                 if (D->Lhs.X.Flags & LI_DIRECT) {
                     CodeEntry* LoadX = D->Lhs.X.LoadEntry;
                     X = NewCodeEntry (OP65_LDX, LoadX->AM, LoadX->Arg, 0, D->OpEntry->LI);
@@ -1690,8 +1690,8 @@ static int CmpFunc (const void* Key, const void* Func)
 
 static const OptFuncDesc* FindFunc (const char* Name)
 /* Find the function with the given name. Return a pointer to the table entry
- * or NULL if the function was not found.
- */
+** or NULL if the function was not found.
+*/
 {
     return bsearch (Name, FuncTable, FUNC_COUNT, sizeof(OptFuncDesc), CmpFunc);
 }
@@ -1708,8 +1708,8 @@ static int CmpHarmless (const void* Key, const void* Entry)
 
 static int HarmlessCall (const char* Name)
 /* Check if this is a call to a harmless subroutine that will not interrupt
- * the pushax/op sequence when encountered.
- */
+** the pushax/op sequence when encountered.
+*/
 {
     static const char* Tab[] = {
         "aslax1",
@@ -1784,9 +1784,9 @@ static void ResetStackOpData (StackOpData* Data)
 
 static int PreCondOk (StackOpData* D)
 /* Check if the preconditions for a call to the optimizer subfunction are
- * satisfied. As a side effect, this function will also choose the zero page
- * register to use.
- */
+** satisfied. As a side effect, this function will also choose the zero page
+** register to use.
+*/
 {
     /* Check the flags */
     unsigned UnusedRegs = D->OptFunc->UnusedRegs;
@@ -1882,20 +1882,20 @@ unsigned OptStackOps (CodeSeg* S)
     Data.Code = S;
 
     /* Look for a call to pushax followed by a call to some other function
-     * that takes it's first argument on the stack, and the second argument
-     * in the primary register.
-     * It depends on the code between the two if we can handle/transform the
-     * sequence, so check this code for the following list of things:
-     *
-     *  - the range must be a basic block (one entry, one exit)
-     *  - there may not be accesses to local variables with unknown
-     *    offsets (because we have to adjust these offsets).
-     *  - no subroutine calls
-     *  - no jump labels
-     *
-     * Since we need a zero page register later, do also check the
-     * intermediate code for zero page use.
-     */
+    ** that takes it's first argument on the stack, and the second argument
+    ** in the primary register.
+    ** It depends on the code between the two if we can handle/transform the
+    ** sequence, so check this code for the following list of things:
+    **
+    **  - the range must be a basic block (one entry, one exit)
+    **  - there may not be accesses to local variables with unknown
+    **    offsets (because we have to adjust these offsets).
+    **  - no subroutine calls
+    **  - no jump labels
+    **
+    ** Since we need a zero page register later, do also check the
+    ** intermediate code for zero page use.
+    */
     I = 0;
     while (I < (int)CS_GetEntryCount (S)) {
 
@@ -1913,8 +1913,8 @@ unsigned OptStackOps (CodeSeg* S)
 
             case Search:
                 /* While searching, track register load insns, so we can tell
-                 * what is in a register once pushax is encountered.
-                 */
+                ** what is in a register once pushax is encountered.
+                */
                 if (CE_HasLabel (E)) {
                     /* Currently we don't track across branches */
                     ClearLoadInfo (&Data.Lhs);
@@ -1930,9 +1930,9 @@ unsigned OptStackOps (CodeSeg* S)
 
             case FoundPush:
                 /* We' found a pushax before. Search for a stack op that may
-                 * follow and in the meantime, track zeropage usage and check
-                 * for code that will disable us from translating the sequence.
-                 */
+                ** follow and in the meantime, track zeropage usage and check
+                ** for code that will disable us from translating the sequence.
+                */
                 if (CE_HasLabel (E)) {
                     /* Currently we don't track across branches */
                     ClearLoadInfo (&Data.Rhs);
@@ -1940,8 +1940,8 @@ unsigned OptStackOps (CodeSeg* S)
                 if (E->OPC == OP65_JSR) {
 
                     /* Subroutine call: Check if this is one of the functions,
-                     * we're going to replace.
-                     */
+                    ** we're going to replace.
+                    */
                     Data.OptFunc = FindFunc (E->Arg);
                     if (Data.OptFunc) {
                         /* Remember the op index and go on */
@@ -1951,9 +1951,9 @@ unsigned OptStackOps (CodeSeg* S)
                         break;
                     } else if (!HarmlessCall (E->Arg)) {
                         /* A call to an unkown subroutine: We need to start
-                         * over after the last pushax. Note: This will also
-                         * happen if we encounter a call to pushax!
-                         */
+                        ** over after the last pushax. Note: This will also
+                        ** happen if we encounter a call to pushax!
+                        */
                         I = Data.PushIndex;
                         State = Initialize;
                         break;
@@ -1966,8 +1966,8 @@ unsigned OptStackOps (CodeSeg* S)
                 } else if (E->Info & OF_STORE && (E->Chg & REG_ZP) == 0) {
 
                     /* Too dangerous - there may be a change of a variable
-                     * within the sequence.
-                     */
+                    ** within the sequence.
+                    */
                     I = Data.PushIndex;
                     State = Initialize;
                     break;
@@ -1978,13 +1978,13 @@ unsigned OptStackOps (CodeSeg* S)
                             E->RI->In.RegY < 2)) {
 
                     /* If we are using the stack, and we don't have "indirect Y"
-                     * addressing mode, or the value of Y is unknown, or less
-                     * than two, we cannot cope with this piece of code. Having
-                     * an unknown value of Y means that we cannot correct the
-                     * stack offset, while having an offset less than two means
-                     * that the code works with the value on stack which is to
-                     * be removed.
-                     */
+                    ** addressing mode, or the value of Y is unknown, or less
+                    ** than two, we cannot cope with this piece of code. Having
+                    ** an unknown value of Y means that we cannot correct the
+                    ** stack offset, while having an offset less than two means
+                    ** that the code works with the value on stack which is to
+                    ** be removed.
+                    */
                     I = Data.PushIndex;
                     State = Initialize;
                     break;
@@ -1995,9 +1995,9 @@ unsigned OptStackOps (CodeSeg* S)
                     TrackLoads (&Data.Rhs, E, I);
                 }
                 /* If the registers from the push (A/X) are used before they're
-                 * changed, we cannot change the sequence, because this would
-                 * with a high probability change the register contents.
-                 */
+                ** changed, we cannot change the sequence, because this would
+                ** with a high probability change the register contents.
+                */
                 UsedRegs |= E->Use;
                 if ((UsedRegs & ~ChangedRegs) & REG_AX) {
                     I = Data.PushIndex;
@@ -2016,9 +2016,9 @@ unsigned OptStackOps (CodeSeg* S)
                 FinalizeLoadInfo (&Data.Rhs, S);
 
                 /* If the Lhs loads do load from zeropage, we have to include
-                 * them into UsedRegs registers used. The Rhs loads have already
-                 * been tracked.
-                 */
+                ** them into UsedRegs registers used. The Rhs loads have already
+                ** been tracked.
+                */
                 if (Data.Lhs.A.LoadEntry && Data.Lhs.A.LoadEntry->AM == AM65_ZP) {
                     Data.UsedRegs |= Data.Lhs.A.LoadEntry->Use;
                 }
@@ -2027,10 +2027,10 @@ unsigned OptStackOps (CodeSeg* S)
                 }
 
                 /* Check the preconditions. If they aren't ok, reset the insn
-                 * pointer to the pushax and start over. We will loose part of
-                 * load tracking but at least a/x has probably lost between
-                 * pushax and here and will be tracked again when restarting.
-                 */
+                ** pointer to the pushax and start over. We will loose part of
+                ** load tracking but at least a/x has probably lost between
+                ** pushax and here and will be tracked again when restarting.
+                */
                 if (!PreCondOk (&Data)) {
                     I = Data.PushIndex;
                     State = Initialize;
@@ -2050,16 +2050,16 @@ unsigned OptStackOps (CodeSeg* S)
                 AdjustStackOffset (&Data, 2);
 
                 /* Regenerate register info, since AdjustStackOffset changed
-                 * the code
-                 */
+                ** the code
+                */
                 CS_GenRegInfo (S);
 
                 /* Call the optimizer function */
                 Changes += Data.OptFunc->Func (&Data);
 
                 /* Since the function may have added or deleted entries,
-                 * correct the index.
-                 */
+                ** correct the index.
+                */
                 I += CS_GetEntryCount (S) - OldEntryCount;
 
                 /* Regenerate register info */

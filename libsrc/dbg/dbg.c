@@ -1,9 +1,9 @@
 /*
- * dbg.c
- *
- * Ullrich von Bassewitz, 08.08.1998
- *
- */
+** dbg.c
+**
+** Ullrich von Bassewitz, 08.08.1998
+**
+*/
 
 
 
@@ -335,8 +335,8 @@ BreakPoint* DbgGetBreakSlot (void);
 
 BreakPoint* DbgIsBreak (unsigned Addr);
 /* Check if there is a user breakpoint at the given address, if so, return
- * a pointer to the slot, else return 0.
- */
+** a pointer to the slot, else return 0.
+*/
 
 
 
@@ -729,8 +729,8 @@ static void DbgResetTmpBreaks (void)
 
 static unsigned char DbgTmpBreaksOk (void)
 /* Check if the temporary breakpoints can be set, if so, return 1, if not,
- * reset them all and return 0.
- */
+** reset them all and return 0.
+*/
 {
     unsigned char i;
     BreakPoint* B = DbgBreaks;
@@ -755,8 +755,8 @@ static unsigned char DbgTmpBreaksOk (void)
 
 static unsigned AsmBack (unsigned mem, unsigned char lines)
 /* Go back in the assembler window the given number of lines (calculate
- * new start address).
- */
+** new start address).
+*/
 {
     unsigned cur;
     unsigned adr [32];
@@ -776,8 +776,8 @@ static unsigned AsmBack (unsigned mem, unsigned char lines)
                     return adr [(in - lines - 1) & 0x1F];
                 } else {
                     /* The requested address is inside an instruction, go back
-                     * one more byte and try again.
-                     */
+                    ** one more byte and try again.
+                    */
                     ++offs;
                     break;
                 }
@@ -1347,8 +1347,8 @@ static void SingleStep (char StepInto)
         case OPC_BNE:
         case OPC_BEQ:
             /* Be sure not to set the breakpoint twice if this is a jump to
-             * the following instruction.
-             */
+            ** the following instruction.
+            */
             Offs = ((signed char*)brk_pc)[1];
             if (Offs) {
                 DbgSetTmpBreak (brk_pc + Offs + 2);
@@ -1491,8 +1491,8 @@ void DbgEntry (void)
     }
 
     /* Only initialize variables here, don't do a display update. The actual
-     * display update will be done while waiting for user input.
-     */
+    ** display update will be done while waiting for user input.
+    */
     AsmHome ();
     UpdateReg ();               /* Must update this (static later) */
     StackHome ();

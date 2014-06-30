@@ -1,12 +1,12 @@
 /* w2cas.c -- write file to cassette
- *
- * This program writes a boot file (typically linked with
- * 'atari-cassette.cfg') to the cassette.
- * Only files < 32K are supported, since the loading of
- * larger files requires a special loader inside the program.
- *
- * Christian Groessler, chris@groessler.org, 2014
- */
+**
+** This program writes a boot file (typically linked with
+** 'atari-cassette.cfg') to the cassette.
+** Only files < 32K are supported, since the loading of
+** larger files requires a special loader inside the program.
+**
+** Christian Groessler, chris@groessler.org, 2014
+*/
 
 #include <stdio.h>
 #include <stdlib.h>

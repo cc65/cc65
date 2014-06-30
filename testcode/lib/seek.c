@@ -1,6 +1,6 @@
 /*
- * seek test program
- */
+** seek test program
+*/
 
 #include <stdio.h>
 #include <string.h>

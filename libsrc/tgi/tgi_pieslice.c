@@ -48,10 +48,10 @@
 void __fastcall__ tgi_pieslice (int x, int y, unsigned char rx, unsigned char ry,
                                 unsigned sa, unsigned ea)
 /* Draw an ellipse pie slice with center at x/y and radii rx/ry using the
- * current drawing color. The pie slice covers the angle between sa and ea
- * (startangle and endangle), which must be in the range 0..360 (otherwise the
- * function may behave unextectedly).
- */
+** current drawing color. The pie slice covers the angle between sa and ea
+** (startangle and endangle), which must be in the range 0..360 (otherwise the
+** function may behave unexpectedly).
+*/
 {
     /* Draw an arc ... */
     tgi_arc (x, y, rx, ry, sa, ea);

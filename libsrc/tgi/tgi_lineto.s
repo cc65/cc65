@@ -3,8 +3,8 @@
 ;
 ; void __fastcall__ tgi_lineto (int x2, int y2);
 ; /* Draw a line in the current drawing color from the graphics cursor to the
-;  * new end point.
-;  */
+; ** new end point.
+; */
 
         .include        "tgi-kernel.inc"
 

@@ -49,8 +49,8 @@
 
 Fragment* NewFragment (unsigned char Type, unsigned short Len)
 /* Create, initialize and return a new fragment. The fragment will be inserted
- * into the current segment.
- */
+** into the current segment.
+*/
 {
     /* Create a new fragment */
     Fragment* F = xmalloc (sizeof (*F));

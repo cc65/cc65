@@ -1,9 +1,9 @@
 /*
- * fgetc.c
- *
- * (C) Copyright 1998, 2002 Ullrich von Bassewitz (uz@cc65.org)
- *
- */
+** fgetc.c
+**
+** (C) Copyright 1998, 2002 Ullrich von Bassewitz (uz@cc65.org)
+**
+*/
 
 
 

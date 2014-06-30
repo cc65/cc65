@@ -36,10 +36,10 @@
 
 
 /* Please note: All functions in this file will set _oserror *and* return its
- * value. The only exception is dio_open, which will return NULL, but _oserror
- * will be set. All function will also set _oserror in case of successful
- * execution, effectively clearing it.
- */
+** value. The only exception is dio_open, which will return NULL, but _oserror
+** will be set. All function will also set _oserror in case of successful
+** execution, effectively clearing it.
+*/
 
 
 

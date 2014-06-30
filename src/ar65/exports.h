@@ -59,8 +59,8 @@ void ExpInsert (const char* Name, const struct ObjData* Module);
 
 const struct ObjData* ExpFind (const char* Name);
 /* Check for an identifier in the list. Return NULL if not found, otherwise
- * return a pointer to the module, that exports the identifer.
- */
+** return a pointer to the module, that exports the identifer.
+*/
 
 
 

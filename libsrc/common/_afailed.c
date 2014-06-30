@@ -1,8 +1,8 @@
 /*
- * _afailed.c
- *
- * Ullrich von Bassewitz, 06.06.1998
- */
+** _afailed.c
+**
+** Ullrich von Bassewitz, 06.06.1998
+*/
 
 
 

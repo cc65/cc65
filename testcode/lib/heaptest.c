@@ -20,8 +20,8 @@ static char* Alloc (void)
     unsigned char* P = malloc (Size);
 
     /* Set the string to a defined value. We use the size, since this will
-     * also allow us to retrieve it later.
-     */
+    ** also allow us to retrieve it later.
+    */
     if (P) {
         memset (P, Size, Size);
     } else {

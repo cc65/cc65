@@ -36,10 +36,10 @@
 
 
 /* Define a structure with the 6522 register offsets.
- * NOTE: The timer registers are not declared as 16 bit registers, because
- * the order in which the two 8 bit halves are written is important, and
- * the compiler doesn't guarantee any order when writing 16 bit values.
- */
+** NOTE: The timer registers are not declared as 16 bit registers, because
+** the order in which the two 8 bit halves are written is important, and
+** the compiler doesn't guarantee any order when writing 16 bit values.
+*/
 struct __6522 {
     unsigned char       prb;            /* Port register B */
     unsigned char       pra;            /* Port register A */

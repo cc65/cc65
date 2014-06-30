@@ -8,9 +8,9 @@
 ;                                      unsigned char sec_addr,
 ;                                      const char* name);
 ; /* Opens a file. Works just like the BASIC command.
-;  * Returns 0 if opening was successful, otherwise an errorcode (see table
-;  * below).
-;  */
+; ** Returns 0 if opening was successful, otherwise an errorcode (see table
+; ** below).
+; */
 ; {
 ;     cbm_k_setlfs(lfn, device, sec_addr);
 ;     cbm_k_setnam(name);

@@ -152,8 +152,8 @@ static void Usage (void)
 
 static unsigned long CvtNumber (const char* Arg, const char* Number)
 /* Convert a number from a string. Allow '$' and '0x' prefixes for hex
- * numbers.
- */
+** numbers.
+*/
 {
     unsigned long Val;
     int           Converted;
@@ -227,11 +227,11 @@ static void LinkFile (const char* Name, FILETYPE Type)
     Magic = Read32 (F);
 
     /* Check the magic for known file types. The handling is somewhat weird
-     * since we may have given a file with a ".lib" extension, which was
-     * searched and found in a directory for library files, but we now find
-     * out (by looking at the magic) that it's indeed an object file. We just
-     * ignore the problem and hope no one will notice...
-     */
+    ** since we may have given a file with a ".lib" extension, which was
+    ** searched and found in a directory for library files, but we now find
+    ** out (by looking at the magic) that it's indeed an object file. We just
+    ** ignore the problem and hope no one will notice...
+    */
     switch (Magic) {
 
         case OBJ_MAGIC:
@@ -365,8 +365,8 @@ static void OptForceImport (const char* Opt attribute ((unused)), const char* Ar
     if (ColPos == 0) {
 
         /* Use default address size (which for now is always absolute
-         * addressing)
-         */
+        ** addressing)
+        */
         InsertImport (GenImport (GetStringId (Arg), ADDR_SIZE_ABS));
 
     } else {
@@ -800,9 +800,9 @@ int main (int argc, char* argv [])
     ConDesCreate ();
 
     /* Process data from the config file. Assign start addresses for the
-     * segments, define linker symbols. The function will return the number
-     * of memory area overflows (zero on success).
-     */
+    ** segments, define linker symbols. The function will return the number
+    ** of memory area overflows (zero on success).
+    */
     MemoryAreaOverflows = CfgProcess ();
 
     /* Check module assertions */
@@ -812,9 +812,9 @@ int main (int argc, char* argv [])
     CheckExports ();
 
     /* If we had a memory area overflow before, we cannot generate the output
-     * file. However, we will generate a short map file if requested, since
-     * this will help the user to rearrange segments and fix the overflow.
-     */
+    ** file. However, we will generate a short map file if requested, since
+    ** this will help the user to rearrange segments and fix the overflow.
+    */
     if (MemoryAreaOverflows) {
         if (MapFileName) {
             CreateMapFile (SHORT_MAPFILE);

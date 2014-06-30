@@ -159,8 +159,8 @@ static void CheckSymTable (SymTable* Tab)
         if (!SymIsTypeDef (Entry)) {
 
             /* Check if the symbol is one with storage, and it if it was
-             * defined but not used.
-             */
+            ** defined but not used.
+            */
             if (((Flags & SC_AUTO) || (Flags & SC_STATIC)) && (Flags & SC_EXTERN) == 0) {
                 if (SymIsDef (Entry) && !SymIsRef (Entry) &&
                     !SymHasAttr (Entry, atUnused)) {
@@ -375,9 +375,9 @@ void EnterStructLevel (void)
     SymTable* S;
 
     /* Get a new symbol table and make it current. Note: Structs and enums
-     * nested in struct scope are NOT local to the struct but visible in the
-     * outside scope. So we will NOT create a new struct or enum table.
-     */
+    ** nested in struct scope are NOT local to the struct but visible in the
+    ** outside scope. So we will NOT create a new struct or enum table.
+    */
     S = NewSymTable (SYMTAB_SIZE_BLOCK);
     S->PrevTab  = SymTab;
     SymTab      = S;
@@ -497,8 +497,8 @@ SymEntry* FindStructField (const Type* T, const char* Name)
         CHECK (Struct != 0);
 
         /* Now search in the struct symbol table. Beware: The table may not
-         * exist.
-         */
+        ** exist.
+        */
         if (Struct->V.S.SymTab) {
             Field = FindSymInTable (Struct->V.S.SymTab, Name, HashStr (Name));
         }
@@ -762,9 +762,9 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
         EType = Entry->Type;
 
         /* If we are handling arrays, the old entry or the new entry may be an
-         * incomplete declaration. Accept this, and if the exsting entry is
-         * incomplete, complete it.
-         */
+        ** incomplete declaration. Accept this, and if the exsting entry is
+        ** incomplete, complete it.
+        */
         if (IsTypeArray (T) && IsTypeArray (EType)) {
 
             /* Get the array sizes */
@@ -792,17 +792,17 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
             }
 
             /* In case of a function, use the new type descriptor, since it
-             * contains pointers to the new symbol tables that are needed if
-             * an actual function definition follows. Be sure not to use the
-             * new descriptor if it contains a function declaration with an
-             * empty parameter list.
-             */
+            ** contains pointers to the new symbol tables that are needed if
+            ** an actual function definition follows. Be sure not to use the
+            ** new descriptor if it contains a function declaration with an
+            ** empty parameter list.
+            */
             if (IsFunc) {
                 /* Get the function descriptor from the new type */
                 FuncDesc* F = GetFuncDesc (T);
                 /* Use this new function descriptor if it doesn't contain
-                 * an empty parameter list.
-                 */
+                ** an empty parameter list.
+                */
                 if ((F->Flags & FD_EMPTY) == 0) {
                     Entry->V.F.Func = F;
                     SetFuncDesc (EType, F);
@@ -822,8 +822,8 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
         Entry->Type = TypeDup (T);
 
         /* If this is a function, set the function descriptor and clear
-         * additional fields.
-         */
+        ** additional fields.
+        */
         if (IsFunc) {
             Entry->V.F.Func = GetFuncDesc (Entry->Type);
             Entry->V.F.Seg  = 0;
@@ -956,8 +956,8 @@ void EmitDebugInfo (void)
     /* Output info for locals if enabled */
     if (DebugInfo) {
         /* For cosmetic reasons in the output file, we will insert two tabs
-         * on global level and just one on local level.
-         */
+        ** on global level and just one on local level.
+        */
         if (LexicalLevel == LEX_LEVEL_GLOBAL) {
             Head = "\t.dbg\t\tsym";
         } else {

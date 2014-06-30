@@ -1,9 +1,9 @@
 /*
- * test program for the debugger
- *
- * press 'd' to enter the debugger
- *
- */
+** test program for the debugger
+**
+** press 'd' to enter the debugger
+**
+*/
 
 #include <stdio.h>
 #include <conio.h>

@@ -1,9 +1,9 @@
 /*
- * Fancy hello world program using cc65.
- *
- * Ullrich von Bassewitz (ullrich@von-bassewitz.de)
- *
- */
+** Fancy hello world program using cc65.
+**
+** Ullrich von Bassewitz (ullrich@von-bassewitz.de)
+**
+*/
 
 
 

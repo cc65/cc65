@@ -54,20 +54,20 @@ extern void __fastcall__ (*pen_adjuster) (unsigned char *pValue);
 
 void __fastcall__ pen_calibrate (unsigned char *XOffset);
 /* Ask the user to help to calibrate a lightpen.  Changes the screen!
- * A pointer to this function can be put into pen_adjuster.
- */
+** A pointer to this function can be put into pen_adjuster.
+*/
 
 void __fastcall__ pen_adjust (const char *filename);
 /* Get a lightpen calibration value from a file if it exists.  Otherwise, call
- * pen_calibrate() to create a value; then, write it into a file, so that it
- * will be available at the next time that the lightpen is used.
- * Might change the screen.
- * pen_adjust() is optional; if you want to use its feature,
- * then it must be called before a driver is installed.
- * Note:  This function merely saves the file-name pointer, and sets
- * the pen_adjuster pointer.  The file will be read only when a driver
- * is installed, and only if that driver wants to be calibrated.
- */
+** pen_calibrate() to create a value; then, write it into a file, so that it
+** will be available at the next time that the lightpen is used.
+** Might change the screen.
+** pen_adjust() is optional; if you want to use its feature,
+** then it must be called before a driver is installed.
+** Note:  This function merely saves the file-name pointer, and sets
+** the pen_adjuster pointer.  The file will be read only when a driver
+** is installed, and only if that driver wants to be calibrated.
+*/
 
 
 

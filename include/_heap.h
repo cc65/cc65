@@ -1,9 +1,9 @@
 /*
- * _heap.h
- *
- * Ullrich von Bassewitz, 1998-06-03, 2004-12-19
- *
- */
+** _heap.h
+**
+** Ullrich von Bassewitz, 1998-06-03, 2004-12-19
+**
+*/
 
 
 
@@ -12,11 +12,11 @@
 
 
 
-/* Structure that preceeds a user block in most cases. 
- * The aligned_malloc function may generate blocks where the start pointer
- * and size are splitted to handle a memory hole that is needed for 
- * alignment.
- */
+/* Structure that preceeds a user block in most cases.
+** The aligned_malloc function may generate blocks where the start pointer
+** and size are splitted to handle a memory hole that is needed for
+** alignment.
+*/
 struct usedblock {
     unsigned            size;
     struct usedblock*   start;
@@ -26,8 +26,8 @@ struct usedblock {
 #define HEAP_ADMIN_SPACE        sizeof (struct usedblock)
 
 /* The data type used to implement the free list.
- * Beware: Field order is significant!
- */                                                      
+** Beware: Field order is significant!
+*/
 struct freeblock {
     unsigned            size;
     struct freeblock*   next;

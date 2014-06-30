@@ -306,9 +306,9 @@ static void DefineSym (const char* Def)
         DefineNumericMacro (Def, 1);
     } else {
         /* We have a value, P points to the '=' character. Since the argument
-         * is const, create a copy and replace the '=' in the copy by a zero
-         * terminator.
-         */
+        ** is const, create a copy and replace the '=' in the copy by a zero
+        ** terminator.
+        */
         char* Q;
         unsigned Len = strlen (Def)+1;
         char* S = (char*) xmalloc (Len);
@@ -468,13 +468,13 @@ static void OptDebugOpt (const char* Opt attribute ((unused)), const char* Arg)
     }
 
     /* Read line by line, ignore empty lines and switch optimization
-     * steps on/off.
-     */
+    ** steps on/off.
+    */
     while (fgets (Buf, sizeof (Buf), F) != 0) {
 
         /* Remove trailing control chars. This will also remove the
-         * trailing newline.
-         */
+        ** trailing newline.
+        */
         unsigned Len = strlen (Buf);
         while (Len > 0 && IsControl (Buf[Len-1])) {
             --Len;
@@ -488,8 +488,8 @@ static void OptDebugOpt (const char* Opt attribute ((unused)), const char* Arg)
         }
 
         /* Check the first character and enable/disable the step or
-         * ignore the line
-         */
+        ** ignore the line
+        */
         switch (*Line) {
 
             case '\0':
@@ -515,8 +515,8 @@ static void OptDebugOpt (const char* Opt attribute ((unused)), const char* Arg)
     }
 
     /* Close the file, no error check here since we were just reading and
-     * this is only a debug function.
-     */
+    ** this is only a debug function.
+    */
     (void) fclose (F);
 }
 

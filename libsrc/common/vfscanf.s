@@ -31,9 +31,9 @@ d:      .addr   _fgetc          ; GET
 ; /* Standard C function */
 ; {
 ;     /* Initialize the data struct. We do only need the given file as user data,
-;      * because the (getfunc) and (ungetfunc) functions are crafted so that they
-;      * match the standard-I/O fgetc() and ungetc().
-;      */
+;     ** because the (getfunc) and (ungetfunc) functions are crafted so that they
+;     ** match the standard-I/O fgetc() and ungetc().
+;     */
 ;     static struct scanfdata d = {
 ;         (  getfunc)  fgetc,
 ;         (ungetfunc) ungetc

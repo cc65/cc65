@@ -1,8 +1,8 @@
 /*
- * qsort.c
- *
- * Ullrich von Bassewitz, 09.12.1998
- */
+** qsort.c
+**
+** Ullrich von Bassewitz, 09.12.1998
+*/
 
 
 
@@ -14,8 +14,8 @@ static void QuickSort (register unsigned char* Base, int Lo, int Hi,
                        register size_t Size,
                        int (*Compare)(const void*, const void*))
 /* Internal recursive function. Works with ints, but this shouldn't be
- * a problem.
- */
+** a problem.
+*/
 {
     int I, J;
 
@@ -59,8 +59,6 @@ void __fastcall__ qsort (void* base, size_t nmemb, size_t size,
         QuickSort (base, 0, (nmemb-1) * size, size, compare);
     }
 }
-
-
 
 
 

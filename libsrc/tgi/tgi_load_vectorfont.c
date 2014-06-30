@@ -52,9 +52,9 @@
 
 const tgi_vectorfont* __fastcall__ tgi_load_vectorfont (const char* name)
 /* Load a vector font into memory and return it. In case of errors, NULL is
- * returned and an error is set, which can be retrieved using tgi_geterror.
- * To use the font, it has to be installed using tgi_install_vectorfont.
- */
+** returned and an error is set, which can be retrieved using tgi_geterror.
+** To use the font, it has to be installed using tgi_install_vectorfont.
+*/
 {
     static const char Magic[4] = {
         0x54, 0x43, 0x48, TGI_VF_VERSION
@@ -108,10 +108,10 @@ const tgi_vectorfont* __fastcall__ tgi_load_vectorfont (const char* name)
     close (F);
 
     /* Fix the offset pointers. When loaded, they contain numeric offsets
-     * into the VectorOps, with the start of the VectorOps at offset zero.
-     * We will add a pointer to the VectorOps to make them actual pointers
-     * that may be used independently from anything else.
-     */
+    ** into the VectorOps, with the start of the VectorOps at offset zero.
+    ** We will add a pointer to the VectorOps to make them actual pointers
+    ** that may be used independently from anything else.
+    */
     V = (unsigned) &Font->vec_ops;
     for (I = 0; I < TGI_VF_CCOUNT; ++I) {
         Font->chars[I] += V;
@@ -125,8 +125,8 @@ const tgi_vectorfont* __fastcall__ tgi_load_vectorfont (const char* name)
 
 LoadError:
     /* Some sort of load problem. If the file is still open, be sure to
-     * close it
-     */
+    ** close it
+    */
     if (F >= 0) {
         close (F);
     }

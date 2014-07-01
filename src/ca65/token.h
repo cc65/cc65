@@ -306,8 +306,8 @@ INLINE int TokIsSep (enum token_t T)
 
 void CopyToken (Token* Dst, const Token* Src);
 /* Copy a token. The current value of Dst.SVal is free'd, so Dst must be
- * initialized.
- */
+** initialized.
+*/
 
 
 

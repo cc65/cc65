@@ -109,8 +109,8 @@ extern void a2e_lo_tgi[];
 void __fastcall__ textframe (unsigned char width, unsigned char height,
                              unsigned char style);
 /* Output a frame on the text screen with the given width and height
- * starting at the current cursor position and using the given style.
- */
+** starting at the current cursor position and using the given style.
+*/
 
 void __fastcall__ textframexy (unsigned char x, unsigned char y,
                                unsigned char width, unsigned char height,
@@ -119,8 +119,8 @@ void __fastcall__ textframexy (unsigned char x, unsigned char y,
 
 unsigned __fastcall__ videomode (unsigned mode);
 /* Set the video mode, return the old mode. Call with one of the VIDEOMODE_xx
- * constants.
- */
+** constants.
+*/
 
 
 

@@ -1,8 +1,8 @@
 /*
- * testprogram for get_ostype() and get_tv() functions
- *
- * 09-Jul-2004, chris@groessler.org
- */
+** testprogram for get_ostype() and get_tv() functions
+**
+** 09-Jul-2004, chris@groessler.org
+*/
 
 #include <stdio.h>
 #include <atari.h>

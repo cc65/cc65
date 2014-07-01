@@ -94,8 +94,8 @@ int ValidAddrSizeForCPU (unsigned char AddrSize);
 
 cpu_t FindCPU (const char* Name);
 /* Find a CPU by name and return the target id. CPU_UNKNOWN is returned if
- * the given name is no valid target.
- */
+** the given name is no valid target.
+*/
 
 
 

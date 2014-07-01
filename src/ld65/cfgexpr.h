@@ -57,8 +57,8 @@ long CfgConstExpr (void);
 
 long CfgCheckedConstExpr (long Min, long Max);
 /* Read an expression, make sure it's an int and in range, then return its
- * value.
- */
+** value.
+*/
 
 
 

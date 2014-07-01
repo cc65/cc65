@@ -1,8 +1,8 @@
 /*
- * fgetpos.c
- *
- * Christian Groessler, 07-Aug-2000
- */
+** fgetpos.c
+**
+** Christian Groessler, 07-Aug-2000
+*/
 
 
 

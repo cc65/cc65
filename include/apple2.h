@@ -109,23 +109,23 @@
 
 extern unsigned char _dos_type;
 /* Valid _dos_type values:
- *
- * AppleDOS 3.3   - 0x00
- * ProDOS 8 1.0.1 - 0x10
- * ProDOS 8 1.0.2 - 0x10
- * ProDOS 8 1.1.1 - 0x11
- * ProDOS 8 1.2   - 0x12
- * ProDOS 8 1.3   - 0x13
- * ProDOS 8 1.4   - 0x14
- * ProDOS 8 1.5   - 0x15
- * ProDOS 8 1.6   - 0x16
- * ProDOS 8 1.7   - 0x17
- * ProDOS 8 1.8   - 0x18
- * ProDOS 8 1.9   - 0x18 (!)
- * ProDOS 8 2.0.1 - 0x21
- * ProDOS 8 2.0.2 - 0x22
- * ProDOS 8 2.0.3 - 0x23
- */
+**
+** AppleDOS 3.3   - 0x00
+** ProDOS 8 1.0.1 - 0x10
+** ProDOS 8 1.0.2 - 0x10
+** ProDOS 8 1.1.1 - 0x11
+** ProDOS 8 1.2   - 0x12
+** ProDOS 8 1.3   - 0x13
+** ProDOS 8 1.4   - 0x14
+** ProDOS 8 1.5   - 0x15
+** ProDOS 8 1.6   - 0x16
+** ProDOS 8 1.7   - 0x17
+** ProDOS 8 1.8   - 0x18
+** ProDOS 8 1.9   - 0x18 (!)
+** ProDOS 8 2.0.1 - 0x21
+** ProDOS 8 2.0.2 - 0x22
+** ProDOS 8 2.0.3 - 0x23
+*/
 
 
 
@@ -136,9 +136,9 @@ extern unsigned char _dos_type;
 
 
 /* The file stream implementation and the POSIX I/O functions will use the
- * following variables to determine the file type, aux type and creation time
- * stamp to use.
- */
+** following variables to determine the file type, aux type and creation time
+** stamp to use.
+*/
 extern unsigned char _filetype;  /* Default: 6 */
 extern unsigned int _auxtype;    /* Default: 0 */
 extern struct {
@@ -179,18 +179,18 @@ void rebootafterexit (void);
 
 #define ser_apple2_slot(num)  ser_ioctl (0, (void*) (num))
 /* Select a slot number from 1 to 7 prior to ser_open.
- * The default slot number is 2.
- */
+** The default slot number is 2.
+*/
 
 #define tgi_apple2_mix(onoff)  tgi_ioctl (0, (void*) (onoff))
 /* If onoff is 1, graphics/text mixed mode is enabled.
- * If onoff is 0, graphics/text mixed mode is disabled.
- */
+** If onoff is 0, graphics/text mixed mode is disabled.
+*/
 
 /* The following #defines will cause the matching functions calls in conio.h
- * to be overlaid by macros with the same names, saving the function call
- * overhead.
- */
+** to be overlaid by macros with the same names, saving the function call
+** overhead.
+*/
 #define _textcolor(color)    COLOR_WHITE
 #define _bgcolor(color)      COLOR_BLACK
 #define _bordercolor(color)  COLOR_BLACK

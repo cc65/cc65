@@ -59,8 +59,8 @@
 
 void CreateMapFile (int ShortMap)
 /* Create a map file. If ShortMap is true, only the segment lists are
- * generated, not the import/export lists.
- */
+** generated, not the import/export lists.
+*/
 {
     unsigned I;
 
@@ -90,8 +90,8 @@ void CreateMapFile (int ShortMap)
         for (J = 0; J < CollCount (&O->Sections); ++J) {
             const Section* S = CollConstAt (&O->Sections, J);
             /* Don't include zero sized sections if not explicitly
-             * requested
-             */
+            ** requested
+            */
             if (VerboseMap || S->Size > 0) {
                 fprintf (F, 
                          "    %-17s Offs=%06lX  Size=%06lX  "

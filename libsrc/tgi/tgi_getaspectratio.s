@@ -3,8 +3,8 @@
 ;
 ; unsigned tgi_getaspectratio (void);
 ; /* Returns the aspect ratio for the loaded driver. The aspect ratio is an
-;  * 8.8 fixed point value.
-;  */
+; ** 8.8 fixed point value.
+; */
 ;
 
         .include        "tgi-kernel.inc"

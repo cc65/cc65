@@ -1,8 +1,8 @@
 /*
- * testprogram printing the default device
- *
- * 26-Nov-2009, Christian Groessler
- */
+** testprogram printing the default device
+**
+** 26-Nov-2009, Christian Groessler
+*/
 
 #include <stdio.h>
 #include <conio.h>

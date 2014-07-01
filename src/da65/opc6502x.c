@@ -46,8 +46,8 @@
 
 
 /* Descriptions for all opcodes. Base table from opc6502.c with illegal
- * opcodes from http://www.oxyron.de/html/opcodes02.html
- */
+** opcodes from http://www.oxyron.de/html/opcodes02.html
+*/
 const OpcDesc OpcTable_6502X[256] = {
     {   "brk",  1,  flNone,                   OH_Implicit              }, /* $00 */
     {   "ora",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $01 */

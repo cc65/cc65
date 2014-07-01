@@ -8,8 +8,8 @@
 ;-----------------------------------------------------------------------------
 ; void __fastcall__ tgi_settextdir (unsigned char dir);
 ; /* Set the direction for text output. dir is one of the TGI_TEXT_XXX
-;  * constants.
-;  */
+; ** constants.
+; */
 ;
 
 .proc   _tgi_settextdir

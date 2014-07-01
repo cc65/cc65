@@ -1,10 +1,10 @@
 /*
- * testprogram for _sys() function on Atari
- *
- * 17-Sep-2013, chris@groessler.org
- *
- * uses PUTCHR IOCB function to display a string
- */
+** testprogram for _sys() function on Atari
+**
+** 17-Sep-2013, chris@groessler.org
+**
+** uses PUTCHR IOCB function to display a string
+*/
 
 #include <atari.h>
 #include <6502.h>

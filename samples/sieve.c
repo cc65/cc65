@@ -1,6 +1,6 @@
 /*
- * Calculate all primes up to a specific number.
- */
+** Calculate all primes up to a specific number.
+*/
 
 
 

@@ -1,11 +1,11 @@
 /*
- * Compresses data to the DEFLATE format.
- * The compressed data is ready to use with inflatemem().
- * Compile using e.g.
- * gcc -O2 -o deflater deflater.c -lz
- *
- * Author: Piotr Fusik <fox@scene.pl>
- */
+** Compresses data to the DEFLATE format.
+** The compressed data is ready to use with inflatemem().
+** Compile using e.g.
+** gcc -O2 -o deflater deflater.c -lz
+**
+** Author: Piotr Fusik <fox@scene.pl>
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <zlib.h>

@@ -1,6 +1,6 @@
 /*
- * Ullrich von Bassewitz, 2012-06-03. Based on code by Groepaz.
- */
+** Ullrich von Bassewitz, 2012-06-03. Based on code by Groepaz.
+*/
 
 #include <fcntl.h>
 #include <unistd.h>

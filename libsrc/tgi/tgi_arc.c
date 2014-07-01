@@ -48,10 +48,10 @@
 void __fastcall__ tgi_arc (int x, int y, unsigned char rx, unsigned char ry,
                            unsigned sa, unsigned ea)
 /* Draw an ellipse arc with center at x/y and radii rx/ry using the current
- * drawing color. The arc covers the angle between sa and ea (startangle and
- * endangle), which must be in the range 0..360 (otherwise the function may
- * bevave unextectedly).
- */
+** drawing color. The arc covers the angle between sa and ea (startangle and
+** endangle), which must be in the range 0..360 (otherwise the function may
+** bevave unextectedly).
+*/
 {
     int x1, y1, x2, y2;
     unsigned char inc;

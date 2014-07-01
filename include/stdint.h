@@ -34,8 +34,8 @@
 
 
 /* Note: This file is not fully ISO 9899-1999 compliant because cc65 lacks
- * a 64 bit data types. The declarations have been adjusted accordingly.
- */
+** a 64 bit data types. The declarations have been adjusted accordingly.
+*/
 
 
 

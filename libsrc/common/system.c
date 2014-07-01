@@ -1,9 +1,9 @@
 /*
- * system.c
- *
- * Stefan Haubenthal, 2003-05-26
- * Ullrich von Bassewitz, 2003-05-27
- */
+** system.c
+**
+** Stefan Haubenthal, 2003-05-26
+** Ullrich von Bassewitz, 2003-05-27
+*/
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -34,18 +34,18 @@
 
 
 /*
- * This is the direct console interface for cc65. I do not like the function
- * names very much, but the first version started as a rewrite of Borland's
- * conio, and, even if the interface has changed, the names did not.
- *
- * The interface does direct screen I/O, so it is fast enough for most
- * programs. I did not implement text windows, since many applications do
- * not need them and should not pay for the additional overhead. It should
- * be easy to add text windows on a higher level if needed,
- *
- * Most routines do not check the parameters. This may be unfortunate but is
- * also related to speed. The coordinates are always 0/0 based.
- */
+** This is the direct console interface for cc65. I do not like the function
+** names very much, but the first version started as a rewrite of Borland's
+** conio, and, even if the interface has changed, the names did not.
+**
+** The interface does direct screen I/O, so it is fast enough for most
+** programs. I did not implement text windows, since many applications do
+** not need them and should not pay for the additional overhead. It should
+** be easy to add text windows on a higher level if needed,
+**
+** Most routines do not check the parameters. This may be unfortunate but is
+** also related to speed. The coordinates are always 0/0 based.
+*/
 
 
 
@@ -128,9 +128,9 @@ int __fastcall__ vcprintf (const char* format, va_list ap);
 
 char cgetc (void);
 /* Return a character from the keyboard. If there is no character available,
- * the function waits until the user does press a key. If cursor is set to
- * 1 (see below), a blinking cursor is displayed while waiting.
- */
+** the function waits until the user does press a key. If cursor is set to
+** 1 (see below), a blinking cursor is displayed while waiting.
+*/
 
 int cscanf (const char* format, ...);
 /* Like scanf(), but uses direct keyboard input */
@@ -140,14 +140,14 @@ int __fastcall__ vcscanf (const char* format, va_list ap);
 
 unsigned char __fastcall__ cursor (unsigned char onoff);
 /* If onoff is 1, a cursor is displayed when waiting for keyboard input. If
- * onoff is 0, the cursor is hidden when waiting for keyboard input. The
- * function returns the old cursor setting.
- */
+** onoff is 0, the cursor is hidden when waiting for keyboard input. The
+** function returns the old cursor setting.
+*/
 
 unsigned char __fastcall__ revers (unsigned char onoff);
 /* Enable/disable reverse character display. This may not be supported by
- * the output device. Return the old setting.
- */
+** the output device. Return the old setting.
+*/
 
 unsigned char __fastcall__ textcolor (unsigned char color);
 /* Set the color for text output. The old color setting is returned. */
@@ -160,16 +160,16 @@ unsigned char __fastcall__ bordercolor (unsigned char color);
 
 void __fastcall__ chline (unsigned char length);
 /* Output a horizontal line with the given length starting at the current
- * cursor position.
- */
+** cursor position.
+*/
 
 void __fastcall__ chlinexy (unsigned char x, unsigned char y, unsigned char length);
 /* Same as "gotoxy (x, y); chline (length);" */
 
 void __fastcall__ cvline (unsigned char length);
 /* Output a vertical line with the given length at the current cursor
- * position.
- */
+** position.
+*/
 
 void __fastcall__ cvlinexy (unsigned char x, unsigned char y, unsigned char length);
 /* Same as "gotoxy (x, y); cvline (length);" */
@@ -196,14 +196,14 @@ void __fastcall__ cputhex16 (unsigned val);
 
 
 /* On some platforms, functions are not available or are dummys. To suppress
- * the call to these functions completely, the platform header files may
- * define macros for these functions that start with an underline. If such a
- * macro exists, a new macro is defined here, that expands to the one with the
- * underline. The reason for this two stepped approach is that it is sometimes
- * necessary to take the address of the function, which is not possible when
- * using a macro. Since the function prototype is still present, #undefining
- * the macro will give access to the actual function.
- */
+** the call to these functions completely, the platform header files may
+** define macros for these functions that start with an underline. If such a
+** macro exists, a new macro is defined here, that expands to the one with the
+** underline. The reason for this two stepped approach is that it is sometimes
+** necessary to take the address of the function, which is not possible when
+** using a macro. Since the function prototype is still present, #undefining
+** the macro will give access to the actual function.
+*/
 
 #if defined(_textcolor)
 #  define textcolor(x)          _textcolor(x)

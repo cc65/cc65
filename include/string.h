@@ -65,8 +65,8 @@ void* __fastcall__ memmove (void* dest, const void* src, size_t count);
 void* __fastcall__ memset (void* s, int c, size_t count);
 
 /* The following is an internal function, the compiler will replace memset
- * with it if the fill value is zero. Never use this one directly!
- */
+** with it if the fill value is zero. Never use this one directly!
+*/
 void* __fastcall__ _bzero (void* ptr, size_t n);
 
 /* Non standard: */

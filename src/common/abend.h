@@ -50,8 +50,8 @@
 
 void AbEnd (const char* Format, ...) attribute ((format (printf, 1, 2), noreturn));
 /* Print a message preceeded by the program name and terminate the program
- * with an error exit code.
- */
+** with an error exit code.
+*/
 
 
 

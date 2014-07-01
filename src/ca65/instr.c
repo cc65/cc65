@@ -90,37 +90,37 @@ static void PutSEP (const InsDesc* Ins);
 
 static void PutTAMn (const InsDesc* Ins);
 /* Emit a TAMn instruction (HuC6280). Since this is a two byte instruction with
- * implicit addressing mode, the opcode byte in the table is actually the
- * second operand byte. The TAM instruction is the more generic form, it takes
- * an immediate argument.
- */
+** implicit addressing mode, the opcode byte in the table is actually the
+** second operand byte. The TAM instruction is the more generic form, it takes
+** an immediate argument.
+*/
 
 static void PutTMA (const InsDesc* Ins);
 /* Emit a TMA instruction (HuC6280) with an immediate argument. Only one bit
- * in the argument byte may be set.
- */
+** in the argument byte may be set.
+*/
 
 static void PutTMAn (const InsDesc* Ins);
 /* Emit a TMAn instruction (HuC6280). Since this is a two byte instruction with
- * implicit addressing mode, the opcode byte in the table is actually the
- * second operand byte. The TAM instruction is the more generic form, it takes
- * an immediate argument.
- */
+** implicit addressing mode, the opcode byte in the table is actually the
+** second operand byte. The TAM instruction is the more generic form, it takes
+** an immediate argument.
+*/
 
 static void PutTST (const InsDesc* Ins);
 /* Emit a TST instruction (HuC6280). */
 
 static void PutJMP (const InsDesc* Ins);
 /* Handle the jump instruction for the 6502. Problem is that these chips have
- * a bug: If the address crosses a page, the upper byte gets not corrected and
- * the instruction will fail. The PutJmp function will add a linker assertion
- * to check for this case and is otherwise identical to PutAll.
- */
+** a bug: If the address crosses a page, the upper byte gets not corrected and
+** the instruction will fail. The PutJmp function will add a linker assertion
+** to check for this case and is otherwise identical to PutAll.
+*/
 
 static void PutRTS (const InsDesc* Ins attribute ((unused)));
 /* Handle the RTS instruction for the 816. In smart mode emit a RTL opcode if
- * the enclosing scope is FAR.
- */
+** the enclosing scope is FAR.
+*/
 
 static void PutAll (const InsDesc* Ins);
 /* Handle all other instructions */
@@ -783,8 +783,8 @@ static const InsTable* InsTabs[CPU_COUNT] = {
 const InsTable* InsTab = (const InsTable*) &InsTab6502;
 
 /* Table to build the effective 65xx opcode from a base opcode and an
- * addressing mode.
- */
+** addressing mode.
+*/
 static unsigned char EATab[10][AM65I_COUNT] = {
     {   /* Table 0 */
         0x00, 0x00, 0x05, 0x0D, 0x0F, 0x15, 0x1D, 0x1F,
@@ -849,8 +849,8 @@ static unsigned char EATab[10][AM65I_COUNT] = {
 };
 
 /* Table to build the effective SWEET16 opcode from a base opcode and an
- * addressing mode.
- */
+** addressing mode.
+*/
 static unsigned char Sweet16EATab[2][AMSW16I_COUNT] = {
     {   /* Table 0 */
         0x00, 0x00, 0x00, 0x00, 0x00,
@@ -910,21 +910,21 @@ static unsigned char Sweet16ExtBytes[AMSW16I_COUNT] = {
 
 static int EvalEA (const InsDesc* Ins, EffAddr* A)
 /* Evaluate the effective address. All fields in A will be valid after calling
- * this function. The function returns true on success and false on errors.
- */
+** this function. The function returns true on success and false on errors.
+*/
 {
     /* Get the set of possible addressing modes */
     GetEA (A);
 
     /* From the possible addressing modes, remove the ones that are invalid
-     * for this instruction or CPU.
-     */
+    ** for this instruction or CPU.
+    */
     A->AddrModeSet &= Ins->AddrMode;
 
     /* If we have an expression, check it and remove any addressing modes that
-     * are too small for the expression size. Since we have to study the
-     * expression anyway, do also replace it by a simpler one if possible.
-     */
+    ** are too small for the expression size. Since we have to study the
+    ** expression anyway, do also replace it by a simpler one if possible.
+    */
     if (A->Expr) {
         ExprDesc ED;
         ED_Init (&ED);
@@ -937,10 +937,10 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
 
         if (ED.AddrSize == ADDR_SIZE_DEFAULT) {
             /* We don't know how big the expression is. If the instruction
-             * allows just one addressing mode, assume this as address size
-             * for the expression. Otherwise assume the default address size
-             * for data.
-             */
+            ** allows just one addressing mode, assume this as address size
+            ** for the expression. Otherwise assume the default address size
+            ** for data.
+            */
             if ((A->AddrModeSet & ~AM65_ALL_ZP) == 0) {
                 ED.AddrSize = ADDR_SIZE_ZP;
             } else if ((A->AddrModeSet & ~AM65_ALL_ABS) == 0) {
@@ -950,12 +950,12 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
             } else {
                 ED.AddrSize = DataAddrSize;
                 /* If the default address size of the data segment is unequal
-                 * to zero page addressing, but zero page addressing is 
-                 * allowed by the instruction, mark all symbols in the 
-                 * expression tree. This mark will be checked at end of 
-                 * assembly, and a warning is issued, if a zero page symbol
-                 * was guessed wrong here.
-                 */
+                ** to zero page addressing, but zero page addressing is 
+                ** allowed by the instruction, mark all symbols in the 
+                ** expression tree. This mark will be checked at end of 
+                ** assembly, and a warning is issued, if a zero page symbol
+                ** was guessed wrong here.
+                */
                 if (ED.AddrSize > ADDR_SIZE_ZP && (A->AddrModeSet & AM65_SET_ZP)) {
                     ExprGuessedAddrSize (A->Expr, ADDR_SIZE_ZP);
                 }
@@ -987,11 +987,11 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
     A->AddrModeBit = (0x01UL << A->AddrMode);
 
     /* If the instruction has a one byte operand and immediate addressing is
-     * allowed but not used, check for an operand expression in the form
-     * <label or >label, where label is a far or absolute label. If found,
-     * emit a warning. This warning protects against a typo, where the '#'
-     * for the immediate operand is omitted.
-     */
+    ** allowed but not used, check for an operand expression in the form
+    ** <label or >label, where label is a far or absolute label. If found,
+    ** emit a warning. This warning protects against a typo, where the '#'
+    ** for the immediate operand is omitted.
+    */
     if (A->Expr && (Ins->AddrMode & AM65_ALL_IMM)                &&
         (A->AddrModeSet & (AM65_DIR | AM65_ABS | AM65_ABS_LONG)) &&
         ExtBytes[A->AddrMode] == 1) {
@@ -1011,8 +1011,8 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
     A->Opcode = Ins->BaseCode | EATab[Ins->ExtCode][A->AddrMode];
 
     /* If feature force_range is active, and we have immediate addressing mode,
-     * limit the expression to the maximum possible value.
-     */
+    ** limit the expression to the maximum possible value.
+    */
     if (A->AddrMode == AM65I_IMM_ACCU || A->AddrMode == AM65I_IMM_INDEX ||
         A->AddrMode == AM65I_IMM_IMPLICIT) {
         if (ForceRange && A->Expr) {
@@ -1043,9 +1043,9 @@ static void EmitCode (EffAddr* A)
         case 2:
             if (CPU == CPU_65816 && (A->AddrModeBit & (AM65_ABS | AM65_ABS_X | AM65_ABS_Y))) {
                 /* This is a 16 bit mode that uses an address. If in 65816,
-                 * mode, force this address into 16 bit range to allow
-                 * addressing inside a 64K segment.
-                 */
+                ** mode, force this address into 16 bit range to allow
+                ** addressing inside a 64K segment.
+                */
                 Emit2 (A->Opcode, GenWordExpr (A->Expr));
             } else {
                 Emit2 (A->Opcode, A->Expr);
@@ -1067,8 +1067,8 @@ static void EmitCode (EffAddr* A)
 
 static long PutImmed8 (const InsDesc* Ins)
 /* Parse and emit an immediate 8 bit instruction. Return the value of the
- * operand if it's available and const.
- */
+** operand if it's available and const.
+*/
 {
     EffAddr A;
     long Val = -1;
@@ -1210,10 +1210,10 @@ static void PutSEP (const InsDesc* Ins)
 
 static void PutTAMn (const InsDesc* Ins)
 /* Emit a TAMn instruction (HuC6280). Since this is a two byte instruction with
- * implicit addressing mode, the opcode byte in the table is actually the
- * second operand byte. The TAM instruction is the more generic form, it takes
- * an immediate argument.
- */
+** implicit addressing mode, the opcode byte in the table is actually the
+** second operand byte. The TAM instruction is the more generic form, it takes
+** an immediate argument.
+*/
 {
     /* Emit the TAM opcode itself */
     Emit0 (0x53);
@@ -1226,8 +1226,8 @@ static void PutTAMn (const InsDesc* Ins)
 
 static void PutTMA (const InsDesc* Ins)
 /* Emit a TMA instruction (HuC6280) with an immediate argument. Only one bit
- * in the argument byte may be set.
- */
+** in the argument byte may be set.
+*/
 {
     /* Use the generic handler */
     long Val = PutImmed8 (Ins);
@@ -1248,10 +1248,10 @@ static void PutTMA (const InsDesc* Ins)
 
 static void PutTMAn (const InsDesc* Ins)
 /* Emit a TMAn instruction (HuC6280). Since this is a two byte instruction with
- * implicit addressing mode, the opcode byte in the table is actually the
- * second operand byte. The TAM instruction is the more generic form, it takes
- * an immediate argument.
- */
+** implicit addressing mode, the opcode byte in the table is actually the
+** second operand byte. The TAM instruction is the more generic form, it takes
+** an immediate argument.
+*/
 {
     /* Emit the TMA opcode itself */
     Emit0 (0x43);
@@ -1303,10 +1303,10 @@ static void PutTST (const InsDesc* Ins)
 
 static void PutJMP (const InsDesc* Ins)
 /* Handle the jump instruction for the 6502. Problem is that these chips have
- * a bug: If the address crosses a page, the upper byte gets not corrected and
- * the instruction will fail. The PutJmp function will add a linker assertion
- * to check for this case and is otherwise identical to PutAll.
- */
+** a bug: If the address crosses a page, the upper byte gets not corrected and
+** the instruction will fail. The PutJmp function will add a linker assertion
+** to check for this case and is otherwise identical to PutAll.
+*/
 {
     EffAddr A;
 
@@ -1317,9 +1317,9 @@ static void PutJMP (const InsDesc* Ins)
         if (A.AddrModeBit & AM65_ABS_IND) {
 
             /* Compare the low byte of the expression to 0xFF to check for
-             * a page cross. Be sure to use a copy of the expression otherwise
-             * things will go weird later.
-             */
+            ** a page cross. Be sure to use a copy of the expression otherwise
+            ** things will go weird later.
+            */
             ExprNode* E = GenNE (GenByteExpr (CloneExpr (A.Expr)), 0xFF);
 
             /* Generate the message */
@@ -1338,8 +1338,8 @@ static void PutJMP (const InsDesc* Ins)
 
 static void PutRTS (const InsDesc* Ins attribute ((unused)))
 /* Handle the RTS instruction for the 816. In smart mode emit a RTL opcode if
- * the enclosing scope is FAR.
- */
+** the enclosing scope is FAR.
+*/
 {
     if (SmartMode && CurrentScope->AddrSize == ADDR_SIZE_FAR) {
         Emit0 (0x6B);       /* RTL */
@@ -1379,8 +1379,8 @@ static void PutSweet16 (const InsDesc* Ins)
     GetSweet16EA (&A);
 
     /* From the possible addressing modes, remove the ones that are invalid
-     * for this instruction or CPU.
-     */
+    ** for this instruction or CPU.
+    */
     A.AddrModeSet &= Ins->AddrMode;
 
     /* Check if we have any adressing modes left */
@@ -1466,16 +1466,16 @@ cpu_t GetCPU (void)
 
 int FindInstruction (const StrBuf* Ident)
 /* Check if Ident is a valid mnemonic. If so, return the index in the
- * instruction table. If not, return -1.
- */
+** instruction table. If not, return -1.
+*/
 {
     unsigned I;
     const InsDesc* ID;
     char Key[sizeof (ID->Mnemonic)];
 
     /* Shortcut for the "none" CPU: If there are no instructions to search
-     * for, bail out early.
-     */
+    ** for, bail out early.
+    */
     if (InsTab->Count == 0) {
         /* Not found */
         return -1;
@@ -1485,8 +1485,8 @@ int FindInstruction (const StrBuf* Ident)
     I = 0;
     while (I < SB_GetLen (Ident)) {
         /* If the identifier is longer than the longest mnemonic, it cannot
-         * be one.
-         */
+        ** be one.
+        */
         if (I >= sizeof (Key) - 1) {
             /* Not found, no need for further action */
             return -1;

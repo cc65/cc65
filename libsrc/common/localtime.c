@@ -55,9 +55,9 @@ struct tm* __fastcall__ localtime (const time_t* timep)
     }
 
     /* Since our ints are just 16 bits, split the given time into seconds,
-     * hours and days. Each of the values will fit in a 16 bit variable.
-     * The mktime routine will then do the rest.
-     */
+    ** hours and days. Each of the values will fit in a 16 bit variable.
+    ** The mktime routine will then do the rest.
+    */
     timebuf.tm_sec  = t % 3600;
     timebuf.tm_min  = 0;
     timebuf.tm_hour = (t / 3600) % 24;

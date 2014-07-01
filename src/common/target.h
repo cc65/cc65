@@ -107,8 +107,8 @@ extern target_t         Target;
 
 target_t FindTarget (const char* Name);
 /* Find a target by name and return the target id. TGT_UNKNOWN is returned if
- * the given name is no valid target.
- */
+** the given name is no valid target.
+*/
 
 const TargetProperties* GetTargetProperties (target_t Target);
 /* Return the properties for a target */

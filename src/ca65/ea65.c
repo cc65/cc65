@@ -157,12 +157,12 @@ void GetEA (EffAddr* A)
     } else {
 
         /* Remaining stuff:
-         *
-         * adr
-         * adr,x
-         * adr,y
-         * adr,s
-         */
+        **
+        ** adr
+        ** adr,x
+        ** adr,y
+        ** adr,s
+        */
         A->Expr = Expression ();
 
         if (CurTok.Tok == TOK_COMMA) {

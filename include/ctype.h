@@ -85,12 +85,12 @@ unsigned char __fastcall__ toascii (unsigned char c);
 
 
 /* When inlining-of-known-functions is enabled, overload most of the above
- * functions by macroes. The function prototypes are available again after
- * #undef'ing the macroes.
- * Please note that the following macroes do NOT handle EOF correctly, as
- * stated in the manual. If you need correct behaviour for EOF, don't
- * use -Os, or #undefine the following macroes.
- */
+** functions by macroes. The function prototypes are available again after
+** #undef'ing the macroes.
+** Please note that the following macroes do NOT handle EOF correctly, as
+** stated in the manual. If you need correct behaviour for EOF, don't
+** use -Os, or #undefine the following macroes.
+*/
 #ifdef __OPT_s__
 
 #define isalnum(c)  (__AX__ = (c),                      \

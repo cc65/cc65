@@ -52,9 +52,9 @@
 
 
 /* CBM FILE TYPES. The definitions are used within standard headers, so we
- * be careful with identifiers in the user name space.
- * "Regular" files have a special bit set so it's easier to pick them out.
- */
+** be careful with identifiers in the user name space.
+** "Regular" files have a special bit set so it's easier to pick them out.
+*/
 #define _CBM_T_REG      0x10U   /* Bit set for regular files */
 #define _CBM_T_SEQ      0x10U
 #define _CBM_T_PRG      0x11U
@@ -93,12 +93,12 @@
 
 unsigned char __fastcall__ _cbm_filetype (unsigned char c);
 /* Map the start character for a file type to one of the file types above.
- * Note: 'd' will always mapped to CBM_T_DEL. The calling function has to
- * look at the following character to determine if the file type is actually
- * CBM_T_DIR.
- * This is a function used by the implementation. There is usually no need
- * to call it from user code.
- */
+** Note: 'd' will always mapped to CBM_T_DEL. The calling function has to
+** look at the following character to determine if the file type is actually
+** CBM_T_DIR.
+** This is a function used by the implementation. There is usually no need
+** to call it from user code.
+*/
 
 
 

@@ -1,7 +1,7 @@
 /*
- * Simple ("tiny") shell to test filename and directory functions.
- * Copyright (c) 2013, Christian Groessler, chris@groessler.org
- */
+** Simple ("tiny") shell to test filename and directory functions.
+** Copyright (c) 2013, Christian Groessler, chris@groessler.org
+*/
 
 #define VERSION_ASC "0.90"
 

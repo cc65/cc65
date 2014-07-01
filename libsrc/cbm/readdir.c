@@ -1,6 +1,6 @@
 /*
- * Ullrich von Bassewitz, 2012-05-30. Based on code by Groepaz.
- */
+** Ullrich von Bassewitz, 2012-05-30. Based on code by Groepaz.
+*/
 
 
 
@@ -53,9 +53,9 @@ struct dirent* __fastcall__ readdir (register DIR* dir)
     dir->off += count + 4;
 
     /* End of directory is reached if the buffer contains "blocks free". It is
-     * sufficient here to check for the leading 'b'. buffer will contain at
-     * least one byte if we come here.
-     */
+    ** sufficient here to check for the leading 'b'. buffer will contain at
+    ** least one byte if we come here.
+    */
     if (buffer[0] == 'b') {
         goto exitpoint;
     }

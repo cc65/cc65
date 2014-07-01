@@ -141,21 +141,21 @@ extern void c128_vdc2_tgi[];
 
 unsigned __fastcall__ videomode (unsigned Mode);
 /* Set the video mode, return the old mode. Call with one of the VIDEOMODE_xx
- * constants.
- */
+** constants.
+*/
 
 void toggle_videomode (void);
 /* Toggle the video mode between 40 and 80 chars (calls SWAPPER).
- * THIS FUNCTION IS DEPRECATED, please use videomode instead!
- */
+** THIS FUNCTION IS DEPRECATED, please use videomode instead!
+*/
 
 void c64mode (void);
 /* Switch the C128 into C64 mode. Note: This function will not return! */
 
 void fast (void);
 /* Switch the CPU into 2MHz mode. Note: This will disable video when in
- * 40 column mode.
- */
+** 40 column mode.
+*/
 
 void slow (void);
 /* Switch the CPU into 1MHz mode. */

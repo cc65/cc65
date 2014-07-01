@@ -198,8 +198,8 @@ tgi_set_ptr:
 ;----------------------------------------------------------------------------
 ; void tgi_uninstall (void);
 ; /* Uninstall the currently loaded driver but do not unload it. Will call
-;  * tgi_done if necessary.
-;  */
+; ** tgi_done if necessary.
+; */
 
 _tgi_uninstall:
         jsr     _tgi_done               ; Switch off graphics

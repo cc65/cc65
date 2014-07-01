@@ -1,17 +1,17 @@
 /*
- * This is part of a changed public domain getopt implementation that
- * had the following text on top:
- *
- *      I got this off net.sources from Henry Spencer.
- *      It is a public domain getopt(3) like in System V.
- *      I have made the following modifications:
- *
- *      A test main program was added, ifdeffed by GETOPT.
- *      This main program is a public domain implementation
- *      of the getopt(1) program like in System V.  The getopt
- *      program can be used to standardize shell option handling.
- *              e.g.  cc -DGETOPT getopt.c -o getopt
- */
+** This is part of a changed public domain getopt implementation that
+** had the following text on top:
+**
+**      I got this off net.sources from Henry Spencer.
+**      It is a public domain getopt(3) like in System V.
+**      I have made the following modifications:
+**
+**      A test main program was added, ifdeffed by GETOPT.
+**      This main program is a public domain implementation
+**      of the getopt(1) program like in System V.  The getopt
+**      program can be used to standardize shell option handling.
+**              e.g.  cc -DGETOPT getopt.c -o getopt
+*/
 
 #include <stdio.h>
 #include <stdlib.h>

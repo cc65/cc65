@@ -94,8 +94,8 @@ L1:     tax                             ; Save return value
 ; /* Push back a character onto the input stream */
 ; {
 ;     /* We do assume here that the _scanf routine will not push back anything
-;      * not read, so we can ignore c safely and won't check the index.
-;      */
+;     ** not read, so we can ignore c safely and won't check the index.
+;     */
 ;     --d->index;
 ;     return c;
 ; }
@@ -129,8 +129,8 @@ L1:     tax                             ; Save return value
 ; /* Standard C function */
 ; {
 ;     /* Initialize the data structs. The sscanfdata struct will be passed back
-;      * to the get and unget functions by _scanf().
-;      */
+;     ** to the get and unget functions by _scanf().
+;     */
 ;     static       struct sscanfdata sd;
 ;     static const struct  scanfdata  d = {
 ;         (  getfunc)   get,

@@ -82,21 +82,21 @@ struct regs {
 #define F6502_C         0x01    /* C flag */
 
 /* Function to call any machine language subroutine. All registers in the
- * regs structure are passed into the routine and the results are passed
- * out. The B flag is ignored on input. The called routine must end with
- * an RTS.
- */
+** regs structure are passed into the routine and the results are passed
+** out. The B flag is ignored on input. The called routine must end with
+** an RTS.
+*/
 void __fastcall__ _sys (struct regs* r);
 
 
 
 /* Set and reset the break vector. The given user function is called if
- * a break occurs. The values of the registers may be read from the brk_...
- * variables. The value in brk_pc will point to the address that contains
- * the brk instruction.
- * The set_brk function will install an exit handler that will reset the
- * vector if the program ends.
- */
+** a break occurs. The values of the registers may be read from the brk_...
+** variables. The value in brk_pc will point to the address that contains
+** the brk instruction.
+** The set_brk function will install an exit handler that will reset the
+** vector if the program ends.
+*/
 
 extern unsigned char brk_a;     /* A register value */
 extern unsigned char brk_x;     /* X register value */

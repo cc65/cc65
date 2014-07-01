@@ -1,8 +1,8 @@
 /*
- * abort.c
- *
- * Ullrich von Bassewitz, 02.06.1998
- */
+** abort.c
+**
+** Ullrich von Bassewitz, 02.06.1998
+*/
 
 
 

@@ -27,8 +27,8 @@ ParamSize:      .res    1               ; Number of parameter bytes
 ;     va_start (ap, format);
 ;
 ;     /* Call vfscanf(). Since we know that va_end won't do anything, we will
-;      * save the call and return the value directly.
-;      */
+;     ** save the call and return the value directly.
+;     */
 ;     return vfscanf (f, format, ap);
 ; }
 ;

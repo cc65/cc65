@@ -194,7 +194,7 @@ delay1: ldx     #0
 end:
 
 .ifndef __ATARIXL__
-tmp:		; outside of the load chunk, some kind of poor man's .bss
+tmp:            ; outside of the load chunk, some kind of poor man's .bss
 .endif
 
 ; ------------------------------------------------------------------------

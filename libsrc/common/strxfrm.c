@@ -1,8 +1,8 @@
 /*
- * strxfrm.c
- *
- * Ullrich von Bassewitz, 11.12.1998
- */
+** strxfrm.c
+**
+** Ullrich von Bassewitz, 11.12.1998
+*/
 
 
 

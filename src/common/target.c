@@ -119,8 +119,8 @@ struct TargetEntry {
 };
 
 /* Table that maps target names to ids. Sorted alphabetically for bsearch.
- * Allows mupltiple entries for one target id (target name aliases).
- */
+** Allows mupltiple entries for one target id (target name aliases).
+*/
 static const TargetEntry TargetMap[] = {
     {   "apple2",       TGT_APPLE2      },
     {   "apple2enh",    TGT_APPLE2ENH   },
@@ -203,8 +203,8 @@ static int Compare (const void* Key, const void* Entry)
 
 target_t FindTarget (const char* Name)
 /* Find a target by name and return the target id. TGT_UNKNOWN is returned if
- * the given name is no valid target.
- */
+** the given name is no valid target.
+*/
 {
     /* Search for the name in the map */
     const TargetEntry* T;

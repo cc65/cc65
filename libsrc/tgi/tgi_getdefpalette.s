@@ -3,8 +3,8 @@
 ;
 ; const unsigned char* tgi_getdefpalette (void);
 ; /* Return the default palette. Will return NULL for drivers that do not
-;  * support palettes.
-;  */
+; ** support palettes.
+; */
 ;
 
         .include        "tgi-kernel.inc"

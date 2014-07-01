@@ -1,19 +1,19 @@
 /*
- * simple file i/o test
- *
- * 12-Jun-2000, Christian Groessler
- *
- * please compile with
- *   cl65 -tsystem ft.c getsp.s -o ft.com
- *
- * The program asks for a filename (if it hasn't
- * got one from argv). I then opens the file,
- * reads the the first 16 bytes and displays them
- * (as hex values).
- * The values of sp (cc65 runtime stack pointer)
- * are displayed at some places. The displayed
- * value should always be the same.
- */
+** simple file I/O test
+**
+** 12-Jun-2000, Christian Groessler
+**
+** please compile with
+**   cl65 -tsystem ft.c getsp.s -o ft.com
+**
+** The program asks for a filename (if it hasn't
+** got one from argv). I then opens the file,
+** reads the the first 16 bytes and displays them
+** (as hex values).
+** The values of sp (cc65 runtime stack pointer)
+** are displayed at some places. The displayed
+** value should always be the same.
+*/
 
 #include <stdio.h>
 #include <string.h>

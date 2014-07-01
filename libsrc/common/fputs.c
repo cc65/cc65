@@ -1,8 +1,8 @@
 /*
- * int fputs (const char* s, FILE* f);
- *
- * Ullrich von Bassewitz, 11.08.1998
- */
+** int fputs (const char* s, FILE* f);
+**
+** Ullrich von Bassewitz, 11.08.1998
+*/
 
 
 

@@ -5,10 +5,10 @@
 ;
 ; int __fastcall__ cbm_read (unsigned char lfn, void* buffer, unsigned int size)
 ; /* Reads up to "size" bytes from a file to "buffer".
-;  * Returns the number of actually read bytes, 0 if there are no bytes left
-;  * (EOF) or -1 in case of an error. _oserror contains an errorcode then (see
-;  * table below).
-;  */
+; ** Returns the number of actually read bytes, 0 if there are no bytes left
+; ** (EOF) or -1 in case of an error. _oserror contains an errorcode then (see
+; ** table below).
+; */
 ; {
 ;     static unsigned int bytesread;
 ;     static unsigned char tmp;
@@ -22,9 +22,10 @@
 ;         tmp = cbm_k_basin();
 ;
 ;         /* the kernal routine BASIN sets ST to EOF if the end of file
-;          * is reached the first time, then we have store tmp.
-;          * every subsequent call returns EOF and READ ERROR in ST, then
-;          * we have to exit the loop here immidiatly. */
+;         ** is reached the first time, then we have store tmp.
+;         ** every subsequent call returns EOF and READ ERROR in ST, then
+;         ** we have to exit the loop here immediatly.
+;         */
 ;         if (cbm_k_readst() & 0xBF) break;
 ;
 ;         ((unsigned char*)buffer)[bytesread++] = tmp;

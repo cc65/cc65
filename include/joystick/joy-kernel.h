@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2002-2006, Ullrich von Bassewitz                                      */
-/*                Römerstrasse 52                                            */
+/*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
 /*                                                                           */
@@ -45,8 +45,8 @@
 
 
 /* A structure that describes the header of a joystick driver loaded into
- * memory.
- */
+** memory.
+*/
 typedef struct {
 
     /* Driver header */
@@ -85,7 +85,6 @@ void joy_clear_ptr (void);
 
 /* End of joy-kernel.h */
 #endif
-
 
 
 

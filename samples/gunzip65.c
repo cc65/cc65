@@ -1,14 +1,14 @@
 /*
- * gunzip65 - a gunzip utility for 6502-based machines.
- *
- * Piotr Fusik <fox@scene.pl>
- *
- * This should be considered as a test of my zlib-compatible library
- * rather than a real application.
- * It's not user-friendly, fault-tolerant, whatever.
- * However, it really works for real GZIP files, provided they are small
- * enough to fit in buffer[] (after decompression!).
- */
+** gunzip65 - a gunzip utility for 6502-based machines.
+**
+** Piotr Fusik <fox@scene.pl>
+**
+** This should be considered as a test of my zlib-compatible library
+** rather than a real application.
+** It's not user-friendly, fault-tolerant, whatever.
+** However, it really works for real GZIP files, provided they are small
+** enough to fit in buffer[] (after decompression!).
+*/
 
 #include <stdio.h>
 #include <string.h>
@@ -16,9 +16,9 @@
 
 #ifndef __CC65__
 /*
- * Emulate inflatemem() if using original zlib.
- * As you can see, this program is quite portable.
- */
+** Emulate inflatemem() if using original zlib.
+** As you can see, this program is quite portable.
+*/
 unsigned inflatemem(char* dest, const char* source)
 {
         z_stream stream;
@@ -41,26 +41,26 @@ unsigned inflatemem(char* dest, const char* source)
 #endif /* __CC65__ */
 
 /*
- * Structure of a GZIP file:
- *
- * 1. GZIP header:
- *    Offset 0: Signature (2 bytes: 0x1f, 0x8b)
- *    Offset 2: Compression method (1 byte: 8 == "deflate")
- *    Offset 3: Flags (1 byte: see below)
- *    Offset 4: File date and time (4 bytes)
- *    Offset 8: Extra flags (1 byte)
- *    Offset 9: Target OS (1 byte: DOS, Amiga, Unix, etc.)
- *    if (flags & FEXTRA) { 2 bytes of length, then length bytes }
- *    if (flags & FNAME) { ASCIIZ filename }
- *    if (flags & FCOMMENT) { ASCIIZ comment }
- *    if (flags & FHCRC) { 2 bytes of CRC }
- *
- * 2. Deflate compressed data.
- *
- * 3. GZIP trailer:
- *    Offset 0: CRC-32 (4 bytes)
- *    Offset 4: uncompressed file length (4 bytes)
- */
+** Structure of a GZIP file:
+**
+** 1. GZIP header:
+**    Offset 0: Signature (2 bytes: 0x1f, 0x8b)
+**    Offset 2: Compression method (1 byte: 8 == "deflate")
+**    Offset 3: Flags (1 byte: see below)
+**    Offset 4: File date and time (4 bytes)
+**    Offset 8: Extra flags (1 byte)
+**    Offset 9: Target OS (1 byte: DOS, Amiga, Unix, etc.)
+**    if (flags & FEXTRA) { 2 bytes of length, then length bytes }
+**    if (flags & FNAME) { ASCIIZ filename }
+**    if (flags & FCOMMENT) { ASCIIZ comment }
+**    if (flags & FHCRC) { 2 bytes of CRC }
+**
+** 2. Deflate compressed data.
+**
+** 3. GZIP trailer:
+**    Offset 0: CRC-32 (4 bytes)
+**    Offset 4: uncompressed file length (4 bytes)
+*/
 
 /* Flags in the GZIP header. */
 #define FTEXT     1     /* Extra text */
@@ -70,28 +70,28 @@ unsigned inflatemem(char* dest, const char* source)
 #define FCOMMENT 16     /* File comment */
 
 /*
- * We read whole GZIP file into this buffer.
- * Then we use this buffer for the decompressed data.
- */
+** We read whole GZIP file into this buffer.
+** Then we use this buffer for the decompressed data.
+*/
 static unsigned char buffer[26000];
 
 /*
- * Get a 16-bit little-endian unsigned number, using unsigned char* p.
- * On many machines this could be (*(unsigned short*) p),
- * but I really like portability. :-)
- */
+** Get a 16-bit little-endian unsigned number, using unsigned char* p.
+** On many machines this could be (*(unsigned short*) p),
+** but I really like portability. :-)
+*/
 #define GET_WORD(p) (*(p) + ((unsigned) (p)[1] << 8))
 
 /* Likewise, for a 32-bit number. */
 #define GET_LONG(p) (GET_WORD(p) + ((unsigned long) GET_WORD(p + 2) << 16))
 
 /*
- * Uncompress a GZIP file.
- * On entry, buffer[] should contain the whole GZIP file contents,
- * and the argument complen should be equal to the length of the GZIP file.
- * On return, buffer[] contains the uncompressed data, and the returned
- * value is the length of the uncompressed data.
- */
+** Uncompress a GZIP file.
+** On entry, buffer[] should contain the whole GZIP file contents,
+** and the argument complen should be equal to the length of the GZIP file.
+** On return, buffer[] contains the uncompressed data, and the returned
+** value is the length of the uncompressed data.
+*/
 unsigned uncompress_buffer(unsigned complen)
 {
         unsigned char* ptr;
@@ -134,19 +134,19 @@ unsigned uncompress_buffer(unsigned complen)
                 ptr += 2;
 
         /*
-         * calculate length of raw "deflate" data
-         * (without the GZIP header and 8-byte trailer)
-         */
+        ** calculate length of raw "deflate" data
+        ** (without the GZIP header and 8-byte trailer)
+        */
         complen -= (ptr - buffer) + 8;
 
         /*
-         * We will move the compressed data to the end of buffer[].
-         * Thus the compressed data and the decompressed data (written from
-         * the beginning of buffer[]) may overlap, as long as the decompressed
-         * data doesn't go further than unread compressed data.
-         * ptr2 points to the beginning of compressed data at the end
-         * of buffer[].
-         */
+        ** We will move the compressed data to the end of buffer[].
+        ** Thus the compressed data and the decompressed data (written from
+        ** the beginning of buffer[]) may overlap, as long as the decompressed
+        ** data doesn't go further than unread compressed data.
+        ** ptr2 points to the beginning of compressed data at the end
+        ** of buffer[].
+        */
         ptr2 = buffer + sizeof(buffer) - complen;
         /* move the compressed data to end of buffer[] */
         memmove(ptr2, ptr, complen);
@@ -173,8 +173,8 @@ unsigned uncompress_buffer(unsigned complen)
 }
 
 /*
- * Get a filename from standard input.
- */
+** Get a filename from standard input.
+*/
 char* get_fname(void)
 {
         static char filename[100];

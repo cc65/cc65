@@ -39,8 +39,8 @@
 
 
 /* Define a structure with the vic register offsets. In cc65 mode, there
- * are aliases for the field accessible as arrays.
- */
+** are aliases for the field accessible as arrays.
+*/
 #if __CC65_STD__ == __CC65_STD_CC65__
 struct __vic2 {
     union {

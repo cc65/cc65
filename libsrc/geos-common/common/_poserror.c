@@ -1,8 +1,8 @@
 /*
- * _poserror.c
- *
- * Maciej 'YTM/Elysium' Witkowiak, 25.04.2003
- */
+** _poserror.c
+**
+** Maciej 'YTM/Elysium' Witkowiak, 25.04.2003
+*/
 
 #include <stdio.h>
 #include <string.h>

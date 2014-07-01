@@ -3,8 +3,8 @@
 ;
 ; void __fastcall__ tgi_setpalette (const unsigned char* palette);
 ; /* Set the palette (not available with all drivers/hardware). palette is
-;  * a pointer to as many entries as there are colors.
-;  */
+; ** a pointer to as many entries as there are colors.
+; */
 ;
 
         .include        "tgi-kernel.inc"

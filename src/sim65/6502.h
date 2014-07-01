@@ -93,8 +93,8 @@ void NMIRequest (void);
 
 unsigned ExecuteInsn (void);
 /* Execute one CPU instruction. Return the number of clock cycles for the
- * executed instruction.
- */
+** executed instruction.
+*/
 
 unsigned long GetCycles (void);
 /* Return the total number of clock cycles executed */

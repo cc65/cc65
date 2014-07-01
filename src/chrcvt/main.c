@@ -52,111 +52,111 @@
 
 
 /*
- * The following is a corrected doc from the BGI font editor toolkit:
- *
- *                      BGI Stroke File Format
- *
- * The structure of Borland .CHR (stroke) files is as follows:
- *
- * ;  offset 0h is a Borland header:
- * ;
- *         HeaderSize      equ     080h
- *         DataSize        equ     (size of font file)
- *         descr           equ     "Triplex font"
- *         fname           equ     "TRIP"
- *         MajorVersion    equ     1
- *         MinorVersion    equ     0
- *
- *         db      'PK',8,8
- *         db      'BGI ',descr,'  V'
- *         db      MajorVersion+'0'
- *         db      (MinorVersion / 10)+'0',(MinorVersion mod 10)+'0'
- *         db      ' - 19 October 1987',0DH,0AH
- *         db      'Copyright (c) 1987 Borland International', 0dh,0ah
- *         db      0,1ah                           ; null & ctrl-Z = end
- *
- *         dw      HeaderSize                      ; size of header
- *         db      fname                           ; font name
- *         dw      DataSize                        ; font file size
- *         db      MajorVersion,MinorVersion       ; version #'s
- *         db      1,0                             ; minimal version #'s
- *
- *         db      (HeaderSize - $) DUP (0)        ; pad out to header size
- *
- * At offset 80h starts data for the file:
- *
- * ;               80h     '+'  flags stroke file type
- * ;               81h-82h  number chars in font file (n)
- * ;               83h      undefined
- * ;               84h      ASCII value of first char in file
- * ;               85h-86h  offset to stroke definitions (8+3n)
- * ;               87h      scan flag (normally 0)
- * ;               88h      distance from origin to top of capital
- * ;               89h      distance from origin to baseline
- * ;               8Ah      distance from origin to bottom descender
- * ;               8Bh-8Fh  undefined
- * ;               90h      offsets to individual character definitions
- * ;               90h+2n   width table (one word per character)
- * ;               90h+3n   start of character definitions
- * ;
- * The individual character definitions consist of a variable number of words
- * describing the operations required to render a character. Each word
- * consists of an (x,y) coordinate pair and a two-bit opcode, encoded as shown
- * here:
- *
- * Byte 1          7   6   5   4   3   2   1   0     bit #
- *                op1  <seven bit signed X coord>
- *
- * Byte 2          7   6   5   4   3   2   1   0     bit #
- *                op2  <seven bit signed Y coord>
- *
- *
- *           Opcodes
- *
- *         op1=0  op2=0  End of character definition.
- *         op1=1  op2=0  Move the pointer to (x,y)
- *         op1=1  op2=1  Draw from current pointer to (x,y)
- */
+** The following is a corrected doc from the BGI font editor toolkit:
+**
+**                      BGI Stroke File Format
+**
+** The structure of Borland .CHR (stroke) files is as follows:
+**
+** ;  offset 0h is a Borland header:
+** ;
+**         HeaderSize      equ     080h
+**         DataSize        equ     (size of font file)
+**         descr           equ     "Triplex font"
+**         fname           equ     "TRIP"
+**         MajorVersion    equ     1
+**         MinorVersion    equ     0
+**
+**         db      'PK',8,8
+**         db      'BGI ',descr,'  V'
+**         db      MajorVersion+'0'
+**         db      (MinorVersion / 10)+'0',(MinorVersion mod 10)+'0'
+**         db      ' - 19 October 1987',0DH,0AH
+**         db      'Copyright (c) 1987 Borland International', 0dh,0ah
+**         db      0,1ah                           ; null & ctrl-Z = end
+**
+**         dw      HeaderSize                      ; size of header
+**         db      fname                           ; font name
+**         dw      DataSize                        ; font file size
+**         db      MajorVersion,MinorVersion       ; version #'s
+**         db      1,0                             ; minimal version #'s
+**
+**         db      (HeaderSize - $) DUP (0)        ; pad out to header size
+**
+** At offset 80h starts data for the file:
+**
+** ;               80h     '+'  flags stroke file type
+** ;               81h-82h  number chars in font file (n)
+** ;               83h      undefined
+** ;               84h      ASCII value of first char in file
+** ;               85h-86h  offset to stroke definitions (8+3n)
+** ;               87h      scan flag (normally 0)
+** ;               88h      distance from origin to top of capital
+** ;               89h      distance from origin to baseline
+** ;               8Ah      distance from origin to bottom descender
+** ;               8Bh-8Fh  undefined
+** ;               90h      offsets to individual character definitions
+** ;               90h+2n   width table (one word per character)
+** ;               90h+3n   start of character definitions
+** ;
+** The individual character definitions consist of a variable number of words
+** describing the operations required to render a character. Each word
+** consists of an (x,y) coordinate pair and a two-bit opcode, encoded as shown
+** here:
+**
+** Byte 1          7   6   5   4   3   2   1   0     bit #
+**                op1  <seven bit signed X coord>
+**
+** Byte 2          7   6   5   4   3   2   1   0     bit #
+**                op2  <seven bit signed Y coord>
+**
+**
+**           Opcodes
+**
+**         op1=0  op2=0  End of character definition.
+**         op1=1  op2=0  Move the pointer to (x,y)
+**         op1=1  op2=1  Draw from current pointer to (x,y)
+*/
 
 
 
 /* The target file format is designed to be read by a cc65 compiled program
- * more easily. It should not be necessary to load the whole file into a
- * buffer to parse it, or seek within the file. Also using less memory if
- * possible would be fine. Therefore we use the following structure:
- *
- * Header portion:
- *      .byte   $54, $43, $48, $00              ; "TCH" version
- *      .word   <size of data portion>
- * Data portion:
- *      .byte   <top>                           ; Baseline to top
- *      .byte   <bottom>                        ; Baseline to bottom
- *      .byte   <height>                        ; Maximum char height
- *      .byte   <width>, ...                    ; $5F width bytes
- *      .word   <char definition offset>, ...   ; $5F char def offsets
- * Character definitions:
- *      .word   <converted opcode>, ...
- *      .byte   $80
- *
- * The baseline of the character is assume to be at position zero. top and
- * bottom are both positive values. The former extends in positive, the other
- * in negative direction of the baseline. height contains the sum of top and
- * bottom and is stored here just for easier handling.
- *
- * The opcodes get converted for easier handling: END is marked by bit 7
- * set in the first byte. The second byte of this opcode is not needed.
- * Bit 7 of the second byte marks a MOVE (bit 7 = 0) or DRAW (bit 7 = 1).
- *
- * The number of characters is fixed to $20..$7E (space to tilde), so character
- * widths and offsets can be stored in fixed size preallocated tables. The
- * space for the character definitions is allocated on the heap, it's size
- * is stored in the header.
- *
- * Above structure allows a program to read the header portion of the file,
- * validate it, then read the remainder of the file into memory in one chunk.
- * The character definition offsets will then be converted into pointers by
- * adding the character definition base pointer to each.
- */
+** more easily. It should not be necessary to load the whole file into a
+** buffer to parse it, or seek within the file. Also using less memory if
+** possible would be fine. Therefore we use the following structure:
+**
+** Header portion:
+**      .byte   $54, $43, $48, $00              ; "TCH" version
+**      .word   <size of data portion>
+** Data portion:
+**      .byte   <top>                           ; Baseline to top
+**      .byte   <bottom>                        ; Baseline to bottom
+**      .byte   <height>                        ; Maximum char height
+**      .byte   <width>, ...                    ; $5F width bytes
+**      .word   <char definition offset>, ...   ; $5F char def offsets
+** Character definitions:
+**      .word   <converted opcode>, ...
+**      .byte   $80
+**
+** The baseline of the character is assume to be at position zero. top and
+** bottom are both positive values. The former extends in positive, the other
+** in negative direction of the baseline. height contains the sum of top and
+** bottom and is stored here just for easier handling.
+**
+** The opcodes get converted for easier handling: END is marked by bit 7
+** set in the first byte. The second byte of this opcode is not needed.
+** Bit 7 of the second byte marks a MOVE (bit 7 = 0) or DRAW (bit 7 = 1).
+**
+** The number of characters is fixed to $20..$7E (space to tilde), so character
+** widths and offsets can be stored in fixed size preallocated tables. The
+** space for the character definitions is allocated on the heap, it's size
+** is stored in the header.
+**
+** Above structure allows a program to read the header portion of the file,
+** validate it, then read the remainder of the file into memory in one chunk.
+** The character definition offsets will then be converted into pointers by
+** adding the character definition base pointer to each.
+*/
 
 
 
@@ -227,8 +227,8 @@ static void OptVersion (const char* Opt attribute ((unused)),
 
 static void ConvertChar (StrBuf* Data, const unsigned char* Buf, int Remaining)
 /* Convert data for one character. Original data is in Buf, converted data
- * will be placed in Data.
- */
+** will be placed in Data.
+*/
 {
     /* Convert all drawing vectors for this character */
     while (1) {
@@ -289,11 +289,12 @@ static void ConvertFile (const char* Input, const char* Output)
     /* The header of a BGI vector font file */
     static const unsigned char ChrHeader[] = {
         /* According to the Borland docs, the following should work, but it
-         * doesn't. Seems like there are fonts that work, but don't have the
-         * "BGI" string in the header. So we use just the PK\b\b mark as
-         * a header.
-         *
-         * 0x50, 0x4B, 0x08, 0x08, 0x42, 0x47, 0x49, 0x20 */
+        ** doesn't. Seems like there are fonts that work, but don't have the
+        ** "BGI" string in the header. So we use just the PK\b\b mark as
+        ** a header.
+        **
+        ** 0x50, 0x4B, 0x08, 0x08, 0x42, 0x47, 0x49, 0x20
+        */
         0x50, 0x4B, 0x08, 0x08
     };
 
@@ -380,8 +381,8 @@ static void ConvertFile (const char* Input, const char* Output)
     Print (stderr, 1, "%.*s\n", (int) (MsgEnd - Buf - 4), Buf+4);
 
     /* Get pointers to the width table, the offset table and the vector data
-     * table. The first two corrected for 0x20 as first entry.
-     */
+    ** table. The first two corrected for 0x20 as first entry.
+    */
     OffsetBuf = Buf + 0x90 + ((0x20 - FirstChar) * 2);
     WidthBuf  = Buf + 0x90 + (CharCount * 2) + (0x20 - FirstChar);
     VectorBuf = Buf + 0x90 + (CharCount * 3);
@@ -425,8 +426,8 @@ static void ConvertFile (const char* Input, const char* Output)
     }
 
     /* If the output file is NULL, use the name of the input file with ".tch"
-     * appended.
-     */
+    ** appended.
+    */
     if (Output == 0) {
         Output = MakeFilename (Input, ".tch");
     }

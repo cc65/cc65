@@ -1,5 +1,6 @@
 ;
-; Oliver Schmidt, 2012-10-16
+; 2012-10-16, Oliver Schmidt
+; 2014-07-16, Greg King
 ;
 ; unsigned char __fastcall__ _syschdir (const char* name);
 ;
@@ -39,18 +40,14 @@
 
 ; Multiply first digit by 10
 
-        ldx     #8
-@L0:    asl
-        asl     tmp1
-        bcc     @L1
-        clc
-        adc     #10
-@L1:    dex
-        bne     @L0
+        txa
+        asl     a               ; * 2
+        asl     a               ; * 4, carry cleared
+        adc     tmp1            ; * 5
+        asl     a               ; * 10, carry cleared
 
 ; Add second digit to product
 
-        clc
         adc     tmp2
         tax
 
@@ -80,7 +77,8 @@ done:   rts
 .endproc
 
 ;--------------------------------------------------------------------------
-; getdigit
+; getdigit -- Converts PetSCII to binary.
+; Sets carry if the character is outside of '0'-'9'.
 
 .proc   getdigit
 

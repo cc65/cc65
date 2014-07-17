@@ -1,5 +1,6 @@
 /*
-** Ullrich von Bassewitz, 2012-06-03. Based on code by Groepaz.
+** 2012-06-03, Ullrich von Bassewitz. Based on code by Groepaz.
+** 2014-07-16, Greg King
 */
 
 #include <fcntl.h>
@@ -15,8 +16,10 @@ void __fastcall__ seekdir (register DIR* dir, long offs)
     unsigned char count;
     unsigned char buf[128];
 
-    /* Make sure we have a reasonable value for offs */
-    if (offs > 0x1000) {
+    /* Make sure that we have a reasonable value for offs.  We reject
+    ** negative numbers by converting them to (very high) unsigned values.
+    */
+    if ((unsigned long)offs > 0x1000uL) {
         errno = EINVAL;
         return;
     }
@@ -32,15 +35,15 @@ void __fastcall__ seekdir (register DIR* dir, long offs)
     }
 
     /* Skip until we've reached the target offset in the directory */
-    o = dir->off = offs;
+    o = dir->off = (unsigned)offs;
     while (o) {
 
         /* Determine size of next chunk to read */
-        if (o > sizeof (buf)) {  
+        if (o > sizeof (buf)) {
             count = sizeof (buf);
             o -= sizeof (buf);
         } else {
-            count = offs;
+            count = (unsigned char)o;
             o = 0;
         }
 

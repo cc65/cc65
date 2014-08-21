@@ -2,6 +2,7 @@
 ; Startup code for cc65 (Oric version)
 ;
 ; By Debrune Jérôme <jede@oric.org> and Ullrich von Bassewitz <uz@cc65.org>
+; 2014-08-15, Greg King
 ;
 
         .export         _exit
@@ -39,26 +40,33 @@
 
 .segment        "STARTUP"
 
-; Save the zero page area we're about to use
+; Save the zero-page area we're about to use.
 
         ldx     #zpspace-1
 L1:     lda     sp,x
-        sta     zpsave,x        ; Save the zero page locations we need
+        sta     zpsave,x
         dex
         bpl     L1
 
-; Clear the BSS data
+; Clear the BSS data.
 
         jsr     zerobss
 
-; Unprotect columns 0 and 1
+; Turn capitals lock off.
+
+        lda     CAPSLOCK
+        sta     capsave
+        lda     #$7F
+        sta     CAPSLOCK
+
+; Unprotect screen columns 0 and 1.
 
         lda     STATUS
         sta     stsave
         and     #%11011111
         sta     STATUS
 
-; Save system stuff and setup the stack
+; Save system stuff; and, set up the stack.
 
         tsx
         stx     spsave          ; Save system stk ptr
@@ -68,26 +76,31 @@ L1:     lda     sp,x
         lda     #>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
         sta     sp+1            ; Set argument stack ptr
 
-; Call module constructors
+; Call module constructors.
 
         jsr     initlib
 
-; Push arguments and call main()
+; Push arguments; and, call main().
 
         jsr     callmain
 
-; Call module destructors. This is also the _exit entry.
+; Call module destructors. This is also the exit() entry.
 
 _exit:  jsr     donelib         ; Run module destructors
 
-; Restore system stuff
+; Restore system stuff.
 
         ldx     spsave
         txs
         lda     stsave
         sta     STATUS
 
-; Copy back the zero page stuff
+; Restore capitals lock.
+
+        lda     capsave
+        sta     CAPSLOCK
+
+; Copy back the zero-page stuff.
 
         ldx     #zpspace-1
 L2:     lda     zpsave,x
@@ -95,7 +108,7 @@ L2:     lda     zpsave,x
         dex
         bpl     L2
 
-; Back to BASIC
+; Back to BASIC.
 
         rts
 
@@ -111,3 +124,5 @@ zpsave: .res    zpspace
 
 spsave: .res    1
 stsave: .res    1
+capsave:
+        .res    1

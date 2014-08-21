@@ -1,6 +1,6 @@
 ;
 ; 2003-04-13, Ullrich von Bassewitz
-; 2013-07-26, Greg King
+; 2014-08-21, Greg King
 ;
 ; char cgetc (void);
 ;
@@ -22,11 +22,11 @@
 
 ; No character, enable cursor and wait
 
-        lda     cursor          ; Cursor currently off?
+        lda     cursor          ; Should cursor be off?
         beq     @L1             ; Skip if so
-        lda     STATUS
-        ora     #%00000001      ; Cursor ON
-        sta     STATUS
+        lsr     STATUS
+        sec                     ; Cursor ON
+        rol     STATUS
 @L1:    lda     KEYBUF
         bpl     @L1
 
@@ -34,13 +34,13 @@
 
         ldx     cursor
         beq     @L2
-        ldx     #$00            ; Zero high byte
         dec     STATUS          ; Clear bit zero
 
 ; We have the character, clear avail flag
 
 @L2:    and     #$7F            ; Mask out avail flag
         sta     KEYBUF
+        ldx     #>0
         ldy     MODEKEY
         cpy     #FUNCTKEY
         bne     @L3
@@ -53,16 +53,12 @@
 .endproc
 
 ; ------------------------------------------------------------------------
-; Switch the cursor off, disable capslock. Code goes into the INIT segment
+; Switch the cursor off. Code goes into the INIT segment
 ; which may be reused after it is run.
 
 .segment        "INIT"
 
 initcgetc:
-        lda     STATUS
-        and     #%11111110
-        sta     STATUS
-        lda     #$7F
-        sta     CAPSLOCK
+        lsr     STATUS
+        asl     STATUS          ; Clear bit zero
         rts
-

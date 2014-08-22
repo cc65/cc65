@@ -1,13 +1,15 @@
 ;
 ; 2003-04-13, Ullrich von Bassewitz
-; 2014-08-21, Greg King
+; 2014-08-22, Greg King
 ;
 ; char cgetc (void);
 ;
 
         .export         _cgetc
         .constructor    initcgetc
+
         .import         cursor
+        .forceimport    disable_caps
 
         .include        "atmos.inc"
 

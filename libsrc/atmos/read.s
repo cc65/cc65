@@ -1,5 +1,5 @@
 ;
-; 2013-12-24, Greg King
+; 2014-08-22, Greg King
 ;
 ; int read (int fd, void* buf, unsigned count);
 ;
@@ -11,6 +11,7 @@
 
         .import         popax
         .importzp       ptr1, ptr2, ptr3
+        .forceimport    disable_caps
 
         .macpack        generic
         .include        "atmos.inc"

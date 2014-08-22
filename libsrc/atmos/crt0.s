@@ -2,7 +2,7 @@
 ; Startup code for cc65 (Oric version)
 ;
 ; By Debrune Jérôme <jede@oric.org> and Ullrich von Bassewitz <uz@cc65.org>
-; 2014-08-15, Greg King
+; 2014-08-22, Greg King
 ;
 
         .export         _exit
@@ -40,7 +40,7 @@
 
 .segment        "STARTUP"
 
-; Save the zero-page area we're about to use.
+; Save the zero-page area that we're about to use.
 
         ldx     #zpspace-1
 L1:     lda     sp,x
@@ -52,13 +52,6 @@ L1:     lda     sp,x
 
         jsr     zerobss
 
-; Turn capitals lock off.
-
-        lda     CAPSLOCK
-        sta     capsave
-        lda     #$7F
-        sta     CAPSLOCK
-
 ; Unprotect screen columns 0 and 1.
 
         lda     STATUS
@@ -66,7 +59,7 @@ L1:     lda     sp,x
         and     #%11011111
         sta     STATUS
 
-; Save system stuff; and, set up the stack.
+; Save some system stuff; and, set up the stack.
 
         tsx
         stx     spsave          ; Save system stk ptr
@@ -76,29 +69,24 @@ L1:     lda     sp,x
         lda     #>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
         sta     sp+1            ; Set argument stack ptr
 
-; Call module constructors.
+; Call the module constructors.
 
         jsr     initlib
 
-; Push arguments; and, call main().
+; Push the command-line arguments; and, call main().
 
         jsr     callmain
 
-; Call module destructors. This is also the exit() entry.
+; Call the module destructors. This is also the exit() entry.
 
 _exit:  jsr     donelib         ; Run module destructors
 
-; Restore system stuff.
+; Restore the system stuff.
 
         ldx     spsave
         txs
         lda     stsave
         sta     STATUS
-
-; Restore capitals lock.
-
-        lda     capsave
-        sta     CAPSLOCK
 
 ; Copy back the zero-page stuff.
 
@@ -124,5 +112,3 @@ zpsave: .res    zpspace
 
 spsave: .res    1
 stsave: .res    1
-capsave:
-        .res    1

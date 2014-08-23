@@ -17,29 +17,29 @@
 
 start:
 
-; Clear the BSS data
+; Clear the BSS data.
 
         jsr     zerobss
 
-; initialize data
+; Initialize the data.
         jsr     copydata
 
-; setup the stack
+; Set up the stack.
 
         lda     #<(__RAM_START__ + __RAM_SIZE__ - __RESERVED_MEMORY__)
         sta     sp
         lda     #>(__RAM_START__ + __RAM_SIZE__ - __RESERVED_MEMORY__)
         sta     sp+1            ; Set argument stack ptr
 
-; Call module constructors
+; Call the module constructors.
 
         jsr     initlib
 
-; Push arguments and call main()
+; Push the command-line arguments; and, call main().
 
         jsr     callmain
 
-; Call module destructors. This is also the _exit entry.
+; Call the module destructors. This is also the exit() entry.
 
 _exit:  jsr     donelib         ; Run module destructors
 

@@ -1,5 +1,5 @@
 ;
-; Startup code for geos
+; Startup code for GEOS
 ;
 ; Maciej 'YTM/Elysium' Witkowiak
 ; 26.10.99, 10.3.2000, 15.8.2001, 23.12.2002
@@ -23,9 +23,9 @@
 .segment        "STARTUP"
 
 ; GEOS 64/128 initializes the screen before starting an application while
-; Apple GEOS does not. In order to provide identical startup conditions
-; we initialize the screen here on Apple GEOS. For the same reason we set
-; the pattern and dispBufferOn even on GEOS 64/128 although we don't use
+; Apple GEOS does not. In order to provide identical startup conditions,
+; we initialize the screen here, on Apple GEOS. For the same reason, we set
+; the pattern and dispBufferOn, even on GEOS 64/128, although we don't use
 ; them here.
 
         lda #2                  ; Checkerboard pattern
@@ -44,23 +44,23 @@
 
         jsr zerobss
 
-; Setup stack.
+; Set up the stack.
 
         lda #<(__STACKADDR__ + __STACKSIZE__)
         ldx #>(__STACKADDR__ + __STACKSIZE__)
         sta sp
         stx sp+1
 
-; Call module constructors.
+; Call the module constructors.
 
         jsr initlib
 
-; Push arguments and call main().
+; Push the command-line arguments; and, call main().
 
         cli
         jsr callmain
 
-; Call module destructors.
+; Call the module destructors.
 
 _exit:  jsr donelib
 

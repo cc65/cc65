@@ -70,7 +70,7 @@
 
 start:
 
-; setup the CPU and System-IRQ
+; Set up the CPU and System-IRQ.
 
         sei
         cld
@@ -90,40 +90,40 @@ start:
         inx
         bne     @l
 
-; Clear the BSS data
+; Clear the BSS data.
 
         jsr     zerobss
 
-; initialize data
+; Initialize the data.
         jsr     copydata
 
-; setup the stack
+; Set up the stack.
 
         lda     #<(__SRAM_START__ + __SRAM_SIZE__)
         sta     sp
         lda     #>(__SRAM_START__ + __SRAM_SIZE__)
         sta     sp+1            ; Set argument stack ptr
 
-; Call module constructors
+; Call the module constructors.
 
         jsr     initlib
 
-; Push arguments and call main()
+; Push the command-line arguments; and, call main().
 
         jsr     callmain
 
-; Call module destructors. This is also the _exit entry.
+; Call the module destructors. This is also the exit() entry.
 
 _exit:  jsr     donelib         ; Run module destructors
 
-; Reset the NES
+; Reset the NES.
 
         jmp start
 
 ; ------------------------------------------------------------------------
-; System V-Blank Interupt
-; updates PPU Memory (buffered)
-; updates VBLANK_FLAG and tickcount
+; System V-Blank Interrupt
+; Updates PPU Memory (buffered).
+; Updates VBLANK_FLAG and tickcount.
 ; ------------------------------------------------------------------------
 
 nmi:    pha
@@ -141,13 +141,13 @@ nmi:    pha
 
 @s:     jsr     ppubuf_flush
 
-        ; reset the video counter
+        ; Reset the video counter.
         lda     #$20
         sta     PPU_VRAM_ADDR2
         lda     #$00
         sta     PPU_VRAM_ADDR2
 
-        ; reset scrolling
+        ; Reset scrolling.
         sta     PPU_VRAM_ADDR1
         sta     PPU_VRAM_ADDR1
 

@@ -9,9 +9,9 @@
 ;
 ; ***
 ;
-; Startup code for cc65 (Lynx version).  Based on Atari 8-bit startup
+; Startup code for cc65 (Lynx version).  Based on the Atari 8-bit startup
 ; code structure.  The C stack is located at the end of the RAM memory
-; segment and grows downward.  Bastian Schick's executable header is put
+; segment, and grows downward.  Bastian Schick's executable header is put
 ; on the front of the fully linked binary (see EXEHDR segment.)
 ;
 
@@ -44,19 +44,19 @@ MikeyInitData:  .byte $9e,$18,$68,$1f,$00,$00,$00,$00,$00,$ff,$1a,$1b,$04,$0d,$2
 
         .segment "STARTUP"
 
-; set up system
+; Set up the system.
 
         sei
         cld
         ldx     #$FF
         txs
 
-; init bank switching
+; Init the bank switching.
 
         lda     #$C
         sta     MAPCTL          ; $FFF9
 
-; disable all timer interrupts
+; Disable all timer interrupts.
 
         lda     #$80
         trb     TIM0CTLA
@@ -67,24 +67,24 @@ MikeyInitData:  .byte $9e,$18,$68,$1f,$00,$00,$00,$00,$00,$ff,$1a,$1b,$04,$0d,$2
         trb     TIM6CTLA
         trb     TIM7CTLA
 
-; disable TX/RX IRQ, set to 8E1
+; Disable the TX/RX IRQ; set to 8E1.
 
         lda     #%11101
         sta     SERCTL
 
-; clear all pending interrupts
+; Clear all pending interrupts.
 
         lda     INTSET
         sta     INTRST
 
-; setup the stack
+; Set up the stack.
 
         lda     #<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
         sta     sp
         lda     #>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
         sta     sp+1
 
-; Init Mickey
+; Init Mickey.
 
         ldx     #.sizeof(MikeyInitReg)-1
 mloop:  ldy     MikeyInitReg,x
@@ -93,7 +93,7 @@ mloop:  ldy     MikeyInitReg,x
         dex
         bpl     mloop
 
-; these are RAM-shadows of read only regs
+; These are RAM-shadows of read-only regs.
 
         ldx     #$1b
         stx     __iodat
@@ -102,7 +102,7 @@ mloop:  ldy     MikeyInitReg,x
         ldx     #$d
         stx     __viddma
 
-; Init Suzy
+; Init Suzy.
 
         ldx     #.sizeof(SuzyInitReg)-1
 sloop:  ldy     SuzyInitReg,x
@@ -115,19 +115,19 @@ sloop:  ldy     SuzyInitReg,x
         sta     __sprsys
         cli
 
-; Clear the BSS data
+; Clear the BSS data.
 
         jsr     zerobss
 
-; Call module constructors
+; Call the module constructors.
 
         jsr     initlib
 
-; Push arguments and call main
+; Push the command-line arguments; and, call main().
 
         jsr     callmain
 
-; Call module destructors. This is also the _exit entry.
+; Call the module destructors. This is also the exit() entry.
 
 _exit:  jsr     donelib         ; Run module destructors
 

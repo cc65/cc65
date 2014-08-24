@@ -23,7 +23,7 @@
 
 Start:
 
-; Save the zero page locations we need
+; Save the zero-page locations that we need.
 
         ldx     #zpspace-1
 L1:     lda     sp,x
@@ -31,24 +31,24 @@ L1:     lda     sp,x
         dex
         bpl     L1
 
-; Switch to second charset
+; Switch to the second charset.
 
         lda     #14
         jsr     BSOUT
 
-; Switch off the BASIC ROM
+; Switch off the BASIC ROM.
 
         lda     $01
         pha                     ; Remember the value
         and     #$F8
-        ora     #$06            ; Enable kernal+I/O, disable basic
+        ora     #$06            ; Enable Kernal+I/O, disable BASIC
         sta     $01
 
-; Clear the BSS data
+; Clear the BSS data.
 
         jsr     zerobss
 
-; Save system settings and setup the stack
+; Save some system settings; and, set up the stack.
 
         pla
         sta     mmusave         ; Save the memory configuration
@@ -61,20 +61,20 @@ L1:     lda     sp,x
         lda     #>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
         sta     sp+1            ; Set argument stack ptr
 
-; Call module constructors
+; Call the module constructors.
 
         jsr     initlib
 
-; Push arguments and call main
+; Push the command-line arguments; and, call main().
 
         jsr     callmain
 
-; Back from main (This is also the _exit entry). Run module destructors
+; Back from main() [this is also the exit() entry]. Run the module destructors.
 
 _exit:  pha                     ; Save the return code on stack
         jsr     donelib
 
-; Copy back the zero page stuff
+; Copy back the zero-page stuff.
 
         ldx     #zpspace-1
 L2:     lda     zpsave,x
@@ -82,19 +82,19 @@ L2:     lda     zpsave,x
         dex
         bpl     L2
 
-; Place the program return code into ST
+; Place the program return code into BASIC's status variable.
 
         pla
         sta     ST
 
-; Restore system stuff
+; Restore the system stuff.
 
         ldx     spsave
         txs                     ; Restore stack pointer
         ldx     mmusave
         stx     $01             ; Restore memory configuration
 
-; Back to basic
+; Back to BASIC.
 
         rts
 

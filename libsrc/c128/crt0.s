@@ -22,21 +22,21 @@
 
 Start:
 
-; Switch to the second charset
+; Switch to the second charset.
 
         lda     #14
         jsr     BSOUT
 
-; Before doing anything else, we have to setup our banking configuration.
-; Otherwise just the lowest 16K are actually RAM. Writing through the ROM
-; to the underlying RAM works, but it is bad style.
+; Before doing anything else, we have to set up our banking configuration.
+; Otherwise, just the lowest 16K are actually RAM. Writing through the ROM
+; to the underlying RAM works; but, it is bad style.
 
         lda     MMU_CR          ; Get current memory configuration...
         pha                     ; ...and save it for later
-        lda     #MMU_CFG_CC65   ; Bank0 with kernal ROM
+        lda     #MMU_CFG_CC65   ; Bank0 with Kernal ROM
         sta     MMU_CR
 
-; Save the zero page locations we need
+; Save the zero-page locations that we need.
 
         ldx     #zpspace-1
 L1:     lda     sp,x
@@ -44,11 +44,11 @@ L1:     lda     sp,x
         dex
         bpl     L1
 
-; Clear the BSS data
+; Clear the BSS data.
 
         jsr     zerobss
 
-; Save system stuff and setup the stack
+; Save some system stuff; and, set up the stack.
 
         pla                     ; Get MMU setting
         sta     mmusave
@@ -61,27 +61,27 @@ L1:     lda     sp,x
         lda     #>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
         sta     sp+1            ; Set argument stack ptr
 
-; Call module constructors
+; Call the module constructors.
 
         jsr     initlib
 
-; Set the bank for the file name to our execution bank. We must do this,
-; *after* calling constructors, because some of them may depend on the
-; original value of this register.
+; Set the bank for the file name to our execution bank. We must do this
+; *after* calling the constructors because some of them might depend on
+; the original value of this register.
 
         lda     #0
         sta     FNAM_BANK
 
-; Push arguments and call main()
+; Push the command-line arguments; and, call main().
 
         jsr     callmain
 
-; Back from main (this is also the _exit entry). Run module destructors
+; Back from main() [this is also the exit() entry]. Run the module destructors.
 
 _exit:  pha                     ; Save the return code on stack
         jsr     donelib
 
-; Copy back the zero page stuff
+; Copy back the zero-page stuff.
 
         ldx     #zpspace-1
 L2:     lda     zpsave,x
@@ -89,19 +89,19 @@ L2:     lda     zpsave,x
         dex
         bpl     L2
 
-; Place the program return code into ST
+; Place the program return code into BASIC's status variable.
 
         pla
         sta     ST
 
-; Reset the stack and the memory configuration
+; Reset the stack and the memory configuration.
 
         ldx     spsave
         txs
         ldx     mmusave
         stx     MMU_CR
 
-; Done, return to BASIC
+; Done, return to BASIC.
 
         rts
 

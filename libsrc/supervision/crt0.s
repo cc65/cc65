@@ -28,7 +28,7 @@ _sv_nmi_counter:        .byte 0
 reset:
         jsr     zerobss
 
-        ; initialize data
+        ; Initialize data.
         jsr     copydata
 
         lda     #>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
@@ -63,12 +63,12 @@ not_dma:
         rti
 .endproc
 
-; removing this segment gives only a warning
+; Removing this segment gives only a warning.
         .segment "FFF0"
 .proc reset32kcode
         lda     #(6<<5)
         sta     sv_bank
-; now the 32kbyte image can reside in the top of 64kbyte, 128kbyte roms
+; Now, the 32Kbyte image can reside in the top of 64Kbyte and 128Kbyte ROMs.
         jmp     reset
 .endproc
 

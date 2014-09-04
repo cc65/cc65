@@ -5,23 +5,13 @@
 ; (which is the default on other cc65 platforms).
 ; This module is linked by the conio and POSIX input functions.
 ;
-; 2014-08-22, Greg King
+; 2014-09-04, Greg King
 ;
 
-        .destructor     restore_caps
         .constructor    disable_caps
+        .destructor     restore_caps
 
         .include        "atmos.inc"
-
-
-;--------------------------------------------------------------------------
-
-; Restore the old capitals-lock state.
-
-restore_caps:
-        lda     capsave
-        sta     CAPSLOCK
-        rts
 
 
 ;--------------------------------------------------------------------------
@@ -35,6 +25,18 @@ disable_caps:
         lda     CAPSLOCK
         sta     capsave
         lda     #$7F
+        sta     CAPSLOCK
+        rts
+
+
+;--------------------------------------------------------------------------
+
+.code
+
+; Restore the old capitals-lock state.
+
+restore_caps:
+        lda     capsave
         sta     CAPSLOCK
         rts
 

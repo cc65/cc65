@@ -1,6 +1,6 @@
 ;
 ; 2003-04-13, Ullrich von Bassewitz
-; 2014-08-22, Greg King
+; 2014-09-04, Greg King
 ;
 ; char cgetc (void);
 ;
@@ -38,15 +38,15 @@
         beq     @L2
         dec     STATUS          ; Clear bit zero
 
-; We have the character, clear avail flag
+; We have the character, clear the "available" flag
 
 @L2:    and     #$7F            ; Mask out avail flag
         sta     KEYBUF
-        ldx     #>0
+        ldx     #>$0000
         ldy     MODEKEY
         cpy     #FUNCTKEY
         bne     @L3
-        ora     #$80            ; FUNCT pressed
+        ora     #$80            ; FUNCT-key pressed
 
 ; Done
 

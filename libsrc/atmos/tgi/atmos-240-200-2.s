@@ -2,7 +2,7 @@
 ; Graphics driver for the 240x200x2 monochrome mode on the Atmos
 ;
 ; Stefan Haubenthal <polluks@sdf.lonestar.org>
-; 2013-07-16, Greg King <gregdk@users.sf.net>
+; 2014-09-10, Greg King <gregdk@users.sf.net>
 ;
 
         .include        "zeropage.inc"
@@ -254,7 +254,7 @@ SETPIXEL:
 mymode: sta     PARAM3
         lda     X1
         sta     PARAM1
-        lda     #0
+        lda     #>$0000
         sta     PARAM1+1
         sta     PARAM2+1
         sta     PARAM3+1
@@ -270,13 +270,13 @@ GETPIXEL:
         sta     PARAM1
         lda     Y1
         sta     PARAM2
-        lda     #0
+        lda     #>$0000
         sta     PARAM1+1
         sta     PARAM2+1
         jsr     POINT
         lda     PARAM1
         and     #%00000001
-        ldx     #0
+        ldx     #>$0000
         rts
 
 ; ------------------------------------------------------------------------
@@ -302,7 +302,7 @@ LINE:
         sta     PARAM2+1
         lda     MODE
         sta     PARAM3
-        ldx     #>0
+        ldx     #>$0000
         stx     PARAM3+1
         jmp     DRAW
 

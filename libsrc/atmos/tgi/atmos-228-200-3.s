@@ -2,7 +2,7 @@
 ; Graphics driver for the 228x200x3 palette mode on the Atmos
 ;
 ; Stefan Haubenthal <polluks@sdf.lonestar.org>
-; 2013-07-15, Greg King <gregdk@users.sf.net>
+; 2014-09-10, Greg King <gregdk@users.sf.net>
 ;
 
         .include        "zeropage.inc"
@@ -275,7 +275,7 @@ mymode: sta     PARAM3
         lda     X1
         add     #2 * XSIZE      ; Skip screen attribute columns
         sta     PARAM1
-        lda     #0
+        lda     #>$0000
         sta     PARAM1+1
         sta     PARAM2+1
         sta     PARAM3+1
@@ -291,13 +291,13 @@ GETPIXEL:
         sta     PARAM1
         lda     Y1
         sta     PARAM2
-        lda     #0
+        lda     #>$0000
         sta     PARAM1+1
         sta     PARAM2+1
         jsr     POINT
         lda     PARAM1
         and     #%00000001
-        ldx     #0
+        ldx     #>$0000
         rts
 
 ; ------------------------------------------------------------------------
@@ -323,7 +323,7 @@ LINE:
         sta     PARAM2+1
         lda     MODE
         sta     PARAM3
-        ldx     #>0
+        ldx     #>$0000
         stx     PARAM3+1
         jmp     DRAW
 
@@ -359,7 +359,7 @@ BAR:
 
 ; ------------------------------------------------------------------------
 ; TEXTSTYLE: Set the style used when calling OUTTEXT. Text scaling in the x
-; and y directions is passend in X/Y, the text direction is passed in A.
+; and y directions is passed in X/Y, the text direction is passed in A.
 ;
 ; Must set an error code: NO
 ;
@@ -369,7 +369,7 @@ TEXTSTYLE:
 
 
 ; ------------------------------------------------------------------------
-; OUTTEXT: Output text at X/Y = ptr1/ptr2 using the current color and the
+; OUTTEXT: Output text at x/y = ptr1/ptr2, using the current color and the
 ; current text style. The text to output is given as a zero-terminated
 ; string with its address in ptr3.
 ;

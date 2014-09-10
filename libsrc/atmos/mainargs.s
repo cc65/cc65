@@ -1,9 +1,9 @@
 ;
 ; 2003-03-07, Ullrich von Bassewitz
 ; 2011-01-28, Stefan Haubenthal
-; 2013-12-22, Greg King
+; 2014-09-10, Greg King
 ;
-; Setup arguments for main
+; Set up arguments for main
 ;
 
         .constructor    initmainargs, 24
@@ -80,7 +80,7 @@ setterm:sta     term            ; Set end of argument marker
         txa                     ; Get low byte
         add     #<args
         sta     argv,y          ; argv[y]= &arg
-        lda     #>0
+        lda     #>$0000
         adc     #>args
         sta     argv+1,y
         iny
@@ -99,7 +99,7 @@ argloop:lda     BASIC_BUF,x
 ; A contains the terminating character. To make the argument a valid C string,
 ; replace the terminating character by a zero.
 
-        lda     #0
+        lda     #$00
         sta     args-1,x
 
 ; Check if the maximum number of command line arguments is reached. If not,
@@ -130,4 +130,4 @@ args:   .res    SCREEN_XSIZE * 2 - 1
 
 .data
 argv:   .addr   name
-        .res    MAXARGS * 2, 0
+        .res    MAXARGS * 2, $00

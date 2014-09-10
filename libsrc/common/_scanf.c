@@ -2,7 +2,7 @@
 ** _scanf.c
 **
 ** (c) Copyright 2001-2005, Ullrich von Bassewitz <uz@cc65.org>
-** 2005-01-24, Greg King <greg.king5@ver5z6n.net>
+** 2014-09-10, Greg King <greg.king5@verizon.net>
 **
 ** This is the basic layer for all scanf-type functions.  It should be
 ** rewritten in assembly, at some time in the future.  So, some of the code
@@ -275,7 +275,7 @@ static void __fastcall__ Error (unsigned char /* Code */)
     (char*) __AX__ = JumpBuf;
     asm ("jsr pushax");
     asm ("pla");
-    asm ("ldx #>0");
+    asm ("ldx #>$0000");
     asm ("jmp %v", longjmp);
 }
 
@@ -474,7 +474,7 @@ static char GetFormat (void)
     ++format;
     asm ("ldy #0");
     asm ("lda (regsave),y");
-    asm ("ldx #>0");
+    asm ("ldx #>$0000");
     return (F = (char) __AX__);
 }
 

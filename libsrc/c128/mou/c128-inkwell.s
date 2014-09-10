@@ -2,7 +2,7 @@
 ; Driver for the Inkwell Systems 170-C and 184-C lightpens.
 ;
 ; 2014-04-26, Christian Groessler
-; 2014-05-01, Greg King
+; 2014-09-10, Greg King
 ;
 
         .include        "zeropage.inc"
@@ -118,6 +118,8 @@ old_irq:        .res    2
 ; Default Inkwell calibration.
 ; The first number is the width of the left border;
 ; the second number is the actual calibration value.
+; See a comment below (at "Calculate the new X co-ordinate")
+; for the reason for the third number.
 
 XOffset:        .byte   (24 + 24) / 2   ; x-offset
 
@@ -190,11 +192,11 @@ INSTALL:
         ; Because it's called via "rts", we must decrement it by one.
         iny
         lda     old_irq
-        sub     #<1
+        sub     #<$0001
         sta     (ptr3),y
         iny
         lda     old_irq+1
-        sbc     #>1
+        sbc     #>$0001
         sta     (ptr3),y
         cli
 
@@ -334,7 +336,7 @@ MOVE:   sei                             ; No interrupts
 
 BUTTONS:
         lda     Buttons
-        ldx     #>0
+        ldx     #>$0000
 
 ; Make the lightpen buttons look like a 1351 mouse.
 
@@ -434,7 +436,7 @@ IRQ:    jsr     CPREP
 
         sub     #50
         tay                             ; Remember low byte
-        ldx     #>0
+        ldx     #>$0000
 
 ; Limit the Y co-ordinate to the bounding box.
 
@@ -475,7 +477,7 @@ IRQ:    jsr     CPREP
 
         asl     a
         tay                             ; Remember low byte
-        lda     #>0
+        lda     #>$0000
         rol     a
         tax                             ; Remember high byte
 

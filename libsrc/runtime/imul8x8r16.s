@@ -1,6 +1,6 @@
 ;
 ; 2010-11-02, Ullrich von Bassewitz
-; 2014-05-10, Greg King
+; 2014-09-10, Greg King
 ;
 ; CC65 runtime: 8x8 => 16 signed multiplication
 ;
@@ -23,13 +23,13 @@ imul8x8r16:
         sta     ptr3
 
 imul8x8r16m:
-        ldx     #>0
+        ldx     #>$0000
         bit     ptr3
         bpl     @L7
         dex
 @L7:    stx     ptr3+1          ; Extend sign of Left-Hand Side
-        ldy     #<0             ; Clear .XY accumulator
-        ldx     #>0
+        ldy     #<$0000         ; Clear .XY accumulator
+        ldx     #>$0000
         lda     ptr1
         bmi     NegMult
         bpl     @L2             ; Branch always

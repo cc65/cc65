@@ -3,7 +3,7 @@
 ; 2003-03-07, Ullrich von Bassewitz,
 ;   based on code from Stefan A. Haubenthal, <polluks@web.de>
 ; 2005-02-26, Ullrich von Bassewitz
-; 2014-04-02, Greg King
+; 2014-09-10, Greg King
 ;
 ; Scan a group of arguments that are in BASIC's input-buffer.
 ; Build an array that points to the beginning of each argument.
@@ -106,7 +106,7 @@ setterm:sta     term            ; Set end-of-argument marker
         txa                     ; Get low byte
         add     #<BASIC_BUF
         sta     argv,y          ; argv[y]= &arg
-        lda     #>0
+        lda     #>$0000
         adc     #>BASIC_BUF
         sta     argv+1,y
         iny
@@ -125,7 +125,7 @@ argloop:lda     BASIC_BUF,x
 ; A contains the terminating character. To make the argument a valid C string,
 ; replace the terminating character by a zero.
 ;
-        lda     #0
+        lda     #$00
         sta     BASIC_BUF-1,x
 
 ; Check if the maximum number of command-line arguments is reached. If not,
@@ -153,4 +153,4 @@ name:   .res    NAME_LEN + 1
 
 .data
 argv:   .addr   name
-        .res    MAXARGS * 2, 0
+        .res    MAXARGS * 2, $00

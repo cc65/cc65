@@ -3,7 +3,7 @@
 ; /* Standard C function */
 ;
 ; 2004-11-28, Ullrich von Bassewitz
-; 2004-12-21, Greg King
+; 2014-09-10, Greg King
 ;
 
         .export         _vsscanf
@@ -65,7 +65,7 @@
 ; Return EOF if we are at the end of the string
 
         bne     L1
-        lda     #$FF
+        lda     #<-1
         tax
         rts
 
@@ -74,17 +74,17 @@
 L1:     tax                             ; Save return value
         tya                             ; Low byte of index
         ldy     #SSCANFDATA::INDEX
-        add     #<1
+        add     #<$0001
         sta     (ptr1),y
         iny
         lda     (ptr1),y
-        adc     #>1
+        adc     #>$0001
         sta     (ptr1),y
 
 ; Return the char just read
 
         txa
-        ldx     #>0
+        ldx     #>$0000
         rts
 
 .endproc
@@ -111,11 +111,11 @@ L1:     tax                             ; Save return value
 
         ldy     #SSCANFDATA::INDEX
         lda     (ptr1),y
-        sub     #<1
+        sub     #<$0001
         sta     (ptr1),y
         iny
         lda     (ptr1),y
-        sbc     #>1
+        sbc     #>$0001
         sta     (ptr1),y
 
 ; Return c

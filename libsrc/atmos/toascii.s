@@ -8,7 +8,7 @@
 .proc   _toascii
 
 ; .X must be zero, on return.
-        ldx     #>0
+        ldx     #>$0000
         rts
 
 .endproc

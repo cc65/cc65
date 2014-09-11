@@ -1,6 +1,6 @@
 ;
 ; 1998-06-02, Ullrich von Bassewitz
-; 2013-05-01, Greg King
+; 2014-09-10, Greg King
 ;
 ; int ispunct (int c);
 ;
@@ -9,7 +9,7 @@
         .include        "ctype.inc"
 
 _ispunct:
-        cpx     #>0             ; Char range OK?
+        cpx     #>$0000         ; Char range OK?
         bne     @L1             ; Jump if no
         tay
         lda     __ctype,y       ; Get character classification

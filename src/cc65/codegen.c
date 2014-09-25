@@ -1226,26 +1226,34 @@ void g_tosint (unsigned flags)
 
 
 
-void g_regint (unsigned Flags)
-/* Make sure, the value in the primary register an int. Convert if necessary */
+static void g_regchar (unsigned Flags)
+/* Make sure, the value in the primary register is in the range of char. Truncate if necessary */
 {
     unsigned L;
 
+    AddCodeLine ("ldx #$00");
+
+    if ((Flags & CF_UNSIGNED) == 0) {
+        /* Sign extend */
+        L = GetLocalLabel();
+        AddCodeLine ("cmp #$80");
+        AddCodeLine ("bcc %s", LocalLabelName (L));
+        AddCodeLine ("dex");
+        g_defcodelabel (L);
+    }
+}
+
+
+
+void g_regint (unsigned Flags)
+/* Make sure, the value in the primary register an int. Convert if necessary */
+{
     switch (Flags & CF_TYPEMASK) {
 
         case CF_CHAR:
             if (Flags & CF_FORCECHAR) {
                 /* Conversion is from char */
-                if (Flags & CF_UNSIGNED) {
-                    AddCodeLine ("ldx #$00");
-                } else {
-                    L = GetLocalLabel();
-                    AddCodeLine ("ldx #$00");
-                    AddCodeLine ("cmp #$80");
-                    AddCodeLine ("bcc %s", LocalLabelName (L));
-                    AddCodeLine ("dex");
-                    g_defcodelabel (L);
-                }
+                g_regchar (Flags);
             }
             /* FALLTHROUGH */
 
@@ -1263,8 +1271,6 @@ void g_regint (unsigned Flags)
 void g_reglong (unsigned Flags)
 /* Make sure, the value in the primary register a long. Convert if necessary */
 {
-    unsigned L;
-
     switch (Flags & CF_TYPEMASK) {
 
         case CF_CHAR:
@@ -1280,12 +1286,7 @@ void g_reglong (unsigned Flags)
                     }
                 } else {
                     if (IS_Get (&CodeSizeFactor) >= 366) {
-                        L = GetLocalLabel();
-                        AddCodeLine ("ldx #$00");
-                        AddCodeLine ("cmp #$80");
-                        AddCodeLine ("bcc %s", LocalLabelName (L));
-                        AddCodeLine ("dex");
-                        g_defcodelabel (L);
+                        g_regchar (Flags);
                         AddCodeLine ("stx sreg");
                         AddCodeLine ("stx sreg+1");
                     } else {
@@ -1374,20 +1375,27 @@ unsigned g_typecast (unsigned lhs, unsigned rhs)
 ** by the lhs value. Return the result value.
 */
 {
-    unsigned ltype, rtype;
-
-    /* Get the type spec from the flags */
-    ltype = lhs & CF_TYPEMASK;
-    rtype = rhs & CF_TYPEMASK;
-
     /* Check if a conversion is needed */
     if ((rhs & CF_CONST) == 0) {
-        if (ltype == CF_LONG && rtype != CF_LONG) {
-            /* We must promote the primary register to long */
-            g_reglong (rhs);
-        } else if (ltype == CF_INT && rtype != CF_INT) {
-            /* We must promote the primary register to int */
-            g_regint (rhs);
+        switch (lhs & CF_TYPEMASK) {
+
+            case CF_LONG:
+                /* We must promote the primary register to long */
+                g_reglong (rhs);
+                break;
+
+            case CF_INT:
+                /* We must promote the primary register to int */
+                g_regint (rhs);
+                break;
+
+            case CF_CHAR:
+                /* We must truncate the primary register to char */
+                g_regchar (lhs);
+                break;
+
+            default:
+                typeerror (lhs);
         }
     }
 

@@ -40,13 +40,48 @@
 
 typedef char jmp_buf [5];
 
+/* 	The cc65 assembly implementation of setjmp and longjmp expect that the jmp_buf is passed by reference.
+	"setjmp" receives the pointer to the "jmp_buf" in __AX__ while longjmp receives it with popax from the
+	parameter stack.
+	This is quite unconventional as normally the jmp_buf is passed by value which conforms also with the cc65
+	header "setjmp.h".
 
+	see: http://www.cplusplus.com/reference/csetjmp/setjmp/
+	and: http://www.cplusplus.com/reference/csetjmp/longjmp/
+
+	Due to this discrepancy between the original cc65 header and cc65 assembly implementation problems arise
+	using "setjmp.h" functions.
+	For example, if you dereference a pointer to a jmp_buf and pass it to longjmp the code will not perform.
+
+	Therefore following changes are suggested:
+
+	- Rename the function "longjmp" into "_longjmp" like it was done for setjmp.
+	- Change the prototypes of "_longjmp" and "_setjmp" to receive jmp_buf "by reference" instead of "by value".
+	- Hide the functions prototypes with the macros "setjmp(jmp_buf)" and "longjmp(jmp_buf, retval)" taking a jmp_buf by value.
+	- Use the macro to convert jmp_buf to address of jmp_buf.
+
+	*/
+
+int __fastcall__ _setjmp (jmp_buf *buf);	//	non standard "call by ref" version to workaround cc65's incomplete
+											//	implementation for passing arrays/structs by value
+void __fastcall__ _longjmp (jmp_buf *buf, int retval) __attribute__((noreturn));
+											//	non standard "call by ref" version to workaround cc65's incomplete
+											//	implementation for passing arrays/structs by value
+
+#define setjmp(x)  _setjmp(&(x))        /*	ISO insists on a macro.
+												provides call by value interface for functions expecting call by ref*/
+
+#define longjmp(x,y)  _longjmp(&(x),(y))/*	non standard macro.
+												provides call by value interface for functions expecting call by ref*/
+
+
+/*	From old header
 
 int __fastcall__ _setjmp (jmp_buf buf);
-#define setjmp  _setjmp         /* ISO insists on a macro */
+#define setjmp  _setjmp         // ISO insists on a macro
 void __fastcall__ longjmp (jmp_buf buf, int retval) __attribute__((noreturn));
 
-
+*/
 
 /* End of setjmp.h */
 #endif

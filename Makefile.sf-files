@@ -1,0 +1,16 @@
+.PHONY: all
+
+.SUFFIXES:
+
+SCPFLAGS = -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
+
+SF_USER = oliverschmidt
+SF_HOST = frs.sourceforge.net
+SF_FILE = /home/frs/project/cc65/cc65-snapshot-win64.zip
+
+all:
+	echo $(TRAVIS_COMMIT) | zip -z cc65
+ifdef SF_PASS
+	@echo 'sshpass -p $$(SF_PASS) scp $(SCPFLAGS) cc65.zip $(SF_USER)@$(SF_HOST):$(SF_FILE)'
+	@sshpass -p $(SF_PASS) scp $(SCPFLAGS) cc65.zip $(SF_USER)@$(SF_HOST):$(SF_FILE)
+endif

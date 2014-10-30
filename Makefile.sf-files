@@ -2,7 +2,7 @@
 
 .SUFFIXES:
 
-SCPFLAGS = -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
+SCPFLAGS = -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -q
 
 SF_USER = oliverschmidt
 SF_HOST = frs.sourceforge.net

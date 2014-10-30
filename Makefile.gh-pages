@@ -16,5 +16,5 @@ ifdef GH_TOKEN
 	cp html/*.* $(GH_PAGES)/doc
 	cd $(GH_PAGES) && git add -A doc
 	cd $(GH_PAGES) && git commit -m "Updated from commit $(TRAVIS_COMMIT)."
-	cd $(GH_PAGES) && git push
+	-cd $(GH_PAGES) && git push
 endif

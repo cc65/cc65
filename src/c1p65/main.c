@@ -82,6 +82,7 @@ static unsigned long CvtNumber (const char* Arg, const char* Number)
 #define ADDRESS_MODE_CMD     '.'
 #define DATA_MODE_CMD        '/'
 #define EXECUTE_CMD          'G'
+#define DATA_MODE_ADDRESS	0x00FB
 
 /* Transform the cc65 executable binary into a series of
    commands that make the C1P PROM monitor load the bytes
@@ -90,18 +91,19 @@ static unsigned long CvtNumber (const char* Arg, const char* Number)
 static void Transform (unsigned long StartAddress, FILE *In, FILE *Out)
 {
 	int c;
-	unsigned long CurrentAddress;
 
-	/* Loop over all input bytes, position to current address,
-	   switch to data mod, output input byte
-	*/
-	for (CurrentAddress = StartAddress, c = getc(In);
-				c != EOF;
-				c = getc(In), CurrentAddress += 1) {
-		fprintf (Out, "%c%04.4X%c%02.2X",
-			ADDRESS_MODE_CMD, (unsigned int) CurrentAddress & 0xFFFF,
-			DATA_MODE_CMD, (unsigned int) c & 0xFF);
+	/* Position to the start address */
+	fprintf(Out, "%c%04.4X%c", ADDRESS_MODE_CMD,
+		StartAddress & 0xFFFF, DATA_MODE_CMD);
+
+	/* Loop over all input bytes and enter them one by one */
+	for (c = getc(In); c != EOF; c = getc(In)) {
+		fprintf(Out, "%02.2X\n", (unsigned int) c & 0xFF);
 	}
+
+	/* Store 00 to 0x00FB to enable keyboard input at the end */
+	fprintf(Out, "%c%04.4X%c%02.2X\n", ADDRESS_MODE_CMD,
+		0x00FB, DATA_MODE_CMD, 0x00);
 
 	/* And execute
 	fprintf (Out, "%c%04.4x%c",

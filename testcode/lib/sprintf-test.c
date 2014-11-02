@@ -18,8 +18,8 @@
 
 
 /* Struct used to test the 'n' conversion specifier. It is machine dependent /
- * not portable.
- */
+** not portable.
+*/
 typedef union WriteCount WriteCount;
 union WriteCount {
     signed char C;
@@ -41,9 +41,9 @@ static unsigned Failures = 0;
 
 static void OneTest (int Line, const char* RString, int RCount, const char* Format, ...)
 /* Test one conversion. Line is the line number (to make the life of the
- * tester easier), RString the expected result and RCount the expected return
- * count. The other parameters are used for formatting.
- */
+** tester easier), RString the expected result and RCount the expected return
+** count. The other parameters are used for formatting.
+*/
 {
     int Count;
     char Buf[128];
@@ -70,9 +70,9 @@ static void OneTest (int Line, const char* RString, int RCount, const char* Form
 
 static void WriteTest (int Line, const char* Format, WriteCount* W, long Count)
 /* Test one write conversion. Line is the line number (to make the life of the
- * tester easier), Format is the format specification. W is a WriteCount
- * variable and Count is the expected result.
- */
+** tester easier), Format is the format specification. W is a WriteCount
+** variable and Count is the expected result.
+*/
 {
     /* Clear the counter in full length */
     W->L = 0x5A5A5A5AL;
@@ -227,9 +227,9 @@ int main (void)
     OneTest (__LINE__, "EF98",                     4, "%+X", -4200U);
 
     /* ' ': If the first character of a signed conversion is not a sign, or if
-     *      a signed conversion results in no characters, a space is prefixed
-     *      to the result.
-     */
+    **      a signed conversion results in no characters, a space is prefixed
+    **      to the result.
+    */
     OneTest (__LINE__, "u",                        1, "% c", 'u');
     OneTest (__LINE__, " 4200",                    5, "% d", 4200);
     OneTest (__LINE__, "-4200",                    5, "% d", -4200);
@@ -310,10 +310,10 @@ int main (void)
     OneTest (__LINE__, "EF98           ",         15, "%-15X", -4200U);
 
     /* A negative field width specified via an argument is treated as if the
-     * '-' flag and a positive field width were given.
-     *
-     * Beware: These tests will crash the old printf routine!
-     */
+    ** '-' flag and a positive field width were given.
+    **
+    ** Beware: These tests will crash the old printf routine!
+    */
 #ifndef NOCRASH
     OneTest (__LINE__, "u              ",         15, "%*c", -15, 'u');
     OneTest (__LINE__, "4200           ",         15, "%*d", -15, 4200);
@@ -442,8 +442,8 @@ int main (void)
     OneTest (__LINE__, "     000000EF98",         15, "%15.10X", -4200U);
 
     /* For d, i, o, u, x and X conversions, if a precision is specified, the
-     * '0' flag is ignored.
-     */
+    ** '0' flag is ignored.
+    */
     OneTest (__LINE__, "     0000004200",         15, "%015.10d", 4200);
     OneTest (__LINE__, "    -0000004200",         15, "%015.10d", -4200);
     OneTest (__LINE__, "     0000004200",         15, "%015.10i", 4200);

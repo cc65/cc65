@@ -34,8 +34,8 @@
 
 
 /* Note: This is NOT some sort of code segment, it is used to store lines of
- * output that are textual (not real code) instead.
- */
+** output that are textual (not real code) instead.
+*/
 
 
 
@@ -116,6 +116,3 @@ void TS_Output (const TextSeg* S)
     /* Add an additional newline after the segment output */
     WriteOutput ("\n");
 }
-
-
-

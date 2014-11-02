@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2012, Ullrich von Bassewitz                                      */
+/* (C) 1998-2014, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -207,8 +207,8 @@ void SymEnterLevel (const StrBuf* ScopeName, unsigned char Type,
     }
 
     /* If we have a current scope, search for the given name and create a
-     * new one if it doesn't exist. If this is the root scope, just create it.
-     */
+    ** new one if it doesn't exist. If this is the root scope, just create it.
+    */
     if (CurrentScope) {
 
         /* Search for the scope, create a new one */
@@ -230,11 +230,11 @@ void SymEnterLevel (const StrBuf* ScopeName, unsigned char Type,
     CurrentScope->Label    = ScopeLabel;
 
     /* If this is a scope that allows to emit data into segments, add spans
-     * for all currently existing segments. Doing this for just a few scope
-     * types is not really necessary but an optimization, because it does not
-     * allocate memory for useless data (unhandled types here don't occupy
-     * space in any segment).
-     */
+    ** for all currently existing segments. Doing this for just a few scope
+    ** types is not really necessary but an optimization, because it does not
+    ** allocate memory for useless data (unhandled types here don't occupy
+    ** space in any segment).
+    */
     if (CurrentScope->Type <= SCOPE_HAS_DATA) {
         OpenSpanList (&CurrentScope->Spans);
     }
@@ -246,17 +246,17 @@ void SymLeaveLevel (void)
 /* Leave the current lexical level */
 {
     /* If this is a scope that allows to emit data into segments, close the
-     * open the spans.
-     */
+    ** open the spans.
+    */
     if (CurrentScope->Type <= SCOPE_HAS_DATA) {
         CloseSpanList (&CurrentScope->Spans);
     }
 
     /* If we have spans, the first one is the segment that was active, when the
-     * scope was opened. Set the size of the scope to the number of data bytes
-     * emitted into this segment. If we have an owner symbol set the size of
-     * this symbol, too.
-     */
+    ** scope was opened. Set the size of the scope to the number of data bytes
+    ** emitted into this segment. If we have an owner symbol set the size of
+    ** this symbol, too.
+    */
     if (CollCount (&CurrentScope->Spans) > 0) {
         const Span* S = CollAtUnchecked (&CurrentScope->Spans, 0);
         unsigned long Size = GetSpanSize (S);
@@ -304,9 +304,9 @@ SymTable* SymFindScope (SymTable* Parent, const StrBuf* Name, SymFindAction Acti
 
 SymTable* SymFindAnyScope (SymTable* Parent, const StrBuf* Name)
 /* Find a scope in the given or any of its parent scopes. The function will
- * never create a new symbol, since this can only be done in one specific
- * scope.
- */
+** never create a new symbol, since this can only be done in one specific
+** scope.
+*/
 {
     SymTable* Scope;
     do {
@@ -325,9 +325,9 @@ SymTable* SymFindAnyScope (SymTable* Parent, const StrBuf* Name)
 
 SymEntry* SymFindLocal (SymEntry* Parent, const StrBuf* Name, SymFindAction Action)
 /* Find a cheap local symbol. If Action contains SYM_ALLOC_NEW and the entry is
- * not found, create a new one. Return the entry found, or the new entry
- * created, or - in case Action is SYM_FIND_EXISTING - return 0.
- */
+** not found, create a new one. Return the entry found, or the new entry
+** created, or - in case Action is SYM_FIND_EXISTING - return 0.
+*/
 
 {
     SymEntry* S;
@@ -375,10 +375,10 @@ SymEntry* SymFindLocal (SymEntry* Parent, const StrBuf* Name, SymFindAction Acti
 
 SymEntry* SymFind (SymTable* Scope, const StrBuf* Name, SymFindAction Action)
 /* Find a new symbol table entry in the given table. If Action contains
- * SYM_ALLOC_NEW and the entry is not found, create a new one. Return the
- * entry found, or the new entry created, or - in case Action is
- * SYM_FIND_EXISTING - return 0.
- */
+** SYM_ALLOC_NEW and the entry is not found, create a new one. Return the
+** entry found, or the new entry created, or - in case Action is
+** SYM_FIND_EXISTING - return 0.
+*/
 {
     SymEntry* S;
 
@@ -399,9 +399,9 @@ SymEntry* SymFind (SymTable* Scope, const StrBuf* Name, SymFindAction Action)
     if (Action & SYM_ALLOC_NEW) {
 
         /* Otherwise create a new entry, insert and return it. If the scope is
-         * already closed, mark the symbol as fixed so it won't be resolved
-         * by a symbol in the enclosing scopes later.
-         */
+        ** already closed, mark the symbol as fixed so it won't be resolved
+        ** by a symbol in the enclosing scopes later.
+        */
         SymEntry* N = NewSymEntry (Name, SF_NONE);
         if (SymTabIsClosed (Scope)) {
             N->Flags |= SF_FIXED;
@@ -427,9 +427,9 @@ SymEntry* SymFind (SymTable* Scope, const StrBuf* Name, SymFindAction Action)
 
 SymEntry* SymFindAny (SymTable* Scope, const StrBuf* Name)
 /* Find a symbol in the given or any of its parent scopes. The function will
- * never create a new symbol, since this can only be done in one specific
- * scope.
- */
+** never create a new symbol, since this can only be done in one specific
+** scope.
+*/
 {
     /* Generate the name hash */
     unsigned Hash = HashBuf (Name);
@@ -438,9 +438,9 @@ SymEntry* SymFindAny (SymTable* Scope, const StrBuf* Name)
     SymEntry* Sym;
     do {
         /* Search in the current table. Ignore entries flagged with SF_UNUSED,
-         * because for such symbols there is a real entry in one of the parent
-         * scopes.
-         */
+        ** because for such symbols there is a real entry in one of the parent
+        ** scopes.
+        */
         if (SymSearchTree (Scope->Table[Hash % Scope->TableSlots], Name, &Sym) == 0) {
             if (Sym->Flags & SF_UNUSED) {
                 Sym = 0;
@@ -467,15 +467,15 @@ static void SymCheckUndefined (SymEntry* S)
 /* Handle an undefined symbol */
 {
     /* Undefined symbol. It may be...
-     *
-     *   - An undefined symbol in a nested lexical level. If the symbol is not
-     *     fixed to this level, search for the symbol in the higher levels and
-     *     make the entry a trampoline entry if we find one.
-     *
-     *   - If the symbol is not found, it is a real undefined symbol. If the
-     *     AutoImport flag is set, make it an import. If the AutoImport flag is
-     *     not set, it's an error.
-     */
+    **
+    **   - An undefined symbol in a nested lexical level. If the symbol is not
+    **     fixed to this level, search for the symbol in the higher levels and
+    **     make the entry a trampoline entry if we find one.
+    **
+    **   - If the symbol is not found, it is a real undefined symbol. If the
+    **     AutoImport flag is set, make it an import. If the AutoImport flag is
+    **     not set, it's an error.
+    */
     SymEntry* Sym = 0;
     if ((S->Flags & SF_FIXED) == 0) {
         SymTable* Tab = GetSymParentScope (S);
@@ -483,8 +483,8 @@ static void SymCheckUndefined (SymEntry* S)
             Sym = SymFind (Tab, GetStrBuf (S->Name), SYM_FIND_EXISTING | SYM_CHECK_ONLY);
             if (Sym && (Sym->Flags & (SF_DEFINED | SF_IMPORT)) != 0) {
                 /* We've found a symbol in a higher level that is
-                 * either defined in the source, or an import.
-                 */
+                ** either defined in the source, or an import.
+                */
                  break;
             }
             /* No matching symbol found in this level. Look further */
@@ -495,9 +495,9 @@ static void SymCheckUndefined (SymEntry* S)
     if (Sym) {
 
         /* We found the symbol in a higher level. Transfer the flags and
-         * address size from the local symbol to that in the higher level
-         * and check for problems.
-         */
+        ** address size from the local symbol to that in the higher level
+        ** and check for problems.
+        */
         if (S->Flags & SF_EXPORT) {
             if (Sym->Flags & SF_IMPORT) {
                 /* The symbol is already marked as import */
@@ -505,17 +505,7 @@ static void SymCheckUndefined (SymEntry* S)
                          "Symbol `%s' is already an import",
                          GetString (Sym->Name));
             }
-            if (Sym->Flags & SF_EXPORT) {
-                /* The symbol is already marked as an export. */
-                if (Sym->AddrSize > S->ExportSize) {
-                    /* We're exporting a symbol smaller than it actually is */
-                    LIWarning (&S->DefLines, 1,
-                               "Symbol `%m%p' is %s but exported %s",
-                              GetSymName (Sym),
-                              AddrSizeToStr (Sym->AddrSize),
-                              AddrSizeToStr (S->ExportSize));
-                }
-            } else {
+            if ((Sym->Flags & SF_EXPORT) == 0) {
                 /* Mark the symbol as an export */
                 Sym->Flags |= SF_EXPORT;
                 Sym->ExportSize = S->ExportSize;
@@ -525,7 +515,7 @@ static void SymCheckUndefined (SymEntry* S)
                 }
                 if (Sym->AddrSize > Sym->ExportSize) {
                     /* We're exporting a symbol smaller than it actually is */
-                    LIWarning (&S->DefLines, 1,
+                    LIWarning (&Sym->DefLines, 1,
                                "Symbol `%m%p' is %s but exported %s",
                                GetSymName (Sym),
                                AddrSizeToStr (Sym->AddrSize),
@@ -584,13 +574,13 @@ void SymCheck (void)
     }
 
     /* First pass: Walk through all symbols, checking for undefined's and
-     * changing them to trampoline symbols or make them imports.
-     */
+    ** changing them to trampoline symbols or make them imports.
+    */
     S = SymList;
     while (S) {
         /* If the symbol is marked as global, mark it as export, if it is
-         * already defined, otherwise mark it as import.
-         */
+        ** already defined, otherwise mark it as import.
+        */
         if (S->Flags & SF_GLOBAL) {
             if (S->Flags & SF_DEFINED) {
                 SymExportFromGlobal (S);
@@ -610,10 +600,10 @@ void SymCheck (void)
     }
 
     /* Second pass: Walk again through the symbols. Count exports and imports
-     * and set address sizes where this has not happened before. Ignore
-     * undefined's, since we handled them in the last pass, and ignore unused
-     * symbols, since we handled them in the last pass, too.
-     */
+    ** and set address sizes where this has not happened before. Ignore
+    ** undefined's, since we handled them in the last pass, and ignore unused
+    ** symbols, since we handled them in the last pass, too.
+    */
     S = SymList;
     while (S) {
         if ((S->Flags & SF_UNUSED) == 0 &&
@@ -649,8 +639,8 @@ void SymCheck (void)
             }
 
             /* If the symbol is defined but has an unknown address size,
-             * recalculate it.
-             */
+            ** recalculate it.
+            */
             if (SymHasExpr (S) && S->AddrSize == ADDR_SIZE_DEFAULT) {
                 ExprDesc ED;
                 ED_Init (&ED);
@@ -673,9 +663,9 @@ void SymCheck (void)
             }
 
             /* If the address size of the symbol was guessed, check the guess
-             * against the actual address size and print a warning if the two
-             * differ.
-             */
+            ** against the actual address size and print a warning if the two
+            ** differ.
+            */
             if (S->AddrSize != ADDR_SIZE_DEFAULT) {
                 /* Do we have data for this address size? */
                 if (S->AddrSize <= sizeof (S->GuessedUse) / sizeof (S->GuessedUse[0])) {
@@ -735,10 +725,10 @@ void WriteImports (void)
     ObjWriteVar (ImportCount);
 
     /* Walk throught list and write all valid imports to the file. An import
-     * is considered valid, if it is either referenced, or the forced bit is
-     * set. Otherwise, the import is ignored (no need to link in something
-     * that isn't used).
-     */
+    ** is considered valid, if it is either referenced, or the forced bit is
+    ** set. Otherwise, the import is ignored (no need to link in something
+    ** that isn't used).
+    */
     S = SymList;
     while (S) {
         if ((S->Flags & (SF_UNUSED | SF_IMPORT)) == SF_IMPORT &&
@@ -780,8 +770,8 @@ void WriteExports (void)
             unsigned SymFlags = GetSymInfoFlags (S, &ConstVal);
 
             /* Check if this symbol has a size. If so, remember it in the
-             * flags.
-             */
+            ** flags.
+            */
             long Size;
             SymEntry* SizeSym = FindSizeOfSymbol (S);
             if (SizeSym != 0 && SymIsConst (SizeSym, &Size)) {
@@ -865,8 +855,8 @@ void WriteDbgSyms (void)
         ObjWriteVar (Count);
 
         /* Walk through list and write all symbols to the file. Ignore size
-         * symbols.
-         */
+        ** symbols.
+        */
         S = SymList;
         while (S) {
             if (IsDbgSym (S)) {
@@ -876,8 +866,8 @@ void WriteDbgSyms (void)
                 unsigned SymFlags = GetSymInfoFlags (S, &ConstVal);
 
                 /* Check if this symbol has a size. If so, remember it in the
-                 * flags.
-                 */
+                ** flags.
+                */
                 long Size;
                 SymEntry* SizeSym = FindSizeOfSymbol (S);
                 if (SizeSym != 0 && SymIsConst (SizeSym, &Size)) {
@@ -891,8 +881,8 @@ void WriteDbgSyms (void)
                 ObjWrite8 (S->AddrSize);
 
                 /* Write the id of the parent. For normal symbols, this is a
-                 * scope (symbol table), for cheap locals, it's a symbol.
-                 */
+                ** scope (symbol table), for cheap locals, it's a symbol.
+                */
                 if (SYM_IS_STD (SymFlags)) {
                     ObjWriteVar (S->Sym.Tab->Id);
                 } else {
@@ -969,8 +959,8 @@ void WriteScopes (void)
             unsigned Flags = 0;
 
             /* Check if this scope has a size. If so, remember it in the
-             * flags.
-             */
+            ** flags.
+            */
             long Size;
             SymEntry* SizeSym = FindSizeOfScope (S);
             if (SizeSym != 0 && SymIsConst (SizeSym, &Size)) {
@@ -1031,6 +1021,3 @@ void WriteScopes (void)
     /* Done writing the scopes */
     ObjEndScopes ();
 }
-
-
-

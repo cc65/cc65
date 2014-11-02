@@ -283,8 +283,8 @@ void PPWarning (const char* Format, ...)
 
 IntStack* FindWarning (const char* Name)
 /* Search for a warning in the WarnMap table and return a pointer to the
- * intstack that holds its state. Return NULL if there is no such warning.
- */
+** intstack that holds its state. Return NULL if there is no such warning.
+*/
 {
     unsigned I;
 
@@ -321,6 +321,3 @@ void ErrorReport (void)
 {
     Print (stdout, 1, "%u errors, %u warnings\n", ErrorCount, WarningCount);
 }
-
-
-

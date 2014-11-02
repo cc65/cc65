@@ -6,8 +6,8 @@
 
 
 /* Number of elements in the progress bar. Use a power of 2, to avoid the
- * multiplication (which is about to be tested).
- */
+** multiplication (which is about to be tested).
+*/
 #define BAR_ELEMENTS    32U
 
 #if defined(__CBM__)

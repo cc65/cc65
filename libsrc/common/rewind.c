@@ -1,8 +1,8 @@
 /*
- * rewind.c
- *
- * Christian Groessler, 07-Aug-2000
- */
+** rewind.c
+**
+** Christian Groessler, 07-Aug-2000
+*/
 
 
 

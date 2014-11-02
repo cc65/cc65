@@ -1,8 +1,8 @@
 /*
- * systime.c
- *
- * Maciej 'YTM/Elysium' Witkowiak, 22.11.2002
- */
+** systime.c
+**
+** Maciej 'YTM/Elysium' Witkowiak, 22.11.2002
+*/
 
 #include <time.h>
 #include <geos.h>

@@ -26,11 +26,13 @@
         .include        "ser-error.inc"
         .include        "plus4.inc"
 
+        .macpack        module
+
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-.segment        "JUMPTABLE"
+        module_header   _plus4_stdser_ser
 
 ; Driver signature
 

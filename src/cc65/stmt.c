@@ -73,9 +73,9 @@
 
 static int CheckLabelWithoutStatement (void)
 /* Called from Statement() after a label definition. Will check for a
- * following closing curly brace. This means that a label is not followed
- * by a statement which is required by the standard. Output an error if so.
- */
+** following closing curly brace. This means that a label is not followed
+** by a statement which is required by the standard. Output an error if so.
+*/
 {
     if (CurTok.Tok == TOK_RCURLY) {
         Error ("Label at end of compound statement");
@@ -89,9 +89,9 @@ static int CheckLabelWithoutStatement (void)
 
 static void CheckTok (token_t Tok, const char* Msg, int* PendingToken)
 /* Helper function for Statement. Will check for Tok and print Msg if not
- * found. If PendingToken is NULL, it will the skip the token, otherwise
- * it will store one to PendingToken.
- */
+** found. If PendingToken is NULL, it will the skip the token, otherwise
+** it will store one to PendingToken.
+*/
 {
     if (CurTok.Tok != Tok) {
         Error ("%s", Msg);
@@ -106,12 +106,12 @@ static void CheckTok (token_t Tok, const char* Msg, int* PendingToken)
 
 static void CheckSemi (int* PendingToken)
 /* Helper function for Statement. Will check for a semicolon and print an
- * error message if not found (plus some error recovery). If PendingToken is
- * NULL, it will the skip the token, otherwise it will store one to
- * PendingToken.
- * This function is a special version of CheckTok with the addition of the
- * error recovery.
- */
+** error message if not found (plus some error recovery). If PendingToken is
+** NULL, it will the skip the token, otherwise it will store one to
+** PendingToken.
+** This function is a special version of CheckTok with the addition of the
+** error recovery.
+*/
 {
     int HaveToken = (CurTok.Tok == TOK_SEMI);
     if (!HaveToken) {
@@ -171,8 +171,8 @@ static int IfStatement (void)
         g_defcodelabel (Label1);
 
         /* Since there's no else clause, we're not sure, if the a break
-         * statement is really executed.
-         */
+        ** statement is really executed.
+        */
         return 0;
 
     } else {
@@ -185,8 +185,8 @@ static int IfStatement (void)
         NextToken ();
 
         /* If the if expression was always true, the code in the else branch
-         * is never executed. Output a warning if this is the case.
-         */
+        ** is never executed. Output a warning if this is the case.
+        */
         if (TestResult == TESTEXPR_TRUE) {
             Warning ("Unreachable code");
         }
@@ -261,13 +261,13 @@ static void WhileStatement (void)
     NextToken ();
 
     /* Add the loop to the loop stack. In case of a while loop, the condition
-     * label is used for continue statements.
-     */
+    ** label is used for continue statements.
+    */
     AddLoop (BreakLabel, CondLabel);
 
     /* We will move the code that evaluates the while condition to the end of
-     * the loop, so generate a jump here.
-     */
+    ** the loop, so generate a jump here.
+    */
     g_jump (CondLabel);
 
     /* Remember the current position */
@@ -296,8 +296,8 @@ static void WhileStatement (void)
     g_defcodelabel (BreakLabel);
 
     /* Eat remaining tokens that were delayed because of line info
-     * correctness
-     */
+    ** correctness
+    */
     SkipPending (PendingToken);
 
     /* Remove the loop from the loop stack */
@@ -318,9 +318,9 @@ static void ReturnStatement (void)
         hie0 (&Expr);
 
         /* If we return something in a void function, print an error and
-         * ignore the value. Otherwise convert the value to the type of the
-         * return.
-         */
+        ** ignore the value. Otherwise convert the value to the type of the
+        ** return.
+        */
         if (F_HasVoidReturn (CurrentFunc)) {
             Error ("Returning a value in function with return type void");
         } else {
@@ -429,8 +429,8 @@ static void ForStatement (void)
     NextToken ();
 
     /* Add the loop to the loop stack. A continue jumps to the start of the
-     * the increment condition.
-     */
+    ** the increment condition.
+    */
     AddLoop (BreakLabel, IncLabel);
 
     /* Skip the opening paren */
@@ -480,9 +480,9 @@ static void ForStatement (void)
     Statement (&PendingToken);
 
     /* If we had an increment expression, move the code to the bottom of
-     * the loop. In this case we don't need to jump there at the end of
-     * the loop body.
-     */
+    ** the loop. In this case we don't need to jump there at the end of
+    ** the loop body.
+    */
     if (HaveIncExpr) {
         CodeMark Here;
         GetCodePos (&Here);
@@ -506,8 +506,8 @@ static void ForStatement (void)
 
 static int CompoundStatement (void)
 /* Compound statement. Allow any number of statements inside braces. The
- * function returns true if the last statement was a break or return.
- */
+** function returns true if the last statement was a break or return.
+*/
 {
     int GotBreak;
 
@@ -549,13 +549,13 @@ static int CompoundStatement (void)
 
 int Statement (int* PendingToken)
 /* Statement parser. Returns 1 if the statement does a return/break, returns
- * 0 otherwise. If the PendingToken pointer is not NULL, the function will
- * not skip the terminating token of the statement (closing brace or
- * semicolon), but store true if there is a pending token, and false if there
- * is none. The token is always checked, so there is no need for the caller to
- * check this token, it must be skipped, however. If the argument pointer is
- * NULL, the function will skip the token.
- */
+** 0 otherwise. If the PendingToken pointer is not NULL, the function will
+** not skip the terminating token of the statement (closing brace or
+** semicolon), but store true if there is a pending token, and false if there
+** is none. The token is always checked, so there is no need for the caller to
+** check this token, it must be skipped, however. If the argument pointer is
+** NULL, the function will skip the token.
+*/
 {
     ExprDesc Expr;
     int GotBreak;
@@ -567,8 +567,8 @@ int Statement (int* PendingToken)
     }
 
     /* Check for a label. A label is always part of a statement, it does not
-     * replace one.
-     */
+    ** replace one.
+    */
     while (CurTok.Tok == TOK_IDENT && NextTok.Tok == TOK_COLON) {
         /* Handle the label */
         DoLabel ();
@@ -649,14 +649,14 @@ int Statement (int* PendingToken)
             /* Actual statement */
             ExprWithCheck (hie0, &Expr);
             /* Load the result only if it is an lvalue and the type is
-             * marked as volatile. Otherwise the load is useless.
-             */
+            ** marked as volatile. Otherwise the load is useless.
+            */
             if (ED_IsLVal (&Expr) && IsQualVolatile (Expr.Type)) {
                 LoadExpr (CF_NONE, &Expr);
             }
             /* If the statement didn't generate code, and is not of type
-             * void, emit a warning.
-             */
+            ** void, emit a warning.
+            */
             GetCodePos (&End);
             if (CodeRangeIsEmpty (&Start, &End) &&
                 !IsTypeVoid (Expr.Type)         &&
@@ -667,7 +667,3 @@ int Statement (int* PendingToken)
     }
     return 0;
 }
-
-
-
-

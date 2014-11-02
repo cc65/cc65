@@ -43,6 +43,25 @@ endif
 # This one comes with VICE
 C1541	= c1541
 
+# --------------------------------------------------------------------------
+# System dependent settings
+
+# The Apple machines need the start address adjusted when using TGI
+LDFLAGS_mandelbrot_apple2 = --start-addr 0x4000
+LDFLAGS_tgidemo_apple2 = --start-addr 0x4000
+LDFLAGS_mandelbrot_apple2enh = --start-addr 0x4000
+LDFLAGS_tgidemo_apple2enh = --start-addr 0x4000
+
+# The Apple ][ needs the start address adjusted for the mousetest
+LDFLAGS_mousetest_apple2 = --start-addr 0x4000
+
+# The atarixl target needs the start address adjusted when using TGI
+LDFLAGS_mandelbrot_atarixl = --start-addr 0x4000
+LDFLAGS_tgidemo_atarixl = --start-addr 0x4000
+
+# The atari target needs to reserve some memory when using TGI
+LDFLAGS_mandelbrot_atari = -D __RESERVED_MEMORY__=0x2000
+LDFLAGS_tgidemo_atari = -D __RESERVED_MEMORY__=0x2000
 
 # --------------------------------------------------------------------------
 # Generic rules
@@ -59,9 +78,10 @@ C1541	= c1541
 	@echo $<
 	@$(AS) $(AFLAGS) -t $(SYS) $<
 
-.o:
-	@$(LD) -o $@ -t $(SYS) -m $@.map $^ $(CLIB)
+.PRECIOUS: %.o
 
+.o:
+	@$(LD) $(LDFLAGS_$(basename $@)_$(SYS)) -o $@ -t $(SYS) -m $@.map $^ $(CLIB)
 
 # --------------------------------------------------------------------------
 # List of executables. This list could be made target dependent by checking
@@ -87,62 +107,6 @@ EXELIST	=	ascii		\
 
 .PHONY:	all
 all:	$(EXELIST)
-
-ascii:		ascii.o
-
-diodemo:	diodemo.o
-
-fire:		fire.o
-
-gunzip65:	gunzip65.o
-
-hello:		hello.o
-
-# The Apple machines need the start address adjusted for the mandelbrot demo
-ifeq "$(SYS)" "apple2"
-mandelbrot:	mandelbrot.o
-	@$(LD) -o $@ -t $(SYS) -m $@.map --start-addr 0x4000 $^ $(CLIB)
-else
-ifeq "$(SYS)" "apple2enh"
-mandelbrot:	mandelbrot.o
-	@$(LD) -o $@ -t $(SYS) -m $@.map --start-addr 0x4000 $^ $(CLIB)
-else
-mandelbrot:	mandelbrot.o
-endif
-endif
-
-# The Apple ][ needs the start address adjusted for the mousetest
-ifeq "$(SYS)" "apple2"
-mousetest:	mousetest.o
-	@$(LD) -o $@ -t $(SYS) -m $@.map --start-addr 0x4000 $^ $(CLIB)
-else
-mousetest:	mousetest.o
-endif
-
-multdemo:	multidemo.o
-	@$(LD) -o $@ -m $@.map -C $(SYS)-overlay.cfg $^ $(CLIB)
-
-nachtm:		nachtm.o
-
-ovrldemo:	overlaydemo.o
-	@$(LD) -o $@ -m $@.map -C $(SYS)-overlay.cfg $^ $(CLIB)
-
-plasma:		plasma.o
-
-sieve:		sieve.o
-
-# The Apple machines need the start address adjusted for the tgidemo
-ifeq "$(SYS)" "apple2"
-tgidemo:	tgidemo.o
-	@$(LD) -o $@ -t $(SYS) -m $@.map --start-addr 0x4000 $^ $(CLIB)
-else
-ifeq "$(SYS)" "apple2enh"
-tgidemo:	tgidemo.o
-	@$(LD) -o $@ -t $(SYS) -m $@.map --start-addr 0x4000 $^ $(CLIB)
-else
-tgidemo:	tgidemo.o
-endif
-endif
 
 # --------------------------------------------------------------------------
 # Rule to make a disk with all samples. Needs the c1541 program that comes

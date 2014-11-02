@@ -13,12 +13,17 @@
         .include        "atari.inc"
 
         .macpack        generic
+        .macpack        module
 
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-.segment        "JUMPTABLE"
+.ifdef __ATARIXL__
+        module_header   _atrxstd_joy
+.else
+        module_header   _atrstd_joy
+.endif
 
 ; Driver signature
 

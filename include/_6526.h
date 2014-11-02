@@ -39,10 +39,10 @@
 
 
 /* Define a structure with the 6526 register offsets.
- * NOTE: The timer registers are not declared as 16 bit registers, because
- * the order in which the two 8 bit halves are written is important, and
- * the compiler doesn't guarantee any order when writing 16 bit values.
- */
+** NOTE: The timer registers are not declared as 16 bit registers, because
+** the order in which the two 8 bit halves are written is important, and
+** the compiler doesn't guarantee any order when writing 16 bit values.
+*/
 struct __6526 {
     unsigned char       pra;            /* Port register A */
     unsigned char       prb;            /* Port register B */

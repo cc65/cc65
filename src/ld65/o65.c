@@ -94,8 +94,8 @@
 #define MF_ALIGN_MASK   0x0003          /* Mask to extract alignment */
 
 /* The four o65 segment types. Note: These values are identical to the values
- * needed for the segmentID in the o65 spec.
- */
+** needed for the segmentID in the o65 spec.
+*/
 #define O65SEG_UNDEF    0x00
 #define O65SEG_ABS      0x01
 #define O65SEG_TEXT     0x02
@@ -222,11 +222,11 @@ static unsigned O65SegType (const SegDesc* S)
 /* Map our own segment types into something o65 compatible */
 {
     /* Check the segment type. Readonly segments are assign to the o65
-     * text segment, writeable segments that contain data are assigned
-     * to data, bss and zp segments are handled respectively.
-     * Beware: Zeropage segments have the SF_BSS flag set, so be sure
-     * to check SF_ZP first.
-     */
+    ** text segment, writeable segments that contain data are assigned
+    ** to data, bss and zp segments are handled respectively.
+    ** Beware: Zeropage segments have the SF_BSS flag set, so be sure
+    ** to check SF_ZP first.
+    */
     if (S->Flags & SF_RO) {
         return O65SEG_TEXT;
     } else if (S->Flags & SF_ZP) {
@@ -242,8 +242,8 @@ static unsigned O65SegType (const SegDesc* S)
 
 static void CvtMemoryToSegment (ExprDesc* ED)
 /* Convert a memory area into a segment by searching the list of run segments
- * in this memory area and assigning the nearest one.
- */
+** in this memory area and assigning the nearest one.
+*/
 {
     /* Get the memory area from the expression */
     MemoryArea* M = ED->MemRef;
@@ -291,8 +291,8 @@ static void CvtMemoryToSegment (ExprDesc* ED)
 
 static const SegDesc* FindSeg (SegDesc** const List, unsigned Count, const Segment* S)
 /* Search for a segment in the given list of segment descriptors and return
- * the descriptor for a segment if we found it, and NULL if not.
- */
+** the descriptor for a segment if we found it, and NULL if not.
+*/
 {
     unsigned I;
 
@@ -341,9 +341,9 @@ static const SegDesc* O65FindSeg (const O65Desc* D, const Segment* S)
 
 static void O65ParseExpr (ExprNode* Expr, ExprDesc* D, int Sign)
 /* Extract and evaluate all constant factors in an subtree that has only
- * additions and subtractions. If anything other than additions and
- * subtractions are found, D->TooComplex is set to true.
- */
+** additions and subtractions. If anything other than additions and
+** subtractions are found, D->TooComplex is set to true.
+*/
 {
     Export* E;
 
@@ -357,9 +357,9 @@ static void O65ParseExpr (ExprNode* Expr, ExprDesc* D, int Sign)
             /* Get the referenced Export */
             E = GetExprExport (Expr);
             /* If this export has a mark set, we've already encountered it.
-             * This means that the export is used to define it's own value,
-             * which in turn means, that we have a circular reference.
-             */
+            ** This means that the export is used to define it's own value,
+            ** which in turn means, that we have a circular reference.
+            */
             if (ExportHasMark (E)) {
                 CircularRefError (E);
             } else if (E->Expr == 0) {
@@ -412,8 +412,8 @@ static void O65ParseExpr (ExprNode* Expr, ExprDesc* D, int Sign)
                 /* Remember the memory area reference */
                 D->MemRef = Expr->V.Mem;
                 /* Add the start address of the memory area to the constant
-                 * value
-                 */
+                ** value
+                */
                 D->Val += (Sign * D->MemRef->Start);
             }
             break;
@@ -593,9 +593,9 @@ static void O65WriteHeader (O65Desc* D)
 static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
                               unsigned long Offs, void* Data)
 /* Called from SegWrite for an expression. Evaluate the expression, check the
- * range and write the expression value to the file, update the relocation
- * table.
- */
+** range and write the expression value to the file, update the relocation
+** table.
+*/
 {
     long          Diff;
     unsigned      RefCount;
@@ -614,9 +614,9 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
     }
 
     /* We have a relocatable expression that needs a relocation table entry.
-     * Calculate the number of bytes between this entry and the last one, and
-     * setup all necessary intermediate bytes in the relocation table.
-     */
+    ** Calculate the number of bytes between this entry and the last one, and
+    ** setup all necessary intermediate bytes in the relocation table.
+    */
     Offs += D->SegSize;         /* Calulate full offset */
     Diff = ((long) Offs) - D->LastOffs;
     while (Diff > 0xFE) {
@@ -649,9 +649,9 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
     }
 
     /* If we have a memory area reference, we need to convert it into a
-     * segment reference. If we cannot do that, we cannot handle the
-     * expression.
-     */
+    ** segment reference. If we cannot do that, we cannot handle the
+    ** expression.
+    */
     if (ED.MemRef) {
         CvtMemoryToSegment (&ED);
         if (ED.SegRef == 0) {
@@ -682,8 +682,8 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
     WriteVal (D->F, BinVal, Size);
 
     /* Determine the actual type of relocation entry needed from the
-     * information gathered about the expression.
-     */
+    ** information gathered about the expression.
+    */
     if (E->Op == EXPR_BYTE0) {
         RelocType = O65RELOC_LOW;
     } else if (E->Op == EXPR_BYTE1) {
@@ -730,8 +730,8 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
         Seg = O65FindSeg (D, ED.SegRef);
         if (Seg == 0) {
             /* For some reason, we didn't find this segment in the list of
-             * segments written to the o65 file.
-             */
+            ** segments written to the o65 file.
+            */
             return SEG_EXPR_INVALID;
         }
         RelocType |= O65SegType (Seg);
@@ -844,8 +844,8 @@ static void O65WriteDataSeg (O65Desc* D)
 
 static void O65WriteBssSeg (O65Desc* D)
 /* "Write" the bss segments to the o65 output file. This will only update
- * the relevant header fields.
- */
+** the relevant header fields.
+*/
 {
     /* Initialize variables */
     D->CurReloc = 0;
@@ -861,8 +861,8 @@ static void O65WriteBssSeg (O65Desc* D)
 
 static void O65WriteZPSeg (O65Desc* D)
 /* "Write" the zeropage segments to the o65 output file. This will only update
- * the relevant header fields.
- */
+** the relevant header fields.
+*/
 {
     /* Initialize variables */
     D->CurReloc = 0;
@@ -935,9 +935,9 @@ static void O65WriteExports (O65Desc* D)
         const char* Name = GetString (NameIdx);
 
         /* Get the export for this symbol. We've checked before that this
-         * export does really exist, so if it is unresolved, or if we don't
-         * find it, there is an error in the linker code.
-         */
+        ** export does really exist, so if it is unresolved, or if we don't
+        ** find it, there is an error in the linker code.
+        */
         Export* E = FindExport (NameIdx);
         if (E == 0 || IsUnresolvedExport (E)) {
             Internal ("Unresolved export `%s' found in O65WriteExports", Name);
@@ -950,8 +950,8 @@ static void O65WriteExports (O65Desc* D)
         O65ParseExpr (Expr, InitExprDesc (&ED, D), 1);
 
         /* We cannot handle expressions with imported symbols, or expressions
-         * with more than one segment reference here
-         */
+        ** with more than one segment reference here
+        */
         if (ED.ExtRef != 0 || (ED.SegRef != 0 && ED.SecRef != 0)) {
             ED.TooComplex = 1;
         }
@@ -975,8 +975,8 @@ static void O65WriteExports (O65Desc* D)
             Seg = O65FindSeg (D, ED.SegRef);
             if (Seg == 0) {
                 /* For some reason, we didn't find this segment in the list of
-                 * segments written to the o65 file.
-                 */
+                ** segments written to the o65 file.
+                */
                 Error ("Segment for symbol `%s' is undefined", Name);
             }
             SegmentID = O65SegType (Seg);
@@ -1203,8 +1203,8 @@ void O65SetExport (O65Desc* D, unsigned Ident)
 /* Set an exported identifier */
 {
     /* Get the export for this symbol and check if it does exist and is
-     * a resolved symbol.
-     */
+    ** a resolved symbol.
+    */
     Export* E = FindExport (Ident);
     if (E == 0 || IsUnresolvedExport (E)) {
         Error ("Unresolved export: `%s'", GetString (Ident));
@@ -1320,16 +1320,24 @@ static void O65SetupHeader (O65Desc* D)
         SegDesc* FirstSeg = D->ZPSeg [0];
         D->Header.ZPBase  = FirstSeg->Seg->PC;
     }
+}
 
-    /* If we have byte wise relocation and an alignment of 1, we can set
-     * the "simple addressing" bit in the header.
-     */
+
+
+static void O65UpdateHeader  (O65Desc* D)
+/* Update mode word, currently only the "simple" bit */
+{
+    /* If we have byte wise relocation and an alignment of 1, and text
+    ** and data are adjacent, we can set the "simple addressing" bit
+    ** in the header.
+    */
     if ((D->Header.Mode & MF_RELOC_MASK) == MF_RELOC_BYTE &&
-        (D->Header.Mode & MF_ALIGN_MASK) == MF_ALIGN_1) {
+        (D->Header.Mode & MF_ALIGN_MASK) == MF_ALIGN_1 &&
+        D->Header.TextBase + D->Header.TextSize == D->Header.DataBase &&
+        D->Header.DataBase + D->Header.DataSize == D->Header.BssBase) {
         D->Header.Mode = (D->Header.Mode & ~MF_ADDR_MASK) | MF_ADDR_SIMPLE;
     }
 }
-
 
 
 void O65WriteTarget (O65Desc* D, File* F)
@@ -1344,8 +1352,8 @@ void O65WriteTarget (O65Desc* D, File* F)
     D->Filename = GetString (F->Name);
 
     /* Check for unresolved symbols. The function O65Unresolved is called
-     * if we get an unresolved symbol.
-     */
+    ** if we get an unresolved symbol.
+    */
     D->Undef = 0;               /* Reset the counter */
     CheckUnresolvedImports (O65Unresolved, D);
     if (D->Undef > 0) {
@@ -1369,8 +1377,8 @@ void O65WriteTarget (O65Desc* D, File* F)
     Print (stdout, 1, "Opened `%s'...\n", D->Filename);
 
     /* Define some more options: A timestamp, the linker version and the
-     * filename
-     */
+    ** filename
+    */
     T = time (0);
     strcpy (OptBuf, ctime (&T));
     OptLen = strlen (OptBuf);
@@ -1411,6 +1419,9 @@ void O65WriteTarget (O65Desc* D, File* F)
     /* Write the list of exports */
     O65WriteExports (D);
 
+    /* Update header flags */
+    O65UpdateHeader (D);
+
     /* Seek back to the start and write the updated header */
     fseek (D->F, 0, SEEK_SET);
     O65WriteHeader (D);
@@ -1424,7 +1435,3 @@ void O65WriteTarget (O65Desc* D, File* F)
     D->F        = 0;
     D->Filename = 0;
 }
-
-
-
-

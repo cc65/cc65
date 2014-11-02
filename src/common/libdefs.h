@@ -67,6 +67,3 @@ struct LibHeader {
 /* End of libdefs.h */
 
 #endif
-
-
-

@@ -14,12 +14,13 @@
 
 
         .macpack        generic
+        .macpack        module
 
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-.segment        "JUMPTABLE"
+        module_header   _dtv_himem_emd
 
 ; Driver signature
 

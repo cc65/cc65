@@ -53,7 +53,6 @@ typedef enum {
     CPU_65SC02,
     CPU_65C02,
     CPU_65816,
-    CPU_SUNPLUS,                /* Not in the freeware version - sorry */
     CPU_SWEET16,
     CPU_HUC6280,                /* Used in PC engine */
     CPU_M740,                   /* Mitsubishi 740 series MCUs */
@@ -68,7 +67,6 @@ enum {
     CPU_ISET_65SC02     = 1 << CPU_65SC02,
     CPU_ISET_65C02      = 1 << CPU_65C02,
     CPU_ISET_65816      = 1 << CPU_65816,
-    CPU_ISET_SUNPLUS    = 1 << CPU_SUNPLUS,
     CPU_ISET_SWEET16    = 1 << CPU_SWEET16,
     CPU_ISET_HUC6280    = 1 << CPU_HUC6280,
     CPU_ISET_M740       = 1 << CPU_M740,
@@ -96,14 +94,11 @@ int ValidAddrSizeForCPU (unsigned char AddrSize);
 
 cpu_t FindCPU (const char* Name);
 /* Find a CPU by name and return the target id. CPU_UNKNOWN is returned if
- * the given name is no valid target.
- */
+** the given name is no valid target.
+*/
 
 
 
 /* End of cpu.h */
 
 #endif
-
-
-

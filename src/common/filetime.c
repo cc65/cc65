@@ -2,7 +2,7 @@
 /*                                                                           */
 /*                                filetime.c                                 */
 /*                                                                           */
-/*                   Replacement for buggy Microsoft code                    */
+/*                       Replacement for Windows code                        */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -34,26 +34,20 @@
 
 
 /* This module works around bugs in the time conversion code supplied by
- * Microsoft. The problem described here:
- *   http://www.codeproject.com/KB/datetime/dstbugs.aspx
- * is also true when setting file times via utime(), so we need a
- * replacement
- */
+** Microsoft. The problem described here:
+**   http://www.codeproject.com/KB/datetime/dstbugs.aspx
+** is also true when setting file times via utime(), so we need a
+** replacement
+*/
 
 
 
-#if defined(__WATCOMC__) && defined(__NT__)
-#define BUGGY_OS 1
-#include <errno.h>
-#include <windows.h>
+#if defined(_WIN32)
+#  include <errno.h>
+#  include <windows.h>
 #else
-#if defined(__WATCOMC__) || defined(_MSC_VER) || defined(__MINGW32__)
-/* The Windows compilers have the file in the wrong directory */
-#  include <sys/utime.h>
-#else
-#  include <sys/types.h>                /* FreeBSD needs this */
+#  include <sys/types.h>                          /* FreeBSD needs this */
 #  include <utime.h>
-#endif
 #endif
 
 
@@ -68,21 +62,21 @@
 
 
 
-#if defined(BUGGY_OS)
+#if defined(_WIN32)
 
 
 
 static FILETIME* UnixTimeToFileTime (time_t T, FILETIME* FT)
 /* Calculate a FILETIME value from a time_t. FILETIME contains a 64 bit
- * value with point zero at 1600-01-01 00:00:00 and counting 100ns intervals.
- * time_t is in seconds since 1970-01-01 00:00:00.
- */
+** value with point zero at 1600-01-01 00:00:00 and counting 100ns intervals.
+** time_t is in seconds since 1970-01-01 00:00:00.
+*/
 {
     /* Offset between 1600-01-01 and the Epoch in seconds. Watcom C has no
-     * way to express a number > 32 bit (known to me) but is able to do
-     * calculations with 64 bit integers, so we need to do it this way.
-     */
-    static const ULARGE_INTEGER Offs = { 0xB6109100UL, 0x00000020UL };
+    ** way to express a number > 32 bit (known to me) but is able to do
+    ** calculations with 64 bit integers, so we need to do it this way.
+    */
+    static const ULARGE_INTEGER Offs = { { 0xB6109100UL, 0x00000020UL } };
     ULARGE_INTEGER V;
     V.QuadPart = ((unsigned __int64) T + Offs.QuadPart) * 10000000U;
     FT->dwLowDateTime  = V.LowPart;
@@ -94,9 +88,9 @@ static FILETIME* UnixTimeToFileTime (time_t T, FILETIME* FT)
 
 int SetFileTimes (const char* Path, time_t T)
 /* Set the time of last modification and the time of last access of a file to
- * the given time T. This calls utime() for system where it works, and applies
- * workarounds for all others (which in fact means "WINDOWS").
- */
+** the given time T. This calls utime() for system where it works, and applies
+** workarounds for all others (which in fact means "WINDOWS").
+*/
 {
     HANDLE   H;
     FILETIME FileTime;
@@ -135,9 +129,9 @@ int SetFileTimes (const char* Path, time_t T)
 
 int SetFileTimes (const char* Path, time_t T)
 /* Set the time of last modification and the time of last access of a file to
- * the given time T. This calls utime() for system where it works, and applies
- * workarounds for all others (which in fact means "WINDOWS").
- */
+** the given time T. This calls utime() for system where it works, and applies
+** workarounds for all others (which in fact means "WINDOWS").
+*/
 {
     struct utimbuf U;
 
@@ -150,6 +144,3 @@ int SetFileTimes (const char* Path, time_t T)
 
 
 #endif
-
-
-

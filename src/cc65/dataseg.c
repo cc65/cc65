@@ -130,7 +130,3 @@ void DS_Output (const DataSeg* S)
     /* Add an additional newline after the segment output */
     WriteOutput ("\n");
 }
-
-
-
-

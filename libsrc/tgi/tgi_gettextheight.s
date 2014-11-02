@@ -11,8 +11,8 @@
 ;-----------------------------------------------------------------------------
 ; unsigned __fastcall__ tgi_gettextheight (const char* s);
 ; /* Calculate the height of the text in pixels according to the current text
-;  * style.
-;  */
+; ** style.
+; */
 ;
 
 .proc   _tgi_gettextheight        

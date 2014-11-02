@@ -94,6 +94,3 @@ void EmitFill (unsigned long Count);
 /* End of objcode.h */
 
 #endif
-
-
-

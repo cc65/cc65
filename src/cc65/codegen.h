@@ -53,11 +53,11 @@
 
 
 /* Code generator flags.
- * Note: The type flags are designed so that a smaller type may override a
- * larger one by or'ing it into the existing one.
- * Note^2: The actual type including the sign flag is in the lower bits, so
- * we can mask the information and use them as a table index.
- */
+** Note: The type flags are designed so that a smaller type may override a
+** larger one by or'ing it into the existing one.
+** Note^2: The actual type including the sign flag is in the lower bits, so
+** we can mask the information and use them as a table index.
+*/
 #define CF_NONE         0x0000  /* No special flags */
 
 /* Values for the actual type */
@@ -208,21 +208,21 @@ void g_reglong (unsigned Flags);
 
 unsigned g_typeadjust (unsigned lhs, unsigned rhs);
 /* Adjust the integer operands before doing a binary operation. lhs is a flags
- * value, that corresponds to the value on TOS, rhs corresponds to the value
- *  in (e)ax. The return value is the the flags value for the resulting type.
- */
+** value, that corresponds to the value on TOS, rhs corresponds to the value
+**  in (e)ax. The return value is the the flags value for the resulting type.
+*/
 
 unsigned g_typecast (unsigned lhs, unsigned rhs);
 /* Cast the value in the primary register to the operand size that is flagged
- * by the lhs value. Return the result value.
- */
+** by the lhs value. Return the result value.
+*/
 
 void g_scale (unsigned flags, long val);
 /* Scale the value in the primary register by the given value. If val is positive,
- * scale up, is val is negative, scale down. This function is used to scale
- * the operands or results of pointer arithmetic by the size of the type, the
- * pointer points to.
- */
+** scale up, is val is negative, scale down. This function is used to scale
+** the operands or results of pointer arithmetic by the size of the type, the
+** pointer points to.
+*/
 
 
 
@@ -274,16 +274,16 @@ void g_getlocal (unsigned Flags, int Offs);
 
 void g_getind (unsigned Flags, unsigned Offs);
 /* Fetch the specified object type indirect through the primary register
- * into the primary register
- */
+** into the primary register
+*/
 
 void g_leasp (int Offs);
 /* Fetch the address of the specified symbol into the primary register */
 
 void g_leavariadic (int Offs);
 /* Fetch the address of a parameter in a variadic function into the primary
- * register
- */
+** register
+*/
 
 
 
@@ -301,8 +301,8 @@ void g_putlocal (unsigned Flags, int Offs, long Val);
 
 void g_putind (unsigned flags, unsigned offs);
 /* Store the specified object type in the primary register at the address
- * on the top of the stack
- */
+** on the top of the stack
+*/
 
 
 
@@ -376,8 +376,8 @@ void g_restore (unsigned flags);
 
 void g_cmp (unsigned flags, unsigned long val);
 /* Immidiate compare. The primary register will not be changed, Z flag
- * will be set.
- */
+** will be set.
+*/
 
 void g_test (unsigned flags);
 /* Test the value in the primary and set the condition codes */
@@ -387,8 +387,8 @@ void g_push (unsigned flags, unsigned long val);
 
 void g_swap (unsigned flags);
 /* Swap the primary register and the top of the stack. flags give the type
- * of *both* values (must have same size).
- */
+** of *both* values (must have same size).
+*/
 
 void g_call (unsigned Flags, const char* Label, unsigned ArgSize);
 /* Call the specified subroutine name */
@@ -486,6 +486,5 @@ void g_asmcode (struct StrBuf* B);
 
 
 /* End of codegen.h */
+
 #endif
-
-

@@ -71,16 +71,16 @@ void SkipUntilSep (void);
 
 void ExpectSep (void);
 /* Check if we've reached a line separator, and output an error if not. Do
- * not skip the line separator.
- */
+** not skip the line separator.
+*/
 
 void EnterRawTokenMode (void);
 /* Enter raw token mode. In raw mode, token handling functions are not
- * executed, but the function tokens are passed untouched to the upper
- * layer. Raw token mode is used when storing macro tokens for later
- * use.
- * Calls to EnterRawTokenMode and LeaveRawTokenMode may be nested.
- */
+** executed, but the function tokens are passed untouched to the upper
+** layer. Raw token mode is used when storing macro tokens for later
+** use.
+** Calls to EnterRawTokenMode and LeaveRawTokenMode may be nested.
+*/
 
 void LeaveRawTokenMode (void);
 /* Leave raw token mode. */
@@ -90,7 +90,3 @@ void LeaveRawTokenMode (void);
 /* End of nexttok.h */
 
 #endif
-
-
-
-

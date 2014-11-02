@@ -10,10 +10,16 @@
         .include        "em-kernel.inc"
         .include        "em-error.inc"
 
+        .macpack        module
+
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-.segment        "JUMPTABLE"
+        .ifdef  __APPLE2ENH__
+        module_header   _a2e_auxmem_emd
+        .else
+        module_header   _a2_auxmem_emd
+        .endif
 
 ; Driver signature
 

@@ -1,10 +1,9 @@
-
 /*
- * char MessageBox (char mode, const char *format, ...)
- *
- * Maciej 'YTM/Elysium' Witkowiak, 17.08.2003
- *
- */
+** char MessageBox (char mode, const char *format, ...)
+**
+** Maciej 'YTM/Elysium' Witkowiak, 17.08.2003
+**
+*/
 
 #include <geos.h>
 #include <stdio.h>

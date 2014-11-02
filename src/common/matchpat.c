@@ -94,8 +94,8 @@ typedef unsigned char CharSet[32];      /* 256 bits */
 
 static int RealChar (const unsigned char* Pattern)
 /* Return the next character from Pattern. If the next character is the
- * escape character, skip it and return the following.
- */
+** escape character, skip it and return the following.
+*/
 {
     if (*Pattern == ESCAPE_CHAR) {
         Pattern++;
@@ -146,9 +146,9 @@ static int RecursiveMatch (const unsigned char* Source, const unsigned char* Pat
         } else {
 
             /* Check a single char. Build a set of all possible characters in
-             * CS, then check if the current char of Source is contained in
-             * there.
-             */
+            ** CS, then check if the current char of Source is contained in
+            ** there.
+            */
             CS_CLEAR (CS);      /* Clear the character set */
 
             if (*Pattern == '?') {
@@ -224,11 +224,11 @@ static int RecursiveMatch (const unsigned char* Source, const unsigned char* Pat
 
 int MatchPattern (const char* Source, const char* Pattern)
 /* Match the string in Source against Pattern. Pattern may contain the
- * wildcards '*', '?', '[abcd]' '[ab-d]', '[!abcd]', '[!ab-d]'. The
- * function returns a value of zero if Source does not match Pattern,
- * otherwise a non zero value is returned. If Pattern contains an invalid
- * wildcard pattern (e.g. 'A[x'), the function returns zero.
- */
+** wildcards '*', '?', '[abcd]' '[ab-d]', '[!abcd]', '[!ab-d]'. The
+** function returns a value of zero if Source does not match Pattern,
+** otherwise a non zero value is returned. If Pattern contains an invalid
+** wildcard pattern (e.g. 'A[x'), the function returns zero.
+*/
 {
     /* Handle the trivial cases */
     if (Pattern == 0 || *Pattern == '\0') {
@@ -238,6 +238,3 @@ int MatchPattern (const char* Source, const char* Pattern)
     /* Do the real thing */
     return RecursiveMatch ((const unsigned char*) Source, (const unsigned char*) Pattern);
 }
-
-
-

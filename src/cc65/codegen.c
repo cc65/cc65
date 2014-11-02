@@ -192,8 +192,8 @@ void g_fileinfo (const char* Name, unsigned long Size, unsigned long MTime)
 {
     if (DebugInfo) {
         /* We have to place this into the global text segment, so it will
-         * appear before all .dbg line statements.
-         */
+        ** appear before all .dbg line statements.
+        */
         TS_AddLine (GS->Text, "\t.dbg\t\tfile, \"%s\", %lu, %lu", Name, Size, MTime);
     }
 }
@@ -298,15 +298,15 @@ int push (unsigned flags)
 
 static unsigned MakeByteOffs (unsigned Flags, unsigned Offs)
 /* The value in Offs is an offset to an address in a/x. Make sure, an object
- * of the type given in Flags can be loaded or stored into this address by
- * adding part of the offset to the address in ax, so that the remaining
- * offset fits into an index register. Return the remaining offset.
- */
+** of the type given in Flags can be loaded or stored into this address by
+** adding part of the offset to the address in ax, so that the remaining
+** offset fits into an index register. Return the remaining offset.
+*/
 {
     /* If the offset is too large for a byte register, add the high byte
-     * of the offset to the primary. Beware: We need a special correction
-     * if the offset in the low byte will overflow in the operation.
-     */
+    ** of the offset to the primary. Beware: We need a special correction
+    ** if the offset in the low byte will overflow in the operation.
+    */
     unsigned O = Offs & ~0xFFU;
     if ((Offs & 0xFF) > 256 - sizeofarg (Flags)) {
         /* We need to add the low byte also */
@@ -351,8 +351,8 @@ void g_aliasdatalabel (unsigned label, unsigned baselabel, long offs)
 /* Define label as a local alias for baselabel+offs */
 {
     /* We need an intermediate buffer here since LocalLabelName uses a
-     * static buffer which changes with each call.
-     */
+    ** static buffer which changes with each call.
+    */
     StrBuf L = AUTO_STRBUF_INITIALIZER;
     SB_AppendStr (&L, LocalLabelName (label));
     SB_Terminate (&L);
@@ -427,10 +427,10 @@ void g_importmainargs (void)
 
 
 /* Remember the argument size of a function. The variable is set by g_enter
- * and used by g_leave. If the functions gets its argument size by the caller
- * (variable param list or function without prototype), g_enter will set the
- * value to -1.
- */
+** and used by g_leave. If the function gets its argument size by the caller
+** (variable param list or function without prototype), g_enter will set the
+** value to -1.
+*/
 static int funcargs;
 
 
@@ -602,9 +602,9 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes)
     } else if (StackOffs <= RegOffs) {
 
         /* More bytes, but the relation between the register offset in the
-         * register bank and the stack offset allows us to generate short
-         * code that uses just one index register.
-         */
+        ** register bank and the stack offset allows us to generate short
+        ** code that uses just one index register.
+        */
         unsigned Label = GetLocalLabel ();
         AddCodeLine ("ldy #$%02X", StackOffs);
         g_defcodelabel (Label);
@@ -616,9 +616,9 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes)
 
     } else {
 
-        /* Ok, this is the generic code. We need to save X because the
-         * caller will only save A.
-         */
+        /* OK, this is the generic code. We need to save X because the
+        ** caller will only save A.
+        */
         unsigned Label = GetLocalLabel ();
         AddCodeLine ("stx tmp1");
         AddCodeLine ("ldy #$%02X", (unsigned char) (StackOffs + Bytes - 1));
@@ -840,13 +840,13 @@ void g_getlocal (unsigned Flags, int Offs)
 
 void g_getind (unsigned Flags, unsigned Offs)
 /* Fetch the specified object type indirect through the primary register
- * into the primary register
- */
+** into the primary register
+*/
 {
     /* If the offset is greater than 255, add the part that is > 255 to
-     * the primary. This way we get an easy addition and use the low byte
-     * as the offset
-     */
+    ** the primary. This way we get an easy addition and use the low byte
+    ** as the offset
+    */
     Offs = MakeByteOffs (Flags, Offs);
 
     /* Handle the indirect fetch */
@@ -958,8 +958,8 @@ void g_leasp (int Offs)
 
 void g_leavariadic (int Offs)
 /* Fetch the address of a parameter in a variadic function into the primary
- * register
- */
+** register
+*/
 {
     unsigned ArgSizeOffs;
 
@@ -967,8 +967,8 @@ void g_leavariadic (int Offs)
     Offs -= StackPtr;
 
     /* Get the offset of the parameter which is stored at sp+0 on function
-     * entry and check if this offset is reachable with a byte offset.
-     */
+    ** entry and check if this offset is reachable with a byte offset.
+    */
     CHECK (StackPtr <= 0);
     ArgSizeOffs = -StackPtr;
     CheckLocalOffs (ArgSizeOffs);
@@ -1106,14 +1106,14 @@ void g_putlocal (unsigned Flags, int Offs, long Val)
 
 void g_putind (unsigned Flags, unsigned Offs)
 /* Store the specified object type in the primary register at the address
- * on the top of the stack
- */
+** on the top of the stack
+*/
 {
     /* We can handle offsets below $100 directly, larger offsets must be added
-     * to the address. Since a/x is in use, best code is achieved by adding
-     * just the high byte. Be sure to check if the low byte will overflow while
-     * while storing.
-     */
+    ** to the address. Since a/x is in use, best code is achieved by adding
+    ** just the high byte. Be sure to check if the low byte will overflow while
+    ** while storing.
+    */
     if ((Offs & 0xFF) > 256 - sizeofarg (Flags | CF_FORCECHAR)) {
 
         /* Overflow - we need to add the low byte also */
@@ -1226,26 +1226,34 @@ void g_tosint (unsigned flags)
 
 
 
-void g_regint (unsigned Flags)
-/* Make sure, the value in the primary register an int. Convert if necessary */
+static void g_regchar (unsigned Flags)
+/* Make sure, the value in the primary register is in the range of char. Truncate if necessary */
 {
     unsigned L;
 
+    AddCodeLine ("ldx #$00");
+
+    if ((Flags & CF_UNSIGNED) == 0) {
+        /* Sign extend */
+        L = GetLocalLabel();
+        AddCodeLine ("cmp #$80");
+        AddCodeLine ("bcc %s", LocalLabelName (L));
+        AddCodeLine ("dex");
+        g_defcodelabel (L);
+    }
+}
+
+
+
+void g_regint (unsigned Flags)
+/* Make sure, the value in the primary register an int. Convert if necessary */
+{
     switch (Flags & CF_TYPEMASK) {
 
         case CF_CHAR:
             if (Flags & CF_FORCECHAR) {
                 /* Conversion is from char */
-                if (Flags & CF_UNSIGNED) {
-                    AddCodeLine ("ldx #$00");
-                } else {
-                    L = GetLocalLabel();
-                    AddCodeLine ("ldx #$00");
-                    AddCodeLine ("cmp #$80");
-                    AddCodeLine ("bcc %s", LocalLabelName (L));
-                    AddCodeLine ("dex");
-                    g_defcodelabel (L);
-                }
+                g_regchar (Flags);
             }
             /* FALLTHROUGH */
 
@@ -1263,8 +1271,6 @@ void g_regint (unsigned Flags)
 void g_reglong (unsigned Flags)
 /* Make sure, the value in the primary register a long. Convert if necessary */
 {
-    unsigned L;
-
     switch (Flags & CF_TYPEMASK) {
 
         case CF_CHAR:
@@ -1280,12 +1286,7 @@ void g_reglong (unsigned Flags)
                     }
                 } else {
                     if (IS_Get (&CodeSizeFactor) >= 366) {
-                        L = GetLocalLabel();
-                        AddCodeLine ("ldx #$00");
-                        AddCodeLine ("cmp #$80");
-                        AddCodeLine ("bcc %s", LocalLabelName (L));
-                        AddCodeLine ("dex");
-                        g_defcodelabel (L);
+                        g_regchar (Flags);
                         AddCodeLine ("stx sreg");
                         AddCodeLine ("stx sreg+1");
                     } else {
@@ -1321,9 +1322,9 @@ void g_reglong (unsigned Flags)
 
 unsigned g_typeadjust (unsigned lhs, unsigned rhs)
 /* Adjust the integer operands before doing a binary operation. lhs is a flags
- * value, that corresponds to the value on TOS, rhs corresponds to the value
- * in (e)ax. The return value is the the flags value for the resulting type.
- */
+** value, that corresponds to the value on TOS, rhs corresponds to the value
+** in (e)ax. The return value is the the flags value for the resulting type.
+*/
 {
     unsigned ltype, rtype;
     unsigned result;
@@ -1352,11 +1353,11 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
     }
 
     /* Determine the result type for the operation:
-     *  - The result is const if both operands are const.
-     *  - The result is unsigned if one of the operands is unsigned.
-     *  - The result is long if one of the operands is long.
-     *  - Otherwise the result is int sized.
-     */
+    **  - The result is const if both operands are const.
+    **  - The result is unsigned if one of the operands is unsigned.
+    **  - The result is long if one of the operands is long.
+    **  - Otherwise the result is int sized.
+    */
     result = (lhs & CF_CONST) & (rhs & CF_CONST);
     result |= (lhs & CF_UNSIGNED) | (rhs & CF_UNSIGNED);
     if (rtype == CF_LONG || ltype == CF_LONG) {
@@ -1371,38 +1372,45 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
 
 unsigned g_typecast (unsigned lhs, unsigned rhs)
 /* Cast the value in the primary register to the operand size that is flagged
- * by the lhs value. Return the result value.
- */
+** by the lhs value. Return the result value.
+*/
 {
-    unsigned ltype, rtype;
-
-    /* Get the type spec from the flags */
-    ltype = lhs & CF_TYPEMASK;
-    rtype = rhs & CF_TYPEMASK;
-
     /* Check if a conversion is needed */
     if ((rhs & CF_CONST) == 0) {
-        if (ltype == CF_LONG && rtype != CF_LONG) {
-            /* We must promote the primary register to long */
-            g_reglong (rhs);
-        } else if (ltype == CF_INT && rtype != CF_INT) {
-            /* We must promote the primary register to int */
-            g_regint (rhs);
+        switch (lhs & CF_TYPEMASK) {
+
+            case CF_LONG:
+                /* We must promote the primary register to long */
+                g_reglong (rhs);
+                break;
+
+            case CF_INT:
+                /* We must promote the primary register to int */
+                g_regint (rhs);
+                break;
+
+            case CF_CHAR:
+                /* We must truncate the primary register to char */
+                g_regchar (lhs);
+                break;
+
+            default:
+                typeerror (lhs);
         }
     }
 
     /* Do not need any other action. If the left type is int, and the primary
-     * register is long, it will be automagically truncated. If the right hand
-     * side is const, it is not located in the primary register and handled by
-     * the expression parser code.
-     */
+    ** register is long, it will be automagically truncated. If the right hand
+    ** side is const, it is not located in the primary register and handled by
+    ** the expression parser code.
+    */
 
     /* Result is const if the right hand side was const */
     lhs |= (rhs & CF_CONST);
 
     /* The resulting type is that of the left hand side (that's why you called
-     * this function :-)
-     */
+    ** this function :-)
+    */
     return lhs;
 }
 
@@ -1410,10 +1418,10 @@ unsigned g_typecast (unsigned lhs, unsigned rhs)
 
 void g_scale (unsigned flags, long val)
 /* Scale the value in the primary register by the given value. If val is positive,
- * scale up, is val is negative, scale down. This function is used to scale
- * the operands or results of pointer arithmetic by the size of the type, the
- * pointer points to.
- */
+** scale up, is val is negative, scale down. This function is used to scale
+** the operands or results of pointer arithmetic by the size of the type, the
+** pointer points to.
+*/
 {
     int p2;
 
@@ -1813,9 +1821,9 @@ void g_addeqind (unsigned flags, unsigned offs, unsigned long val)
 /* Emit += for the location with address in ax */
 {
     /* If the offset is too large for a byte register, add the high byte
-     * of the offset to the primary. Beware: We need a special correction
-     * if the offset in the low byte will overflow in the operation.
-     */
+    ** of the offset to the primary. Beware: We need a special correction
+    ** if the offset in the low byte will overflow in the operation.
+    */
     offs = MakeByteOffs (flags, offs);
 
     /* Check the size and determine operation */
@@ -2009,9 +2017,9 @@ void g_subeqind (unsigned flags, unsigned offs, unsigned long val)
 /* Emit -= for the location with address in ax */
 {
     /* If the offset is too large for a byte register, add the high byte
-     * of the offset to the primary. Beware: We need a special correction
-     * if the offset in the low byte will overflow in the operation.
-     */
+    ** of the offset to the primary. Beware: We need a special correction
+    ** if the offset in the low byte will overflow in the operation.
+    */
     offs = MakeByteOffs (flags, offs);
 
     /* Check the size and determine operation */
@@ -2168,8 +2176,8 @@ void g_restore (unsigned flags)
 
 void g_cmp (unsigned flags, unsigned long val)
 /* Immidiate compare. The primary register will not be changed, Z flag
- * will be set.
- */
+** will be set.
+*/
 {
     unsigned L;
 
@@ -2204,11 +2212,11 @@ void g_cmp (unsigned flags, unsigned long val)
 
 static void oper (unsigned Flags, unsigned long Val, const char** Subs)
 /* Encode a binary operation. subs is a pointer to four strings:
- *      0       --> Operate on ints
- *      1       --> Operate on unsigneds
- *      2       --> Operate on longs
- *      3       --> Operate on unsigned longs
- */
+**      0       --> Operate on ints
+**      1       --> Operate on unsigneds
+**      2       --> Operate on longs
+**      3       --> Operate on unsigned longs
+*/
 {
     /* Determine the offset into the array */
     if (Flags & CF_UNSIGNED) {
@@ -2326,8 +2334,8 @@ void g_push (unsigned flags, unsigned long val)
 
 void g_swap (unsigned flags)
 /* Swap the primary register and the top of the stack. flags give the type
- * of *both* values (must have same size).
- */
+** of *both* values (must have same size).
+*/
 {
     switch (flags & CF_TYPEMASK) {
 
@@ -2421,8 +2429,8 @@ void g_drop (unsigned Space)
 {
     if (Space > 255) {
         /* Inline the code since calling addysp repeatedly is quite some
-         * overhead.
-         */
+        ** overhead.
+        */
         AddCodeLine ("pha");
         AddCodeLine ("lda #$%02X", (unsigned char) Space);
         AddCodeLine ("clc");
@@ -2450,8 +2458,8 @@ void g_space (int Space)
         g_drop (-Space);
     } else if (Space > 255) {
         /* Inline the code since calling subysp repeatedly is quite some
-         * overhead.
-         */
+        ** overhead.
+        */
         AddCodeLine ("pha");
         AddCodeLine ("lda sp");
         AddCodeLine ("sec");
@@ -2547,8 +2555,8 @@ void g_mul (unsigned flags, unsigned long val)
     }
 
     /* If the right hand side is const, the lhs is not on stack but still
-     * in the primary register.
-     */
+    ** in the primary register.
+    */
     if (flags & CF_CONST) {
 
         switch (flags & CF_TYPEMASK) {
@@ -2624,8 +2632,8 @@ void g_mul (unsigned flags, unsigned long val)
         }
 
         /* If we go here, we didn't emit code. Push the lhs on stack and fall
-         * into the normal, non-optimized stuff.
-         */
+        ** into the normal, non-optimized stuff.
+        */
         flags &= ~CF_FORCECHAR; /* Handle chars as ints */
         g_push (flags & ~CF_CONST, 0);
 
@@ -2695,8 +2703,8 @@ void g_or (unsigned flags, unsigned long val)
     };
 
     /* If the right hand side is const, the lhs is not on stack but still
-     * in the primary register.
-     */
+    ** in the primary register.
+    */
     if (flags & CF_CONST) {
 
         switch (flags & CF_TYPEMASK) {
@@ -2744,9 +2752,9 @@ void g_or (unsigned flags, unsigned long val)
         }
 
         /* If we go here, we didn't emit code. Push the lhs on stack and fall
-         * into the normal, non-optimized stuff. Note: The standard stuff will
-         * always work with ints.
-         */
+        ** into the normal, non-optimized stuff. Note: The standard stuff will
+        ** always work with ints.
+        */
         flags &= ~CF_FORCECHAR;
         g_push (flags & ~CF_CONST, 0);
     }
@@ -2766,8 +2774,8 @@ void g_xor (unsigned flags, unsigned long val)
 
 
     /* If the right hand side is const, the lhs is not on stack but still
-     * in the primary register.
-     */
+    ** in the primary register.
+    */
     if (flags & CF_CONST) {
 
         switch (flags & CF_TYPEMASK) {
@@ -2812,9 +2820,9 @@ void g_xor (unsigned flags, unsigned long val)
         }
 
         /* If we go here, we didn't emit code. Push the lhs on stack and fall
-         * into the normal, non-optimized stuff. Note: The standard stuff will
-         * always work with ints.
-         */
+        ** into the normal, non-optimized stuff. Note: The standard stuff will
+        ** always work with ints.
+        */
         flags &= ~CF_FORCECHAR;
         g_push (flags & ~CF_CONST, 0);
     }
@@ -2833,8 +2841,8 @@ void g_and (unsigned Flags, unsigned long Val)
     };
 
     /* If the right hand side is const, the lhs is not on stack but still
-     * in the primary register.
-     */
+    ** in the primary register.
+    */
     if (Flags & CF_CONST) {
 
         switch (Flags & CF_TYPEMASK) {
@@ -2904,9 +2912,9 @@ void g_and (unsigned Flags, unsigned long Val)
         }
 
         /* If we go here, we didn't emit code. Push the lhs on stack and fall
-         * into the normal, non-optimized stuff. Note: The standard stuff will
-         * always work with ints.
-         */
+        ** into the normal, non-optimized stuff. Note: The standard stuff will
+        ** always work with ints.
+        */
         Flags &= ~CF_FORCECHAR;
         g_push (Flags & ~CF_CONST, 0);
     }
@@ -2925,8 +2933,8 @@ void g_asr (unsigned flags, unsigned long val)
     };
 
     /* If the right hand side is const, the lhs is not on stack but still
-     * in the primary register.
-     */
+    ** in the primary register.
+    */
     if (flags & CF_CONST) {
 
         switch (flags & CF_TYPEMASK) {
@@ -3035,9 +3043,9 @@ void g_asr (unsigned flags, unsigned long val)
         }
 
         /* If we go here, we didn't emit code. Push the lhs on stack and fall
-         * into the normal, non-optimized stuff. Note: The standard stuff will
-         * always work with ints.
-         */
+        ** into the normal, non-optimized stuff. Note: The standard stuff will
+        ** always work with ints.
+        */
         flags &= ~CF_FORCECHAR;
         g_push (flags & ~CF_CONST, 0);
     }
@@ -3057,8 +3065,8 @@ void g_asl (unsigned flags, unsigned long val)
 
 
     /* If the right hand side is const, the lhs is not on stack but still
-     * in the primary register.
-     */
+    ** in the primary register.
+    */
     if (flags & CF_CONST) {
 
         switch (flags & CF_TYPEMASK) {
@@ -3134,9 +3142,9 @@ void g_asl (unsigned flags, unsigned long val)
         }
 
         /* If we go here, we didn't emit code. Push the lhs on stack and fall
-         * into the normal, non-optimized stuff. Note: The standard stuff will
-         * always work with ints.
-         */
+        ** into the normal, non-optimized stuff. Note: The standard stuff will
+        ** always work with ints.
+        */
         flags &= ~CF_FORCECHAR;
         g_push (flags & ~CF_CONST, 0);
     }
@@ -3419,10 +3427,10 @@ void g_dec (unsigned flags, unsigned long val)
 
 
 /*
- * Following are the conditional operators. They compare the TOS against
- * the primary and put a literal 1 in the primary if the condition is
- * true, otherwise they clear the primary register
- */
+** Following are the conditional operators. They compare the TOS against
+** the primary and put a literal 1 in the primary if the condition is
+** true, otherwise they clear the primary register
+*/
 
 
 
@@ -3436,8 +3444,8 @@ void g_eq (unsigned flags, unsigned long val)
     unsigned L;
 
     /* If the right hand side is const, the lhs is not on stack but still
-     * in the primary register.
-     */
+    ** in the primary register.
+    */
     if (flags & CF_CONST) {
 
         switch (flags & CF_TYPEMASK) {
@@ -3467,9 +3475,9 @@ void g_eq (unsigned flags, unsigned long val)
         }
 
         /* If we go here, we didn't emit code. Push the lhs on stack and fall
-         * into the normal, non-optimized stuff. Note: The standard stuff will
-         * always work with ints.
-         */
+        ** into the normal, non-optimized stuff. Note: The standard stuff will
+        ** always work with ints.
+        */
         flags &= ~CF_FORCECHAR;
         g_push (flags & ~CF_CONST, 0);
     }
@@ -3490,8 +3498,8 @@ void g_ne (unsigned flags, unsigned long val)
     unsigned L;
 
     /* If the right hand side is const, the lhs is not on stack but still
-     * in the primary register.
-     */
+    ** in the primary register.
+    */
     if (flags & CF_CONST) {
 
         switch (flags & CF_TYPEMASK) {
@@ -3521,9 +3529,9 @@ void g_ne (unsigned flags, unsigned long val)
         }
 
         /* If we go here, we didn't emit code. Push the lhs on stack and fall
-         * into the normal, non-optimized stuff. Note: The standard stuff will
-         * always work with ints.
-         */
+        ** into the normal, non-optimized stuff. Note: The standard stuff will
+        ** always work with ints.
+        */
         flags &= ~CF_FORCECHAR;
         g_push (flags & ~CF_CONST, 0);
     }
@@ -3544,14 +3552,14 @@ void g_lt (unsigned flags, unsigned long val)
     unsigned Label;
 
     /* If the right hand side is const, the lhs is not on stack but still
-     * in the primary register.
-     */
+    ** in the primary register.
+    */
     if (flags & CF_CONST) {
 
         /* Because the handling of the overflow flag is too complex for
-         * inlining, we can handle only unsigned compares, and signed
-         * compares against zero here.
-         */
+        ** inlining, we can handle only unsigned compares, and signed
+        ** compares against zero here.
+        */
         if (flags & CF_UNSIGNED) {
 
             /* Give a warning in some special cases */
@@ -3683,9 +3691,9 @@ void g_lt (unsigned flags, unsigned long val)
         }
 
         /* If we go here, we didn't emit code. Push the lhs on stack and fall
-         * into the normal, non-optimized stuff. Note: The standard stuff will
-         * always work with ints.
-         */
+        ** into the normal, non-optimized stuff. Note: The standard stuff will
+        ** always work with ints.
+        */
         flags &= ~CF_FORCECHAR;
         g_push (flags & ~CF_CONST, 0);
     }
@@ -3705,8 +3713,8 @@ void g_le (unsigned flags, unsigned long val)
 
 
     /* If the right hand side is const, the lhs is not on stack but still
-     * in the primary register.
-     */
+    ** in the primary register.
+    */
     if (flags & CF_CONST) {
 
         /* Look at the type */
@@ -3718,8 +3726,8 @@ void g_le (unsigned flags, unsigned long val)
                         /* Unsigned compare */
                         if (val < 0xFF) {
                             /* Use < instead of <= because the former gives
-                             * better code on the 6502 than the latter.
-                             */
+                            ** better code on the 6502 than the latter.
+                            */
                             g_lt (flags, val+1);
                         } else {
                             /* Always true */
@@ -3730,8 +3738,8 @@ void g_le (unsigned flags, unsigned long val)
                         /* Signed compare */
                         if ((long) val < 0x7F) {
                             /* Use < instead of <= because the former gives
-                             * better code on the 6502 than the latter.
-                             */
+                            ** better code on the 6502 than the latter.
+                            */
                             g_lt (flags, val+1);
                         } else {
                             /* Always true */
@@ -3748,8 +3756,8 @@ void g_le (unsigned flags, unsigned long val)
                     /* Unsigned compare */
                     if (val < 0xFFFF) {
                         /* Use < instead of <= because the former gives
-                         * better code on the 6502 than the latter.
-                         */
+                        ** better code on the 6502 than the latter.
+                        */
                         g_lt (flags, val+1);
                     } else {
                         /* Always true */
@@ -3773,8 +3781,8 @@ void g_le (unsigned flags, unsigned long val)
                     /* Unsigned compare */
                     if (val < 0xFFFFFFFF) {
                         /* Use < instead of <= because the former gives
-                         * better code on the 6502 than the latter.
-                         */
+                        ** better code on the 6502 than the latter.
+                        */
                         g_lt (flags, val+1);
                     } else {
                         /* Always true */
@@ -3798,9 +3806,9 @@ void g_le (unsigned flags, unsigned long val)
         }
 
         /* If we go here, we didn't emit code. Push the lhs on stack and fall
-         * into the normal, non-optimized stuff. Note: The standard stuff will
-         * always work with ints.
-         */
+        ** into the normal, non-optimized stuff. Note: The standard stuff will
+        ** always work with ints.
+        */
         flags &= ~CF_FORCECHAR;
         g_push (flags & ~CF_CONST, 0);
     }
@@ -3820,8 +3828,8 @@ void g_gt (unsigned flags, unsigned long val)
 
 
     /* If the right hand side is const, the lhs is not on stack but still
-     * in the primary register.
-     */
+    ** in the primary register.
+    */
     if (flags & CF_CONST) {
 
         /* Look at the type */
@@ -3832,14 +3840,14 @@ void g_gt (unsigned flags, unsigned long val)
                     if (flags & CF_UNSIGNED) {
                         if (val == 0) {
                             /* If we have a compare > 0, we will replace it by
-                             * != 0 here, since both are identical but the
-                             * latter is easier to optimize.
-                             */
+                            ** != 0 here, since both are identical but the
+                            ** latter is easier to optimize.
+                            */
                             g_ne (flags, val);
                         } else if (val < 0xFF) {
                             /* Use >= instead of > because the former gives
-                             * better code on the 6502 than the latter.
-                             */
+                            ** better code on the 6502 than the latter.
+                            */
                             g_ge (flags, val+1);
                         } else {
                             /* Never true */
@@ -3849,8 +3857,8 @@ void g_gt (unsigned flags, unsigned long val)
                     } else {
                         if ((long) val < 0x7F) {
                             /* Use >= instead of > because the former gives
-                             * better code on the 6502 than the latter.
-                             */
+                            ** better code on the 6502 than the latter.
+                            */
                             g_ge (flags, val+1);
                         } else {
                             /* Never true */
@@ -3867,14 +3875,14 @@ void g_gt (unsigned flags, unsigned long val)
                     /* Unsigned compare */
                     if (val == 0) {
                         /* If we have a compare > 0, we will replace it by
-                         * != 0 here, since both are identical but the latter
-                         * is easier to optimize.
-                         */
+                        ** != 0 here, since both are identical but the latter
+                        ** is easier to optimize.
+                        */
                         g_ne (flags, val);
                     } else if (val < 0xFFFF) {
                         /* Use >= instead of > because the former gives better
-                         * code on the 6502 than the latter.
-                         */
+                        ** code on the 6502 than the latter.
+                        */
                         g_ge (flags, val+1);
                     } else {
                         /* Never true */
@@ -3898,14 +3906,14 @@ void g_gt (unsigned flags, unsigned long val)
                     /* Unsigned compare */
                     if (val == 0) {
                         /* If we have a compare > 0, we will replace it by
-                         * != 0 here, since both are identical but the latter
-                         * is easier to optimize.
-                         */
+                        ** != 0 here, since both are identical but the latter
+                        ** is easier to optimize.
+                        */
                         g_ne (flags, val);
                     } else if (val < 0xFFFFFFFF) {
                         /* Use >= instead of > because the former gives better
-                         * code on the 6502 than the latter.
-                         */
+                        ** code on the 6502 than the latter.
+                        */
                         g_ge (flags, val+1);
                     } else {
                         /* Never true */
@@ -3929,9 +3937,9 @@ void g_gt (unsigned flags, unsigned long val)
         }
 
         /* If we go here, we didn't emit code. Push the lhs on stack and fall
-         * into the normal, non-optimized stuff. Note: The standard stuff will
-         * always work with ints.
-         */
+        ** into the normal, non-optimized stuff. Note: The standard stuff will
+        ** always work with ints.
+        */
         flags &= ~CF_FORCECHAR;
         g_push (flags & ~CF_CONST, 0);
     }
@@ -3953,14 +3961,14 @@ void g_ge (unsigned flags, unsigned long val)
 
 
     /* If the right hand side is const, the lhs is not on stack but still
-     * in the primary register.
-     */
+    ** in the primary register.
+    */
     if (flags & CF_CONST) {
 
         /* Because the handling of the overflow flag is too complex for
-         * inlining, we can handle only unsigned compares, and signed
-         * compares against zero here.
-         */
+        ** inlining, we can handle only unsigned compares, and signed
+        ** compares against zero here.
+        */
         if (flags & CF_UNSIGNED) {
 
             /* Give a warning in some special cases */
@@ -4087,9 +4095,9 @@ void g_ge (unsigned flags, unsigned long val)
         }
 
         /* If we go here, we didn't emit code. Push the lhs on stack and fall
-         * into the normal, non-optimized stuff. Note: The standard stuff will
-         * always work with ints.
-         */
+        ** into the normal, non-optimized stuff. Note: The standard stuff will
+        ** always work with ints.
+        */
         flags &= ~CF_FORCECHAR;
         g_push (flags & ~CF_CONST, 0);
     }
@@ -4362,6 +4370,3 @@ void g_asmcode (struct StrBuf* B)
 {
     AddCodeLine ("%.*s", (int) SB_GetLen (B), SB_GetConstBuf (B));
 }
-
-
-

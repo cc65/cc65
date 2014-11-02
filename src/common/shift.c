@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -34,16 +34,16 @@
 
 
 /* According to the C standard, shifting a data type by the number of bits it
- * has causes undefined behaviour. So 
- *
- *      unsigned long l = 1;
- *      unsigned u =32;
- *      l <<= u;
- *
- * maybe illegal. The functions in this module behave safely in this respect,
- * and they use proper casting to distinguish signed from unsigned shifts.
- * They are not a general purpose replacement for the shift operator!
- */
+** has causes undefined behaviour. So
+**
+**      unsigned long l = 1;
+**      unsigned u =32;
+**      l <<= u;
+**
+** may be illegal. The functions in this module behave safely in that respect,
+** and they use proper casting to distinguish signed from unsigned shifts.
+** They are not a general purpose replacement for the shift operator!
+*/
 
 
 
@@ -125,6 +125,3 @@ unsigned long shr_l (unsigned long l, unsigned count)
     }
     return l;
 }
-
-
-

@@ -51,8 +51,8 @@
 
 unsigned OptBoolTrans (CodeSeg* S);
 /* Try to remove the call to boolean transformer routines where the call is
- * not really needed.
- */
+** not really needed.
+*/
 
 
 
@@ -64,113 +64,110 @@ unsigned OptBoolTrans (CodeSeg* S);
 
 unsigned OptCmp1 (CodeSeg* S);
 /* Search for the sequence
- *
- *      ldx     xx
- *      stx     tmp1
- *      ora     tmp1
- *
- * and replace it by
- *
- *      ora     xx
- */
+**
+**      ldx     xx
+**      stx     tmp1
+**      ora     tmp1
+**
+** and replace it by
+**
+**      ora     xx
+*/
 
 unsigned OptCmp2 (CodeSeg* S);
 /* Search for the sequence
- *
- *      stx     xx
- *      stx     tmp1
- *      ora     tmp1
- *
- * and replace it by
- *
- *      stx     xx
- *      ora     xx
- */
+**
+**      stx     xx
+**      stx     tmp1
+**      ora     tmp1
+**
+** and replace it by
+**
+**      stx     xx
+**      ora     xx
+*/
 
 unsigned OptCmp3 (CodeSeg* S);
 /* Search for
- *
- *      lda/and/ora/eor ...
- *      cmp #$00
- *      jeq/jne
- * or
- *      lda/and/ora/eor ...
- *      cmp #$00
- *      jsr boolxx
- *
- * and remove the cmp.
- */
+**
+**      lda/and/ora/eor ...
+**      cmp #$00
+**      jeq/jne
+** or
+**      lda/and/ora/eor ...
+**      cmp #$00
+**      jsr boolxx
+**
+** and remove the cmp.
+*/
 
 unsigned OptCmp4 (CodeSeg* S);
 /* Search for
- *
- *      lda     x
- *      ldx     y
- *      cpx     #a
- *      bne     L1
- *      cmp     #b
- *      jne/jeq L2
- *
- * If a is zero, we may remove the compare. If a and b are both zero, we may
- * replace it by the sequence
- *
- *      lda     x
- *      ora     x+1
- *      jne/jeq ...
- *
- * L1 may be either the label at the branch instruction, or the target label
- * of this instruction.
- */
+**
+**      lda     x
+**      ldx     y
+**      cpx     #a
+**      bne     L1
+**      cmp     #b
+**      jne/jeq L2
+**
+** If a is zero, we may remove the compare. If a and b are both zero, we may
+** replace it by the sequence
+**
+**      lda     x
+**      ora     x+1
+**      jne/jeq ...
+**
+** L1 may be either the label at the branch instruction, or the target label
+** of this instruction.
+*/
 
 unsigned OptCmp5 (CodeSeg* S);
 /* Optimize compares of local variables:
- *
- *      ldy     #o
- *      lda     (sp),y
- *      tax
- *      dey
- *      lda     (sp),y
- *      cpx     #a
- *      bne     L1
- *      cmp     #b
- *      jne/jeq L2
- */
+**
+**      ldy     #o
+**      lda     (sp),y
+**      tax
+**      dey
+**      lda     (sp),y
+**      cpx     #a
+**      bne     L1
+**      cmp     #b
+**      jne/jeq L2
+*/
 
 unsigned OptCmp6 (CodeSeg* S);
 /* Search for calls to compare subroutines followed by a conditional branch
- * and replace them by cheaper versions, since the branch means that the
- * boolean value returned by these routines is not needed (we may also check
- * that explicitly, but for the current code generator it is always true).
- */
+** and replace them by cheaper versions, since the branch means that the
+** boolean value returned by these routines is not needed (we may also check
+** that explicitly, but for the current code generator it is always true).
+*/
 
 unsigned OptCmp7 (CodeSeg* S);
 /* Search for a sequence ldx/txa/branch and remove the txa if A is not
- * used later.
- */
+** used later.
+*/
 
 unsigned OptCmp8 (CodeSeg* S);
 /* Check for register compares where the contents of the register and therefore
- * the result of the compare is known.
- */
+** the result of the compare is known.
+*/
 
 unsigned OptCmp9 (CodeSeg* S);
 /* Search for the sequence
- *
- *    sbc       xx
- *    bvs/bvc   L
- *    eor       #$80
- * L: asl       a
- *    bcc/bcs   somewhere
- *
- * If A is not used later (which should be the case), we can branch on the N
- * flag instead of the carry flag and remove the asl.
- */
+**
+**    sbc       xx
+**    bvs/bvc   L
+**    eor       #$80
+** L: asl       a
+**    bcc/bcs   somewhere
+**
+** If A is not used later (which should be the case), we can branch on the N
+** flag instead of the carry flag and remove the asl.
+*/
 
 
 
 /* End of coptcmp.h */
 
 #endif
-
-
-

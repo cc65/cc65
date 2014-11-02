@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2001-2006, Ullrich von Bassewitz                                      */
-/*                Römerstrasse 52                                            */
+/*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
 /*                                                                           */
@@ -51,43 +51,40 @@
 
 unsigned OptSub1 (CodeSeg* S);
 /* Search for the sequence
- *
- *      sbc     ...
- *      bcs     L
- *      dex
- * L:
- *
- * and remove the handling of the high byte if X is not used later.
- */
+**
+**      sbc     ...
+**      bcs     L
+**      dex
+** L:
+**
+** and remove the handling of the high byte if X is not used later.
+*/
 
 unsigned OptSub2 (CodeSeg* S);
 /* Search for the sequence
- *
- *      lda     xx
- *      sec
- *      sta     tmp1
- *      lda     yy
- *      sbc     tmp1
- *      sta     yy
- *
- * and replace it by
- *
- *      sec
- *      lda     yy
- *      sbc     xx
- *      sta     yy
- */
+**
+**      lda     xx
+**      sec
+**      sta     tmp1
+**      lda     yy
+**      sbc     tmp1
+**      sta     yy
+**
+** and replace it by
+**
+**      sec
+**      lda     yy
+**      sbc     xx
+**      sta     yy
+*/
 
 unsigned OptSub3 (CodeSeg* S);
 /* Search for a call to decaxn and replace it by an 8 bit sub if the X register
- * is not used later.
- */
+** is not used later.
+*/
 
 
 
 /* End of coptsub.h */
 
 #endif
-
-
-

@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2001-2004 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -451,8 +451,8 @@ const OPCDesc OPCTable[OP65_COUNT] = {
         OF_SETF | OF_NOIMP                      /* flags */
     },
     /* Mark RTI as "uses all registers but doesn't change them", so the
-     * optimizer won't remove preceeding loads.
-     */
+    ** optimizer won't remove preceeding loads.
+    */
     {   OP65_RTI,                               /* opcode */
         "rti",                                  /* mnemonic */
         1,                                      /* size */
@@ -599,15 +599,15 @@ static int FindCmp (const void* Key, const void* Desc)
 
 const OPCDesc* FindOP65 (const char* M)
 /* Find the given opcode and return the opcode number. If the opcode was not
- * found, return NULL.
- */
+** found, return NULL.
+*/
 {
     unsigned I;
     unsigned Len;
 
     /* Check the length of the given string, then copy it into local
-     * storage, converting it to upper case.
-     */
+    ** storage, converting it to upper case.
+    */
     char Mnemo[sizeof (OPCTable[0].Mnemo)];
     Len = strlen (M);
     if (Len >= sizeof (OPCTable[0].Mnemo)) {
@@ -658,8 +658,8 @@ unsigned GetInsnSize (opc_t OPC, am_t AM)
 
 unsigned char GetAMUseInfo (am_t AM)
 /* Get usage info for the given addressing mode (addressing modes that use
- * index registers return REG_r info for these registers).
- */
+** index registers return REG_r info for these registers).
+*/
 {
     /* Check the addressing mode. */
     switch (AM) {
@@ -705,8 +705,8 @@ opc_t GetInverseBranch (opc_t OPC)
 
 opc_t MakeShortBranch (opc_t OPC)
 /* Return the short version of the given branch. If the branch is already
- * a short branch, return the opcode unchanged.
- */
+** a short branch, return the opcode unchanged.
+*/
 {
     switch (OPC) {
         case OP65_BCC:
@@ -737,8 +737,8 @@ opc_t MakeShortBranch (opc_t OPC)
 
 opc_t MakeLongBranch (opc_t OPC)
 /* Return the long version of the given branch. If the branch is already
- * a long branch, return the opcode unchanged.
- */
+** a long branch, return the opcode unchanged.
+*/
 {
     switch (OPC) {
         case OP65_BCC:
@@ -812,7 +812,3 @@ bc_t GetInverseCond (bc_t BC)
             return 0;
     }
 }
-
-
-
-

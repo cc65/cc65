@@ -9,6 +9,12 @@
         .import         popa, _gotoxy, cputdirect, setcursor
         .importzp       tmp1
 
+.ifdef __ATARI5200__
+CHRCODE =       14
+.else
+CHRCODE =       $12+64
+.endif
+
 _chlinexy:
         pha                     ; Save the length
         jsr     popa            ; Get y
@@ -19,12 +25,8 @@ _chline:
         cmp     #0              ; Is the length zero?
         beq     L9              ; Jump if done
         sta     tmp1
-L1:     lda     #$12+64         ; Horizontal line, screen code
+L1:     lda     #CHRCODE        ; Horizontal line, screen code
         jsr     cputdirect      ; Direct output
         dec     tmp1
         bne     L1
 L9:     jmp     setcursor
-
-
-
-

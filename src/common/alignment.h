@@ -50,13 +50,13 @@
 
 
 /* Maximum possible alignment. Beware: To increase the possible alignment it
- * is not enough to bump this value. Check the code inside.
- */
+** is not enough to bump this value. Check the code inside.
+*/
 #define MAX_ALIGNMENT   0x10000UL
 
 /* The following value marks what is considered a "large alignment" and worth
- * a warning if not suppressed.
- */
+** a warning if not suppressed.
+*/
 #define LARGE_ALIGNMENT 0x101UL
 
 
@@ -69,8 +69,8 @@
 
 unsigned long LeastCommonMultiple (unsigned long Left, unsigned long Right);
 /* Calculate the least common multiple of two numbers and return
- * the result.
- */
+** the result.
+*/
 
 unsigned long AlignAddr (unsigned long Addr, unsigned long Alignment);
 /* Align an address to the given alignment */
@@ -83,6 +83,3 @@ unsigned long AlignCount (unsigned long Addr, unsigned long Alignment);
 /* End of alignment.h */
 
 #endif
-
-
-

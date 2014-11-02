@@ -82,6 +82,3 @@ int spawnvp (int Mode attribute ((unused)),
     /* Return the result */
     return Status;
 }
-
-
-

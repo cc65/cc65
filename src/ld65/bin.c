@@ -106,8 +106,8 @@ static unsigned BinWriteExpr (ExprNode* E, int Signed, unsigned Size,
                               unsigned long Offs attribute ((unused)),
                               void* Data)
 /* Called from SegWrite for an expression. Evaluate the expression, check the
- * range and write the expression value to the file.
- */
+** range and write the expression value to the file.
+*/
 {
     /* There's a predefined function to handle constant expressions */
     return SegWriteConstExpr (((BinDesc*)Data)->F, E, Signed, Size);
@@ -170,23 +170,23 @@ static void BinWriteMem (BinDesc* D, MemoryArea* M)
         PrintNumVal  ("FileOffs", (unsigned long) ftell (D->F));
 
         /* Check if the alignment for the segment from the linker config is
-         * a multiple for that of the segment.
-         */
+        ** a multiple for that of the segment.
+        */
         if ((S->RunAlignment % S->Seg->Alignment) != 0) {
             /* Segment requires another alignment than configured
-             * in the linker.
-             */
+            ** in the linker.
+            */
             Warning ("Segment `%s' is not aligned properly. Resulting "
                      "executable may not be functional.",
                      GetString (S->Name));
         }
 
         /* If this is the run memory area, we must apply run alignment. If
-         * this is not the run memory area but the load memory area (which
-         * means that both are different), we must apply load alignment.
-         * Beware: DoWrite may be true even if this is the run memory area,
-         * because it may be also the load memory area.
-         */
+        ** this is not the run memory area but the load memory area (which
+        ** means that both are different), we must apply load alignment.
+        ** Beware: DoWrite may be true even if this is the run memory area,
+        ** because it may be also the load memory area.
+        */
         if (S->Run == M) {
 
             /* Handle ALIGN and OFFSET/START */
@@ -227,8 +227,8 @@ static void BinWriteMem (BinDesc* D, MemoryArea* M)
         }
 
         /* Now write the segment to disk if it is not a BSS type segment and
-         * if the memory area is the load area.
-         */
+        ** if the memory area is the load area.
+        */
         if (DoWrite) {
             unsigned long P = ftell (D->F);
             SegWrite (D->Filename, D->F, S->Seg, BinWriteExpr, D);
@@ -263,9 +263,9 @@ static int BinUnresolved (unsigned Name attribute ((unused)), void* D)
 /* Called if an unresolved symbol is encountered */
 {
     /* Unresolved symbols are an error in binary format. Bump the counter
-     * and return zero telling the caller that the symbol is indeed
-     * unresolved.
-     */
+    ** and return zero telling the caller that the symbol is indeed
+    ** unresolved.
+    */
     ((BinDesc*) D)->Undef++;
     return 0;
 }
@@ -281,8 +281,8 @@ void BinWriteTarget (BinDesc* D, struct File* F)
     D->Filename = GetString (F->Name);
 
     /* Check for unresolved symbols. The function BinUnresolved is called
-     * if we get an unresolved symbol.
-     */
+    ** if we get an unresolved symbol.
+    */
     D->Undef = 0;               /* Reset the counter */
     CheckUnresolvedImports (BinUnresolved, D);
     if (D->Undef > 0) {
@@ -316,8 +316,3 @@ void BinWriteTarget (BinDesc* D, struct File* F)
     D->F        = 0;
     D->Filename = 0;
 }
-
-
-
-
-

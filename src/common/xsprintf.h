@@ -34,14 +34,14 @@
 
 
 /* We need a way to output a StrBuf, but on the other side, we don't want to 
- * switch off gcc's printf format string checking. So we cheat as follows: 
- * %m (which is a gcc extension and doesn't take an argument) switches %p 
- * between outputting a pointer and a string buf. This works just one time,
- * so each StrBuf needs in fact a %m%p spec. There's no way to apply a width
- * and precision to such a StrBuf, but *not* using %p would bring up a warning
- * about a wrong argument type each time. Maybe gcc will one day allow custom
- * format specifiers and we can change this ...
- */
+** switch off gcc's printf format string checking. So we cheat as follows: 
+** %m (which is a gcc extension and doesn't take an argument) switches %p 
+** between outputting a pointer and a string buf. This works just one time,
+** so each StrBuf needs in fact a %m%p spec. There's no way to apply a width
+** and precision to such a StrBuf, but *not* using %p would bring up a warning
+** about a wrong argument type each time. Maybe gcc will one day allow custom
+** format specifiers and we can change this ...
+*/
 
 
 
@@ -66,14 +66,14 @@
 int xvsnprintf (char* Buf, size_t Size, const char* Format, va_list ap)
         attribute ((format (printf, 3, 0)));
 /* A basic vsnprintf implementation. Does currently only support integer
- * formats.
- */
+** formats.
+*/
 
 int xsnprintf (char* Buf, size_t Size, const char* Format, ...)
         attribute ((format (printf, 3, 4)));
 /* A basic snprintf implementation. Does currently only support integer
- * formats.
- */
+** formats.
+*/
 
 int xsprintf (char* Buf, size_t BufSize, const char* Format, ...)
         attribute ((format (printf, 3, 4)));
@@ -88,7 +88,3 @@ int xvsprintf (char* Buf, size_t BufSize, const char* Format, va_list ap)
 /* End of xsprintf.h */
 
 #endif
-
-
-
-

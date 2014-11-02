@@ -51,23 +51,23 @@
 
 unsigned OptBNegA1 (CodeSeg* S);
 /* Check for
- *
- *      ldx     #$00
- *      lda     ..
- *      jsr     bnega
- *
- * Remove the ldx if the lda does not use it.
- */
+**
+**      ldx     #$00
+**      lda     ..
+**      jsr     bnega
+**
+** Remove the ldx if the lda does not use it.
+*/
 
 unsigned OptBNegA2 (CodeSeg* S);
 /* Check for
- *
- *      lda     ..
- *      jsr     bnega
- *      jeq/jne ..
- *
- * Adjust the conditional branch and remove the call to the subroutine.
- */
+**
+**      lda     ..
+**      jsr     bnega
+**      jeq/jne ..
+**
+** Adjust the conditional branch and remove the call to the subroutine.
+*/
 
 
 
@@ -79,56 +79,56 @@ unsigned OptBNegA2 (CodeSeg* S);
 
 unsigned OptBNegAX1 (CodeSeg* S);
 /* On a call to bnegax, if X is zero, the result depends only on the value in
- * A, so change the call to a call to bnega. This will get further optimized
- * later if possible.
- */
+** A, so change the call to a call to bnega. This will get further optimized
+** later if possible.
+*/
 
 unsigned OptBNegAX2 (CodeSeg* S);
 /* Search for the sequence:
- *
- *      lda     (xx),y
- *      tax
- *      dey
- *      lda     (xx),y
- *      jsr     bnegax
- *      jne/jeq ...
- *
- * and replace it by
- *
- *      lda     (xx),y
- *      dey
- *      ora     (xx),y
- *      jeq/jne ...
- */
+**
+**      lda     (xx),y
+**      tax
+**      dey
+**      lda     (xx),y
+**      jsr     bnegax
+**      jne/jeq ...
+**
+** and replace it by
+**
+**      lda     (xx),y
+**      dey
+**      ora     (xx),y
+**      jeq/jne ...
+*/
 
 unsigned OptBNegAX3 (CodeSeg* S);
 /* Search for the sequence:
- *
- *      lda     xx
- *      ldx     yy
- *      jsr     bnegax
- *      jne/jeq ...
- *
- * and replace it by
- *
- *      lda     xx
- *      ora     xx+1
- *      jeq/jne ...
- */
+**
+**      lda     xx
+**      ldx     yy
+**      jsr     bnegax
+**      jne/jeq ...
+**
+** and replace it by
+**
+**      lda     xx
+**      ora     xx+1
+**      jeq/jne ...
+*/
 
 unsigned OptBNegAX4 (CodeSeg* S);
 /* Search for the sequence:
- *
- *      jsr     xxx
- *      jsr     bnega(x)
- *      jeq/jne ...
- *
- * and replace it by:
- *
- *      jsr     xxx
- *      <boolean test>
- *      jne/jeq ...
- */
+**
+**      jsr     xxx
+**      jsr     bnega(x)
+**      jeq/jne ...
+**
+** and replace it by:
+**
+**      jsr     xxx
+**      <boolean test>
+**      jne/jeq ...
+*/
 
 
 
@@ -140,27 +140,27 @@ unsigned OptBNegAX4 (CodeSeg* S);
 
 unsigned OptNegAX1 (CodeSeg* S);
 /* Search for a call to negax and replace it by
- *
- *      eor     #$FF
- *      clc
- *      adc     #$01
- *
- * if X isn't used later.
- */
+**
+**      eor     #$FF
+**      clc
+**      adc     #$01
+**
+** if X isn't used later.
+*/
 
 unsigned OptNegAX2 (CodeSeg* S);
 /* Search for a call to negax and replace it by
- *
- *      ldx     #$FF
- *      eor     #$FF
- *      clc
- *      adc     #$01
- *      bne     L1
- *      inx
- * L1:
- *
- * if X is known and zero on entry.
- */
+**
+**      ldx     #$FF
+**      eor     #$FF
+**      clc
+**      adc     #$01
+**      bne     L1
+**      inx
+** L1:
+**
+** if X is known and zero on entry.
+*/
 
 
 
@@ -172,17 +172,14 @@ unsigned OptNegAX2 (CodeSeg* S);
 
 unsigned OptComplAX1 (CodeSeg* S);
 /* Search for a call to complax and replace it by
- *
- *      eor     #$FF
- *
- * if X isn't used later.
- */
+**
+**      eor     #$FF
+**
+** if X isn't used later.
+*/
 
 
 
 /* End of coptneg.h */
 
 #endif
-
-
-

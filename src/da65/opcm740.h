@@ -55,7 +55,5 @@ extern const OpcDesc OpcTable_M740[256];
 
 
 /* End of opcm740.h */
+
 #endif
-
-
-

@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2006      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -59,40 +59,40 @@ void AddUnnamedLabel (unsigned Addr);
 
 void AddDepLabel (unsigned Addr, attr_t Attr, const char* BaseName, unsigned Offs);
 /* Add a dependent label at the given address using "base name+Offs" as the new
- * name.
- */
+** name.
+*/
 
 void AddIntLabelRange (unsigned Addr, const char* Name, unsigned Count);
 /* Add an internal label for a range. The first entry gets the label "Name"
- * while the others get "Name+offs".
- */
+** while the others get "Name+offs".
+*/
 
 void AddExtLabelRange (unsigned Addr, const char* Name, unsigned Count);
 /* Add an external label for a range. The first entry gets the label "Name"
- * while the others get "Name+offs".
- */
+** while the others get "Name+offs".
+*/
 
 int HaveLabel (unsigned Addr);
 /* Check if there is a label for the given address */
 
 int MustDefLabel (unsigned Addr);
 /* Return true if we must define a label for this address, that is, if there
- * is a label at this address, and it is an external or internal label.
- */
+** is a label at this address, and it is an external or internal label.
+*/
 
 const char* GetLabelName (unsigned Addr);
 /* Return the label name for an address */
 
 const char* GetLabel (unsigned Addr, unsigned RefFrom);
 /* Return the label name for an address, as it is used in a label reference.
- * RefFrom is the address the label is referenced from. This is needed in case
- * of unnamed labels, to determine the name.
- */
+** RefFrom is the address the label is referenced from. This is needed in case
+** of unnamed labels, to determine the name.
+*/
 
 void ForwardLabel (unsigned Offs);
 /* If necessary, output a forward label, one that is within the next few
- * bytes and is therefore output as "label = * + x".
- */
+** bytes and is therefore output as "label = * + x".
+*/
 
 void DefOutOfRangeLabels (void);
 /* Output any labels that are out of the loaded code range */
@@ -100,7 +100,5 @@ void DefOutOfRangeLabels (void);
 
 
 /* End of labels.h */
+
 #endif
-
-
-

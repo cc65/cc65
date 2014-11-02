@@ -116,8 +116,8 @@ set:    sta     joy_vectors,x
 ;----------------------------------------------------------------------------
 ; unsigned char joy_uninstall (void);
 ; /* Uninstall the currently loaded driver. Note: This call does not free
-;  * allocated memory.
-;  */
+; ** allocated memory.
+; */
 
 _joy_uninstall:
         lda     #$60                    ; RTS opcode

@@ -75,18 +75,18 @@ void Assignment (ExprDesc* Expr)
     NextToken ();
 
     /* cc65 does not have full support for handling structs by value. Since
-     * assigning structs is one of the more useful operations from this
-     * family, allow it here.
-     */
+    ** assigning structs is one of the more useful operations from this
+    ** family, allow it here.
+    */
     if (IsClassStruct (ltype)) {
 
         /* Get the size of the left hand side. */
         unsigned Size = SizeOf (ltype);
 
         /* If the size is that of a basic type (char, int, long), we will copy
-         * the struct using the primary register, otherwise we use memcpy. In
-         * the former case, push the address only if really needed.
-         */
+        ** the struct using the primary register, otherwise we use memcpy. In
+        ** the former case, push the address only if really needed.
+        */
         int UseReg = 1;
         Type* stype;
         switch (Size) {
@@ -143,10 +143,10 @@ void Assignment (ExprDesc* Expr)
         } else {
 
             /* We have an rvalue. This can only happen if a function returns
-             * a struct, since there is no other way to generate an expression
-             * that as a struct as an rvalue result. We allow only 1, 2, and 4
-             * byte sized structs and do direct assignment.
-             */
+            ** a struct, since there is no other way to generate an expression
+            ** that has a struct as an rvalue result. We allow only 1, 2, and 4
+            ** byte sized structs, and do direct assignment.
+            */
             if (UseReg) {
                 /* Do the store */
                 Store (Expr, stype);
@@ -168,8 +168,8 @@ void Assignment (ExprDesc* Expr)
         unsigned Flags;
 
         /* If the bit-field fits within one byte, do the following operations
-         * with bytes.
-         */
+        ** with bytes.
+        */
         if (Expr->BitOffs / CHAR_BITS == (Expr->BitOffs + Expr->BitWidth - 1) / CHAR_BITS) {
             Expr->Type = type_uchar;
         }
@@ -197,14 +197,14 @@ void Assignment (ExprDesc* Expr)
         MarkedExprWithCheck (hie1, &Expr2);
 
         /* Do type conversion if necessary. Beware: Do not use char type
-         * here!
-         */
+        ** here!
+        */
         TypeConversion (&Expr2, ltype);
 
         /* Special treatment if the value is constant. */
         /* Beware: Expr2 may contain side effects, so there must not be
-         * code generated for Expr2.
-         */
+        ** code generated for Expr2.
+        */
         if (ED_IsConstAbsInt (&Expr2) && ED_CodeRangeIsEmpty (&Expr2)) {
 
             /* Get the value and apply the mask */
@@ -214,8 +214,8 @@ void Assignment (ExprDesc* Expr)
             RemoveCode (&PushPos);
 
             /* If the value is equal to the mask now, all bits are one, and we
-             * can remove the mask operation from above.
-             */
+            ** can remove the mask operation from above.
+            */
             if (Val == Mask) {
                 RemoveCode (&AndPos);
             }
@@ -266,6 +266,3 @@ void Assignment (ExprDesc* Expr)
     /* Value is still in primary and not an lvalue */
     ED_MakeRValExpr (Expr);
 }
-
-
-

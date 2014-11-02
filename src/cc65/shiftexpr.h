@@ -34,7 +34,7 @@
 
 
 #ifndef SHIFTEXPR_H
-#define SHIFTEXPT_H
+#define SHIFTEXPR_H
 
 
 
@@ -68,7 +68,3 @@ void ShiftExpr (struct ExprDesc* Expr);
 /* End of shiftexpr.h */
 
 #endif
-
-
-
-

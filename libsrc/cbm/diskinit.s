@@ -21,7 +21,7 @@
         tax
         jsr     isdisk
         bcc     open
-        lda     #9              ; "Ilegal device"
+        lda     #9              ; "Illegal device"
         rts
 
 ; Open channel

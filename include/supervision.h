@@ -98,9 +98,9 @@ struct __sv_dma {
 
 
 /* Counters incremented asynchronously!
- * If you want more complex, copy the crt0.s file from the libsrc/supervision
- * directory and code them yourself (in assembler)
- */
+** If you want more complex, copy the crt0.s file from the libsrc/supervision
+** directory and code them yourself (in assembler)
+*/
 extern unsigned char sv_nmi_counter;
 extern unsigned char sv_timer_irq_counter;
 extern unsigned char sv_timer_dma_counter;

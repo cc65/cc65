@@ -128,19 +128,19 @@ typedef enum {
 
 void GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg);
 /* For the given function, lookup register information and store it into
- * the given variables. If the function is unknown, assume it will use and
- * load all registers.
- */
+** the given variables. If the function is unknown, assume it will use and
+** load all registers.
+*/
 
 const ZPInfo* GetZPInfo (const char* Name);
 /* If the given name is a zero page symbol, return a pointer to the info
- * struct for this symbol, otherwise return NULL.
- */
+** struct for this symbol, otherwise return NULL.
+*/
 
 unsigned GetRegInfo (struct CodeSeg* S, unsigned Index, unsigned Wanted);
 /* Determine register usage information for the instructions starting at the
- * given index.
- */
+** given index.
+*/
 
 int RegAUsed (struct CodeSeg* S, unsigned Index);
 /* Check if the value in A is used. */
@@ -159,26 +159,23 @@ int RegEAXUsed (struct CodeSeg* S, unsigned Index);
 
 unsigned GetKnownReg (unsigned Use, const struct RegContents* RC);
 /* Return the register or zero page location from the set in Use, thats
- * contents are known. If Use does not contain any register, or if the
- * register in question does not have a known value, return REG_NONE.
- */
+** contents are known. If Use does not contain any register, or if the
+** register in question does not have a known value, return REG_NONE.
+*/
 
 cmp_t FindBoolCmpCond (const char* Name);
 /* Check if the given string is the name of one of the boolean transformer
- * subroutine, and if so, return the condition that is evaluated by this
- * routine. Return CMP_INV if the condition is not recognised.
- */
+** subroutine, and if so, return the condition that is evaluated by this
+** routine. Return CMP_INV if the condition is not recognised.
+*/
 
 cmp_t FindTosCmpCond (const char* Name);
 /* Check if this is a call to one of the TOS compare functions (tosgtax).
- * Return the condition code or CMP_INV on failure.
- */
+** Return the condition code or CMP_INV on failure.
+*/
 
 
 
 /* End of codeinfo.h */
+
 #endif
-
-
-
-

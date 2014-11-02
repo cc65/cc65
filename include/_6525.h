@@ -39,9 +39,9 @@
 
 
 /* Define a structure with the 6525 register offsets. The shadow registers
- * (if port C is unused) are currently not implemented, we would need a
- * union to do that, however that would introduce an additional name.
- */
+** (if port C is unused) are currently not implemented, we would need a
+** union to do that, however that would introduce an additional name.
+*/
 struct __6525 {
     unsigned char       pra;            /* Port register A */
     unsigned char       prb;            /* Port register B */

@@ -69,6 +69,3 @@ const char* ZeropageLabel   = 0;                /* Label for the zeropage segmen
 /* Flags */
 unsigned char DebugInfo     = 0;                /* Enable debug info */
 unsigned char NoOutput      = 0;                /* Suppress the actual conversion */
-
-
-

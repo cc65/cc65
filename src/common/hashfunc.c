@@ -46,10 +46,10 @@
 
 unsigned HashInt (unsigned V)
 /* Return a hash value for the given integer. The function uses Robert
- * Jenkins' 32 bit integer hash function taken from
- *     http://www.concentric.net/~ttwang/tech/inthash.htm
- * For 16 bit integers, the function may be suboptimal.
- */
+** Jenkins' 32 bit integer hash function taken from
+**     http://www.concentric.net/~ttwang/tech/inthash.htm
+** For 16 bit integers, the function may be suboptimal.
+*/
 {
    V = (V + 0x7ed55d16) + (V << 12);
    V = (V ^ 0xc761c23c) ^ (V >> 19);
@@ -89,6 +89,3 @@ unsigned HashBuf (const StrBuf* S)
     }
     return H;
 }
-
-
-

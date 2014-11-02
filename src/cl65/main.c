@@ -34,15 +34,27 @@
 
 
 /* Check out if we have a spawn() function on the system, or if we must use
- * our own.
- */
-#if defined(__WATCOMC__) || defined(_MSC_VER) || defined(__MINGW32__) || defined(__DJGPP__)
-#  define HAVE_SPAWN    1
+** our own.
+*/
+#if defined(_WIN32)
+#  define HAVE_SPAWN 1
 #else
-#  define NEED_SPAWN   1
+#  define NEED_SPAWN 1
 #endif
-#if defined(_MSC_VER)
-#  pragma warning(disable : 4996)
+
+/* GCC strictly follows http://c-faq.com/ansi/constmismatch.html and issues an
+** 'incompatible pointer type' warning - that can't be suppressed via #pragma.
+** The spawnvp() prototype of MinGW (http://www.mingw.org/) differs from the
+** one of MinGW-w64 (http://mingw-w64.sourceforge.net/) regarding constness.
+** So there's no alternative to actually distinguish these environments :-(
+*/
+#define SPAWN_ARGV_CONST_CAST
+#if defined(__MINGW32__)
+#  include <_mingw.h>
+#  if !defined(__MINGW64_VERSION_MAJOR)
+#    undef  SPAWN_ARGV_CONST_CAST
+#    define SPAWN_ARGV_CONST_CAST (const char* const *)
+#  endif
 #endif
 
 
@@ -51,7 +63,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
-#ifdef HAVE_SPAWN
+#if defined(HAVE_SPAWN)
 #  include <process.h>
 #endif
 
@@ -110,8 +122,8 @@ static const char* OutputName = 0;
 static const char* LinkerConfig = 0;
 
 /* The name of the first input file. This will be used to construct the
- * executable file name if no explicit name is given.
- */
+** executable file name if no explicit name is given.
+*/
 static const char* FirstInput = 0;
 
 /* The names of the files for dependency generation */
@@ -214,8 +226,8 @@ static void CmdAddArgList (CmdDesc* Cmd, const char* ArgList)
             ++Cmd->ArgCount;
 
             /* If the argument was terminated by a comma, skip it, otherwise
-             * we're done.
-             */
+            ** we're done.
+            */
             if (*P == ',') {
                 /* Start over at next char */
                 Arg = ++P;
@@ -258,10 +270,10 @@ static void CmdAddFile (CmdDesc* Cmd, const char* File)
     }
 
     /* If the file name is not NULL (which is legal and is used to terminate
-     * the file list), check if the file name does already exist in the file
-     * list and print a warning if so. Regardless of the search result, add
-     * the file.
-     */
+    ** the file list), check if the file name does already exist in the file
+    ** list and print a warning if so. Regardless of the search result, add
+    ** the file.
+    */
     if (File) {
         unsigned I;
         for (I = 0; I < Cmd->FileCount; ++I) {
@@ -375,7 +387,7 @@ static void ExecProgram (CmdDesc* Cmd)
     }
 
     /* Call the program */
-    Status = spawnvp (P_WAIT, Cmd->Name, Cmd->Args);
+    Status = spawnvp (P_WAIT, Cmd->Name, SPAWN_ARGV_CONST_CAST Cmd->Args);
 
     /* Check the result code */
     if (Status < 0) {
@@ -395,9 +407,9 @@ static void Link (void)
     unsigned I;
 
     /* Since linking is always the final step, if we have an output file name
-     * given, set it here. If we don't have an explicit output name given,
-     * try to build one from the name of the first input file.
-     */
+    ** given, set it here. If we don't have an explicit output name given,
+    ** try to build one from the name of the first input file.
+    */
     if (OutputName) {
 
         CmdSetOutput (&LD65, OutputName);
@@ -412,8 +424,8 @@ static void Link (void)
     }
 
     /* If we have a linker config file given, add it to the command line.
-     * Otherwise pass the target to the linker if we have one.
-     */
+    ** Otherwise pass the target to the linker if we have one.
+    */
     if (LinkerConfig) {
         if (Module) {
             Error ("Cannot use -C and --module together");
@@ -449,9 +461,9 @@ static void Link (void)
 
 static void AssembleFile (const char* File, unsigned ArgCount)
 /* Common routine to assemble a file. Will be called by Assemble() and
- * AssembleIntermediate(). Adds options common for both routines and
- * assembles the file. Will remove excess arguments after assembly.
- */
+** AssembleIntermediate(). Adds options common for both routines and
+** assembles the file. Will remove excess arguments after assembly.
+*/
 {
     /* Set the target system */
     CmdSetTarget (&CA65, Target);
@@ -459,9 +471,9 @@ static void AssembleFile (const char* File, unsigned ArgCount)
     /* Check if this is the last processing step */
     if (DoLink) {
         /* We're linking later. Add the output file of the assembly
-         * the the file list of the linker. The name of the output
-         * file is that of the input file with ".s" replaced by ".o".
-         */
+        ** the the file list of the linker. The name of the output
+        ** file is that of the input file with ".s" replaced by ".o".
+        */
         char* ObjName = MakeFilename (File, ".o");
         CmdAddFile (&LD65, ObjName);
         xfree (ObjName);
@@ -489,13 +501,13 @@ static void AssembleFile (const char* File, unsigned ArgCount)
 
 static void AssembleIntermediate (const char* SourceFile)
 /* Assemble an intermediate file which was generated by a previous processing
- * step with SourceFile as input. The -dep options won't be added and
- * the intermediate assembler file is removed after assembly.
- */
+** step with SourceFile as input. The -dep options won't be added and
+** the intermediate assembler file is removed after assembly.
+*/
 {
     /* Generate the name of the assembler output file from the source file
-     * name. It's the same name with the extension replaced by ".s"
-     */
+    ** name. It's the same name with the extension replaced by ".s"
+    */
     char* AsmName = MakeFilename (SourceFile, ".s");
 
     /* Assemble the intermediate assembler file */
@@ -520,9 +532,9 @@ static void Assemble (const char* File)
     unsigned ArgCount = CA65.ArgCount;
 
     /* We aren't assembling an intermediate file, but one requested by the
-     * user. So add a few options here if they were given on the command
-     * line.
-     */
+    ** user. So add a few options here if they were given on the command
+    ** line.
+    */
     if (DepName && *DepName) {
         CmdAddArg2 (&CA65, "--create-dep", DepName);
     }
@@ -548,10 +560,10 @@ static void Compile (const char* File)
     /* Check if this is the final step */
     if (DoAssemble) {
         /* We will assemble this file later. If a dependency file is to be
-         * generated, set the dependency target to be the final object file,
-         * not the intermediate assembler file. But beware: There may be an
-         * output name specified for the assembler.
-         */
+        ** generated, set the dependency target to be the final object file,
+        ** not the intermediate assembler file. But beware: There may be an
+        ** output name specified for the assembler.
+        */
         if (DepName || FullDepName) {
             /* Was an output name for the assembler specified? */
             if (!DoLink && OutputName) {
@@ -566,8 +578,8 @@ static void Compile (const char* File)
         }
     } else {
         /* If we won't assemble, this is the final step. In this case, set
-         * the output name if it was given.
-         */
+        ** the output name if it was given.
+        */
         if (OutputName) {
             CmdSetOutput (&CC65, OutputName);
         }
@@ -586,8 +598,8 @@ static void Compile (const char* File)
     CmdDelArgs (&CC65, ArgCount);
 
     /* If this is not the final step, assemble the generated file, then
-     * remove it
-     */
+    ** remove it
+    */
     if (DoAssemble) {
         /* Assemble the intermediate file and remove it */
         AssembleIntermediate (File);
@@ -603,8 +615,8 @@ static void CompileRes (const char* File)
     unsigned ArgCount = GRC.ArgCount;
 
     /* Resource files need an geos-apple or geos-cbm target but this
-     * is checked within grc65.
-     */
+    ** is checked within grc65.
+    */
     CmdSetTarget (&GRC, Target);
 
     /* Add the file as argument for the resource compiler */
@@ -620,8 +632,8 @@ static void CompileRes (const char* File)
     CmdDelArgs (&GRC, ArgCount);
 
     /* If this is not the final step, assemble the generated file, then
-     * remove it
-     */
+    ** remove it
+    */
     if (DoAssemble) {
         /* Assemble the intermediate file and remove it */
         AssembleIntermediate (File);
@@ -637,8 +649,8 @@ static void ConvertO65 (const char* File)
     unsigned ArgCount = CO65.ArgCount;
 
     /* If we won't assemble, this is the final step. In this case, set the
-     * output name.
-     */
+    ** output name.
+    */
     if (!DoAssemble && OutputName) {
         CmdSetOutput (&CO65, OutputName);
     }
@@ -656,8 +668,8 @@ static void ConvertO65 (const char* File)
     CmdDelArgs (&CO65, ArgCount);
 
     /* If this is not the final step, assemble the generated file, then
-     * remove it
-     */
+    ** remove it
+    */
     if (DoAssemble) {
         /* Assemble the intermediate file and remove it */
         AssembleIntermediate (File);
@@ -1526,6 +1538,3 @@ int main (int argc, char* argv [])
     /* Return an apropriate exit code */
     return EXIT_SUCCESS;
 }
-
-
-

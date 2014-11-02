@@ -96,10 +96,10 @@ void DumpAttrColl (const Collection* C)
 
 int FindAttr (const Collection* C, const char* Name, unsigned* Index)
 /* Search for an attribute with the given name in the collection. If it is
- * found, the function returns true and Index contains the index of the
- * entry. If Name isn't found, the function returns false and Index
- * will contain the insert position.
- */
+** found, the function returns true and Index contains the index of the
+** entry. If Name isn't found, the function returns false and Index
+** will contain the insert position.
+*/
 {
     /* Do a binary search */
     int Lo = 0;
@@ -136,8 +136,8 @@ int FindAttr (const Collection* C, const char* Name, unsigned* Index)
 
 const Attr* GetAttr (const Collection* C, const char* Name)
 /* Search for an attribute with the given name and return it. The function
- * returns NULL if the attribute wasn't found.
- */
+** returns NULL if the attribute wasn't found.
+*/
 {
     /* Search for the attribute and return it */
     unsigned Index;
@@ -153,9 +153,9 @@ const Attr* GetAttr (const Collection* C, const char* Name)
 
 const Attr* NeedAttr (const Collection* C, const char* Name, const char* Op)
 /* Search for an attribute with the given name and return it. If the attribute
- * is not found, the function terminates with an error using Op as additional
- * context in the error message.
- */
+** is not found, the function terminates with an error using Op as additional
+** context in the error message.
+*/
 {
     /* Search for the attribute and return it */
     unsigned Index;
@@ -169,8 +169,8 @@ const Attr* NeedAttr (const Collection* C, const char* Name, const char* Op)
 
 const char* GetAttrVal (const Collection* C, const char* Name)
 /* Search for an attribute with the given name and return its value. The
- * function returns NULL if the attribute wasn't found.
- */
+** function returns NULL if the attribute wasn't found.
+*/
 {
     const Attr* A = GetAttr (C, Name);
     return (A == 0)? 0 : A->Value;
@@ -180,9 +180,9 @@ const char* GetAttrVal (const Collection* C, const char* Name)
 
 const char* NeedAttrVal (const Collection* C, const char* Name, const char* Op)
 /* Search for an attribute with the given name and return its value. If the
- * attribute wasn't not found, the function terminates with an error using
- * Op as additional context in the error message.
- */
+** attribute wasn't not found, the function terminates with an error using
+** Op as additional context in the error message.
+*/
 {
     const Attr* A = NeedAttr (C, Name, Op);
     return (A == 0)? 0 : A->Value;
@@ -197,8 +197,8 @@ void AddAttr (Collection* C, const char* Name, const char* Value)
     Attr* A = NewAttr (Name, Value);
 
     /* Search for the attribute. If it is there, we have a duplicate, otherwise
-     * we have the insert position.
-     */
+    ** we have the insert position.
+    */
     unsigned Index;
     if (FindAttr (C, Name, &Index)) {
         Error ("Duplicate command line attribute `%s'", Name);
@@ -212,9 +212,9 @@ void AddAttr (Collection* C, const char* Name, const char* Value)
 
 void SplitAddAttr (Collection* C, const char* Combined, const char* Name)
 /* Split a combined name/value pair and add it as an attribute to C. Some
- * attributes may not need a name. If the name is missing, use Name. If
- * Name is NULL, terminate with an error.
- */
+** attributes may not need a name. If the name is missing, use Name. If
+** Name is NULL, terminate with an error.
+*/
 {
     /* Name and value are separated by an equal sign */
     const char* Pos = strchr (Combined, '=');
@@ -242,10 +242,10 @@ void SplitAddAttr (Collection* C, const char* Combined, const char* Name)
 
 Collection* ParseAttrList (const char* List, const char** NameList, unsigned NameCount)
 /* Parse a list containing name/value pairs into a sorted collection. Some
- * attributes may not need a name, so NameList contains these names. If there
- * were no errors, the function returns a alphabetically sorted collection
- * containing Attr entries.
- */
+** attributes may not need a name, so NameList contains these names. If there
+** were no errors, the function returns a alphabetically sorted collection
+** containing Attr entries.
+*/
 {
     const char* Name;
 
@@ -304,6 +304,3 @@ void FreeAttrList (Collection* C)
     /* Free the collection itself */
     FreeCollection (C);
 }
-
-
-

@@ -78,10 +78,10 @@ static LiteralPool*     GlobalPool = 0;
 static LiteralPool*     LP         = 0;
 
 /* Stack that contains the nested literal pools. Since TOS is in LiteralPool
- * and functions aren't nested in C, the maximum depth is 1. I'm using a
- * collection anyway, so the code is prepared for nested functions or
- * whatever.
- */
+** and functions aren't nested in C, the maximum depth is 1. I'm using a
+** collection anyway, so the code is prepared for nested functions or
+** whatever.
+*/
 static Collection       LPStack  = STATIC_COLLECTION_INITIALIZER;
 
 
@@ -286,8 +286,8 @@ void PushLiteralPool (struct SymEntry* Func)
 
 LiteralPool* PopLiteralPool (void)
 /* Pop the last literal pool from TOS and activate it. Return the old
- * literal pool.
- */
+** literal pool.
+*/
 {
     /* Remember the current literal pool */
     LiteralPool* Old = LP;
@@ -313,8 +313,8 @@ static void MoveLiterals (Collection* Source, Collection* Target)
         Literal* L = CollAt (Source, I);
 
         /* If it is referenced and not output, add it to the Target pool,
-         * otherwise free it
-         */
+        ** otherwise free it
+        */
         if (L->RefCount && !L->Output) {
             CollAppend (Target, L);
         } else {
@@ -327,8 +327,8 @@ static void MoveLiterals (Collection* Source, Collection* Target)
 
 void MoveLiteralPool (LiteralPool* LocalPool)
 /* Move all referenced literals in LocalPool to the global literal pool. This
- * function will free LocalPool after moving the used string literals.
- */
+** function will free LocalPool after moving the used string literals.
+*/
 {
     /* Move the literals */
     MoveLiterals (&LocalPool->WritableLiterals, &GlobalPool->WritableLiterals);
@@ -403,10 +403,10 @@ static void OutputReadOnlyLiterals (Collection* Literals)
         TranslateLiteral (L);
 
         /* Check if this literal is part of another one. Since the literals
-         * are sorted by size (larger ones first), it can only be part of a
-         * literal with a smaller index.
-         * Beware: Only check literals that have actually been referenced.
-         */
+        ** are sorted by size (larger ones first), it can only be part of a
+        ** literal with a smaller index.
+        ** Beware: Only check literals that have actually been referenced.
+        */
         C = 0;
         for (J = 0; J < I; ++J) {
 
@@ -474,8 +474,8 @@ Literal* AddLiteral (const char* S)
 
 Literal* AddLiteralBuf (const void* Buf, unsigned Len)
 /* Add a buffer containing a literal string to the literal pool. Return the
- * literal.
- */
+** literal.
+*/
 {
     /* Create a new literal */
     Literal* L = NewLiteral (Buf, Len);
@@ -498,6 +498,3 @@ Literal* AddLiteralStr (const StrBuf* S)
 {
     return AddLiteralBuf (SB_GetConstBuf (S), SB_GetLen (S));
 }
-
-
-

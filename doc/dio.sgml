@@ -1,0 +1,134 @@
+<!doctype linuxdoc system>
+
+<article>
+<title>Diskette Sector I/O Routines
+<author><url url="mailto:chris@groessler.org" name="Christian Groessler">
+<date>2014-04-10
+
+<abstract>
+The cc65 library provides functions to read and write raw disk sectors.
+Include the dio.h header file to get the necessary definitions.
+</abstract>
+
+<!-- Table of contents -->
+<toc>
+
+<!-- Begin the document -->
+
+<sect>Opening the disk for low level I/O<p>
+
+Prior to using these functions a handle to the device has to be obtained. This
+is done with the <tt>dio_open</tt> function. After use, the handle should be
+released with the <tt>dio_close</tt> function.
+
+<tscreen><verb>
+    dhandle_t __fastcall__ dio_open (unsigned char device);
+</verb></tscreen>
+
+The <tt>device</tt> specifies the device to access, with 0 being the first
+device, 1 the second, and so on.
+
+<tscreen><verb>
+    unsigned char __fastcall__ dio_close (dhandle_t handle);
+</verb></tscreen>
+
+Closes a handle obtained by <tt>dio_open</tt>. Returns status code.
+<p>
+
+<sect>Reading and writing sectors<p>
+
+The read and write functions are:
+
+<tscreen><verb>
+    unsigned char __fastcall__ dio_read (dhandle_t handle,
+                                         unsigned sect_num,
+                                         void *buffer);
+</verb></tscreen>
+
+This function will read the sector specified by <tt>sect_num</tt> into the memory
+location at buffer.
+
+<tscreen><verb>
+    unsigned char __fastcall__ dio_write (dhandle_t handle,
+                                          unsigned sect_num,
+                                          const void *buffer);
+</verb></tscreen>
+
+This function will write the memory contents at buffer to the sector specified
+by <tt>sect_num</tt>. No verify is performed.
+
+<tscreen><verb>
+    unsigned char __fastcall__ dio_write_verify (dhandle_t handle,
+                                                 unsigned sect_num,
+                                                 const void *buffer);
+</verb></tscreen>
+
+This function will write the memory contents at buffer to the sector specified
+by <tt>sect_num</tt>. A verification is performed.
+<p>
+
+Use the <tt><ref name="dio_query_sectsize" id="sectsizecount"></tt> function to query
+the size of a sector and the <tt><ref name="dio_query_sectcount" id="sectsizecount"></tt>
+function to query the number of available sectors.
+<p>
+
+All these functions will return 0 for success and an OS specific error code in
+case of failure.
+<p>
+
+<sect>Querying sector size and count<label id="sectsizecount"><p>
+
+Some systems support multiple diskette formats which have different sector sizes
+and/or different sector counts.
+<p>
+
+The following function returns the sector size of the currently inserted disk:
+
+<tscreen><verb>
+    unsigned __fastcall__ dio_query_sectsize (dhandle_t handle);
+</verb></tscreen>
+
+On the Atari platform, the sector size is handled specially. Please refer
+to the DIO section in the <url url="atari.html" name="Atari-specific
+platform documentation">.
+<p>
+
+The following function returns the sector count of the currently inserted disk:
+
+<tscreen><verb>
+    unsigned __fastcall__ dio_query_sectcount (dhandle_t handle);
+</verb></tscreen>
+
+<sect>Converting sector numbers<p>
+
+Since the read and write functions expect a sector number, for systems where
+the sectors aren't addressed by a logical sector number (e.g. CBM devices),
+there are 2 conversion functions. One of them converts a logical sector number
+to a head/track/sector triple. The other conversion function works the other
+way round.
+
+<tscreen><verb>
+    unsigned char __fastcall__ dio_phys_to_log (dhandle_t handle,
+                                                const dio_phys_pos *physpos,
+                                                unsigned *sectnum);
+</verb></tscreen>
+
+This function converts track/head/sector to logical sector number.
+
+<tscreen><verb>
+    unsigned char __fastcall__ dio_log_to_phys (dhandle_t handle,
+                                                const unsigned *sectnum,
+                                                dio_phys_pos *physpos);
+</verb></tscreen>
+
+This function converts a logical sector number to track/head/sector notation.
+<p>
+
+Note, that on systems which natively use logical sector numbers (e.g. Atari),
+the conversion functions are dummies. They ignore head/track
+(<tt>dio_phys_to_log</tt>) or return them as zero (<tt>dio_log_to_phys</tt>).
+The logical sector number is returned as physical sector and vice versa.
+<p>
+
+
+</article>

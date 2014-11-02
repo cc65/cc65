@@ -13,10 +13,13 @@
         .include "joy-error.inc"
         .include "vic20.inc"
 
+        .macpack module
+
+
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-        .segment "JUMPTABLE"
+        module_header   _vic20_ptvjoy_joy
 
 ; Driver signature
 

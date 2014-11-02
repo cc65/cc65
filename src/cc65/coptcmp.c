@@ -66,11 +66,11 @@ static const unsigned char CmpInvertTab [] = {
 
 static void ReplaceCmp (CodeSeg* S, unsigned I, cmp_t Cond)
 /* Helper function for the replacement of routines that return a boolean
- * followed by a conditional jump. Instead of the boolean value, the condition
- * codes are evaluated directly.
- * I is the index of the conditional branch, the sequence is already checked
- * to be correct.
- */
+** followed by a conditional jump. Instead of the boolean value, the condition
+** codes are evaluated directly.
+** I is the index of the conditional branch, the sequence is already checked
+** to be correct.
+*/
 {
     CodeEntry* N;
     CodeLabel* L;
@@ -91,10 +91,10 @@ static void ReplaceCmp (CodeSeg* S, unsigned I, cmp_t Cond)
 
         case CMP_GT:
             /* Replace by
-             *     beq @L
-             *     jpl Target
-             * @L: ...
-             */
+            **     beq @L
+            **     jpl Target
+            ** @L: ...
+            */
             if ((N = CS_GetNextEntry (S, I)) == 0) {
                 /* No such entry */
                 Internal ("Invalid program flow");
@@ -115,9 +115,9 @@ static void ReplaceCmp (CodeSeg* S, unsigned I, cmp_t Cond)
 
         case CMP_LE:
             /* Replace by
-             *     jmi Target
-             *     jeq Target
-             */
+            **     jmi Target
+            **     jeq Target
+            */
             CE_ReplaceOPC (E, OP65_JMI);
             L = E->JumpTo;
             N = NewCodeEntry (OP65_JEQ, AM65_BRA, L->Name, L, E->LI);
@@ -126,10 +126,10 @@ static void ReplaceCmp (CodeSeg* S, unsigned I, cmp_t Cond)
 
         case CMP_UGT:
             /* Replace by
-             *     beq @L
-             *     jcs Target
-             * @L: ...
-             */
+            **     beq @L
+            **     jcs Target
+            ** @L: ...
+            */
             if ((N = CS_GetNextEntry (S, I)) == 0) {
                 /* No such entry */
                 Internal ("Invalid program flow");
@@ -150,9 +150,9 @@ static void ReplaceCmp (CodeSeg* S, unsigned I, cmp_t Cond)
 
         case CMP_ULE:
             /* Replace by
-             *     jcc Target
-             *     jeq Target
-             */
+            **     jcc Target
+            **     jeq Target
+            */
             CE_ReplaceOPC (E, OP65_JCC);
             L = E->JumpTo;
             N = NewCodeEntry (OP65_JEQ, AM65_BRA, L->Name, L, E->LI);
@@ -169,10 +169,10 @@ static void ReplaceCmp (CodeSeg* S, unsigned I, cmp_t Cond)
 
 
 static int IsImmCmp16 (CodeEntry** L)
-/* Check if the instructions at L are an immidiate compare of a/x:
- *
- *
- */
+/* Check if the instructions at L are an immediate compare of a/x:
+**
+**
+*/
 {
     return (L[0]->OPC == OP65_CPX                              &&
             L[0]->AM == AM65_IMM                               &&
@@ -213,8 +213,8 @@ static int GetCmpRegVal (const CodeEntry* E)
 
 unsigned OptBoolTrans (CodeSeg* S)
 /* Try to remove the call to boolean transformer routines where the call is
- * not really needed.
- */
+** not really needed.
+*/
 {
     unsigned Changes = 0;
 
@@ -235,11 +235,11 @@ unsigned OptBoolTrans (CodeSeg* S)
             (N->Info & OF_ZBRA) != 0) {
 
             /* Make the boolean transformer unnecessary by changing the
-             * the conditional jump to evaluate the condition flags that
-             * are set after the compare directly. Note: jeq jumps if
-             * the condition is not met, jne jumps if the condition is met.
-             * Invert the code if we jump on condition not met.
-             */
+            ** the conditional jump to evaluate the condition flags that
+            ** are set after the compare directly. Note: jeq jumps if
+            ** the condition is not met, jne jumps if the condition is met.
+            ** Invert the code if we jump on condition not met.
+            */
             if (GetBranchCond (N->OPC) == BC_EQ) {
                 /* Jumps if condition false, invert condition */
                 Cond = CmpInvertTab [Cond];
@@ -275,15 +275,15 @@ unsigned OptBoolTrans (CodeSeg* S)
 
 unsigned OptCmp1 (CodeSeg* S)
 /* Search for the sequence
- *
- *      ldx     xx
- *      stx     tmp1
- *      ora     tmp1
- *
- * and replace it by
- *
- *      ora     xx
- */
+**
+**      ldx     xx
+**      stx     tmp1
+**      ora     tmp1
+**
+** and replace it by
+**
+**      ora     xx
+*/
 {
     unsigned Changes = 0;
 
@@ -332,16 +332,16 @@ unsigned OptCmp1 (CodeSeg* S)
 
 unsigned OptCmp2 (CodeSeg* S)
 /* Search for the sequence
- *
- *      stx     xx
- *      stx     tmp1
- *      ora     tmp1
- *
- * and replace it by
- *
- *      stx     xx
- *      ora     xx
- */
+**
+**      stx     xx
+**      stx     tmp1
+**      ora     tmp1
+**
+** and replace it by
+**
+**      stx     xx
+**      ora     xx
+*/
 {
     unsigned Changes = 0;
 
@@ -387,17 +387,17 @@ unsigned OptCmp2 (CodeSeg* S)
 
 unsigned OptCmp3 (CodeSeg* S)
 /* Search for
- *
- *      lda/and/ora/eor ...
- *      cmp #$00
- *      jeq/jne
- * or
- *      lda/and/ora/eor ...
- *      cmp #$00
- *      jsr boolxx
- *
- * and remove the cmp.
- */
+**
+**      lda/and/ora/eor ...
+**      cmp #$00
+**      jeq/jne
+** or
+**      lda/and/ora/eor ...
+**      cmp #$00
+**      jsr boolxx
+**
+** and remove the cmp.
+*/
 {
     unsigned Changes = 0;
 
@@ -432,9 +432,9 @@ unsigned OptCmp3 (CodeSeg* S)
             int Delete = 0;
 
             /* Check for the call to boolxx. We only remove the compare if
-             * the carry flag is not evaluated later, because the load will
-             * not set the carry flag.
-             */
+            ** the carry flag is not evaluated later, because the load will
+            ** not set the carry flag.
+            */
             if (L[2]->OPC == OP65_JSR) {
                 switch (FindBoolCmpCond (L[2]->Arg)) {
 
@@ -459,10 +459,10 @@ unsigned OptCmp3 (CodeSeg* S)
 
             } else if ((L[2]->Info & OF_FBRA) != 0) {
                 /* The following insn branches on the condition of the load,
-                 * so the compare instruction might be removed. For safety,
-                 * do some more checks if the carry isn't used later, since
-                 * the compare does set the carry, but the load does not.
-                 */
+                ** so the compare instruction might be removed. For safety,
+                ** do some more checks if the carry isn't used later, since
+                ** the compare does set the carry, but the load does not.
+                */
                 CodeEntry* E;
                 CodeEntry* N;
                 if ((E = CS_GetNextEntry (S, I+2)) != 0         &&
@@ -476,9 +476,9 @@ unsigned OptCmp3 (CodeSeg* S)
                     FindBoolCmpCond (N->Arg) == CMP_INV)) {
 
                     /* The following insn branches on the condition of a load,
-                     * and there's no use of the carry flag in sight, so the
-                     * compare instruction can be removed.
-                     */
+                    ** and there's no use of the carry flag in sight, so the
+                    ** compare instruction can be removed.
+                    */
                     Delete = 1;
                 }
             }
@@ -503,24 +503,24 @@ unsigned OptCmp3 (CodeSeg* S)
 
 unsigned OptCmp4 (CodeSeg* S)
 /* Search for
- *
- *      lda     x
- *      ldx     y
- *      cpx     #a
- *      bne     L1
- *      cmp     #b
- * L1:  jne/jeq L2
- *
- * If a is zero, we may remove the compare. If a and b are both zero, we may
- * replace it by the sequence
- *
- *      lda     x
- *      ora     x+1
- *      jne/jeq ...
- *
- * L1 may be either the label at the branch instruction, or the target label
- * of this instruction.
- */
+**
+**      lda     x
+**      ldx     y
+**      cpx     #a
+**      bne     L1
+**      cmp     #b
+** L1:  jne/jeq L2
+**
+** If a is zero, we may remove the compare. If a and b are both zero, we may
+** replace it by the sequence
+**
+**      lda     x
+**      ora     x+1
+**      jne/jeq ...
+**
+** L1 may be either the label at the branch instruction, or the target label
+** of this instruction.
+*/
 {
     unsigned Changes = 0;
 
@@ -547,9 +547,9 @@ unsigned OptCmp4 (CodeSeg* S)
                 CS_DelEntries (S, I+2, 3);
             } else {
                 /* Move the lda instruction after the first branch. This will
-                 * improve speed, since the load is delayed after the first
-                 * test.
-                 */
+                ** improve speed, since the load is delayed after the first
+                ** test.
+                */
                 CS_MoveEntry (S, I, I+4);
 
                 /* We will replace the ldx/cpx by lda/cmp */
@@ -557,8 +557,8 @@ unsigned OptCmp4 (CodeSeg* S)
                 CE_ReplaceOPC (L[1], OP65_CMP);
 
                 /* Beware: If the first LDA instruction had a label, we have
-                 * to move this label to the top of the sequence again.
-                 */
+                ** to move this label to the top of the sequence again.
+                */
                 if (CE_HasLabel (E)) {
                     CS_MoveLabels (S, E, L[0]);
                 }
@@ -581,14 +581,14 @@ unsigned OptCmp4 (CodeSeg* S)
 
 unsigned OptCmp5 (CodeSeg* S)
 /* Optimize compares of local variables:
- *
- *      ldy     #o
- *      jsr     ldaxysp
- *      cpx     #a
- *      bne     L1
- *      cmp     #b
- *      jne/jeq L2
- */
+**
+**      ldy     #o
+**      jsr     ldaxysp
+**      cpx     #a
+**      bne     L1
+**      cmp     #b
+**      jne/jeq L2
+*/
 {
     unsigned Changes = 0;
 
@@ -615,12 +615,12 @@ unsigned OptCmp5 (CodeSeg* S)
                 char Buf[20];
 
                 /* The value is zero, we may use the simple code version:
-                 *      ldy     #o-1
-                 *      lda     (sp),y
-                 *      ldy     #o
-                 *      ora     (sp),y
-                 *      jne/jeq ...
-                 */
+                **      ldy     #o-1
+                **      lda     (sp),y
+                **      ldy     #o
+                **      ora     (sp),y
+                **      jne/jeq ...
+                */
                 sprintf (Buf, "$%02X", (int)(L[0]->Num-1));
                 X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+1);
@@ -643,17 +643,17 @@ unsigned OptCmp5 (CodeSeg* S)
                 char Buf[20];
 
                 /* Change the code to just use the A register. Move the load
-                 * of the low byte after the first branch if possible:
-                 *
-                 *      ldy     #o
-                 *      lda     (sp),y
-                 *      cmp     #a
-                 *      bne     L1
-                 *      ldy     #o-1
-                 *      lda     (sp),y
-                 *      cmp     #b
-                 *      jne/jeq ...
-                 */
+                ** of the low byte after the first branch if possible:
+                **
+                **      ldy     #o
+                **      lda     (sp),y
+                **      cmp     #a
+                **      bne     L1
+                **      ldy     #o-1
+                **      lda     (sp),y
+                **      cmp     #b
+                **      jne/jeq ...
+                */
                 X = NewCodeEntry (OP65_LDY, AM65_IMM, L[0]->Arg, 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+3);
 
@@ -690,10 +690,10 @@ unsigned OptCmp5 (CodeSeg* S)
 
 unsigned OptCmp6 (CodeSeg* S)
 /* Search for calls to compare subroutines followed by a conditional branch
- * and replace them by cheaper versions, since the branch means that the
- * boolean value returned by these routines is not needed (we may also check
- * that explicitly, but for the current code generator it is always true).
- */
+** and replace them by cheaper versions, since the branch means that the
+** boolean value returned by these routines is not needed (we may also check
+** that explicitly, but for the current code generator it is always true).
+*/
 {
     unsigned Changes = 0;
 
@@ -715,12 +715,12 @@ unsigned OptCmp6 (CodeSeg* S)
             !CE_HasLabel (N)) {
 
             /* The tos... functions will return a boolean value in a/x and
-             * the Z flag says if this value is zero or not. We will call
-             * a cheaper subroutine instead, one that does not return a
-             * boolean value but only valid flags. Note: jeq jumps if
-             * the condition is not met, jne jumps if the condition is met.
-             * Invert the code if we jump on condition not met.
-             */
+            ** the Z flag says if this value is zero or not. We will call
+            ** a cheaper subroutine instead, one that does not return a
+            ** boolean value but only valid flags. Note: jeq jumps if
+            ** the condition is not met, jne jumps if the condition is met.
+            ** Invert the code if we jump on condition not met.
+            */
             if (GetBranchCond (N->OPC) == BC_EQ) {
                 /* Jumps if condition false, invert condition */
                 Cond = CmpInvertTab [Cond];
@@ -752,8 +752,8 @@ unsigned OptCmp6 (CodeSeg* S)
 
 unsigned OptCmp7 (CodeSeg* S)
 /* Search for a sequence ldx/txa/branch and remove the txa if A is not
- * used later.
- */
+** used later.
+*/
 {
     unsigned Changes = 0;
 
@@ -796,8 +796,8 @@ unsigned OptCmp7 (CodeSeg* S)
 
 unsigned OptCmp8 (CodeSeg* S)
 /* Check for register compares where the contents of the register and therefore
- * the result of the compare is known.
- */
+** the result of the compare is known.
+*/
 {
     unsigned Changes = 0;
     unsigned I;
@@ -817,8 +817,8 @@ unsigned OptCmp8 (CodeSeg* S)
             CE_IsConstImm (E)) {
 
             /* We are able to evaluate the compare at compile time. Check if
-             * one or more branches are ahead.
-             */
+            ** one or more branches are ahead.
+            */
             unsigned JumpsChanged = 0;
             CodeEntry* N;
             while ((N = CS_GetNextEntry (S, I)) != 0 &&   /* Followed by something.. */
@@ -855,10 +855,10 @@ unsigned OptCmp8 (CodeSeg* S)
                     case BC_VC:
                     case BC_VS:
                         /* Not set by the compare operation, bail out (Note:
-                         * Just skipping anything here is rather stupid, but
-                         * the sequence is never generated by the compiler,
-                         * so it's quite safe to skip).
-                         */
+                        ** Just skipping anything here is rather stupid, but
+                        ** the sequence is never generated by the compiler,
+                        ** so it's quite safe to skip).
+                        */
                         goto NextEntry;
 
                     default:
@@ -867,9 +867,9 @@ unsigned OptCmp8 (CodeSeg* S)
                 }
 
                 /* If the condition is false, we may remove the jump. Otherwise
-                 * the branch will always be taken, so we may replace it by a
-                 * jump (and bail out).
-                 */
+                ** the branch will always be taken, so we may replace it by a
+                ** jump (and bail out).
+                */
                 if (!Cond) {
                     CS_DelEntry (S, I+1);
                 } else {
@@ -906,16 +906,16 @@ NextEntry:
 
 unsigned OptCmp9 (CodeSeg* S)
 /* Search for the sequence
- *
- *    sbc       xx
- *    bvs/bvc   L
- *    eor       #$80
- * L: asl       a
- *    bcc/bcs   somewhere
- *
- * If A is not used later (which should be the case), we can branch on the N
- * flag instead of the carry flag and remove the asl.
- */
+**
+**    sbc       xx
+**    bvs/bvc   L
+**    eor       #$80
+** L: asl       a
+**    bcc/bcs   somewhere
+**
+** If A is not used later (which should be the case), we can branch on the N
+** flag instead of the carry flag and remove the asl.
+*/
 {
     unsigned Changes = 0;
     unsigned I;
@@ -971,6 +971,3 @@ unsigned OptCmp9 (CodeSeg* S)
     /* Return the number of changes made */
     return Changes;
 }
-
-
-

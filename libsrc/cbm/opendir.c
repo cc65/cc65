@@ -1,6 +1,6 @@
 /*
- * Ullrich von Bassewitz, 2012-05-30. Based on code by Groepaz.
- */
+** Ullrich von Bassewitz, 2012-05-30. Based on code by Groepaz.
+*/
 
 #include <stdlib.h>
 #include <string.h>
@@ -18,8 +18,8 @@ DIR* __fastcall__ opendir (register const char* name)
     DIR d;
 
     /* Setup the actual file name that is sent to the disk. We accept "0:",
-     * "1:" and "." as directory names.
-     */
+    ** "1:" and "." as directory names.
+    */
     d.name[0] = '$';
     if (name == 0 || name[0] == '\0' || (name[0] == '.' && name[1] == '\0')) {
         d.name[1] = '\0';

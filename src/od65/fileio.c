@@ -137,8 +137,8 @@ unsigned long ReadVar (FILE* F)
 /* Read a variable size value from the file */
 {
     /* The value was written to the file in 7 bit chunks LSB first. If there
-     * are more bytes, bit 8 is set, otherwise it is clear.
-     */
+    ** are more bytes, bit 8 is set, otherwise it is clear.
+    */
     unsigned char C;
     unsigned long V = 0;
     unsigned Shift = 0;
@@ -246,6 +246,3 @@ void ReadStrPool (FILE* F, Collection* C)
         CollAppend (C, ReadStr (F));
     }
 }
-
-
-

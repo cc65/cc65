@@ -1,12 +1,12 @@
-/*****************************************************************************
- * fire test program for cc65.                                               *
- *                                                                           *
- * (w)2002 by groepaz/hitmen                                                 *
- *                                                                           *
- * Cleanup and porting by Ullrich von Bassewitz.                             *
- * 2004-06-08, Greg King                                                     *
- *                                                                           *
- *****************************************************************************/
+/*****************************************************************************\
+** fire test program for cc65.                                               **
+**                                                                           **
+** (w)2002 by groepaz/hitmen                                                 **
+**                                                                           **
+** Cleanup and porting by Ullrich von Bassewitz.                             **
+** 2004-06-08, Greg King                                                     **
+**                                                                           **
+\*****************************************************************************/
 
 
 
@@ -187,8 +187,8 @@ int main (void)
 #endif
 #if defined(__C128__)
     /* Save and change some flags, so that kernal/basic interrupt handler will
-     * not interfere with our routine.
-     */
+    ** not interfere with our routine.
+    */
     initflag = *(unsigned char*) 0xA04;
     *(unsigned char*) 0xA04 &= 0xFE;
     graphflag = *(unsigned char*) 0xD8;

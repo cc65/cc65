@@ -31,12 +31,17 @@
 
 
         .macpack        generic
+        .macpack        module
 
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-.segment        "JUMPTABLE"
+.ifdef __ATARIXL__
+        module_header   _atrx130_emd
+.else
+        module_header   _atr130_emd
+.endif
 
 ; Driver signature
 

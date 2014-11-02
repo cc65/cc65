@@ -180,9 +180,9 @@ void FreeTokList (TokList* List)
 
 enum token_t GetTokListTerm (enum token_t Term)
 /* Determine if the following token list is enclosed in curly braces. This is
- * the case if the next token is the opening brace. If so, skip it and return
- * a closing brace, otherwise return Term.
- */
+** the case if the next token is the opening brace. If so, skip it and return
+** a closing brace, otherwise return Term.
+*/
 {
     if (CurTok.Tok == TOK_LCURLY) {
         NextTok ();
@@ -216,16 +216,16 @@ void AddCurTok (TokList* List)
 
 static int ReplayTokList (void* List)
 /* Function that gets the next token from a token list and sets it. This
- * function may be used together with the PushInput function from the istack
- * module.
- */
+** function may be used together with the PushInput function from the istack
+** module.
+*/
 {
     /* Cast the generic pointer to an actual list */
     TokList* L = List;
 
     /* If there are no more tokens, decrement the repeat counter. If it goes
-     * zero, delete the list and remove the function from the stack.
-     */
+    ** zero, delete the list and remove the function from the stack.
+    */
     if (L->Last == 0) {
         if (++L->RepCount >= L->RepMax) {
             /* Done with this list */
@@ -249,8 +249,8 @@ static int ReplayTokList (void* List)
     L->LI = StartLine (&CurTok.Pos, LI_TYPE_ASM, PushCounter);
 
     /* If a check function is defined, call it, so it may look at the token
-     * just set and changed it as apropriate.
-     */
+    ** just set and changed it as apropriate.
+    */
     if (L->Check) {
         L->Check (L);
     }
@@ -266,9 +266,9 @@ static int ReplayTokList (void* List)
 
 void PushTokList (TokList* List, const char* Desc)
 /* Push a token list to be used as input for InputFromStack. This includes
- * several initializations needed in the token list structure, so don't use
- * PushInput directly.
- */
+** several initializations needed in the token list structure, so don't use
+** PushInput directly.
+*/
 {
     /* If the list is empty, just delete it and bail out */
     if (List->Count == 0) {
@@ -283,6 +283,3 @@ void PushTokList (TokList* List, const char* Desc)
     ++PushCounter;
     PushInput (ReplayTokList, List, Desc);
 }
-
-
-

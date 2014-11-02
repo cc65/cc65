@@ -49,9 +49,9 @@ unsigned GetLocalLabel (void);
 
 const char* LocalLabelName (unsigned L);
 /* Make a label name from the given label number. The label name will be
- * created in static storage and overwritten when calling the function
- * again.
- */
+** created in static storage and overwritten when calling the function
+** again.
+*/
 
 int IsLocalLabelName (const char* Name);
 /* Return true if Name is the name of a local label */
@@ -59,7 +59,5 @@ int IsLocalLabelName (const char* Name);
 
 
 /* End of asmlabel.h */
+
 #endif
-
-
-

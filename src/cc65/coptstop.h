@@ -55,7 +55,5 @@ unsigned OptStackOps (CodeSeg* S);
 
 
 /* End of coptstop.h */
+
 #endif
-
-
-

@@ -1,8 +1,8 @@
 /*
- * fsetpos.c
- *
- * Christian Groessler, 07-Aug-2000
- */
+** fsetpos.c
+**
+** Christian Groessler, 07-Aug-2000
+*/
 
 
 

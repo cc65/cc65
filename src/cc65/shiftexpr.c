@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2004-2006 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -136,9 +136,9 @@ void ShiftExpr (struct ExprDesc* Expr)
             RemoveCode (&Mark2);
 
             /* If the shift count is greater or equal than the bit count of
-             * the operand, the behaviour is undefined according to the
-             * standard.
-             */
+            ** the operand, the behaviour is undefined according to the
+            ** standard.
+            */
             if (Expr2.IVal < 0 || Expr2.IVal >= (long) ExprBits) {
 
                 Warning ("Shift count too large for operand type");
@@ -174,11 +174,11 @@ void ShiftExpr (struct ExprDesc* Expr)
             }
 
             /* If we're shifting an integer or unsigned to the right, the
-             * lhs has a const address, and the shift count is larger than 8,
-             * we can load just the high byte as a char with the correct
-             * signedness, and reduce the shift count by 8. If the remaining
-             * shift count is zero, we're done.
-             */
+            ** lhs has a const address, and the shift count is larger than 8,
+            ** we can load just the high byte as a char with the correct
+            ** signedness, and reduce the shift count by 8. If the remaining
+            ** shift count is zero, we're done.
+            */
             if (Tok == TOK_SHR &&
                 IsTypeInt (Expr->Type) &&
                 ED_IsLVal (Expr) &&
@@ -192,8 +192,8 @@ void ShiftExpr (struct ExprDesc* Expr)
                 Expr2.IVal -= 8;
 
                 /* Replace the type of the expression temporarily by the
-                 * corresponding char type.
-                 */
+                ** corresponding char type.
+                */
                 OldType = Expr->Type;
                 if (IsSignUnsigned (Expr->Type)) {
                     Expr->Type = type_uchar;
@@ -235,6 +235,3 @@ Next:
         Expr->Type = ResultType;
     }
 }
-
-
-

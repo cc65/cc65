@@ -14,12 +14,13 @@
 
 
         .macpack        generic
+        .macpack        module
 
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-.segment        "JUMPTABLE"
+        module_header   _c64_ramcart_emd
 
 ; Driver signature
 

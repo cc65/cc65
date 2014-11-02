@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2000-2005, Ullrich von Bassewitz                                      */
-/*                Römerstraße 52                                             */
+/*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
 /*                                                                           */
@@ -74,13 +74,13 @@ struct Macro {
 
 Macro* NewMacro (const char* Name);
 /* Allocate a macro structure with the given name. The structure is not
- * inserted into the macro table.
- */
+** inserted into the macro table.
+*/
 
 void FreeMacro (Macro* M);
 /* Delete a macro definition. The function will NOT remove the macro from the
- * table, use UndefineMacro for that.
- */
+** table, use UndefineMacro for that.
+*/
 
 void DefineNumericMacro (const char* Name, long Val);
 /* Define a macro for a numeric constant */
@@ -93,9 +93,9 @@ void InsertMacro (Macro* M);
 
 int UndefineMacro (const char* Name);
 /* Search for the macro with the given name and remove it from the macro
- * table if it exists. Return 1 if a macro was found and deleted, return
- * 0 otherwise.
- */
+** table if it exists. Return 1 if a macro was found and deleted, return
+** 0 otherwise.
+*/
 
 Macro* FindMacro (const char* Name);
 /* Find a macro with the given name. Return the macro definition or NULL */
@@ -112,8 +112,8 @@ INLINE int IsMacro (const char* Name)
 
 int FindMacroArg (Macro* M, const char* Arg);
 /* Search for a formal macro argument. If found, return the index of the
- * argument. If the argument was not found, return -1.
- */
+** argument. If the argument was not found, return -1.
+*/
 
 void AddMacroArg (Macro* M, const char* Arg);
 /* Add a formal macro argument. */
@@ -127,7 +127,5 @@ void PrintMacroStats (FILE* F);
 
 
 /* End of macrotab.h */
+
 #endif
-
-
-

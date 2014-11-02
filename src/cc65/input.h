@@ -52,12 +52,12 @@
 
 
 /* An enum that describes different types of input files. The members are
- * choosen so that it is possible to combine them to bitsets
- */
+** choosen so that it is possible to combine them to bitsets
+*/
 typedef enum {
-    IT_MAIN     = 0x01,         /* Main input file */
-    IT_SYSINC   = 0x02,         /* System include file (using <>) */
-    IT_USRINC  = 0x04,          /* User include file (using "") */
+    IT_MAIN   = 0x01,           /* Main input file */
+    IT_SYSINC = 0x02,           /* System include file (using <>) */
+    IT_USRINC = 0x04,           /* User include file (using "") */
 } InputType;
 
 /* Forward for an IFile structure */
@@ -86,17 +86,17 @@ void OpenIncludeFile (const char* Name, InputType IT);
 
 void NextChar (void);
 /* Read the next character from the input stream and make CurC and NextC
- * valid. If end of line is reached, both are set to NUL, no more lines
- * are read by this function.
- */
+** valid. If end of line is reached, both are set to NUL, no more lines
+** are read by this function.
+*/
 
 void ClearLine (void);
 /* Clear the current input line */
 
 StrBuf* InitLine (StrBuf* Buf);
 /* Initialize Line from Buf and read CurC and NextC from the new input line.
- * The function returns the old input line.
- */
+** The function returns the old input line.
+*/
 
 int NextLine (void);
 /* Get a line from the current input. Returns 0 on end of file. */
@@ -116,7 +116,5 @@ void CreateDependencies (void);
 
 
 /* End of input.h */
+
 #endif
-
-
-

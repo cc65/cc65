@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -52,8 +52,8 @@
 
 int FindStdFunc (const char* Name);
 /* Determine if the given function is a known standard function that may be
- * called in a special way. If so, return the index, otherwise return -1.
- */
+** called in a special way. If so, return the index, otherwise return -1.
+*/
 
 void HandleStdFunc (int Index, struct FuncDesc* F, ExprDesc* lval);
 /* Generate code for a known standard function. */
@@ -63,6 +63,3 @@ void HandleStdFunc (int Index, struct FuncDesc* F, ExprDesc* lval);
 /* End of stdfunc.h */
 
 #endif
-
-
-

@@ -56,9 +56,9 @@ void InitFilePos (FilePos* P)
 
 int CompareFilePos (const FilePos* P1, const FilePos* P2)
 /* Compare two file positions. Return zero if both are equal, return a value
- * > 0 if P1 is greater and P2, and a value < 0 if P1 is less than P2. The
- * compare rates file index over line over column.
- */
+** > 0 if P1 is greater and P2, and a value < 0 if P1 is less than P2. The
+** compare rates file index over line over column.
+*/
 {
     if (P1->Name > P2->Name) {    
         return 1;
@@ -76,6 +76,3 @@ int CompareFilePos (const FilePos* P1, const FilePos* P2)
         return 0;
     }
 }
-
-
-

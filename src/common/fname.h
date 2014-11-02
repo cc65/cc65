@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -49,21 +49,18 @@ const char* FindExt (const char* Name);
 
 const char* FindName (const char* Path);
 /* Return a pointer to the file name in Path. If there is no path leading to
- * the file, the function returns Path as name.
- */
+** the file, the function returns Path as name.
+*/
 
 char* MakeFilename (const char* Origin, const char* Ext);
 /* Make a new file name from Origin and Ext. If Origin has an extension, it
- * is removed and Ext is appended. If Origin has no extension, Ext is simply
- * appended. The result is placed in a malloc'ed buffer and returned.
- * The function may be used to create "foo.o" from "foo.s".
- */
+** is removed and Ext is appended. If Origin has no extension, Ext is simply
+** appended. The result is placed in a malloc'ed buffer and returned.
+** The function may be used to create "foo.o" from "foo.s".
+*/
 
 
 
 /* End of fname.h */
 
 #endif
-
-
-

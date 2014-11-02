@@ -1,0 +1,415 @@
+<!doctype linuxdoc system>      <!-- -*- text-mode -*- -->
+
+<article>
+<title>sp65 Users Guide
+<author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
+<date>2012-03-11
+
+<abstract>
+sp65 is a sprite and bitmap utility that is part of the cc65 development suite.
+It is used to convert graphics and bitmaps into the target formats of the
+supported machines.
+</abstract>
+
+<!-- Table of contents -->
+<toc>
+
+<!-- Begin the document -->
+
+<sect>Overview<p>
+
+sp65 is a tool that converts images from common formats into formats used
+on the 6502 platforms that are the targets of the cc65 compiler suite. In
+addition, it allows some very simple operation with loaded graphics data, like
+using part of an image for further processing.
+
+The utility has been designed in a way that adding additional source or target
+formats is easy. The final output is either binary, or C/assembler source.
+
+
+
+<sect>Usage<p>
+
+
+<sect1>Command line option overview<p>
+
+The sp65 utility accepts the following options:
+
+<tscreen><verb>
+---------------------------------------------------------------------------
+Usage: sp65 [options] file [options] [file]
+Short options:
+  -V                            Print the version number and exit
+  -c fmt[,attrlist]             Convert into target format
+  -h                            Help (this text)
+  -lc                           List all possible conversions
+  -r file[,attrlist]            Read an input file
+  -v                            Increase verbosity
+  -w file[,attrlist]            Write the output to a file
+
+Long options:
+  --convert-to fmt[,attrlist]   Convert into target format
+  --help                        Help (this text)
+  --list-conversions            List all possible conversions
+  --pop                         Restore the original loaded image
+  --read file[,attrlist]        Read an input file
+  --slice x,y,w,h               Generate a slice from the loaded bitmap
+  --verbose                     Increase verbosity
+  --version                     Print the version number and exit
+  --write file[,attrlist]       Write the output to a file
+---------------------------------------------------------------------------
+</verb></tscreen>
+
+
+<sect1>Command line options in detail<p>
+
+Below is a description of all the command line options. For the concept of
+attribute lists see <ref id="attr-lists" name="below">.
+
+<descrip>
+
+  <label id="option--convert-to">
+  <tag><tt>-c, --convert-to format[,attrlist]</tt></tag>
+
+  Convert a bitmap into one of the supported target formats. The option
+  argument must at least contain the "format" attribute. For more attributes,
+  see section <ref id="conversions" name="Conversions">.
+
+
+  <label id="option--help">
+  <tag><tt>-h, --help</tt></tag>
+
+  Print the short option summary shown above.
+
+
+  <label id="option--list-conversions">
+  <tag><tt>-lc, --list-conversions</tt></tag>
+
+  Print a list of possible conversions.
+
+
+  <label id="option--pop">
+  <tag><tt>--pop</tt></tag>
+
+  Restore the working copy of the bitmap from the one originally loaded from
+  the file. This may for example be used when creating several output files
+  from one input file.
+
+
+  <label id="option--read">
+  <tag><tt>-r, --read filename[,attrlist]</tt></tag>
+
+  Read an input file. The option argument must at least contain the "name"
+  attribute. See <ref id="input-formats" name="input formats"> for more
+  information.
+
+
+  <label id="option-v">
+  <tag><tt>-v, --verbose</tt></tag>
+
+  Increase verbosity. Usually only needed for debugging purposes. You may use
+  this option more than one time for even more verbose output.
+
+
+  <label id="option-V">
+  <tag><tt>-V, --version</tt></tag>
+
+  Print the version number of the assembler. If you send any suggestions or
+  bugfixes, please include the version number.
+
+
+  <label id="option--write">
+  <tag><tt>-w, --write filename[,attrlist]</tt></tag>
+
+  Write an output file. The option argument must at least contain the "name"
+  attribute. See <ref id="output-formats" name="output formats"> for more
+  information.
+
+</descrip>
+<p>
+
+
+
+<sect>Processing pipeline<label id="processing-pipeline"><p>
+
+sp65 consists of
+
+<itemize>
+<item>Front ends that read graphics data,
+<item>processors for graphics data,
+<item>converters
+<item>and output modules for several formats.
+</itemize>
+
+These modules can be combined to a pipeline that reads data, does some
+optional bitmap processing, converts the bitmap into a target format, and
+writes this binary data to disk in one of several forms.
+
+
+
+<sect>Attribute lists<label id="attr-lists"><p>
+
+As described in <ref id="processing-pipeline" name="Processing pipeline">,
+sp65 consists of lots of different modules that may be combined in different
+ways, to convert an input bitmap to some output.
+
+Many of the processors and converters have options to change the way, they're
+working. To avoid having lots of command line options that must be parsed on
+high level and passed down to the relevant parts of the program, sp65 features
+something called "attribute lists". Attribute lists are lists of
+attribute/value pairs. These lists are parsed by the main program module
+without any knowledge about their meaning. Lower level parts just grab the
+attributes they need.
+
+In general, attribute lists look like this:
+
+<tscreen><verb>
+        attr1=val1[,attr2=val2[,...]]
+</verb></tscreen>
+
+Instead of the comma, colons may also be used (even mixed).
+
+To simplify things and to make the most common options look "normal", some
+mandatory attributes may be given without an attribute name. If the attribute
+name is missing, the default name is determined by the position. For example,
+the option <tt/<ref id="option--read" name="--read">/ does always need a file
+name. The attribute name for the file name is "name". To avoid having to type
+
+<tscreen><verb>
+        sp65 --read name=ball.pcx ...
+</verb></tscreen>
+
+the first attribute gets the default name "name" assigned. So if the first
+attribute doesn't have a name, it is assumed that it is the file name. This
+means that instead of the line above, one can also use
+
+<tscreen><verb>
+        sp65 --read ball.pcx ...
+</verb></tscreen>
+
+The second attribute for <tt/--read/ is the format of the input file. So when
+using
+
+<tscreen><verb>
+        sp65 --read ball.pic:pcx ...
+</verb></tscreen>
+
+a PCX file named "ball.pic" is read. The long form would be
+
+<tscreen><verb>
+        sp65 --read name=ball.pic:format=pcx ...
+</verb></tscreen>
+
+Changing the order of the attributes is possible only when explicitly
+specifying the names of the attributes. Using
+
+<tscreen><verb>
+        sp65 --read pcx:ball.pic ...
+</verb></tscreen>
+
+will make sp65 complain, because it tries to read a file named "pcx" with an
+(unknown) format of "ball.pic". The following however will work:
+
+<tscreen><verb>
+        sp65 --read format=pcx:name=ball.pic ...
+</verb></tscreen>
+
+The attributes that are valid for each processor or converter are listed
+below.
+
+
+
+<sect>Input formats<label id="input-formats"><p>
+
+Input formats are either specified explicitly when using <tt/<ref
+id="option--read" name="--read">/, or are determined by looking at the
+extension of the file name given.
+
+<sect1>PCX<p>
+
+While sp65 is prepared for more, this is currently the only possible input
+format. There are no additional attributes for this format.
+
+
+
+<sect>Conversions<label id="conversions"><p>
+
+<sect1>GEOS bitmap<p>
+
+The current bitmap working copy is converted to a GEOS compacted bitmap. This
+format is used by several GEOS functions (i.e. 'BitmapUp') and is described
+in 'The Official GEOS Programmers Reference Guide', chapter 4, section
+'Bit-Mapped Graphics'.
+
+
+<sect1>GEOS icon<p>
+
+The current bitmap working copy is converted to GEOS icon format. A GEOS icon
+has the same format as a C64 high resolution sprite (24x21, monochrome, 63
+bytes). There are no additional attributes for this conversion.
+
+
+<sect1>Koala image<p>
+
+
+<sect1>Lynx sprite<p>
+
+Lynx can handle 1, 2, 3 and 4 bits per pixel indexed sprites. The maximum size
+of a sprite is roughly 508 pixels but in reality the Lynx screen is only 160 by
+102 pixels which makes very large sprites useless.
+
+The number per pixels is taken from the number of colors of the input bitmap.
+
+There are a few attributes that you can give to the conversion software.
+
+<descrip>
+
+  <tag/mode/
+  The first is what kind of encoding to use for the sprite. The attribute for
+  this is called "mode" and the possible values are "literal", "packed" or
+  "transparent". The default is "packed" if no mode is specified.
+
+  The "literal" is a totally literal mode with no packing. In this mode the
+  number of pixels per scanline will be a multiple of 8 both right and left from
+  the action point.
+
+  If the source bitmap edge ends with a color where the least significant bit is
+  one then there will be an extra 8 zero bits on that scan line.
+
+  So if you are using totally literal sprites and intend to change them at
+  runtime then please add a single pixel border far left and far right with
+  zeros in order to prevent graphical glitches in the game.
+
+  The standard encoding is called "packed". In this mode the sprite is packed
+  using run-length encoding and literal coding mixed for optimisation to
+  produce a small sprite.
+
+  The last encoding mode "transparent" is like packed. But here we know that
+  the index 0 will be transparent so we can clip off all 0 pixels from the left
+  and right edge of the sprite. This will produce the smallest sprite possible
+  on the Lynx. The sprite is not rectangular anymore.
+
+  <tag/ax/
+  The sprite is painted around the Anchor point. The anchor point x can be
+  between 0 and the width of the sprite - 1. If anchor point x is zero then
+  painting the sprite in location 10,20 will set the left edge of the sprite
+  10 pixels from the left of the Lynx screen. When the sprite is scaled by
+  hardware the anchor point stays in place and the sprite grows or shrinks
+  around the anchor point. The default value is 0 (left).
+
+  <tag/ay/
+  The sprite is painted around the Anchor point. The anchor point y can be
+  between 0 and the height of the sprite - 1. If anchor point y is zero then
+  painting the sprite in location 10,20 will set the top of the sprite 20
+  pixels from the top of the Lynx screen. When the sprite is scaled by
+  hardware the anchor point stays in place and the sprite grows or shrinks
+  around the anchor point. The default value is 0 (top).
+
+</descrip>
+
+<sect1>VIC2 sprite<p>
+
+
+
+
+<sect>Output formats<label id="output-formats"><p>
+
+Using <tt/<ref id="option--write" name="--write">/ it is possible to write
+processed data to an output file. An attribute "name" is mandatory, it is used
+as the file name for the output. The output format can be specified using an
+attribute named "format". If this attribute doesn't exist, the output format
+is determined by looking at the file name extension.
+
+
+<sect1>Binary<p>
+
+For this format, the processed data is written to the output file in raw
+binary format. There are no additional attributes (besides "name" and
+"format") for this output format.
+
+
+<sect1>Assembler code<p>
+
+For this format, the processed data is written to the output file in ca65
+assembler format. There are several attributes for this output format:
+
+<descrip>
+
+  <tag/base/
+  The value for this attribute specifies the numeric base for the data
+  values. It may be either 2, 10 or 16. The default is 16. If the base is
+  2, the numbers are prefixed by '%', if the base is 16, the numbers are
+  prefixed by '&dollar;'. For base 10, there is no prefix.
+
+  <tag/bytesperline/
+  The value for this attribute specifies the number of bytes output in one
+  line of the assembler file. The default is 16.
+
+  <tag/ident/
+  This is an optional attribute. When given, the output processor will wrap
+  the data into a <tt/.PROC/ with the given name. In addition, three constants
+  are added as local symbols within the <tt/.PROC/: <tt/COLORS/, <tt/WIDTH/
+  and <tt/HEIGHT/.
+
+</descrip>
+
+
+
+<sect1>C code<p>
+
+When using C output format, a small piece of C source code is generated that
+defines the data containing the output in an array of <tt/unsigned char/.
+
+Possible attributes for this format are:
+
+<descrip>
+  <tag/base/
+  The value for this attribute specifies the numeric base for the data values.
+  It may be either 10 or 16. The default is 16. If the base is 16, the numbers
+  are prefixed by 0x. For base 10, there is no prefix.
+
+  <tag/bytesperline/
+  The value for this attribute specifies the number of bytes output in one
+  line of the C source code. The default is 16.
+
+  <tag/ident/
+  This is an optional attribute. When given, the output processor will wrap
+  the data into an array of unsigned char with the given name. In addition,
+  three <tt/#define/s are added for <tt/&lt;ident&gt;_COLORS/,
+  <tt/&lt;ident&gt;_WIDTH/ and <tt/&lt;ident&gt;_HEIGHT/.
+
+</descrip>
+
+
+
+<sect>Copyright<p>
+
+sp65 (and all cc65 binutils) are (C) Copyright 1998-2012 Ullrich von Bassewitz
+and others. For usage of the binaries and/or sources the following conditions
+do apply:
+
+This software is provided 'as-is', without any expressed or implied
+warranty.  In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+<enum>
+<item> 	The origin of this software must not be misrepresented; you must not
+       	claim that you wrote the original software. If you use this software
+       	in a product, an acknowledgment in the product documentation would be
+	appreciated but is not required.
+<item>	Altered source versions must be plainly marked as such, and must not
+	be misrepresented as being the original software.
+<item>	This notice may not be removed or altered from any source
+	distribution.
+</enum>
+
+
+
+</article>
+
+
+

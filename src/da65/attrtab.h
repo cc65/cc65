@@ -114,7 +114,5 @@ attr_t GetLabelAttr (unsigned Addr);
 
 
 /* End of attrtab.h */
+
 #endif
-
-
-

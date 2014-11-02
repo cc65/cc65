@@ -44,13 +44,13 @@
 
 
 
-SearchPath*      LibSearchPath;         /* Library path */
-SearchPath*      ObjSearchPath;         /* Object file path */
-SearchPath*      CfgSearchPath;         /* Config file path */
+SearchPaths*     LibSearchPath;         /* Library path */
+SearchPaths*     ObjSearchPath;         /* Object file path */
+SearchPaths*     CfgSearchPath;         /* Config file path */
 
-SearchPath*      LibDefaultPath;        /* Default Library path */
-SearchPath*      ObjDefaultPath;        /* Default Object file path */
-SearchPath*      CfgDefaultPath;        /* Default Config file path */
+SearchPaths*     LibDefaultPath;        /* Default Library path */
+SearchPaths*     ObjDefaultPath;        /* Default Object file path */
+SearchPaths*     CfgDefaultPath;        /* Default Config file path */
 
 
 
@@ -88,13 +88,13 @@ void InitSearchPaths (void)
     AddSubSearchPathFromEnv (CfgDefaultPath, "CC65_HOME", "cfg");
 
     /* Add some compiled-in search paths if defined at compile time. */
-#if defined(LD65_LIB)
+#if defined(LD65_LIB) && !defined(_WIN32)
     AddSearchPath (LibDefaultPath, STRINGIZE (LD65_LIB));
 #endif
-#if defined(LD65_OBJ)
+#if defined(LD65_OBJ) && !defined(_WIN32)
     AddSearchPath (ObjDefaultPath, STRINGIZE (LD65_OBJ));
 #endif
-#if defined(LD65_CFG)
+#if defined(LD65_CFG) && !defined(_WIN32)
     AddSearchPath (CfgDefaultPath, STRINGIZE (LD65_CFG));
 #endif
 
@@ -103,6 +103,3 @@ void InitSearchPaths (void)
     AddSubSearchPathFromWinBin (ObjDefaultPath, "lib");
     AddSubSearchPathFromWinBin (CfgDefaultPath, "cfg");
 }
-
-
-

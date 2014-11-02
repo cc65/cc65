@@ -2,7 +2,7 @@
 ; Driver for a "joystick mouse".
 ;
 ; 2009-09-26, Ullrich von Bassewitz
-; 2013-09-05, Greg King
+; 2014-09-10, Greg King
 ;
 
         .include        "zeropage.inc"
@@ -12,11 +12,13 @@
         .include        "cbm510.inc"
 
         .macpack        generic
+        .macpack        module
+
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-.segment        "JUMPTABLE"
+        module_header   _cbm510_joy_mou
 
 HEADER:
 
@@ -52,6 +54,8 @@ HEADER:
 
 CHIDE:  jmp     $0000                   ; Hide the cursor
 CSHOW:  jmp     $0000                   ; Show the cursor
+CPREP:  jmp     $0000                   ; Prepare to move the cursor
+CDRAW:  jmp     $0000                   ; Draw the cursor
 CMOVEX: jmp     $0000                   ; Move the cursor to x co-ord.
 CMOVEY: jmp     $0000                   ; Move the cursor to y co-ord.
 
@@ -89,9 +93,10 @@ YMax:           .res    2               ; Y2 value of bounding box
 
 Temp:           .res    1
 
-; Default values for above variables
-
 .rodata
+
+; Default values for above variables
+; (We use ".proc" because we want to define both a label and a scope.)
 
 .proc   DefVars
         .word   SCREEN_HEIGHT / 2       ; YPos
@@ -261,7 +266,7 @@ BUTTONS:
 ; Bits go up when buttons go down.
 
         eor     #MOUSE_BTN_LEFT | MOUSE_BTN_RIGHT
-        ldx     #>0
+        ldx     #>$0000
         rts
 
 ;----------------------------------------------------------------------------
@@ -322,7 +327,8 @@ IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL   ; We don't support ioctls, for now
 ; Reads joystick 2.
 ;
 
-IRQ:    ldy     #15                     ; Switch to the system bank
+IRQ:    jsr     CPREP
+        ldy     #15                     ; Switch to the system bank
         sty     IndReg
 
 ; Get the direction bits.
@@ -352,11 +358,11 @@ IRQ:    ldy     #15                     ; Switch to the system bank
 
         and     #JOY::RIGHT << 4        ; Check RIGHT bit
         bnz     @Right
-        lda     #<-1
+        lda     #<-$0001
         tax
         bnz     @AddX                   ; Branch always
-@Right: lda     #<1
-        ldx     #>1
+@Right: lda     #<$0001
+        ldx     #>$0001
 
 ; Calculate the new x co-ordinate (--> .YA).
 
@@ -395,11 +401,11 @@ IRQ:    ldy     #15                     ; Switch to the system bank
 
         and     #JOY::UP << 4           ; Check UP bit
         bze     @Down
-        lda     #<-1
+        lda     #<-$0001
         tax
         bnz     @AddY
-@Down:  lda     #<1
-        ldx     #>1
+@Down:  lda     #<$0001
+        ldx     #>$0001
 
 ; Calculate the new y co-ordinate (--> .YA).
 
@@ -429,7 +435,8 @@ IRQ:    ldy     #15                     ; Switch to the system bank
 
 ; Done
 
-@SkipY: clc                             ; Interrupt not handled
+@SkipY: jsr     CDRAW
+        clc                             ; Interrupt not "handled"
         rts
 
 ; Move the mouse pointer to the new x pos.

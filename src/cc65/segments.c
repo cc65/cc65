@@ -71,10 +71,10 @@ Segments* GS = 0;
 static StrStack SegmentNames[SEG_COUNT];
 
 /* We're using a collection for the stack instead of a linked list. Since
- * functions may not be nested (at least in the current implementation), the
- * maximum stack depth is 2, so there is not really a need for a better
- * implementation.
- */
+** functions may not be nested (at least in the current implementation), the
+** maximum stack depth is 2, so there is not really a need for a better
+** implementation.
+*/
 static Collection SegmentStack = STATIC_COLLECTION_INITIALIZER;
 
 
@@ -300,6 +300,3 @@ void OutputSegments (const Segments* S)
     /* Output the code segment epiloque */
     CS_OutputEpilogue (S->Code);
 }
-
-
-

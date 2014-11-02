@@ -1,8 +1,8 @@
 /*
- * freopen.c
- *
- * Ullrich von Bassewitz, 17.06.1998
- */
+** freopen.c
+**
+** Ullrich von Bassewitz, 17.06.1998
+*/
 
 
 
@@ -28,8 +28,8 @@ FILE* __fastcall__ freopen (const char* name, const char* mode, FILE* f)
     }
 
     /* Close the file. Don't bother setting the flag, it will get
-     * overwritten by _fopen.
-     */
+    ** overwritten by _fopen.
+    */
     if (close (f->f_fd) < 0) {
         /* An error occured, errno is already set */
         return 0;

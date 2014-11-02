@@ -70,9 +70,9 @@ unsigned GetLocalLabel (void)
 
 const char* LocalLabelName (unsigned L)
 /* Make a label name from the given label number. The label name will be
- * created in static storage and overwritten when calling the function
- * again.
- */
+** created in static storage and overwritten when calling the function
+** again.
+*/
 {
     static char Buf[64];
     sprintf (Buf, "L%04X", L);
@@ -98,7 +98,3 @@ int IsLocalLabelName (const char* Name)
     /* Local label name */
     return 1;
 }
-
-
-
-

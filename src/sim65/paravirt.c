@@ -36,15 +36,17 @@
 #include <string.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#if defined(_WIN32)
+#  define O_INITIAL O_BINARY
+#else
+#  define O_INITIAL 0
+#endif
 #if defined(_MSC_VER)
 /* Microsoft compiler */
 #  include <io.h>
-#  pragma warning(disable : 4996)
-#  define O_INITIAL O_BINARY
 #else
 /* Anyone else */
 #  include <unistd.h>
-#  define O_INITIAL 0
 #endif
 
 /* common */

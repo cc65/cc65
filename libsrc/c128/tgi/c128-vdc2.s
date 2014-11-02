@@ -26,8 +26,9 @@
         .include        "tgi-kernel.inc"
         .include        "tgi-error.inc"
 
-
         .macpack        generic
+        .macpack        module
+
 
 ; ------------------------------------------------------------------------
 ; Constants
@@ -49,7 +50,7 @@ VDC_DATA          = 31
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table and constants.
 
-.segment        "JUMPTABLE"
+        module_header   _c128_vdc2_tgi
 
 ; First part of the header is a structure that has a magic and defines the
 ; capabilities of the driver

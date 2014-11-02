@@ -102,8 +102,8 @@ void SwitchStatement (void)
     NextToken ();
 
     /* Read the switch expression and load it into the primary. It must have
-     * integer type.
-     */
+    ** integer type.
+    */
     ConsumeLParen ();
     Expression0 (&SwitchExpr);
     if (!IsClassInt (SwitchExpr.Type))  {
@@ -114,20 +114,20 @@ void SwitchStatement (void)
     ConsumeRParen ();
 
     /* Add a jump to the switch code. This jump is usually unnecessary,
-     * because the switch code will moved up just behind the switch
-     * expression. However, in rare cases, there's a label at the end of
-     * the switch expression. This label will not get moved, so the code
-     * jumps around the switch code, and after moving the switch code,
-     * things look really weird. If we add a jump here, we will never have
-     * a label attached to the current code position, and the jump itself
-     * will get removed by the optimizer if it is unnecessary.
-     */
+    ** because the switch code will moved up just behind the switch
+    ** expression. However, in rare cases, there's a label at the end of
+    ** the switch expression. This label will not get moved, so the code
+    ** jumps around the switch code, and after moving the switch code,
+    ** things look really weird. If we add a jump here, we will never have
+    ** a label attached to the current code position, and the jump itself
+    ** will get removed by the optimizer if it is unnecessary.
+    */
     SwitchCodeLabel = GetLocalLabel ();
     g_jump (SwitchCodeLabel);
 
     /* Remember the current code position. We will move the switch code
-     * to this position later.
-     */
+    ** to this position later.
+    */
     GetCodePos (&CaseCodeStart);
 
     /* Setup the control structure, save the old and activate the new one */
@@ -150,8 +150,8 @@ void SwitchStatement (void)
     }
 
     /* Parse the following statement, which will actually be a compound
-     * statement because of the curly brace at the current input position
-     */
+    ** statement because of the curly brace at the current input position
+    */
     HaveBreak = Statement (&RCurlyBrace);
 
     /* Check if we had any labels */
@@ -160,12 +160,12 @@ void SwitchStatement (void)
     }
 
     /* If the last statement did not have a break, we may have an open
-     * label (maybe from an if or similar). Emitting code and then moving
-     * this code to the top will also move the label to the top which is
-     * wrong. So if the last statement did not have a break (which would
-     * carry the label), add a jump to the exit. If it is useless, the
-     * optimizer will remove it later.
-     */
+    ** label (maybe from an if or similar). Emitting code and then moving
+    ** this code to the top will also move the label to the top which is
+    ** wrong. So if the last statement did not have a break (which would
+    ** carry the label), add a jump to the exit. If it is useless, the
+    ** optimizer will remove it later.
+    */
     if (!HaveBreak) {
         g_jump (ExitLabel);
     }
@@ -200,8 +200,8 @@ void SwitchStatement (void)
     FreeCaseNodeColl (SwitchData.Nodes);
 
     /* If the case statement was (correctly) terminated by a closing curly
-     * brace, skip it now.
-     */
+    ** brace, skip it now.
+    */
     if (RCurlyBrace) {
         NextToken ();
     }
@@ -315,6 +315,3 @@ void DefaultLabel (void)
     /* Skip the colon */
     ConsumeColon ();
 }
-
-
-

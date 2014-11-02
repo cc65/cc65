@@ -1,0 +1,4753 @@
+<!doctype linuxdoc system>      <!-- -*- text-mode -*- -->
+
+<article>
+<title>ca65 Users Guide
+<author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
+<date>2014-04-24
+
+<abstract>
+ca65 is a powerful macro assembler for the 6502, 65C02 and 65816 CPUs. It is
+used as a companion assembler for the cc65 crosscompiler, but it may also be
+used as a standalone product.
+</abstract>
+
+<!-- Table of contents -->
+<toc>
+
+<!-- Begin the document -->
+
+<sect>Overview<p>
+
+ca65 is a replacement for the ra65 assembler that was part of the cc65 C
+compiler, originally developed by John R. Dunning. I had some problems with
+ra65 and the copyright does not permit some things which I wanted to be
+possible, so I decided to write a completely new assembler/linker/archiver
+suite for the cc65 compiler. ca65 is part of this suite.
+
+Some parts of the assembler (code generation and some routines for symbol
+table handling) are taken from an older crossassembler named a816 written
+by me a long time ago.
+
+
+<sect1>Design criteria<p>
+
+Here's a list of the design criteria, that I considered important for the
+development:
+
+<itemize>
+
+<item>	The assembler must support macros. Macros are not essential, but they
+      	make some things easier, especially when you use the assembler in the
+	backend of a compiler.
+<item>	The assembler must support the newer 65C02 and 65816 CPUs. I have been
+	thinking about a 65816 backend for the C compiler, and even my old
+	a816 assembler had support for these CPUs, so this wasn't really a
+	problem.
+<item>	The assembler must produce relocatable code. This is necessary for the
+	compiler support, and it is more convenient.
+<item>	Conditional assembly must be supported. This is a must for bigger
+	projects written in assembler (like Elite128).
+<item>	The assembler must support segments, and it must support more than
+	three segments (this is the count, most other assemblers support).
+	Having more than one code segments helps developing code for systems
+	with a divided ROM area (like the C64).
+<item>	The linker must be able to resolve arbitrary expressions. It should
+	be able to get things like
+<tscreen><verb>
+	.import	S1, S2
+	.export Special
+   	Special	= 2*S1 + S2/7
+</verb></tscreen>
+	right.
+<item>	True lexical nesting for symbols. This is very convenient for larger
+	assembly projects.
+<item>	"Cheap" local symbols without lexical nesting for those quick, late
+	night hacks.
+<item>	I liked the idea of "options" as Anre Fachats .o65 format has it, so I
+	introduced the concept into the object file format use by the new cc65
+	binutils.
+<item>	The assembler will be a one pass assembler. There was no real need for
+	this decision, but I've written several multipass assemblers, and it
+	started to get boring. A one pass assembler needs much more elaborated
+	data structures, and because of that it's much more fun:-)
+<item>	Non-GPLed code that may be used in any project without restrictions or
+   	fear of "GPL infecting" other code.
+</itemize>
+<p>
+
+
+<sect>Usage<p>
+
+
+<sect1>Command line option overview<p>
+
+The assembler accepts the following options:
+
+<tscreen><verb>
+---------------------------------------------------------------------------
+Usage: ca65 [options] file
+Short options:
+  -D name[=value]               Define a symbol
+  -I dir                        Set an include directory search path
+  -U                            Mark unresolved symbols as import
+  -V                            Print the assembler version
+  -W n                          Set warning level n
+  -d                            Debug mode
+  -g                            Add debug info to object file
+  -h                            Help (this text)
+  -i                            Ignore case of symbols
+  -l name                       Create a listing file if assembly was ok
+  -mm model                     Set the memory model
+  -o name                       Name the output file
+  -s                            Enable smart mode
+  -t sys                        Set the target system
+  -v                            Increase verbosity
+
+Long options:
+  --auto-import                 Mark unresolved symbols as import
+  --bin-include-dir dir         Set a search path for binary includes
+  --cpu type                    Set cpu type
+  --create-dep name             Create a make dependency file
+  --create-full-dep name        Create a full make dependency file
+  --debug                       Debug mode
+  --debug-info                  Add debug info to object file
+  --feature name                Set an emulation feature
+  --help                        Help (this text)
+  --ignore-case                 Ignore case of symbols
+  --include-dir dir             Set an include directory search path
+  --large-alignment             Don't warn about large alignments
+  --listing name                Create a listing file if assembly was ok
+  --list-bytes n                Maximum number of bytes per listing line
+  --memory-model model          Set the memory model
+  --pagelength n                Set the page length for the listing
+  --relax-checks                Relax some checks (see docs)
+  --smart                       Enable smart mode
+  --target sys                  Set the target system
+  --verbose                     Increase verbosity
+  --version                     Print the assembler version
+---------------------------------------------------------------------------
+</verb></tscreen>
+
+
+<sect1>Command line options in detail<p>
+
+Here is a description of all the command line options:
+
+<descrip>
+
+  <label id="option--bin-include-dir">
+  <tag><tt>--bin-include-dir dir</tt></tag>
+
+  Name a directory which is searched for binary include files. The option
+  may be used more than once to specify more than one directory to search. The
+  current directory is always searched first before considering any
+  additional directories. See also the section about <ref id="search-paths"
+  name="search paths">.
+
+
+  <label id="option--cpu">
+  <tag><tt>--cpu type</tt></tag>
+
+  Set the default for the CPU type. The option takes a parameter, which
+  may be one of
+
+       	6502, 65SC02, 65C02, 65816, sweet16, HuC6280
+
+
+  <label id="option-create-dep">
+  <tag><tt>--create-dep name</tt></tag>
+
+  Tells the assembler to generate a file containing the dependency list for
+  the assembled module in makefile syntax. The output is written to a file
+  with the given name. The output does not include files passed via debug
+  information to the assembler.
+
+
+  <label id="option-create-full-dep">
+  <tag><tt>--create-full-dep name</tt></tag>
+
+  Tells the assembler to generate a file containing the dependency list for
+  the assembled module in makefile syntax. The output is written to a file
+  with the given name. The output does include files passed via debug
+  information to the assembler.
+
+
+  <tag><tt>-d, --debug</tt></tag>
+
+  Enables debug mode, something that should not be needed for mere
+  mortals:-)
+
+
+  <label id="option--feature">
+  <tag><tt>--feature name</tt></tag>
+
+  Enable an emulation feature. This is identical as using <tt/.FEATURE/
+  in the source with two exceptions: Feature names must be lower case, and
+  each feature must be specified by using an extra <tt/--feature/ option,
+  comma separated lists are not allowed.
+
+  See the discussion of the <tt><ref id=".FEATURE" name=".FEATURE"></tt>
+  command for a list of emulation features.
+
+
+  <label id="option-g">
+  <tag><tt>-g, --debug-info</tt></tag>
+
+  When this option (or the equivalent control command <tt/.DEBUGINFO/) is
+  used, the assembler will add a section to the object file that contains
+  all symbols (including local ones) together with the symbol values and
+  source file positions. The linker will put these additional symbols into
+  the VICE label file, so even local symbols can be seen in the VICE
+  monitor.
+
+
+  <label id="option-h">
+  <tag><tt>-h, --help</tt></tag>
+
+  Print the short option summary shown above.
+
+
+  <label id="option-i">
+  <tag><tt>-i, --ignore-case</tt></tag>
+
+  This option makes the assembler case insensitive on identifiers and labels.
+  This option will override the default, but may itself be overridden by the
+  <tt><ref id=".CASE" name=".CASE"></tt> control command.
+
+
+  <label id="option-l">
+  <tag><tt>-l name, --listing name</tt></tag>
+
+  Generate an assembler listing with the given name. A listing file will
+  never be generated in case of assembly errors.
+
+
+  <label id="option--large-alignment">
+  <tag><tt>--large-alignment</tt></tag>
+
+  Disable warnings about a large combined alignment. See the discussion of the
+  <tt><ref id=".ALIGN" name=".ALIGN"></tt> directive for futher information.
+
+
+  <label id="option--list-bytes">
+  <tag><tt>--list-bytes n</tt></tag>
+
+  Set the maximum number of bytes printed in the listing for one line of
+  input. See the <tt><ref id=".LISTBYTES" name=".LISTBYTES"></tt> directive
+  for more information. The value zero can be used to encode an unlimited
+  number of printed bytes.
+
+
+  <label id="option-mm">
+  <tag><tt>-mm model, --memory-model model</tt></tag>
+
+  Define the default memory model. Possible model specifiers are near, far and
+  huge.
+
+
+  <label id="option-o">
+  <tag><tt>-o name</tt></tag>
+
+  The default output name is the name of the input file with the extension
+  replaced by ".o". If you don't like that, you may give another name with
+  the -o option. The output file will be placed in the same directory as
+  the source file, or, if -o is given, the full path in this name is used.
+
+
+  <label id="option--pagelength">
+  <tag><tt>--pagelength n</tt></tag>
+
+  sets the length of a listing page in lines. See the <tt><ref
+  id=".PAGELENGTH" name=".PAGELENGTH"></tt> directive for more information.
+
+
+  <label id="option--relax-checks">
+  <tag><tt>--relax-checks</tt></tag>
+
+  Relax some checks done by the assembler. This will allow code that is an
+  error in most cases and flagged as such by the assembler, but can be valid
+  in special situations.
+
+  Examples are:
+<itemize>
+<item>Short branches between two different segments.
+<item>Byte sized address loads where the address is not a zeropage address.
+</itemize>
+
+
+  <label id="option-s">
+  <tag><tt>-s, --smart-mode</tt></tag>
+
+  In smart mode (enabled by -s or the <tt><ref id=".SMART" name=".SMART"></tt>
+  pseudo instruction) the assembler will track usage of the <tt/REP/ and
+  <tt/SEP/ instructions in 65816 mode and update the operand sizes
+  accordingly. If the operand of such an instruction cannot be evaluated by
+  the assembler (for example, because the operand is an imported symbol), a
+  warning is issued.
+
+  Beware: Since the assembler cannot trace the execution flow this may
+  lead to false results in some cases. If in doubt, use the .ixx and .axx
+  instructions to tell the assembler about the current settings. Smart
+  mode is off by default.
+
+
+  <label id="option-t">
+  <tag><tt>-t sys, --target sys</tt></tag>
+
+  Set the target system. This will enable translation of character strings and
+  character constants into the character set of the target platform. The
+  default for the target system is "none", which means that no translation
+  will take place. The assembler supports the same target systems as the
+  compiler, see there for a list.
+
+  Depending on the target, the default CPU type is also set. This can be
+  overriden by using the <tt/<ref id="option--cpu" name="--cpu">/ option.
+
+
+  <label id="option-v">
+  <tag><tt>-v, --verbose</tt></tag>
+
+  Increase the assembler verbosity. Usually only needed for debugging
+  purposes. You may use this option more than one time for even more
+  verbose output.
+
+
+  <label id="option-D">
+  <tag><tt>-D</tt></tag>
+
+  This option allows you to define symbols on the command line. Without a
+  value, the symbol is defined with the value zero. When giving a value,
+  you may use the '&dollar;' prefix for hexadecimal symbols. Please note
+  that for some operating systems, '&dollar;' has a special meaning, so
+  you may have to quote the expression.
+
+
+  <label id="option-I">
+  <tag><tt>-I dir, --include-dir dir</tt></tag>
+
+  Name a directory which is searched for include files. The option may be
+  used more than once to specify more than one directory to search. The
+  current directory is always searched first before considering any
+  additional directories. See also the section about <ref id="search-paths"
+  name="search paths">.
+
+
+  <label id="option-U">
+  <tag><tt>-U, --auto-import</tt></tag>
+
+  Mark symbols that are not defined in the sources as imported symbols. This
+  should be used with care since it delays error messages about typos and such
+  until the linker is run. The compiler uses the equivalent of this switch
+  (<tt><ref id=".AUTOIMPORT" name=".AUTOIMPORT"></tt>) to enable auto imported
+  symbols for the runtime library. However, the compiler is supposed to
+  generate code that runs through the assembler without problems, something
+  which is not always true for assembler programmers.
+
+
+  <label id="option-V">
+  <tag><tt>-V, --version</tt></tag>
+
+  Print the version number of the assembler. If you send any suggestions
+  or bugfixes, please include the version number.
+
+
+  <label id="option-W">
+  <tag><tt>-Wn</tt></tag>
+
+  Set the warning level for the assembler. Using -W2 the assembler will
+  even warn about such things like unused imported symbols. The default
+  warning level is 1, and it would probably be silly to set it to
+  something lower.
+
+</descrip>
+<p>
+
+
+
+<sect>Search paths<label id="search-paths"><p>
+
+Normal include files are searched in the following places:
+
+<enum>
+<item>The current file's directory.
+<item>Any directory added with the <tt/<ref id="option-I" name="-I">/ option
+on the command line.
+<item>The value of the environment variable <tt/CA65_INC/ if it is defined.
+<item>A subdirectory named <tt/asminc/ of the directory defined in the
+      environment variable <tt/CC65_HOME/, if it is defined.
+<item>An optionally compiled-in directory.
+</enum>
+
+Binary include files are searched in the following places:
+
+<enum>
+<item>The current file's directory.
+<item>Any directory added with the <tt/<ref id="option--bin-include-dir"
+name="--bin-include-dir">/ option on the command line.
+</enum>
+
+
+
+<sect>Input format<p>
+
+<sect1>Assembler syntax<p>
+
+The assembler accepts the standard 6502/65816 assembler syntax. One line may
+contain a label (which is identified by a colon), and, in addition to the
+label, an assembler mnemonic, a macro, or a control command (see section <ref
+id="control-commands" name="Control Commands"> for supported control
+commands). Alternatively, the line may contain a symbol definition using
+the '=' token. Everything after a semicolon is handled as a comment (that is,
+it is ignored).
+
+Here are some examples for valid input lines:
+
+<tscreen><verb>
+   	Label:	   	       		; A label and a comment
+   	     	lda	#$20   		; A 6502 instruction plus comment
+   	L1:  	ldx    	#$20   		; Same with label
+   	L2:  	.byte	"Hello world"	; Label plus control command
+   	     	mymac	$20    		; Macro expansion
+   	     	MySym = 3*L1   		; Symbol definition
+   	MaSym 	= Label	       		; Another symbol
+</verb></tscreen>
+
+The assembler accepts
+
+<itemize>
+<item>all valid 6502 mnemonics when in 6502 mode (the default or after the
+      <tt><ref id=".P02" name=".P02"></tt> command was given).
+<item>all valid 6502 mnemonics plus a set of illegal instructions when in
+      <ref id="6502X-mode" name="6502X mode">.
+<item>all valid 65SC02 mnemonics when in 65SC02 mode (after the
+      <tt><ref id=".PSC02" name=".PSC02"></tt> command was given).
+<item>all valid 65C02 mnemonics when in 65C02 mode (after the
+      <tt><ref id=".PC02" name=".PC02"></tt> command was given).
+<item>all valid 65618 mnemonics when in 65816 mode (after the
+      <tt><ref id=".P816" name=".P816"></tt> command was given).
+</itemize>
+
+
+<sect1>65816 mode<p>
+
+In 65816 mode several aliases are accepted in addition to the official
+mnemonics:
+
+<tscreen><verb>
+  	BGE is an alias for BCS
+  	BLT is an alias for BCC
+  	CPA is an alias for CMP
+  	DEA is an alias for DEC A
+        INA is an alias for INC A
+  	SWA is an alias for XBA
+      	TAD is an alias for TCD
+  	TAS is an alias for TCS
+  	TDA is an alias for TDC
+  	TSA is an alias for TSC
+</verb></tscreen>
+
+
+
+<sect1>6502X mode<label id="6502X-mode"><p>
+
+6502X mode is an extension to the normal 6502 mode. In this mode, several
+mnemonics for illegal instructions of the NMOS 6502 CPUs are accepted. Since
+these instructions are illegal, there are no official mnemonics for them. The
+unofficial ones are taken from <url
+url="http://www.oxyron.de/html/opcodes02.html">. Please note that only the
+ones marked as "stable" are supported. The following table uses information
+from the mentioned web page, for more information, see there.
+
+<itemize>
+<item><tt>ALR: A:=(A and #{imm})/2;</tt>
+<item><tt>ANC: A:=A and #{imm};</tt> Generates opcode &dollar;0B.
+<item><tt>ARR: A:=(A and #{imm})/2;</tt>
+<item><tt>AXS: X:=A and X-#{imm};</tt>
+<item><tt>DCP: {adr}:={adr}-1; A-{adr};</tt>
+<item><tt>ISC: {adr}:={adr}+1; A:=A-{adr};</tt>
+<item><tt>LAS: A,X,S:={adr} and S;</tt>
+<item><tt>LAX: A,X:={adr};</tt>
+<item><tt>RLA: {adr}:={adr}rol; A:=A and {adr};</tt>
+<item><tt>RRA: {adr}:={adr}ror; A:=A adc {adr};</tt>
+<item><tt>SAX: {adr}:=A and X;</tt>
+<item><tt>SLO: {adr}:={adr}*2; A:=A or {adr};</tt>
+<item><tt>SRE: {adr}:={adr}/2; A:=A xor {adr};</tt>
+</itemize>
+
+
+
+<sect1>sweet16 mode<label id="sweet16-mode"><p>
+
+SWEET 16 is an interpreter for a pseudo 16 bit CPU written by Steve Wozniak
+for the Apple ][ machines. It is available in the Apple ][ ROM. ca65 can
+generate code for this pseudo CPU when switched into sweet16 mode. The
+following is special in sweet16 mode:
+
+<itemize>
+
+<item>The '@' character denotes indirect addressing and is no longer available
+for cheap local labels. If you need cheap local labels, you will have to
+switch to another lead character using the <tt/<ref id=".LOCALCHAR"
+name=".LOCALCHAR">/ command.
+
+<item>Registers are specified using <tt/R0/ .. <tt/R15/. In sweet16 mode,
+these identifiers are reserved words.
+
+</itemize>
+
+Please note that the assembler does neither supply the interpreter needed for
+SWEET 16 code, nor the zero page locations needed for the SWEET 16 registers,
+nor does it call the interpreter. All this must be done by your program. Apple
+][ programmers do probably know how to use sweet16 mode.
+
+For more information about SWEET 16, see
+<url url="http://www.6502.org/source/interpreters/sweet16.htm">.
+
+
+<sect1>Number format<p>
+
+For literal values, the assembler accepts the widely used number formats: A
+preceding '&dollar;' or a trailing 'h' denotes a hex value, a preceding '%'
+denotes a binary value, and a bare number is interpreted as a decimal. There
+are currently no octal values and no floats.
+
+
+<sect1>Conditional assembly<p>
+
+Please note that when using the conditional directives (<tt/.IF/ and friends),
+the input must consist of valid assembler tokens, even in <tt/.IF/ branches
+that are not assembled. The reason for this behaviour is that the assembler
+must still be able to detect the ending tokens (like <tt/.ENDIF/), so
+conversion of the input stream into tokens still takes place. As a consequence
+conditional assembly directives may <bf/not/ be used to prevent normal text
+(used as a comment or similar) from being assembled. <p>
+
+
+<sect>Expressions<p>
+
+
+<sect1>Expression evaluation<p>
+
+All expressions are evaluated with (at least) 32 bit precision. An
+expression may contain constant values and any combination of internal and
+external symbols. Expressions that cannot be evaluated at assembly time
+are stored inside the object file for evaluation by the linker.
+Expressions referencing imported symbols must always be evaluated by the
+linker.
+
+
+<sect1>Size of an expression result<p>
+
+Sometimes, the assembler must know about the size of the value that is the
+result of an expression. This is usually the case, if a decision has to be
+made, to generate a zero page or an absolute memory references. In this
+case, the assembler has to make some assumptions about the result of an
+expression:
+
+<itemize>
+<item> 	If the result of an expression is constant, the actual value is
+       	checked to see if it's a byte sized expression or not.
+<item> 	If the expression is explicitly casted to a byte sized expression by
+       	one of the '&gt;', '&lt;' or '^' operators, it is a byte expression.
+<item> 	If this is not the case, and the expression contains a symbol,
+       	explicitly declared as zero page symbol (by one of the .importzp or
+       	.exportzp instructions), then the whole expression is assumed to be
+       	byte sized.
+<item> 	If the expression contains symbols that are not defined, and these
+       	symbols are local symbols, the enclosing scopes are searched for a
+       	symbol with the same name. If one exists and this symbol is defined,
+       	its attributes are used to determine the result size.
+<item> 	In all other cases the expression is assumed to be word sized.
+</itemize>
+
+Note: If the assembler is not able to evaluate the expression at assembly
+time, the linker will evaluate it and check for range errors as soon as
+the result is known.
+
+
+<sect1>Boolean expressions<p>
+
+In the context of a boolean expression, any non zero value is evaluated as
+true, any other value to false. The result of a boolean expression is 1 if
+it's true, and zero if it's false. There are boolean operators with extreme
+low precedence with version 2.x (where x &gt; 0). The <tt/.AND/ and <tt/.OR/
+operators are shortcut operators. That is, if the result of the expression is
+already known, after evaluating the left hand side, the right hand side is
+not evaluated.
+
+
+<sect1>Constant expressions<p>
+
+Sometimes an expression must evaluate to a constant without looking at any
+further input. One such example is the <tt/<ref id=".IF" name=".IF">/ command
+that decides if parts of the code are assembled or not. An expression used in
+the <tt/.IF/ command cannot reference a symbol defined later, because the
+decision about the <tt/.IF/ must be made at the point when it is read. If the
+expression used in such a context contains only constant numerical values,
+there is no problem. When unresolvable symbols are involved it may get harder
+for the assembler to determine if the expression is actually constant, and it
+is even possible to create expressions that aren't recognized as constant.
+Simplifying the expressions will often help.
+
+In cases where the result of the expression is not needed immediately, the
+assembler will delay evaluation until all input is read, at which point all
+symbols are known. So using arbitrary complex constant expressions is no
+problem in most cases.
+
+
+
+<sect1>Available operators<label id="operators"><p>
+
+<table>
+<tabular ca="clc">
+<bf/Operator/| <bf/Description/| <bf/Precedence/@<hline>
+| Built-in string functions| 0@
+||~@
+| Built-in pseudo-variables| 1@
+| Built-in pseudo-functions| 1@
++| Unary positive| 1@
+-| Unary negative| 1@
+&tilde;<newline>
+.BITNOT| Unary bitwise not| 1@
+&lt;<newline>
+.LOBYTE| Unary low-byte operator| 1@
+&gt;<newline>
+.HIBYTE| Unary high-byte operator| 1@
+^<newline>
+.BANKBYTE| Unary bank-byte operator| 1@
+||~@
+*| Multiplication| 2@
+/| Division| 2@
+.MOD| Modulo operator| 2@
+&amp;<newline>
+.BITAND| Bitwise and| 2@
+^<newline>
+.BITXOR| Binary bitwise xor| 2@
+&lt;&lt;<newline>
+.SHL| Shift-left operator| 2@
+&gt;&gt;<newline>
+.SHR| Shift-right operator| 2@
+||~@
++| Binary addition| 3@
+-| Binary subtraction| 3@
+&verbar;<newline>
+.BITOR| Bitwise or| 3@
+||~@
+= | Compare operator (equal)| 4@
+&lt;&gt;| Compare operator (not equal)| 4@
+&lt;| Compare operator (less)| 4@
+&gt;| Compare operator (greater)| 4@
+&lt;=| Compare operator (less or equal)| 4@
+&gt;=| Compare operator (greater or equal)| 4@
+||~@
+&amp;&amp;<newline>
+.AND| Boolean and| 5@
+.XOR| Boolean xor| 5@
+||~@
+&verbar;&verbar;<newline>
+.OR| Boolean or| 6@
+||~@
+!<newline>
+.NOT| Boolean not| 7@<hline>
+</tabular>
+<caption>Available operators, sorted by precedence
+</table>
+
+To force a specific order of evaluation, parentheses may be used, as usual.
+
+
+
+<sect>Symbols and labels<p>
+
+A symbol or label is an identifier that starts with a letter and is followed
+by letters and digits. Depending on some features enabled (see
+<tt><ref id="at_in_identifiers" name="at_in_identifiers"></tt>,
+<tt><ref id="dollar_in_identifiers" name="dollar_in_identifiers"></tt> and
+<tt><ref id="leading_dot_in_identifiers" name="leading_dot_in_identifiers"></tt>)
+other characters may be present. Use of identifiers consisting of a single
+character will not work in all cases, because some of these identifiers are
+reserved keywords (for example "A" is not a valid identifier for a label,
+because it is the keyword for the accumulator).
+
+The assembler allows you to use symbols instead of naked values to make
+the source more readable. There are a lot of different ways to define and
+use symbols and labels, giving a lot of flexibility.
+
+<sect1>Numeric constants<p>
+
+Numeric constants are defined using the equal sign or the label assignment
+operator. After doing
+
+<tscreen><verb>
+        two = 2
+</verb></tscreen>
+
+may use the symbol "two" in every place where a number is expected, and it is
+evaluated to the value 2 in this context. The label assignment operator is
+almost identical, but causes the symbol to be marked as a label, so it may be
+handled differently in a debugger:
+
+<tscreen><verb>
+        io := $d000
+</verb></tscreen>
+
+The right side can of course be an expression:
+
+<tscreen><verb>
+        four = two * two
+</verb></tscreen>
+
+
+<label id="variables">
+<sect1>Numeric variables<p>
+
+Within macros and other control structures (<tt><ref id=".REPEAT"
+name=".REPEAT"></tt>, ...) it is sometimes useful to have some sort of
+variable. This can be achieved by the <tt>.SET</tt> operator. It creates a
+symbol that may get assigned a different value later:
+
+<tscreen><verb>
+        four .set 4
+        lda     #four           ; Loads 4 into A
+        four .set 3
+        lda     #four           ; Loads 3 into A
+</verb></tscreen>
+
+Since the value of the symbol can change later, it must be possible to
+evaluate it when used (no delayed evaluation as with normal symbols). So the
+expression used as the value must be constant.
+
+Following is an example for a macro that generates a different label each time
+it is used. It uses the <tt><ref id=".SPRINTF" name=".SPRINTF"></tt> function
+and a numeric variable named <tt>lcount</tt>.
+
+<tscreen><verb>
+        .lcount .set 0          ; Initialize the counter
+
+        .macro  genlab
+                .ident (.sprintf ("L%04X", lcount)):
+                lcount .set lcount + 1
+        .endmacro
+</verb></tscreen>
+
+
+<sect1>Standard labels<p>
+
+A label is defined by writing the name of the label at the start of the line
+(before any instruction mnemonic, macro or pseudo directive), followed by a
+colon. This will declare a symbol with the given name and the value of the
+current program counter.
+
+
+<sect1>Local labels and symbols<p>
+
+Using the <tt><ref id=".PROC" name=".PROC"></tt> directive, it is possible to
+create regions of code where the names of labels and symbols are local to this
+region. They are not known outside of this region and cannot be accessed from
+there. Such regions may be nested like PROCEDUREs in Pascal.
+
+See the description of the <tt><ref id=".PROC" name=".PROC"></tt>
+directive for more information.
+
+
+<sect1>Cheap local labels<p>
+
+Cheap local labels are defined like standard labels, but the name of the
+label must begin with a special symbol (usually '@', but this can be
+changed by the <tt><ref id=".LOCALCHAR" name=".LOCALCHAR"></tt>
+directive).
+
+Cheap local labels are visible only between two non cheap labels. As soon as a
+standard symbol is encountered (this may also be a local symbol if inside a
+region defined with the <tt><ref id=".PROC" name=".PROC"></tt> directive), the
+cheap local symbol goes out of scope.
+
+You may use cheap local labels as an easy way to reuse common label
+names like "Loop". Here is an example:
+
+<tscreen><verb>
+      	Clear:  lda    #$00   	     	; Global label
+      		ldy    #$20
+      	@Loop:  sta    Mem,y  	     	; Local label
+      		dey
+      		bne    @Loop  	     	; Ok
+      		rts
+       	Sub:    ... 	       	     	; New global label
+      	 	bne    @Loop  	     	; ERROR: Unknown identifier!
+</verb></tscreen>
+
+<sect1>Unnamed labels<p>
+
+If you really want to write messy code, there are also unnamed labels. These
+labels do not have a name (you guessed that already, didn't you?). A colon is
+used to mark the absence of the name.
+
+Unnamed labels may be accessed by using the colon plus several minus or plus
+characters as a label designator. Using the '-' characters will create a back
+reference (use the n'th label backwards), using '+' will create a forward
+reference (use the n'th label in forward direction). An example will help to
+understand this:
+
+<tscreen><verb>
+      	:	lda	(ptr1),y	; #1
+      		cmp	(ptr2),y
+      		bne    	:+     		; -> #2
+      		tax
+      		beq	:+++   		; -> #4
+      		iny
+      		bne	:-     		; -> #1
+      		inc	ptr1+1
+      		inc	ptr2+1
+      		bne	:-     		; -> #1
+
+      	:	bcs	:+     	       	; #2 -> #3
+      		ldx	#$FF
+      		rts
+
+      	:	ldx	#$01   		; #3
+      	:	rts	       		; #4
+</verb></tscreen>
+
+As you can see from the example, unnamed labels will make even short
+sections of code hard to understand, because you have to count labels
+to find branch targets (this is the reason why I for my part do
+prefer the "cheap" local labels). Nevertheless, unnamed labels are
+convenient in some situations, so it's your decision.
+
+<em/Note:/ <ref id="scopes" name="Scopes"> organize named symbols, not
+unnamed ones, so scopes don't have an effect on unnamed labels.
+
+
+
+<sect1>Using macros to define labels and constants<p>
+
+While there are drawbacks with this approach, it may be handy in a few rare
+situations. Using <tt><ref id=".DEFINE" name=".DEFINE"></tt>, it is possible
+to define symbols or constants that may be used elsewhere. One of the
+advantages is that you can use it to define string constants (this is not
+possible with the other symbol types).
+
+Please note: <tt/.DEFINE/ style macros do token replacements on a low level,
+so the names do not adhere to scoping, diagnostics may be misleading, there
+are no symbols to look up in the map file, and there is no debug info.
+Especially the first problem in the list can lead to very nasty programming
+errors. Because of these problems, the general advice is, <bf/NOT/ do use
+<tt/.DEFINE/ if you don't have to.
+
+Example:
+
+<tscreen><verb>
+      	.DEFINE	two	2
+      	.DEFINE version	"SOS V2.3"
+
+      	four = two * two       	; Ok
+      	.byte	version	       	; Ok
+
+      	.PROC		       	; Start local scope
+      	two = 3		       	; Will give "2 = 3" - invalid!
+      	.ENDPROC
+</verb></tscreen>
+
+
+<sect1>Symbols and <tt>.DEBUGINFO</tt><p>
+
+If <tt><ref id=".DEBUGINFO" name=".DEBUGINFO"></tt> is enabled (or <ref
+id="option-g" name="-g"> is given on the command line), global, local and
+cheap local labels are written to the object file and will be available in the
+symbol file via the linker. Unnamed labels are not written to the object file,
+because they don't have a name which would allow to access them.
+
+
+
+<sect>Scopes<label id="scopes"><p>
+
+ca65 implements several sorts of scopes for symbols.
+
+<sect1>Global scope<p>
+
+All (non cheap local) symbols that are declared outside of any nested scopes
+are in global scope.
+
+
+<sect1>Cheap locals<p>
+
+A special scope is the scope for cheap local symbols. It lasts from one non
+local symbol to the next one, without any provisions made by the programmer.
+All other scopes differ in usage but use the same concept internally.
+
+
+<sect1>Generic nested scopes<p>
+
+A nested scoped for generic use is started with <tt/<ref id=".SCOPE"
+name=".SCOPE">/ and closed with <tt/<ref id=".ENDSCOPE" name=".ENDSCOPE">/.
+The scope can have a name, in which case it is accessible from the outside by
+using <ref id="scopesyntax" name="explicit scopes">. If the scope does not
+have a name, all symbols created within the scope are local to the scope, and
+aren't accessible from the outside.
+
+A nested scope can access symbols from the local or from enclosing scopes by
+name without using explicit scope names. In some cases there may be
+ambiguities, for example if there is a reference to a local symbol that is not
+yet defined, but a symbol with the same name exists in outer scopes:
+
+<tscreen><verb>
+        .scope  outer
+                foo     = 2
+                .scope  inner
+                        lda     #foo
+                        foo     = 3
+                .endscope
+        .endscope
+</verb></tscreen>
+
+In the example above, the <tt/lda/ instruction will load the value 3 into the
+accumulator, because <tt/foo/ is redefined in the scope. However:
+
+<tscreen><verb>
+        .scope  outer
+                foo     = $1234
+                .scope  inner
+                        lda     foo,x
+                        foo     = $12
+                .endscope
+        .endscope
+</verb></tscreen>
+
+Here, <tt/lda/ will still load from <tt/$12,x/, but since it is unknown to the
+assembler that <tt/foo/ is a zeropage symbol when translating the instruction,
+absolute mode is used instead. In fact, the assembler will not use absolute
+mode by default, but it will search through the enclosing scopes for a symbol
+with the given name. If one is found, the address size of this symbol is used.
+This may lead to errors:
+
+<tscreen><verb>
+        .scope  outer
+                foo     = $12
+                .scope  inner
+                        lda     foo,x
+                        foo     = $1234
+                .endscope
+        .endscope
+</verb></tscreen>
+
+In this case, when the assembler sees the symbol <tt/foo/ in the <tt/lda/
+instruction, it will search for an already defined symbol <tt/foo/. It will
+find <tt/foo/ in scope <tt/outer/, and a close look reveals that it is a
+zeropage symbol. So the assembler will use zeropage addressing mode. If
+<tt/foo/ is redefined later in scope <tt/inner/, the assembler tries to change
+the address in the <tt/lda/ instruction already translated, but since the new
+value needs absolute addressing mode, this fails, and an error message "Range
+error" is output.
+
+Of course the most simple solution for the problem is to move the definition
+of <tt/foo/ in scope <tt/inner/ upwards, so it precedes its use. There may be
+rare cases when this cannot be done. In these cases, you can use one of the
+address size override operators:
+
+<tscreen><verb>
+        .scope  outer
+                foo     = $12
+                .scope  inner
+                        lda     a:foo,x
+                        foo     = $1234
+                .endscope
+        .endscope
+</verb></tscreen>
+
+This will cause the <tt/lda/ instruction to be translated using absolute
+addressing mode, which means changing the symbol reference later does not
+cause any errors.
+
+
+<sect1>Nested procedures<p>
+
+A nested procedure is created by use of <tt/<ref id=".PROC" name=".PROC">/. It
+differs from a <tt/<ref id=".SCOPE" name=".SCOPE">/ in that it must have a
+name, and a it will introduce a symbol with this name in the enclosing scope.
+So
+
+<tscreen><verb>
+        .proc   foo
+                ...
+        .endproc
+</verb></tscreen>
+
+is actually the same as
+
+<tscreen><verb>
+        foo:
+        .scope  foo
+                ...
+        .endscope
+</verb></tscreen>
+
+This is the reason why a procedure must have a name. If you want a scope
+without a name, use <tt/<ref id=".SCOPE" name=".SCOPE">/.
+
+<em/Note:/ As you can see from the example above, scopes and symbols live in
+different namespaces. There can be a symbol named <tt/foo/ and a scope named
+<tt/foo/ without any conflicts (but see the section titled <ref
+id="scopesearch" name="&quot;Scope search order&quot;">).
+
+
+<sect1>Structs, unions and enums<p>
+
+Structs, unions and enums are explained in a <ref id="structs" name="separate
+section">, I do only cover them here, because if they are declared with a
+name, they open a nested scope, similar to <tt/<ref id=".SCOPE"
+name=".SCOPE">/. However, when no name is specified, the behaviour is
+different: In this case, no new scope will be opened, symbols declared within
+a struct, union, or enum declaration will then be added to the enclosing scope
+instead.
+
+
+<sect1>Explicit scope specification<label id="scopesyntax"><p>
+
+Accessing symbols from other scopes is possible by using an explicit scope
+specification, provided that the scope where the symbol lives in has a name.
+The namespace token (<tt/::/) is used to access other scopes:
+
+<tscreen><verb>
+        .scope  foo
+        bar:    .word   0
+        .endscope
+
+                ...
+                lda     foo::bar        ; Access foo in scope bar
+</verb></tscreen>
+
+The only way to deny access to a scope from the outside is to declare a scope
+without a name (using the <tt/<ref id=".SCOPE" name=".SCOPE">/ command).
+
+A special syntax is used to specify the global scope: If a symbol or scope is
+preceded by the namespace token, the global scope is searched:
+
+<tscreen><verb>
+        bar     = 3
+
+        .scope  foo
+                bar     = 2
+                lda     #::bar  ; Access the global bar (which is 3)
+        .endscope
+</verb></tscreen>
+
+
+<sect1>Scope search order<label id="scopesearch"><p>
+
+The assembler searches for a scope in a similar way as for a symbol. First, it
+looks in the current scope, and then it walks up the enclosing scopes until
+the scope is found.
+
+However, one important thing to note when using explicit scope syntax is, that
+a symbol may be accessed before it is defined, but a scope may <bf/not/ be
+used without a preceding definition. This means that in the following
+example:
+
+<tscreen><verb>
+        .scope  foo
+                bar     = 3
+        .endscope
+
+        .scope  outer
+                lda     #foo::bar  ; Will load 3, not 2!
+                .scope  foo
+                        bar     = 2
+                .endscope
+        .endscope
+</verb></tscreen>
+
+the reference to the scope <tt/foo/ will use the global scope, and not the
+local one, because the local one is not visible at the point where it is
+referenced.
+
+Things get more complex if a complete chain of scopes is specified:
+
+<tscreen><verb>
+        .scope  foo
+                .scope  outer
+                        .scope  inner
+                                bar = 1
+                        .endscope
+                .endscope
+                .scope  another
+                        .scope  nested
+                                lda     #outer::inner::bar      ; 1
+                        .endscope
+                .endscope
+        .endscope
+
+        .scope  outer
+                .scope  inner
+                        bar = 2
+                .endscope
+        .endscope
+</verb></tscreen>
+
+When <tt/outer::inner::bar/ is referenced in the <tt/lda/ instruction, the
+assembler will first search in the local scope for a scope named <tt/outer/.
+Since none is found, the enclosing scope (<tt/another/) is checked. There is
+still no scope named <tt/outer/, so scope <tt/foo/ is checked, and finally
+scope <tt/outer/ is found. Within this scope, <tt/inner/ is searched, and in
+this scope, the assembler looks for a symbol named <tt/bar/.
+
+Please note that once the anchor scope is found, all following scopes
+(<tt/inner/ in this case) are expected to be found exactly in this scope. The
+assembler will search the scope tree only for the first scope (if it is not
+anchored in the root scope). Starting from there on, there is no flexibility,
+so if the scope named <tt/outer/ found by the assembler does not contain a
+scope named <tt/inner/, this would be an error, even if such a pair does exist
+(one level up in global scope).
+
+Ambiguities that may be introduced by this search algorithm may be removed by
+anchoring the scope specification in the global scope. In the example above,
+if you want to access the "other" symbol <tt/bar/, you would have to write:
+
+<tscreen><verb>
+        .scope  foo
+                .scope  outer
+                        .scope  inner
+                                bar = 1
+                        .endscope
+                .endscope
+                .scope  another
+                        .scope  nested
+                                lda     #::outer::inner::bar    ; 2
+                        .endscope
+                .endscope
+        .endscope
+
+        .scope  outer
+                .scope  inner
+                        bar = 2
+                .endscope
+        .endscope
+</verb></tscreen>
+
+
+<sect>Address sizes and memory models<label id="address-sizes"><p>
+
+<sect1>Address sizes<p>
+
+ca65 assigns each segment and each symbol an address size. This is true, even
+if the symbol is not used as an address. You may also think of a value range
+of the symbol instead of an address size.
+
+Possible address sizes are:
+
+<itemize>
+<item>Zeropage or direct (8 bits)
+<item>Absolute (16 bits)
+<item>Far (24 bits)
+<item>Long (32 bits)
+</itemize>
+
+Since the assembler uses default address sizes for the segments and symbols,
+it is usually not necessary to override the default behaviour. In cases, where
+it is necessary, the following keywords may be used to specify address sizes:
+
+<itemize>
+<item>DIRECT, ZEROPAGE or ZP for zeropage addressing (8 bits).
+<item>ABSOLUTE, ABS or NEAR for absolute addressing (16 bits).
+<item>FAR for far addressing (24 bits).
+<item>LONG or DWORD for long addressing (32 bits).
+</itemize>
+
+
+<sect1>Address sizes of segments<p>
+
+The assembler assigns an address size to each segment. Since the
+representation of a label within this segment is "segment start + offset",
+labels will inherit the address size of the segment they are declared in.
+
+The address size of a segment may be changed, by using an optional address
+size modifier. See the <tt/<ref id=".SEGMENT" name="segment directive">/ for
+an explanation on how this is done.
+
+
+<sect1>Address sizes of symbols<p>
+
+
+
+
+<sect1>Memory models<p>
+
+The default address size of a segment depends on the memory model used. Since
+labels inherit the address size from the segment they are declared in,
+changing the memory model is an easy way to change the address size of many
+symbols at once.
+
+
+
+
+<sect>Pseudo variables<label id="pseudo-variables"><p>
+
+Pseudo variables are readable in all cases, and in some special cases also
+writable.
+
+<sect1><tt>*</tt><p>
+
+  Reading this pseudo variable will return the program counter at the start
+  of the current input line.
+
+  Assignment to this variable is possible when <tt/<ref id=".FEATURE"
+  name=".FEATURE pc_assignment">/ is used. Note: You should not use
+  assignments to <tt/*/, use <tt/<ref id=".ORG" name=".ORG">/ instead.
+
+
+<sect1><tt>.CPU</tt><label id=".CPU"><p>
+
+  Reading this pseudo variable will give a constant integer value that
+  tells which CPU is currently enabled. It can also tell which instruction
+  set the CPU is able to translate. The value read from the pseudo variable
+  should be further examined by using one of the constants defined by the
+  "cpu" macro package (see <tt/<ref id=".MACPACK" name=".MACPACK">/).
+
+  It may be used to replace the .IFPxx pseudo instructions or to construct
+  even more complex expressions.
+
+  Example:
+
+  <tscreen><verb>
+        .macpack        cpu
+       	.if	(.cpu .bitand CPU_ISET_65816)
+  	 	phx
+  	 	phy
+  	.else
+  	 	txa
+  	 	pha
+  	 	tya
+  	 	pha
+  	.endif
+  </verb></tscreen>
+
+
+<sect1><tt>.PARAMCOUNT</tt><label id=".PARAMCOUNT"><p>
+
+  This builtin pseudo variable is only available in macros. It is replaced by
+  the actual number of parameters that were given in the macro invocation.
+
+  Example:
+
+  <tscreen><verb>
+	.macro	foo	arg1, arg2, arg3
+	.if	.paramcount <> 3
+   	.error	"Too few parameters for macro foo"
+	.endif
+	...
+ 	.endmacro
+  </verb></tscreen>
+
+  See section <ref id="macros" name="Macros">.
+
+
+<sect1><tt>.TIME</tt><label id=".TIME"><p>
+
+  Reading this pseudo variable will give a constant integer value that
+  represents the current time in POSIX standard (as seconds since the
+  Epoch).
+
+  It may be used to encode the time of translation somewhere in the created
+  code.
+
+  Example:
+
+  <tscreen><verb>
+        .dword  .time   ; Place time here
+  </verb></tscreen>
+
+
+<sect1><tt>.VERSION</tt><label id=".VERSION"><p>
+
+  Reading this pseudo variable will give the assembler version according to
+  the following formula:
+
+        VER_MAJOR*$100 + VER_MINOR*$10
+
+  It may be used to encode the assembler version or check the assembler for
+  special features not available with older versions.
+
+  Example:
+
+  Version 2.14 of the assembler will return $2E0 as numerical constant when
+  reading the pseudo variable <tt/.VERSION/.
+
+
+
+<sect>Pseudo functions<label id="pseudo-functions"><p>
+
+Pseudo functions expect their arguments in parenthesis, and they have a result,
+either a string or an expression.
+
+
+<sect1><tt>.BANK</tt><label id=".BANK"><p>
+
+  The <tt/.BANK/ function is used to support systems with banked memory. The
+  argument is an expression with exactly one segment reference - usually a
+  label. The function result is the value of the <tt/bank/ attribute assigned
+  to the run memory area of the segment. Please see the linker documentation
+  for more information about memory areas and their attributes.
+
+  The value of <tt/.BANK/ can be used to switch memory so that a memory bank
+  containing specific data is available.
+
+  The <tt/bank/ attribute is a 32 bit integer and so is the result of the
+  <tt/.BANK/ function. You will have to use <tt><ref id=".LOBYTE"
+  name=".LOBYTE"></tt> or similar functions to address just part of it.
+
+  Please note that <tt/.BANK/ will always get evaluated in the link stage, so
+  an expression containing <tt/.BANK/ can never be used where a constant known
+  result is expected (for example with <tt/.RES/).
+
+  Example:
+
+  <tscreen><verb>
+        .segment "BANK1"
+        .proc   banked_func_1
+                ...
+        .endproc
+
+        .segment "BANK2"
+        .proc   banked_func_2
+                ...
+        .endproc
+
+        .proc   bank_table
+  	        .addr   banked_func_1
+                .byte   <.BANK (banked_func_1)
+
+                .addr   banked_func_2
+                .byte   <.BANK (banked_func_2)
+        .endproc
+  </verb></tscreen>
+
+
+
+<sect1><tt>.BANKBYTE</tt><label id=".BANKBYTE"><p>
+
+  The function returns the bank byte (that is, bits 16-23) of its argument.
+  It works identical to the '^' operator.
+
+  See: <tt><ref id=".HIBYTE" name=".HIBYTE"></tt>,
+       <tt><ref id=".LOBYTE" name=".LOBYTE"></tt>
+
+
+<sect1><tt>.BLANK</tt><label id=".BLANK"><p>
+
+  Builtin function. The function evaluates its argument in braces and yields
+  "false" if the argument is non blank (there is an argument), and "true" if
+  there is no argument.  The token list that makes up the function argument
+  may optionally be enclosed in curly braces. This allows the inclusion of
+  tokens that would otherwise terminate the list (the closing right
+  parenthesis). The curly braces are not considered part of the list, a list
+  just consisting of curly braces is considered to be empty.
+
+  As an example, the <tt/.IFBLANK/ statement may be replaced by
+
+  <tscreen><verb>
+  	.if	.blank({arg})
+  </verb></tscreen>
+
+
+
+<sect1><tt>.CONCAT</tt><label id=".CONCAT"><p>
+
+  Builtin string function. The function allows to concatenate a list of string
+  constants separated by commas. The result is a string constant that is the
+  concatenation of all arguments. This function is most useful in macros and
+  when used together with the <tt/.STRING/ builtin function. The function may
+  be used in any case where a string constant is expected.
+
+  Example:
+
+  <tscreen><verb>
+	.include 	.concat ("myheader", ".", "inc")
+  </verb></tscreen>
+
+  This is the same as the command
+
+  <tscreen><verb>
+	.include 	"myheader.inc"
+  </verb></tscreen>
+
+
+<sect1><tt>.CONST</tt><label id=".CONST"><p>
+
+  Builtin function. The function evaluates its argument in braces and
+  yields "true" if the argument is a constant expression (that is, an
+  expression that yields a constant value at assembly time) and "false"
+  otherwise. As an example, the .IFCONST statement may be replaced by
+
+  <tscreen><verb>
+      	.if	.const(a + 3)
+  </verb></tscreen>
+
+
+<sect1><tt>.HIBYTE</tt><label id=".HIBYTE"><p>
+
+  The function returns the high byte (that is, bits 8-15) of its argument.
+  It works identical to the '>' operator.
+
+  See: <tt><ref id=".LOBYTE" name=".LOBYTE"></tt>,
+       <tt><ref id=".BANKBYTE" name=".BANKBYTE"></tt>
+
+
+<sect1><tt>.HIWORD</tt><label id=".HIWORD"><p>
+
+  The function returns the high word (that is, bits 16-31) of its argument.
+
+  See: <tt><ref id=".LOWORD" name=".LOWORD"></tt>
+
+
+<sect1><tt>.IDENT</tt><label id=".IDENT"><p>
+
+  The function expects a string as its argument, and converts this argument
+  into an identifier. If the string starts with the current <tt/<ref
+  id=".LOCALCHAR" name=".LOCALCHAR">/, it will be converted into a cheap local
+  identifier, otherwise it will be converted into a normal identifier.
+
+  Example:
+
+  <tscreen><verb>
+    	.macro 	makelabel       arg1, arg2
+                .ident (.concat (arg1, arg2)):
+        .endmacro
+
+                makelabel       "foo", "bar"
+
+                .word           foobar          ; Valid label
+  </verb></tscreen>
+
+
+<sect1><tt>.LEFT</tt><label id=".LEFT"><p>
+
+  Builtin function. Extracts the left part of a given token list.
+
+  Syntax:
+
+  <tscreen><verb>
+       	.LEFT (&lt;int expr&gt;, &lt;token list&gt;)
+  </verb></tscreen>
+
+  The first integer expression gives the number of tokens to extract from
+  the token list. The second argument is the token list itself. The token
+  list may optionally be enclosed into curly braces. This allows the
+  inclusion of tokens that would otherwise terminate the list (the closing
+  right paren in the given case).
+
+  Example:
+
+  To check in a macro if the given argument has a '#' as first token
+  (immediate addressing mode), use something like this:
+
+  <tscreen><verb>
+    	.macro 	ldax	arg
+    	       	...
+    	       	.if (.match (.left (1, {arg}), #))
+
+    	       	; ldax called with immediate operand
+    	       	...
+
+    	       	.endif
+    	       	...
+       	.endmacro
+  </verb></tscreen>
+
+  See also the <tt><ref id=".MID" name=".MID"></tt> and <tt><ref id=".RIGHT"
+  name=".RIGHT"></tt> builtin functions.
+
+
+<sect1><tt>.LOBYTE</tt><label id=".LOBYTE"><p>
+
+  The function returns the low byte (that is, bits 0-7) of its argument.
+  It works identical to the '<' operator.
+
+  See: <tt><ref id=".HIBYTE" name=".HIBYTE"></tt>,
+       <tt><ref id=".BANKBYTE" name=".BANKBYTE"></tt>
+
+
+<sect1><tt>.LOWORD</tt><label id=".LOWORD"><p>
+
+  The function returns the low word (that is, bits 0-15) of its argument.
+
+  See: <tt><ref id=".HIWORD" name=".HIWORD"></tt>
+
+
+<sect1><tt>.MATCH</tt><label id=".MATCH"><p>
+
+  Builtin function. Matches two token lists against each other. This is
+  most useful within macros, since macros are not stored as strings, but
+  as lists of tokens.
+
+  The syntax is
+
+  <tscreen><verb>
+       	.MATCH(&lt;token list #1&gt;, &lt;token list #2&gt;)
+  </verb></tscreen>
+
+  Both token list may contain arbitrary tokens with the exception of the
+  terminator token (comma resp. right parenthesis) and
+
+  <itemize>
+  <item>end-of-line
+  <item>end-of-file
+  </itemize>
+
+  The token lists may optionally be enclosed into curly braces. This allows
+  the inclusion of tokens that would otherwise terminate the list (the closing
+  right paren in the given case). Often a macro parameter is used for any of
+  the token lists.
+
+  Please note that the function does only compare tokens, not token
+  attributes. So any number is equal to any other number, regardless of the
+  actual value. The same is true for strings. If you need to compare tokens
+  <em/and/ token attributes, use the <tt><ref id=".XMATCH"
+  name=".XMATCH"></tt> function.
+
+  Example:
+
+  Assume the macro <tt/ASR/, that will shift right the accumulator by one,
+  while honoring the sign bit. The builtin processor instructions will allow
+  an optional "A" for accu addressing for instructions like <tt/ROL/ and
+  <tt/ROR/. We will use the <tt><ref id=".MATCH" name=".MATCH"></tt> function
+  to check for this and print and error for invalid calls.
+
+  <tscreen><verb>
+  	.macro	asr 	arg
+
+       	       	.if (.not .blank(arg)) .and (.not .match ({arg}, a))
+    	    	.error "Syntax error"
+    	    	.endif
+
+    	    	cmp 	#$80		; Bit 7 into carry
+    	    	lsr 	a		; Shift carry into bit 7
+
+    	.endmacro
+  </verb></tscreen>
+
+  The macro will only accept no arguments, or one argument that must be the
+  reserved keyword "A".
+
+  See: <tt><ref id=".XMATCH" name=".XMATCH"></tt>
+
+
+<sect1><tt>.MAX</tt><label id=".MAX"><p>
+
+  Builtin function. The result is the larger of two values.
+
+  The syntax is
+
+  <tscreen><verb>
+       	.MAX (&lt;value #1&gt;, &lt;value #2&gt;)
+  </verb></tscreen>
+
+  Example:
+
+  <tscreen><verb>
+        ; Reserve space for the larger of two data blocks
+       	savearea:       .max (.sizeof (foo), .sizeof (bar))
+  </verb></tscreen>
+
+  See: <tt><ref id=".MIN" name=".MIN"></tt>
+
+
+<sect1><tt>.MID</tt><label id=".MID"><p>
+
+  Builtin function. Takes a starting index, a count and a token list as
+  arguments. Will return part of the token list.
+
+  Syntax:
+
+  <tscreen><verb>
+       	.MID (&lt;int expr&gt;, &lt;int expr&gt;, &lt;token list&gt;)
+  </verb></tscreen>
+
+  The first integer expression gives the starting token in the list (the first
+  token has index 0). The second integer expression gives the number of tokens
+  to extract from the token list. The third argument is the token list itself.
+  The token list may optionally be enclosed into curly braces. This allows the
+  inclusion of tokens that would otherwise terminate the list (the closing
+  right paren in the given case).
+
+  Example:
+
+  To check in a macro if the given argument has a '<tt/#/' as first token
+  (immediate addressing mode), use something like this:
+
+    <tscreen><verb>
+  	.macro	ldax	arg
+    		...
+    		.if (.match (.mid (0, 1, {arg}), #))
+
+    		; ldax called with immediate operand
+    		...
+
+    		.endif
+    		...
+       	.endmacro
+  </verb></tscreen>
+
+  See also the <tt><ref id=".LEFT" name=".LEFT"></tt> and <tt><ref id=".RIGHT"
+  name=".RIGHT"></tt> builtin functions.
+
+
+<sect1><tt>.MIN</tt><label id=".MIN"><p>
+
+  Builtin function. The result is the smaller of two values.
+
+  The syntax is
+
+  <tscreen><verb>
+       	.MIN (&lt;value #1&gt;, &lt;value #2&gt;)
+  </verb></tscreen>
+
+  Example:
+
+  <tscreen><verb>
+        ; Reserve space for some data, but 256 bytes minimum
+       	savearea:       .min (.sizeof (foo), 256)
+  </verb></tscreen>
+
+  See: <tt><ref id=".MAX" name=".MAX"></tt>
+
+
+<sect1><tt>.REF, .REFERENCED</tt><label id=".REFERENCED"><p>
+
+  Builtin function. The function expects an identifier as argument in braces.
+  The argument is evaluated, and the function yields "true" if the identifier
+  is a symbol that has already been referenced somewhere in the source file up
+  to the current position. Otherwise the function yields false. As an example,
+  the <tt><ref id=".IFREF" name=".IFREF"></tt> statement may be replaced by
+
+  <tscreen><verb>
+	.if	.referenced(a)
+  </verb></tscreen>
+
+  See: <tt><ref id=".DEFINED" name=".DEFINED"></tt>
+
+
+<sect1><tt>.RIGHT</tt><label id=".RIGHT"><p>
+
+  Builtin function. Extracts the right part of a given token list.
+
+  Syntax:
+
+  <tscreen><verb>
+       	.RIGHT (&lt;int expr&gt;, &lt;token list&gt;)
+  </verb></tscreen>
+
+  The first integer expression gives the number of tokens to extract from the
+  token list. The second argument is the token list itself.  The token list
+  may optionally be enclosed into curly braces. This allows the inclusion of
+  tokens that would otherwise terminate the list (the closing right paren in
+  the given case).
+
+  See also the <tt><ref id=".LEFT" name=".LEFT"></tt> and <tt><ref id=".MID"
+  name=".MID"></tt> builtin functions.
+
+
+<sect1><tt>.SIZEOF</tt><label id=".SIZEOF"><p>
+
+  <tt/.SIZEOF/ is a pseudo function that returns the size of its argument. The
+  argument can be a struct/union, a struct member, a procedure, or a label. In
+  case of a procedure or label, its size is defined by the amount of data
+  placed in the segment where the label is relative to. If a line of code
+  switches segments (for example in a macro) data placed in other segments
+  does not count for the size.
+
+  Please note that a symbol or scope must exist, before it is used together with
+  <tt/.SIZEOF/ (this may get relaxed later, but will always be true for scopes).
+  A scope has preference over a symbol with the same name, so if the last part
+  of a name represents both, a scope and a symbol, the scope is chosen over the
+  symbol.
+
+  After the following code:
+
+  <tscreen><verb>
+        .struct Point                   ; Struct size = 4
+                xcoord  .word
+                ycoord  .word
+        .endstruct
+
+        P:      .tag    Point           ; Declare a point
+        @P:     .tag    Point           ; Declare another point
+
+        .code
+        .proc   Code
+                nop
+                .proc   Inner
+                        nop
+                .endproc
+                nop
+        .endproc
+
+        .proc   Data
+        .data                           ; Segment switch!!!
+                .res    4
+        .endproc
+  </verb></tscreen>
+
+  <descrip>
+    <tag><tt/.sizeof(Point)/</tag>
+    will have the value 4, because this is the size of struct <tt/Point/.
+
+    <tag><tt/.sizeof(Point::xcoord)/</tag>
+    will have the value 2, because this is the size of the member <tt/xcoord/
+    in struct <tt/Point/.
+
+    <tag><tt/.sizeof(P)/</tag>
+    will have the value 4, this is the size of the data declared on the same
+    source line as the label <tt/P/, which is in the same segment that <tt/P/
+    is relative to.
+
+    <tag><tt/.sizeof(@P)/</tag>
+    will have the value 4, see above. The example demonstrates that <tt/.SIZEOF/
+    does also work for cheap local symbols.
+
+    <tag><tt/.sizeof(Code)/</tag>
+    will have the value 3, since this is amount of data emitted into the code
+    segment, the segment that was active when <tt/Code/ was entered. Note that
+    this value includes the amount of data emitted in child scopes (in this
+    case <tt/Code::Inner/).
+
+    <tag><tt/.sizeof(Code::Inner)/</tag>
+    will have the value 1 as expected.
+
+    <tag><tt/.sizeof(Data)/</tag>
+    will have the value 0. Data is emitted within the scope <tt/Data/, but since
+    the segment is switched after entry, this data is emitted into another
+    segment.
+  </descrip>
+
+
+<sect1><tt>.STRAT</tt><label id=".STRAT"><p>
+
+  Builtin function. The function accepts a string and an index as
+  arguments and returns the value of the character at the given position
+  as an integer value. The index is zero based.
+
+  Example:
+
+  <tscreen><verb>
+       	.macro	M    	Arg
+		; Check if the argument string starts with '#'
+		.if (.strat (Arg, 0) = '#')
+		...
+		.endif
+       	.endmacro
+  </verb></tscreen>
+
+
+<sect1><tt>.SPRINTF</tt><label id=".SPRINTF"><p>
+
+  Builtin function. It expects a format string as first argument. The number
+  and type of the following arguments depend on the format string. The format
+  string is similar to the one of the C <tt/printf/ function. Missing things
+  are: Length modifiers, variable width.
+
+  The result of the function is a string.
+
+  Example:
+
+  <tscreen><verb>
+        num     = 3
+
+        ; Generate an identifier:
+        .ident (.sprintf ("%s%03d", "label", num)):
+  </verb></tscreen>
+
+
+<sect1><tt>.STRING</tt><label id=".STRING"><p>
+
+  Builtin function. The function accepts an argument in braces and converts
+  this argument into a string constant. The argument may be an identifier, or
+  a constant numeric value.
+
+  Since you can use a string in the first place, the use of the function may
+  not be obvious. However, it is useful in macros, or more complex setups.
+
+  Example:
+
+  <tscreen><verb>
+       	; Emulate other assemblers:
+       	.macro	section	name
+       		.segment	.string(name)
+       	.endmacro
+  </verb></tscreen>
+
+
+<sect1><tt>.STRLEN</tt><label id=".STRLEN"><p>
+
+  Builtin function. The function accepts a string argument in braces and
+  evaluates to the length of the string.
+
+  Example:
+
+  The following macro encodes a string as a pascal style string with
+  a leading length byte.
+
+  <tscreen><verb>
+       	.macro	PString	Arg
+		.byte	.strlen(Arg), Arg
+       	.endmacro
+  </verb></tscreen>
+
+
+<sect1><tt>.TCOUNT</tt><label id=".TCOUNT"><p>
+
+  Builtin function. The function accepts a token list in braces. The function
+  result is the number of tokens given as argument. The token list may
+  optionally be enclosed into curly braces which are not considered part of
+  the list and not counted. Enclosement in curly braces allows the inclusion
+  of tokens that would otherwise terminate the list (the closing right paren
+  in the given case).
+
+  Example:
+
+  The <tt/ldax/ macro accepts the '#' token to denote immediate addressing (as
+  with the normal 6502 instructions). To translate it into two separate 8 bit
+  load instructions, the '#' token has to get stripped from the argument:
+
+  <tscreen><verb>
+    	.macro	ldax	arg
+    	   	.if (.match (.mid (0, 1, {arg}), #))
+    	   	; ldax called with immediate operand
+	   	lda	#<(.right (.tcount ({arg})-1, {arg}))
+	   	ldx	#>(.right (.tcount ({arg})-1, {arg}))
+	   	.else
+	   	...
+    	   	.endif
+       	.endmacro
+  </verb></tscreen>
+
+
+<sect1><tt>.XMATCH</tt><label id=".XMATCH"><p>
+
+  Builtin function. Matches two token lists against each other. This is
+  most useful within macros, since macros are not stored as strings, but
+  as lists of tokens.
+
+  The syntax is
+
+  <tscreen><verb>
+       	.XMATCH(&lt;token list #1&gt;, &lt;token list #2&gt;)
+  </verb></tscreen>
+
+  Both token list may contain arbitrary tokens with the exception of the
+  terminator token (comma resp. right parenthesis) and
+
+  <itemize>
+  <item>end-of-line
+  <item>end-of-file
+  </itemize>
+
+  The token lists may optionally be enclosed into curly braces. This allows
+  the inclusion of tokens that would otherwise terminate the list (the closing
+  right paren in the given case). Often a macro parameter is used for any of
+  the token lists.
+
+  The function compares tokens <em/and/ token values. If you need a function
+  that just compares the type of tokens, have a look at the <tt><ref
+  id=".MATCH" name=".MATCH"></tt> function.
+
+  See: <tt><ref id=".MATCH" name=".MATCH"></tt>
+
+
+
+<sect>Control commands<label id="control-commands"><p>
+
+Here's a list of all control commands and a description, what they do:
+
+
+<sect1><tt>.A16</tt><label id=".A16"><p>
+
+  Valid only in 65816 mode. Switch the accumulator to 16 bit.
+
+  Note: This command will not emit any code, it will tell the assembler to
+  create 16 bit operands for immediate accumulator addressing mode.
+
+  See also: <tt><ref id=".SMART" name=".SMART"></tt>
+
+
+<sect1><tt>.A8</tt><label id=".A8"><p>
+
+  Valid only in 65816 mode. Switch the accumulator to 8 bit.
+
+  Note: This command will not emit any code, it will tell the assembler to
+  create 8 bit operands for immediate accu addressing mode.
+
+  See also: <tt><ref id=".SMART" name=".SMART"></tt>
+
+
+<sect1><tt>.ADDR</tt><label id=".ADDR"><p>
+
+  Define word sized data. In 6502 mode, this is an alias for <tt/.WORD/ and
+  may be used for better readability if the data words are address values. In
+  65816 mode, the address is forced to be 16 bit wide to fit into the current
+  segment. See also <tt><ref id=".FARADDR" name=".FARADDR"></tt>. The command
+  must be followed by a sequence of (not necessarily constant) expressions.
+
+  Example:
+
+  <tscreen><verb>
+  	.addr  	$0D00, $AF13, _Clear
+  </verb></tscreen>
+
+  See: <tt><ref id=".FARADDR" name=".FARADDR"></tt>, <tt><ref id=".WORD"
+       name=".WORD"></tt>
+
+
+<sect1><tt>.ALIGN</tt><label id=".ALIGN"><p>
+
+  Align data to a given boundary. The command expects a constant integer
+  argument in the range 1 ... 65536, plus an optional second argument
+  in byte range. If there is a second argument, it is used as fill value,
+  otherwise the value defined in the linker configuration file is used
+  (the default for this value is zero).
+
+  <tt/.ALIGN/ will insert fill bytes, and the number of fill bytes depend of
+  the final address of the segment. <tt/.ALIGN/ cannot insert a variable
+  number of bytes, since that would break address calculations within the
+  module. So each <tt/.ALIGN/ expects the segment to be aligned to a multiple
+  of the alignment, because that allows the number of fill bytes to be
+  calculated in advance by the assembler. You are therefore required to
+  specify a matching alignment for the segment in the linker config. The
+  linker will output a warning if the alignment of the segment is less than
+  what is necessary to have a correct alignment in the object file.
+
+  Example:
+
+  <tscreen><verb>
+      	.align	256
+  </verb></tscreen>
+
+  Some unexpected behaviour might occur if there are multiple <tt/.ALIGN/
+  commands with different arguments. To allow the assembler to calculate the
+  number of fill bytes in advance, the alignment of the segment must be a
+  multiple of each of the alignment factors. This may result in unexpectedly
+  large alignments for the segment within the module.
+
+  Example:
+
+  <tscreen><verb>
+        .align  15
+        .byte   15
+        .align  18
+        .byte   18
+  </verb></tscreen>
+
+  For the assembler to be able to align correctly, the segment must be aligned
+  to the least common multiple of 15 and 18 which is 90. The assembler will
+  calculate this automatically and will mark the segment with this value.
+
+  Unfortunately, the combined alignment may get rather large without the user
+  knowing about it, wasting space in the final executable. If we add another
+  alignment to the example above
+
+  <tscreen><verb>
+        .align  15
+        .byte   15
+        .align  18
+        .byte   18
+        .align  251
+        .byte   0
+  </verb></tscreen>
+
+  the assembler will force a segment alignment to the least common multiple of
+  15, 18 and 251 - which is 22590. To protect the user against errors, the
+  assembler will issue a warning when the combined alignment exceeds 256. The
+  command line option <tt><ref id="option--large-alignment"
+  name="--large-alignment"></tt> will disable this warning.
+
+  Please note that with alignments that are a power of two (which were the
+  only alignments possible in older versions of the assembler), the problem is
+  less severe, because the least common multiple of powers to the same base is
+  always the larger one.
+
+
+
+<sect1><tt>.ASCIIZ</tt><label id=".ASCIIZ"><p>
+
+  Define a string with a trailing zero.
+
+  Example:
+
+  <tscreen><verb>
+  	Msg: 	.asciiz	"Hello world"
+  </verb></tscreen>
+
+  This will put the string "Hello world" followed by a binary zero into
+  the current segment. There may be more strings separated by commas, but
+  the binary zero is only appended once (after the last one).
+
+
+<sect1><tt>.ASSERT</tt><label id=".ASSERT"><p>
+
+  Add an assertion. The command is followed by an expression, an action
+  specifier, and an optional message that is output in case the assertion
+  fails. If no message was given, the string "Assertion failed" is used. The
+  action specifier may be one of <tt/warning/, <tt/error/, <tt/ldwarning/ or
+  <tt/lderror/. In the former two cases, the assertion is evaluated by the
+  assembler if possible, and in any case, it's also passed to the linker in
+  the object file (if one is generated). The linker will then evaluate the
+  expression when segment placement has been done.
+
+  Example:
+
+  <tscreen><verb>
+       	.assert         * = $8000, error, "Code not at $8000"
+  </verb></tscreen>
+
+  The example assertion will check that the current location is at $8000,
+  when the output file is written, and abort with an error if this is not
+  the case. More complex expressions are possible. The action specifier
+  <tt/warning/ outputs a warning, while the <tt/error/ specifier outputs
+  an error message. In the latter case, generation of the output file is
+  suppressed in both the assembler and linker.
+
+
+<sect1><tt>.AUTOIMPORT</tt><label id=".AUTOIMPORT"><p>
+
+  Is followed by a plus or a minus character. When switched on (using a
+  +), undefined symbols are automatically marked as import instead of
+  giving errors. When switched off (which is the default so this does not
+  make much sense), this does not happen and an error message is
+  displayed. The state of the autoimport flag is evaluated when the
+  complete source was translated, before outputting actual code, so it is
+  <em/not/ possible to switch this feature on or off for separate sections
+  of code. The last setting is used for all symbols.
+
+  You should probably not use this switch because it delays error
+  messages about undefined symbols until the link stage. The cc65
+  compiler (which is supposed to produce correct assembler code in all
+  circumstances, something which is not true for most assembler
+  programmers) will insert this command to avoid importing each and every
+  routine from the runtime library.
+
+  Example:
+
+  <tscreen><verb>
+  	.autoimport    	+   	; Switch on auto import
+  </verb></tscreen>
+
+<sect1><tt>.BANKBYTES</tt><label id=".BANKBYTES"><p>
+
+  Define byte sized data by extracting only the bank byte (that is, bits 16-23) from
+  each expression.  This is equivalent to <tt><ref id=".BYTE" name=".BYTE"></tt> with
+  the operator '^' prepended to each expression in its list.
+
+  Example:
+
+  <tscreen><verb>
+        .define MyTable TableItem0, TableItem1, TableItem2, TableItem3
+
+	TableLookupLo:   .lobytes   MyTable
+	TableLookupHi:   .hibytes   MyTable
+	TableLookupBank: .bankbytes MyTable
+  </verb></tscreen>
+
+  which is equivalent to
+
+  <tscreen><verb>
+        TableLookupLo:   .byte &lt;TableItem0, &lt;TableItem1, &lt;TableItem2, &lt;TableItem3
+	TableLookupHi:   .byte &gt;TableItem0, &gt;TableItem1, &gt;TableItem2, &gt;TableItem3
+	TableLookupBank: .byte ^TableItem0, ^TableItem1, ^TableItem2, ^TableItem3
+  </verb></tscreen>
+
+  See also: <tt><ref id=".BYTE" name=".BYTE"></tt>,
+            <tt><ref id=".HIBYTES" name=".HIBYTES"></tt>,
+            <tt><ref id=".LOBYTES" name=".LOBYTES"></tt>
+
+
+<sect1><tt>.BSS</tt><label id=".BSS"><p>
+
+  Switch to the BSS segment. The name of the BSS segment is always "BSS",
+  so this is a shortcut for
+
+  <tscreen><verb>
+  	.segment  "BSS"
+  </verb></tscreen>
+
+  See also the <tt><ref id=".SEGMENT" name=".SEGMENT"></tt> command.
+
+
+<sect1><tt>.BYT, .BYTE</tt><label id=".BYTE"><p>
+
+  Define byte sized data. Must be followed by a sequence of (byte ranged)
+  expressions or strings.
+
+  Example:
+
+  <tscreen><verb>
+  	.byte	"Hello "
+	.byt	"world", $0D, $00
+  </verb></tscreen>
+
+
+<sect1><tt>.CASE</tt><label id=".CASE"><p>
+
+  Switch on or off case sensitivity on identifiers. The default is off
+  (that is, identifiers are case sensitive), but may be changed by the
+  -i switch on the command line.
+  The command must be followed by a '+' or '-' character to switch the
+  option on or off respectively.
+
+  Example:
+
+  <tscreen><verb>
+       	.case	-   	    	; Identifiers are not case sensitive
+  </verb></tscreen>
+
+
+<sect1><tt>.CHARMAP</tt><label id=".CHARMAP"><p>
+
+  Apply a custom mapping for characters. The command is followed by two
+  numbers. The first one is the index of the source character (range 1..255),
+  the second one is the mapping (range 0..255). The mapping applies to all
+  character and string constants when they generate output, and overrides a
+  mapping table specified with the <tt><ref id="option-t" name="-t"></tt>
+  command line switch.
+
+  Example:
+
+  <tscreen><verb>
+       	.charmap        $41, $61        ; Map 'A' to 'a'
+  </verb></tscreen>
+
+
+<sect1><tt>.CODE</tt><label id=".CODE"><p>
+
+  Switch to the CODE segment. The name of the CODE segment is always
+  "CODE", so this is a shortcut for
+
+  <tscreen><verb>
+       	.segment  "CODE"
+  </verb></tscreen>
+
+  See also the <tt><ref id=".SEGMENT" name=".SEGMENT"></tt> command.
+
+
+<sect1><tt>.CONDES</tt><label id=".CONDES"><p>
+
+  Export a symbol and mark it in a special way. The linker is able to build
+  tables of all such symbols. This may be used to automatically create a list
+  of functions needed to initialize linked library modules.
+
+  Note: The linker has a feature to build a table of marked routines, but it
+  is your code that must call these routines, so just declaring a symbol with
+  <tt/.CONDES/ does nothing by itself.
+
+  All symbols are exported as an absolute (16 bit) symbol. You don't need to
+  use an additional <tt><ref id=".EXPORT" name=".EXPORT"></tt> statement, this
+  is implied by <tt/.CONDES/.
+
+  <tt/.CONDES/ is followed by the type, which may be <tt/constructor/,
+  <tt/destructor/ or a numeric value between 0 and 6 (where 0 is the same as
+  specifying <tt/constructor/ and 1 is equal to specifying <tt/destructor/).
+  The <tt><ref id=".CONSTRUCTOR" name=".CONSTRUCTOR"></tt>, <tt><ref
+  id=".DESTRUCTOR" name=".DESTRUCTOR"></tt> and <tt><ref id=".INTERRUPTOR"
+  name=".INTERRUPTOR"></tt> commands are actually shortcuts for <tt/.CONDES/
+  with a type of <tt/constructor/ resp. <tt/destructor/ or <tt/interruptor/.
+
+  After the type, an optional priority may be specified. Higher numeric values
+  mean higher priority. If no priority is given, the default priority of 7 is
+  used. Be careful when assigning priorities to your own module constructors
+  so they won't interfere with the ones in the cc65 library.
+
+  Example:
+
+  <tscreen><verb>
+   	.condes	      	ModuleInit, constructor
+	.condes	      	ModInit, 0, 16
+  </verb></tscreen>
+
+  See the <tt><ref id=".CONSTRUCTOR" name=".CONSTRUCTOR"></tt>, <tt><ref
+  id=".DESTRUCTOR" name=".DESTRUCTOR"></tt> and <tt><ref id=".INTERRUPTOR"
+  name=".INTERRUPTOR"></tt> commands and the separate section <ref id="condes"
+  name="Module constructors/destructors"> explaining the feature in more
+  detail.
+
+
+<sect1><tt>.CONSTRUCTOR</tt><label id=".CONSTRUCTOR"><p>
+
+  Export a symbol and mark it as a module constructor. This may be used
+  together with the linker to build a table of constructor subroutines that
+  are called by the startup code.
+
+  Note: The linker has a feature to build a table of marked routines, but it
+  is your code that must call these routines, so just declaring a symbol as
+  constructor does nothing by itself.
+
+  A constructor is always exported as an absolute (16 bit) symbol. You don't
+  need to use an additional <tt/.export/ statement, this is implied by
+  <tt/.constructor/. It may have an optional priority that is separated by a
+  comma. Higher numeric values mean a higher priority. If no priority is
+  given, the default priority of 7 is used. Be careful when assigning
+  priorities to your own module constructors so they won't interfere with the
+  ones in the cc65 library.
+
+  Example:
+
+  <tscreen><verb>
+   	.constructor	ModuleInit
+	.constructor	ModInit, 16
+  </verb></tscreen>
+
+  See the <tt><ref id=".CONDES" name=".CONDES"></tt> and <tt><ref
+  id=".DESTRUCTOR" name=".DESTRUCTOR"></tt> commands and the separate section
+  <ref id="condes" name="Module constructors/destructors"> explaining the
+  feature in more detail.
+
+
+<sect1><tt>.DATA</tt><label id=".DATA"><p>
+
+  Switch to the DATA segment. The name of the DATA segment is always
+  "DATA", so this is a shortcut for
+
+  <tscreen><verb>
+       	.segment  "DATA"
+  </verb></tscreen>
+
+  See also the <tt><ref id=".SEGMENT" name=".SEGMENT"></tt> command.
+
+
+<sect1><tt>.DBYT</tt><label id=".DBYT"><p>
+
+  Define word sized data with the hi and lo bytes swapped (use <tt/.WORD/ to
+  create word sized data in native 65XX format). Must be followed by a
+  sequence of (word ranged) expressions.
+
+  Example:
+
+  <tscreen><verb>
+	.dbyt	$1234, $4512
+  </verb></tscreen>
+
+  This will emit the bytes
+
+  <tscreen><verb>
+  	$12 $34 $45 $12
+  </verb></tscreen>
+
+  into the current segment in that order.
+
+
+<sect1><tt>.DEBUGINFO</tt><label id=".DEBUGINFO"><p>
+
+  Switch on or off debug info generation. The default is off (that is,
+  the object file will not contain debug infos), but may be changed by the
+  -g switch on the command line.
+  The command must be followed by a '+' or '-' character to switch the
+  option on or off respectively.
+
+  Example:
+
+  <tscreen><verb>
+       	.debuginfo	+	; Generate debug info
+  </verb></tscreen>
+
+
+<sect1><tt>.DEFINE</tt><label id=".DEFINE"><p>
+
+  Start a define style macro definition. The command is followed by an
+  identifier (the macro name) and optionally by a list of formal arguments
+  in braces.
+
+  Please note that <tt/.DEFINE/ shares most disadvantages with its C
+  counterpart, so the general advice is, <bf/NOT/ do use <tt/.DEFINE/ if you
+  don't have to.
+
+  See also the <tt><ref id=".UNDEFINE" name=".UNDEFINE"></tt> command and
+  section <ref id="macros" name="Macros">.
+
+
+<sect1><tt>.DELMAC, .DELMACRO</tt><label id=".DELMACRO"><p>
+
+  Delete a classic macro (defined with <tt><ref id=".MACRO"
+  name=".MACRO"></tt>) . The command is followed by the name of an
+  existing macro. Its definition will be deleted together with the name.
+  If necessary, another macro with this name may be defined later.
+
+  See: <tt><ref id=".ENDMACRO" name=".ENDMACRO"></tt>,
+       <tt><ref id=".EXITMACRO" name=".EXITMACRO"></tt>,
+       <tt><ref id=".MACRO" name=".MACRO"></tt>
+
+  See also section <ref id="macros" name="Macros">.
+
+
+<sect1><tt>.DEF, .DEFINED</tt><label id=".DEFINED"><p>
+
+  Builtin function. The function expects an identifier as argument in braces.
+  The argument is evaluated, and the function yields "true" if the identifier
+  is a symbol that is already defined somewhere in the source file up to the
+  current position. Otherwise the function yields false. As an example, the
+  <tt><ref id=".IFDEF" name=".IFDEF"></tt> statement may be replaced by
+
+  <tscreen><verb>
+  	.if	.defined(a)
+  </verb></tscreen>
+
+
+<sect1><tt>.DESTRUCTOR</tt><label id=".DESTRUCTOR"><p>
+
+  Export a symbol and mark it as a module destructor. This may be used
+  together with the linker to build a table of destructor subroutines that
+  are called by the startup code.
+
+  Note: The linker has a feature to build a table of marked routines, but it
+  is your code that must call these routines, so just declaring a symbol as
+  constructor does nothing by itself.
+
+  A destructor is always exported as an absolute (16 bit) symbol. You don't
+  need to use an additional <tt/.export/ statement, this is implied by
+  <tt/.destructor/. It may have an optional priority that is separated by a
+  comma. Higher numerical values mean a higher priority. If no priority is
+  given, the default priority of 7 is used. Be careful when assigning
+  priorities to your own module destructors so they won't interfere with the
+  ones in the cc65 library.
+
+  Example:
+
+  <tscreen><verb>
+   	.destructor	ModuleDone
+	.destructor	ModDone, 16
+  </verb></tscreen>
+
+  See the <tt><ref id=".CONDES" name=".CONDES"></tt> and <tt><ref
+  id=".CONSTRUCTOR" name=".CONSTRUCTOR"></tt> commands and the separate
+  section <ref id="condes" name="Module constructors/destructors"> explaining
+  the feature in more detail.
+
+
+<sect1><tt>.DWORD</tt><label id=".DWORD"><p>
+
+  Define dword sized data (4 bytes) Must be followed by a sequence of
+  expressions.
+
+  Example:
+
+  <tscreen><verb>
+       	.dword	$12344512, $12FA489
+  </verb></tscreen>
+
+
+<sect1><tt>.ELSE</tt><label id=".ELSE"><p>
+
+  Conditional assembly: Reverse the current condition.
+
+
+<sect1><tt>.ELSEIF</tt><label id=".ELSEIF"><p>
+
+  Conditional assembly: Reverse current condition and test a new one.
+
+
+<sect1><tt>.END</tt><label id=".END"><p>
+
+  Forced end of assembly. Assembly stops at this point, even if the command
+  is read from an include file.
+
+
+<sect1><tt>.ENDENUM</tt><label id=".ENDENUM"><p>
+
+  End a <tt><ref id=".ENUM" name=".ENUM"></tt> declaration.
+
+
+<sect1><tt>.ENDIF</tt><label id=".ENDIF"><p>
+
+  Conditional assembly: Close a <tt><ref id=".IF" name=".IF..."></tt> or
+  <tt><ref id=".ELSE" name=".ELSE"></tt> branch.
+
+
+<sect1><tt>.ENDMAC, .ENDMACRO</tt><label id=".ENDMACRO"><p>
+
+  Marks the end of a macro definition.
+
+  See: <tt><ref id=".DELMACRO" name=".DELMACRO"></tt>,
+       <tt><ref id=".EXITMACRO" name=".EXITMACRO"></tt>,
+       <tt><ref id=".MACRO" name=".MACRO"></tt>
+
+  See also section <ref id="macros" name="Macros">.
+
+
+<sect1><tt>.ENDPROC</tt><label id=".ENDPROC"><p>
+
+  End of local lexical level (see <tt><ref id=".PROC" name=".PROC"></tt>).
+
+
+<sect1><tt>.ENDREP, .ENDREPEAT</tt><label id=".ENDREPEAT"><p>
+
+  End a <tt><ref id=".REPEAT" name=".REPEAT"></tt> block.
+
+
+<sect1><tt>.ENDSCOPE</tt><label id=".ENDSCOPE"><p>
+
+  End of local lexical level (see <tt/<ref id=".SCOPE" name=".SCOPE">/).
+
+
+<sect1><tt>.ENDSTRUCT</tt><label id=".ENDSTRUCT"><p>
+
+  Ends a struct definition. See the <tt/<ref id=".STRUCT" name=".STRUCT">/
+  command and the separate section named <ref id="structs" name="&quot;Structs
+  and unions&quot;">.
+
+
+<sect1><tt>.ENDUNION</tt><label id=".ENDUNION"><p>
+
+  Ends a union definition. See the <tt/<ref id=".UNION" name=".UNION">/
+  command and the separate section named <ref id="structs" name="&quot;Structs
+  and unions&quot;">.
+
+
+<sect1><tt>.ENUM</tt><label id=".ENUM"><p>
+
+  Start an enumeration. This directive is very similar to the C <tt/enum/
+  keyword. If a name is given, a new scope is created for the enumeration,
+  otherwise the enumeration members are placed in the enclosing scope.
+
+  In the enumeration body, symbols are declared. The first symbol has a value
+  of zero, and each following symbol will get the value of the preceding plus
+  one. This behaviour may be overridden by an explicit assignment. Two symbols
+  may have the same value.
+
+  Example:
+
+  <tscreen><verb>
+        .enum   errorcodes
+                no_error
+                file_error
+                parse_error
+        .endenum
+  </verb></tscreen>
+
+  Above example will create a new scope named <tt/errorcodes/ with three
+  symbols in it that get the values 0, 1 and 2 respectively. Another way
+  to write this would have been:
+
+  <tscreen><verb>
+        .scope  errorcodes
+                no_error        = 0
+                file_error      = 1
+                parse_error     = 2
+        .endscope
+  </verb></tscreen>
+
+  Please note that explicit scoping must be used to access the identifiers:
+
+  <tscreen><verb>
+        .word   errorcodes::no_error
+  </verb></tscreen>
+
+  A more complex example:
+
+  <tscreen><verb>
+        .enum
+                EUNKNOWN        = -1
+                EOK
+                EFILE
+                EBUSY
+                EAGAIN
+                EWOULDBLOCK     = EAGAIN
+        .endenum
+  </verb></tscreen>
+
+  In this example, the enumeration does not have a name, which means that the
+  members will be visible in the enclosing scope and can be used in this scope
+  without explicit scoping. The first member (<tt/EUNKNOWN/) has the value -1.
+  The value for the following members is incremented by one, so <tt/EOK/ would
+  be zero and so on. <tt/EWOULDBLOCK/ is an alias for <tt/EGAIN/, so it has an
+  override for the value using an already defined symbol.
+
+
+<sect1><tt>.ERROR</tt><label id=".ERROR"><p>
+
+  Force an assembly error. The assembler will output an error message
+  preceded by "User error". Assembly is continued but no object file will
+  generated.
+
+  This command may be used to check for initial conditions that must be
+  set before assembling a source file.
+
+  Example:
+
+  <tscreen><verb>
+	.if    	foo = 1
+	...
+	.elseif	bar = 1
+	...
+	.else
+	.error 	"Must define foo or bar!"
+	.endif
+  </verb></tscreen>
+
+  See also: <tt><ref id=".FATAL" name=".FATAL"></tt>,
+            <tt><ref id=".OUT" name=".OUT"></tt>,
+            <tt><ref id=".WARNING" name=".WARNING"></tt>
+
+
+<sect1><tt>.EXITMAC, .EXITMACRO</tt><label id=".EXITMACRO"><p>
+
+  Abort a macro expansion immediately. This command is often useful in
+  recursive macros.
+
+  See: <tt><ref id=".DELMACRO" name=".DELMACRO"></tt>,
+       <tt><ref id=".ENDMACRO" name=".ENDMACRO"></tt>,
+       <tt><ref id=".MACRO" name=".MACRO"></tt>
+
+  See also section <ref id="macros" name="Macros">.
+
+
+<sect1><tt>.EXPORT</tt><label id=".EXPORT"><p>
+
+  Make symbols accessible from other modules. Must be followed by a comma
+  separated list of symbols to export, with each one optionally followed by an
+  address specification and (also optional) an assignment. Using an additional
+  assignment in the export statement allows to define and export a symbol in
+  one statement. The default is to export the symbol with the address size it
+  actually has. The assembler will issue a warning, if the symbol is exported
+  with an address size smaller than the actual address size.
+
+  Examples:
+
+  <tscreen><verb>
+	.export	foo
+        .export bar: far
+        .export foobar: far = foo * bar
+        .export baz := foobar, zap: far = baz - bar
+  </verb></tscreen>
+
+  As with constant definitions, using <tt/:=/ instead of <tt/=/ marks the
+  symbols as a label.
+
+  See: <tt><ref id=".EXPORTZP" name=".EXPORTZP"></tt>
+
+
+<sect1><tt>.EXPORTZP</tt><label id=".EXPORTZP"><p>
+
+  Make symbols accessible from other modules. Must be followed by a comma
+  separated list of symbols to export. The exported symbols are explicitly
+  marked as zero page symbols. An assignment may be included in the
+  <tt/.EXPORTZP/ statement. This allows to define and export a symbol in one
+  statement.
+
+  Examples:
+
+  <tscreen><verb>
+  	.exportzp  foo, bar
+        .exportzp  baz := &dollar;02
+  </verb></tscreen>
+
+  See: <tt><ref id=".EXPORT" name=".EXPORT"></tt>
+
+
+<sect1><tt>.FARADDR</tt><label id=".FARADDR"><p>
+
+  Define far (24 bit) address data. The command must be followed by a
+  sequence of (not necessarily constant) expressions.
+
+  Example:
+
+  <tscreen><verb>
+  	.faraddr	DrawCircle, DrawRectangle, DrawHexagon
+  </verb></tscreen>
+
+  See: <tt><ref id=".ADDR" name=".ADDR"></tt>
+
+
+<sect1><tt>.FATAL</tt><label id=".FATAL"><p>
+
+  Force an assembly error and terminate assembly. The assembler will output an
+  error message preceded by "User error" and will terminate assembly
+  immediately.
+
+  This command may be used to check for initial conditions that must be
+  set before assembling a source file.
+
+  Example:
+
+  <tscreen><verb>
+	.if    	foo = 1
+	...
+	.elseif	bar = 1
+	...
+	.else
+       	.fatal  "Must define foo or bar!"
+	.endif
+  </verb></tscreen>
+
+  See also: <tt><ref id=".ERROR" name=".ERROR"></tt>,
+            <tt><ref id=".OUT" name=".OUT"></tt>,
+            <tt><ref id=".WARNING" name=".WARNING"></tt>
+
+
+<sect1><tt>.FEATURE</tt><label id=".FEATURE"><p>
+
+  This directive may be used to enable one or more compatibility features
+  of the assembler. While the use of <tt/.FEATURE/ should be avoided when
+  possible, it may be useful when porting sources written for other
+  assemblers. There is no way to switch a feature off, once you have
+  enabled it, so using
+
+  <tscreen><verb>
+       	.FEATURE  	xxx
+  </verb></tscreen>
+
+  will enable the feature until end of assembly is reached.
+
+  The following features are available:
+
+  <descrip>
+
+  <tag><tt>at_in_identifiers</tt><label id="at_in_identifiers"></tag>
+
+    Accept the at character (`@') as a valid character in identifiers. The
+    at character is not allowed to start an identifier, even with this
+    feature enabled.
+
+  <tag><tt>c_comments</tt><label id="c_comments"></tag>
+
+    Allow C like comments using <tt>/*</tt> and <tt>*/</tt> as left and right
+    comment terminators. Note that C comments may not be nested. There's also a
+    pitfall when using C like comments: All statements must be terminated by
+    "end-of-line". Using C like comments, it is possible to hide the newline,
+    which results in error messages. See the following non working example:
+
+    <tscreen><verb>
+        lda     #$00  /* This comment hides the newline
+*/      sta     $82
+    </verb></tscreen>
+
+  <tag><tt>dollar_in_identifiers</tt><label id="dollar_in_identifiers"></tag>
+
+    Accept the dollar sign (`&dollar;') as a valid character in identifiers. The
+    dollar character is not allowed to start an identifier, even with this
+    feature enabled.
+
+  <tag><tt>dollar_is_pc</tt><label id="dollar_is_pc"></tag>
+
+    The dollar sign may be used as an alias for the star (`*'), which
+    gives the value of the current PC in expressions.
+    Note: Assignment to the pseudo variable is not allowed.
+
+  <tag><tt>force_range</tt><label id="force_range"></tag>
+
+    Force expressions into their valid range for immediate addressing and
+    storage operators like <tt><ref id=".BYTE" name=".BYTE"></tt> and
+    <tt><ref id=".WORD" name=".WORD"></tt>. Be very careful with this one,
+    since it will completely disable error checks.
+
+  <tag><tt>labels_without_colons</tt><label id="labels_without_colons"></tag>
+
+    Allow labels without a trailing colon. These labels are only accepted,
+    if they start at the beginning of a line (no leading white space).
+
+  <tag><tt>leading_dot_in_identifiers</tt><label id="leading_dot_in_identifiers"></tag>
+
+    Accept the dot (`.') as the first character of an identifier. This may be
+    used for example to create macro names that start with a dot emulating
+    control directives of other assemblers. Note however, that none of the
+    reserved keywords built into the assembler, that starts with a dot, may be
+    overridden. When using this feature, you may also get into trouble if
+    later versions of the assembler define new keywords starting with a dot.
+
+  <tag><tt>loose_char_term</tt><label id="loose_char_term"></tag>
+
+    Accept single quotes as well as double quotes as terminators for char
+    constants.
+
+  <tag><tt>loose_string_term</tt><label id="loose_string_term"></tag>
+
+    Accept single quotes as well as double quotes as terminators for string
+    constants.
+
+  <tag><tt>missing_char_term</tt><label id="missing_char_term"></tag>
+
+    Accept single quoted character constants where the terminating quote is
+    missing.
+    <tscreen><verb>
+        lda     #'a
+    </verb></tscreen>
+    <em/Note:/ This does not work in conjunction with <tt/.FEATURE
+    loose_string_term/, since in this case the input would be ambiguous.
+
+  <tag><tt>org_per_seg</tt><label id="org_per_seg"></tag>
+
+    This feature makes relocatable/absolute mode local to the current segment.
+    Using <tt><ref id=".ORG" name=".ORG"></tt> when <tt/org_per_seg/ is in
+    effect will only enable absolute mode for the current segment. Dito for
+    <tt><ref id=".RELOC" name=".RELOC"></tt>.
+
+  <tag><tt>pc_assignment</tt><label id="pc_assignment"></tag>
+
+    Allow assignments to the PC symbol (`*' or `&dollar;' if <tt/dollar_is_pc/
+    is enabled). Such an assignment is handled identical to the <tt><ref
+    id=".ORG" name=".ORG"></tt> command (which is usually not needed, so just
+    removing the lines with the assignments may also be an option when porting
+    code written for older assemblers).
+
+  <tag><tt>ubiquitous_idents</tt><label id="ubiquitous_idents"></tag>
+
+    Allow the use of instructions names as names for macros and symbols. This
+    makes it possible to "overload" instructions by defining a macro with the
+    same name. This does also make it possible to introduce hard to find errors
+    in your code, so be careful!
+
+  <tag><tt>underline_in_numbers</tt><label id="underline_in_numbers"></tag>
+
+    Allow underlines within numeric constants. These may be used for grouping
+    the digits of numbers for easier reading.
+    Example:
+    <tscreen><verb>
+        .feature        underline_in_numbers
+        .word           %1100001110100101
+        .word           %1100_0011_1010_0101    ; Identical but easier to read
+    </verb></tscreen>
+
+  </descrip>
+
+  It is also possible to specify features on the command line using the
+  <tt><ref id="option--feature" name="--feature"></tt> command line option.
+  This is useful when translating sources written for older assemblers, when
+  you don't want to change the source code.
+
+  As an example, to translate sources written for Andre Fachats xa65
+  assembler, the features
+
+  <verb>
+  	labels_without_colons, pc_assignment, loose_char_term
+  </verb>
+
+  may be helpful. They do not make ca65 completely compatible, so you may not
+  be able to translate the sources without changes, even when enabling these
+  features. However, I have found several sources that translate without
+  problems when enabling these features on the command line.
+
+
+<sect1><tt>.FILEOPT, .FOPT</tt><label id=".FOPT"><p>
+
+  Insert an option string into the object file. There are two forms of
+  this command, one specifies the option by a keyword, the second
+  specifies it as a number. Since usage of the second one needs knowledge
+  of the internal encoding, its use is not recommended and I will only
+  describe the first form here.
+
+  The command is followed by one of the keywords
+
+  <tscreen><verb>
+      	author
+      	comment
+      	compiler
+  </verb></tscreen>
+
+  a comma and a string. The option is written into the object file
+  together with the string value. This is currently unidirectional and
+  there is no way to actually use these options once they are in the
+  object file.
+
+  Examples:
+
+  <tscreen><verb>
+       	.fileopt	comment, "Code stolen from my brother"
+	.fileopt	compiler, "BASIC 2.0"
+	.fopt		author, "J. R. User"
+  </verb></tscreen>
+
+
+<sect1><tt>.FORCEIMPORT</tt><label id=".FORCEIMPORT"><p>
+
+  Import an absolute symbol from another module. The command is followed by a
+  comma separated list of symbols to import. The command is similar to <tt>
+  <ref id=".IMPORT" name=".IMPORT"></tt>, but the import reference is always
+  written to the generated object file, even if the symbol is never referenced
+  (<tt><ref id=".IMPORT" name=".IMPORT"></tt> will not generate import
+  references for unused symbols).
+
+  Example:
+
+  <tscreen><verb>
+   	.forceimport   	needthisone, needthistoo
+  </verb></tscreen>
+
+  See: <tt><ref id=".IMPORT" name=".IMPORT"></tt>
+
+
+<sect1><tt>.GLOBAL</tt><label id=".GLOBAL"><p>
+
+  Declare symbols as global. Must be followed by a comma separated list of
+  symbols to declare. Symbols from the list, that are defined somewhere in the
+  source, are exported, all others are imported. Additional <tt><ref
+  id=".IMPORT" name=".IMPORT"></tt> or <tt><ref id=".EXPORT"
+  name=".EXPORT"></tt> commands for the same symbol are allowed.
+
+  Example:
+
+  <tscreen><verb>
+  	.global foo, bar
+  </verb></tscreen>
+
+
+<sect1><tt>.GLOBALZP</tt><label id=".GLOBALZP"><p>
+
+  Declare symbols as global. Must be followed by a comma separated list of
+  symbols to declare. Symbols from the list, that are defined somewhere in the
+  source, are exported, all others are imported. Additional <tt><ref
+  id=".IMPORTZP" name=".IMPORTZP"></tt> or <tt><ref id=".EXPORTZP"
+  name=".EXPORTZP"></tt> commands for the same symbol are allowed. The symbols
+  in the list are explicitly marked as zero page symbols.
+
+  Example:
+
+  <tscreen><verb>
+       	.globalzp foo, bar
+  </verb></tscreen>
+
+<sect1><tt>.HIBYTES</tt><label id=".HIBYTES"><p>
+
+  Define byte sized data by extracting only the high byte (that is, bits 8-15) from
+  each expression.  This is equivalent to <tt><ref id=".BYTE" name=".BYTE"></tt> with
+  the operator '>' prepended to each expression in its list.
+
+  Example:
+
+  <tscreen><verb>
+        .lobytes         $1234, $2345, $3456, $4567
+	.hibytes         $fedc, $edcb, $dcba, $cba9
+  </verb></tscreen>
+
+  which is equivalent to
+
+  <tscreen><verb>
+        .byte            $34, $45, $56, $67
+	.byte            $fe, $ed, $dc, $cb
+  </verb></tscreen>
+
+  Example:
+
+  <tscreen><verb>
+        .define MyTable TableItem0, TableItem1, TableItem2, TableItem3
+
+	TableLookupLo:   .lobytes MyTable
+	TableLookupHi:   .hibytes MyTable
+  </verb></tscreen>
+
+  which is equivalent to
+
+  <tscreen><verb>
+        TableLookupLo:   .byte &lt;TableItem0, &lt;TableItem1, &lt;TableItem2, &lt;TableItem3
+	TableLookupHi:   .byte &gt;TableItem0, &gt;TableItem1, &gt;TableItem2, &gt;TableItem3
+  </verb></tscreen>
+
+  See also: <tt><ref id=".BYTE" name=".BYTE"></tt>,
+            <tt><ref id=".LOBYTES" name=".LOBYTES"></tt>,
+            <tt><ref id=".BANKBYTES" name=".BANKBYTES"></tt>
+
+
+<sect1><tt>.I16</tt><label id=".I16"><p>
+
+  Valid only in 65816 mode. Switch the index registers to 16 bit.
+
+  Note: This command will not emit any code, it will tell the assembler to
+  create 16 bit operands for immediate operands.
+
+  See also the <tt><ref id=".I8" name=".I8"></tt> and <tt><ref id=".SMART"
+  name=".SMART"></tt> commands.
+
+
+<sect1><tt>.I8</tt><label id=".I8"><p>
+
+  Valid only in 65816 mode. Switch the index registers to 8 bit.
+
+  Note: This command will not emit any code, it will tell the assembler to
+  create 8 bit operands for immediate operands.
+
+  See also the <tt><ref id=".I16" name=".I16"></tt> and <tt><ref id=".SMART"
+  name=".SMART"></tt> commands.
+
+
+<sect1><tt>.IF</tt><label id=".IF"><p>
+
+  Conditional assembly: Evaluate an expression and switch assembler output
+  on or off depending on the expression. The expression must be a constant
+  expression, that is, all operands must be defined.
+
+  A expression value of zero evaluates to FALSE, any other value evaluates
+  to TRUE.
+
+
+<sect1><tt>.IFBLANK</tt><label id=".IFBLANK"><p>
+
+  Conditional assembly: Check if there are any remaining tokens in this line,
+  and evaluate to FALSE if this is the case, and to TRUE otherwise. If the
+  condition is not true, further lines are not assembled until an <tt><ref
+  id=".ELSE" name=".ESLE"></tt>, <tt><ref id=".ELSEIF" name=".ELSEIF"></tt> or
+  <tt><ref id=".ENDIF" name=".ENDIF"></tt> directive.
+
+  This command is often used to check if a macro parameter was given. Since an
+  empty macro parameter will evaluate to nothing, the condition will evaluate
+  to TRUE if an empty parameter was given.
+
+  Example:
+
+  <tscreen><verb>
+       	.macro	   arg1, arg2
+       	.ifblank   arg2
+       		   lda     #arg1
+       	.else
+       	 	   lda	   #arg2
+       	.endif
+       	.endmacro
+  </verb></tscreen>
+
+  See also: <tt><ref id=".BLANK" name=".BLANK"></tt>
+
+
+<sect1><tt>.IFCONST</tt><label id=".IFCONST"><p>
+
+  Conditional assembly: Evaluate an expression and switch assembler output
+  on or off depending on the constness of the expression.
+
+  A const expression evaluates to to TRUE, a non const expression (one
+  containing an imported or currently undefined symbol) evaluates to
+  FALSE.
+
+  See also: <tt><ref id=".CONST" name=".CONST"></tt>
+
+
+<sect1><tt>.IFDEF</tt><label id=".IFDEF"><p>
+
+  Conditional assembly: Check if a symbol is defined. Must be followed by
+  a symbol name. The condition is true if the the given symbol is already
+  defined, and false otherwise.
+
+  See also: <tt><ref id=".DEFINED" name=".DEFINED"></tt>
+
+
+<sect1><tt>.IFNBLANK</tt><label id=".IFNBLANK"><p>
+
+  Conditional assembly: Check if there are any remaining tokens in this line,
+  and evaluate to TRUE if this is the case, and to FALSE otherwise. If the
+  condition is not true, further lines are not assembled until an <tt><ref
+  id=".ELSE" name=".ELSE"></tt>, <tt><ref id=".ELSEIF" name=".ELSEIF"></tt> or
+  <tt><ref id=".ENDIF" name=".ENDIF"></tt> directive.
+
+  This command is often used to check if a macro parameter was given.
+  Since an empty macro parameter will evaluate to nothing, the condition
+  will evaluate to FALSE if an empty parameter was given.
+
+  Example:
+
+  <tscreen><verb>
+   	.macro	   arg1, arg2
+   		   lda	   #arg1
+   	.ifnblank  arg2
+   		   lda     #arg2
+   	.endif
+   	.endmacro
+  </verb></tscreen>
+
+  See also: <tt><ref id=".BLANK" name=".BLANK"></tt>
+
+
+<sect1><tt>.IFNDEF</tt><label id=".IFNDEF"><p>
+
+  Conditional assembly: Check if a symbol is defined. Must be followed by
+  a symbol name. The condition is true if the the given symbol is not
+  defined, and false otherwise.
+
+  See also: <tt><ref id=".DEFINED" name=".DEFINED"></tt>
+
+
+<sect1><tt>.IFNREF</tt><label id=".IFNREF"><p>
+
+  Conditional assembly: Check if a symbol is referenced. Must be followed
+  by a symbol name. The condition is true if if the the given symbol was
+  not referenced before, and false otherwise.
+
+  See also: <tt><ref id=".REFERENCED" name=".REFERENCED"></tt>
+
+
+<sect1><tt>.IFP02</tt><label id=".IFP02"><p>
+
+  Conditional assembly: Check if the assembler is currently in 6502 mode
+  (see <tt><ref id=".P02" name=".P02"></tt> command).
+
+
+<sect1><tt>.IFP816</tt><label id=".IFP816"><p>
+
+  Conditional assembly: Check if the assembler is currently in 65816 mode
+  (see <tt><ref id=".P816" name=".P816"></tt> command).
+
+
+<sect1><tt>.IFPC02</tt><label id=".IFPC02"><p>
+
+  Conditional assembly: Check if the assembler is currently in 65C02 mode
+  (see <tt><ref id=".PC02" name=".PC02"></tt> command).
+
+
+<sect1><tt>.IFPSC02</tt><label id=".IFPSC02"><p>
+
+  Conditional assembly: Check if the assembler is currently in 65SC02 mode
+  (see <tt><ref id=".PSC02" name=".PSC02"></tt> command).
+
+
+<sect1><tt>.IFREF</tt><label id=".IFREF"><p>
+
+  Conditional assembly: Check if a symbol is referenced. Must be followed
+  by a symbol name. The condition is true if if the the given symbol was
+  referenced before, and false otherwise.
+
+  This command may be used to build subroutine libraries in include files
+  (you may use separate object modules for this purpose too).
+
+  Example:
+
+  <tscreen><verb>
+   	.ifref 	ToHex	    		; If someone used this subroutine
+   	ToHex:	tay	    		; Define subroutine
+   		lda	HexTab,y
+   		rts
+   	.endif
+  </verb></tscreen>
+
+  See also: <tt><ref id=".REFERENCED" name=".REFERENCED"></tt>
+
+
+<sect1><tt>.IMPORT</tt><label id=".IMPORT"><p>
+
+  Import a symbol from another module. The command is followed by a comma
+  separated list of symbols to import, with each one optionally followed by
+  an address specification.
+
+  Example:
+
+  <tscreen><verb>
+   	.import	foo
+        .import bar: zeropage
+  </verb></tscreen>
+
+  See: <tt><ref id=".IMPORTZP" name=".IMPORTZP"></tt>
+
+
+<sect1><tt>.IMPORTZP</tt><label id=".IMPORTZP"><p>
+
+  Import a symbol from another module. The command is followed by a comma
+  separated list of symbols to import. The symbols are explicitly imported
+  as zero page symbols (that is, symbols with values in byte range).
+
+  Example:
+
+  <tscreen><verb>
+   	.importzp       foo, bar
+  </verb></tscreen>
+
+  See: <tt><ref id=".IMPORT" name=".IMPORT"></tt>
+
+
+<sect1><tt>.INCBIN</tt><label id=".INCBIN"><p>
+
+  Include a file as binary data. The command expects a string argument
+  that is the name of a file to include literally in the current segment.
+  In addition to that, a start offset and a size value may be specified,
+  separated by commas. If no size is specified, all of the file from the
+  start offset to end-of-file is used. If no start position is specified
+  either, zero is assumed (which means that the whole file is inserted).
+
+  Example:
+
+  <tscreen><verb>
+	; Include whole file
+   	.incbin	 	"sprites.dat"
+
+	; Include file starting at offset 256
+	.incbin		"music.dat", $100
+
+	; Read 100 bytes starting at offset 200
+	.incbin		"graphics.dat", 200, 100
+  </verb></tscreen>
+
+
+<sect1><tt>.INCLUDE</tt><label id=".INCLUDE"><p>
+
+  Include another file. Include files may be nested up to a depth of 16.
+
+  Example:
+
+  <tscreen><verb>
+   	.include	"subs.inc"
+  </verb></tscreen>
+
+
+<sect1><tt>.INTERRUPTOR</tt><label id=".INTERRUPTOR"><p>
+
+  Export a symbol and mark it as an interruptor. This may be used together
+  with the linker to build a table of interruptor subroutines that are called
+  in an interrupt.
+
+  Note: The linker has a feature to build a table of marked routines, but it
+  is your code that must call these routines, so just declaring a symbol as
+  interruptor does nothing by itself.
+
+  An interruptor is always exported as an absolute (16 bit) symbol. You don't
+  need to use an additional <tt/.export/ statement, this is implied by
+  <tt/.interruptor/. It may have an optional priority that is separated by a
+  comma. Higher numeric values mean a higher priority. If no priority is
+  given, the default priority of 7 is used. Be careful when assigning
+  priorities to your own module constructors so they won't interfere with the
+  ones in the cc65 library.
+
+  Example:
+
+  <tscreen><verb>
+   	.interruptor    IrqHandler
+	.interruptor    Handler, 16
+  </verb></tscreen>
+
+  See the <tt><ref id=".CONDES" name=".CONDES"></tt> command and the separate
+  section <ref id="condes" name="Module constructors/destructors"> explaining
+  the feature in more detail.
+
+
+<sect1><tt>.LINECONT</tt><label id=".LINECONT"><p>
+
+  Switch on or off line continuations using the backslash character
+  before a newline. The option is off by default.
+  Note: Line continuations do not work in a comment. A backslash at the
+  end of a comment is treated as part of the comment and does not trigger
+  line continuation.
+  The command must be followed by a '+' or '-' character to switch the
+  option on or off respectively.
+
+  Example:
+
+  <tscreen><verb>
+       	.linecont      	+		; Allow line continuations
+
+	lda	\
+		#$20			; This is legal now
+  </verb></tscreen>
+
+
+<sect1><tt>.LIST</tt><label id=".LIST"><p>
+
+  Enable output to the listing. The command must be followed by a boolean
+  switch ("on", "off", "+" or "-") and will enable or disable listing
+  output.
+  The option has no effect if the listing is not enabled by the command line
+  switch -l. If -l is used, an internal counter is set to 1. Lines are output
+  to the listing file, if the counter is greater than zero, and suppressed if
+  the counter is zero. Each use of <tt/.LIST/ will increment or decrement the
+  counter.
+
+  Example:
+
+  <tscreen><verb>
+       	.list	on		; Enable listing output
+  </verb></tscreen>
+
+
+<sect1><tt>.LISTBYTES</tt><label id=".LISTBYTES"><p>
+
+  Set, how many bytes are shown in the listing for one source line. The
+  default is 12, so the listing will show only the first 12 bytes for any
+  source line that generates more than 12 bytes of code or data.
+  The directive needs an argument, which is either "unlimited", or an
+  integer constant in the range 4..255.
+
+  Examples:
+
+  <tscreen><verb>
+       	.listbytes	unlimited	; List all bytes
+	.listbytes	12		; List the first 12 bytes
+	.incbin		"data.bin"	; Include large binary file
+  </verb></tscreen>
+
+
+<sect1><tt>.LOBYTES</tt><label id=".LOBYTES"><p>
+
+  Define byte sized data by extracting only the low byte (that is, bits 0-7) from
+  each expression.  This is equivalent to <tt><ref id=".BYTE" name=".BYTE"></tt> with
+  the operator '<' prepended to each expression in its list.
+
+  Example:
+
+  <tscreen><verb>
+        .lobytes         $1234, $2345, $3456, $4567
+	.hibytes         $fedc, $edcb, $dcba, $cba9
+  </verb></tscreen>
+
+  which is equivalent to
+
+  <tscreen><verb>
+        .byte            $34, $45, $56, $67
+	.byte            $fe, $ed, $dc, $cb
+  </verb></tscreen>
+
+  Example:
+
+  <tscreen><verb>
+        .define MyTable TableItem0, TableItem1, TableItem2, TableItem3
+
+	TableLookupLo:   .lobytes MyTable
+	TableLookupHi:   .hibytes MyTable
+  </verb></tscreen>
+
+  which is equivalent to
+
+  <tscreen><verb>
+        TableLookupLo:   .byte &lt;TableItem0, &lt;TableItem1, &lt;TableItem2, &lt;TableItem3
+	TableLookupHi:   .byte &gt;TableItem0, &gt;TableItem1, &gt;TableItem2, &gt;TableItem3
+  </verb></tscreen>
+
+  See also: <tt><ref id=".BYTE" name=".BYTE"></tt>,
+            <tt><ref id=".HIBYTES" name=".HIBYTES"></tt>,
+            <tt><ref id=".BANKBYTES" name=".BANKBYTES"></tt>
+
+
+<sect1><tt>.LOCAL</tt><label id=".LOCAL"><p>
+
+  This command may only be used inside a macro definition. It declares a
+  list of identifiers as local to the macro expansion.
+
+  A problem when using macros are labels: Since they don't change their name,
+  you get a "duplicate symbol" error if the macro is expanded the second time.
+  Labels declared with <tt><ref id=".LOCAL" name=".LOCAL"></tt> have their
+  name mapped to an internal unique name (<tt/___ABCD__/) with each macro
+  invocation.
+
+  Some other assemblers start a new lexical block inside a macro expansion.
+  This has some drawbacks however, since that will not allow <em/any/ symbol
+  to be visible outside a macro, a feature that is sometimes useful. The
+  <tt><ref id=".LOCAL" name=".LOCAL"></tt> command is in my eyes a better way
+  to address the problem.
+
+  You get an error when using <tt><ref id=".LOCAL" name=".LOCAL"></tt> outside
+  a macro.
+
+
+<sect1><tt>.LOCALCHAR</tt><label id=".LOCALCHAR"><p>
+
+  Defines the character that start "cheap" local labels. You may use one
+  of '@' and '?' as start character. The default is '@'.
+
+  Cheap local labels are labels that are visible only between two non
+  cheap labels. This way you can reuse identifiers like "<tt/loop/" without
+  using explicit lexical nesting.
+
+  Example:
+
+  <tscreen><verb>
+       	.localchar	'?'
+
+	Clear: 	lda	#$00		; Global label
+       	?Loop:	sta	Mem,y		; Local label
+ 	   	dey
+	   	bne	?Loop		; Ok
+	   	rts
+	Sub:	...	 		; New global label
+  	   	bne	?Loop		; ERROR: Unknown identifier!
+  </verb></tscreen>
+
+
+<sect1><tt>.MACPACK</tt><label id=".MACPACK"><p>
+
+  Insert a predefined macro package. The command is followed by an
+  identifier specifying the macro package to insert. Available macro
+  packages are:
+
+  <tscreen><verb>
+        atari           Defines the scrcode macro.
+        cbm             Defines the scrcode macro.
+        cpu             Defines constants for the .CPU variable.
+	generic		Defines generic macros like add and sub.
+    	longbranch     	Defines conditional long jump macros.
+  </verb></tscreen>
+
+  Including a macro package twice, or including a macro package that
+  redefines already existing macros will lead to an error.
+
+  Example:
+
+  <tscreen><verb>
+       	.macpack	longbranch	; Include macro package
+
+       	   	cmp	#$20		; Set condition codes
+       	   	jne    	Label		; Jump long on condition
+  </verb></tscreen>
+
+  Macro packages are explained in more detail in section <ref
+  id="macropackages" name="Macro packages">.
+
+
+<sect1><tt>.MAC, .MACRO</tt><label id=".MACRO"><p>
+
+  Start a classic macro definition. The command is followed by an identifier
+  (the macro name) and optionally by a comma separated list of identifiers
+  that are macro parameters. A macro definition is terminated by <tt><ref
+  id=".ENDMACRO" name=".ENDMACRO"></tt>.
+
+  Example:
+
+  <tscreen><verb>
+       	.macro  ldax    arg             ; Define macro ldax
+                lda     arg
+                ldx     arg+1
+  </verb></tscreen>
+
+  See: <tt><ref id=".DELMACRO" name=".DELMACRO"></tt>,
+       <tt><ref id=".ENDMACRO" name=".ENDMACRO"></tt>,
+       <tt><ref id=".EXITMACRO" name=".EXITMACRO"></tt>
+
+  See also section <ref id="macros" name="Macros">.
+
+
+<sect1><tt>.ORG</tt><label id=".ORG"><p>
+
+  Start a section of absolute code. The command is followed by a constant
+  expression that gives the new PC counter location for which the code is
+  assembled. Use <tt><ref id=".RELOC" name=".RELOC"></tt> to switch back to
+  relocatable code.
+
+  By default, absolute/relocatable mode is global (valid even when switching
+  segments). Using <tt>.FEATURE <ref id="org_per_seg" name="org_per_seg"></tt>
+  it can be made segment local.
+
+  Please note that you <em/do not need/ <tt/.ORG/ in most cases. Placing
+  code at a specific address is the job of the linker, not the assembler, so
+  there is usually no reason to assemble code to a specific address.
+
+  Example:
+
+  <tscreen><verb>
+  	.org	$7FF	     	; Emit code starting at $7FF
+  </verb></tscreen>
+
+
+<sect1><tt>.OUT</tt><label id=".OUT"><p>
+
+  Output a string to the console without producing an error. This command
+  is similar to <tt/.ERROR/, however, it does not force an assembler error
+  that prevents the creation of an object file.
+
+  Example:
+
+  <tscreen><verb>
+  	.out	"This code was written by the codebuster(tm)"
+  </verb></tscreen>
+
+  See also: <tt><ref id=".ERROR" name=".ERROR"></tt>,
+            <tt><ref id=".FATAL" name=".FATAL"></tt>,
+            <tt><ref id=".WARNING" name=".WARNING"></tt>
+
+
+<sect1><tt>.P02</tt><label id=".P02"><p>
+
+  Enable the 6502 instruction set, disable 65SC02, 65C02 and 65816
+  instructions. This is the default if not overridden by the
+  <tt><ref id="option--cpu" name="--cpu"></tt> command line option.
+
+  See: <tt><ref id=".PC02" name=".PC02"></tt>, <tt><ref id=".PSC02"
+  name=".PSC02"></tt> and <tt><ref id=".P816" name=".P816"></tt>
+
+
+<sect1><tt>.P816</tt><label id=".P816"><p>
+
+  Enable the 65816 instruction set. This is a superset of the 65SC02 and
+  6502 instruction sets.
+
+  See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
+  name=".PSC02"></tt> and <tt><ref id=".PC02" name=".PC02"></tt>
+
+
+<sect1><tt>.PAGELEN, .PAGELENGTH</tt><label id=".PAGELENGTH"><p>
+
+  Set the page length for the listing. Must be followed by an integer
+  constant. The value may be "unlimited", or in the range 32 to 127. The
+  statement has no effect if no listing is generated. The default value is -1
+  (unlimited) but may be overridden by the <tt/--pagelength/ command line
+  option. Beware: Since ca65 is a one pass assembler, the listing is generated
+  after assembly is complete, you cannot use multiple line lengths with one
+  source. Instead, the value set with the last <tt/.PAGELENGTH/ is used.
+
+  Examples:
+
+  <tscreen><verb>
+	.pagelength	66		; Use 66 lines per listing page
+
+	.pagelength	unlimited	; Unlimited page length
+  </verb></tscreen>
+
+
+<sect1><tt>.PC02</tt><label id=".PC02"><p>
+
+  Enable the 65C02 instructions set. This instruction set includes all
+  6502 and 65SC02 instructions.
+
+  See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
+  name=".PSC02"></tt> and <tt><ref id=".P816" name=".P816"></tt>
+
+
+<sect1><tt>.POPCPU</tt><label id=".POPCPU"><p>
+
+  Pop the last CPU setting from the stack, and activate it.
+
+  This command will switch back to the CPU that was last pushed onto the CPU
+  stack using the <tt><ref id=".PUSHCPU" name=".PUSHCPU"></tt> command, and
+  remove this entry from the stack.
+
+  The assembler will print an error message if the CPU stack is empty when
+  this command is issued.
+
+  See: <tt><ref id=".CPU" name=".CPU"></tt>, <tt><ref id=".PUSHCPU"
+  name=".PUSHCPU"></tt>, <tt><ref id=".SETCPU" name=".SETCPU"></tt>
+
+
+<sect1><tt>.POPSEG</tt><label id=".POPSEG"><p>
+
+  Pop the last pushed segment from the stack, and set it.
+
+  This command will switch back to the segment that was last pushed onto the
+  segment stack using the <tt><ref id=".PUSHSEG" name=".PUSHSEG"></tt>
+  command, and remove this entry from the stack.
+
+  The assembler will print an error message if the segment stack is empty
+  when this command is issued.
+
+  See: <tt><ref id=".PUSHSEG" name=".PUSHSEG"></tt>
+
+
+<sect1><tt>.PROC</tt><label id=".PROC"><p>
+
+  Start a nested lexical level with the given name and adds a symbol with this
+  name to the enclosing scope. All new symbols from now on are in the local
+  lexical level and are accessible from outside only via <ref id="scopesyntax"
+  name="explicit scope specification">. Symbols defined outside this local
+  level may be accessed as long as their names are not used for new symbols
+  inside the level. Symbols names in other lexical levels do not clash, so you
+  may use the same names for identifiers. The lexical level ends when the
+  <tt><ref id=".ENDPROC" name=".ENDPROC"></tt> command is read. Lexical levels
+  may be nested up to a depth of 16 (this is an artificial limit to protect
+  against errors in the source).
+
+  Note: Macro names are always in the global level and in a separate name
+  space. There is no special reason for this, it's just that I've never
+  had any need for local macro definitions.
+
+  Example:
+
+  <tscreen><verb>
+       	.proc 	Clear  	      	; Define Clear subroutine, start new level
+      		lda    	#$00
+      	L1:    	sta    	Mem,y  	; L1 is local and does not cause a
+       		       	      	; duplicate symbol error if used in other
+      		       	      	; places
+      		dey
+      		bne	L1    	; Reference local symbol
+      		rts
+      	.endproc  	      	; Leave lexical level
+  </verb></tscreen>
+
+  See: <tt/<ref id=".ENDPROC" name=".ENDPROC">/ and <tt/<ref id=".SCOPE"
+  name=".SCOPE">/
+
+
+<sect1><tt>.PSC02</tt><label id=".PSC02"><p>
+
+  Enable the 65SC02 instructions set. This instruction set includes all
+  6502 instructions.
+
+  See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PC02"
+  name=".PC02"></tt> and <tt><ref id=".P816" name=".P816"></tt>
+
+
+<sect1><tt>.PUSHCPU</tt><label id=".PUSHCPU"><p>
+
+  Push the currently active CPU onto a stack. The stack has a size of 8
+  entries.
+
+  <tt/.PUSHCPU/ allows together with <tt><ref id=".POPCPU"
+  name=".POPCPU"></tt> to switch to another CPU and to restore the old CPU
+  later, without knowledge of the current CPU setting.
+
+  The assembler will print an error message if the CPU stack is already full,
+  when this command is issued.
+
+  See: <tt><ref id=".CPU" name=".CPU"></tt>, <tt><ref id=".POPCPU"
+  name=".POPCPU"></tt>, <tt><ref id=".SETCPU" name=".SETCPU"></tt>
+
+
+<sect1><tt>.PUSHSEG</tt><label id=".PUSHSEG"><p>
+
+  Push the currently active segment onto a stack. The entries on the stack
+  include the name of the segment and the segment type. The stack has a size
+  of 16 entries.
+
+  <tt/.PUSHSEG/ allows together with <tt><ref id=".POPSEG" name=".POPSEG"></tt>
+  to switch to another segment and to restore the old segment later, without
+  even knowing the name and type of the current segment.
+
+  The assembler will print an error message if the segment stack is already
+  full, when this command is issued.
+
+  See: <tt><ref id=".POPSEG" name=".POPSEG"></tt>
+
+
+<sect1><tt>.RELOC</tt><label id=".RELOC"><p>
+
+  Switch back to relocatable mode. See the <tt><ref id=".ORG"
+  name=".ORG"></tt> command.
+
+
+<sect1><tt>.REPEAT</tt><label id=".REPEAT"><p>
+
+  Repeat all commands between <tt/.REPEAT/ and <tt><ref id=".ENDREPEAT"
+  name=".ENDREPEAT"></tt> constant number of times. The command is followed by
+  a constant expression that tells how many times the commands in the body
+  should get repeated. Optionally, a comma and an identifier may be specified.
+  If this identifier is found in the body of the repeat statement, it is
+  replaced by the current repeat count (starting with zero for the first time
+  the body is repeated).
+
+  <tt/.REPEAT/ statements may be nested. If you use the same repeat count
+  identifier for a nested <tt/.REPEAT/ statement, the one from the inner
+  level will be used, not the one from the outer level.
+
+  Example:
+
+  The following macro will emit a string that is "encrypted" in that all
+  characters of the string are XORed by the value $55.
+
+  <tscreen><verb>
+	.macro	Crypt  	Arg
+		.repeat	.strlen(Arg), I
+		.byte  	.strat(Arg, I) ^ $55
+		.endrep
+	.endmacro
+  </verb></tscreen>
+
+  See: <tt><ref id=".ENDREPEAT" name=".ENDREPEAT"></tt>
+
+
+<sect1><tt>.RES</tt><label id=".RES"><p>
+
+  Reserve storage. The command is followed by one or two constant
+  expressions. The first one is mandatory and defines, how many bytes of
+  storage should be defined. The second, optional expression must by a
+  constant byte value that will be used as value of the data. If there
+  is no fill value given, the linker will use the value defined in the
+  linker configuration file (default: zero).
+
+  Example:
+
+  <tscreen><verb>
+	; Reserve 12 bytes of memory with value $AA
+     	.res	12, $AA
+  </verb></tscreen>
+
+
+<sect1><tt>.RODATA</tt><label id=".RODATA"><p>
+
+  Switch to the RODATA segment. The name of the RODATA segment is always
+  "RODATA", so this is a shortcut for
+
+  <tscreen><verb>
+       	.segment  "RODATA"
+  </verb></tscreen>
+
+  The RODATA segment is a segment that is used by the compiler for
+  readonly data like string constants.
+
+  See also the <tt><ref id=".SEGMENT" name=".SEGMENT"></tt> command.
+
+
+<sect1><tt>.SCOPE</tt><label id=".SCOPE"><p>
+
+  Start a nested lexical level with the given name. All new symbols from now
+  on are in the local lexical level and are accessible from outside only via
+  <ref id="scopesyntax" name="explicit scope specification">. Symbols defined
+  outside this local level may be accessed as long as their names are not used
+  for new symbols inside the level. Symbols names in other lexical levels do
+  not clash, so you may use the same names for identifiers. The lexical level
+  ends when the <tt><ref id=".ENDSCOPE" name=".ENDSCOPE"></tt> command is
+  read. Lexical levels may be nested up to a depth of 16 (this is an
+  artificial limit to protect against errors in the source).
+
+  Note: Macro names are always in the global level and in a separate name
+  space. There is no special reason for this, it's just that I've never
+  had any need for local macro definitions.
+
+  Example:
+
+  <tscreen><verb>
+       	.scope  Error                   ; Start new scope named Error
+                None = 0                ; No error
+                File = 1                ; File error
+                Parse = 2               ; Parse error
+      	.endscope  	      	        ; Close lexical level
+
+                ...
+                lda #Error::File        ; Use symbol from scope Error
+  </verb></tscreen>
+
+  See: <tt/<ref id=".ENDSCOPE" name=".ENDSCOPE">/ and <tt/<ref id=".PROC"
+  name=".PROC">/
+
+
+<sect1><tt>.SEGMENT</tt><label id=".SEGMENT"><p>
+
+  Switch to another segment. Code and data is always emitted into a
+  segment, that is, a named section of data. The default segment is
+  "CODE". There may be up to 254 different segments per object file
+  (and up to 65534 per executable). There are shortcut commands for
+  the most common segments ("CODE", "DATA" and "BSS").
+
+  The command is followed by a string containing the segment name (there are
+  some constraints for the name - as a rule of thumb use only those segment
+  names that would also be valid identifiers). There may also be an optional
+  address size separated by a colon. See the section covering <tt/<ref
+  id="address-sizes" name="address sizes">/ for more information.
+
+  The default address size for a segment depends on the memory model specified
+  on the command line. The default is "absolute", which means that you don't
+  have to use an address size modifier in most cases.
+
+  "absolute" means that the is a segment with 16 bit (absolute) addressing.
+  That is, the segment will reside somewhere in core memory outside the zero
+  page. "zeropage" (8 bit) means that the segment will be placed in the zero
+  page and direct (short) addressing is possible for data in this segment.
+
+  Beware: Only labels in a segment with the zeropage attribute are marked
+  as reachable by short addressing. The `*' (PC counter) operator will
+  work as in other segments and will create absolute variable values.
+
+  Please note that a segment cannot have two different address sizes. A
+  segment specified as zeropage cannot be declared as being absolute later.
+
+  Examples:
+
+  <tscreen><verb>
+       	.segment "ROM2"			; Switch to ROM2 segment
+	.segment "ZP2": zeropage	; New direct segment
+ 	.segment "ZP2" 			; Ok, will use last attribute
+	.segment "ZP2": absolute	; Error, redecl mismatch
+  </verb></tscreen>
+
+  See: <tt><ref id=".BSS" name=".BSS"></tt>, <tt><ref id=".CODE"
+  name=".CODE"></tt>, <tt><ref id=".DATA" name=".DATA"></tt> and <tt><ref
+  id=".RODATA" name=".RODATA"></tt>
+
+
+<sect1><tt>.SET</tt><label id=".SET"><p>
+
+  <tt/.SET/ is used to assign a value to a variable. See <ref id="variables"
+  name="Numeric variables"> for a full description.
+
+
+<sect1><tt>.SETCPU</tt><label id=".SETCPU"><p>
+
+  Switch the CPU instruction set. The command is followed by a string that
+  specifies the CPU. Possible values are those that can also be supplied to
+  the <tt><ref id="option--cpu" name="--cpu"></tt> command line option,
+  namely: 6502, 6502X, 65SC02, 65C02, 65816 and HuC6280.
+
+  See: <tt><ref id=".CPU" name=".CPU"></tt>,
+       <tt><ref id=".IFP02" name=".IFP02"></tt>,
+       <tt><ref id=".IFP816" name=".IFP816"></tt>,
+       <tt><ref id=".IFPC02" name=".IFPC02"></tt>,
+       <tt><ref id=".IFPSC02" name=".IFPSC02"></tt>,
+       <tt><ref id=".P02" name=".P02"></tt>,
+       <tt><ref id=".P816" name=".P816"></tt>,
+       <tt><ref id=".PC02" name=".PC02"></tt>,
+       <tt><ref id=".PSC02" name=".PSC02"></tt>
+
+
+<sect1><tt>.SMART</tt><label id=".SMART"><p>
+
+  Switch on or off smart mode. The command must be followed by a '+' or '-'
+  character to switch the option on or off respectively. The default is off
+  (that is, the assembler doesn't try to be smart), but this default may be
+  changed by the -s switch on the command line.
+
+  In smart mode the assembler will do the following:
+
+  <itemize>
+  <item>Track usage of the <tt/REP/ and <tt/SEP/ instructions in 65816 mode
+        and update the operand sizes accordingly. If the operand of such an
+        instruction cannot be evaluated by the assembler (for example, because
+        the operand is an imported symbol), a warning is issued. Beware: Since
+        the assembler cannot trace the execution flow this may lead to false
+        results in some cases. If in doubt, use the <tt/.Inn/ and <tt/.Ann/
+        instructions to tell the assembler about the current settings.
+  <item>In 65816 mode, replace a <tt/RTS/ instruction by <tt/RTL/ if it is
+        used within a procedure declared as <tt/far/, or if the procedure has
+        no explicit address specification, but it is <tt/far/ because of the
+        memory model used.
+  </itemize>
+
+  Example:
+
+  <tscreen><verb>
+	.smart				; Be smart
+	.smart	-			; Stop being smart
+  </verb></tscreen>
+
+  See: <tt><ref id=".A16" name=".A16"></tt>,
+       <tt><ref id=".A8" name=".A8"></tt>,
+       <tt><ref id=".I16" name=".I16"></tt>,
+       <tt><ref id=".I8" name=".I8"></tt>
+
+
+<sect1><tt>.STRUCT</tt><label id=".STRUCT"><p>
+
+  Starts a struct definition. Structs are covered in a separate section named
+  <ref id="structs" name="&quot;Structs and unions&quot;">.
+
+  See also: <tt><ref id=".ENDSTRUCT" name=".ENDSTRUCT"></tt>,
+            <tt><ref id=".ENDUNION" name=".ENDUNION"></tt>,
+            <tt><ref id=".UNION" name=".UNION"></tt>
+
+
+<sect1><tt>.TAG</tt><label id=".TAG"><p>
+
+  Allocate space for a struct or union.
+
+  Example:
+
+  <tscreen><verb>
+        .struct Point
+                xcoord  .word
+                ycoord  .word
+        .endstruct
+
+        .bss
+                .tag    Point           ; Allocate 4 bytes
+  </verb></tscreen>
+
+
+<sect1><tt>.UNDEF, .UNDEFINE</tt><label id=".UNDEFINE"><p>
+
+  Delete a define style macro definition. The command is followed by an
+  identifier which specifies the name of the macro to delete. Macro
+  replacement is switched of when reading the token following the command
+  (otherwise the macro name would be replaced by its replacement list).
+
+  See also the <tt><ref id=".DEFINE" name=".DEFINE"></tt> command and
+  section <ref id="macros" name="Macros">.
+
+
+<sect1><tt>.UNION</tt><label id=".UNION"><p>
+
+  Starts a union definition. Unions are covered in a separate section named
+  <ref id="structs" name="&quot;Structs and unions&quot;">.
+
+  See also: <tt><ref id=".ENDSTRUCT" name=".ENDSTRUCT"></tt>,
+            <tt><ref id=".ENDUNION" name=".ENDUNION"></tt>,
+            <tt><ref id=".STRUCT" name=".STRUCT"></tt>
+
+
+<sect1><tt>.WARNING</tt><label id=".WARNING"><p>
+
+  Force an assembly warning. The assembler will output a warning message
+  preceded by "User warning". This warning will always be output, even if
+  other warnings are disabled with the <tt><ref id="option-W" name="-W0"></tt>
+  command line option.
+
+  This command may be used to output possible problems when assembling
+  the source file.
+
+  Example:
+
+  <tscreen><verb>
+	.macro	jne	target
+	   	.local L1
+	   	.ifndef	target
+	   	.warning "Forward jump in jne, cannot optimize!"
+	   	beq	L1
+	   	jmp	target
+	L1:
+	   	.else
+	   	...
+	   	.endif
+	.endmacro
+  </verb></tscreen>
+
+  See also: <tt><ref id=".ERROR" name=".ERROR"></tt>,
+            <tt><ref id=".FATAL" name=".FATAL"></tt>,
+            <tt><ref id=".OUT" name=".OUT"></tt>
+
+
+<sect1><tt>.WORD</tt><label id=".WORD"><p>
+
+  Define word sized data. Must be followed by a sequence of (word ranged,
+  but not necessarily constant) expressions.
+
+  Example:
+
+  <tscreen><verb>
+  	.word  	$0D00, $AF13, _Clear
+  </verb></tscreen>
+
+
+<sect1><tt>.ZEROPAGE</tt><label id=".ZEROPAGE"><p>
+
+  Switch to the ZEROPAGE segment and mark it as direct (zeropage) segment.
+  The name of the ZEROPAGE segment is always "ZEROPAGE", so this is a
+  shortcut for
+
+  <tscreen><verb>
+       	.segment  "ZEROPAGE", zeropage
+  </verb></tscreen>
+
+  Because of the "zeropage" attribute, labels declared in this segment are
+  addressed using direct addressing mode if possible. You <em/must/ instruct
+  the linker to place this segment somewhere in the address range 0..$FF
+  otherwise you will get errors.
+
+  See: <tt><ref id=".SEGMENT" name=".SEGMENT"></tt>
+
+
+
+<sect>Macros<label id="macros"><p>
+
+
+<sect1>Introduction<p>
+
+Macros may be thought of as "parametrized super instructions". Macros are
+sequences of tokens that have a name. If that name is used in the source
+file, the macro is "expanded", that is, it is replaced by the tokens that
+were specified when the macro was defined.
+
+
+<sect1>Macros without parameters<p>
+
+In its simplest form, a macro does not have parameters. Here's an
+example:
+
+<tscreen><verb>
+       	.macro  asr		; Arithmetic shift right
+      	       	cmp	#$80	; Put bit 7 into carry
+      		ror		; Rotate right with carry
+      	.endmacro
+</verb></tscreen>
+
+The macro above consists of two real instructions, that are inserted into
+the code, whenever the macro is expanded. Macro expansion is simply done
+by using the name, like this:
+
+<tscreen><verb>
+      	lda    	$2010
+      	asr
+      	sta	$2010
+</verb></tscreen>
+
+
+<sect1>Parametrized macros<p>
+
+When using macro parameters, macros can be even more useful:
+
+<tscreen><verb>
+      	.macro 	inc16	addr
+      		clc
+      		lda    	addr
+      		adc	#$01
+      		sta	addr
+      		lda	addr+1
+      	 	adc	#$00
+      		sta	addr+1
+      	.endmacro
+</verb></tscreen>
+
+When calling the macro, you may give a parameter, and each occurrence of
+the name "addr" in the macro definition will be replaced by the given
+parameter. So
+
+<tscreen><verb>
+      	inc16  	$1000
+</verb></tscreen>
+
+will be expanded to
+
+<tscreen><verb>
+      	       	clc
+      		lda	$1000
+      		adc	#$01
+      		sta	$1000
+      		lda	$1000+1
+      		adc	#$00
+      		sta	$1000+1
+</verb></tscreen>
+
+A macro may have more than one parameter, in this case, the parameters
+are separated by commas. You are free to give less parameters than the
+macro actually takes in the definition. You may also leave intermediate
+parameters empty. Empty parameters are replaced by empty space (that is,
+they are removed when the macro is expanded). If you have a look at our
+macro definition above, you will see, that replacing the "addr" parameter
+by nothing will lead to wrong code in most lines. To help you, writing
+macros with a variable parameter list, there are some control commands:
+
+<tt><ref id=".IFBLANK" name=".IFBLANK"></tt> tests the rest of the line and
+returns true, if there are any tokens on the remainder of the line. Since
+empty parameters are replaced by nothing, this may be used to test if a given
+parameter is empty. <tt><ref id=".IFNBLANK" name=".IFNBLANK"></tt> tests the
+opposite.
+
+Look at this example:
+
+<tscreen><verb>
+      	.macro 	ldaxy  	a, x, y
+      	.ifnblank      	a
+      	     	lda    	#a
+      	.endif
+      	.ifnblank      	x
+      		ldx    	#x
+      	.endif
+      	.ifnblank      	y
+      		ldy    	#y
+      	.endif
+      	.endmacro
+</verb></tscreen>
+
+This macro may be called as follows:
+
+<tscreen><verb>
+      	ldaxy  	1, 2, 3		; Load all three registers
+
+  	ldaxy	1, , 3 		; Load only a and y
+
+  	ldaxy	, , 3  		; Load y only
+</verb></tscreen>
+
+There's another helper command for determining, which macro parameters are
+valid: <tt><ref id=".PARAMCOUNT" name=".PARAMCOUNT"></tt> This command is
+replaced by the parameter count given, <em/including/ intermediate empty macro
+parameters:
+
+<tscreen><verb>
+  	ldaxy  	1      	       	; .PARAMCOUNT = 1
+  	ldaxy	1,,3   	       	; .PARAMCOUNT = 3
+  	ldaxy	1,2    	       	; .PARAMCOUNT = 2
+  	ldaxy	1,     	       	; .PARAMCOUNT = 2
+  	ldaxy	1,2,3  	       	; .PARAMCOUNT = 3
+</verb></tscreen>
+
+Macro parameters may optionally be enclosed into curly braces. This allows the
+inclusion of tokens that would otherwise terminate the parameter (the comma in
+case of a macro parameter).
+
+<tscreen><verb>
+        .macro  foo     arg1, arg2
+                ...
+        .endmacro
+
+                foo     ($00,x)         ; Two parameters passed
+                foo     {($00,x)}       ; One parameter passed
+</verb></tscreen>
+
+In the first case, the macro is called with two parameters: '<tt/(&dollar;00/'
+and 'x)'. The comma is not passed to the macro, since it is part of the
+calling sequence, not the parameters.
+
+In the second case, '(&dollar;00,x)' is passed to the macro, this time
+including the comma.
+
+
+<sect1>Detecting parameter types<p>
+
+Sometimes it is nice to write a macro that acts differently depending on the
+type of the argument supplied. An example would be a macro that loads a 16 bit
+value from either an immediate operand, or from memory. The <tt/<ref
+id=".MATCH" name=".MATCH">/ and <tt/<ref id=".XMATCH" name=".XMATCH">/
+functions will allow you to do exactly this:
+
+<tscreen><verb>
+        .macro  ldax    arg
+                .if (.match (.left (1, {arg}), #))
+                    ; immediate mode
+                    lda     #<(.right (.tcount ({arg})-1, {arg}))
+                    ldx     #>(.right (.tcount ({arg})-1, {arg}))
+                .else
+                    ; assume absolute or zero page
+                    lda     arg
+                    ldx     1+(arg)
+                .endif
+        .endmacro
+</verb></tscreen>
+
+Using the <tt/<ref id=".MATCH" name=".MATCH">/ function, the macro is able to
+check if its argument begins with a hash mark. If so, two immediate loads are
+emitted, Otherwise a load from an absolute zero page memory location is
+assumed. Please note how the curly braces are used to enclose parameters to
+pseudo functions handling token lists. This is necessary, because the token
+lists may include commas or parens, which would be treated by the assembler
+as end-of-list.
+
+The macro can be used as
+
+<tscreen><verb>
+        foo:    .word   $5678
+        ...
+                ldax    #$1234          ; X=$12, A=$34
+        ...
+                ldax    foo             ; X=$56, A=$78
+</verb></tscreen>
+
+
+<sect1>Recursive macros<p>
+
+Macros may be used recursively:
+
+<tscreen><verb>
+  	.macro 	push   	r1, r2, r3
+  	    	lda    	r1
+  	    	pha
+  	.if 	.paramcount > 1
+  	    	push   	r2, r3
+  	.endif
+  	.endmacro
+</verb></tscreen>
+
+There's also a special macro to help writing recursive macros: <tt><ref
+id=".EXITMACRO" name=".EXITMACRO"></tt> This command will stop macro expansion
+immediately:
+
+<tscreen><verb>
+      	.macro 	push   	r1, r2, r3, r4, r5, r6, r7
+      	.ifblank       	r1
+      	      	; First parameter is empty
+      	      	.exitmacro
+      	.else
+      	      	lda    	r1
+      	      	pha
+      	.endif
+      	      	push   	r2, r3, r4, r5, r6, r7
+      	.endmacro
+</verb></tscreen>
+
+When expanding this macro, the expansion will push all given parameters
+until an empty one is encountered. The macro may be called like this:
+
+<tscreen><verb>
+      	push   	$20, $21, $32		; Push 3 ZP locations
+      	push  	$21    			; Push one ZP location
+</verb></tscreen>
+
+
+<sect1>Local symbols inside macros<p>
+
+Now, with recursive macros, <tt><ref id=".IFBLANK" name=".IFBLANK"></tt> and
+<tt><ref id=".PARAMCOUNT" name=".PARAMCOUNT"></tt>, what else do you need?
+Have a look at the inc16 macro above. Here is it again:
+
+<tscreen><verb>
+       	.macro 	inc16  	addr
+       	      	clc
+       	      	lda    	addr
+       	      	adc    	#$01
+       	      	sta    	addr
+       	      	lda    	addr+1
+       	      	adc    	#$00
+       	      	sta    	addr+1
+       	.endmacro
+</verb></tscreen>
+
+If you have a closer look at the code, you will notice, that it could be
+written more efficiently, like this:
+
+<tscreen><verb>
+       	.macro 	inc16  	addr
+       	       	inc	addr
+       	       	bne    	Skip
+       	   	inc    	addr+1
+       	Skip:
+       	.endmacro
+</verb></tscreen>
+
+But imagine what happens, if you use this macro twice? Since the label "Skip"
+has the same name both times, you get a "duplicate symbol" error. Without a
+way to circumvent this problem, macros are not as useful, as they could be.
+One possible solution is the command <tt><ref id=".LOCAL" name=".LOCAL"></tt>.
+It declares one or more symbols as local to the macro expansion. The names of
+local variables are replaced by a unique name in each separate macro
+expansion. So we can solve the problem above by using <tt/.LOCAL/:
+
+<tscreen><verb>
+     	.macro 	inc16	addr
+       	    	.local 	Skip 	    	; Make Skip a local symbol
+  	     	inc     addr
+       	       	bne     Skip
+  	     	inc     addr+1
+  	Skip:	     	     		; Not visible outside
+  	.endmacro
+</verb></tscreen>
+
+Another solution is of course to start a new lexical block inside the macro
+that hides any labels:
+
+<tscreen><verb>
+  	.macro 	inc16  	addr
+  	.proc
+       	       	inc   	addr
+       	       	bne    	Skip
+       	   	inc    	addr+1
+  	Skip:
+  	.endproc
+  	.endmacro
+</verb></tscreen>
+
+
+<sect1>C style macros<p>
+
+Starting with version 2.5 of the assembler, there is a second macro type
+available: C style macros using the <tt/.DEFINE/ directive. These macros are
+similar to the classic macro type described above, but behaviour is sometimes
+different:
+
+<itemize>
+
+<item>	Macros defined with <tt><ref id=".DEFINE" name=".DEFINE"></tt> may not
+	span more than a line. You may use line continuation (see <tt><ref
+	id=".LINECONT" name=".LINECONT"></tt>) to spread the definition over
+	more than one line for increased readability, but the macro itself
+	may not contain an end-of-line token.
+
+<item>	Macros defined with <tt><ref id=".DEFINE" name=".DEFINE"></tt> share
+	the name space with classic macros, but they are detected and replaced
+	at the scanner level. While classic macros may be used in every place,
+	where a mnemonic or other directive is allowed, <tt><ref id=".DEFINE"
+	name=".DEFINE"></tt> style macros are allowed anywhere in a line. So
+	they are more versatile in some situations.
+
+<item>	<tt><ref id=".DEFINE" name=".DEFINE"></tt> style macros may take
+	parameters. While classic macros may have empty parameters, this is
+	not true for <tt><ref id=".DEFINE" name=".DEFINE"></tt> style macros.
+	For this macro type, the number of actual parameters must match
+	exactly the number of formal parameters.
+
+	To make this possible, formal parameters are enclosed in braces when
+	defining the macro. If there are no parameters, the empty braces may
+	be omitted.
+
+<item>	Since <tt><ref id=".DEFINE" name=".DEFINE"></tt> style macros may not
+      	contain end-of-line tokens, there are things that cannot be done. They
+	may not contain several processor instructions for example. So, while
+	some things may be done with both macro types, each type has special
+	usages. The types complement each other.
+
+</itemize>
+
+Let's look at a few examples to make the advantages and disadvantages
+clear.
+
+To emulate assemblers that use "<tt/EQU/" instead of "<tt/=/" you may use the
+following <tt/.DEFINE/:
+
+<tscreen><verb>
+      	.define	EQU   	=
+
+      	foo  	EQU   	$1234	   	; This is accepted now
+</verb></tscreen>
+
+You may use the directive to define string constants used elsewhere:
+
+<tscreen><verb>
+      	; Define the version number
+      	.define	VERSION	       	"12.3a"
+
+      	; ... and use it
+      	.asciiz	VERSION
+</verb></tscreen>
+
+Macros with parameters may also be useful:
+
+<tscreen><verb>
+      	.define DEBUG(message)	.out	message
+
+      	DEBUG	"Assembling include file #3"
+</verb></tscreen>
+
+Note that, while formal parameters have to be placed in braces, this is
+not true for the actual parameters. Beware: Since the assembler cannot
+detect the end of one parameter, only the first token is used. If you
+don't like that, use classic macros instead:
+
+<tscreen><verb>
+   	.macro 	DEBUG   message
+   	     	.out	message
+   	.endmacro
+</verb></tscreen>
+
+(This is an example where a problem can be solved with both macro types).
+
+
+<sect1>Characters in macros<p>
+
+When using the <ref id="option-t" name="-t"> option, characters are translated
+into the target character set of the specific machine. However, this happens
+as late as possible. This means that strings are translated if they are part
+of a <tt><ref id=".BYTE" name=".BYTE"></tt> or <tt><ref id=".ASCIIZ"
+name=".ASCIIZ"></tt> command. Characters are translated as soon as they are
+used as part of an expression.
+
+This behaviour is very intuitive outside of macros but may be confusing when
+doing more complex macros. If you compare characters against numeric values,
+be sure to take the translation into account.
+
+
+<sect1>Deleting macros<p>
+
+Macros can be deleted. This will not work if the macro that should be deleted
+is currently expanded as in the following non working example:
+
+<tscreen><verb>
+   	.macro 	notworking
+   	     	.delmacro       notworking
+   	.endmacro
+
+        notworking              ; Will not work
+</verb></tscreen>
+
+The commands to delete classic and define style macros differ. Classic macros
+can be deleted by use of <tt><ref id=".DELMACRO" name=".DELMACRO"></tt>, while
+for <tt><ref id=".DEFINE" name=".DEFINE"></tt> style macros, <tt><ref
+id=".UNDEFINE" name=".UNDEFINE"></tt> must be used. Example:
+
+<tscreen><verb>
+        .define value   1
+   	.macro 	mac
+   	       	.byte   2
+   	.endmacro
+
+                .byte   value           ; Emit one byte with value 1
+                mac                     ; Emit another byte with value 2
+
+        .undefine value
+        .delmacro mac
+
+                .byte   value           ; Error: Unknown identifier
+                mac                     ; Error: Missing ":"
+</verb></tscreen>
+
+A separate command for <tt>.DEFINE</tt> style macros was necessary, because
+the name of such a macro is replaced by its replacement list on a very low
+level. To get the actual name, macro replacement has to be switched off when
+reading the argument to <tt>.UNDEFINE</tt>. This does also mean that the
+argument to <tt>.UNDEFINE</tt> is not allowed to come from another
+<tt>.DEFINE</tt>. All this is not necessary for classic macros, so having two
+different commands increases flexibility.
+
+
+<sect>Macro packages<label id="macropackages"><p>
+
+Using the <tt><ref id=".MACPACK" name=".MACPACK"></tt> directive, predefined
+macro packages may be included with just one command. Available macro packages
+are:
+
+
+<sect1><tt>.MACPACK generic</tt><p>
+
+This macro package defines macros that are useful in almost any program.
+Currently defined macros are:
+
+<tscreen><verb>
+      	.macro  add     Arg
+      	     	clc
+      	     	adc     Arg
+      	.endmacro
+
+      	.macro  sub     Arg
+      	     	sec
+      	     	sbc     Arg
+      	.endmacro
+
+        .macro  bge     Arg
+                bcs     Arg
+        .endmacro
+
+        .macro  blt     Arg
+                bcc     Arg
+        .endmacro
+
+        .macro  bgt     Arg
+                .local  L
+                beq     L
+                bcs     Arg
+        L:
+        .endmacro
+
+        .macro  ble     Arg
+                beq     Arg
+                bcc     Arg
+        .endmacro
+
+        .macro  bnz     Arg
+                bne     Arg
+        .endmacro
+
+        .macro  bze     Arg
+                beq     Arg
+        .endmacro
+
+</verb></tscreen>
+
+
+<sect1><tt>.MACPACK longbranch</tt><p>
+
+This macro package defines long conditional jumps. They are named like the
+short counterpart but with the 'b' replaced by a 'j'. Here is a sample
+definition for the "<tt/jeq/" macro, the other macros are built using the same
+scheme:
+
+<tscreen><verb>
+       	.macro	jeq    	Target
+       	    	.if	.def(Target) .and ((*+2)-(Target) <= 127)
+       	    	beq	Target
+       	    	.else
+       	    	bne    	*+5
+       	    	jmp    	Target
+       	    	.endif
+       	.endmacro
+</verb></tscreen>
+
+All macros expand to a short branch, if the label is already defined (back
+jump) and is reachable with a short jump. Otherwise the macro expands to a
+conditional branch with the branch condition inverted, followed by an absolute
+jump to the actual branch target.
+
+The package defines the following macros:
+
+<tscreen><verb>
+       	jeq, jne, jmi, jpl, jcs, jcc, jvs, jvc
+</verb></tscreen>
+
+
+
+<sect1><tt>.MACPACK atari</tt><p>
+
+This macro package defines a macro named <tt/scrcode/. It takes a string
+as argument and places this string into memory translated into screen codes.
+
+
+<sect1><tt>.MACPACK cbm</tt><p>
+
+This macro package defines a macro named <tt/scrcode/. It takes a string
+as argument and places this string into memory translated into screen codes.
+
+
+<sect1><tt>.MACPACK cpu</tt><p>
+
+This macro package does not define any macros but constants used to examine
+the value read from the <tt/<ref id=".CPU" name=".CPU">/ pseudo variable. For
+each supported CPU a constant similar to
+
+<tscreen><verb>
+    CPU_6502
+    CPU_65SC02
+    CPU_65C02
+    CPU_65816
+    CPU_SWEET16
+    CPU_HUC6280
+</verb></tscreen>
+
+is defined. These constants may be used to determine the exact type of the
+currently enabled CPU. In addition to that, for each CPU instruction set,
+another constant is defined:
+
+<tscreen><verb>
+    CPU_ISET_6502
+    CPU_ISET_65SC02
+    CPU_ISET_65C02
+    CPU_ISET_65816
+    CPU_ISET_SWEET16
+    CPU_ISET_HUC6280
+</verb></tscreen>
+
+The value read from the <tt/<ref id=".CPU" name=".CPU">/ pseudo variable may
+be checked with <tt/<ref id="operators" name=".BITAND">/ to determine if the
+currently enabled CPU supports a specific instruction set. For example the
+65C02 supports all instructions of the 65SC02 CPU, so it has the
+<tt/CPU_ISET_65SC02/ bit set in addition to its native <tt/CPU_ISET_65C02/
+bit. Using
+
+<tscreen><verb>
+        .if (.cpu .bitand CPU_ISET_65SC02)
+                lda     (sp)
+        .else
+                ldy     #$00
+                lda     (sp),y
+        .endif
+</verb></tscreen>
+
+it is possible to determine if the
+
+<tscreen><verb>
+                lda     (sp)
+</verb></tscreen>
+
+instruction is supported, which is the case for the 65SC02, 65C02 and 65816
+CPUs (the latter two are upwards compatible to the 65SC02).
+
+  
+<sect1><tt>.MACPACK module</tt><p>
+
+This macro package defines a macro named <tt/module_header/. It takes an
+identifier as argument and is used to define the header of a module both
+in the dynamic and static variant.
+
+
+
+<sect>Predefined constants<label id="predefined-constants"><p>
+
+For better orthogonality, the assembler defines similar symbols as the
+compiler, depending on the target system selected:
+
+<itemize>
+<item><tt/__APPLE2__/ - Target system is <tt/apple2/ or <tt/apple2enh/
+<item><tt/__APPLE2ENH__/ - Target system is <tt/apple2enh/
+<item><tt/__ATARI5200__/ - Target system is <tt/atari5200/
+<item><tt/__ATARI__/ - Target system is <tt/atari/ or <tt/atarixl/
+<item><tt/__ATARIXL__/ - Target system is <tt/atarixl/
+<item><tt/__ATMOS__/ - Target system is <tt/atmos/
+<item><tt/__BBC__/ - Target system is <tt/bbc/
+<item><tt/__C128__/ - Target system is <tt/c128/
+<item><tt/__C16__/ - Target system is <tt/c16/ or <tt/plus4/
+<item><tt/__C64__/ - Target system is <tt/c64/
+<item><tt/__CBM__/ - Target is a Commodore system
+<item><tt/__CBM510__/ - Target system is <tt/cbm510/
+<item><tt/__CBM610__/ - Target system is <tt/cbm610/
+<item><tt/__GEOS__/ - Target is a GEOS system
+<item><tt/__GEOS_APPLE__/ - Target system is <tt/geos-apple/
+<item><tt/__GEOS_CBM__/ - Target system is <tt/geos-cbm/
+<item><tt/__LUNIX__/ - Target system is <tt/lunix/
+<item><tt/__LYNX__/ - Target system is <tt/lynx/
+<item><tt/__NES__/ - Target system is <tt/nes/
+<item><tt/__PET__/ - Target system is <tt/pet/
+<item><tt/__PLUS4__/ - Target system is <tt/plus4/
+<item><tt/__SIM6502__/ - Target system is <tt/sim6502/
+<item><tt/__SIM65C02__/ - Target system is <tt/sim65c02/
+<item><tt/__SUPERVISION__/ - Target system is <tt/supervision/
+<item><tt/__VIC20__/ - Target system is <tt/vic20/
+</itemize>
+
+
+<sect>Structs and unions<label id="structs"><p>
+
+<sect1>Structs and unions Overview<p>
+
+Structs and unions are special forms of <ref id="scopes" name="scopes">.  They
+are to some degree comparable to their C counterparts. Both have a list of
+members. Each member allocates storage and may optionally have a name, which,
+in case of a struct, is the offset from the beginning and, in case of a union,
+is always zero.
+
+
+<sect1>Declaration<p>
+
+Here is an example for a very simple struct with two members and a total size
+of 4 bytes:
+
+<tscreen><verb>
+      .struct Point
+              xcoord  .word
+              ycoord  .word
+      .endstruct
+</verb></tscreen>
+
+A union shares the total space between all its members, its size is the same
+as that of the largest member. The offset of all members relative to the union
+is zero.
+
+<tscreen><verb>
+      .union  Entry
+              index   .word
+              ptr     .addr
+      .endunion
+</verb></tscreen>
+
+A struct or union must not necessarily have a name. If it is anonymous, no
+local scope is opened, the identifiers used to name the members are placed
+into the current scope instead.
+
+A struct may contain unnamed members and definitions of local structs. The
+storage allocators may contain a multiplier, as in the example below:
+
+<tscreen><verb>
+      .struct Circle
+              .struct Point
+                      .word   2         ; Allocate two words
+              .endstruct
+              Radius  .word
+      .endstruct
+</verb></tscreen>
+
+
+<sect1>The <tt/.TAG/ keyword<p>
+
+Using the <ref id=".TAG" name=".TAG"> keyword, it is possible to reserve space
+for an already defined struct or unions within another struct:
+
+<tscreen><verb>
+      .struct Point
+              xcoord  .word
+              ycoord  .word
+      .endstruct
+
+      .struct Circle
+              Origin  .tag    Point
+              Radius  .byte
+      .endstruct
+</verb></tscreen>
+
+Space for a struct or union may be allocated using the <ref id=".TAG"
+name=".TAG"> directive.
+
+<tscreen><verb>
+        C:      .tag    Circle
+</verb></tscreen>
+
+Currently, members are just offsets from the start of the struct or union. To
+access a field of a struct, the member offset has to be added to the address
+of the struct itself:
+
+<tscreen><verb>
+        lda     C+Circle::Radius        ; Load circle radius into A
+</verb></tscreen>
+
+This may change in a future version of the assembler.
+
+
+<sect1>Limitations<p>
+
+Structs and unions are currently implemented as nested symbol tables (in fact,
+they were a by-product of the improved scoping rules). Currently, the
+assembler has no idea of types. This means that the <ref id=".TAG"
+name=".TAG"> keyword will only allocate space. You won't be able to initialize
+variables declared with <ref id=".TAG" name=".TAG">, and adding an embedded
+structure to another structure with <ref id=".TAG" name=".TAG"> will not make
+this structure accessible by using the '::' operator.
+
+
+
+<sect>Module constructors/destructors<label id="condes"><p>
+
+<em>Note:</em> This section applies mostly to C programs, so the explanation
+below uses examples from the C libraries. However, the feature may also be
+useful for assembler programs.
+
+
+<sect1>Module constructors/destructors Overview<p>
+
+Using the <tt><ref id=".CONSTRUCTOR" name=".CONSTRUCTOR"></tt>, <tt><ref
+id=".DESTRUCTOR" name=".DESTRUCTOR"></tt> and <tt><ref id=".INTERRUPTOR"
+name=".INTERRUPTOR"></tt> keywords it is possible to export functions in a
+special way. The linker is able to generate tables with all functions of a
+specific type. Such a table will <em>only</em> include symbols from object
+files that are linked into a specific executable. This may be used to add
+initialization and cleanup code for library modules, or a table of interrupt
+handler functions.
+
+The C heap functions are an example where module initialization code is used.
+All heap functions (<tt>malloc</tt>, <tt>free</tt>, ...) work with a few
+variables that contain the start and the end of the heap, pointers to the free
+list and so on. Since the end of the heap depends on the size and start of the
+stack, it must be initialized at runtime. However, initializing these
+variables for programs that do not use the heap are a waste of time and
+memory.
+
+So the central module defines a function that contains initialization code and
+exports this function using the <tt/.CONSTRUCTOR/ statement. If (and only if)
+this module is added to an executable by the linker, the initialization
+function will be placed into the table of constructors by the linker. The C
+startup code will call all constructors before <tt/main/ and all destructors
+after <tt/main/, so without any further work, the heap initialization code is
+called once the module is linked in.
+
+While it would be possible to add explicit calls to initialization functions
+in the startup code, the new approach has several advantages:
+
+<enum>
+<item>
+If a module is not included, the initialization code is not linked in and not
+called. So you don't pay for things you don't need.
+
+<item>
+Adding another library that needs initialization does not mean that the
+startup code has to be changed. Before we had module constructors and
+destructors, the startup code for all systems had to be adjusted to call the
+new initialization code.
+
+<item>
+The feature saves memory: Each additional initialization function needs just
+two bytes in the table (a pointer to the function).
+
+</enum>
+
+
+<sect1>Calling order<p>
+
+The symbols are sorted in increasing priority order by the linker when using
+one of the builtin linker configurations, so the functions with lower
+priorities come first and are followed by those with higher priorities. The C
+library runtime subroutine that walks over the function tables calls the
+functions starting from the top of the table - which means that functions with
+a high priority are called first.
+
+So when using the C runtime, functions are called with high priority functions
+first, followed by low priority functions.
+
+
+<sect1>Pitfalls<p>
+
+When using these special symbols, please take care of the following:
+
+<itemize>
+
+<item>
+The linker will only generate function tables, it will not generate code to
+call these functions. If you're using the feature in some other than the
+existing C environments, you have to write code to call all functions in a
+linker generated table yourself. See the <tt/condes/ and <tt/callirq/ modules
+in the C runtime for an example on how to do this.
+
+<item>
+The linker will only add addresses of functions that are in modules linked to
+the executable. This means that you have to be careful where to place the
+condes functions. If initialization or an irq handler is needed for a group of
+functions, be sure to place the function into a module that is linked in
+regardless of which function is called by the user.
+
+<item>
+The linker will generate the tables only when requested to do so by the
+<tt/FEATURE CONDES/ statement in the linker config file. Each table has to
+be requested separately.
+
+<item>
+Constructors and destructors may have priorities. These priorities determine
+the order of the functions in the table. If your initialization or cleanup code
+does depend on other initialization or cleanup code, you have to choose the
+priority for the functions accordingly.
+
+<item>
+Besides the <tt><ref id=".CONSTRUCTOR" name=".CONSTRUCTOR"></tt>, <tt><ref
+id=".DESTRUCTOR" name=".DESTRUCTOR"></tt> and <tt><ref id=".INTERRUPTOR"
+name=".INTERRUPTOR"></tt> statements, there is also a more generic command:
+<tt><ref id=".CONDES" name=".CONDES"></tt>. This allows to specify an
+additional type. Predefined types are 0 (constructor), 1 (destructor) and 2
+(interruptor). The linker generates a separate table for each type on request.
+
+</itemize>
+
+
+<sect>Porting sources from other assemblers<p>
+
+Sometimes it is necessary to port code written for older assemblers to ca65.
+In some cases, this can be done without any changes to the source code by
+using the emulation features of ca65 (see <tt><ref id=".FEATURE"
+name=".FEATURE"></tt>). In other cases, it is necessary to make changes to the
+source code.
+
+Probably the biggest difference is the handling of the <tt><ref id=".ORG"
+name=".ORG"></tt> directive. ca65 generates relocatable code, and placement is
+done by the linker. Most other assemblers generate absolute code, placement is
+done within the assembler and there is no external linker.
+
+In general it is not a good idea to write new code using the emulation
+features of the assembler, but there may be situations where even this rule is
+not valid.
+
+<sect1>TASS<p>
+
+You need to use some of the ca65 emulation features to simulate the behaviour
+of such simple assemblers.
+
+<enum>
+<item>Prepare your sourcecode like this:
+
+<tscreen><verb>
+        ; if you want TASS style labels without colons
+        .feature labels_without_colons
+
+        ; if you want TASS style character constants
+        ; ("a" instead of the default 'a')
+        .feature loose_char_term
+
+                .word *+2       ; the cbm load address
+
+                [yourcode here]
+</verb></tscreen>
+
+notice that the two emulation features are mostly useful for porting
+sources originally written in/for TASS, they are not needed for the
+actual "simple assembler operation" and are not recommended if you are
+writing new code from scratch.
+
+<item>Replace all program counter assignments (which are not possible in ca65
+by default, and the respective emulation feature works different from what
+you'd expect) by another way to skip to memory locations, for example the
+<tt><ref id=".RES" name=".RES"></tt> directive.
+
+<tscreen><verb>
+        ; *=$2000
+        .res $2000-*    ; reserve memory up to $2000
+</verb></tscreen>
+
+Please note that other than the original TASS, ca65 can never move the program
+counter backwards - think of it as if you are assembling to disk with TASS.
+
+<item>Conditional assembly (<tt/.ifeq//<tt/.endif//<tt/.goto/ etc.) must be
+rewritten to match ca65 syntax. Most importantly notice that due to the lack
+of <tt/.goto/, everything involving loops must be replaced by
+<tt><ref id=".REPEAT" name=".REPEAT"></tt>.
+
+<item>To assemble code to a different address than it is executed at, use the
+<tt><ref id=".ORG" name=".ORG"></tt> directive instead of
+<tt/.offs/-constructs.
+
+<tscreen><verb>
+        .org $1800
+
+        [floppy code here]
+
+        .reloc  ; back to normal
+</verb></tscreen>
+
+<item>Then assemble like this:
+
+<tscreen><verb>
+        cl65 --start-addr 0x0ffe -t none myprog.s -o myprog.prg
+</verb></tscreen>
+
+Note that you need to use the actual start address minus two, since two bytes
+are used for the cbm load address.
+
+</enum>
+
+
+<sect>Copyright<p>
+
+ca65 (and all cc65 binutils) are (C) Copyright 1998-2003 Ullrich von
+Bassewitz. For usage of the binaries and/or sources the following
+conditions do apply:
+
+This software is provided 'as-is', without any expressed or implied
+warranty.  In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+<enum>
+<item> 	The origin of this software must not be misrepresented; you must not
+       	claim that you wrote the original software. If you use this software
+       	in a product, an acknowledgment in the product documentation would be
+	appreciated but is not required.
+<item>	Altered source versions must be plainly marked as such, and must not
+	be misrepresented as being the original software.
+<item>	This notice may not be removed or altered from any source
+	distribution.
+</enum>
+
+
+
+</article>
+
+
+

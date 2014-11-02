@@ -166,12 +166,12 @@ extern StrBuf           CfgSVal;
 extern unsigned long    CfgIVal;
 
 /* Error location. PLEASE NOTE: I'm abusing the FilePos structure to some
- * degree. It is used mostly to hold a file position, where the Name member
- * is an index into the source file table of an object file. As used in config
- * file processing, the Name member is a string pool index instead. This is
- * distinguished by the object file pointer being NULL or not in the structs
- * where this is relevant.
- */
+** degree. It is used mostly to hold a file position, where the Name member
+** is an index into the source file table of an object file. As used in config
+** file processing, the Name member is a string pool index instead. This is
+** distinguished by the object file pointer being NULL or not in the structs
+** where this is relevant.
+*/
 extern FilePos          CfgErrorPos;
 
 
@@ -239,7 +239,5 @@ void CfgCloseInput (void);
 
 
 /* End of scanner.h */
+
 #endif
-
-
-

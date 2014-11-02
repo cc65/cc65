@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2002-2006, Ullrich von Bassewitz                                      */
-/*                Römerstrasse 52                                            */
+/*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
 /*                                                                           */
@@ -51,64 +51,61 @@
 
 unsigned OptStore1 (CodeSeg* S);
 /* Search for the sequence
- *
- *      ldy     #n
- *      jsr     staxysp
- *      ldy     #n+1
- *      jsr     ldaxysp
- *
- * and remove the useless load, provided that the next insn doesn't use flags
- * from the load.
- */
+**
+**      ldy     #n
+**      jsr     staxysp
+**      ldy     #n+1
+**      jsr     ldaxysp
+**
+** and remove the useless load, provided that the next insn doesn't use flags
+** from the load.
+*/
 
 unsigned OptStore2 (CodeSeg* S);
 /* Search for a call to staxysp. If the ax register is not used later, and
- * the value is constant, just use the A register and store directly into the
- * stack.
- */
+** the value is constant, just use the A register and store directly into the
+** stack.
+*/
 
 unsigned OptStore3 (CodeSeg* S);
 /* Search for a call to steaxysp. If the eax register is not used later, and
- * the value is constant, just use the A register and store directly into the
- * stack.
- */
+** the value is constant, just use the A register and store directly into the
+** stack.
+*/
 
 unsigned OptStore4 (CodeSeg* S);
 /* Search for the sequence
- *
- *      sta     xx
- *      stx     yy
- *      lda     xx
- *      ldx     yy
- *
- * and remove the useless load, provided that the next insn doesn't use flags
- * from the load.
- */
+**
+**      sta     xx
+**      stx     yy
+**      lda     xx
+**      ldx     yy
+**
+** and remove the useless load, provided that the next insn doesn't use flags
+** from the load.
+*/
 
 unsigned OptStore5 (CodeSeg* S);
 /* Search for the sequence
- *
- *      lda     foo
- *      ldx     bar
- *      sta     something
- *      stx     something-else
- *
- * and replace it by
- *
- *      lda     foo
- *      sta     something
- *      lda     bar
- *      sta     something-else
- *
- * if X is not used later. This replacement doesn't save any cycles or bytes,
- * but it keeps the value of X, which may be reused later.
- */
+**
+**      lda     foo
+**      ldx     bar
+**      sta     something
+**      stx     something-else
+**
+** and replace it by
+**
+**      lda     foo
+**      sta     something
+**      lda     bar
+**      sta     something-else
+**
+** if X is not used later. This replacement doesn't save any cycles or bytes,
+** but it keeps the value of X, which may be reused later.
+*/
 
 
 
 /* End of coptstore.h */
 
 #endif
-
-
-

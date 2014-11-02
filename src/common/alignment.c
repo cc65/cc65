@@ -46,9 +46,9 @@
 
 
 /* To factorize an alignment, we will use the following prime table. It lists
- * all primes up to 256, which means we're able to factorize alignments up to
- * 0x10000. This is checked in the code.
- */
+** all primes up to 256, which means we're able to factorize alignments up to
+** 0x10000. This is checked in the code.
+*/
 static const unsigned char Primes[] = {
       2,   3,   5,   7,  11,  13,  17,  19,  23,  29,
      31,  37,  41,  43,  47,  53,  59,  61,  67,  71,
@@ -138,8 +138,8 @@ static void Factorize (unsigned long Value, FactorizedNumber* F)
 
 unsigned long LeastCommonMultiple (unsigned long Left, unsigned long Right)
 /* Calculate the least common multiple of two numbers and return
- * the result.
- */
+** the result.
+*/
 {
     unsigned I;
     FactorizedNumber L, R;
@@ -150,11 +150,11 @@ unsigned long LeastCommonMultiple (unsigned long Left, unsigned long Right)
     Factorize (Right, &R);
 
     /* Generate the result from the factors.
-     * Some thoughts on range problems: Since the largest numbers we can
-     * factorize are 2^16 (0x10000), the only numbers that could produce an
-     * overflow when using 32 bits are exactly these. But the LCM for 2^16
-     * and 2^16 is 2^16 so this will never happen and we're safe.
-     */
+    ** Some thoughts on range problems: Since the largest numbers we can
+    ** factorize are 2^16 (0x10000), the only numbers that could produce an
+    ** overflow when using 32 bits are exactly these. But the LCM for 2^16
+    ** and 2^16 is 2^16 so this will never happen and we're safe.
+    */
     Res = L.Remainder * R.Remainder;
     for (I = 0; I < PRIME_COUNT; ++I) {
         unsigned P = (L.Powers[I] > R.Powers[I])? L.Powers[I] : R.Powers[I];
@@ -182,6 +182,3 @@ unsigned long AlignCount (unsigned long Addr, unsigned long Alignment)
 {
     return AlignAddr (Addr, Alignment) - Addr;
 }
-
-
-

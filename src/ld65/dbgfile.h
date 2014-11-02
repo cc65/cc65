@@ -52,6 +52,3 @@ void CreateDbgFile (void);
 /* End of dbgfile.h */
 
 #endif
-
-
-

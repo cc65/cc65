@@ -110,12 +110,12 @@ void CfgRead (void);
 
 unsigned CfgProcess (void);
 /* Process the config file after reading in object files and libraries. This
- * includes postprocessing of the config file data but also assigning segments
- * and defining segment/memory area related symbols. The function will return
- * the number of memory area overflows (so zero means anything went ok).
- * In case of overflows, a short mapfile can be generated later, to ease the
- * task of rearranging segments for the user.
- */
+** includes postprocessing of the config file data but also assigning segments
+** and defining segment/memory area related symbols. The function will return
+** the number of memory area overflows (so zero means anything went ok).
+** In case of overflows, a short mapfile can be generated later, to ease the
+** task of rearranging segments for the user.
+*/
 
 void CfgWriteTarget (void);
 /* Write the target file(s) */
@@ -125,8 +125,3 @@ void CfgWriteTarget (void);
 /* End of config.h */
 
 #endif
-
-
-
-
-

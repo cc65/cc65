@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2000-2004 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -50,8 +50,8 @@
 #define CD_TYPE_MAX     6               /* Maximum numeric type value */
 
 /* ConDes priorities, zero is no valid priority and used to mark an empty
- * (missing) decl for this type throughout the code.
- */
+** (missing) decl for this type throughout the code.
+*/
 #define CD_PRIO_NONE    0               /* No priority (no decl) */
 #define CD_PRIO_MIN     1               /* Lowest priority */
 #define CD_PRIO_DEF     7               /* Default priority */
@@ -63,8 +63,8 @@
 #define CD_TYPE_INT     2               /* Interruptor */
 
 /* When part of an export in an object file, type and priority are encoded in
- * one byte. In this case, the following macros access the fields:
- */
+** one byte. In this case, the following macros access the fields:
+*/
 #define CD_GET_TYPE(v)          (((v) >> 5) & 0x07)
 #define CD_GET_PRIO(v)          (((v) & 0x1F) + 1)
 
@@ -76,6 +76,3 @@
 /* End of cddefs.h */
 
 #endif
-
-
-

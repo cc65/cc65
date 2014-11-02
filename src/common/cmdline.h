@@ -73,9 +73,9 @@ struct LongOpt {
 
 void InitCmdLine (int* aArgCount, char** aArgVec[], const char* aProgName);
 /* Initialize command line parsing. aArgVec is the argument array terminated by
- * a NULL pointer (as usual), ArgCount is the number of valid arguments in the
- * array. Both arguments are remembered in static storage.
- */
+** a NULL pointer (as usual), ArgCount is the number of valid arguments in the
+** array. Both arguments are remembered in static storage.
+*/
 
 void UnknownOption (const char* Opt) attribute ((noreturn));
 /* Print an error about an unknown option and die. */
@@ -91,8 +91,8 @@ void InvDef (const char* Def) attribute ((noreturn));
 
 const char* GetArg (unsigned* ArgNum, unsigned Len);
 /* Get an argument for a short option. The argument may be appended to the
- * option itself or may be separate. Len is the length of the option string.
- */
+** option itself or may be separate. Len is the length of the option string.
+*/
 
 void LongOption (unsigned* ArgNum, const LongOpt* OptTab, unsigned OptCount);
 /* Handle a long command line option */
@@ -102,6 +102,3 @@ void LongOption (unsigned* ArgNum, const LongOpt* OptTab, unsigned OptCount);
 /* End of cmdline.h */
 
 #endif
-
-
-

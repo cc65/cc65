@@ -62,6 +62,3 @@ extern const char*      DbgFileName;    /* Name of the debug file */
 /* End of global.h */
 
 #endif
-
-
-

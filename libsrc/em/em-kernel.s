@@ -94,8 +94,8 @@ copy:   lda     (ptr1),y
 ;----------------------------------------------------------------------------
 ; unsigned char em_uninstall (void);
 ; /* Uninstall the currently loaded driver and return an error code.
-;  * Note: This call does not free allocated memory.
-;  */
+; ** Note: This call does not free allocated memory.
+; */
 
 _em_uninstall:
         jsr     emd_uninstall           ; Call driver routine

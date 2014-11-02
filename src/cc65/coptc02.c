@@ -75,9 +75,9 @@ unsigned Opt65C02Ind (CodeSeg* S)
         CodeEntry* E = CS_GetEntry (S, I);
 
         /* Check for addressing mode indirect indexed Y where Y is zero.
-         * Note: All opcodes that are available as (zp),y are also available
-         * as (zp), so we can ignore the actual opcode here.
-         */
+        ** Note: All opcodes that are available as (zp),y are also available
+        ** as (zp), so we can ignore the actual opcode here.
+        */
         if (E->AM == AM65_ZP_INDY && E->RI->In.RegY == 0) {
 
             /* Replace it by indirect addressing mode */
@@ -187,8 +187,8 @@ unsigned Opt65C02Stores (CodeSeg* S)
         CodeEntry* E = CS_GetEntry (S, I);
 
         /* Check for a store with a register value of zero and an addressing
-         * mode available with STZ.
-         */
+        ** mode available with STZ.
+        */
         if (((E->OPC == OP65_STA && E->RI->In.RegA == 0) ||
              (E->OPC == OP65_STX && E->RI->In.RegX == 0) ||
              (E->OPC == OP65_STY && E->RI->In.RegY == 0))       &&
@@ -214,6 +214,3 @@ unsigned Opt65C02Stores (CodeSeg* S)
     /* Return the number of changes made */
     return Changes;
 }
-
-
-

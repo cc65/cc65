@@ -64,8 +64,8 @@ static const char CmpSuffixTab [][4] = {
 };
 
 /* Table listing the function names and code info values for known internally
- * used functions. This table should get auto-generated in the future.
- */
+** used functions. This table should get auto-generated in the future.
+*/
 typedef struct FuncInfo FuncInfo;
 struct FuncInfo {
     const char*     Name;       /* Function name */
@@ -74,9 +74,9 @@ struct FuncInfo {
 };
 
 /* Note for the shift functions: Shifts are done modulo 32, so all shift
- * routines are marked to use only the A register. The remainder is ignored
- * anyway.
- */
+** routines are marked to use only the A register. The remainder is ignored
+** anyway.
+*/
 static const FuncInfo FuncInfoTable[] = {
     { "addeq0sp",       REG_AX,               REG_AXY                        },
     { "addeqysp",       REG_AXY,              REG_AXY                        },
@@ -376,15 +376,15 @@ static int CompareFuncInfo (const void* Key, const void* Info)
 
 void GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg)
 /* For the given function, lookup register information and store it into
- * the given variables. If the function is unknown, assume it will use and
- * load all registers.
- */
+** the given variables. If the function is unknown, assume it will use and
+** load all registers.
+*/
 {
     /* If the function name starts with an underline, it is an external
-     * function. Search for it in the symbol table. If the function does
-     * not start with an underline, it may be a runtime support function.
-     * Search for it in the list of builtin functions.
-     */
+    ** function. Search for it in the symbol table. If the function does
+    ** not start with an underline, it may be a runtime support function.
+    ** Search for it in the list of builtin functions.
+    */
     if (Name[0] == '_') {
 
         /* Search in the symbol table, skip the leading underscore */
@@ -396,11 +396,11 @@ void GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg)
             FuncDesc* D = E->V.F.Func;
 
             /* A function may use the A or A/X registers if it is a fastcall
-             * function. If it is not a fastcall function but a variadic one,
-             * it will use the Y register (the parameter size is passed here).
-             * In all other cases, no registers are used. However, we assume
-             * that any function will destroy all registers.
-             */
+            ** function. If it is not a fastcall function but a variadic one,
+            ** it will use the Y register (the parameter size is passed here).
+            ** In all other cases, no registers are used. However, we assume
+            ** that any function will destroy all registers.
+            */
             if (IsQualFastcall (E->Type) && D->ParamCount > 0) {
                 /* Will use registers depending on the last param */
                 unsigned LastParamSize = CheckedSizeOf (D->LastParam->Type);
@@ -428,9 +428,9 @@ void GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg)
     } else if (IsDigit (Name[0]) || Name[0] == '$') {
 
         /* A call to a numeric address. Assume that anything gets used and
-         * destroyed. This is not a real problem, since numeric addresses
-         * are used mostly in inline assembly anyway.
-         */
+        ** destroyed. This is not a real problem, since numeric addresses
+        ** are used mostly in inline assembly anyway.
+        */
         *Use = REG_ALL;
         *Chg = REG_ALL;
         return;
@@ -448,10 +448,10 @@ void GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg)
             *Chg = Info->Chg;
         } else {
             /* It's an internal function we have no information for. If in
-             * debug mode, output an additional warning, so we have a chance
-             * to fix it. Otherwise assume that the internal function will
-             * use and change all registers.
-             */
+            ** debug mode, output an additional warning, so we have a chance
+            ** to fix it. Otherwise assume that the internal function will
+            ** use and change all registers.
+            */
             if (Debug) {
                 fprintf (stderr, "No info about internal function `%s'\n", Name);
             }
@@ -462,8 +462,8 @@ void GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg)
     }
 
     /* Function not found - assume that the primary register is input, and all
-     * registers are changed
-     */
+    ** registers are changed
+    */
     *Use = REG_EAXY;
     *Chg = REG_ALL;
 }
@@ -478,8 +478,8 @@ static int CompareZPInfo (const void* Name, const void* Info)
     const ZPInfo* E = (const ZPInfo*) Info;
 
     /* Do the compare. Be careful because of the length (Info may contain
-     * more than just the zeropage name).
-     */
+    ** more than just the zeropage name).
+    */
     if (E->Len == 0) {
         /* Do a full compare */
         return strcmp (N, E->Name);
@@ -498,8 +498,8 @@ static int CompareZPInfo (const void* Name, const void* Info)
 
 const ZPInfo* GetZPInfo (const char* Name)
 /* If the given name is a zero page symbol, return a pointer to the info
- * struct for this symbol, otherwise return NULL.
- */
+** struct for this symbol, otherwise return NULL.
+*/
 {
     /* Search for the zp location in the list */
     return bsearch (Name, ZPInfoTable, ZPInfoCount,
@@ -523,8 +523,8 @@ static unsigned GetRegInfo2 (CodeSeg* S,
         unsigned R;
 
         /* Check if we have already visited the current code entry. If so,
-         * bail out.
-         */
+        ** bail out.
+        */
         if (CE_HasMark (E)) {
             break;
         }
@@ -542,8 +542,8 @@ static unsigned GetRegInfo2 (CodeSeg* S,
         }
         if (R != REG_NONE) {
             /* We are not interested in the use of any register that has been
-             * used before.
-             */
+            ** used before.
+            */
             R &= ~Unused;
             /* Remember the remaining registers */
             Used |= R;
@@ -552,8 +552,8 @@ static unsigned GetRegInfo2 (CodeSeg* S,
         /* Evaluate the changed registers */
         if ((R = E->Chg) != REG_NONE) {
             /* We are not interested in the use of any register that has been
-             * used before.
-             */
+            ** used before.
+            */
             R &= ~Used;
             /* Remember the remaining registers */
             Unused |= R;
@@ -570,8 +570,8 @@ static unsigned GetRegInfo2 (CodeSeg* S,
         }
 
         /* If we have an unconditional branch, follow this branch if possible,
-         * otherwise we're done.
-         */
+        ** otherwise we're done.
+        */
         if ((E->Info & OF_UBRA) != 0) {
 
             /* Does this jump have a valid target? */
@@ -587,9 +587,9 @@ static unsigned GetRegInfo2 (CodeSeg* S,
             }
 
         /* In case of conditional branches, follow the branch if possible and
-         * follow the normal flow (branch not taken) afterwards. If we cannot
-         * follow the branch, we're done.
-         */
+        ** follow the normal flow (branch not taken) afterwards. If we cannot
+        ** follow the branch, we're done.
+        */
         } else if ((E->Info & OF_CBRA) != 0) {
 
             /* Recursively determine register usage at the branch target */
@@ -604,8 +604,8 @@ static unsigned GetRegInfo2 (CodeSeg* S,
             } else {
 
                 /* Jump to external label. This will effectively exit the
-                 * function, so we use the exitregs information here.
-                 */
+                ** function, so we use the exitregs information here.
+                */
                 U1 = S->ExitRegs;
 
             }
@@ -677,8 +677,8 @@ static unsigned GetRegInfo1 (CodeSeg* S,
 
 unsigned GetRegInfo (struct CodeSeg* S, unsigned Index, unsigned Wanted)
 /* Determine register usage information for the instructions starting at the
- * given index.
- */
+** given index.
+*/
 {
     CodeEntry*      E;
     Collection      Visited;    /* Visited entries */
@@ -748,9 +748,9 @@ int RegEAXUsed (struct CodeSeg* S, unsigned Index)
 
 unsigned GetKnownReg (unsigned Use, const RegContents* RC)
 /* Return the register or zero page location from the set in Use, thats
- * contents are known. If Use does not contain any register, or if the
- * register in question does not have a known value, return REG_NONE.
- */
+** contents are known. If Use does not contain any register, or if the
+** register in question does not have a known value, return REG_NONE.
+*/
 {
     if ((Use & REG_A) != 0) {
         return (RC == 0 || RC->RegA >= 0)? REG_A : REG_NONE;
@@ -796,9 +796,9 @@ static cmp_t FindCmpCond (const char* Code, unsigned CodeLen)
 
 cmp_t FindBoolCmpCond (const char* Name)
 /* Check if the given string is the name of one of the boolean transformer
- * subroutine, and if so, return the condition that is evaluated by this
- * routine. Return CMP_INV if the condition is not recognised.
- */
+** subroutine, and if so, return the condition that is evaluated by this
+** routine. Return CMP_INV if the condition is not recognised.
+*/
 {
     /* Check for the correct subroutine name */
     if (strncmp (Name, "bool", 4) == 0) {
@@ -814,8 +814,8 @@ cmp_t FindBoolCmpCond (const char* Name)
 
 cmp_t FindTosCmpCond (const char* Name)
 /* Check if this is a call to one of the TOS compare functions (tosgtax).
- * Return the condition code or CMP_INV on failure.
- */
+** Return the condition code or CMP_INV on failure.
+*/
 {
     unsigned Len = strlen (Name);
 
@@ -828,6 +828,3 @@ cmp_t FindTosCmpCond (const char* Name)
         return CMP_INV;
     }
 }
-
-
-

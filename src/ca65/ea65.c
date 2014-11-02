@@ -110,7 +110,7 @@ void GetEA (EffAddr* A)
             A->AddrModeSet = AM65_DIR_IND_LONG_Y;
         } else {
             /* [dir] */
-            A->AddrModeSet = AM65_DIR_IND_LONG;
+            A->AddrModeSet = AM65_DIR_IND_LONG | AM65_ABS_IND_LONG;
         }
 
     } else if (CurTok.Tok == TOK_LPAREN) {
@@ -150,19 +150,19 @@ void GetEA (EffAddr* A)
                 A->AddrModeSet = AM65_DIR_IND_Y;
             } else {
                 /* (adr) */
-                A->AddrModeSet = AM65_ABS_IND | AM65_DIR_IND;
+                A->AddrModeSet = AM65_ABS_IND | AM65_ABS_IND_LONG | AM65_DIR_IND;
             }
         }
 
     } else {
 
         /* Remaining stuff:
-         *
-         * adr
-         * adr,x
-         * adr,y
-         * adr,s
-         */
+        **
+        ** adr
+        ** adr,x
+        ** adr,y
+        ** adr,s
+        */
         A->Expr = Expression ();
 
         if (CurTok.Tok == TOK_COMMA) {
@@ -200,7 +200,3 @@ void GetEA (EffAddr* A)
     /* Apply addressing mode overrides */
     A->AddrModeSet &= Restrictions;
 }
-
-
-
-

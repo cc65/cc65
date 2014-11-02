@@ -86,6 +86,3 @@ void DoLabel (void)
     NextToken ();
     NextToken ();
 }
-
-
-

@@ -118,8 +118,8 @@ Type* TypeDup (const Type* T)
 
 Type* TypeAlloc (unsigned Len)
 /* Allocate memory for a type string of length Len. Len *must* include the
- * trailing T_END.
- */
+** trailing T_END.
+*/
 {
     return xmalloc (Len * sizeof (Type));
 }
@@ -200,8 +200,8 @@ Type* GetImplicitFuncType (void)
 
 Type* PointerTo (const Type* T)
 /* Return a type string that is "pointer to T". The type string is allocated
- * on the heap and may be freed after use.
- */
+** on the heap and may be freed after use.
+*/
 {
     /* Get the size of the type string including the terminator */
     unsigned Size = TypeLen (T) + 1;
@@ -221,8 +221,8 @@ Type* PointerTo (const Type* T)
 
 static TypeCode PrintTypeComp (FILE* F, TypeCode C, TypeCode Mask, const char* Name)
 /* Check for a specific component of the type. If it is there, print the
- * name and remove it. Return the type with the component removed.
- */
+** name and remove it. Return the type with the component removed.
+*/
 {
     if ((C & Mask) == Mask) {
         fprintf (F, "%s ", Name);
@@ -459,9 +459,9 @@ unsigned PSizeOf (const Type* T)
 
 unsigned CheckedSizeOf (const Type* T)
 /* Return the size of a data type. If the size is zero, emit an error and
- * return some valid size instead (so the rest of the compiler doesn't have
- * to work with invalid sizes).
- */
+** return some valid size instead (so the rest of the compiler doesn't have
+** to work with invalid sizes).
+*/
 {
     unsigned Size = SizeOf (T);
     if (Size == 0) {
@@ -475,9 +475,9 @@ unsigned CheckedSizeOf (const Type* T)
 
 unsigned CheckedPSizeOf (const Type* T)
 /* Return the size of a data type that is pointed to by a pointer. If the
- * size is zero, emit an error and return some valid size instead (so the
- * rest of the compiler doesn't have to work with invalid sizes).
- */
+** size is zero, emit an error and return some valid size instead (so the
+** rest of the compiler doesn't have to work with invalid sizes).
+*/
 {
     unsigned Size = PSizeOf (T);
     if (Size == 0) {
@@ -540,8 +540,8 @@ unsigned TypeOf (const Type* T)
 
 Type* Indirect (Type* T)
 /* Do one indirection for the given type, that is, return the type where the
- * given type points to.
- */
+** given type points to.
+*/
 {
     /* We are expecting a pointer expression */
     CHECK (IsClassPtr (T));
@@ -563,8 +563,8 @@ Type* ArrayToPtr (Type* T)
 
 int IsVariadicFunc (const Type* T)
 /* Return true if this is a function type or pointer to function type with
- * variable parameter list
- */
+** variable parameter list
+*/
 {
     FuncDesc* F = GetFuncDesc (T);
     return (F->Flags & FD_VARIADIC) != 0;
@@ -625,8 +625,8 @@ Type* GetFuncReturn (Type* T)
 
 long GetElementCount (const Type* T)
 /* Get the element count of the array specified in T (which must be of
- * array type).
- */
+** array type).
+*/
 {
     CHECK (IsTypeArray (T));
     return T->A.L;
@@ -636,8 +636,8 @@ long GetElementCount (const Type* T)
 
 void SetElementCount (Type* T, long Count)
 /* Set the element count of the array specified in T (which must be of
- * array type).
- */
+** array type).
+*/
 {
     CHECK (IsTypeArray (T));
     T->A.L = Count;
@@ -656,9 +656,9 @@ Type* GetElementType (Type* T)
 
 Type* GetBaseElementType (Type* T)
 /* Return the base element type of a given type. If T is not an array, this
- * will return. Otherwise it will return the base element type, which means
- * the element type that is not an array.
- */
+** will return. Otherwise it will return the base element type, which means
+** the element type that is not an array.
+*/
 {     
     while (IsTypeArray (T)) {
         ++T;
@@ -694,15 +694,15 @@ void SetSymEntry (Type* T, SymEntry* S)
 
 Type* IntPromotion (Type* T)
 /* Apply the integer promotions to T and return the result. The returned type
- * string may be T if there is no need to change it.
- */
+** string may be T if there is no need to change it.
+*/
 {
     /* We must have an int to apply int promotions */
     PRECONDITION (IsClassInt (T));
 
     /* An integer can represent all values from either signed or unsigned char,
-     * so convert chars to int and leave all other types alone.
-     */
+    ** so convert chars to int and leave all other types alone.
+    */
     if (IsTypeChar (T)) {
         return type_int;
     } else {
@@ -714,9 +714,9 @@ Type* IntPromotion (Type* T)
 
 Type* PtrConversion (Type* T)
 /* If the type is a function, convert it to pointer to function. If the
- * expression is an array, convert it to pointer to first element. Otherwise
- * return T.
- */
+** expression is an array, convert it to pointer to first element. Otherwise
+** return T.
+*/
 {
     if (IsTypeFunc (T)) {
         return PointerTo (T);
@@ -746,6 +746,3 @@ TypeCode AddrSizeQualifier (unsigned AddrSize)
 
     }
 }
-
-
-

@@ -71,6 +71,3 @@ int AssertAtAsmTime (AssertAction A);
 /* End of assertion.h */
 
 #endif
-
-
-

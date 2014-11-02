@@ -50,6 +50,3 @@ const char Func_memset[]        = "memset";     /* Asm name of "memset" */
 const char Func_strcmp[]        = "strcmp";     /* Asm name of "strcmp" */
 const char Func_strcpy[]        = "strcpy";     /* Asm name of "strcpy" */
 const char Func_strlen[]        = "strlen";     /* Asm name of "strlen" */
-
-
-

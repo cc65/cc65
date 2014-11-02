@@ -1,8 +1,8 @@
 /*
- * strtok.c
- *
- * Ullrich von Bassewitz, 11.12.1998
- */
+** strtok.c
+**
+** Ullrich von Bassewitz, 11.12.1998
+*/
 
 
 
@@ -43,8 +43,8 @@ char* __fastcall__ strtok (register char* s1, const char* s2)
     }
 
     /* Search the address of the first element in s1 that equals none
-     * of the characters in s2.
-     */
+    ** of the characters in s2.
+    */
     while ((c = *s1) && strchr (s2, c) != 0) {
         ++s1;
     }

@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -120,12 +120,12 @@ void PopInput (void)
 
 int InputFromStack (void)
 /* Try to get input from the input stack. Return true if we had such input,
- * return false otherwise.
- */
+** return false otherwise.
+*/
 {
     /* Repeatedly call the TOS routine until we have a token or if run out of
-     * routines.
-     */
+    ** routines.
+    */
     while (IStack) {
         if (IStack->Func (IStack->Data) != 0) {
             /* We have a token */
@@ -149,13 +149,10 @@ int HavePushedInput (void)
 
 void CheckInputStack (void)
 /* Called from the scanner before closing an input file. Will check for any
- * stuff on the input stack.
- */
+** stuff on the input stack.
+*/
 {
     if (IStack) {
         Error ("Open %s", IStack->Desc);
     }
 }
-
-
-

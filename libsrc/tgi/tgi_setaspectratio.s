@@ -3,8 +3,8 @@
 ;
 ; void __fastcall__ tgi_setaspectratio (unsigned aspectratio);
 ; /* Set a new aspect ratio for the loaded driver. The aspect ratio is an
-;  * 8.8 fixed point value.
-;  */
+; ** 8.8 fixed point value.
+; */
 ;
 
         .include        "tgi-kernel.inc"

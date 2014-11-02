@@ -108,8 +108,8 @@ static void DuplicateQualifier (const char* Name)
 
 static TypeCode OptionalQualifiers (TypeCode Allowed)
 /* Read type qualifiers if we have any. Allowed specifies the allowed
- * qualifiers.
- */
+** qualifiers.
+*/
 {
     /* We start without any qualifiers */
     TypeCode Q = T_QUAL_NONE;
@@ -286,9 +286,9 @@ static void NeedTypeSpace (Declaration* D, unsigned Count)
 {
     if (D->Index + Count >= MAXTYPELEN) {
         /* We must call Fatal() here, since calling Error() will try to
-         * continue, and the declaration type is not correctly terminated
-         * in case we come here.
-         */
+        ** continue, and the declaration type is not correctly terminated
+        ** in case we come here.
+        */
         Fatal ("Too many type specifiers");
     }
 }
@@ -311,9 +311,9 @@ static void FixQualifiers (Type* DataType)
     TypeCode Q;
 
     /* Using typedefs, it is possible to generate declarations that have
-     * type qualifiers attached to an array, not the element type. Go and
-     * fix these here.
-     */
+    ** type qualifiers attached to an array, not the element type. Go and
+    ** fix these here.
+    */
     T = DataType;
     Q = T_QUAL_NONE;
     while (T->C != T_END) {
@@ -341,8 +341,8 @@ static void FixQualifiers (Type* DataType)
                 /* Pointer to function which is not fastcall? */
                 if (IsTypeFunc (T+1) && !IsQualFastcall (T+1)) {
                     /* Move the fastcall qualifier from the pointer to
-                     * the function.
-                     */
+                    ** the function.
+                    */
                     T[0].C &= ~T_QUAL_FASTCALL;
                     T[1].C |= T_QUAL_FASTCALL;
                 } else {
@@ -356,8 +356,8 @@ static void FixQualifiers (Type* DataType)
                 /* No address size qualifiers specified */
                 if (IsTypeFunc (T+1)) {
                     /* Pointer to function. Use the qualifier from the function
-                     * or the default if the function don't has one.
-                     */
+                    ** or the default if the function don't has one.
+                    */
                     Q = (T[1].C & T_QUAL_ADDRSIZE);
                     if (Q == T_QUAL_NONE) {
                         Q = CodeAddrSizeQualifier ();
@@ -368,8 +368,8 @@ static void FixQualifiers (Type* DataType)
                 T[0].C |= Q;
             } else {
                 /* We have address size qualifiers. If followed by a function,
-                 * apply these also to the function.
-                 */
+                ** apply these also to the function.
+                */
                 if (IsTypeFunc (T+1)) {
                     TypeCode FQ = (T[1].C & T_QUAL_ADDRSIZE);
                     if (FQ == T_QUAL_NONE) {
@@ -490,8 +490,8 @@ static void ParseEnumDecl (void)
 
 static int ParseFieldWidth (Declaration* Decl)
 /* Parse an optional field width. Returns -1 if no field width is speficied,
- * otherwise the width of the field.
- */
+** otherwise the width of the field.
+*/
 {
     ExprDesc Expr;
 
@@ -531,8 +531,8 @@ static SymEntry* StructOrUnionForwardDecl (const char* Name, unsigned Type)
 /* Handle a struct or union forward decl */
 {
     /* Try to find a struct/union with the given name. If there is none,
-     * insert a forward declaration into the current lexical level.
-     */
+    ** insert a forward declaration into the current lexical level.
+    */
     SymEntry* Entry = FindTagSym (Name);
     if (Entry == 0) {
         Entry = AddStructSym (Name, Type, 0, 0);
@@ -547,8 +547,8 @@ static SymEntry* StructOrUnionForwardDecl (const char* Name, unsigned Type)
 
 static unsigned CopyAnonStructFields (const Declaration* Decl, int Offs)
 /* Copy fields from an anon union/struct into the current lexical level. The
- * function returns the size of the embedded struct/union.
- */
+** function returns the size of the embedded struct/union.
+*/
 {
     /* Get the pointer to the symbol table entry of the anon struct */
     SymEntry* Entry = GetSymEntry (Decl->Type);
@@ -557,8 +557,8 @@ static unsigned CopyAnonStructFields (const Declaration* Decl, int Offs)
     unsigned Size = Entry->V.S.Size;
 
     /* Get the symbol table containing the fields. If it is empty, there has
-     * been an error before, so bail out.
-     */
+    ** been an error before, so bail out.
+    */
     SymTable* Tab = Entry->V.S.SymTab;
     if (Tab == 0) {
         /* Incomplete definition - has been flagged before */
@@ -566,19 +566,19 @@ static unsigned CopyAnonStructFields (const Declaration* Decl, int Offs)
     }
 
     /* Get a pointer to the list of symbols. Then walk the list adding copies
-     * of the embedded struct to the current level.
-     */
+    ** of the embedded struct to the current level.
+    */
     Entry = Tab->SymHead;
     while (Entry) {
 
         /* Enter a copy of this symbol adjusting the offset. We will just
-         * reuse the type string here.
-         */
+        ** reuse the type string here.
+        */
         AddLocalSym (Entry->Name, Entry->Type, SC_STRUCTFIELD, Offs + Entry->V.Offs);
 
         /* Currently, there can not be any attributes, but if there will be
-         * some in the future, we want to know this.
-         */
+        ** some in the future, we want to know this.
+        */
         CHECK (Entry->Attr == 0);
 
         /* Next entry */
@@ -643,12 +643,12 @@ static SymEntry* ParseUnionDecl (const char* Name)
             /* Check for fields without a name */
             if (Decl.Ident[0] == '\0') {
                 /* In cc65 mode, we allow anonymous structs/unions within
-                 * a struct.
-                 */
+                ** a struct.
+                */
                 if (IS_Get (&Standard) >= STD_CC65 && IsClassStruct (Decl.Type)) {
                     /* This is an anonymous struct or union. Copy the fields
-                     * into the current level.
-                     */
+                    ** into the current level.
+                    */
                     CopyAnonStructFields (&Decl, 0);
 
                 } else {
@@ -735,8 +735,8 @@ static SymEntry* ParseStructDecl (const char* Name)
             ident       Ident;
 
             /* If we had a flexible array member before, no other fields can
-             * follow.
-             */
+            ** follow.
+            */
             if (FlexibleMember) {
                 Error ("Flexible array member must be last field");
                 FlexibleMember = 0;     /* Avoid further errors */
@@ -749,10 +749,10 @@ static SymEntry* ParseStructDecl (const char* Name)
             FieldWidth = ParseFieldWidth (&Decl);
 
             /* If this is not a bit field, or the bit field is too large for
-             * the remainder of the current member, or we have a bit field
-             * with width zero, align the struct to the next member by adding
-             * a member with an anonymous name.
-             */
+            ** the remainder of the current member, or we have a bit field
+            ** with width zero, align the struct to the next member by adding
+            ** a member with an anonymous name.
+            */
             if (BitOffs > 0) {
                 if (FieldWidth <= 0 || (BitOffs + FieldWidth) > (int) INT_BITS) {
 
@@ -760,8 +760,8 @@ static SymEntry* ParseStructDecl (const char* Name)
                     AnonName (Ident, "bit-field");
 
                     /* Add an anonymous bit-field that aligns to the next
-                     * storage unit.
-                     */
+                    ** storage unit.
+                    */
                     AddBitField (Ident, StructSize, BitOffs, INT_BITS - BitOffs);
 
                     /* No bits left */
@@ -771,15 +771,15 @@ static SymEntry* ParseStructDecl (const char* Name)
             }
 
             /* Apart from the above, a bit field with width 0 is not processed
-             * further.
-             */
+            ** further.
+            */
             if (FieldWidth == 0) {
                 goto NextMember;
             }
 
             /* Check if this field is a flexible array member, and
-             * calculate the size of the field.
-             */
+            ** calculate the size of the field.
+            */
             if (IsTypeArray (Decl.Type) && GetElementCount (Decl.Type) == UNSPECIFIED) {
                 /* Array with unspecified size */
                 if (StructSize == 0) {
@@ -794,13 +794,13 @@ static SymEntry* ParseStructDecl (const char* Name)
             if (Decl.Ident[0] == '\0') {
                 if (FieldWidth < 0) {
                     /* In cc65 mode, we allow anonymous structs/unions within
-                     * a struct.
-                     */
+                    ** a struct.
+                    */
                     if (IS_Get (&Standard) >= STD_CC65 && IsClassStruct (Decl.Type)) {
 
                         /* This is an anonymous struct or union. Copy the
-                         * fields into the current level.
-                         */
+                        ** fields into the current level.
+                        */
                         StructSize += CopyAnonStructFields (&Decl, StructSize);
 
                     } else {
@@ -817,9 +817,9 @@ static SymEntry* ParseStructDecl (const char* Name)
             /* Add a field entry to the table */
             if (FieldWidth > 0) {
                 /* Add full byte from the bit offset to the variable offset.
-                 * This simplifies handling he bit-field as a char type
-                 * in expressions.
-                 */
+                ** This simplifies handling he bit-field as a char type
+                ** in expressions.
+                */
                 unsigned Offs = StructSize + (BitOffs / CHAR_BITS);
                 AddBitField (Decl.Ident, Offs, BitOffs % CHAR_BITS, FieldWidth);
                 BitOffs += FieldWidth;
@@ -1103,8 +1103,8 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
 
 static Type* ParamTypeCvt (Type* T)
 /* If T is an array, convert it to a pointer else do nothing. Return the
- * resulting type.
- */
+** resulting type.
+*/
 {
     if (IsTypeArray (T)) {
         T->C = T_PTR;
@@ -1152,8 +1152,8 @@ static void ParseOldStyleParamList (FuncDesc* F)
     }
 
     /* Skip right paren. We must explicitly check for one here, since some of
-     * the breaks above bail out without checking.
-     */
+    ** the breaks above bail out without checking.
+    */
     ConsumeRParen ();
 
     /* An optional list of type specifications follows */
@@ -1165,8 +1165,8 @@ static void ParseOldStyleParamList (FuncDesc* F)
         ParseDeclSpec (&Spec, SC_AUTO, T_INT);
 
         /* We accept only auto and register as storage class specifiers, but
-         * we ignore all this, since we use auto anyway.
-         */
+        ** we ignore all this, since we use auto anyway.
+        */
         if ((Spec.StorageClass & SC_AUTO) == 0 &&
             (Spec.StorageClass & SC_REGISTER) == 0) {
             Error ("Illegal storage class");
@@ -1185,8 +1185,8 @@ static void ParseOldStyleParamList (FuncDesc* F)
                 SymEntry* Sym = FindLocalSym (Decl.Ident);
                 if (Sym) {
                     /* Check if we already changed the type for this
-                     * parameter
-                     */
+                    ** parameter
+                    */
                     if (Sym->Flags & SC_DEFTYPE) {
                         /* Found it, change the default type to the one given */
                         ChangeSymType (Sym, ParamTypeCvt (Decl.Type));
@@ -1247,14 +1247,14 @@ static void ParseAnsiParamList (FuncDesc* F)
         }
 
         /* Allow parameters without a name, but remember if we had some to
-         * eventually print an error message later.
-         */
+        ** eventually print an error message later.
+        */
         ParseDecl (&Spec, &Decl, DM_ACCEPT_IDENT);
         if (Decl.Ident[0] == '\0') {
 
             /* Unnamed symbol. Generate a name that is not user accessible,
-             * then handle the symbol normal.
-             */
+            ** then handle the symbol normal.
+            */
             AnonName (Decl.Ident, "param");
             F->Flags |= FD_UNNAMED_PARAMS;
 
@@ -1290,8 +1290,8 @@ static void ParseAnsiParamList (FuncDesc* F)
     }
 
     /* Skip right paren. We must explicitly check for one here, since some of
-     * the breaks above bail out without checking.
-     */
+    ** the breaks above bail out without checking.
+    */
     ConsumeRParen ();
 }
 
@@ -1320,8 +1320,8 @@ static FuncDesc* ParseFuncDecl (void)
     } else if (CurTok.Tok == TOK_IDENT &&
                (NextTok.Tok == TOK_COMMA || NextTok.Tok == TOK_RPAREN)) {
         /* If the identifier is a typedef, we have a new style parameter list,
-         * if it's some other identifier, it's an old style parameter list.
-         */
+        ** if it's some other identifier, it's an old style parameter list.
+        */
         Sym = FindSym (CurTok.Ident);
         if (Sym == 0 || !SymIsTypeDef (Sym)) {
             /* Old style (K&R) function. */
@@ -1341,15 +1341,15 @@ static FuncDesc* ParseFuncDecl (void)
     }
 
     /* Remember the last function parameter. We need it later for several
-     * purposes, for example when passing stuff to fastcall functions. Since
-     * more symbols are added to the table, it is easier if we remember it
-     * now, since it is currently the last entry in the symbol table.
-     */
+    ** purposes, for example when passing stuff to fastcall functions. Since
+    ** more symbols are added to the table, it is easier if we remember it
+    ** now, since it is currently the last entry in the symbol table.
+    */
     F->LastParam = GetSymTab()->SymTail;
 
     /* Assign offsets. If the function has a variable parameter list,
-     * there's one additional byte (the arg size).
-     */
+    ** there's one additional byte (the arg size).
+    */
     Offs = (F->Flags & FD_VARIADIC)? 1 : 0;
     Sym = F->LastParam;
     while (Sym) {
@@ -1377,11 +1377,11 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
 /* Recursively process declarators. Build a type array in reverse order. */
 {
     /* Read optional function or pointer qualifiers. These modify the
-     * identifier or token to the right. For convenience, we allow the fastcall
-     * qualifier also for pointers here. If it is a pointer-to-function, the
-     * qualifier will later be transfered to the function itself. If it's a
-     * pointer to something else, it will be flagged as an error.
-     */
+    ** identifier or token to the right. For convenience, we allow the fastcall
+    ** qualifier also for pointers here. If it is a pointer-to-function, the
+    ** qualifier will later be transfered to the function itself. If it's a
+    ** pointer to something else, it will be flagged as an error.
+    */
     TypeCode Qualifiers = OptionalQualifiers (T_QUAL_ADDRSIZE | T_QUAL_FASTCALL);
 
     /* Pointer to something */
@@ -1407,15 +1407,15 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
         ConsumeRParen ();
     } else {
         /* Things depend on Mode now:
-         *  - Mode == DM_NEED_IDENT means:
-         *      we *must* have a type and a variable identifer.
-         *  - Mode == DM_NO_IDENT means:
-         *      we must have a type but no variable identifer
-         *      (if there is one, it's not read).
-         *  - Mode == DM_ACCEPT_IDENT means:
-         *      we *may* have an identifier. If there is an identifier,
-         *      it is read, but it is no error, if there is none.
-         */
+        **  - Mode == DM_NEED_IDENT means:
+        **      we *must* have a type and a variable identifer.
+        **  - Mode == DM_NO_IDENT means:
+        **      we must have a type but no variable identifer
+        **      (if there is one, it's not read).
+        **  - Mode == DM_ACCEPT_IDENT means:
+        **      we *may* have an identifier. If there is an identifier,
+        **      it is read, but it is no error, if there is none.
+        */
         if (Mode == DM_NO_IDENT) {
             D->Ident[0] = '\0';
         } else if (CurTok.Tok == TOK_IDENT) {
@@ -1597,8 +1597,8 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
         if ((Spec->Flags & DS_DEF_TYPE) != 0 &&
             RetType[0].C == T_INT && RetType[1].C == T_END) {
             /* Function has an implicit int return. Output a warning if we don't
-             * have the C89 standard enabled explicitly.
-             */
+            ** have the C89 standard enabled explicitly.
+            */
             if (IS_Get (&Standard) >= STD_C99) {
                 Warning ("Implicit `int' return type is an obsolete feature");
             }
@@ -1608,13 +1608,13 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
     }
 
     /* For anthing that is not a function or typedef, check for an implicit
-     * int declaration.
-     */
+    ** int declaration.
+    */
     if ((D->StorageClass & SC_FUNC) != SC_FUNC &&
         (D->StorageClass & SC_TYPEMASK) != SC_TYPEDEF) {
         /* If the standard was not set explicitly to C89, print a warning
-         * for variables with implicit int type.
-         */
+        ** for variables with implicit int type.
+        */
         if ((Spec->Flags & DS_DEF_TYPE) != 0 && IS_Get (&Standard) >= STD_C99) {
             Warning ("Implicit `int' is an obsolete feature");
         }
@@ -1658,9 +1658,9 @@ void ParseDeclSpec (DeclSpec* D, unsigned DefStorage, long DefType)
 
 void CheckEmptyDecl (const DeclSpec* D)
 /* Called after an empty type declaration (that is, a type declaration without
- * a variable). Checks if the declaration does really make sense and issues a
- * warning if not.
- */
+** a variable). Checks if the declaration does really make sense and issues a
+** warning if not.
+*/
 {
     if ((D->Flags & DS_EXTRA_TYPE) == 0) {
         Warning ("Useless declaration");
@@ -1671,8 +1671,8 @@ void CheckEmptyDecl (const DeclSpec* D)
 
 static void SkipInitializer (unsigned BracesExpected)
 /* Skip the remainder of an initializer in case of errors. Try to be somewhat
- * smart so we don't have too many following errors.
- */
+** smart so we don't have too many following errors.
+*/
 {
     while (CurTok.Tok != TOK_CEOF && CurTok.Tok != TOK_SEMI && BracesExpected > 0) {
         switch (CurTok.Tok) {
@@ -1688,9 +1688,9 @@ static void SkipInitializer (unsigned BracesExpected)
 
 static unsigned OpeningCurlyBraces (unsigned BracesNeeded)
 /* Accept any number of opening curly braces around an initialization, skip
- * them and return the number. If the number of curly braces is less than
- * BracesNeeded, issue a warning.
- */
+** them and return the number. If the number of curly braces is less than
+** BracesNeeded, issue a warning.
+*/
 {
     unsigned BraceCount = 0;
     while (CurTok.Tok == TOK_LCURLY) {
@@ -1707,9 +1707,9 @@ static unsigned OpeningCurlyBraces (unsigned BracesNeeded)
 
 static void ClosingCurlyBraces (unsigned BracesExpected)
 /* Accept and skip the given number of closing curly braces together with
- * an optional comma. Output an error messages, if the input does not contain
- * the expected number of braces.
- */
+** an optional comma. Output an error messages, if the input does not contain
+** the expected number of braces.
+*/
 {
     while (BracesExpected) {
         if (CurTok.Tok == TOK_RCURLY) {
@@ -1750,8 +1750,8 @@ static void DefineData (ExprDesc* Expr)
 
         case E_LOC_REGISTER:
             /* Register variable. Taking the address is usually not
-             * allowed.
-             */
+            ** allowed.
+            */
             if (IS_Get (&AllowRegVarAddr) == 0) {
                 Error ("Cannot take the address of a register variable");
             }
@@ -1791,15 +1791,15 @@ static void OutputBitFieldData (StructInitData* SI)
 
 static void ParseScalarInitInternal (Type* T, ExprDesc* ED)
 /* Parse initializaton for scalar data types. This function will not output the
- * data but return it in ED.
- */
+** data but return it in ED.
+*/
 {
     /* Optional opening brace */
     unsigned BraceCount = OpeningCurlyBraces (0);
 
     /* We warn if an initializer for a scalar contains braces, because this is
-     * quite unusual and often a sign for some problem in the input.
-     */
+    ** quite unusual and often a sign for some problem in the input.
+    */
     if (BraceCount > 0) {
         Warning ("Braces around scalar initializer");
     }
@@ -1874,8 +1874,8 @@ static unsigned ParseArrayInit (Type* T, int AllowFlexibleMembers)
         int NeedParen;
 
         /* If we initializer is enclosed in brackets, remember this fact and
-         * skip the opening bracket.
-         */
+        ** skip the opening bracket.
+        */
         NeedParen = (CurTok.Tok == TOK_LCURLY);
         if (NeedParen) {
             NextToken ();
@@ -1885,8 +1885,8 @@ static unsigned ParseArrayInit (Type* T, int AllowFlexibleMembers)
         TranslateLiteral (CurTok.SVal);
 
         /* If the array is one too small for the string literal, omit the
-         * trailing zero.
-         */
+        ** trailing zero.
+        */
         Count = GetLiteralSize (CurTok.SVal);
         if (ElementCount != UNSPECIFIED &&
             ElementCount != FLEXIBLE    &&
@@ -1902,8 +1902,8 @@ static unsigned ParseArrayInit (Type* T, int AllowFlexibleMembers)
         NextToken ();
 
         /* If the initializer was enclosed in curly braces, we need a closing
-         * one.
-         */
+        ** one.
+        */
         if (NeedParen) {
             ConsumeRCurly ();
         }
@@ -1917,9 +1917,9 @@ static unsigned ParseArrayInit (Type* T, int AllowFlexibleMembers)
         Count = 0;
         while (CurTok.Tok != TOK_RCURLY) {
             /* Flexible array members may not be initialized within
-             * an array (because the size of each element may differ
-             * otherwise).
-             */
+            ** an array (because the size of each element may differ
+            ** otherwise).
+            */
             ParseInitInternal (ElementType, 0);
             ++Count;
             if (CurTok.Tok != TOK_COMMA)
@@ -1937,8 +1937,8 @@ static unsigned ParseArrayInit (Type* T, int AllowFlexibleMembers)
         ElementCount = Count;
     } else if (ElementCount == FLEXIBLE && AllowFlexibleMembers) {
         /* In non ANSI mode, allow initialization of flexible array
-         * members.
-         */
+        ** members.
+        */
         ElementCount = Count;
     } else if (Count < ElementCount) {
         g_zerobytes ((ElementCount - Count) * ElementSize);
@@ -1968,8 +1968,8 @@ static unsigned ParseStructInit (Type* T, int AllowFlexibleMembers)
     SI.Size = Entry->V.S.Size;
 
     /* Check if this struct definition has a field table. If it doesn't, it
-     * is an incomplete definition.
-     */
+    ** is an incomplete definition.
+    */
     Tab = Entry->V.S.SymTab;
     if (Tab == 0) {
         Error ("Cannot initialize variables with incomplete type");
@@ -1996,8 +1996,8 @@ static unsigned ParseStructInit (Type* T, int AllowFlexibleMembers)
         }
 
         /* Parse initialization of one field. Bit-fields need a special
-         * handling.
-         */
+        ** handling.
+        */
         if (SymIsBitField (Entry)) {
 
             ExprDesc ED;
@@ -2012,8 +2012,8 @@ static unsigned ParseStructInit (Type* T, int AllowFlexibleMembers)
                    SI.Offs         * CHAR_BITS + SI.ValBits);
 
             /* This may be an anonymous bit-field, in which case it doesn't
-             * have an initializer.
-             */
+            ** have an initializer.
+            */
             if (IsAnonName (Entry->Name)) {
                 /* Account for the data and output it if we have a full word */
                 SI.ValBits += Entry->V.B.BitWidth;
@@ -2024,8 +2024,8 @@ static unsigned ParseStructInit (Type* T, int AllowFlexibleMembers)
                 goto NextMember;
             } else {
                 /* Read the data, check for a constant integer, do a range
-                 * check.
-                 */
+                ** check.
+                */
                 ParseScalarInitInternal (type_uint, &ED);
                 if (!ED_IsConstAbsInt (&ED)) {
                     Error ("Constant initializer expected");
@@ -2052,13 +2052,13 @@ static unsigned ParseStructInit (Type* T, int AllowFlexibleMembers)
         } else {
 
             /* Standard member. We should never have stuff from a
-             * bit-field left
-             */
+            ** bit-field left
+            */
             CHECK (SI.ValBits == 0);
 
             /* Flexible array members may only be initialized if they are
-             * the last field (or part of the last struct field).
-             */
+            ** the last field (or part of the last struct field).
+            */
             SI.Offs += ParseInitInternal (Entry->Type, AllowFlexibleMembers && Entry->NextSym == 0);
         }
 
@@ -2094,9 +2094,9 @@ NextMember:
     }
 
     /* Return the actual number of bytes initialized. This number may be
-     * larger than sizeof (Struct) if flexible array members are present and
-     * were initialized (possible in non ANSI mode).
-     */
+    ** larger than sizeof (Struct) if flexible array members are present and
+    ** were initialized (possible in non ANSI mode).
+    */
     return SI.Offs;
 }
 
@@ -2104,8 +2104,8 @@ NextMember:
 
 static unsigned ParseVoidInit (void)
 /* Parse an initialization of a void variable (special cc65 extension).
- * Return the number of bytes initialized.
- */
+** Return the number of bytes initialized.
+*/
 {
     ExprDesc Expr;
     unsigned Size;
@@ -2222,13 +2222,13 @@ unsigned ParseInit (Type* T)
 /* Parse initialization of variables. Return the number of data bytes. */
 {
     /* Parse the initialization. Flexible array members can only be initialized
-     * in cc65 mode.
-     */
+    ** in cc65 mode.
+    */
     unsigned Size = ParseInitInternal (T, IS_Get (&Standard) == STD_CC65);
 
     /* The initialization may not generate code on global level, because code
-     * outside function scope will never get executed.
-     */
+    ** outside function scope will never get executed.
+    */
     if (HaveGlobalCode ()) {
         Error ("Non constant initializers");
         RemoveGlobalCode ();
@@ -2237,6 +2237,3 @@ unsigned ParseInit (Type* T)
     /* Return the size needed for the initialization */
     return Size;
 }
-
-
-

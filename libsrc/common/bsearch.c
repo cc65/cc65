@@ -1,8 +1,8 @@
 /*
- * bsearch.c
- *
- * Ullrich von Bassewitz, 17.06.1998
- */
+** bsearch.c
+**
+** Ullrich von Bassewitz, 17.06.1998
+*/
 
 
 
@@ -33,9 +33,9 @@ void* __fastcall__ bsearch (const void* key, const void* base, size_t n,
             last = current - 1;
             if (result == 0) {
                 /* Found one entry that matches the search key. However there may be
-                 * more than one entry with the same key value and ANSI guarantees
-                 * that we return the first of a row of items with the same key.
-                 */
+                ** more than one entry with the same key value and ANSI guarantees
+                ** that we return the first of a row of items with the same key.
+                */
                 found = 1;
             }
         }

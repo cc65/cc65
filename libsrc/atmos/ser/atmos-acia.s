@@ -28,10 +28,13 @@
         .include        "ser-error.inc"
         .include        "atmos.inc"
 
+        .macpack        module
+
+
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-        .segment        "JUMPTABLE"
+        module_header   _atmos_acia_ser
 
         ; Driver signature
         .byte   $73, $65, $72           ; "ser"

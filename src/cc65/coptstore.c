@@ -56,14 +56,14 @@ static void InsertStore (CodeSeg* S, unsigned* IP, LineInfo* LI)
 
 unsigned OptStore1 (CodeSeg* S)
 /* Search for the sequence
- *
- *      ldy     #n
- *      jsr     staxysp
- *      ldy     #n+1
- *      jsr     ldaxysp
- *
- * and remove the useless load.
- */
+**
+**      ldy     #n
+**      jsr     staxysp
+**      ldy     #n+1
+**      jsr     ldaxysp
+**
+** and remove the useless load.
+*/
 {
     unsigned Changes = 0;
 
@@ -108,9 +108,9 @@ unsigned OptStore1 (CodeSeg* S)
 
 unsigned OptStore2 (CodeSeg* S)
 /* Search for a call to staxysp. If the ax register is not used later, and
- * the value is constant, just use the A register and store directly into the
- * stack.
- */
+** the value is constant, just use the A register and store directly into the
+** stack.
+*/
 {
     unsigned I;
     unsigned Changes = 0;
@@ -142,8 +142,8 @@ unsigned OptStore2 (CodeSeg* S)
             unsigned    IP = I + 1;     /* Insertion point */
 
             /* Replace the store. We will not remove the loads, since this is
-             * too complex and will be done by other optimizer steps.
-             */
+            ** too complex and will be done by other optimizer steps.
+            */
             N = NewCodeEntry (OP65_LDA, AM65_IMM, MakeHexArg (A), 0, E->LI);
             CS_InsertEntry (S, N, IP++);
             InsertStore (S, &IP, E->LI);
@@ -178,9 +178,9 @@ unsigned OptStore2 (CodeSeg* S)
 
 unsigned OptStore3 (CodeSeg* S)
 /* Search for a call to steaxysp. If the eax register is not used later, and
- * the value is constant, just use the A register and store directly into the
- * stack.
- */
+** the value is constant, just use the A register and store directly into the
+** stack.
+*/
 {
     unsigned I;
     unsigned Changes = 0;
@@ -217,8 +217,8 @@ unsigned OptStore3 (CodeSeg* S)
             unsigned    IP = I + 1;     /* Insertion point */
 
             /* Replace the store. We will not remove the loads, since this is
-             * too complex and will be done by other optimizer steps.
-             */
+            ** too complex and will be done by other optimizer steps.
+            */
             N = NewCodeEntry (OP65_LDA, AM65_IMM, MakeHexArg (A), 0, E->LI);
             CS_InsertEntry (S, N, IP++);
             InsertStore (S, &IP, E->LI);
@@ -317,15 +317,15 @@ unsigned OptStore3 (CodeSeg* S)
 
 unsigned OptStore4 (CodeSeg* S)
 /* Search for the sequence
- *
- *      sta     xx
- *      stx     yy
- *      lda     xx
- *      ldx     yy
- *
- * and remove the useless load, provided that the next insn doesn't use flags
- * from the load.
- */
+**
+**      sta     xx
+**      stx     yy
+**      lda     xx
+**      ldx     yy
+**
+** and remove the useless load, provided that the next insn doesn't use flags
+** from the load.
+*/
 {
     unsigned Changes = 0;
 
@@ -374,22 +374,22 @@ unsigned OptStore4 (CodeSeg* S)
 
 unsigned OptStore5 (CodeSeg* S)
 /* Search for the sequence
- *
- *      lda     foo
- *      ldx     bar
- *      sta     something
- *      stx     something-else
- *
- * and replace it by
- *
- *      lda     foo
- *      sta     something
- *      lda     bar
- *      sta     something-else
- *
- * if X is not used later. This replacement doesn't save any cycles or bytes,
- * but it keeps the value of X, which may be reused later.
- */
+**
+**      lda     foo
+**      ldx     bar
+**      sta     something
+**      stx     something-else
+**
+** and replace it by
+**
+**      lda     foo
+**      sta     something
+**      lda     bar
+**      sta     something-else
+**
+** if X is not used later. This replacement doesn't save any cycles or bytes,
+** but it keeps the value of X, which may be reused later.
+*/
 {
     unsigned Changes = 0;
 
@@ -435,6 +435,3 @@ unsigned OptStore5 (CodeSeg* S)
     /* Return the number of changes made */
     return Changes;
 }
-
-
-

@@ -10,11 +10,13 @@
         .include        "joy-error.inc"
         .include        "pet.inc"
 
+        .macpack        module
+
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-        .segment "JUMPTABLE"
+        module_header   _pet_stdjoy_joy
 
 ; Driver signature
 

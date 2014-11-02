@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2001-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -104,9 +104,9 @@ void RC_Dump (FILE* F, const RegContents* RC)
 
 RegInfo* NewRegInfo (const RegContents* RC)
 /* Allocate a new register info, initialize and return it. If RC is not
- * a NULL pointer, it is used to initialize both, the input and output
- * registers. If the pointer is NULL, all registers are set to unknown.
- */
+** a NULL pointer, it is used to initialize both, the input and output
+** registers. If the pointer is NULL, all registers are set to unknown.
+*/
 {
     /* Allocate memory */
     RegInfo* RI = xmalloc (sizeof (RegInfo));
@@ -145,6 +145,3 @@ void DumpRegInfo (const char* Desc, const RegInfo* RI)
     fprintf (stdout, "Out: ");
     RC_Dump (stdout, &RI->Out);
 }
-
-
-

@@ -16,6 +16,7 @@
         .bss
         
 backup: .res    1
+visible:.res    1
 
 ; ------------------------------------------------------------------------
 
@@ -25,6 +26,8 @@ backup: .res    1
 _mouse_def_callbacks:
         .addr   hide
         .addr   show
+        .addr   prep
+        .addr   draw
         .addr   movex
         .addr   movey
 
@@ -65,10 +68,15 @@ done:
         .ifdef  __APPLE2ENH__
         bit     LOWSCR          ; Doesn't hurt in 40 column mode
         .endif
-        rts
+return: rts
 
 ; Hide the mouse cursor.
 hide:
+        dec     visible
+        ; Fall through
+
+; Prepare to move the mouse cursor.
+prep:
         jsr     getcursor       ; Cursor visible at current position?
         bne     done            ; No, we're done
         lda     backup          ; Get character at cursor position
@@ -76,6 +84,13 @@ hide:
 
 ; Show the mouse cursor.
 show:
+        inc     visible
+        ; Fall through
+
+; Draw the mouse cursor.
+draw:
+        lda     visible
+        beq     return
         jsr     getcursor       ; Cursor visible at current position?
         beq     done            ; Yes, we're done
         sta     backup          ; Save character at cursor position

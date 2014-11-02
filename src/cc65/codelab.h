@@ -108,8 +108,8 @@ void CL_AddRef (CodeLabel* L, struct CodeEntry* E);
 
 void CL_MoveRefs (CodeLabel* OldLabel, CodeLabel* NewLabel);
 /* Move all references to OldLabel to point to NewLabel. OldLabel will have no
- * more references on return.
- */
+** more references on return.
+*/
 
 void CL_Output (const CodeLabel* L);
 /* Output the code label to the output file */
@@ -117,7 +117,5 @@ void CL_Output (const CodeLabel* L);
 
 
 /* End of codelab.h */
+
 #endif
-
-
-

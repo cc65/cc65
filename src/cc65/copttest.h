@@ -51,36 +51,32 @@
 
 unsigned OptTest1 (CodeSeg* S);
 /* Given a sequence
- *
- *     stx     xxx
- *     ora     xxx
- *     beq/bne ...
- *
- * If X is zero, the sequence may be changed to
- *
- *     cmp     #$00
- *     beq/bne ...
- *
- * which may be optimized further by another step.
- *
- * If A is zero, the sequence may be changed to
- *
- *     txa
- *     beq/bne ...
- *
- */
+**
+**     stx     xxx
+**     ora     xxx
+**     beq/bne ...
+**
+** If X is zero, the sequence may be changed to
+**
+**     cmp     #$00
+**     beq/bne ...
+**
+** which may be optimized further by another step.
+**
+** If A is zero, the sequence may be changed to
+**
+**     txa
+**     beq/bne ...
+*/
 
 unsigned OptTest2 (CodeSeg* S);
 /* Search for an inc/dec operation followed by a load and a conditional
- * branch based on the flags from the load. Remove the load if the insn
- * isn't used later.
- */
+** branch based on the flags from the load. Remove the load if the insn
+** isn't used later.
+*/
 
 
 
 /* End of copttest.h */
 
 #endif
-
-
-

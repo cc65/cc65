@@ -53,28 +53,28 @@
 
 unsigned OptPtrLoad1 (CodeSeg* S)
 /* Search for the sequence:
- *
- *      clc
- *      adc     xxx
- *      tay
- *      txa
- *      adc     yyy
- *      tax
- *      tya
- *      ldy     #$00
- *      jsr     ldauidx
- *
- * and replace it by:
- *
- *      sta     ptr1
- *      txa
- *      clc
- *      adc     yyy
- *      sta     ptr1+1
- *      ldy     xxx
- *      ldx     #$00
- *      lda     (ptr1),y
- */
+**
+**      clc
+**      adc     xxx
+**      tay
+**      txa
+**      adc     yyy
+**      tax
+**      tya
+**      ldy     #$00
+**      jsr     ldauidx
+**
+** and replace it by:
+**
+**      sta     ptr1
+**      txa
+**      clc
+**      adc     yyy
+**      sta     ptr1+1
+**      ldy     xxx
+**      ldx     #$00
+**      lda     (ptr1),y
+*/
 {
     unsigned Changes = 0;
 
@@ -115,9 +115,9 @@ unsigned OptPtrLoad1 (CodeSeg* S)
             CS_InsertEntry (S, X, IP++);
 
             /* If the instruction before the clc is a ldx, replace the
-             * txa by an lda with the same location of the ldx. Otherwise
-             * transfer the value in X to A.
-             */
+            ** txa by an lda with the same location of the ldx. Otherwise
+            ** transfer the value in X to A.
+            */
             if ((P = CS_GetPrevEntry (S, I)) != 0 &&
                 P->OPC == OP65_LDX                &&
                 !CE_HasLabel (P)) {
@@ -172,29 +172,29 @@ unsigned OptPtrLoad1 (CodeSeg* S)
 
 unsigned OptPtrLoad2 (CodeSeg* S)
 /* Search for the sequence:
- *
- *      adc     xxx
- *      pha
- *      txa
- *      iny
- *      adc     yyy
- *      tax
- *      pla
- *      ldy
- *      jsr     ldauidx
- *
- * and replace it by:
- *
- *      adc     xxx
- *      sta     ptr1
- *      txa
- *      iny
- *      adc     yyy
- *      sta     ptr1+1
- *      ldy
- *      ldx     #$00
- *      lda     (ptr1),y
- */
+**
+**      adc     xxx
+**      pha
+**      txa
+**      iny
+**      adc     yyy
+**      tax
+**      pla
+**      ldy
+**      jsr     ldauidx
+**
+** and replace it by:
+**
+**      adc     xxx
+**      sta     ptr1
+**      txa
+**      iny
+**      adc     yyy
+**      sta     ptr1+1
+**      ldy
+**      ldx     #$00
+**      lda     (ptr1),y
+*/
 {
     unsigned Changes = 0;
 
@@ -260,22 +260,22 @@ unsigned OptPtrLoad2 (CodeSeg* S)
 
 unsigned OptPtrLoad3 (CodeSeg* S)
 /* Search for the sequence:
- *
- *      lda     #<(label+0)
- *      ldx     #>(label+0)
- *      clc
- *      adc     xxx
- *      bcc     L
- *      inx
- * L:   ldy     #$00
- *      jsr     ldauidx
- *
- * and replace it by:
- *
- *      ldy     xxx
- *      ldx     #$00
- *      lda     label,y
- */
+**
+**      lda     #<(label+0)
+**      ldx     #>(label+0)
+**      clc
+**      adc     xxx
+**      bcc     L
+**      inx
+** L:   ldy     #$00
+**      jsr     ldauidx
+**
+** and replace it by:
+**
+**      ldy     xxx
+**      ldx     #$00
+**      lda     label,y
+*/
 {
     unsigned Changes = 0;
 
@@ -319,8 +319,8 @@ unsigned OptPtrLoad3 (CodeSeg* S)
             char* Label;
 
             /* We will create all the new stuff behind the current one so
-             * we keep the line references.
-             */
+            ** we keep the line references.
+            */
             X = NewCodeEntry (OP65_LDY, L[3]->AM, L[3]->Arg, 0, L[0]->LI);
             CS_InsertEntry (S, X, I+8);
 
@@ -354,25 +354,25 @@ unsigned OptPtrLoad3 (CodeSeg* S)
 
 unsigned OptPtrLoad4 (CodeSeg* S)
 /* Search for the sequence:
- *
- *      lda     #<(label+0)
- *      ldx     #>(label+0)
- *      ldy     #$xx
- *      clc
- *      adc     (sp),y
- *      bcc     L
- *      inx
- * L:   ldy     #$00
- *      jsr     ldauidx
- *
- * and replace it by:
- *
- *      ldy     #$xx
- *      lda     (sp),y
- *      tay
- *      ldx     #$00
- *      lda     label,y
- */
+**
+**      lda     #<(label+0)
+**      ldx     #>(label+0)
+**      ldy     #$xx
+**      clc
+**      adc     (sp),y
+**      bcc     L
+**      inx
+** L:   ldy     #$00
+**      jsr     ldauidx
+**
+** and replace it by:
+**
+**      ldy     #$xx
+**      lda     (sp),y
+**      tay
+**      ldx     #$00
+**      lda     label,y
+*/
 {
     unsigned Changes = 0;
 
@@ -463,22 +463,22 @@ unsigned OptPtrLoad4 (CodeSeg* S)
 
 unsigned OptPtrLoad5 (CodeSeg* S)
 /* Search for the sequence:
- *
- *      jsr     pushax
- *      ldx     #$00
- *      lda     yyy
- *      jsr     tosaddax
- *      ldy     #$00
- *      jsr     ldauidx
- *
- * and replace it by:
- *
- *      sta     ptr1
- *      stx     ptr1+1
- *      ldy     yyy
- *      ldx     #$00
- *      lda     (ptr1),y
- */
+**
+**      jsr     pushax
+**      ldx     #$00
+**      lda     yyy
+**      jsr     tosaddax
+**      ldy     #$00
+**      jsr     ldauidx
+**
+** and replace it by:
+**
+**      sta     ptr1
+**      stx     ptr1+1
+**      ldy     yyy
+**      ldx     #$00
+**      lda     (ptr1),y
+*/
 {
     unsigned Changes = 0;
 
@@ -549,25 +549,25 @@ unsigned OptPtrLoad5 (CodeSeg* S)
 
 unsigned OptPtrLoad6 (CodeSeg* S)
 /* Search for the sequence:
- *
- *      jsr     pushax
- *      ldy     #xxx
- *      ldx     #$00
- *      lda     (sp),y
- *      jsr     tosaddax
- *      ldy     #$00
- *      jsr     ldauidx
- *
- * and replace it by:
- *
- *      sta     ptr1
- *      stx     ptr1+1
- *      ldy     #xxx-2
- *      lda     (sp),y
- *      tay
- *      ldx     #$00
- *      lda     (ptr1),y
- */
+**
+**      jsr     pushax
+**      ldy     #xxx
+**      ldx     #$00
+**      lda     (sp),y
+**      jsr     tosaddax
+**      ldy     #$00
+**      jsr     ldauidx
+**
+** and replace it by:
+**
+**      sta     ptr1
+**      stx     ptr1+1
+**      ldy     #xxx-2
+**      lda     (sp),y
+**      tay
+**      ldx     #$00
+**      lda     (ptr1),y
+*/
 {
     unsigned Changes = 0;
 
@@ -650,35 +650,35 @@ unsigned OptPtrLoad6 (CodeSeg* S)
 
 unsigned OptPtrLoad7 (CodeSeg* S)
 /* Search for the sequence:
- *
- *      jsr     aslax1/shlax1
- *      clc
- *      adc     xxx
- *      tay
- *      txa
- *      adc     yyy
- *      tax
- *      tya
- *      ldy     zzz
- *      jsr     ldaxidx
- *
- * and replace it by:
- *
- *      stx     tmp1
- *      asl     a
- *      rol     tmp1
- *      clc
- *      adc     xxx
- *      sta     ptr1
- *      lda     tmp1
- *      adc     yyy
- *      sta     ptr1+1
- *      ldy     zzz
- *      lda     (ptr1),y
- *      tax
- *      dey
- *      lda     (ptr1),y
- */
+**
+**      jsr     aslax1/shlax1
+**      clc
+**      adc     xxx
+**      tay
+**      txa
+**      adc     yyy
+**      tax
+**      tya
+**      ldy     zzz
+**      jsr     ldaxidx
+**
+** and replace it by:
+**
+**      stx     tmp1
+**      asl     a
+**      rol     tmp1
+**      clc
+**      adc     xxx
+**      sta     ptr1
+**      lda     tmp1
+**      adc     yyy
+**      sta     ptr1+1
+**      ldy     zzz
+**      lda     (ptr1),y
+**      tax
+**      dey
+**      lda     (ptr1),y
+*/
 {
     unsigned Changes = 0;
     unsigned I;
@@ -715,15 +715,15 @@ unsigned OptPtrLoad7 (CodeSeg* S)
 
 
             /* If X is zero on entry to aslax1, we can generate:
-             *
-             *      asl     a
-             *      bcc     L1
-             *      inx
-             * L1:  clc
-             *
-             * instead of the code above. "lda tmp1" needs to be changed
-             * to "txa" in this case.
-             */
+            **
+            **      asl     a
+            **      bcc     L1
+            **      inx
+            ** L1:  clc
+            **
+            ** instead of the code above. "lda tmp1" needs to be changed
+            ** to "txa" in this case.
+            */
             int ShortCode = (L[0]->RI->In.RegX == 0);
 
             if (ShortCode) {
@@ -838,22 +838,22 @@ unsigned OptPtrLoad7 (CodeSeg* S)
 
 unsigned OptPtrLoad11 (CodeSeg* S)
 /* Search for the sequence:
- *
- *      clc
- *      adc     xxx
- *      bcc     L
- *      inx
- * L:   ldy     #$00
- *      jsr     ldauidx
- *
- * and replace it by:
- *
- *      ldy     xxx
- *      sta     ptr1
- *      stx     ptr1+1
- *      ldx     #$00
- *      lda     (ptr1),y
- */
+**
+**      clc
+**      adc     xxx
+**      bcc     L
+**      inx
+** L:   ldy     #$00
+**      jsr     ldauidx
+**
+** and replace it by:
+**
+**      ldy     xxx
+**      sta     ptr1
+**      stx     ptr1+1
+**      ldx     #$00
+**      lda     (ptr1),y
+*/
 {
     unsigned Changes = 0;
 
@@ -884,8 +884,8 @@ unsigned OptPtrLoad11 (CodeSeg* S)
             CodeEntry* X;
 
             /* We will create all the new stuff behind the current one so
-             * we keep the line references.
-             */
+            ** we keep the line references.
+            */
             X = NewCodeEntry (OP65_LDY, L[1]->AM, L[1]->Arg, 0, L[0]->LI);
             CS_InsertEntry (S, X, I+6);
 
@@ -925,35 +925,35 @@ unsigned OptPtrLoad11 (CodeSeg* S)
 
 unsigned OptPtrLoad12 (CodeSeg* S)
 /* Search for the sequence:
- *
- *      lda     regbank+n
- *      ldx     regbank+n+1
- *      sta     regsave
- *      stx     regsave+1
- *      clc
- *      adc     #$01
- *      bcc     L0005
- *      inx
- * L:   sta     regbank+n
- *      stx     regbank+n+1
- *      lda     regsave
- *      ldx     regsave+1
- *      ldy     #$00
- *      jsr     ldauidx
- *
- * and replace it by:
- *
- *      ldy     #$00
- *      ldx     #$00
- *      lda     (regbank+n),y
- *      inc     regbank+n
- *      bne     L1
- *      inc     regbank+n+1
- * L1:  tay                     <- only if flags are used
- *
- * This function must execute before OptPtrLoad7!
- *
- */
+**
+**      lda     regbank+n
+**      ldx     regbank+n+1
+**      sta     regsave
+**      stx     regsave+1
+**      clc
+**      adc     #$01
+**      bcc     L0005
+**      inx
+** L:   sta     regbank+n
+**      stx     regbank+n+1
+**      lda     regsave
+**      ldx     regsave+1
+**      ldy     #$00
+**      jsr     ldauidx
+**
+** and replace it by:
+**
+**      ldy     #$00
+**      ldx     #$00
+**      lda     (regbank+n),y
+**      inc     regbank+n
+**      bne     L1
+**      inc     regbank+n+1
+** L1:  tay                     <- only if flags are used
+**
+** This function must execute before OptPtrLoad7!
+**
+*/
 {
     unsigned Changes = 0;
 
@@ -1012,17 +1012,17 @@ unsigned OptPtrLoad12 (CodeSeg* S)
             CodeLabel* Label;
 
             /* Check if the instruction following the sequence uses the flags
-             * set by the load. If so, insert a test of the value in the
-             * accumulator.
-             */
+            ** set by the load. If so, insert a test of the value in the
+            ** accumulator.
+            */
             if (CE_UseLoadFlags (L[14])) {
                 X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, L[13]->LI);
                 CS_InsertEntry (S, X, I+14);
             }
 
             /* Attach a label to L[14]. This may be either the just inserted
-             * instruction, or the one following the sequence.
-             */
+            ** instruction, or the one following the sequence.
+            */
             Label = CS_GenLabel (S, L[14]);
 
             /* ldy #$xx */
@@ -1070,18 +1070,18 @@ unsigned OptPtrLoad12 (CodeSeg* S)
 
 unsigned OptPtrLoad13 (CodeSeg* S)
 /* Search for the sequence:
- *
- *      lda     zp
- *      ldx     zp+1
- *      ldy     xx
- *      jsr     ldauidx
- *
- * and replace it by:
- *
- *      ldy     xx
- *      ldx     #$00
- *      lda     (zp),y
- */
+**
+**      lda     zp
+**      ldx     zp+1
+**      ldy     xx
+**      jsr     ldauidx
+**
+** and replace it by:
+**
+**      ldy     xx
+**      ldx     #$00
+**      lda     (zp),y
+*/
 {
     unsigned Changes = 0;
 
@@ -1138,23 +1138,22 @@ unsigned OptPtrLoad13 (CodeSeg* S)
 
 unsigned OptPtrLoad14 (CodeSeg* S)
 /* Search for the sequence:
- *
- *      lda     zp
- *      ldx     zp+1
- *      (anything that doesn't change a/x)
- *      ldy     xx
- *      jsr     ldauidx
- *
- * and replace it by:
- *
- *      lda     zp
- *      ldx     zp+1
- *      (anything that doesn't change a/x)
- *      ldy     xx
- *      ldx     #$00
- *      lda     (zp),y
- *
- */
+**
+**      lda     zp
+**      ldx     zp+1
+**      (anything that doesn't change a/x)
+**      ldy     xx
+**      jsr     ldauidx
+**
+** and replace it by:
+**
+**      lda     zp
+**      ldx     zp+1
+**      (anything that doesn't change a/x)
+**      ldy     xx
+**      ldx     #$00
+**      lda     (zp),y
+*/
 {
     unsigned Changes = 0;
     unsigned I;
@@ -1212,24 +1211,24 @@ unsigned OptPtrLoad14 (CodeSeg* S)
 
 unsigned OptPtrLoad15 (CodeSeg* S)
 /* Search for the sequence:
- *
- *      lda     zp
- *      ldx     zp+1
- *      jsr     pushax          <- optional
- *      ldy     xx
- *      jsr     ldaxidx
- *
- * and replace it by:
- *
- *      lda     zp              <- only if
- *      ldx     zp+1            <- call to
- *      jsr     pushax          <- pushax present
- *      ldy     xx
- *      lda     (zp),y
- *      tax
- *      dey
- *      lda     (zp),y
- */
+**
+**      lda     zp
+**      ldx     zp+1
+**      jsr     pushax          <- optional
+**      ldy     xx
+**      jsr     ldaxidx
+**
+** and replace it by:
+**
+**      lda     zp              <- only if
+**      ldx     zp+1            <- call to
+**      jsr     pushax          <- pushax present
+**      ldy     xx
+**      lda     (zp),y
+**      tax
+**      dey
+**      lda     (zp),y
+*/
 {
     unsigned Changes = 0;
 
@@ -1300,20 +1299,20 @@ unsigned OptPtrLoad15 (CodeSeg* S)
 
 unsigned OptPtrLoad16 (CodeSeg* S)
 /* Search for the sequence
- *
- *      ldy     ...
- *      jsr     ldauidx
- *
- * and replace it by:
- *
- *      stx     ptr1+1
- *      sta     ptr1
- *      ldy     ...
- *      ldx     #$00
- *      lda     (ptr1),y
- *
- * This step must be executed *after* OptPtrLoad1!
- */
+**
+**      ldy     ...
+**      jsr     ldauidx
+**
+** and replace it by:
+**
+**      stx     ptr1+1
+**      sta     ptr1
+**      ldy     ...
+**      ldx     #$00
+**      lda     (ptr1),y
+**
+** This step must be executed *after* OptPtrLoad1!
+*/
 {
     unsigned Changes = 0;
 
@@ -1375,25 +1374,25 @@ unsigned OptPtrLoad16 (CodeSeg* S)
 
 unsigned OptPtrLoad17 (CodeSeg* S)
 /* Search for the sequence
- *
- *      ldy     ...
- *      jsr     ldaxidx
- *
- * and replace it by:
- *
- *      sta     ptr1
- *      stx     ptr1+1
- *      ldy     ...
- *      lda     (ptr1),y
- *      tax
- *      dey
- *      lda     (ptr1),y
- *
- * This step must be executed *after* OptPtrLoad9! While code size increases
- * by more than 200%, inlining will greatly improve visibility for the
- * optimizer, so often part of the code gets improved later. So we will mark
- * the step with less than 200% so it gets executed when -Oi is in effect.
- */
+**
+**      ldy     ...
+**      jsr     ldaxidx
+**
+** and replace it by:
+**
+**      sta     ptr1
+**      stx     ptr1+1
+**      ldy     ...
+**      lda     (ptr1),y
+**      tax
+**      dey
+**      lda     (ptr1),y
+**
+** This step must be executed *after* OptPtrLoad9! While code size increases
+** by more than 200%, inlining will greatly improve visibility for the
+** optimizer, so often part of the code gets improved later. So we will mark
+** the step with less than 200% so it gets executed when -Oi is in effect.
+*/
 {
     unsigned Changes = 0;
 
@@ -1458,6 +1457,3 @@ unsigned OptPtrLoad17 (CodeSeg* S)
     /* Return the number of changes made */
     return Changes;
 }
-
-
-

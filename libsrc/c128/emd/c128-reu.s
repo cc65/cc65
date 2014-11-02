@@ -11,14 +11,14 @@
         .include        "em-error.inc"
         .include        "c128.inc"
 
-
         .macpack        generic
+        .macpack        module
 
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-.segment        "JUMPTABLE"
+        module_header   _c128_reu_emd
 
 ; Driver signature
 

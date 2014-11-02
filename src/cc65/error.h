@@ -105,8 +105,8 @@ void PPWarning (const char* Format, ...) attribute ((format (printf, 1, 2)));
 
 IntStack* FindWarning (const char* Name);
 /* Search for a warning in the WarnMap table and return a pointer to the
- * intstack that holds its state. Return NULL if there is no such warning.
- */
+** intstack that holds its state. Return NULL if there is no such warning.
+*/
 
 void ListWarnings (FILE* F);
 /* Print a list of warning types/names to the given file */
@@ -117,9 +117,5 @@ void ErrorReport (void);
 
 
 /* End of error.h */
+
 #endif
-
-
-
-
-

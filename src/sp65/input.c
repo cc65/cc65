@@ -87,9 +87,9 @@ static const FileId FormatTable[] = {
 
 Bitmap* ReadInputFile (const Collection* A)
 /* Read a bitmap from a file and return it. Format, file name etc. must be
- * given as attributes in A. If no format is given, the function tries to
- * autodetect it by using the extension of the file name.
- */
+** given as attributes in A. If no format is given, the function tries to
+** autodetect it by using the extension of the file name.
+*/
 {
     const FileId* F;
 
@@ -119,6 +119,3 @@ Bitmap* ReadInputFile (const Collection* A)
     /* Call the format specific read */
     return InputFormatTable[F->Id].Read (A);
 }
-
-
-

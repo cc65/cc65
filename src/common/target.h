@@ -55,6 +55,7 @@ typedef enum {
     TGT_NONE,
     TGT_MODULE,
     TGT_ATARI,
+    TGT_ATARI5200,
     TGT_ATARIXL,
     TGT_VIC20,
     TGT_C16,
@@ -107,8 +108,8 @@ extern target_t         Target;
 
 target_t FindTarget (const char* Name);
 /* Find a target by name and return the target id. TGT_UNKNOWN is returned if
- * the given name is no valid target.
- */
+** the given name is no valid target.
+*/
 
 const TargetProperties* GetTargetProperties (target_t Target);
 /* Return the properties for a target */
@@ -119,7 +120,5 @@ const char* GetTargetName (target_t Target);
 
 
 /* End of target.h */
+
 #endif
-
-
-

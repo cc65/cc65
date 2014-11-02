@@ -58,7 +58,6 @@ const char* CPUNames[CPU_COUNT] = {
     "65SC02",
     "65C02",
     "65816",
-    "sunplus",
     "sweet16",
     "huc6280",
     "m740",
@@ -72,7 +71,6 @@ const unsigned CPUIsets[CPU_COUNT] = {
     CPU_ISET_6502 | CPU_ISET_65SC02,
     CPU_ISET_6502 | CPU_ISET_65SC02 | CPU_ISET_65C02,
     CPU_ISET_6502 | CPU_ISET_65SC02 | CPU_ISET_65C02 | CPU_ISET_65816,
-    CPU_ISET_SUNPLUS,
     CPU_ISET_SWEET16,
     CPU_ISET_6502 | CPU_ISET_65SC02 | CPU_ISET_65C02 | CPU_ISET_HUC6280,
     CPU_ISET_6502 | CPU_ISET_M740,
@@ -121,8 +119,8 @@ int ValidAddrSizeForCPU (unsigned char AddrSize)
 
 cpu_t FindCPU (const char* Name)
 /* Find a CPU by name and return the target id. CPU_UNKNOWN is returned if
- * the given name is no valid target.
- */
+** the given name is no valid target.
+*/
 {
     unsigned I;
 
@@ -136,6 +134,3 @@ cpu_t FindCPU (const char* Name)
     /* Not found */
     return CPU_UNKNOWN;
 }
-
-
-

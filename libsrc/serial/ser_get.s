@@ -3,8 +3,8 @@
 ;
 ; unsigned char __fastcall__ ser_get (char* b);
 ; /* Get a character from the serial port. If no characters are available, the
-;  * function will return SER_ERR_NO_DATA, so this is not a fatal error.
-;  */
+; ** function will return SER_ERR_NO_DATA, so this is not a fatal error.
+; */
 
 
         .importzp       ptr1

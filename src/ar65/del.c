@@ -78,7 +78,3 @@ void DelObjFiles (int argc, char* argv [])
     /* Successful end */
     exit (EXIT_SUCCESS);
 }
-
-
-
-

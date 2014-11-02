@@ -1,9 +1,9 @@
 /*
- * sleep.c
- *
- * Maciej 'YTM/Elysium' Witkowiak, 16.08.2003
- *
- */
+** sleep.c
+**
+** Maciej 'YTM/Elysium' Witkowiak, 16.08.2003
+**
+*/
 
 #include <geos.h>
 

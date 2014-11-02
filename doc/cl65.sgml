@@ -1,0 +1,307 @@
+<!doctype linuxdoc system>
+
+<article>
+<title>cl65 Users Guide
+<author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
+<date>01.08.2000, 27.11.2000, 02.10.2001
+
+<abstract>
+cl65 is the compile &amp; link utility for cc65, the 6502 C compiler. It was
+designed as a smart frontend for the C compiler (cc65), the assembler (ca65),
+the object file converter (co65), and the linker (ld65).
+</abstract>
+
+<!-- Table of contents -->
+<toc>
+
+<!-- Begin the document -->
+
+<sect>Overview<p>
+
+cl65 is a frontend for cc65, ca65, co65 and ld65. While you may not use the
+full power of the tools when calling them through cl65, most features are
+available, and the use of cl65 is much simpler.
+
+
+<sect>Basic Usage<p>
+
+The cl65 compile and link utility may be used to convert, compile, assemble
+and link files. While the separate tools do just one step, cl65 knows how to
+build object files from C files (by calling the compiler, then the assembler)
+and other things.
+
+<tscreen><verb>
+---------------------------------------------------------------------------
+Usage: cl65 [options] file [...]
+Short options:
+  -c                            Compile and assemble but don't link
+  -d                            Debug mode
+  -g                            Add debug info
+  -h                            Help (this text)
+  -l name                       Create an assembler listing file
+  -m name                       Create a map file
+  -mm model                     Set the memory model
+  -o name                       Name the output file
+  -r                            Enable register variables
+  -t sys                        Set the target system
+  -u sym                        Force an import of symbol `sym'
+  -v                            Verbose mode
+  -vm                           Verbose map file
+  -C name                       Use linker config file
+  -Cl                           Make local variables static
+  -D sym[=defn]                 Define a preprocessor symbol
+  -I dir                        Set a compiler include directory path
+  -L path                       Specify a library search path
+  -Ln name                      Create a VICE label file
+  -O                            Optimize code
+  -Oi                           Optimize code, inline functions
+  -Or                           Optimize code, honour the register keyword
+  -Os                           Optimize code, inline known C funtions
+  -S                            Compile but don't assemble and link
+  -T                            Include source as comment
+  -V                            Print the version number
+  -W name[,...]                 Supress compiler warnings
+  -Wa options                   Pass options to the assembler
+  -Wl options                   Pass options to the linker
+
+Long options:
+  --add-source                  Include source as comment
+  --asm-args options            Pass options to the assembler
+  --asm-define sym[=v]          Define an assembler symbol
+  --asm-include-dir dir         Set an assembler include directory
+  --bin-include-dir dir         Set an assembler binary include directory
+  --bss-label name              Define and export a BSS segment label
+  --bss-name seg                Set the name of the BSS segment
+  --cc-args options             Pass options to the compiler
+  --cfg-path path               Specify a config file search path
+  --check-stack                 Generate stack overflow checks
+  --code-label name             Define and export a CODE segment label
+  --code-name seg               Set the name of the CODE segment
+  --codesize x                  Accept larger code by factor x
+  --config name                 Use linker config file
+  --cpu type                    Set cpu type
+  --create-dep name             Create a make dependency file
+  --create-full-dep name        Create a full make dependency file
+  --data-label name             Define and export a DATA segment label
+  --data-name seg               Set the name of the DATA segment
+  --debug                       Debug mode
+  --debug-info                  Add debug info
+  --feature name                Set an emulation feature
+  --force-import sym            Force an import of symbol `sym'
+  --help                        Help (this text)
+  --include-dir dir             Set a compiler include directory path
+  --ld-args options             Pass options to the linker
+  --lib file                    Link this library
+  --lib-path path               Specify a library search path
+  --list-targets                List all available targets
+  --listing name                Create an assembler listing file
+  --list-bytes n                Number of bytes per assembler listing line
+  --mapfile name                Create a map file
+  --memory-model model          Set the memory model
+  --module                      Link as a module
+  --module-id id                Specify a module id for the linker
+  --o65-model model             Override the o65 model
+  --obj file                    Link this object file
+  --obj-path path               Specify an object file search path
+  --register-space b            Set space available for register variables
+  --register-vars               Enable register variables
+  --rodata-name seg             Set the name of the RODATA segment
+  --signed-chars                Default characters are signed
+  --standard std                Language standard (c89, c99, cc65)
+  --start-addr addr             Set the default start address
+  --static-locals               Make local variables static
+  --target sys                  Set the target system
+  --version                     Print the version number
+  --verbose                     Verbose mode
+  --zeropage-label name         Define and export a ZEROPAGE segment label
+  --zeropage-name seg           Set the name of the ZEROPAGE segment
+---------------------------------------------------------------------------
+</verb></tscreen>
+
+Most of the options have the same meaning than the corresponding compiler,
+assembler or linker option. See the documentation for these tools for an
+explanation. If an option is available for more than one of the tools, it
+is set for all tools, where it is available. One example for this is <tt/-v/:
+The compiler, the assembler and the linker are all called with the <tt/-v/
+switch.
+
+There are a few remaining options that control the behaviour of cl65:
+
+<descrip>
+
+  <tag><tt>-S</tt></tag>
+
+  This option forces cl65 to stop after the assembly step. This means that
+  C files are translated into assembler files, but nothing more is done.
+  Assembler files, object files and libraries given on the command line
+  are ignored.
+
+
+  <tag><tt>-c</tt></tag>
+
+  This options forces cl65 to stop after the assembly step. This means
+  that C and assembler files given on the command line are translated into
+  object files, but there is no link step, and object files and libraries
+  given on the command line are ignored.
+
+
+  <tag><tt>-o name</tt></tag>
+
+  The -o option is used for the target name in the final step. This causes
+  problems, if the linker will not be called, and there are several input
+  files on the command line. In this case, the name given with -o will be
+  used for all of them, which makes the option pretty useless. You
+  shouldn't use -o when more than one output file is created.
+
+
+  <tag><tt>-t sys, --target sys</tt></tag>
+
+  The default for this option is different from the compiler and linker in the
+  case that the option is missing: While the other tools (compiler, assembler
+  and linker) will use the "none" system settings by default, cl65 will use
+  the C64 as a target system by default. This was chosen since most people
+  seem to use cc65 to develop for the C64.
+
+  <tag><tt>-Wa options, --asm-args options</tt></tag>
+
+  Pass options directly to the assembler. This may be used to pass options
+  that aren't directly supported by cl65. Several options may be separated by
+  commas, the commas are replaced by spaces when passing them to the
+  assembler. Beware: Passing arguments directly to the assembler may interfere
+  with some of the defaults, because cl65 doesn't parse the options passed. So
+  if cl65 supports an option by itself, do not pass this option to the
+  assembler by means of the <tt/-Wa/ switch.
+
+  <tag><tt>-Wc options, --cc-args options</tt></tag>
+
+  Pass options directly to the compiler. This may be used to pass options
+  that aren't directly supported by cl65. Several options may be separated by
+  commas, the commas are replaced by spaces when passing them to the
+  compiler. Beware: Passing arguments directly to the compiler may interfere
+  with some of the defaults, because cl65 doesn't parse the options passed. So
+  if cl65 supports an option by itself, do not pass this option to the
+  compiler by means of the <tt/-Wc/ switch.
+
+  <tag><tt>-Wl options, --ld-args options</tt></tag>
+
+  Pass options directly to the linker. This may be used to pass options that
+  aren't directly supported by cl65. Several options may be separated by
+  commas, the commas are replaced by spaces when passing them to the linker.
+  Beware: Passing arguments directly to the linker may interfere with some of
+  the defaults, because cl65 doesn't parse the options passed. So if cl65
+  supports an option by itself, do not pass this option to the linker by means
+  of the <tt/-Wl/ switch.
+
+</descrip>                        
+
+
+
+<sect>More usage<p>
+
+Since cl65 was created to simplify the use of the cc65 development
+package, it tries to be smart about several things.
+
+<itemize>
+
+<item>	If you don't give a target system on the command line, cl65
+	defaults to the C64.
+
+<item>	When linking, cl65 will supply the names of the startup file and
+	library for the target system to the linker, so you don't have to do
+	that.
+
+<item>	If the final step is the linker, and the name of the output file was
+	not explicitly given, cl65 will use the name of the first input file
+	without the extension, provided that the name of this file has an
+	extension. So you don't need to name the executable name in most
+	cases, just give the name of your "main" file as first input file.
+</itemize>
+
+The command line is parsed from left to right, and the actual processing tool
+(compiler, assembler, ...) is invoked whenever a file name is encountered.
+This means that only the options to the left of a file name are in effect when
+this file is processed. It does also mean that you're able to specify
+different options for different files on the command line. As an example.
+
+<tscreen><verb>
+        cl65 -Oirs main.c -O -g module.c
+</verb></tscreen>
+
+translates main.c with full optimization and module.c with less optimization
+and debug info enabled.
+
+The type of an input file is derived from its extension:
+
+<itemize>
+<item>C files: <tt/.c/
+<item>Assembler files: <tt/.s/, <tt/.asm/, <tt/.a65/
+<item>Object files: <tt/.o/ <tt/.obj/
+<item>Libraries: <tt/.a/, <tt/.lib/
+<item>GEOS resource files: <tt/.grc/
+<item>o65 files: <tt/.o65/, <tt/.emd/, <tt/.joy/, <tt/.tgi/
+</itemize>
+
+Please note that the program cannot handle input files with unknown file
+extensions.
+
+
+<sect>Examples<p>
+
+The morse trainer software, which consists of one C file (morse.c) and one
+assembler file (irq.s) will need the following separate steps to compile
+into an executable named morse:
+
+<tscreen><verb>
+	cc65 -g -Oi -t c64 morse.c
+	ca65 -g morse.s
+	ca65 -g irq.s
+	ld65 -o morse -t c64 c64.o morse.o irq.o c64.lib
+</verb></tscreen>
+
+When using cl65, this is simplified to
+
+<tscreen><verb>
+	cl65 -g -Oi morse.c irq.s
+</verb></tscreen>
+
+As a general rule, you may use cl65 instead of cc65 at most times,
+especially in makefiles to build object files directly from C files. Use
+
+<tscreen><verb>
+	.c.o:
+	      	cl65 -g -Oi $<
+</verb></tscreen>
+
+to do this.
+
+
+
+<sect>Copyright<p>
+
+cl65 (and all cc65 binutils) are (C) Copyright 1998-2004 Ullrich von
+Bassewitz. For usage of the binaries and/or sources the following
+conditions do apply:
+
+This software is provided 'as-is', without any expressed or implied
+warranty.  In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+<enum>
+<item> 	The origin of this software must not be misrepresented; you must not
+       	claim that you wrote the original software. If you use this software
+       	in a product, an acknowledgment in the product documentation would be
+	appreciated but is not required.
+<item>	Altered source versions must be plainly marked as such, and must not
+	be misrepresented as being the original software.
+<item>	This notice may not be removed or altered from any source
+	distribution.
+</enum>
+
+
+
+</article>
+

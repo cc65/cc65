@@ -50,7 +50,5 @@ void ReadInfoFile (void);
 
 
 /* End of infofile.h */
+
 #endif
-
-
-

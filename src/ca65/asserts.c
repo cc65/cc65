@@ -176,8 +176,3 @@ void WriteAssertions (void)
     /* Done writing the assertions */
     ObjEndAssertions ();
 }
-
-
-
-
-

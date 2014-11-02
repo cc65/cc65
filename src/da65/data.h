@@ -68,7 +68,5 @@ unsigned TextTable (void);
 
 
 /* End of data.h */
+
 #endif
-
-
-

@@ -63,6 +63,3 @@ struct EffAddr {
 /* End of ea.h */
 
 #endif
-
-
-

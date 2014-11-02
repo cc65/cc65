@@ -44,8 +44,8 @@
 
 
 
-SearchPath*     SysIncSearchPath;       /* System include path */
-SearchPath*     UsrIncSearchPath;       /* User include path */
+SearchPaths*    SysIncSearchPath;       /* System include path */
+SearchPaths*    UsrIncSearchPath;       /* User include path */
 
 
 
@@ -76,13 +76,10 @@ void FinishIncludePaths (void)
     AddSubSearchPathFromEnv (SysIncSearchPath, "CC65_HOME", "include");
 
     /* Add some compiled-in search paths if defined at compile time. */
-#ifdef CC65_INC
+#if defined(CC65_INC) && !defined(_WIN32)
     AddSearchPath (SysIncSearchPath, STRINGIZE (CC65_INC));
 #endif
 
     /* Add paths relative to the parent directory of the Windows binary. */
     AddSubSearchPathFromWinBin (SysIncSearchPath, "include");
 }
-
-
-

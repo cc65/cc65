@@ -64,10 +64,11 @@
 
 /* Name of the library file */
 const char*             LibName = 0;
+static char*            NewLibName = 0;
 
 /* File descriptor for the library file */
-FILE*                   NewLib = 0;
 static FILE*            Lib = 0;
+static FILE*            NewLib = 0;
 
 /* The library header */
 static LibHeader        Header = {
@@ -215,9 +216,9 @@ static void WriteIndex (void)
 
 void LibOpen (const char* Name, int MustExist, int NeedTemp)
 /* Open an existing library and a temporary copy. If MustExist is true, the
- * old library is expected to exist. If NeedTemp is true, a temporary library
- * is created.
- */
+** old library is expected to exist. If NeedTemp is true, a temporary library
+** is created.
+*/
 {
     /* Remember the name */
     LibName = xstrdup (Name);
@@ -246,10 +247,16 @@ void LibOpen (const char* Name, int MustExist, int NeedTemp)
     }
 
     if (NeedTemp) {
+
+        /* Create the temporary library name */
+        NewLibName = xmalloc (strlen (Name) + strlen (".temp") + 1);
+        strcpy (NewLibName, Name);
+        strcat (NewLibName, ".temp");
+
         /* Create the temporary library */
-        NewLib = tmpfile ();
+        NewLib = fopen (NewLibName, "w+b");
         if (NewLib == 0) {
-            Error ("Cannot create temporary file: %s", strerror (errno));
+            Error ("Cannot create temporary library file: %s", strerror (errno));
         }
 
         /* Write a dummy header to the temp file */
@@ -261,8 +268,8 @@ void LibOpen (const char* Name, int MustExist, int NeedTemp)
 
 unsigned long LibCopyTo (FILE* F, unsigned long Bytes)
 /* Copy data from F to the temp library file, return the start position in
- * the temporary library file.
- */
+** the temporary library file.
+*/
 {
     unsigned char Buf [4096];
 
@@ -304,8 +311,8 @@ void LibCopyFrom (unsigned long Pos, unsigned long Bytes, FILE* F)
 
 static void LibCheckExports (ObjData* O)
 /* Insert all exports from the given object file into the global list
- * checking for duplicates.
- */
+** checking for duplicates.
+*/
 {
     unsigned I;
 
@@ -328,8 +335,8 @@ static void LibCheckExports (ObjData* O)
 
 void LibClose (void)
 /* Write remaining data, close both files and copy the temp file to the old
- * filename
- */
+** filename
+*/
 {
     /* Do we have a temporary library? */
     if (NewLib) {
@@ -339,9 +346,9 @@ void LibClose (void)
         size_t Count;
 
         /* Walk through the object file list, inserting exports into the
-         * export list checking for duplicates. Copy any data that is still
-         * in the old library into the new one.
-         */
+        ** export list checking for duplicates. Copy any data that is still
+        ** in the old library into the new one.
+        */
         for (I = 0; I < CollCount (&ObjPool); ++I) {
 
             /* Get a pointer to the object */
@@ -378,7 +385,7 @@ void LibClose (void)
                    LibName, strerror (errno));
         }
 
-        /* Copy the new library to the new one */
+        /* Copy the temporary library to the new one */
         fseek (NewLib, 0, SEEK_SET);
         while ((Count = fread (Buf, 1, sizeof (Buf), NewLib)) != 0) {
             if (fwrite (Buf, 1, Count, Lib) != Count) {
@@ -394,7 +401,7 @@ void LibClose (void)
     if (NewLib && fclose (NewLib) != 0) {
         Error ("Problem closing temporary library file: %s", strerror (errno));
     }
+    if (NewLibName && remove (NewLibName) != 0) {
+        Error ("Problem deleting temporary library file: %s", strerror (errno));
+    }
 }
-
-
-

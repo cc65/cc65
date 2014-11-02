@@ -27,11 +27,13 @@
         .include        "ser-error.inc"
         .include        "cbm510.inc"
 
+        .macpack        module
+
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-.segment        "JUMPTABLE"
+        module_header   _cbm510_std_ser
 
 ; Driver signature
 

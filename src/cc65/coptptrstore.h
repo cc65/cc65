@@ -51,132 +51,128 @@
 
 unsigned OptPtrStore1 (CodeSeg* S);
 /* Search for the sequence:
- *
- *      clc
- *      adc     xxx
- *      bcc     L
- *      inx
- * L:   jsr     pushax
- *      ldx     #$00
- *      lda     yyy
- *      ldy     #$00
- *      jsr     staspidx
- *
- * and replace it by:
- *
- *      sta     ptr1
- *      stx     ptr1+1
- *      ldy     xxx
- *      ldx     #$00
- *      lda     yyy
- *      sta     (ptr1),y
- *
- * or by
- *
- *      ldy     xxx
- *      ldx     #$00
- *      lda     yyy
- *      sta     (zp),y
- *
- * or by
- *
- *      ldy     xxx
- *      ldx     #$00
- *      lda     yyy
- *      sta     label,y
- *
- * or by
- *
- *      ldy     xxx
- *      ldx     #$00
- *      lda     yyy
- *      sta     $xxxx,y
- *
- * depending on the two instructions preceeding the sequence above.
- */
+**
+**      clc
+**      adc     xxx
+**      bcc     L
+**      inx
+** L:   jsr     pushax
+**      ldx     #$00
+**      lda     yyy
+**      ldy     #$00
+**      jsr     staspidx
+**
+** and replace it by:
+**
+**      sta     ptr1
+**      stx     ptr1+1
+**      ldy     xxx
+**      ldx     #$00
+**      lda     yyy
+**      sta     (ptr1),y
+**
+** or by
+**
+**      ldy     xxx
+**      ldx     #$00
+**      lda     yyy
+**      sta     (zp),y
+**
+** or by
+**
+**      ldy     xxx
+**      ldx     #$00
+**      lda     yyy
+**      sta     label,y
+**
+** or by
+**
+**      ldy     xxx
+**      ldx     #$00
+**      lda     yyy
+**      sta     $xxxx,y
+**
+** depending on the two instructions preceeding the sequence above.
+*/
 
 unsigned OptPtrStore2 (CodeSeg* S);
 /* Search for the sequence:
- *
- *      clc
- *      adc     xxx
- *      bcc     L
- *      inx
- * L:   jsr     pushax
- *      ldy     yyy
- *      ldx     #$00
- *      lda     (sp),y
- *      ldy     #$00
- *      jsr     staspidx
- *
- * and replace it by:
- *
- *      sta     ptr1
- *      stx     ptr1+1
- *      ldy     yyy-2
- *      ldx     #$00
- *      lda     (sp),y
- *      ldy     xxx
- *      sta     (ptr1),y
- *
- * or by
- *
- *      ldy     yyy-2
- *      ldx     #$00
- *      lda     (sp),y
- *      ldy     xxx
- *      sta     (zp),y
- *
- * or by
- *
- *      ldy     yyy-2
- *      ldx     #$00
- *      lda     (sp),y
- *      ldy     xxx
- *      sta     label,y
- *
- * or by
- *
- *      ldy     yyy-2
- *      ldx     #$00
- *      lda     (sp),y
- *      ldy     xxx
- *      sta     $xxxx,y
- *
- * depending on the code preceeding the sequence above.
- */
+**
+**      clc
+**      adc     xxx
+**      bcc     L
+**      inx
+** L:   jsr     pushax
+**      ldy     yyy
+**      ldx     #$00
+**      lda     (sp),y
+**      ldy     #$00
+**      jsr     staspidx
+**
+** and replace it by:
+**
+**      sta     ptr1
+**      stx     ptr1+1
+**      ldy     yyy-2
+**      ldx     #$00
+**      lda     (sp),y
+**      ldy     xxx
+**      sta     (ptr1),y
+**
+** or by
+**
+**      ldy     yyy-2
+**      ldx     #$00
+**      lda     (sp),y
+**      ldy     xxx
+**      sta     (zp),y
+**
+** or by
+**
+**      ldy     yyy-2
+**      ldx     #$00
+**      lda     (sp),y
+**      ldy     xxx
+**      sta     label,y
+**
+** or by
+**
+**      ldy     yyy-2
+**      ldx     #$00
+**      lda     (sp),y
+**      ldy     xxx
+**      sta     $xxxx,y
+**
+** depending on the code preceeding the sequence above.
+*/
 
 unsigned OptPtrStore3 (CodeSeg* S);
 /* Search for the sequence:
- *
- *      jsr     pushax
- *      ldy     xxx
- *      jsr     ldauidx
- *      subop
- *      ldy     yyy
- *      jsr     staspidx
- *
- * and replace it by:
- *
- *      sta     ptr1
- *      stx     ptr1+1
- *      ldy     xxx
- *      ldx     #$00
- *      lda     (ptr1),y
- *      subop
- *      ldy     yyy
- *      sta     (ptr1),y
- *
- * In case a/x is loaded from the register bank before the pushax, we can even
- * use the register bank instead of ptr1.
- *
- */
+**
+**      jsr     pushax
+**      ldy     xxx
+**      jsr     ldauidx
+**      subop
+**      ldy     yyy
+**      jsr     staspidx
+**
+** and replace it by:
+**
+**      sta     ptr1
+**      stx     ptr1+1
+**      ldy     xxx
+**      ldx     #$00
+**      lda     (ptr1),y
+**      subop
+**      ldy     yyy
+**      sta     (ptr1),y
+**
+** In case a/x is loaded from the register bank before the pushax, we can even
+** use the register bank instead of ptr1.
+*/
 
 
 
 /* End of coptptrstore.h */
+
 #endif
-
-
-
-

@@ -93,8 +93,8 @@ void FreeExpr (ExprNode* Root)
 
 int IsConstExpr (ExprNode* Root)
 /* Return true if the given expression is a constant expression, that is, one
- * with no references to external symbols.
- */
+** with no references to external symbols.
+*/
 {
     int         Const;
     Export*     E;
@@ -111,9 +111,9 @@ int IsConstExpr (ExprNode* Root)
                 /* Get the referenced export */
                 E = GetExprExport (Root);
                 /* If this export has a mark set, we've already encountered it.
-                 * This means that the export is used to define it's own value,
-                 * which in turn means, that we have a circular reference.
-                 */
+                ** This means that the export is used to define it's own value,
+                ** which in turn means, that we have a circular reference.
+                */
                 if (ExportHasMark (E)) {
                     CircularRefError (E);
                     Const = 0;
@@ -126,8 +126,8 @@ int IsConstExpr (ExprNode* Root)
 
             case EXPR_SECTION:
                 /* A section expression is const if the segment it is in is
-                 * not relocatable and already placed.
-                 */
+                ** not relocatable and already placed.
+                */
                 S = GetExprSection (Root);
                 M = S->Seg->MemArea;
                 return M != 0 && (M->Flags & MF_PLACED) != 0 && !M->Relocatable;
@@ -160,9 +160,9 @@ int IsConstExpr (ExprNode* Root)
                 GetSegExprVal (Root->Left, &D);
 
                 /* The expression is const if the expression contains exactly
-                 * one segment that is assigned to a memory area which has a
-                 * bank attribute that is constant.
-                 */
+                ** one segment that is assigned to a memory area which has a
+                ** bank attribute that is constant.
+                */
                 return (D.TooComplex              == 0  &&
                         D.Seg                     != 0  &&
                         D.Seg->MemArea            != 0  &&
@@ -224,9 +224,9 @@ Import* GetExprImport (ExprNode* Expr)
     PRECONDITION (Expr->Op == EXPR_SYMBOL);
 
     /* If we have an object file, get the import from it, otherwise
-     * (internally generated expressions), get the import from the
-     * import pointer.
-     */
+    ** (internally generated expressions), get the import from the
+    ** import pointer.
+    */
     if (Expr->Obj) {
         /* Return the Import */
         return GetObjImport (Expr->Obj, Expr->V.ImpNum);
@@ -256,9 +256,9 @@ Section* GetExprSection (ExprNode* Expr)
     PRECONDITION (Expr->Op == EXPR_SECTION);
 
     /* If we have an object file, get the section from it, otherwise
-     * (internally generated expressions), get the section from the
-     * section pointer.
-     */
+    ** (internally generated expressions), get the section from the
+    ** section pointer.
+    */
     if (Expr->Obj) {
         /* Return the export */
         return CollAt (&Expr->Obj->Sections, Expr->V.SecNum);
@@ -288,9 +288,9 @@ long GetExprVal (ExprNode* Expr)
             /* Get the referenced export */
             E = GetExprExport (Expr);
             /* If this export has a mark set, we've already encountered it.
-             * This means that the export is used to define it's own value,
-             * which in turn means, that we have a circular reference.
-             */
+            ** This means that the export is used to define it's own value,
+            ** which in turn means, that we have a circular reference.
+            */
             if (ExportHasMark (E)) {
                 CircularRefError (E);
                 Val = 0;
@@ -453,10 +453,10 @@ long GetExprVal (ExprNode* Expr)
 
 static void GetSegExprValInternal (ExprNode* Expr, SegExprDesc* D, int Sign)
 /* Check if the given expression consists of a segment reference and only
- * constant values, additions and subtractions. If anything else is found,
- * set D->TooComplex to true.
- * Internal, recursive routine.
- */
+** constant values, additions and subtractions. If anything else is found,
+** set D->TooComplex to true.
+** Internal, recursive routine.
+*/
 {
     Export* E;
 
@@ -470,9 +470,9 @@ static void GetSegExprValInternal (ExprNode* Expr, SegExprDesc* D, int Sign)
             /* Get the referenced export */
             E = GetExprExport (Expr);
             /* If this export has a mark set, we've already encountered it.
-             * This means that the export is used to define it's own value,
-             * which in turn means, that we have a circular reference.
-             */
+            ** This means that the export is used to define it's own value,
+            ** which in turn means, that we have a circular reference.
+            */
             if (ExportHasMark (E)) {
                 CircularRefError (E);
             } else {
@@ -530,9 +530,9 @@ static void GetSegExprValInternal (ExprNode* Expr, SegExprDesc* D, int Sign)
 
 void GetSegExprVal (ExprNode* Expr, SegExprDesc* D)
 /* Check if the given expression consists of a segment reference and only
- * constant values, additions and subtractions. If anything else is found,
- * set D->TooComplex to true. The function will initialize D.
- */
+** constant values, additions and subtractions. If anything else is found,
+** set D->TooComplex to true. The function will initialize D.
+*/
 {
     /* Initialize the given structure */
     D->Val        = 0;
@@ -714,6 +714,3 @@ int EqualExpr (ExprNode* E1, ExprNode* E2)
     }
 
 }
-
-
-

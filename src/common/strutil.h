@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2001-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -50,9 +50,9 @@
 
 char* StrCopy (char* Dest, size_t DestSize, const char* Source);
 /* Copy Source to Dest honouring the maximum size of the target buffer. In
- * constrast to strncpy, the resulting string will always be NUL terminated.
- * The function returns the pointer to the destintation buffer.
- */
+** constrast to strncpy, the resulting string will always be NUL terminated.
+** The function returns the pointer to the destintation buffer.
+*/
 
 int StrCaseCmp (const char* S1, const char* S2);
 /* Compare two strings ignoring case */
@@ -62,6 +62,3 @@ int StrCaseCmp (const char* S1, const char* S2);
 /* End of strutil.h */
 
 #endif
-
-
-

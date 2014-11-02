@@ -106,11 +106,11 @@ static const FileId FormatTable[] = {
 
 void WriteOutputFile (const StrBuf* Data, const Collection* A, const Bitmap* B)
 /* Write the contents of Data to a file. Format, file name etc. must be given
- * as attributes in A. If no format is given, the function tries to autodetect
- * it by using the extension of the file name. The bitmap passed to the
- * function is the bitmap used as source of the conversion. It may be used to
- * determine the bitmap properties for documentation purposes.
- */
+** as attributes in A. If no format is given, the function tries to autodetect
+** it by using the extension of the file name. The bitmap passed to the
+** function is the bitmap used as source of the conversion. It may be used to
+** determine the bitmap properties for documentation purposes.
+*/
 {
     const FileId* F;
 
@@ -140,6 +140,3 @@ void WriteOutputFile (const StrBuf* Data, const Collection* A, const Bitmap* B)
     /* Call the format specific write */
     OutputFormatTable[F->Id].Write (Data, A, B);
 }
-
-
-

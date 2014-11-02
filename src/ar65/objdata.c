@@ -122,8 +122,8 @@ void ClearObjData (ObjData* O)
 
 ObjData* FindObjData (const char* Module)
 /* Search for the module with the given name and return it. Return NULL if the
- * module is not in the list.
- */
+** module is not in the list.
+*/
 {
     unsigned I;
 
@@ -167,6 +167,3 @@ void DelObjData (const char* Module)
     /* Not found! */
     Warning ("Module `%s' not found in library `%s'", Module, LibName);
 }
-
-
-

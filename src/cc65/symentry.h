@@ -123,8 +123,8 @@ struct SymEntry {
         unsigned                Label;
 
         /* Register bank offset and offset of the saved copy on stack for
-         * register variables.
-         */
+        ** register variables.
+        */
         struct {
             int                 RegOffs;
             int                 SaveOffs;
@@ -272,7 +272,5 @@ int HasAnonName (const SymEntry* Entry);
 
 
 /* End of symentry.h */
+
 #endif
-
-
-

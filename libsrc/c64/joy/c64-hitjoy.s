@@ -12,11 +12,13 @@
         .include "c64.inc"
 
         .macpack generic
+        .macpack module
+
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-        .segment "JUMPTABLE"
+        module_header   _c64_hitjoy_joy
 
 ; Driver signature
 

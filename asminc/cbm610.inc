@@ -4,7 +4,7 @@
 ; Taken from a kernal disassembly done by myself in 1987.
 ;
 ; 1998-09-28, Ullrich von Bassewitz
-; 2013-08-26, Greg King
+; 2014-04-02, Greg King
 
 
 ; ---------------------------------------------------------------------------
@@ -14,6 +14,8 @@ ExecReg         := $00          ; Controls execution memory bank
 IndReg          := $01          ; Controls indirect indexed load-store bank
 
 TXTPTR          := $85          ; Far pointer into BASIC source code
+FNAM            := $90          ; Far pointer to LOAD/SAVE file-name
+FNAM_LEN        := $9D          ; Holds length of file-name
 
 ; ---------------------------------------------------------------------------
 ; Screen size

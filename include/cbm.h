@@ -82,8 +82,8 @@
 
 
 /* The file stream implementation and the POSIX I/O functions will
- * use the following variable to determine the file type to use.
- */
+** use the following variable to determine the file type to use.
+*/
 extern char _filetype;          /* Defaults to 's' */
 
 
@@ -162,10 +162,10 @@ unsigned char get_tv (void);
 
 
 /* Constants to use with cbm_open() for openning a file for reading or
- * writing without the need to append ",r" or ",w" to the filename.
- *
- * e.g., cbm_open(2, 8, CBM_READ, "0:data,s");
- */
+** writing without the need to append ",r" or ",w" to the filename.
+**
+** e.g., cbm_open(2, 8, CBM_READ, "0:data,s");
+*/
 #define CBM_READ        0       /* default is ",p" */
 #define CBM_WRITE       1       /* ditto */
 #define CBM_SEQ         2       /* default is ",r" -- or ",s" when writing */
@@ -202,79 +202,79 @@ void cbm_k_unlsn (void);
 
 
 /* The cbm_* I/O functions below set _oserror (see errno.h),
- * in case of an error.
- *
- * error-code   BASIC error
- * ----------   -----------
- *       1  =   too many files
- *       2  =   file open
- *       3  =   file not open
- *       4  =   file not found
- *       5  =   device not present
- *       6  =   not input-file
- *       7  =   not output-file
- *       8  =   missing file-name
- *       9  =   illegal device-number
- *
- *      10  =   STOP-key pushed
- *      11  =   general I/O-error
- */
+** in case of an error.
+**
+** error-code   BASIC error
+** ----------   -----------
+**       1  =   too many files
+**       2  =   file open
+**       3  =   file not open
+**       4  =   file not found
+**       5  =   device not present
+**       6  =   not input-file
+**       7  =   not output-file
+**       8  =   missing file-name
+**       9  =   illegal device-number
+**
+**      10  =   STOP-key pushed
+**      11  =   general I/O-error
+*/
 
 
 
 unsigned int cbm_load (const char* name, unsigned char device, void* data);
 /* Loads file "name", from given device, to given address -- or, to the load
- * address of the file if "data" is the null pointer (like load"name",8,1
- * in BASIC).
- * Returns number of bytes that were loaded if loading was successful;
- * otherwise 0, "_oserror" contains an error-code, then (see table above).
- */
+** address of the file if "data" is the null pointer (like load"name",8,1
+** in BASIC).
+** Returns number of bytes that were loaded if loading was successful;
+** otherwise 0, "_oserror" contains an error-code, then (see table above).
+*/
 
 unsigned char __fastcall__ cbm_save (const char* name, unsigned char device,
                                      const void* addr, unsigned int size);
 /* Saves "size" bytes, starting at "addr", to a file.
- * Returns 0 if saving was successful, otherwise an error-code (see table
- * above).
- */
+** Returns 0 if saving was successful, otherwise an error-code (see table
+** above).
+*/
 
 unsigned char __fastcall__ cbm_open (unsigned char lfn, unsigned char device,
                                      unsigned char sec_addr, const char* name);
 /* Opens a file. Works just like the BASIC command.
- * Returns 0 if openning was successful, otherwise an error-code (see table
- * above).
- */
+** Returns 0 if openning was successful, otherwise an error-code (see table
+** above).
+*/
 
 void __fastcall__ cbm_close (unsigned char lfn);
 /* Closes a file */
 
 int __fastcall__ cbm_read (unsigned char lfn, void* buffer, unsigned int size);
 /* Reads up to "size" bytes from a file into "buffer".
- * Returns the number of actually-read bytes, 0 if there are no bytes left.
- * -1 in case of an error; then, _oserror contains an error-code (see table
- * above).  (Remember:  0 means end-of-file; -1 means error.)
- */
+** Returns the number of actually-read bytes, 0 if there are no bytes left.
+** -1 in case of an error; then, _oserror contains an error-code (see table
+** above).  (Remember:  0 means end-of-file; -1 means error.)
+*/
 
 int __fastcall__ cbm_write (unsigned char lfn, const void* buffer,
                             unsigned int size);
 /* Writes up to "size" bytes from "buffer" to a file.
- * Returns the number of actually-written bytes, or -1 in case of an error;
- * _oserror contains an error-code, then (see above table).
- */
+** Returns the number of actually-written bytes, or -1 in case of an error;
+** _oserror contains an error-code, then (see above table).
+*/
 
 unsigned char cbm_opendir (unsigned char lfn, unsigned char device, ...);
 /* Opens directory listing. Returns 0 if opening directory was successful;
- * otherwise, an error-code corresponding to cbm_open(). As an optional
- * argument, the name of the directory may be passed to the function. If
- * no explicit name is specified, "$" is used.
- */
+** otherwise, an error-code corresponding to cbm_open(). As an optional
+** argument, the name of the directory may be passed to the function. If
+** no explicit name is specified, "$" is used.
+*/
 
 unsigned char __fastcall__ cbm_readdir (unsigned char lfn,
                                         struct cbm_dirent* l_dirent);
 /* Reads one directory line into cbm_dirent structure.
- * Returns 0 if reading directory-line was successful.
- * Returns non-zero if reading directory failed, or no more file-names to read.
- * Returns 2 on last line.  Then, l_dirent->size = the number of "blocks free."
- */
+** Returns 0 if reading directory-line was successful.
+** Returns non-zero if reading directory failed, or no more file-names to read.
+** Returns 2 on last line.  Then, l_dirent->size = the number of "blocks free."
+*/
 
 void __fastcall__ cbm_closedir (unsigned char lfn);
 /* Closes directory by cbm_close(lfn) */

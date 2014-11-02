@@ -51,9 +51,9 @@
 
 void TypeConversion (ExprDesc* Expr, Type* NewType);
 /* Do an automatic conversion of the given expression to the new type. Output
- * warnings or errors where this automatic conversion is suspicious or
- * impossible.
- */
+** warnings or errors where this automatic conversion is suspicious or
+** impossible.
+*/
 
 void TypeCast (ExprDesc* Expr);
 /* Handle an explicit cast. */
@@ -61,7 +61,5 @@ void TypeCast (ExprDesc* Expr);
 
 
 /* End of typeconv.h */
+
 #endif
-
-
-

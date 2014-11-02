@@ -66,10 +66,10 @@ void* __fastcall__ realloc (void* block, register size_t size)
     }
 
     /* The word below the user block contains a pointer to the start of the
-     * raw memory block. The first word of this raw memory block is the full
-     * size of the block. Get a pointer to the real block, get the old block
-     * size.
-     */
+    ** raw memory block. The first word of this raw memory block is the full
+    ** size of the block. Get a pointer to the real block, get the old block
+    ** size.
+    */
     b = (((struct usedblock*) block) - 1)->start;
     oldsize = b->size;
 
@@ -87,16 +87,16 @@ void* __fastcall__ realloc (void* block, register size_t size)
     }
 
     /* The given block was not located on top of the heap, or there's no
-     * room left. Try to allocate a new block and copy the data.
-     */
+    ** room left. Try to allocate a new block and copy the data.
+    */
     if (newblock = malloc (size)) {
 
         /* Adjust the old size to the user visible portion */
         oldsize -= HEAP_ADMIN_SPACE;
 
         /* If the new block is larger than the old one, copy the old
-         * data only
-         */
+        ** data only
+        */
         if (size > oldsize) {
             size = oldsize;
         }
@@ -107,7 +107,6 @@ void* __fastcall__ realloc (void* block, register size_t size)
     }
     return newblock;
 }
-
 
 
 

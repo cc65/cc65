@@ -10,8 +10,10 @@
             .include "jumptab.inc"
             .include "geossym.inc"
             .include "geossym2.inc"
-            
+
             .macpack generic
+            .macpack module
+
 
 ; ------------------------------------------------------------------------
 ; Constants
@@ -33,7 +35,7 @@ VDC_DATA        = 31
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table and constants.
 
-.segment        "JUMPTABLE"
+        module_header   _geos_tgi_tgi
 
 ; First part of the header is a structure that has a magic signature,
 ; and defines the capabilities of the driver.

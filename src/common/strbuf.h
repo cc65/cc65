@@ -95,10 +95,10 @@ StrBuf* SB_Init (StrBuf* B);
 
 StrBuf* SB_InitFromString (StrBuf* B, const char* S);
 /* Initialize a string buffer from a literal string. Beware: The buffer won't
- * store a copy but a pointer to the actual string. A buffer initialized with
- * this routine may be "forgotten" without calling SB_Done, since no memory
- * has been allocated.
- */
+** store a copy but a pointer to the actual string. A buffer initialized with
+** this routine may be "forgotten" without calling SB_Done, since no memory
+** has been allocated.
+*/
 
 void SB_Done (StrBuf* B);
 /* Free the data of a string buffer (but not the struct itself) */
@@ -111,8 +111,8 @@ void FreeStrBuf (StrBuf* B);
 
 void SB_Realloc (StrBuf* B, unsigned NewSize);
 /* Reallocate the string buffer space, make sure at least NewSize bytes are
- * available.
- */
+** available.
+*/
 
 #if defined(HAVE_INLINE)
 INLINE unsigned SB_GetLen (const StrBuf* B)
@@ -229,8 +229,8 @@ INLINE void SB_Reset (StrBuf* B)
 #if defined(HAVE_INLINE)
 INLINE char SB_Get (StrBuf* B)
 /* Return the next character from the string incrementing Index. Returns NUL
- * if the end of the string is reached.
- */
+** if the end of the string is reached.
+*/
 {
     return (B->Index < B->Len)? B->Buf[B->Index++] : '\0';
 }
@@ -241,8 +241,8 @@ INLINE char SB_Get (StrBuf* B)
 #if defined(HAVE_INLINE)
 INLINE char SB_Peek (const StrBuf* B)
 /* Look at the next character from the string without incrementing Index.
- * Returns NUL if the end of the string is reached.
- */
+** Returns NUL if the end of the string is reached.
+*/
 {
     return (B->Index < B->Len)? B->Buf[B->Index] : '\0';
 }
@@ -253,8 +253,8 @@ INLINE char SB_Peek (const StrBuf* B)
 #if defined(HAVE_INLINE)
 INLINE char SB_LookAt (const StrBuf* B, unsigned Index)
 /* Look at a specific character from the string. Returns NUL if the given
- * index is greater than the size of the string.
- */
+** index is greater than the size of the string.
+*/
 {
     return (Index < B->Len)? B->Buf[Index] : '\0';
 }
@@ -265,8 +265,8 @@ INLINE char SB_LookAt (const StrBuf* B, unsigned Index)
 #if defined(HAVE_INLINE)
 INLINE char SB_LookAtLast (const StrBuf* B)
 /* Look at the last character from the string. Returns NUL if the string buffer
- * is empty.
- */
+** is empty.
+*/
 {
     return (B->Len > 0)? B->Buf[B->Len-1] : '\0';
 }
@@ -304,8 +304,8 @@ void SB_Drop (StrBuf* B, unsigned Count);
 
 void SB_Terminate (StrBuf* B);
 /* Zero terminate the given string buffer. NOTE: The terminating zero is not
- * accounted for in B->Len, if you want that, you have to use AppendChar!
- */
+** accounted for in B->Len, if you want that, you have to use AppendChar!
+*/
 
 void SB_CopyBuf (StrBuf* Target, const char* Buf, unsigned Size);
 /* Copy Buf to Target, discarding the old contents of Target */
@@ -364,8 +364,8 @@ void SB_Append (StrBuf* Target, const StrBuf* Source);
 #if defined(HAVE_INLINE)
 INLINE void SB_Cut (StrBuf* B, unsigned Len)
 /* Cut the contents of B at the given length. If the current length of the
- * buffer is smaller than Len, nothing will happen.
- */
+** buffer is smaller than Len, nothing will happen.
+*/
 {
     if (Len < B->Len) {
         B->Len = Len;
@@ -374,21 +374,21 @@ INLINE void SB_Cut (StrBuf* B, unsigned Len)
 #else
 void SB_Cut (StrBuf* B, unsigned Len);
 /* Cut the contents of B at the given length. If the current length of the
- * buffer is smaller than Len, nothing will happen.
- */
+** buffer is smaller than Len, nothing will happen.
+*/
 #endif
 
 void SB_Slice (StrBuf* Target, const StrBuf* Source, unsigned Start, unsigned Len);
 /* Copy a slice from Source into Target. The current contents of Target are
- * destroyed. If Start is greater than the length of Source, or if Len
- * characters aren't available, the result will be a buffer with less than Len
- * bytes.
- */
+** destroyed. If Start is greater than the length of Source, or if Len
+** characters aren't available, the result will be a buffer with less than Len
+** bytes.
+*/
 
 void SB_Move (StrBuf* Target, StrBuf* Source);
 /* Move the complete contents of Source to target. This will delete the old
- * contents of Target, and Source will be empty after the call.
- */
+** contents of Target, and Source will be empty after the call.
+*/
 
 void SB_ToLower (StrBuf* S);
 /* Convert all characters in S to lower case */
@@ -404,23 +404,20 @@ int SB_CompareStr (const StrBuf* S1, const char* S2);
 
 void SB_VPrintf (StrBuf* S, const char* Format, va_list ap) attribute ((format (printf, 2, 0)));
 /* printf function with S as target. The function is safe, which means that
- * the current contents of S are discarded, and are allocated again with
- * a matching size for the output. The function will call FAIL when problems
- * are detected (anything that let xsnprintf return -1).
- */
+** the current contents of S are discarded, and are allocated again with
+** a matching size for the output. The function will call FAIL when problems
+** are detected (anything that let xsnprintf return -1).
+*/
 
 void SB_Printf (StrBuf* S, const char* Format, ...) attribute ((format (printf, 2, 3)));
 /* vprintf function with S as target. The function is safe, which means that
- * the current contents of S are discarded, and are allocated again with
- * a matching size for the output. The function will call FAIL when problems
- * are detected (anything that let xsnprintf return -1).
- */
+** the current contents of S are discarded, and are allocated again with
+** a matching size for the output. The function will call FAIL when problems
+** are detected (anything that let xsnprintf return -1).
+*/
 
 
 
 /* End of strbuf.h */
 
 #endif
-
-
-

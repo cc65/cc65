@@ -156,7 +156,5 @@ void OutputSegments (const Segments* S);
 
 
 /* End of segments.h */
+
 #endif
-
-
-

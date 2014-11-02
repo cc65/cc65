@@ -17,6 +17,10 @@
 #define DRIVERNAME      "a2e.ssc.ser"
 #elif defined(__APPLE2__)
 #define DRIVERNAME      "a2.ssc.ser"
+#elif defined(__ATARIXL__)
+#define DRIVERNAME      "atrxrdev.ser"
+#elif defined(__ATARI__)
+#define DRIVERNAME      "atrrdev.ser"
 #else
 #define DRIVERNAME      "unknown"
 #error "Unknown target system"
@@ -24,7 +28,7 @@
 
 
 static const struct ser_params Params = {
-    SER_BAUD_19200,     /* Baudrate */
+    SER_BAUD_9600,      /* Baudrate */
     SER_BITS_8,         /* Number of data bits */
     SER_STOP_1,         /* Number of stop bits */
     SER_PAR_NONE,       /* Parity setting */

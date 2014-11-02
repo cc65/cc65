@@ -13,12 +13,13 @@
         .include        "vic20.inc"
 
         .macpack        generic
+        .macpack        module
 
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-.segment        "JUMPTABLE"
+        module_header   _vic20_stdjoy_joy
 
 ; Driver signature
 

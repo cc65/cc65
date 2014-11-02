@@ -88,6 +88,3 @@ int RelocatableBinFmt (unsigned Format)
     /* Return the flag */
     return Reloc;
 }
-
-
-

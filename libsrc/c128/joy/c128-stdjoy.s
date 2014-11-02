@@ -13,12 +13,13 @@
         .include        "c128.inc"
 
         .macpack        generic
+        .macpack        module
 
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-.segment        "JUMPTABLE"
+        module_header   _c128_stdjoy_joy
 
 ; Driver signature
 

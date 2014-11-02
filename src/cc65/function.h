@@ -99,24 +99,24 @@ int F_GetTopLevelSP (const Function* F);
 
 int F_ReserveLocalSpace (Function* F, unsigned Size);
 /* Reserve (but don't allocate) the given local space and return the stack
- * offset.
- */
+** offset.
+*/
 
 int F_GetStackPtr (const Function* F);
 /* Return the current stack pointer including reserved (but not allocated)
- * space on the stack.
- */
+** space on the stack.
+*/
 
 void F_AllocLocalSpace (Function* F);
 /* Allocate any local space previously reserved. The function will do
- * nothing if there is no reserved local space.
- */
+** nothing if there is no reserved local space.
+*/
 
 int F_AllocRegVar (Function* F, const Type* Type);
 /* Allocate a register variable for the given variable type. If the allocation
- * was successful, return the offset of the register variable in the register
- * bank (zero page storage). If there is no register space left, return -1.
- */
+** was successful, return the offset of the register variable in the register
+** bank (zero page storage). If there is no register space left, return -1.
+*/
 
 void NewFunc (struct SymEntry* Func);
 /* Parse argument declarations and function body. */
@@ -124,7 +124,5 @@ void NewFunc (struct SymEntry* Func);
 
 
 /* End of function.h */
+
 #endif
-
-
-

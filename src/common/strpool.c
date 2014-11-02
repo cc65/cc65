@@ -34,11 +34,11 @@
 
 
 /* A string pool is used to store identifiers and other strings. Each string
- * stored in the pool has a unique id, which may be used to access the string
- * in the pool. Identical strings are stored only once in the pool and have
- * identical ids. This means that instead of comparing strings, just the
- * string pool ids must be compared.
- */
+** stored in the pool has a unique id, which may be used to access the string
+** in the pool. Identical strings are stored only once in the pool and have
+** identical ids. This means that instead of comparing strings, just the
+** string pool ids must be compared.
+*/
 
 
 
@@ -68,9 +68,9 @@ static const void* HT_GetKey (const void* Entry);
 
 static int HT_Compare (const void* Key1, const void* Key2);
 /* Compare two keys. The function must return a value less than zero if
- * Key1 is smaller than Key2, zero if both are equal, and a value greater
- * than zero if Key1 is greater then Key2.
- */
+** Key1 is smaller than Key2, zero if both are equal, and a value greater
+** than zero if Key1 is greater then Key2.
+*/
 
 
 
@@ -154,9 +154,9 @@ static const void* HT_GetKey (const void* Entry)
 
 static int HT_Compare (const void* Key1, const void* Key2)
 /* Compare two keys. The function must return a value less than zero if
- * Key1 is smaller than Key2, zero if both are equal, and a value greater
- * than zero if Key1 is greater then Key2.
- */
+** Key1 is smaller than Key2, zero if both are equal, and a value greater
+** than zero if Key1 is greater then Key2.
+*/
 {
     return SB_Compare (Key1, Key2);
 }
@@ -228,9 +228,9 @@ const StrBuf* SP_Get (const StringPool* P, unsigned Index)
 
 unsigned SP_Add (StringPool* P, const StrBuf* S)
 /* Add a string buffer to the buffer and return the index. If the string does
- * already exist in the pool, SP_AddBuf will just return the index of the
- * existing string.
- */
+** already exist in the pool, SP_AddBuf will just return the index of the
+** existing string.
+*/
 {
     /* Search for a matching entry in the hash table */
     StringPoolEntry* E = HT_Find (&P->Tab, S);
@@ -259,14 +259,14 @@ unsigned SP_Add (StringPool* P, const StrBuf* S)
 
 unsigned SP_AddStr (StringPool* P, const char* S)
 /* Add a string to the buffer and return the index. If the string does already
- * exist in the pool, SP_Add will just return the index of the existing string.
- */
+** exist in the pool, SP_Add will just return the index of the existing string.
+*/
 {
     unsigned Id;
 
     /* First make a string buffer, then add it. This is some overhead, but the
-     * routine will probably go.
-     */
+    ** routine will probably go.
+    */
     StrBuf Buf;
     Id = SP_Add (P, SB_InitFromString (&Buf, S));
 
@@ -281,6 +281,3 @@ unsigned SP_GetCount (const StringPool* P)
 {
     return CollCount (&P->Entries);
 }
-
-
-

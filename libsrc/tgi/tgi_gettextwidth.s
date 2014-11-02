@@ -22,8 +22,8 @@ Text    := ptr3
 ;-----------------------------------------------------------------------------
 ; unsigned __fastcall__ tgi_gettextwidth (const char* s);
 ; /* Calculate the width of the text in pixels according to the current text
-;  * style.
-;  */
+; ** style.
+; */
 ;
 ; Result is  strlen (s) * tgi_textmagw * tgi_fontsizex
 ;

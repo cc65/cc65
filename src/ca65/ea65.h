@@ -62,6 +62,3 @@ void GetEA (EffAddr* A);
 /* End of ea65.h */
 
 #endif
-
-
-

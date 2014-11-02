@@ -104,9 +104,9 @@ int ED_CodeRangeIsEmpty (const ExprDesc* Expr)
 
 const char* ED_GetLabelName (const ExprDesc* Expr, long Offs)
 /* Return the assembler label name of the given expression. Beware: This
- * function may use a static buffer, so the name may get "lost" on the second
- * call to the function.
- */
+** function may use a static buffer, so the name may get "lost" on the second
+** call to the function.
+*/
 {
     static StrBuf Buf = STATIC_STRBUF_INITIALIZER;
 
@@ -157,8 +157,8 @@ const char* ED_GetLabelName (const ExprDesc* Expr, long Offs)
 
 int ED_GetStackOffs (const ExprDesc* Expr, int Offs)
 /* Get the stack offset of an address on the stack in Expr taking into account
- * an additional offset in Offs.
- */
+** an additional offset in Offs.
+*/
 {
     PRECONDITION (ED_IsLocStack (Expr));
     Offs += ((int) Expr->IVal) - StackPtr;
@@ -198,8 +198,8 @@ ExprDesc* ED_MakeConstAbsInt (ExprDesc* Expr, long Value)
 
 ExprDesc* ED_MakeRValExpr (ExprDesc* Expr)
 /* Convert Expr into a rvalue which is in the primary register without an
- * offset.
- */
+** offset.
+*/
 {
     Expr->Sym   = 0;
     Expr->Flags &= ~(E_MASK_LOC | E_MASK_RTYPE | E_BITFIELD | E_NEED_TEST | E_CC_SET);
@@ -214,8 +214,8 @@ ExprDesc* ED_MakeRValExpr (ExprDesc* Expr)
 
 ExprDesc* ED_MakeLValExpr (ExprDesc* Expr)
 /* Convert Expr into a lvalue which is in the primary register without an
- * offset.
- */
+** offset.
+*/
 {
     Expr->Sym   = 0;
     Expr->Flags &= ~(E_MASK_LOC | E_MASK_RTYPE | E_BITFIELD | E_NEED_TEST | E_CC_SET);
@@ -230,9 +230,9 @@ ExprDesc* ED_MakeLValExpr (ExprDesc* Expr)
 
 int ED_IsConst (const ExprDesc* Expr)
 /* Return true if the expression denotes a constant of some sort. This can be a
- * numeric constant, the address of a global variable (maybe with offset) or
- * similar.
- */
+** numeric constant, the address of a global variable (maybe with offset) or
+** similar.
+*/
 {
     return ED_IsRVal (Expr) && (Expr->Flags & E_LOC_CONST) != 0;
 }
@@ -261,8 +261,8 @@ int ED_IsNullPtr (const ExprDesc* Expr)
 
 int ED_IsBool (const ExprDesc* Expr)
 /* Return true of the expression can be treated as a boolean, that is, it can
- * be an operand to a compare operation.
- */
+** be an operand to a compare operation.
+*/
 {
     /* Either ints, floats, or pointers can be used in a boolean context */
     return IsClassInt (Expr->Type)   ||
@@ -373,6 +373,3 @@ Type* ReplaceType (ExprDesc* Expr, const Type* NewType)
     Expr->Type = TypeDup (NewType);
     return OldType;
 }
-
-
-

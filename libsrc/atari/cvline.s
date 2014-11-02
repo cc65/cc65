@@ -10,6 +10,12 @@
         .import         popa, _gotoxy, putchar, setcursor
         .importzp       tmp1
 
+.ifdef __ATARI5200__
+CHRCODE =       1               ; exclamation mark
+.else
+CHRCODE =       $7C             ; Vertical bar
+.endif
+
 _cvlinexy:
         pha                     ; Save the length
         jsr     popa            ; Get y
@@ -22,7 +28,7 @@ _cvline:
         sta     tmp1
 L1:     lda     COLCRS
         pha
-        lda     #$7C            ; Vertical bar
+        lda     #CHRCODE        ; Vertical bar
         jsr     putchar         ; Write, no cursor advance
         pla
         sta     COLCRS
@@ -30,6 +36,3 @@ L1:     lda     COLCRS
         dec     tmp1
         bne     L1
 L9:     jmp     setcursor
-
-
-

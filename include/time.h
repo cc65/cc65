@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2012 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -81,6 +81,9 @@ extern struct _timezone {
 unsigned _clocks_per_sec (void);
 #  define CLK_TCK               _clocks_per_sec()
 #  define CLOCKS_PER_SEC        _clocks_per_sec()
+#elif defined(__ATARI5200__)
+#  define CLK_TCK               60      /* POSIX */
+#  define CLOCKS_PER_SEC        60      /* ANSI */
 #elif defined(__ATMOS__)
 #  define CLK_TCK               100     /* POSIX */
 #  define CLOCKS_PER_SEC        100     /* ANSI */
@@ -101,7 +104,8 @@ unsigned _clocks_per_sec (void);
 #  define CLOCKS_PER_SEC        1       /* ANSI */
 #elif defined(__LYNX__)
 /* The clock-rate depends on the video scan-rate;
-** so, read it at run-time. */
+** so, read it at run-time.
+*/
 extern clock_t _clk_tck (void);
 #  define CLK_TCK               _clk_tck()
 #  define CLOCKS_PER_SEC        _clk_tck()
@@ -111,10 +115,10 @@ extern clock_t _clk_tck (void);
 
 time_t _systime (void);
 /* Similar to time(), but:
- *   - Is not ISO C
- *   - Does not take the additional pointer
- *   - Does not set errno when returning -1
- */
+**   - Is not ISO C
+**   - Does not take the additional pointer
+**   - Does not set errno when returning -1
+*/
 
 /* ISO C function prototypes */
 char* __fastcall__ asctime (const struct tm* timep);

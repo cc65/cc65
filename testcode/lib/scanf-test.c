@@ -78,8 +78,9 @@ static const struct {
         {"qwerty   095  2", "qwerty  %i%i", 2, INT, {0}    , INT, {95}},
         {"qwerty   0e5  2", "qwerty  %i%i", 1, INT, {0}    , INT, {0}},
 
-        /* (String pointers are cast as (int),
-         * in order to avoid cc65 warnings.) */
+        /* [String pointers are cast as (int),
+        ** in order to avoid cc65 warnings.]
+        */
 
         /* Test that character specifiers can handle end-of-file. */
         {"qwerty"   , "qwerty  %s%s"     , EOF, CHAR, {(int)""}, CHAR, {(int)""}},

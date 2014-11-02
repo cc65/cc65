@@ -1,9 +1,9 @@
 /*
- * _printf.h
- *
- * (C) Copyright 1998 Ullrich von Bassewitz (uz@cc65.org)
- *
- */
+** _printf.h
+**
+** (C) Copyright 1998 Ullrich von Bassewitz (uz@cc65.org)
+**
+*/
 
 
 
@@ -21,9 +21,9 @@ typedef void (*outfunc) (struct outdesc* desc, const char* buf, unsigned count);
 
 
 /* Control structure passed to the low level worker function.
- * Beware: This function will access the structure on the assembly level,
- * so check this when altering the structure.
- */
+** Beware: This function will access the structure on the assembly level,
+** so check this when altering the structure.
+*/
 struct outdesc {
     int         ccount;         /* Character counter */
     outfunc     fout;           /* Routine used to output data */

@@ -66,8 +66,8 @@ static Macro* MacroTab[MACRO_TAB_SIZE];
 
 Macro* NewMacro (const char* Name)
 /* Allocate a macro structure with the given name. The structure is not
- * inserted into the macro table.
- */
+** inserted into the macro table.
+*/
 {
     /* Get the length of the macro name */
     unsigned Len = strlen(Name);
@@ -93,8 +93,8 @@ Macro* NewMacro (const char* Name)
 
 void FreeMacro (Macro* M)
 /* Delete a macro definition. The function will NOT remove the macro from the
- * table, use UndefineMacro for that.
- */
+** table, use UndefineMacro for that.
+*/
 {
     unsigned I;
 
@@ -152,9 +152,9 @@ void InsertMacro (Macro* M)
 
 int UndefineMacro (const char* Name)
 /* Search for the macro with the given name and remove it from the macro
- * table if it exists. Return 1 if a macro was found and deleted, return
- * 0 otherwise.
- */
+** table if it exists. Return 1 if a macro was found and deleted, return
+** 0 otherwise.
+*/
 {
     /* Get the hash value of the macro name */
     unsigned Hash = HashStr (Name) % MACRO_TAB_SIZE;
@@ -217,8 +217,8 @@ Macro* FindMacro (const char* Name)
 
 int FindMacroArg (Macro* M, const char* Arg)
 /* Search for a formal macro argument. If found, return the index of the
- * argument. If the argument was not found, return -1.
- */
+** argument. If the argument was not found, return -1.
+*/
 {
     unsigned I;
     for (I = 0; I < CollCount (&M->FormalArgs); ++I) {
@@ -238,9 +238,9 @@ void AddMacroArg (Macro* M, const char* Arg)
 /* Add a formal macro argument. */
 {
     /* Check if we have a duplicate macro argument, but add it anyway.
-     * Beware: Don't use FindMacroArg here, since the actual argument array
-     * may not be initialized.
-     */
+    ** Beware: Don't use FindMacroArg here, since the actual argument array
+    ** may not be initialized.
+    */
     unsigned I;
     for (I = 0; I < CollCount (&M->FormalArgs); ++I) {
         if (strcmp (CollAtUnchecked (&M->FormalArgs, I), Arg) == 0) {
@@ -302,6 +302,3 @@ void PrintMacroStats (FILE* F)
         }
     }
 }
-
-
-

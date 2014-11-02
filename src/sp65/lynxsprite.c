@@ -235,22 +235,22 @@ static void WriteOutBuffer(StrBuf *D)
 static void encodeSprite(StrBuf *D, enum Mode M, char ColorBits, char ColorMask, char LineBuffer[512],
     int len, int LastOpaquePixel) {
 /*
- * The data starts with a byte count. It tells the number of bytes on this
- * line + 1.
- * Special case is a count of 1. It will change to next quadrant.
- * Other special case is 0. It will end the sprite.
- *
- * Ordinary data packet. These are bits in a stream.
- * 1=literal 0=packed
- * 4 bit count (+1)
- * for literal you put "count" values
- * for packed you repeat the value "count" times
- * Never use packed mode for one pixel
- * If the last bit on a line is 1 you need to add a byte of zeroes
- * A sequence 00000 ends a scan line
- *
- * All data is high nybble first
- */
+** The data starts with a byte count. It tells the number of bytes on this
+** line + 1.
+** Special case is a count of 1. It will change to next quadrant.
+** Other special case is 0. It will end the sprite.
+**
+** Ordinary data packet. These are bits in a stream.
+** 1=literal 0=packed
+** 4 bit count (+1)
+** for literal you put "count" values
+** for packed you repeat the value "count" times
+** Never use packed mode for one pixel
+** If the last bit on a line is 1 you need to add a byte of zeroes
+** A sequence 00000 ends a scan line
+**
+** All data is high nybble first
+*/
     unsigned char V = 0;
     signed i;
     signed count;
@@ -369,17 +369,17 @@ static void encodeSprite(StrBuf *D, enum Mode M, char ColorBits, char ColorMask,
 
 StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
 /* Generate binary output in Lynx sprite format for the bitmap B. The output
- * is stored in a string buffer (which is actually a dynamic char array) and
- * returned.
- *
- * The Lynx will draw 4 quadrants:
- * - Down right
- * - Up right
- * - Up left
- * - Down left
- *
- * The sprite will end with a byte 0.
- */
+** is stored in a string buffer (which is actually a dynamic char array) and
+** returned.
+**
+** The Lynx will draw 4 quadrants:
+** - Down right
+** - Up right
+** - Up left
+** - Down left
+**
+** The sprite will end with a byte 0.
+*/
 {
     enum Mode M;
     StrBuf* D;
@@ -552,6 +552,3 @@ StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
     /* Return the converted bitmap */
     return D;
 }
-
-
-

@@ -238,6 +238,3 @@ void WriteAsmFile (const StrBuf* Data, const Collection* A, const Bitmap* B)
         Error ("Error closing output file `%s': %s", Name, strerror (errno));
     }
 }
-
-
-

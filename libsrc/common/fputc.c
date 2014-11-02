@@ -1,8 +1,8 @@
 /*
- * fputc.c
- *
- * Ullrich von Bassewitz, 02.06.1998
- */
+** fputc.c
+**
+** Ullrich von Bassewitz, 02.06.1998
+*/
 
 
 

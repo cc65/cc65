@@ -66,15 +66,15 @@ static int MemAccess (CodeSeg* S, unsigned From, unsigned To, const CodeEntry* N
 
 
     /* If the argument of N is a zero page location that ends with "+1", we
-     * must also check for word accesses to the location without +1.
-     */
+    ** must also check for word accesses to the location without +1.
+    */
     if (N->AM == AM65_ZP && NLen > 2 && strcmp (N->Arg + NLen - 2, "+1") == 0) {
         What |= Base;
     }
 
     /* If the argument is zero page indirect, we must also check for accesses
-     * to "arg+1"
-     */
+    ** to "arg+1"
+    */
     if (N->AM == AM65_ZP_INDY || N->AM == AM65_ZPX_IND || N->AM == AM65_ZP_IND) {
         What |= Word;
     }
@@ -86,8 +86,8 @@ static int MemAccess (CodeSeg* S, unsigned From, unsigned To, const CodeEntry* N
         CodeEntry* E = CS_GetEntry (S, From);
 
         /* Check if there is an argument and if this argument equals Arg in
-         * some variants.
-         */
+        ** some variants.
+        */
         if (E->Arg[0] != '\0') {
 
             unsigned ELen;
@@ -126,8 +126,8 @@ static int MemAccess (CodeSeg* S, unsigned From, unsigned To, const CodeEntry* N
 
 static int GetBranchDist (CodeSeg* S, unsigned From, CodeEntry* To)
 /* Get the branch distance between the two entries and return it. The distance
- * will be negative for backward jumps and positive for forward jumps.
- */
+** will be negative for backward jumps and positive for forward jumps.
+*/
 {
     /* Get the index of the branch target */
     unsigned TI = CS_GetEntryIndex (S, To);
@@ -265,8 +265,8 @@ unsigned OptRTSJumps2 (CodeSeg* S)
 
 
             /* Get the jump target and the next entry. There's always a next
-             * entry, because we don't cover the last entry in the loop.
-             */
+            ** entry, because we don't cover the last entry in the loop.
+            */
             CodeEntry* X = 0;
             CodeEntry* T = E->JumpTo->Owner;
             CodeEntry* N = CS_GetNextEntry (S, I);
@@ -275,15 +275,15 @@ unsigned OptRTSJumps2 (CodeSeg* S)
             if (T->OPC == OP65_RTS) {
 
                 /* It's a jump to RTS. Create a conditional branch around an
-                 * RTS insn.
-                 */
+                ** RTS insn.
+                */
                 X = NewCodeEntry (OP65_RTS, AM65_IMP, 0, 0, T->LI);
 
             } else if (T->OPC == OP65_JMP && T->JumpTo == 0) {
 
                 /* It's a jump to a label outside the function. Create a
-                 * conditional branch around a jump to the external label.
-                 */
+                ** conditional branch around a jump to the external label.
+                */
                 X = NewCodeEntry (OP65_JMP, AM65_ABS, T->Arg, T->JumpTo, T->LI);
 
             }
@@ -298,8 +298,8 @@ unsigned OptRTSJumps2 (CodeSeg* S)
                 CS_InsertEntry (S, X, I+1);
 
                 /* Create a conditional branch with the inverse condition
-                 * around the replacement insn
-                 */
+                ** around the replacement insn
+                */
 
                 /* Get the new branch opcode */
                 NewBranch = MakeShortBranch (GetInverseBranch (E->OPC));
@@ -350,8 +350,8 @@ unsigned OptDeadJumps (CodeSeg* S)
         CodeEntry* E = CS_GetEntry (S, I);
 
         /* Check if it's a branch, if it has a local target, and if the target
-         * is the next instruction.
-         */
+        ** is the next instruction.
+        */
         if (E->AM == AM65_BRA                               &&
             E->JumpTo                                       &&
             E->JumpTo->Owner == CS_GetNextEntry (S, I)) {
@@ -384,8 +384,8 @@ unsigned OptDeadJumps (CodeSeg* S)
 
 unsigned OptDeadCode (CodeSeg* S)
 /* Remove dead code (code that follows an unconditional jump or an rts/rti
- * and has no label)
- */
+** and has no label)
+*/
 {
     unsigned Changes = 0;
 
@@ -400,9 +400,9 @@ unsigned OptDeadCode (CodeSeg* S)
         CodeEntry* E = CS_GetEntry (S, I);
 
         /* Check if it's an unconditional branch, and if the next entry has
-         * no labels attached, or if the label is just used so that the insn
-         * can jump to itself.
-         */
+        ** no labels attached, or if the label is just used so that the insn
+        ** can jump to itself.
+        */
         if ((E->Info & OF_DEAD) != 0                     &&     /* Dead code follows */
             (N = CS_GetNextEntry (S, I)) != 0            &&     /* Has next entry */
             (!CE_HasLabel (N)                        ||         /* Don't has a label */
@@ -439,11 +439,11 @@ unsigned OptDeadCode (CodeSeg* S)
 
 unsigned OptJumpCascades (CodeSeg* S)
 /* Optimize jump cascades (jumps to jumps). In such a case, the jump is
- * replaced by a jump to the final location. This will in some cases produce
- * worse code, because some jump targets are no longer reachable by short
- * branches, but this is quite rare, so there are more advantages than
- * disadvantages.
- */
+** replaced by a jump to the final location. This will in some cases produce
+** worse code, because some jump targets are no longer reachable by short
+** branches, but this is quite rare, so there are more advantages than
+** disadvantages.
+*/
 {
     unsigned Changes = 0;
 
@@ -458,17 +458,17 @@ unsigned OptJumpCascades (CodeSeg* S)
         CodeEntry* E = CS_GetEntry (S, I);
 
         /* Check:
-         *   - if it's a branch,
-         *   - if it has a jump label,
-         *   - if this jump label is not attached to the instruction itself,
-         *   - if the target instruction is itself a branch,
-         *   - if either the first branch is unconditional or the target of
-         *     the second branch is internal to the function.
-         * The latter condition will avoid conditional branches to targets
-         * outside of the function (usually incspx), which won't simplify the
-         * code, since conditional far branches are emulated by a short branch
-         * around a jump.
-         */
+        **   - if it's a branch,
+        **   - if it has a jump label,
+        **   - if this jump label is not attached to the instruction itself,
+        **   - if the target instruction is itself a branch,
+        **   - if either the first branch is unconditional or the target of
+        **     the second branch is internal to the function.
+        ** The latter condition will avoid conditional branches to targets
+        ** outside of the function (usually incspx), which won't simplify the
+        ** code, since conditional far branches are emulated by a short branch
+        ** around a jump.
+        */
         if ((E->Info & OF_BRA) != 0             &&
             (OldLabel = E->JumpTo) != 0         &&
             (N = OldLabel->Owner) != E          &&
@@ -476,27 +476,27 @@ unsigned OptJumpCascades (CodeSeg* S)
             ((E->Info & OF_CBRA) == 0   ||
              N->JumpTo != 0)) {
 
-            /* Check if we can use the final target label. This is the case,
-             * if the target branch is an absolut branch, or if it is a
-             * conditional branch checking the same condition as the first one.
-             */
+            /* Check if we can use the final target label. That is the case,
+            ** if the target branch is an absolute branch; or, if it is a
+            ** conditional branch checking the same condition as the first one.
+            */
             if ((N->Info & OF_UBRA) != 0 ||
                 ((E->Info & OF_CBRA) != 0 &&
                  GetBranchCond (E->OPC)  == GetBranchCond (N->OPC))) {
 
                 /* This is a jump cascade and we may jump to the final target,
-                 * provided that the other insn does not jump to itself. If
-                 * this is the case, we can also jump to ourselves, otherwise
-                 * insert a jump to the new instruction and remove the old one.
-                 */
+                ** provided that the other insn does not jump to itself. If
+                ** this is the case, we can also jump to ourselves, otherwise
+                ** insert a jump to the new instruction and remove the old one.
+                */
                 CodeEntry* X;
                 CodeLabel* LN = N->JumpTo;
 
                 if (LN != 0 && LN->Owner == N) {
 
                     /* We found a jump to a jump to itself. Replace our jump
-                     * by a jump to itself.
-                     */
+                    ** by a jump to itself.
+                    */
                     CodeLabel* LE = CS_GenLabel (S, E);
                     X = NewCodeEntry (E->OPC, E->AM, LE->Name, LE, E->LI);
 
@@ -517,10 +517,10 @@ unsigned OptJumpCascades (CodeSeg* S)
                 ++Changes;
 
             /* Check if both are conditional branches, and the condition of
-             * the second is the inverse of that of the first. In this case,
-             * the second branch will never be taken, and we may jump directly
-             * to the instruction behind this one.
-             */
+            ** the second is the inverse of that of the first. In this case,
+            ** the second branch will never be taken, and we may jump directly
+            ** to the instruction behind this one.
+            */
             } else if ((E->Info & OF_CBRA) != 0 && (N->Info & OF_CBRA) != 0) {
 
                 CodeEntry* X;   /* Instruction behind N */
@@ -537,8 +537,8 @@ unsigned OptJumpCascades (CodeSeg* S)
                 }
 
                 /* We may jump behind this conditional branch. Get the
-                 * pointer to the next instruction
-                 */
+                ** pointer to the next instruction
+                */
                 if ((X = CS_GetNextEntry (S, CS_GetEntryIndex (S, N))) == 0) {
                     /* N is the last entry, bail out */
                     goto NextEntry;
@@ -575,9 +575,9 @@ NextEntry:
 
 unsigned OptRTS (CodeSeg* S)
 /* Optimize subroutine calls followed by an RTS. The subroutine call will get
- * replaced by a jump. Don't bother to delete the RTS if it does not have a
- * label, the dead code elimination should take care of it.
- */
+** replaced by a jump. Don't bother to delete the RTS if it does not have a
+** label, the dead code elimination should take care of it.
+*/
 {
     unsigned Changes = 0;
 
@@ -623,10 +623,10 @@ unsigned OptRTS (CodeSeg* S)
 
 unsigned OptJumpTarget1 (CodeSeg* S)
 /* If the instruction preceeding an unconditional branch is the same as the
- * instruction preceeding the jump target, the jump target may be moved
- * one entry back. This is a size optimization, since the instruction before
- * the branch gets removed.
- */
+** instruction preceeding the jump target, the jump target may be moved
+** one entry back. This is a size optimization, since the instruction before
+** the branch gets removed.
+*/
 {
     unsigned Changes = 0;
     CodeEntry* E1;              /* Entry 1 */
@@ -642,8 +642,8 @@ unsigned OptJumpTarget1 (CodeSeg* S)
         E2 = CS_GetNextEntry (S, I);
 
         /* Check if we have a jump or branch without a label attached, and
-         * a jump target, which is not attached to the jump itself
-         */
+        ** a jump target, which is not attached to the jump itself
+        */
         if (E2 != 0                     &&
             (E2->Info & OF_UBRA) != 0   &&
             !CE_HasLabel (E2)           &&
@@ -658,8 +658,8 @@ unsigned OptJumpTarget1 (CodeSeg* S)
             }
 
             /* The entry preceeding the branch target may not be the branch
-             * insn.
-             */
+            ** insn.
+            */
             if (T1 == E2) {
                 goto NextEntry;
             }
@@ -674,17 +674,17 @@ unsigned OptJumpTarget1 (CodeSeg* S)
             }
 
             /* Get the label for the instruction preceeding the jump target.
-             * This routine will create a new label if the instruction does
-             * not already have one.
-             */
+            ** This routine will create a new label if the instruction does
+            ** not already have one.
+            */
             TL1 = CS_GenLabel (S, T1);
 
             /* Change the jump target to point to this new label */
             CS_MoveLabelRef (S, E2, TL1);
 
             /* If the instruction preceeding the jump has labels attached,
-             * move references to this label to the new label.
-             */
+            ** move references to this label to the new label.
+            */
             if (CE_HasLabel (E1)) {
                 CS_MoveLabels (S, E1, T1);
             }
@@ -710,8 +710,8 @@ NextEntry:
 
 unsigned OptJumpTarget2 (CodeSeg* S)
 /* If a bcs jumps to a sec insn or a bcc jumps to clc, skip this insn, since
- * it's job is already done.
- */
+** it's job is already done.
+*/
 {
     unsigned Changes = 0;
 
@@ -748,8 +748,8 @@ unsigned OptJumpTarget2 (CodeSeg* S)
         }
 
         /* Get the owner insn of the jump target and check if it's the one, we
-         * will skip if present.
-         */
+        ** will skip if present.
+        */
         T = E->JumpTo->Owner;
         if (T->OPC != OPC) {
             goto NextEntry;
@@ -763,9 +763,9 @@ unsigned OptJumpTarget2 (CodeSeg* S)
         }
 
         /* Get the label for the instruction following the jump target.
-         * This routine will create a new label if the instruction does
-         * not already have one.
-         */
+        ** This routine will create a new label if the instruction does
+        ** not already have one.
+        */
         L = CS_GenLabel (S, N);
 
         /* Change the jump target to point to this new label */
@@ -787,9 +787,9 @@ NextEntry:
 
 unsigned OptJumpTarget3 (CodeSeg* S)
 /* Jumps to load instructions of a register, that do already have the matching
- * register contents may skip the load instruction, since it's job is already
- * done.
- */
+** register contents may skip the load instruction, since it's job is already
+** done.
+*/
 {
     unsigned Changes = 0;
     unsigned I;
@@ -804,8 +804,8 @@ unsigned OptJumpTarget3 (CodeSeg* S)
         CodeEntry* E = CS_GetEntry (S, I);
 
         /* Check if this is a load insn with a label and the next insn is not
-         * a conditional branch that needs the flags from the load.
-         */
+        ** a conditional branch that needs the flags from the load.
+        */
         if ((E->Info & OF_LOAD) != 0            &&
             CE_IsConstImm (E)                   &&
             CE_HasLabel (E)                     &&
@@ -825,9 +825,9 @@ unsigned OptJumpTarget3 (CodeSeg* S)
                 CodeLabel* L = CE_GetLabel (E, J);
 
                 /* Loop over all insn that reference this label. Since we may
-                 * eventually remove a reference in the loop, we must loop
-                 * from end down to start.
-                 */
+                ** eventually remove a reference in the loop, we must loop
+                ** from end down to start.
+                */
                 for (K = CL_GetRefCount (L) - 1; K >= 0; --K) {
 
                     /* Get the entry that jumps here */
@@ -839,9 +839,9 @@ unsigned OptJumpTarget3 (CodeSeg* S)
                     /* Check if the outgoing value is the one thats's loaded */
                     if (Val == (unsigned char) E->Num) {
 
-                        /* Ok, skip the insn. First, generate a label for the
-                         * next insn after E.
-                         */
+                        /* OK, skip the insn. First, generate a label for the
+                        ** next insn after E.
+                        */
                         if (LN == 0) {
                             LN = CS_GenLabel (S, N);
                         }
@@ -875,16 +875,16 @@ unsigned OptJumpTarget3 (CodeSeg* S)
 
 unsigned OptCondBranches1 (CodeSeg* S)
 /* Performs several optimization steps:
- *
- *  - If an immidiate load of a register is followed by a conditional jump that
- *    is never taken because the load of the register sets the flags in such a
- *    manner, remove the conditional branch.
- *  - If the conditional branch is always taken because of the register load,
- *    replace it by a jmp.
- *  - If a conditional branch jumps around an unconditional branch, remove the
- *    conditional branch and make the jump a conditional branch with the
- *    inverse condition of the first one.
- */
+**
+**  - If an immediate load of a register is followed by a conditional jump that
+**    is never taken because the load of the register sets the flags in such a
+**    manner, remove the conditional branch.
+**  - If the conditional branch is always taken because of the register load,
+**    replace it by a jmp.
+**  - If a conditional branch jumps around an unconditional branch, remove the
+**    conditional branch and make the jump a conditional branch with the
+**    inverse condition of the first one.
+*/
 {
     unsigned Changes = 0;
 
@@ -940,11 +940,11 @@ unsigned OptCondBranches1 (CodeSeg* S)
             (N = CS_GetNextEntry (S, I)) != 0     &&  /* There is a following entry */
             (N->Info & OF_UBRA) != 0              &&  /* ..which is an uncond branch, */
             !CE_HasLabel (N)                      &&  /* ..has no label attached */
-            L->Owner == CS_GetNextEntry (S, I+1)) {/* ..and jump target follows */
+            L->Owner == CS_GetNextEntry (S, I+1)) {   /* ..and jump target follows */
 
             /* Replace the jump by a conditional branch with the inverse branch
-             * condition than the branch around it.
-             */
+            ** condition than the branch around it.
+            */
             CE_ReplaceOPC (N, GetInverseBranch (E->OPC));
 
             /* Remove the conditional branch */
@@ -968,8 +968,8 @@ unsigned OptCondBranches1 (CodeSeg* S)
 
 unsigned OptCondBranches2 (CodeSeg* S)
 /* If on entry to a "rol a" instruction the accu is zero, and a beq/bne follows,
- * we can remove the rol and branch on the state of the carry flag.
- */
+** we can remove the rol and branch on the state of the carry flag.
+*/
 {
     unsigned Changes = 0;
     unsigned I;
@@ -1103,8 +1103,8 @@ unsigned OptUnusedStores (CodeSeg* S)
             (E->Chg & REG_ZP) != 0) {
 
             /* Check for the zero page location. We know that there cannot be
-             * more than one zero page location involved in the store.
-             */
+            ** more than one zero page location involved in the store.
+            */
             unsigned R = E->Chg & REG_ZP;
 
             /* Get register usage and check if the register value is used later */
@@ -1185,9 +1185,9 @@ unsigned OptDupLoads (CodeSeg* S)
 
             case OP65_STA:
                 /* If we store into a known zero page location, and this
-                 * location does already contain the value to be stored,
-                 * remove the store.
-                 */
+                ** location does already contain the value to be stored,
+                ** remove the store.
+                */
                 if (RegValIsKnown (In->RegA)          && /* Value of A is known */
                     E->AM == AM65_ZP                  && /* Store into zp */
                     In->RegA == ZPRegVal (E->Chg, In)) { /* Value identical */
@@ -1198,9 +1198,9 @@ unsigned OptDupLoads (CodeSeg* S)
 
             case OP65_STX:
                 /* If we store into a known zero page location, and this
-                 * location does already contain the value to be stored,
-                 * remove the store.
-                 */
+                ** location does already contain the value to be stored,
+                ** remove the store.
+                */
                 if (RegValIsKnown (In->RegX)          && /* Value of A is known */
                     E->AM == AM65_ZP                  && /* Store into zp */
                     In->RegX == ZPRegVal (E->Chg, In)) { /* Value identical */
@@ -1208,11 +1208,11 @@ unsigned OptDupLoads (CodeSeg* S)
                     Delete = 1;
 
                 /* If the value in the X register is known and the same as
-                 * that in the A register, replace the store by a STA. The
-                 * optimizer will then remove the load instruction for X
-                 * later. STX does support the zeropage,y addressing mode,
-                 * so be sure to check for that.
-                 */
+                ** that in the A register, replace the store by a STA. The
+                ** optimizer will then remove the load instruction for X
+                ** later. STX does support the zeropage,y addressing mode,
+                ** so be sure to check for that.
+                */
                 } else if (RegValIsKnown (In->RegX)   &&
                            In->RegX == In->RegA       &&
                            E->AM != AM65_ABSY         &&
@@ -1224,9 +1224,9 @@ unsigned OptDupLoads (CodeSeg* S)
 
             case OP65_STY:
                 /* If we store into a known zero page location, and this
-                 * location does already contain the value to be stored,
-                 * remove the store.
-                 */
+                ** location does already contain the value to be stored,
+                ** remove the store.
+                */
                 if (RegValIsKnown (In->RegY)          && /* Value of Y is known */
                     E->AM == AM65_ZP                  && /* Store into zp */
                     In->RegY == ZPRegVal (E->Chg, In)) { /* Value identical */
@@ -1234,12 +1234,12 @@ unsigned OptDupLoads (CodeSeg* S)
                     Delete = 1;
 
                 /* If the value in the Y register is known and the same as
-                 * that in the A register, replace the store by a STA. The
-                 * optimizer will then remove the load instruction for Y
-                 * later. If replacement by A is not possible try a
-                 * replacement by X, but check for invalid addressing modes
-                 * in this case.
-                 */
+                ** that in the A register, replace the store by a STA. The
+                ** optimizer will then remove the load instruction for Y
+                ** later. If replacement by A is not possible try a
+                ** replacement by X, but check for invalid addressing modes
+                ** in this case.
+                */
                 } else if (RegValIsKnown (In->RegY)) {
                     if (In->RegY == In->RegA) {
                         CE_ReplaceOPC (E, OP65_STA);
@@ -1253,9 +1253,9 @@ unsigned OptDupLoads (CodeSeg* S)
 
             case OP65_STZ:
                 /* If we store into a known zero page location, and this
-                 * location does already contain the value to be stored,
-                 * remove the store.
-                 */
+                ** location does already contain the value to be stored,
+                ** remove the store.
+                */
                 if ((CPUIsets[CPU] & CPU_ISET_65SC02) != 0 && E->AM == AM65_ZP) {
                     if (ZPRegVal (E->Chg, In) == 0) {
                         Delete = 1;
@@ -1348,8 +1348,8 @@ unsigned OptStoreLoad (CodeSeg* S)
         CodeEntry* E = CS_GetEntry (S, I);
 
         /* Check if it is a store instruction followed by a load from the
-         * same address which is itself not followed by a conditional branch.
-         */
+        ** same address which is itself not followed by a conditional branch.
+        */
         if ((E->Info & OF_STORE) != 0                       &&
             (N = CS_GetNextEntry (S, I)) != 0               &&
             !CE_HasLabel (N)                                &&
@@ -1409,9 +1409,9 @@ unsigned OptTransfers1 (CodeSeg* S)
                 (E->OPC == OP65_TYA && N->OPC == OP65_TAY && !RegAUsed (S, I+2))) {
 
                 /* If the next insn is a conditional branch, check if the insn
-                 * preceeding the first xfr will set the flags right, otherwise we
-                 * may not remove the sequence.
-                 */
+                ** preceeding the first xfr will set the flags right, otherwise we
+                ** may not remove the sequence.
+                */
                 if ((X = CS_GetNextEntry (S, I+1)) == 0) {
                     goto NextEntry;
                 }
@@ -1450,8 +1450,8 @@ NextEntry:
 
 unsigned OptTransfers2 (CodeSeg* S)
 /* Replace loads followed by a register transfer by a load with the second
- * register if possible.
- */
+** register if possible.
+*/
 {
     unsigned Changes = 0;
 
@@ -1465,8 +1465,8 @@ unsigned OptTransfers2 (CodeSeg* S)
         CodeEntry* E = CS_GetEntry (S, I);
 
         /* Check if we have a load followed by a transfer where the loaded
-         * register is not used later.
-         */
+        ** register is not used later.
+        */
         if ((E->Info & OF_LOAD) != 0                &&
             (N = CS_GetNextEntry (S, I)) != 0       &&
             !CE_HasLabel (N)                        &&
@@ -1499,8 +1499,8 @@ unsigned OptTransfers2 (CodeSeg* S)
                 X = NewCodeEntry (OP65_LDA, E->AM, E->Arg, 0, N->LI);
             } else if (E->OPC == OP65_LDX && N->OPC == OP65_TXA) {
                 /* LDX/TXA. LDA doesn't support zp,y, so we must map it to
-                 * abs,y instead.
-                 */
+                ** abs,y instead.
+                */
                 am_t AM = (E->AM == AM65_ZPY)? AM65_ABSY : E->AM;
                 X = NewCodeEntry (OP65_LDA, AM, E->Arg, 0, N->LI);
             }
@@ -1526,8 +1526,8 @@ unsigned OptTransfers2 (CodeSeg* S)
 
 unsigned OptTransfers3 (CodeSeg* S)
 /* Replace a register transfer followed by a store of the second register by a
- * store of the first register if this is possible.
- */
+** store of the first register if this is possible.
+*/
 {
     unsigned Changes      = 0;
     unsigned UsedRegs     = REG_NONE;   /* Track used registers */
@@ -1544,8 +1544,8 @@ unsigned OptTransfers3 (CodeSeg* S)
     } State = Initialize;
 
     /* Walk over the entries. Look for a xfer instruction that is followed by
-     * a store later, where the value of the register is not used later.
-     */
+    ** a store later, where the value of the register is not used later.
+    */
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
@@ -1570,8 +1570,8 @@ unsigned OptTransfers3 (CodeSeg* S)
 
             case FoundXfer:
                 /* If we find a conditional jump, abort the sequence, since
-                 * handling them makes things really complicated.
-                 */
+                ** handling them makes things really complicated.
+                */
                 if (E->Info & OF_CBRA) {
 
                     /* Switch back to searching */
@@ -1582,8 +1582,8 @@ unsigned OptTransfers3 (CodeSeg* S)
                 } else if ((E->Use & XferEntry->Chg) != 0) {
 
                     /* It it's a store instruction, and the block is a basic
-                     * block, proceed. Otherwise restart
-                     */
+                    ** block, proceed. Otherwise restart
+                    */
                     if ((E->Info & OF_STORE) != 0       &&
                         CS_IsBasicBlock (S, Xfer, I)) {
                         Store = I;
@@ -1598,9 +1598,9 @@ unsigned OptTransfers3 (CodeSeg* S)
                 } else if (E->Chg & XferEntry->Chg) {
 
                     /* We *may* add code here to remove the transfer, but I'm
-                     * currently not sure about the consequences, so I won't
-                     * do that and bail out instead.
-                     */
+                    ** currently not sure about the consequences, so I won't
+                    ** do that and bail out instead.
+                    */
                     I = Xfer;
                     State = Initialize;
 
@@ -1619,9 +1619,9 @@ unsigned OptTransfers3 (CodeSeg* S)
 
             case FoundStore:
                 /* We are at the instruction behind the store. If the register
-                 * isn't used later, and we have an address mode match, we can
-                 * replace the transfer by a store and remove the store here.
-                 */
+                ** isn't used later, and we have an address mode match, we can
+                ** replace the transfer by a store and remove the store here.
+                */
                 if ((GetRegInfo (S, I, XferEntry->Chg) & XferEntry->Chg) == 0   &&
                     (StoreEntry->AM == AM65_ABS         ||
                      StoreEntry->AM == AM65_ZP)                                 &&
@@ -1710,8 +1710,8 @@ unsigned OptTransfers3 (CodeSeg* S)
 
 unsigned OptTransfers4 (CodeSeg* S)
 /* Replace a load of a register followed by a transfer insn of the same register
- * by a load of the second register if possible.
- */
+** by a load of the second register if possible.
+*/
 {
     unsigned Changes      = 0;
     unsigned Load         = 0;  /* Index of load insn */
@@ -1726,8 +1726,8 @@ unsigned OptTransfers4 (CodeSeg* S)
     } State = Search;
 
     /* Walk over the entries. Look for a load instruction that is followed by
-     * a load later.
-     */
+    ** a load later.
+    */
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
@@ -1747,8 +1747,8 @@ unsigned OptTransfers4 (CodeSeg* S)
 
             case FoundLoad:
                 /* If we find a conditional jump, abort the sequence, since
-                 * handling them makes things really complicated.
-                 */
+                ** handling them makes things really complicated.
+                */
                 if (E->Info & OF_CBRA) {
 
                     /* Switch back to searching */
@@ -1759,8 +1759,8 @@ unsigned OptTransfers4 (CodeSeg* S)
                 } else if ((E->Use & LoadEntry->Chg) != 0) {
 
                     /* It it's a xfer instruction, and the block is a basic
-                     * block, proceed. Otherwise restart
-                     */
+                    ** block, proceed. Otherwise restart
+                    */
                     if ((E->Info & OF_XFR) != 0       &&
                         CS_IsBasicBlock (S, Load, I)) {
                         Xfer = I;
@@ -1775,9 +1775,9 @@ unsigned OptTransfers4 (CodeSeg* S)
                 } else if (E->Chg & LoadEntry->Chg) {
 
                     /* We *may* add code here to remove the load, but I'm
-                     * currently not sure about the consequences, so I won't
-                     * do that and bail out instead.
-                     */
+                    ** currently not sure about the consequences, so I won't
+                    ** do that and bail out instead.
+                    */
                     I = Load;
                     State = Search;
                 }
@@ -1785,9 +1785,9 @@ unsigned OptTransfers4 (CodeSeg* S)
 
             case FoundXfer:
                 /* We are at the instruction behind the xfer. If the register
-                 * isn't used later, and we have an address mode match, we can
-                 * replace the transfer by a load and remove the initial load.
-                 */
+                ** isn't used later, and we have an address mode match, we can
+                ** replace the transfer by a load and remove the initial load.
+                */
                 if ((GetRegInfo (S, I, LoadEntry->Chg) & LoadEntry->Chg) == 0   &&
                     (LoadEntry->AM == AM65_ABS          ||
                      LoadEntry->AM == AM65_ZP           ||
@@ -1880,14 +1880,14 @@ unsigned OptPushPop (CodeSeg* S)
     } State = Searching;
 
     /* Walk over the entries. Look for a push instruction that is followed by
-     * a pop later, where the pop is not followed by an conditional branch,
-     * and where the value of the A register is not used later on.
-     * Look out for the following problems:
-     *
-     *  - There may be another PHA/PLA inside the sequence: Restart it.
-     *  - If the PLA has a label, all jumps to this label must be inside
-     *    the sequence, otherwise we cannot remove the PHA/PLA.
-     */
+    ** a pop later, where the pop is not followed by an conditional branch,
+    ** and where the value of the A register is not used later on.
+    ** Look out for the following problems:
+    **
+    **  - There may be another PHA/PLA inside the sequence: Restart it.
+    **  - If the PLA has a label, all jumps to this label must be inside
+    **    the sequence, otherwise we cannot remove the PHA/PLA.
+    */
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
@@ -1916,8 +1916,8 @@ unsigned OptPushPop (CodeSeg* S)
                     /* Found a matching pop */
                     Pop = I;
                     /* Check that the block between Push and Pop is a basic
-                     * block (one entry, one exit). Otherwise ignore it.
-                     */
+                    ** block (one entry, one exit). Otherwise ignore it.
+                    */
                     if (CS_IsBasicBlock (S, Push, Pop)) {
                         State = FoundPop;
                     } else {
@@ -1931,16 +1931,16 @@ unsigned OptPushPop (CodeSeg* S)
 
             case FoundPop:
                 /* We're at the instruction after the PLA.
-                 * Check for the following conditions:
-                 *   - If this instruction is a store of A that doesn't use
-                 *     another register, if the instruction does not have a
-                 *     label, and A is not used later, we may replace the PHA
-                 *     by the store and remove pla if several other conditions
-                 *     are met.
-                 *   - If this instruction is not a conditional branch, and A
-                 *     is either unused later, or not changed by the code
-                 *     between push and pop, we may remove PHA and PLA.
-                 */
+                ** Check for the following conditions:
+                **   - If this instruction is a store of A that doesn't use
+                **     another register, if the instruction does not have a
+                **     label, and A is not used later, we may replace the PHA
+                **     by the store and remove pla if several other conditions
+                **     are met.
+                **   - If this instruction is not a conditional branch, and A
+                **     is either unused later, or not changed by the code
+                **     between push and pop, we may remove PHA and PLA.
+                */
                 if (E->OPC == OP65_STA                          &&
                     (E->AM == AM65_ABS || E->AM == AM65_ZP)     &&
                     !CE_HasLabel (E)                            &&
@@ -1995,8 +1995,8 @@ unsigned OptPushPop (CodeSeg* S)
 
 unsigned OptPrecalc (CodeSeg* S)
 /* Replace immediate operations with the accu where the current contents are
- * known by a load of the final value.
- */
+** known by a load of the final value.
+*/
 {
     unsigned Changes = 0;
     unsigned I;
@@ -2052,11 +2052,11 @@ unsigned OptPrecalc (CodeSeg* S)
             case OP65_ADC:
             case OP65_SBC:
                 /* If this is an operation with an immediate operand of zero,
-                 * and the register is zero, the operation won't give us any
-                 * results we don't already have (including the flags), so
-                 * remove it. Something like this is generated as a result of
-                 * a compare where parts of the values are known to be zero.
-                 */
+                ** and the register is zero, the operation won't give us any
+                ** results we don't already have (including the flags), so
+                ** remove it. Something like this is generated as a result of
+                ** a compare where parts of the values are known to be zero.
+                */
                 if (In->RegA == 0 && CE_IsKnownImm (E, 0x00)) {
                     /* 0-0 or 0+0 -> remove */
                     CS_DelEntry (S, I);
@@ -2198,15 +2198,15 @@ unsigned OptBranchDist (CodeSeg* S)
 
 unsigned OptIndLoads1 (CodeSeg* S)
 /* Change
- *
- *     lda      (zp),y
- *
- * into
- *
- *     lda      (zp,x)
- *
- * provided that x and y are both zero.
- */
+**
+**     lda      (zp),y
+**
+** into
+**
+**     lda      (zp,x)
+**
+** provided that x and y are both zero.
+*/
 {
     unsigned Changes = 0;
     unsigned I;
@@ -2246,15 +2246,15 @@ unsigned OptIndLoads1 (CodeSeg* S)
 
 unsigned OptIndLoads2 (CodeSeg* S)
 /* Change
- *
- *     lda      (zp,x)
- *
- * into
- *
- *     lda      (zp),y
- *
- * provided that x and y are both zero.
- */
+**
+**     lda      (zp,x)
+**
+** into
+**
+**     lda      (zp),y
+**
+** provided that x and y are both zero.
+*/
 {
     unsigned Changes = 0;
     unsigned I;
@@ -2289,6 +2289,3 @@ unsigned OptIndLoads2 (CodeSeg* S)
     /* Return the number of changes made */
     return Changes;
 }
-
-
-

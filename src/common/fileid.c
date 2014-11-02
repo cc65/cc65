@@ -58,10 +58,10 @@ int CompareFileId (const void* Key, const void* Id)
 
 const FileId* GetFileId (const char* Name, const FileId* Table, unsigned Count)
 /* Determine the id of the given file by looking at file extension of the name.
- * The table passed to the function must be sorted alphabetically. If the
- * extension is found, a pointer to the matching table entry is returned. If
- * no matching table entry was found, the function returns NULL.
- */
+** The table passed to the function must be sorted alphabetically. If the
+** extension is found, a pointer to the matching table entry is returned. If
+** no matching table entry was found, the function returns NULL.
+*/
 {
     /* Determine the file type by the extension */
     const char* Ext = FindExt (Name);
@@ -74,6 +74,3 @@ const FileId* GetFileId (const char* Name, const FileId* Table, unsigned Count)
     /* Search for a table entry and return it */
     return bsearch (Ext+1, Table, Count, sizeof (FileId), CompareFileId);
 }
-
-
-

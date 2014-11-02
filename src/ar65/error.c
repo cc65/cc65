@@ -89,6 +89,3 @@ void Internal (const char* Format, ...)
     va_end (ap);
     exit (EXIT_FAILURE);
 }
-
-
-

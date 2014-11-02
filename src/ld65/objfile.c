@@ -342,14 +342,14 @@ void ObjAdd (FILE* Obj, const char* Name)
     ObjReadAssertions (Obj, O->Header.AssertOffs, O);
 
     /* Read the segment list from the object file. This must be late, since
-     * the expressions stored in the code may reference segments or imported
-     * symbols.
-     */
+    ** the expressions stored in the code may reference segments or imported
+    ** symbols.
+    */
     ObjReadSections (Obj, O->Header.SegOffs, O);
 
     /* Read the scope table from the object file. Scopes reference segments, so
-     * we must read them after the sections.
-     */
+    ** we must read them after the sections.
+    */
     ObjReadScopes (Obj, O->Header.ScopeOffs, O);
 
     /* Read the spans from the object file */
@@ -368,11 +368,7 @@ void ObjAdd (FILE* Obj, const char* Name)
     InsertObjData (O);
 
     /* All references to strings are now resolved, so we can delete the module
-     * string pool.
-     */
+    ** string pool.
+    */
     FreeObjStrings (O);
 }
-
-
-
-

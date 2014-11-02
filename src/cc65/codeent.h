@@ -90,11 +90,11 @@ struct CodeEntry {
 
 const char* MakeHexArg (unsigned Num);
 /* Convert Num into a string in the form $XY, suitable for passing it as an
- * argument to NewCodeEntry, and return a pointer to the string.
- * BEWARE: The function returns a pointer to a static buffer, so the value is
- * gone if you call it twice (and apart from that it's not thread and signal
- * safe).
- */
+** argument to NewCodeEntry, and return a pointer to the string.
+** BEWARE: The function returns a pointer to a static buffer, so the value is
+** gone if you call it twice (and apart from that it's not thread and signal
+** safe).
+*/
 
 CodeEntry* NewCodeEntry (opc_t OPC, am_t AM, const char* Arg,
                          CodeLabel* JumpTo, LineInfo* LI);
@@ -105,8 +105,8 @@ void FreeCodeEntry (CodeEntry* E);
 
 void CE_ReplaceOPC (CodeEntry* E, opc_t OPC);
 /* Replace the opcode of the instruction. This will also replace related info,
- * Size, Use and Chg, but it will NOT update any arguments or labels.
- */
+** Size, Use and Chg, but it will NOT update any arguments or labels.
+*/
 
 int CodeEntriesAreEqual (const CodeEntry* E1, const CodeEntry* E2);
 /* Check if both code entries are equal */
@@ -116,9 +116,9 @@ void CE_AttachLabel (CodeEntry* E, CodeLabel* L);
 
 void CE_ClearJumpTo (CodeEntry* E);
 /* Clear the JumpTo entry and the argument (which contained the name of the
- * label). Note: The function will not clear the backpointer from the label,
- * so use it with care.
- */
+** label). Note: The function will not clear the backpointer from the label,
+** so use it with care.
+*/
 
 #if defined(HAVE_INLINE)
 INLINE int CE_HasLabel (const CodeEntry* E)
@@ -198,16 +198,16 @@ void CE_SetArg (CodeEntry* E, const char* Arg);
 
 void CE_SetNumArg (CodeEntry* E, long Num);
 /* Set a new numeric argument for the given code entry that must already
- * have a numeric argument.
- */
+** have a numeric argument.
+*/
 
 int CE_IsConstImm (const CodeEntry* E);
 /* Return true if the argument of E is a constant immediate value */
 
 int CE_IsKnownImm (const CodeEntry* E, unsigned long Num);
 /* Return true if the argument of E is a constant immediate value that is
- * equal to Num.
- */
+** equal to Num.
+*/
 
 #if defined(HAVE_INLINE)
 INLINE int CE_IsCallTo (const CodeEntry* E, const char* Name)
@@ -221,16 +221,16 @@ INLINE int CE_IsCallTo (const CodeEntry* E, const char* Name)
 
 int CE_UseLoadFlags (CodeEntry* E);
 /* Return true if the instruction uses any flags that are set by a load of
- * a register (N and Z).
- */
+** a register (N and Z).
+*/
 
 void CE_FreeRegInfo (CodeEntry* E);
 /* Free an existing register info struct */
 
 void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs);
 /* Generate register info for this instruction. If an old info exists, it is
- * overwritten.
- */
+** overwritten.
+*/
 
 void CE_Output (const CodeEntry* E);
 /* Output the code entry to the output file */
@@ -238,8 +238,5 @@ void CE_Output (const CodeEntry* E);
 
 
 /* End of codeent.h */
+
 #endif
-
-
-
-

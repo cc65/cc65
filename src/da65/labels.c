@@ -70,8 +70,8 @@ static const char* SymTab[0x10000];
 
 static const char* MakeLabelName (unsigned Addr)
 /* Make the default label name from the given address and return it in a
- * static buffer.
- */
+** static buffer.
+*/
 {
     static char LabelBuf [32];
     xsprintf (LabelBuf, sizeof (LabelBuf), "L%04X", Addr);
@@ -89,8 +89,8 @@ static void AddLabel (unsigned Addr, attr_t Attr, const char* Name)
     /* Must not have two symbols for one address */
     if (ExistingAttr != atNoLabel) {
         /* Allow redefinition if identical. Beware: Unnamed labels don't
-         * have a name (you guessed that, didn't you?).
-         */
+        ** have a name (you guessed that, didn't you?).
+        */
         if (ExistingAttr == Attr &&
             ((Name == 0 && SymTab[Addr] == 0) || strcmp (SymTab[Addr], Name) == 0)) {
             return;
@@ -133,8 +133,8 @@ void AddUnnamedLabel (unsigned Addr)
 
 void AddDepLabel (unsigned Addr, attr_t Attr, const char* BaseName, unsigned Offs)
 /* Add a dependent label at the given address using "basename+Offs" as the new
- * name.
- */
+** name.
+*/
 {
     /* Allocate memory for the dependent label name */
     unsigned NameLen = strlen (BaseName);
@@ -159,8 +159,8 @@ void AddDepLabel (unsigned Addr, attr_t Attr, const char* BaseName, unsigned Off
 static void AddLabelRange (unsigned Addr, attr_t Attr,
                            const char* Name, unsigned Count)
 /* Add a label for a range. The first entry gets the label "Name" while the
- * others get "Name+offs".
- */
+** others get "Name+offs".
+*/
 {
     /* Define the label */
     AddLabel (Addr, Attr, Name);
@@ -196,8 +196,8 @@ static void AddLabelRange (unsigned Addr, attr_t Attr,
 
 void AddIntLabelRange (unsigned Addr, const char* Name, unsigned Count)
 /* Add an internal label for a range. The first entry gets the label "Name"
- * while the others get "Name+offs".
- */
+** while the others get "Name+offs".
+*/
 {
     /* Define the label range */
     AddLabelRange (Addr, atIntLabel, Name, Count);
@@ -207,8 +207,8 @@ void AddIntLabelRange (unsigned Addr, const char* Name, unsigned Count)
 
 void AddExtLabelRange (unsigned Addr, const char* Name, unsigned Count)
 /* Add an external label for a range. The first entry gets the label "Name"
- * while the others get "Name+offs".
- */
+** while the others get "Name+offs".
+*/
 {
     /* Define the label range */
     AddLabelRange (Addr, atExtLabel, Name, Count);
@@ -227,8 +227,8 @@ int HaveLabel (unsigned Addr)
 
 int MustDefLabel (unsigned Addr)
 /* Return true if we must define a label for this address, that is, if there
- * is a label at this address, and it is an external or internal label.
- */
+** is a label at this address, and it is an external or internal label.
+*/
 {
     /* Get the label attribute */
     attr_t A = GetLabelAttr (Addr);
@@ -246,8 +246,8 @@ const char* GetLabelName (unsigned Addr)
     attr_t A = GetLabelAttr (Addr);
 
     /* Special case unnamed labels, because these don't have a named stored in
-     * the symbol table to save space.
-     */
+    ** the symbol table to save space.
+    */
     if (A == atUnnamedLabel) {
         return "";
     } else {
@@ -260,9 +260,9 @@ const char* GetLabelName (unsigned Addr)
 
 const char* GetLabel (unsigned Addr, unsigned RefFrom)
 /* Return the label name for an address, as it is used in a label reference.
- * RefFrom is the address the label is referenced from. This is needed in case
- * of unnamed labels, to determine the name.
- */
+** RefFrom is the address the label is referenced from. This is needed in case
+** of unnamed labels, to determine the name.
+*/
 {
     static const char* FwdLabels[] = {
         ":+", ":++", ":+++", ":++++", ":+++++", ":++++++", ":+++++++",
@@ -277,15 +277,15 @@ const char* GetLabel (unsigned Addr, unsigned RefFrom)
     attr_t A = GetLabelAttr (Addr);
 
     /* Special case unnamed labels, because these don't have a named stored in
-     * the symbol table to save space.
-     */
+    ** the symbol table to save space.
+    */
     if (A == atUnnamedLabel) {
 
         unsigned Count = 0;
 
         /* Search forward or backward depending in which direction the label
-         * is.
-         */
+        ** is.
+        */
         if (Addr <= RefFrom) {
             /* Search backwards */
             unsigned I = RefFrom;
@@ -333,8 +333,8 @@ const char* GetLabel (unsigned Addr, unsigned RefFrom)
 
 void ForwardLabel (unsigned Offs)
 /* If necessary, output a forward label, one that is within the next few
- * bytes and is therefore output as "label = * + x".
- */
+** bytes and is therefore output as "label = * + x".
+*/
 {
     /* Calculate the actual address */
     unsigned long Addr = PC + Offs;
@@ -348,8 +348,8 @@ void ForwardLabel (unsigned Offs)
     }
 
     /* An unnamed label cannot be output as a forward declaration, so this is
-     * an error.
-     */
+    ** an error.
+    */
     if (A == atUnnamedLabel) {
         Error ("Cannot define unnamed label at address $%04lX", Addr);
     }
@@ -410,6 +410,3 @@ void DefOutOfRangeLabels (void)
 
     SeparatorLine ();
 }
-
-
-

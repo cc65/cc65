@@ -2,7 +2,7 @@
 /*                                                                           */
 /*                                filestat.h                                 */
 /*                                                                           */
-/*                   Replacement for buggy Microsoft code                    */
+/*                       Replacement for Windows code                        */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -34,13 +34,13 @@
 
 
 /* This module works around bugs in the time conversion code supplied by
- * Microsoft. See here for a description of the problem:
- *   http://www.codeproject.com/KB/datetime/dstbugs.aspx
- * Please let me note that I find it absolutely unacceptable to just declare
- * buggy behaviour like this "works as designed" as Microsoft does. The
- * problems did even make it into .NET, where the DateTime builtin data type
- * has exactly the same problems as described in the article above.
- */
+** Microsoft. See here for a description of the problem:
+**   http://www.codeproject.com/KB/datetime/dstbugs.aspx
+** Please let me note that I find it absolutely unacceptable to just declare
+** buggy behaviour like this "works as designed" as Microsoft does. The
+** problems did even make it into .NET, where the DateTime builtin data type
+** has exactly the same problems as described in the article above.
+*/
 
 
 
@@ -68,6 +68,3 @@ int FileStat (const char* Path, struct stat* Buf);
 /* End of filestat.h */
 
 #endif
-
-
-

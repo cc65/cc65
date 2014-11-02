@@ -137,9 +137,9 @@ static int ConDesCompare (void* Data, const void* E1, const void* E2)
     int Cmp;
 
     /* Data is actually a pointer to a ConDesDesc from the table, E1 and
-     * E2 are exports from the collection. Get the condes type and cast
-     * the void pointers to object pointers.
-     */
+    ** E2 are exports from the collection. Get the condes type and cast
+    ** the void pointers to object pointers.
+    */
     ConDesDesc* CD = ((ConDesDesc*) Data);
     int Type = CD - ConDes;
     const Export* Exp1 = (const Export*) E1;
@@ -178,16 +178,16 @@ static void ConDesCreateOne (ConDesDesc* CD)
     unsigned    I;
 
     /* Check if this table has a segment and table label defined. If not,
-     * creation was not requested in the config file - ignore it.
-     */
+    ** creation was not requested in the config file - ignore it.
+    */
     if (CD->SegName == INVALID_STRING_ID || CD->Label == INVALID_STRING_ID) {
         return;
     }
 
     /* Check if there is an import for the table label. If not, there is no
-     * reference to the table and we would just waste memory creating the
-     * table.
-     */
+    ** reference to the table and we would just waste memory creating the
+    ** table.
+    */
     if (!IsUnresolved (CD->Label)) {
         return;
     }
@@ -202,10 +202,10 @@ static void ConDesCreateOne (ConDesDesc* CD)
     Sec = NewSection (Seg, 1, ADDR_SIZE_ABS);
 
     /* Walk over the exports and create a fragment for each one. We will use
-     * the exported expression without copying it, since it's cheap and there
-     * is currently no place where it gets changed (hope this will not hunt
-     * me later...).
-     */
+    ** the exported expression without copying it, since it's cheap and there
+    ** is currently no place where it gets changed (hope this will not hunt
+    ** me later...).
+    */
     Count = CollCount (&CD->ExpList);
     for (I = 0; I < Count; ++I) {
 
@@ -220,13 +220,13 @@ static void ConDesCreateOne (ConDesDesc* CD)
     }
 
     /* Define the table start as an export, offset into section is zero
-     * (the section only contains the table).
-     */
+    ** (the section only contains the table).
+    */
     CreateSectionExport (CD->Label, Sec, 0);
 
     /* If we have a CountSym name given AND if it is referenced, define it
-     * with the number of elements in the table.
-     */
+    ** with the number of elements in the table.
+    */
     if (CD->CountSym) {
         CreateConstExport (CD->CountSym, Count);
     }
@@ -273,8 +273,8 @@ void ConDesSetSegName (unsigned Type, unsigned SegName)
 
 const ConDesImport* ConDesGetImport (unsigned Type)
 /* Get the forced import for the given ConDes type. Returns NULL if there is
- * no forced import for this type.
- */
+** no forced import for this type.
+*/
 {
     const ConDesImport* Import;
 
@@ -389,6 +389,3 @@ void ConDesDump (void)
         printf ("CONDES(%u): %u symbols\n", Type, CollCount (ExpList));
     }
 }
-
-
-

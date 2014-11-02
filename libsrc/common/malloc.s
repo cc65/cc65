@@ -10,17 +10,17 @@
 ;
 ; void* malloc (size_t size)
 ; /* Allocate memory from the given heap. The function returns a pointer to the
-;  * allocated memory block or a NULL pointer if not enough memory is available.
-;  * Allocating a zero size block is not allowed.
-;  */
+; ** allocated memory block or a NULL pointer if not enough memory is available.
+; ** Allocating a zero size block is not allowed.
+; */
 ; {
 ;     struct freeblock* f;
 ;     unsigned* p;
 ;
 ;
 ;     /* Check for a size of zero, then add the administration space and round
-;      * up the size if needed.
-;      */
+;     ** up the size if needed.
+;     */
 ;     if (size == 0) {
 ;       return 0;
 ;     }
@@ -39,10 +39,10 @@
 ;     if (f) {
 ;
 ;         /* We found a block big enough. If the block can hold just the
-;          * requested size, use the block in full. Beware: When slicing blocks,
-;          * there must be space enough to create a new one! If this is not the
-;          * case, then use the complete block.
-;          */
+;         ** requested size, use the block in full. Beware: When slicing blocks,
+;         ** there must be space enough to create a new one! If this is not the
+;         ** case, then use the complete block.
+;         */
 ;         if (f->size - size < sizeof (struct freeblock)) {
 ;
 ;             /* Use the actual size */
@@ -66,9 +66,9 @@
 ;
 ;         } else {
 ;
-;             /* We must slice the block found. Cut off space from the upper
-;            * end, so we can leave the actual free block chain intact.
-;            */
+;           /* We must slice the block found. Cut off space from the upper
+;           ** end, so we can leave the actual free block chain intact.
+;           */
 ;
 ;           /* Decrement the size of the block */
 ;           f->size -= size;
@@ -84,8 +84,8 @@
 ;     } else {
 ;
 ;         /* We did not find a block big enough. Try to use new space from the
-;          * heap top.
-;          */
+;         ** heap top.
+;         */
 ;       if (((unsigned) _hend) - ((unsigned) _hptr) < size) {
 ;             /* Out of heap space */
 ;             return 0;

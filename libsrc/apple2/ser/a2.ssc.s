@@ -25,10 +25,16 @@
         .include        "ser-kernel.inc"
         .include        "ser-error.inc"
 
+        .macpack        module
+
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-        .segment        "JUMPTABLE"
+        .ifdef  __APPLE2ENH__
+        module_header   _a2e_ssc_ser
+        .else
+        module_header   _a2_ssc_ser
+        .endif
 
         ; Driver signature
         .byte   $73, $65, $72           ; "ser"

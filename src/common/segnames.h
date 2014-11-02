@@ -68,6 +68,3 @@ int ValidSegName (const char* Name);
 /* End of segnames.h */
 
 #endif
-
-
-

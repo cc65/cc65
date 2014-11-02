@@ -104,8 +104,8 @@ static DeclAttr* NewDeclAttr (DeclAttrType AttrType)
 
 static const AttrDesc* FindAttribute (const char* Attr)
 /* Search the attribute and return the corresponding attribute descriptor.
- * Return NULL if the attribute name is not known.
- */
+** Return NULL if the attribute name is not known.
+*/
 {
     unsigned A;
 
@@ -235,8 +235,8 @@ void ParseAttribute (Declaration* D)
         }
 
         /* If a comma follows, there's a next attribute. Otherwise this is the
-         * end of the attribute list.
-         */
+        ** end of the attribute list.
+        */
         if (CurTok.Tok != TOK_COMMA) {
             break;
         }
@@ -247,6 +247,3 @@ void ParseAttribute (Declaration* D)
     ConsumeRParen ();
     ConsumeRParen ();
 }
-
-
-

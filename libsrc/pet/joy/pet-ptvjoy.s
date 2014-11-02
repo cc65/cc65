@@ -10,14 +10,14 @@
 
         .include "joy-kernel.inc"
         .include "joy-error.inc"
-;       .include "pet.inc"
-VIA_PRA         := $E841                ; Port register A
-VIA_DDRA        := $E843                ; Data direction register A
+
+        .macpack module
+
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-        .segment "JUMPTABLE"
+        module_header   _pet_ptvjoy_joy
 
 ; Driver signature
 
@@ -50,7 +50,10 @@ VIA_DDRA        := $E843                ; Data direction register A
 ; ------------------------------------------------------------------------
 ; Constants
 
-JOY_COUNT       = 2             ; Number of joysticks we support
+JOY_COUNT       = 2                     ; Number of joysticks we support
+
+VIA_PRA         := $E841                ; Port register A
+VIA_DDRA        := $E843                ; Data direction register A
 
 
 .code

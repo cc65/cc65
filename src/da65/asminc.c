@@ -168,8 +168,8 @@ void AsmInc (const char* Filename, char CommentStart, int IgnoreUnknown)
         }
 
         /* Determine the base of the number. Allow $ and % as prefixes for
-         * hex and binary numbers respectively.
-         */
+        ** hex and binary numbers respectively.
+        */
         if (*L == '$') {
             Base = 16;
             ++L;
@@ -233,6 +233,3 @@ void AsmInc (const char* Filename, char CommentStart, int IgnoreUnknown)
     /* Close the include file ignoring errors (we were just reading). */
     (void) fclose (F);
 }
-
-
-

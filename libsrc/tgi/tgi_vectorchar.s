@@ -3,8 +3,8 @@
 ;
 ; void __fastcall__ tgi_vectorchar (const unsigned char* Ops);
 ; /* Draw one character of the vector font at the current graphics cursor
-;  * position using the current font magnification.
-;  */
+; ** position using the current font magnification.
+; */
 ;
 
         .import         imul16x16r32, umul16x16r32, negax, negeax

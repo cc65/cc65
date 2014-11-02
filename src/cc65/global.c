@@ -67,6 +67,3 @@ IntStack DataAlignment      = INTSTACK(1);  /* Alignment for data */
 StrBuf DepName     = STATIC_STRBUF_INITIALIZER; /* Name of dependencies file */
 StrBuf FullDepName = STATIC_STRBUF_INITIALIZER; /* Name of full dependencies file */
 StrBuf DepTarget   = STATIC_STRBUF_INITIALIZER; /* Name of dependency target */
-
-
-

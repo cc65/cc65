@@ -34,8 +34,8 @@
 
 
 /* Exports structures and functions to load relocatable o65 modules at
- * runtime.
- */
+** runtime.
+*/
 
 
 
@@ -45,22 +45,22 @@
 
 
 /* The following struct is passed to the module loader. It contains stuff,
- * the loader needs to work, and another area where the loader will place
- * informational data if it was successful. You will have to check the return
- * code of mod_load before accessing any of these additional struct members.
- */
+** the loader needs to work, and another area where the loader will place
+** informational data if it was successful. You will have to check the return
+** code of mod_load before accessing any of these additional struct members.
+*/
 struct mod_ctrl {
     /* Parameters passed into the loader routine. The member callerdata
-     * is an opaque 16 bit datatype that may be used by the caller to
-     * pass data through to the read routine. The read routine is used by the
-     * loader to load any required data. There are several calls where the
-     * read routine is passed a count of 1, so you may choose to make this
-     * a special case when implementing read(). The read() should return the
-     * number of bytes actually read. If the return value differs from the
-     * passed count, this is considered an error.
-     * NOTE: read() is designed so that the POSIX read() routine can be used
-     * for this vector, if you're loading from disk.
-     */
+    ** is an opaque 16 bit datatype that may be used by the caller to
+    ** pass data through to the read routine. The read routine is used by the
+    ** loader to load any required data. There are several calls where the
+    ** read routine is passed a count of 1, so you may choose to make this
+    ** a special case when implementing read(). The read() should return the
+    ** number of bytes actually read. If the return value differs from the
+    ** passed count, this is considered an error.
+    ** NOTE: read() is designed so that the POSIX read() routine can be used
+    ** for this vector, if you're loading from disk.
+    */
     int __fastcall__  (*read) (int callerdata, void* buffer, unsigned count);
     int               callerdata;
 
@@ -74,15 +74,15 @@ struct mod_ctrl {
 
 unsigned char __fastcall__ mod_load (struct mod_ctrl* ctrl);
 /* Load a module into memory and relocate it. The function will return an
- * error code (see below). If MLOAD_OK is returned, the outgoing fields in
- * the passed mod_ctrl struct contain information about the module just
- * loaded.
- */
+** error code (see below). If MLOAD_OK is returned, the outgoing fields in
+** the passed mod_ctrl struct contain information about the module just
+** loaded.
+*/
 
 void __fastcall__ mod_free (void* module);
 /* Free a loaded module. Note: The given pointer is the pointer to the
- * module memory, not a pointer to a control structure.
- */
+** module memory, not a pointer to a control structure.
+*/
 
 
 

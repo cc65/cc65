@@ -304,6 +304,3 @@ const OpcDesc OpcTable_65C02[256] = {
     {   "inc",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $fe */
     {   "bbs7", 3,  flUseLabel,               OH_BitBranch             }, /* $ff */
 };
-
-
-

@@ -76,14 +76,11 @@ struct Fragment {
 
 Fragment* NewFragment (unsigned char Type, unsigned short Len);
 /* Create, initialize and return a new fragment. The fragment will be inserted
- * into the current segment.
- */
+** into the current segment.
+*/
 
 
 
 /* End of fragment.h */
+
 #endif
-
-
-
-

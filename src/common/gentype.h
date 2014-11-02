@@ -34,21 +34,21 @@
 
 
 /* This module implements a specification for a "generic data type". It is
- * called generic, because it doesn't mimic a high level language. Instead it
- * tries to desrcibe the type as representation on the machine.
- * The reasoning behing this type is to allow a debugger to represent the
- * data to the user, independent of the actual source.
- * C data types may be mapped to generic ones, but attributes like const or
- * volatile are (of course) lost.
- *
- * The data type is stored in a char array and can be terminate by a zero
- * (see definition of GT_END below). The later is not really necessary but
- * allows handling of types using the usual string functions. This is in fact
- * one of the advantages of the choosen implementation:
- * String buffers may be used to dynamically build types. Types may be stored
- * as strings in the string pool of an object file. And a string pool may be
- * used to remove duplicates and reference types using unique ids.
- */
+** called generic, because it doesn't mimic a high level language. Instead it
+** tries to desrcibe the type as representation on the machine.
+** The reasoning behing this type is to allow a debugger to represent the
+** data to the user, independent of the actual source.
+** C data types may be mapped to generic ones, but attributes like const or
+** volatile are (of course) lost.
+**
+** The data type is stored in a char array; and, can be terminated by a zero
+** (see definition of GT_END below). The latter is not really necessary; but,
+** allows handling of types using the usual string functions. This is in fact
+** one of the advantages of the chosen implementation:
+** String buffers may be used to dynamically build types. Types may be stored
+** as strings in the string pool of an object file. And a string pool may be
+** used to remove duplicates and reference types using unique ids.
+*/
 
 
 
@@ -132,27 +132,23 @@
 
 void GT_AddArray (StrBuf* Type, unsigned ArraySize);
 /* Add an array with the given size to the type string in Type. This will
- * NOT add the element type!
- */
+** NOT add the element type!
+*/
 
 unsigned GT_GetElementCount (StrBuf* Type);
 /* Retrieve the element count of an array stored in Type at the current index
- * position. Note: Index must point to the array token itself, since the size
- * of the element count is encoded there. The index position will get moved
- * past the array.
- */
+** position. Note: Index must point to the array token itself, since the size
+** of the element count is encoded there. The index position will get moved
+** past the array.
+*/
 
 const char* GT_AsString (const StrBuf* Type, StrBuf* String);
 /* Convert the type into a readable representation. The target string buffer
- * will be zero terminated and a pointer to the contents are returned.
- */
+** will be zero terminated and a pointer to the contents are returned.
+*/
 
 
 
 /* End of gentype.h */
 
 #endif
-
-
-
-

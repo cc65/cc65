@@ -67,8 +67,8 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
     OldType = Expr->Type;
 
     /* If we're converting to void, we're done. Note: This does also cover a
-     * conversion void -> void.
-     */
+    ** conversion void -> void.
+    */
     if (IsTypeVoid (NewType)) {
         ED_MakeRVal (Expr);     /* Never an lvalue */
         goto ExitPoint;
@@ -81,22 +81,22 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
     }
 
     /* Get the sizes of the types. Since we've excluded void types, checking
-     * for known sizes makes sense here.
-     */
+    ** for known sizes makes sense here.
+    */
     OldSize = CheckedSizeOf (OldType);
     NewSize = CheckedSizeOf (NewType);
 
     /* lvalue? */
     if (ED_IsLVal (Expr)) {
 
-        /* We have an lvalue. If the new size is smaller than the new one,
-         * we don't need to do anything. The compiler will generate code
-         * to load only the portion of the value that is actually needed.
-         * This works only on a little endian architecture, but that's
-         * what we support.
-         * If both sizes are equal, do also leave the value alone.
-         * If the new size is larger, we must convert the value.
-         */
+        /* We have an lvalue. If the new size is smaller than the old one,
+        ** we don't need to do anything. The compiler will generate code
+        ** to load only the portion of the value that is actually needed.
+        ** This works only on a little endian architecture, but that's
+        ** what we support.
+        ** If both sizes are equal, do also leave the value alone.
+        ** If the new size is larger, we must convert the value.
+        */
         if (NewSize > OldSize) {
             /* Load the value into the primary */
             LoadExpr (CF_NONE, Expr);
@@ -111,17 +111,17 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
     } else if (ED_IsLocAbs (Expr)) {
 
         /* A cast of a constant numeric value to another type. Be sure
-         * to handle sign extension correctly.
-         */
+        ** to handle sign extension correctly.
+        */
 
         /* Get the current and new size of the value */
         unsigned OldBits = OldSize * 8;
         unsigned NewBits = NewSize * 8;
 
         /* Check if the new datatype will have a smaller range. If it
-         * has a larger range, things are ok, since the value is
-         * internally already represented by a long.
-         */
+        ** has a larger range, things are OK, since the value is
+        ** internally already represented by a long.
+        */
         if (NewBits <= OldBits) {
 
             /* Cut the value to the new size */
@@ -139,9 +139,9 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
     } else {
 
         /* The value is not a constant. If the sizes of the types are
-         * not equal, add conversion code. Be sure to convert chars
-         * correctly.
-         */
+        ** not equal, add conversion code. Be sure to convert chars
+        ** correctly.
+        */
         if (OldSize != NewSize) {
 
             /* Load the value into the primary */
@@ -164,9 +164,9 @@ ExitPoint:
 
 void TypeConversion (ExprDesc* Expr, Type* NewType)
 /* Do an automatic conversion of the given expression to the new type. Output
- * warnings or errors where this automatic conversion is suspicious or
- * impossible.
- */
+** warnings or errors where this automatic conversion is suspicious or
+** impossible.
+*/
 {
 #if 0
     /* Debugging */
@@ -181,8 +181,8 @@ void TypeConversion (ExprDesc* Expr, Type* NewType)
     /* First, do some type checking */
     if (IsTypeVoid (NewType) || IsTypeVoid (Expr->Type)) {
         /* If one of the sides are of type void, output a more apropriate
-         * error message.
-         */
+        ** error message.
+        */
         Error ("Illegal type");
     }
 
@@ -228,10 +228,10 @@ void TypeConversion (ExprDesc* Expr, Type* NewType)
             }
 
             /* Pointer to pointer assignment is valid, if:
-             *   - both point to the same types, or
-             *   - the rhs pointer is a void pointer, or
-             *   - the lhs pointer is a void pointer.
-             */
+            **   - both point to the same types, or
+            **   - the rhs pointer is a void pointer, or
+            **   - the lhs pointer is a void pointer.
+            */
             if (!IsTypeVoid (Indirect (NewType)) && !IsTypeVoid (Indirect (Expr->Type))) {
                 /* Compare the types */
                 switch (TypeCmp (NewType, Expr->Type)) {
@@ -295,8 +295,3 @@ void TypeCast (ExprDesc* Expr)
     /* Convert the value. */
     DoConversion (Expr, NewType);
 }
-
-
-
-
-

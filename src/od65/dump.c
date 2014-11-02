@@ -64,8 +64,8 @@
 
 static void DestroyStrPool (Collection* C)
 /* Free all strings in the given pool plus the item pointers. Note: The
- * collection may not be reused later.
- */
+** collection may not be reused later.
+*/
 {
     unsigned I;
     for (I = 0; I < CollCount (C); ++I) {
@@ -78,9 +78,9 @@ static void DestroyStrPool (Collection* C)
 
 static const char* GetString (const Collection* C, unsigned Index)
 /* Get a string from a collection. In fact, this function calls CollConstAt,
- * but will print a somewhat more readable error message if the index is out
- * of bounds.
- */
+** but will print a somewhat more readable error message if the index is out
+** of bounds.
+*/
 {
     if (Index >= CollCount (C)) {
         Error ("Invalid string index (%u) - file corrupt!", Index);
@@ -401,8 +401,8 @@ void DumpObjOptions (FILE* F, unsigned long Offset)
 
             default:
                 /* Unknown argument type. This means that we cannot determine
-                 * the option length, so we cannot proceed.
-                 */
+                ** the option length, so we cannot proceed.
+                */
                 Error ("Unknown option type: 0x%02X", Type);
                 break;
         }
@@ -951,7 +951,3 @@ void DumpObjSegSize (FILE* F, unsigned long Offset)
     /* Destroy the string pool */
     DestroyStrPool (&StrPool);
 }
-
-
-
-

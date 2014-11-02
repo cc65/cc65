@@ -2,7 +2,7 @@
 /*                                                                           */
 /*                                filestat.c                                 */
 /*                                                                           */
-/*                   Replacement for buggy Microsoft code                    */
+/*                       Replacement for Windows code                        */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -34,22 +34,21 @@
 
 
 /* This module works around bugs in the time conversion code supplied by
- * Microsoft. See here for a description of the problem:
- *   http://www.codeproject.com/KB/datetime/dstbugs.aspx
- * Please let me note that I find it absolutely unacceptable to just declare
- * buggy behaviour like this "works as designed" as Microsoft does. The
- * problems did even make it into .NET, where the DateTime builtin data type
- * has exactly the same problems as described in the article above.
- */
+** Microsoft. See here for a description of the problem:
+**   http://www.codeproject.com/KB/datetime/dstbugs.aspx
+** Please let me note that I find it absolutely unacceptable to just declare
+** buggy behaviour like this "works as designed" as Microsoft does. The
+** problems did even make it into .NET, where the DateTime builtin data type
+** has exactly the same problems as described in the article above.
+*/
 
 
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#if defined(__WATCOMC__) && defined(__NT__)
-#define BUGGY_OS 1
-#include <errno.h>
-#include <windows.h>
+#if defined(_WIN32)
+#  include <errno.h>
+#  include <windows.h>
 #endif
 
 /* common */
@@ -63,21 +62,21 @@
 
 
 
-#if defined(BUGGY_OS)
+#if defined(_WIN32)
 
 
 
 static time_t FileTimeToUnixTime (const FILETIME* T)
 /* Calculate a unix time_t value from a FILETIME. FILETIME contains a 64 bit
- * value with point zero at 1600-01-01 00:00:00 and counting 100ns intervals.
- * time_t is in seconds since 1970-01-01 00:00:00.
- */
+** value with point zero at 1600-01-01 00:00:00 and counting 100ns intervals.
+** time_t is in seconds since 1970-01-01 00:00:00.
+*/
 {
     /* Offset between 1600-01-01 and the Epoch in seconds. Watcom C has no
-     * way to express a number > 32 bit (known to me) but is able to do
-     * calculations with 64 bit integers, so we need to do it this way.
-     */
-    static const ULARGE_INTEGER Offs = { 0xB6109100UL, 0x00000020UL };
+    ** way to express a number > 32 bit (known to me) but is able to do
+    ** calculations with 64 bit integers, so we need to do it this way.
+    */
+    static const ULARGE_INTEGER Offs = { { 0xB6109100UL, 0x00000020UL } };
     ULARGE_INTEGER V;
     V.LowPart  = T->dwLowDateTime;
     V.HighPart = T->dwHighDateTime;
@@ -100,10 +99,10 @@ int FileStat (const char* Path, struct stat* Buf)
     }
 
     /* Open the file using backup semantics, so we won't change atime. Then
-     * retrieve the correct times in UTC and replace the ones in Buf. Return
-     * EACCES in case of errors to avoid the hassle of translating windows
-     * error codes to standard ones.
-     */
+    ** retrieve the correct times in UTC and replace the ones in Buf. Return
+    ** EACCES in case of errors to avoid the hassle of translating windows
+    ** error codes to standard ones.
+    */
     H = CreateFile (Path,
                     GENERIC_READ,
                     FILE_SHARE_READ,

@@ -48,13 +48,13 @@
 
 unsigned OptBNegA1 (CodeSeg* S)
 /* Check for
- *
- *      ldx     #$00
- *      lda     ..
- *      jsr     bnega
- *
- * Remove the ldx if the lda does not use it.
- */
+**
+**      ldx     #$00
+**      lda     ..
+**      jsr     bnega
+**
+** Remove the ldx if the lda does not use it.
+*/
 {
     unsigned Changes = 0;
 
@@ -100,13 +100,13 @@ unsigned OptBNegA1 (CodeSeg* S)
 
 unsigned OptBNegA2 (CodeSeg* S)
 /* Check for
- *
- *      lda     ..
- *      jsr     bnega
- *      jeq/jne ..
- *
- * Adjust the conditional branch and remove the call to the subroutine.
- */
+**
+**      lda     ..
+**      jsr     bnega
+**      jeq/jne ..
+**
+** Adjust the conditional branch and remove the call to the subroutine.
+*/
 {
     unsigned Changes = 0;
 
@@ -167,9 +167,9 @@ unsigned OptBNegA2 (CodeSeg* S)
 
 unsigned OptBNegAX1 (CodeSeg* S)
 /* On a call to bnegax, if X is zero, the result depends only on the value in
- * A, so change the call to a call to bnega. This will get further optimized
- * later if possible.
- */
+** A, so change the call to a call to bnega. This will get further optimized
+** later if possible.
+*/
 {
     unsigned Changes = 0;
     unsigned I;
@@ -205,20 +205,20 @@ unsigned OptBNegAX1 (CodeSeg* S)
 
 unsigned OptBNegAX2 (CodeSeg* S)
 /* Search for the sequence:
- *
- *      ldy     #xx
- *      jsr     ldaxysp
- *      jsr     bnegax
- *      jne/jeq ...
- *
- * and replace it by
- *
- *      ldy     #xx
- *      lda     (sp),y
- *      dey
- *      ora     (sp),y
- *      jeq/jne ...
- */
+**
+**      ldy     #xx
+**      jsr     ldaxysp
+**      jsr     bnegax
+**      jne/jeq ...
+**
+** and replace it by
+**
+**      ldy     #xx
+**      lda     (sp),y
+**      dey
+**      ora     (sp),y
+**      jeq/jne ...
+*/
 {
     unsigned Changes = 0;
 
@@ -278,18 +278,18 @@ unsigned OptBNegAX2 (CodeSeg* S)
 
 unsigned OptBNegAX3 (CodeSeg* S)
 /* Search for the sequence:
- *
- *      lda     xx
- *      ldx     yy
- *      jsr     bnegax
- *      jne/jeq ...
- *
- * and replace it by
- *
- *      lda     xx
- *      ora     xx+1
- *      jeq/jne ...
- */
+**
+**      lda     xx
+**      ldx     yy
+**      jsr     bnegax
+**      jne/jeq ...
+**
+** and replace it by
+**
+**      lda     xx
+**      ora     xx+1
+**      jeq/jne ...
+*/
 {
     unsigned Changes = 0;
 
@@ -339,17 +339,17 @@ unsigned OptBNegAX3 (CodeSeg* S)
 
 unsigned OptBNegAX4 (CodeSeg* S)
 /* Search for the sequence:
- *
- *      jsr     xxx
- *      jsr     bnega(x)
- *      jeq/jne ...
- *
- * and replace it by:
- *
- *      jsr     xxx
- *      <boolean test>
- *      jne/jeq ...
- */
+**
+**      jsr     xxx
+**      jsr     bnega(x)
+**      jeq/jne ...
+**
+** and replace it by:
+**
+**      jsr     xxx
+**      <boolean test>
+**      jne/jeq ...
+*/
 {
     unsigned Changes = 0;
 
@@ -419,13 +419,13 @@ unsigned OptBNegAX4 (CodeSeg* S)
 
 unsigned OptNegAX1 (CodeSeg* S)
 /* Search for a call to negax and replace it by
- *
- *      eor     #$FF
- *      clc
- *      adc     #$01
- *
- * if X isn't used later.
- */
+**
+**      eor     #$FF
+**      clc
+**      adc     #$01
+**
+** if X isn't used later.
+*/
 {
     unsigned Changes = 0;
     unsigned I;
@@ -475,17 +475,17 @@ unsigned OptNegAX1 (CodeSeg* S)
 
 unsigned OptNegAX2 (CodeSeg* S)
 /* Search for a call to negax and replace it by
- *
- *      ldx     #$FF
- *      eor     #$FF
- *      clc
- *      adc     #$01
- *      bne     L1
- *      inx
- * L1:
- *
- * if X is known and zero on entry.
- */
+**
+**      ldx     #$FF
+**      eor     #$FF
+**      clc
+**      adc     #$01
+**      bne     L1
+**      inx
+** L1:
+**
+** if X is known and zero on entry.
+*/
 {
     unsigned Changes = 0;
     unsigned I;
@@ -565,11 +565,11 @@ unsigned OptNegAX2 (CodeSeg* S)
 
 unsigned OptComplAX1 (CodeSeg* S)
 /* Search for a call to complax and replace it by
- *
- *      eor     #$FF
- *
- * if X isn't used later.
- */
+**
+**      eor     #$FF
+**
+** if X isn't used later.
+*/
 {
     unsigned Changes = 0;
     unsigned I;
@@ -605,6 +605,3 @@ unsigned OptComplAX1 (CodeSeg* S)
     /* Return the number of changes made */
     return Changes;
 }
-
-
-

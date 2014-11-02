@@ -55,6 +55,3 @@ void FinishCompile (void);
 /* End of compile.h */
 
 #endif
-
-
-

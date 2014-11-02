@@ -1,8 +1,8 @@
 /*
- * fdopen.c
- *
- * Ullrich von Bassewitz, 17.06.1998
- */
+** fdopen.c
+**
+** Ullrich von Bassewitz, 17.06.1998
+*/
 
 
 

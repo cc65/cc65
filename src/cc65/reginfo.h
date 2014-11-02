@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2001-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -114,9 +114,9 @@ INLINE int RegValIsUnknown (short Val)
 
 RegInfo* NewRegInfo (const RegContents* RC);
 /* Allocate a new register info, initialize and return it. If RC is not
- * a NULL pointer, it is used to initialize both, the input and output
- * registers. If the pointer is NULL, all registers are set to unknown.
- */
+** a NULL pointer, it is used to initialize both, the input and output
+** registers. If the pointer is NULL, all registers are set to unknown.
+*/
 
 void FreeRegInfo (RegInfo* RI);
 /* Free a RegInfo struct */
@@ -127,8 +127,5 @@ void DumpRegInfo (const char* Desc, const RegInfo* RI);
 
 
 /* End of reginfo.h */
+
 #endif
-
-
-
-

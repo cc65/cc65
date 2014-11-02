@@ -1,17 +1,17 @@
 /*
- * Marc 'BlackJack' Rintsch, 11.03.2001
- *
- * unsigned char cbm_save(const char* name,
- *                        char device,
- *                        unsigned char* data,
- *                        unsigned int size);
- */
+** Marc 'BlackJack' Rintsch, 11.03.2001
+**
+** unsigned char cbm_save(const char* name,
+**                        char device,
+**                        unsigned char* data,
+**                        unsigned int size);
+*/
 
 #include <cbm.h>
 #include <errno.h>
 
 /* saves a memory area from start to end-1 to a file.
- */
+*/
 unsigned char __fastcall__ cbm_save (const char* name, 
                                      unsigned char device,
                                      const void* data, 

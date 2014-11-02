@@ -3,8 +3,8 @@
 ;
 ; void __fastcall__ tgi_ellipse (int x, int y, unsigned char rx, unsigned char ry);
 ; /* Draw a full ellipse with center at x/y and radii rx/ry using the current
-;  * drawing color.
-;  */
+; ** drawing color.
+; */
 ;
 
 

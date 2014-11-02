@@ -1,7 +1,7 @@
 /* Note:
- * This is just a sample piece of code that shows how to use some structs -
- * it may not even run.
- */
+** This is just a sample piece of code that shows how to use some structs -
+** it may not even run.
+*/
 
 
 #include <geos.h>

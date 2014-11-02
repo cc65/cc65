@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2004 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -46,14 +46,11 @@
 
 int PowerOf2 (unsigned long Val);
 /* Return the exponent if val is a power of two. Return -1 if val is not a
- * power of two.
- */
+** power of two.
+*/
 
 
 
 /* End of util.h */
 
 #endif
-
-
-

@@ -65,7 +65,5 @@ int IsIdent (char c);
 
 
 /* End of ident.h */
+
 #endif
-
-
-

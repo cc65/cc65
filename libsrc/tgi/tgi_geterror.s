@@ -3,8 +3,8 @@
 ;
 ; unsigned char tgi_geterror (void);
 ; /* Return the error code for the last operation. This will also clear the
-;  * error.
-;  */
+; ** error.
+; */
 
         .include        "tgi-kernel.inc"
 

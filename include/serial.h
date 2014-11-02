@@ -67,6 +67,7 @@
 #define SER_BAUD_230400         0x13
 #define SER_BAUD_31250          0x14
 #define SER_BAUD_62500          0x15
+#define SER_BAUD_56_875         0x16
 
 /* Data bit settings */
 #define SER_BITS_5              0x00
@@ -91,8 +92,8 @@
 #define SER_HS_SW               0x02    /* Software handshake */
 
 /* Bit masks to mask out things from the status returned by ser_status.
- * These are 6551 specific and must be mapped by drivers for other chips.
- */
+** These are 6551 specific and must be mapped by drivers for other chips.
+*/
 #define SER_STATUS_PE           0x01    /* Parity error */
 #define SER_STATUS_FE           0x02    /* Framing error */
 #define SER_STATUS_OE           0x04    /* Overrun error */
@@ -111,6 +112,7 @@
 #define SER_ERR_INIT_FAILED     0x08    /* Initialization failed */
 #define SER_ERR_INV_IOCTL       0x09    /* IOCTL not supported */
 #define SER_ERR_INSTALLED       0x0A    /* A driver is already installed */
+#define SER_ERR_NOT_OPEN        0x0B    /* Driver is not open */
 
 /* Struct containing parameters for the serial port */
 struct ser_params {
@@ -139,8 +141,8 @@ unsigned char __fastcall__ ser_install (void* driver);
 
 unsigned char ser_uninstall (void);
 /* Uninstall the currently loaded driver and return an error code.
- * Note: This call does not free allocated memory.
- */
+** Note: This call does not free allocated memory.
+*/
 
 unsigned char __fastcall__ ser_open (const struct ser_params* params);
 /* "Open" the port by setting the port parameters and enable interrupts. */
@@ -150,14 +152,14 @@ unsigned char ser_close (void);
 
 unsigned char __fastcall__ ser_get (char* b);
 /* Get a character from the serial port. If no characters are available, the
- * function will return SER_ERR_NO_DATA, so this is not a fatal error.
- */
+** function will return SER_ERR_NO_DATA, so this is not a fatal error.
+*/
 
 unsigned char __fastcall__ ser_put (char b);
 /* Send a character via the serial port. There is a transmit buffer, but
- * transmitting is not done via interrupt. The function returns
- * SER_ERR_OVERFLOW if there is no space left in the transmit buffer.
- */
+** transmitting is not done via interrupt. The function returns
+** SER_ERR_OVERFLOW if there is no space left in the transmit buffer.
+*/
 
 unsigned char __fastcall__ ser_status (unsigned char* status);
 /* Return the serial port status. */

@@ -144,8 +144,8 @@ static IFile* NewIFile (const char* Name, InputType Type)
 
 static AFile* NewAFile (IFile* IF, FILE* F)
 /* Create a new AFile, push it onto the stack, add the path of the file to
- * the path search list, and finally return a pointer to the new AFile struct.
- */
+** the path search list, and finally return a pointer to the new AFile struct.
+*/
 {
     StrBuf Path = AUTO_STRBUF_INITIALIZER;
 
@@ -158,19 +158,19 @@ static AFile* NewAFile (IFile* IF, FILE* F)
     AF->Input = IF;
 
     /* Increment the usage counter of the corresponding IFile. If this
-     * is the first use, set the file data and output debug info if
-     * requested.
-     */
+    ** is the first use, set the file data and output debug info if
+    ** requested.
+    */
     if (IF->Usage++ == 0) {
 
         /* Get file size and modification time. There a race condition here,
-         * since we cannot use fileno() (non standard identifier in standard
-         * header file), and therefore not fstat. When using stat with the
-         * file name, there's a risk that the file was deleted and recreated
-         * while it was open. Since mtime and size are only used to check
-         * if a file has changed in the debugger, we will ignore this problem
-         * here.
-         */
+        ** since we cannot use fileno() (non standard identifier in standard
+        ** header file), and therefore not fstat. When using stat with the
+        ** file name, there's a risk that the file was deleted and recreated
+        ** while it was open. Since mtime and size are only used to check
+        ** if a file has changed in the debugger, we will ignore this problem
+        ** here.
+        */
         struct stat Buf;
         if (FileStat (IF->Name, &Buf) != 0) {
             /* Error */
@@ -187,9 +187,9 @@ static AFile* NewAFile (IFile* IF, FILE* F)
     CollAppend (&AFiles, AF);
 
     /* Get the path of this file and add it as an extra search path.
-     * To avoid file search overhead, we will add one path only once.
-     * This is checked by the PushSearchPath function.
-     */
+    ** To avoid file search overhead, we will add one path only once.
+    ** This is checked by the PushSearchPath function.
+    */
     SB_CopyBuf (&Path, IF->Name, FindName (IF->Name) - IF->Name);
     SB_Terminate (&Path);
     AF->SearchPath = PushSearchPath (UsrIncSearchPath, SB_GetConstBuf (&Path));
@@ -217,9 +217,9 @@ static void FreeAFile (AFile* AF)
 
 static IFile* FindFile (const char* Name)
 /* Find the file with the given name in the list of all files. Since the list
- * is not large (usually less than 10), I don't care about using hashes or
- * similar things and do a linear search.
- */
+** is not large (usually less than 10), I don't care about using hashes or
+** similar things and do a linear search.
+*/
 {
     unsigned I;
     for (I = 0; I < CollCount (&IFiles); ++I) {
@@ -261,8 +261,8 @@ void OpenMainFile (const char* Name)
     Line = NewStrBuf ();
 
     /* Update the line infos, so we have a valid line info even at start of
-     * the main file before the first line is read.
-     */
+    ** the main file before the first line is read.
+    */
     UpdateLineInfo (MainFile->Input, MainFile->Line, Line);
 }
 
@@ -289,8 +289,8 @@ void OpenIncludeFile (const char* Name, InputType IT)
     }
 
     /* Search the list of all input files for this file. If we don't find
-     * it, create a new IFile object.
-     */
+    ** it, create a new IFile object.
+    */
     IF = FindFile (N);
     if (IF == 0) {
         IF = NewIFile (N, IT);
@@ -318,8 +318,8 @@ void OpenIncludeFile (const char* Name, InputType IT)
 
 static void CloseIncludeFile (void)
 /* Close an include file and switch to the higher level file. Set Input to
- * NULL if this was the main file.
- */
+** NULL if this was the main file.
+*/
 {
     AFile* Input;
 
@@ -351,9 +351,9 @@ static void CloseIncludeFile (void)
 
 static void GetInputChar (void)
 /* Read the next character from the input stream and make CurC and NextC
- * valid. If end of line is reached, both are set to NUL, no more lines
- * are read by this function.
- */
+** valid. If end of line is reached, both are set to NUL, no more lines
+** are read by this function.
+*/
 {
     /* Drop all pushed fragments that don't have data left */
     while (SB_GetIndex (Line) >= SB_GetLen (Line)) {
@@ -389,9 +389,9 @@ static void GetInputChar (void)
 
 void NextChar (void)
 /* Skip the current input character and read the next one from the input
- * stream. CurC and NextC are valid after the call. If end of line is
- * reached, both are set to NUL, no more lines are read by this function.
- */
+** stream. CurC and NextC are valid after the call. If end of line is
+** reached, both are set to NUL, no more lines are read by this function.
+*/
 {
     /* Skip the last character read */
     SB_Skip (Line);
@@ -423,8 +423,8 @@ void ClearLine (void)
 
 StrBuf* InitLine (StrBuf* Buf)
 /* Initialize Line from Buf and read CurC and NextC from the new input line.
- * The function returns the old input line.
- */
+** The function returns the old input line.
+*/
 {
     StrBuf* OldLine = Line;
     Line  = Buf;
@@ -468,8 +468,8 @@ int NextLine (void)
             CloseIncludeFile ();
 
             /* If there is no file open, bail out, otherwise get the
-             * previous input file and start over.
-             */
+            ** previous input file and start over.
+            */
             if (CollCount (&AFiles) == 0) {
                 return 0;
             }
@@ -484,16 +484,16 @@ int NextLine (void)
             ++Input->Line;
 
             /* If the \n is preceeded by a \r, remove the \r, so we can read
-             * DOS/Windows files under *nix.
-             */
+            ** DOS/Windows files under *nix.
+            */
             if (SB_LookAtLast (Line) == '\r') {
                 SB_Drop (Line, 1);
             }
 
             /* If we don't have a line continuation character at the end,
-             * we're done with this line. Otherwise replace the character
-             * by a newline and continue reading.
-             */
+            ** we're done with this line. Otherwise replace the character
+            ** by a newline and continue reading.
+            */
             if (SB_LookAtLast (Line) == '\\') {
                 Line->Buf[Line->Len-1] = '\n';
             } else {
@@ -613,8 +613,8 @@ static void WriteDep (FILE* F, InputType Types)
 
 static void CreateDepFile (const char* Name, InputType Types)
 /* Create a dependency file with the given name and place dependencies for
- * all files with the given types there.
- */
+** all files with the given types there.
+*/
 {
     /* Open the file */
     FILE* F = fopen (Name, "w");
@@ -623,8 +623,8 @@ static void CreateDepFile (const char* Name, InputType Types)
     }
 
     /* If a dependency target was given, use it, otherwise use the output
-     * file name as target, followed by a tab character.
-     */
+    ** file name as target, followed by a tab character.
+    */
     if (SB_IsEmpty (&DepTarget)) {
         WriteEscaped (F, OutputFilename);
     } else {
@@ -661,5 +661,3 @@ void CreateDependencies (void)
                        IT_MAIN | IT_SYSINC | IT_USRINC);
     }
 }
-
-

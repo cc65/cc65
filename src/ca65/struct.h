@@ -68,6 +68,3 @@ void DoUnion (void);
 /* End of struct.h */
 
 #endif
-
-
-

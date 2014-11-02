@@ -75,8 +75,8 @@ void MacDef (unsigned Style);
 
 void MacUndef (const struct StrBuf* Name, unsigned char Style);
 /* Undefine the macro with the given name and style. A style mismatch is
- * treated as if the macro didn't exist.
- */
+** treated as if the macro didn't exist.
+*/
 
 void MacExpandStart (Macro* M);
 /* Start expanding a macro */
@@ -86,13 +86,13 @@ void MacAbort (void);
 
 Macro* FindMacro (const struct StrBuf* Name);
 /* Try to find the macro with the given name and return it. If no macro with
- * this name was found, return NULL.
- */
+** this name was found, return NULL.
+*/
 
 Macro* FindDefine (const struct StrBuf* Name);
 /* Try to find the define style macro with the given name and return it. If no
- * such macro was found, return NULL.
- */
+** such macro was found, return NULL.
+*/
 
 int InMacExpansion (void);
 /* Return true if we're currently expanding a macro */
@@ -102,14 +102,11 @@ void DisableDefineStyleMacros (void);
 
 void EnableDefineStyleMacros (void);
 /* Re-enable define style macros previously disabled with
- * DisableDefineStyleMacros.
- */
+** DisableDefineStyleMacros.
+*/
 
 
 
 /* End of macro.h */
 
 #endif
-
-
-

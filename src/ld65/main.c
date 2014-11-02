@@ -80,6 +80,24 @@
 static unsigned         ObjFiles   = 0; /* Count of object files linked */
 static unsigned         LibFiles   = 0; /* Count of library files linked */
 
+/* struct InputFile.Type definitions */
+#define INPUT_FILES_FILE       0        /* Entry is a file (unknown type) */
+#define INPUT_FILES_FILE_OBJ   1        /* Entry is a object file */
+#define INPUT_FILES_FILE_LIB   2        /* Entry is a library file */
+#define INPUT_FILES_SGROUP     3        /* Entry is 'StartGroup' */
+#define INPUT_FILES_EGROUP     4        /* Entry is 'EndGroup' */
+
+#define MAX_INPUTFILES         256
+
+/* Array of inputs (libraries and object files) */
+static struct InputFile {
+    const char *FileName;
+    unsigned Type;
+}                              *InputFiles;
+static unsigned                InputFilesCount = 0;
+static const char              *CmdlineCfgFile = NULL,
+                               *CmdlineTarget = NULL;
+
 
 
 /*****************************************************************************/
@@ -134,8 +152,8 @@ static void Usage (void)
 
 static unsigned long CvtNumber (const char* Arg, const char* Number)
 /* Convert a number from a string. Allow '$' and '0x' prefixes for hex
- * numbers.
- */
+** numbers.
+*/
 {
     unsigned long Val;
     int           Converted;
@@ -209,11 +227,11 @@ static void LinkFile (const char* Name, FILETYPE Type)
     Magic = Read32 (F);
 
     /* Check the magic for known file types. The handling is somewhat weird
-     * since we may have given a file with a ".lib" extension, which was
-     * searched and found in a directory for library files, but we now find
-     * out (by looking at the magic) that it's indeed an object file. We just
-     * ignore the problem and hope no one will notice...
-     */
+    ** since we may have given a file with a ".lib" extension, which was
+    ** searched and found in a directory for library files, but we now find
+    ** out (by looking at the magic) that it's indeed an object file. We just
+    ** ignore the problem and hope no one will notice...
+    */
     switch (Magic) {
 
         case OBJ_MAGIC:
@@ -347,8 +365,8 @@ static void OptForceImport (const char* Opt attribute ((unused)), const char* Ar
     if (ColPos == 0) {
 
         /* Use default address size (which for now is always absolute
-         * addressing)
-         */
+        ** addressing)
+        */
         InsertImport (GenImport (GetStringId (Arg), ADDR_SIZE_ABS));
 
     } else {
@@ -390,7 +408,10 @@ static void OptHelp (const char* Opt attribute ((unused)),
 static void OptLib (const char* Opt attribute ((unused)), const char* Arg)
 /* Link a library */
 {
-    LinkFile (Arg, FILETYPE_LIB);
+    InputFiles[InputFilesCount].Type = INPUT_FILES_FILE_LIB;
+    InputFiles[InputFilesCount].FileName = Arg;
+    if (++InputFilesCount >= MAX_INPUTFILES)
+        Error ("Too many input files");
 }
 
 
@@ -406,6 +427,9 @@ static void OptLibPath (const char* Opt attribute ((unused)), const char* Arg)
 static void OptMapFile (const char* Opt attribute ((unused)), const char* Arg)
 /* Give the name of the map file */
 {
+    if (MapFileName) {
+        Error ("Cannot use -m twice");
+    }
     MapFileName = Arg;
 }
 
@@ -426,7 +450,10 @@ static void OptModuleId (const char* Opt, const char* Arg)
 static void OptObj (const char* Opt attribute ((unused)), const char* Arg)
 /* Link an object file */
 {
-    LinkFile (Arg, FILETYPE_OBJ);
+    InputFiles[InputFilesCount].Type = INPUT_FILES_FILE_OBJ;
+    InputFiles[InputFilesCount].FileName = Arg;
+    if (++InputFilesCount >= MAX_INPUTFILES)
+        Error ("Too many input files");
 }
 
 
@@ -439,16 +466,14 @@ static void OptObjPath (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
-static void OptOutputName (const char* Opt, const char* Arg)
+static void OptOutputName (const char* Opt attribute ((unused)), const char* Arg)
 /* Give the name of the output file */
 {
-    /* If the name of the output file has been used in the config before
-     * (by using %O) we're actually changing it later, which - in most cases -
-     * gives unexpected results, so emit a warning in this case.
-     */
-    if (OutputNameUsed) {
-        Warning ("Option `%s' should precede options `-t' or `-C'", Opt);
+    static int OutputNameSeen = 0;
+    if (OutputNameSeen) {
+        Error ("Cannot use -o twice");
     }
+    OutputNameSeen = 1;
     OutputName = Arg;
 }
 
@@ -457,6 +482,9 @@ static void OptOutputName (const char* Opt, const char* Arg)
 static void OptStartAddr (const char* Opt, const char* Arg)
 /* Set the default start address */
 {
+    if (HaveStartAddr) {
+        Error ("Cannot use -S twice");
+    }
     StartAddr = CvtNumber (Opt, Arg);
     HaveStartAddr = 1;
 }
@@ -520,16 +548,61 @@ static void OptVersion (const char* Opt attribute ((unused)),
 
 
 
-int main (int argc, char* argv [])
-/* Assembler main program */
+static void CmdlOptStartGroup (const char* Opt attribute ((unused)),
+                               const char* Arg attribute ((unused)))
+/* Remember 'start group' occurrence in input files array */
+{
+    InputFiles[InputFilesCount].Type = INPUT_FILES_SGROUP;
+    InputFiles[InputFilesCount].FileName = Arg;  /* Unused */
+    if (++InputFilesCount >= MAX_INPUTFILES)
+        Error ("Too many input files");
+}
+
+
+
+static void CmdlOptEndGroup (const char* Opt attribute ((unused)),
+                             const char* Arg attribute ((unused)))
+/* Remember 'end group' occurrence in input files array */
+{
+    InputFiles[InputFilesCount].Type = INPUT_FILES_EGROUP;
+    InputFiles[InputFilesCount].FileName = Arg;  /* Unused */
+    if (++InputFilesCount >= MAX_INPUTFILES)
+        Error ("Too many input files");
+}
+
+
+
+static void CmdlOptConfig (const char* Opt attribute ((unused)), const char* Arg)
+/* Set 'config file' command line parameter */
+{
+    if (CmdlineCfgFile || CmdlineTarget) {
+        Error ("Cannot use -C/-t twice");
+    }
+    CmdlineCfgFile = Arg;
+}
+
+
+
+static void CmdlOptTarget (const char* Opt attribute ((unused)), const char* Arg)
+/* Set 'target' command line parameter */
+{
+    if (CmdlineCfgFile || CmdlineTarget) {
+        Error ("Cannot use -C/-t twice");
+    }
+    CmdlineTarget = Arg;
+}
+
+
+
+static void ParseCommandLine(void)
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
         { "--cfg-path",         1,      OptCfgPath              },
-        { "--config",           1,      OptConfig               },
+        { "--config",           1,      CmdlOptConfig           },
         { "--dbgfile",          1,      OptDbgFile              },
         { "--define",           1,      OptDefine               },
-        { "--end-group",        0,      OptEndGroup             },
+        { "--end-group",        0,      CmdlOptEndGroup         },
         { "--force-import",     1,      OptForceImport          },
         { "--help",             0,      OptHelp                 },
         { "--lib",              1,      OptLib                  },
@@ -539,27 +612,18 @@ int main (int argc, char* argv [])
         { "--obj",              1,      OptObj                  },
         { "--obj-path",         1,      OptObjPath              },
         { "--start-addr",       1,      OptStartAddr            },
-        { "--start-group",      0,      OptStartGroup           },
-        { "--target",           1,      OptTarget               },
+        { "--start-group",      0,      CmdlOptStartGroup       },
+        { "--target",           1,      CmdlOptTarget           },
         { "--version",          0,      OptVersion              },
     };
 
     unsigned I;
-    unsigned MemoryAreaOverflows;
+    unsigned LabelFileGiven = 0;
 
-    /* Initialize the cmdline module */
-    InitCmdLine (&argc, &argv, "ld65");
+    /* Allocate memory for input file array */
+    InputFiles = xmalloc (MAX_INPUTFILES * sizeof (struct InputFile));
 
-    /* Initialize the input file search paths */
-    InitSearchPaths ();
-
-    /* Initialize the string pool */
-    InitStrPool ();
-
-    /* Initialize the type pool */
-    InitTypePool ();
-
-    /* Check the parameters */
+    /* Defer setting of config/target and input files until all options are parsed */
     I = 1;
     while (I < ArgCount) {
 
@@ -577,11 +641,11 @@ int main (int argc, char* argv [])
                     break;
 
                 case '(':
-                    OptStartGroup (Arg, 0);
+                    CmdlOptStartGroup (Arg, 0);
                     break;
 
                 case ')':
-                    OptEndGroup (Arg, 0);
+                    CmdlOptEndGroup (Arg, 0);
                     break;
 
                 case 'h':
@@ -594,14 +658,11 @@ int main (int argc, char* argv [])
                     break;
 
                 case 'o':
-                    OptOutputName (Arg, GetArg (&I, 2));
+                    OptOutputName (NULL, GetArg (&I, 2));
                     break;
 
                 case 't':
-                    if (CfgAvail ()) {
-                        Error ("Cannot use -C/-t twice");
-                    }
-                    OptTarget (Arg, GetArg (&I, 2));
+                    CmdlOptTarget (Arg, GetArg (&I, 2));
                     break;
 
                 case 'u':
@@ -617,7 +678,7 @@ int main (int argc, char* argv [])
                     break;
 
                 case 'C':
-                    OptConfig (Arg, GetArg (&I, 2));
+                    CmdlOptConfig (Arg, GetArg (&I, 2));
                     break;
 
                 case 'D':
@@ -626,9 +687,17 @@ int main (int argc, char* argv [])
 
                 case 'L':
                     switch (Arg [2]) {
-                        /* ## The first one is obsolete and will go */
-                        case 'n': LabelFileName = GetArg (&I, 3);   break;
-                        default:  OptLibPath (Arg, GetArg (&I, 2)); break;
+                        case 'n':
+                            /* ## This one is obsolete and will go */
+                            if (LabelFileGiven) {
+                                Error ("Cannot use -Ln twice");
+                            }
+                            LabelFileGiven = 1;
+                            LabelFileName = GetArg (&I, 3);
+                            break;
+                        default:
+                            OptLibPath (Arg, GetArg (&I, 2));
+                            break;
                     }
                     break;
 
@@ -648,13 +717,71 @@ int main (int argc, char* argv [])
         } else {
 
             /* A filename */
-            LinkFile (Arg, FILETYPE_UNKNOWN);
+            InputFiles[InputFilesCount].Type = INPUT_FILES_FILE;
+            InputFiles[InputFilesCount].FileName = Arg;
+            if (++InputFilesCount >= MAX_INPUTFILES)
+                Error ("Too many input files");
 
         }
 
         /* Next argument */
         ++I;
     }
+
+    if (CmdlineTarget) {
+        OptTarget (NULL, CmdlineTarget);
+    } else if (CmdlineCfgFile) {
+        OptConfig (NULL, CmdlineCfgFile);
+    }
+
+    /* Process input files */
+    for (I = 0; I < InputFilesCount; ++I) {
+        switch (InputFiles[I].Type) {
+            case INPUT_FILES_FILE:
+                LinkFile (InputFiles[I].FileName, FILETYPE_UNKNOWN);
+                break;
+            case INPUT_FILES_FILE_LIB:
+                LinkFile (InputFiles[I].FileName, FILETYPE_LIB);
+                break;
+            case INPUT_FILES_FILE_OBJ:
+                LinkFile (InputFiles[I].FileName, FILETYPE_OBJ);
+                break;
+            case INPUT_FILES_SGROUP:
+                OptStartGroup (NULL, 0);
+                break;
+            case INPUT_FILES_EGROUP:
+                OptEndGroup (NULL, 0);
+                break;
+            default:
+                abort ();
+        }
+    }
+
+    /* Free memory used for input file array */
+    xfree (InputFiles);
+}
+
+
+
+int main (int argc, char* argv [])
+/* Linker main program */
+{
+    unsigned MemoryAreaOverflows;
+
+    /* Initialize the cmdline module */
+    InitCmdLine (&argc, &argv, "ld65");
+
+    /* Initialize the input file search paths */
+    InitSearchPaths ();
+
+    /* Initialize the string pool */
+    InitStrPool ();
+
+    /* Initialize the type pool */
+    InitTypePool ();
+
+    /* Parse the command line */
+    ParseCommandLine ();
 
     /* Check if we had any object files */
     if (ObjFiles == 0) {
@@ -673,9 +800,9 @@ int main (int argc, char* argv [])
     ConDesCreate ();
 
     /* Process data from the config file. Assign start addresses for the
-     * segments, define linker symbols. The function will return the number
-     * of memory area overflows (zero on success).
-     */
+    ** segments, define linker symbols. The function will return the number
+    ** of memory area overflows (zero on success).
+    */
     MemoryAreaOverflows = CfgProcess ();
 
     /* Check module assertions */
@@ -685,9 +812,9 @@ int main (int argc, char* argv [])
     CheckExports ();
 
     /* If we had a memory area overflow before, we cannot generate the output
-     * file. However, we will generate a short map file if requested, since
-     * this will help the user to rearrange segments and fix the overflow.
-     */
+    ** file. However, we will generate a short map file if requested, since
+    ** this will help the user to rearrange segments and fix the overflow.
+    */
     if (MemoryAreaOverflows) {
         if (MapFileName) {
             CreateMapFile (SHORT_MAPFILE);
@@ -722,6 +849,3 @@ int main (int argc, char* argv [])
     /* Return an apropriate exit code */
     return EXIT_SUCCESS;
 }
-
-
-

@@ -89,8 +89,8 @@ void ConDesSetSegName (unsigned Type, unsigned SegName);
 
 const ConDesImport* ConDesGetImport (unsigned Type);
 /* Get the forced import for the given ConDes type. Returns NULL if there is
- * no forced import for this type.
- */
+** no forced import for this type.
+*/
 
 void ConDesSetImport (unsigned Type, const ConDesImport* Import);
 /* Set the forced import for the given ConDes type */
@@ -121,6 +121,3 @@ void ConDesDump (void);
 /* End of condes.h */
 
 #endif
-
-
-

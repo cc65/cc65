@@ -1,9 +1,9 @@
 /*
- * _scanf.h
- *
- * (c) Copyright 2004, Ullrich von Bassewitz <uz@cc65.org>
- *
- */
+** _scanf.h
+**
+** (c) Copyright 2004, Ullrich von Bassewitz <uz@cc65.org>
+**
+*/
 
 
 
@@ -13,8 +13,8 @@
 
 
 /* Type of the function that is called to input data. The function will
- * return EOF if no more data is available.
- */
+** return EOF if no more data is available.
+*/
 typedef int __fastcall__ (*getfunc) (void* data);
 
 /* Type of the function that is called to put back unused data */
@@ -23,9 +23,9 @@ typedef int __fastcall__ (*ungetfunc) (int c, void* data);
 
 
 /* Control structure passed to the low level worker function.
- * Beware: This structure is mirrored in the _scanf.inc assembler include
- * file, so check this when altering the structure.
- */
+** Beware: This structure is mirrored in the _scanf.inc assembler include
+** file, so check this when altering the structure.
+*/
 struct scanfdata {
     getfunc     get;    /* Pointer to input routine */
     ungetfunc   unget;  /* Pointer to pushback routine */

@@ -141,14 +141,14 @@ static void Parse (void)
             }
 
             /* Check if we must reserve storage for the variable. We do this,
-             *
-             *   - if it is not a typedef or function,
-             *   - if we don't had a storage class given ("int i")
-             *   - if the storage class is explicitly specified as static,
-             *   - or if there is an initialization.
-             *
-             * This means that "extern int i;" will not get storage allocated.
-             */
+            **
+            **   - if it is not a typedef or function,
+            **   - if we don't had a storage class given ("int i")
+            **   - if the storage class is explicitly specified as static,
+            **   - or if there is an initialization.
+            **
+            ** This means that "extern int i;" will not get storage allocated.
+            */
             if ((Decl.StorageClass & SC_FUNC) != SC_FUNC          &&
                 (Decl.StorageClass & SC_TYPEMASK) != SC_TYPEDEF    &&
                 ((Spec.Flags & DS_DEF_STORAGE) != 0         ||
@@ -161,10 +161,10 @@ static void Parse (void)
             }
 
             /* If this is a function declarator that is not followed by a comma
-             * or semicolon, it must be followed by a function body. If this is
-             * the case, convert an empty parameter list into one accepting no
-             * parameters (same as void) as required by the standard.
-             */
+            ** or semicolon, it must be followed by a function body. If this is
+            ** the case, convert an empty parameter list into one accepting no
+            ** parameters (same as void) as required by the standard.
+            */
             if ((Decl.StorageClass & SC_FUNC) != 0 &&
                 (CurTok.Tok != TOK_COMMA)          &&
                 (CurTok.Tok != TOK_SEMI)) {
@@ -191,8 +191,8 @@ static void Parse (void)
                 if (CurTok.Tok == TOK_ASSIGN) {
 
                     /* We cannot initialize types of unknown size, or
-                     * void types in non ANSI mode.
-                     */
+                    ** void types in ISO modes.
+                    */
                     if (Size == 0) {
                         if (!IsTypeVoid (Decl.Type)) {
                             if (!IsTypeArray (Decl.Type)) {
@@ -206,9 +206,9 @@ static void Parse (void)
                     }
 
                     /* Switch to the data or rodata segment. For arrays, check
-                      * the element qualifiers, since not the array but its
-                      * elements are const.
-                      */
+                     ** the element qualifiers, since not the array but its
+                     ** elements are const.
+                     */
                     if (IsQualConst (GetBaseElementType (Decl.Type))) {
                         g_userodata ();
                     } else {
@@ -303,8 +303,8 @@ void Compile (const char* FileName)
     struct tm*  TM;
 
     /* Since strftime is locale dependent, we need the abbreviated month names
-     * in english.
-     */
+    ** in english.
+    */
     static const char MonthNames[12][4] = {
         "Jan", "Feb", "Mar", "Apr", "May", "Jun",
         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
@@ -320,9 +320,9 @@ void Compile (const char* FileName)
     DefineNumericMacro ("__CC65_STD__", IS_Get (&Standard));
 
     /* Optimization macros. Since no source code has been parsed for now, the
-     * IS_Get functions access the values in effect now, regardless of any
-     * changes using #pragma later.
-     */
+    ** IS_Get functions access the values in effect now, regardless of any
+    ** changes using #pragma later.
+    */
     if (IS_Get (&Optimize)) {
         long CodeSize = IS_Get (&CodeSizeFactor);
         DefineNumericMacro ("__OPT__", 1);
@@ -428,6 +428,3 @@ void FinishCompile (void)
     /* Leave the main lexical level */
     LeaveGlobalLevel ();
 }
-
-
-

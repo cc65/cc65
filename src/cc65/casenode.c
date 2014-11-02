@@ -94,10 +94,10 @@ void FreeCaseNodeColl (Collection* Nodes)
 
 int SearchCaseNode (const Collection* Nodes, unsigned char Key, int* Index)
 /* Search for a node in the given collection. If the node has been found,
- * set Index to the index of the node and return true. If the node was not
- * found, set Index the the insertion position of the node and return
- * false.
- */
+** set Index to the index of the node and return true. If the node was not
+** found, set Index the the insertion position of the node and return
+** false.
+*/
 {
     /* Do a binary search */
     int First = 0;
@@ -134,8 +134,8 @@ int SearchCaseNode (const Collection* Nodes, unsigned char Key, int* Index)
 
 unsigned InsertCaseValue (Collection* Nodes, unsigned long Val, unsigned Depth)
 /* Insert a new case value into a CaseNode tree with the given depth. Return
- * the code label for the value.
- */
+** the code label for the value.
+*/
 {
     CaseNode* N = 0;
     unsigned CaseLabel = GetLocalLabel ();  /* Code label */
@@ -155,8 +155,8 @@ unsigned InsertCaseValue (Collection* Nodes, unsigned long Val, unsigned Depth)
             CollInsert (Nodes, N, Index);
 
             /* If this is not the last round, create the collection for
-             * the subnodes, otherwise get a label for the code.
-             */
+            ** the subnodes, otherwise get a label for the code.
+            */
             if (Depth > 0) {
                 N->Nodes = NewCollection ();
             } else {
@@ -168,8 +168,8 @@ unsigned InsertCaseValue (Collection* Nodes, unsigned long Val, unsigned Depth)
             N = CollAt (Nodes, Index);
 
             /* If this is the last round and we found a node, we have a
-             * duplicate case label in a switch.
-             */
+            ** duplicate case label in a switch.
+            */
             if (Depth == 0) {
                 Error ("Duplicate case label");
             }
@@ -182,6 +182,3 @@ unsigned InsertCaseValue (Collection* Nodes, unsigned long Val, unsigned Depth)
     /* Return the label of the node we found/created */
     return CaseLabel;
 }
-
-
-

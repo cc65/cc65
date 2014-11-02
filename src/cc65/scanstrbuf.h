@@ -54,32 +54,28 @@ void SB_SkipWhite (StrBuf* B);
 
 int SB_GetSym (StrBuf* B, StrBuf* Ident, const char* SpecialChars);
 /* Get a symbol from the string buffer. If SpecialChars is not NULL, it
- * points to a string that contains characters allowed within the string in
- * addition to letters, digits and the underline. Note: The identifier must
- * still begin with a letter.
- * Returns 1 if a symbol was found and 0 otherwise but doesn't output any
- * errors.
- */
+** points to a string that contains characters allowed within the string in
+** addition to letters, digits and the underline. Note: The identifier must
+** still begin with a letter.
+** Returns 1 if a symbol was found and 0 otherwise but doesn't output any
+** errors.
+*/
 
 int SB_GetString (StrBuf* B, StrBuf* S);
 /* Get a string from the string buffer. Returns 1 if a string was found and 0
- * otherwise. Errors are only output in case of invalid strings (missing end
- * of string).
- */
+** otherwise. Errors are only output in case of invalid strings (missing end
+** of string).
+*/
 
 int SB_GetNumber (StrBuf* B, long* Val);
 /* Get a number from the string buffer. Accepted formats are decimal, octal,
- * hex and character constants. Numeric constants may be preceeded by a
- * minus or plus sign. The function returns 1 if a number was found and
- * zero otherwise. Errors are only output for invalid numbers.
- */
+** hex and character constants. Numeric constants may be preceeded by a
+** minus or plus sign. The function returns 1 if a number was found and
+** zero otherwise. Errors are only output for invalid numbers.
+*/
 
 
 
 /* End of scanstrbuf.h */
+
 #endif
-
-
-
-
-

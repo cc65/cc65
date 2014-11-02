@@ -85,8 +85,8 @@ static unsigned HaveIRQRequest;
 #define GET_SF()        ((Regs.SR & SF) != 0)
 
 /* Set the flags. The parameter is a boolean flag that says if the flag should be
- * set or reset.
- */
+** set or reset.
+*/
 #define SET_CF(f)       do { if (f) { Regs.SR |= CF; } else { Regs.SR &= ~CF; } } while (0)
 #define SET_ZF(f)       do { if (f) { Regs.SR |= ZF; } else { Regs.SR &= ~ZF; } } while (0)
 #define SET_IF(f)       do { if (f) { Regs.SR |= IF; } else { Regs.SR &= ~IF; } } while (0)
@@ -96,8 +96,8 @@ static unsigned HaveIRQRequest;
 #define SET_SF(f)       do { if (f) { Regs.SR |= SF; } else { Regs.SR &= ~SF; } } while (0)
 
 /* Special test and set macros. The meaning of the parameter depends on the
- * actual flag that should be set or reset.
- */
+** actual flag that should be set or reset.
+*/
 #define TEST_ZF(v)      SET_ZF (((v) & 0xFF) == 0)
 #define TEST_SF(v)      SET_SF (((v) & 0x80) != 0)
 #define TEST_CF(v)      SET_CF (((v) & 0xFF00) != 0)

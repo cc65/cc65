@@ -118,7 +118,5 @@ void StudyExpr (ExprNode* Expr, ExprDesc* D);
 
 
 /* End of studyexpr.h */
+
 #endif
-
-
-

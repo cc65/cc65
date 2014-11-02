@@ -69,8 +69,8 @@ static void AsmRangeError (unsigned Arg)
 
 static void AsmErrorSkip (void)
 /* Called in case of an error, skips tokens until the closing paren or a
- * semicolon is reached.
- */
+** semicolon is reached.
+*/
 {
     static const token_t TokenList[] = { TOK_RPAREN, TOK_SEMI };
     SkipTokens (TokenList, sizeof(TokenList) / sizeof(TokenList[0]));
@@ -80,8 +80,8 @@ static void AsmErrorSkip (void)
 
 static SymEntry* AsmGetSym (unsigned Arg, unsigned Type)
 /* Find the symbol with the name currently in NextTok. The symbol must be of
- * the given type. On errors, NULL is returned.
- */
+** the given type. On errors, NULL is returned.
+*/
 {
     SymEntry* Sym;
 
@@ -257,9 +257,9 @@ static void ParseLVarArg (StrBuf* T, unsigned Arg)
     }
 
     /* The symbol may be a parameter to a variadic function. In this case, we
-     * don't have a fixed stack offset, so check it and bail out with an error
-     * if this is the case.
-     */
+    ** don't have a fixed stack offset, so check it and bail out with an error
+    ** if this is the case.
+    */
     if ((Sym->Flags & SC_PARAM) == SC_PARAM && F_IsVariadic (CurrentFunc)) {
         Error ("Argument %u has no fixed stack offset", Arg);
         AsmErrorSkip ();
@@ -352,16 +352,16 @@ static void ParseAsm (void)
     NextToken ();
 
     /* Parse the statement. It may contain several lines and one or more
-     * of the following place holders:
-     *   %b     - Numerical 8 bit value
-     *   %w     - Numerical 16 bit value
-     *   %l     - Numerical 32 bit value
-     *   %v     - Assembler name of a (global) variable
-     *   %o     - Stack offset of a (local) variable
-     *   %g     - Assembler name of a C label
-     *   %s     - Any argument converted to a string (almost)
-     *   %%     - The % sign
-     */
+    ** of the following place holders:
+    **   %b     - Numerical 8 bit value
+    **   %w     - Numerical 16 bit value
+    **   %l     - Numerical 32 bit value
+    **   %v     - Assembler name of a (global) variable
+    **   %o     - Stack offset of a (local) variable
+    **   %g     - Assembler name of a C label
+    **   %s     - Any argument converted to a string (almost)
+    **   %%     - The % sign
+    */
     Arg = 0;
     while ((C = SB_Get (&S)) != '\0') {
 
@@ -415,9 +415,9 @@ Done:
 
 void AsmStatement (void)
 /* This function parses ASM statements. The syntax of the ASM directive
- * looks like the one defined for C++ (C has no ASM directive), that is,
- * a string literal in parenthesis.
- */
+** looks like the one defined for C++ (C has no ASM directive), that is,
+** a string literal in parenthesis.
+*/
 {
     /* Skip the ASM */
     NextToken ();
@@ -434,8 +434,8 @@ void AsmStatement (void)
         Error ("String literal expected");
 
         /* Try some smart error recovery: Skip tokens until we reach the
-         * enclosing paren, or a semicolon.
-         */
+        ** enclosing paren, or a semicolon.
+        */
         AsmErrorSkip ();
 
     } else {
@@ -447,6 +447,3 @@ void AsmStatement (void)
     /* Closing paren needed */
     ConsumeRParen ();
 }
-
-
-

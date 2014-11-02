@@ -105,13 +105,13 @@ void PushLiteralPool (struct SymEntry* Func);
 
 LiteralPool* PopLiteralPool (void);
 /* Pop the last literal pool from TOS and activate it. Return the old
- * literal pool.
- */
+** literal pool.
+*/
 
 void MoveLiteralPool (LiteralPool* LocalPool);
 /* Move all referenced literals in LocalPool to the global literal pool. This
- * function will free LocalPool after moving the used string literals.
- */
+** function will free LocalPool after moving the used string literals.
+*/
 
 void OutputLiteralPool (void);
 /* Output the literal pool */
@@ -121,8 +121,8 @@ Literal* AddLiteral (const char* S);
 
 Literal* AddLiteralBuf (const void* Buf, unsigned Len);
 /* Add a buffer containing a literal string to the literal pool. Return the
- * literal.
- */
+** literal.
+*/
 
 Literal* AddLiteralStr (const StrBuf* S);
 /* Add a literal string to the literal pool. Return the literal. */
@@ -130,8 +130,5 @@ Literal* AddLiteralStr (const StrBuf* S);
 
 
 /* End of litpool.h */
+
 #endif
-
-
-
-

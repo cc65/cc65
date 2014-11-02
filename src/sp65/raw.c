@@ -52,8 +52,8 @@
 
 StrBuf* GenRaw (const Bitmap* B, const Collection* A attribute ((unused)))
 /* Generate binary output in raw format. The output is stored in a string
- * buffer (which is actually a dynamic char array) and returned.
- */
+** buffer (which is actually a dynamic char array) and returned.
+*/
 {
     StrBuf* D;
     unsigned X, Y;
@@ -84,6 +84,3 @@ StrBuf* GenRaw (const Bitmap* B, const Collection* A attribute ((unused)))
     /* Return the converted bitmap */
     return D;
 }
-
-
-

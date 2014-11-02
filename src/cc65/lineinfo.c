@@ -91,9 +91,9 @@ static LineInfo* NewLineInfo (struct IFile* F, unsigned LineNum, const StrBuf* L
     LI->LineNum   = LineNum;
 
     /* Copy the line, replacing tabs by spaces in the given line since tabs
-     * will give rather arbitrary results when used in the output later, and
-     * if we do it here, we won't need another copy later.
-     */
+    ** will give rather arbitrary results when used in the output later, and
+    ** if we do it here, we won't need another copy later.
+    */
     T = LI->Line;
     while (Len--) {
         if (*S == '\t') {
@@ -134,8 +134,8 @@ LineInfo* UseLineInfo (LineInfo* LI)
 
 void ReleaseLineInfo (LineInfo* LI)
 /* Release a reference to the given line info, free the structure if the
- * reference count drops to zero.
- */
+** reference count drops to zero.
+*/
 {
     CHECK (LI && LI->RefCount > 0);
     if (--LI->RefCount == 0) {
@@ -148,8 +148,8 @@ void ReleaseLineInfo (LineInfo* LI)
 
 LineInfo* GetCurLineInfo (void)
 /* Return a pointer to the current line info. The reference count is NOT
- * increased, use UseLineInfo for that purpose.
- */
+** increased, use UseLineInfo for that purpose.
+*/
 {
     return CurLineInfo;
 }
@@ -165,8 +165,8 @@ void UpdateLineInfo (struct IFile* F, unsigned LineNum, const StrBuf* Line)
     }
 
     /* If we have intermixed assembly switched off, use an empty line instead
-     * of the supplied one to save some memory.
-     */
+    ** of the supplied one to save some memory.
+    */
     if (!AddSource) {
         Line = &EmptyStrBuf;
     }
@@ -192,6 +192,3 @@ unsigned GetInputLine (const LineInfo* LI)
     PRECONDITION (LI != 0);
     return LI->LineNum;
 }
-
-
-

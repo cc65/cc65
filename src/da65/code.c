@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -98,8 +98,8 @@ void LoadCode (void)
     }
 
     /* Seek to the input offset and correct size to contain the remainder of
-     * the file.
-     */
+    ** the file.
+    */
     if (fseek (F, InputOffs, SEEK_SET) != 0) {
         Error ("Cannot seek on file `%s': %s", InFile, strerror (errno));
     }
@@ -114,9 +114,9 @@ void LoadCode (void)
     }
 
     /* If the start address was not given, set it so that the code loads to
-     * 0x10000 - Size. This is a reasonable default assuming that the file
-     * is a ROM that contains the hardware vectors at $FFFA.
-     */
+    ** 0x10000 - Size. This is a reasonable default assuming that the file
+    ** is a ROM that contains the hardware vectors at $FFFA.
+    */
     if (StartAddr < 0) {
         if (Size > 0x10000) {
             StartAddr = 0;
@@ -219,6 +219,3 @@ void ResetCode (void)
 {
     PC = CodeStart;
 }
-
-
-

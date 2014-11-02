@@ -50,17 +50,14 @@
 
 int MatchPattern (const char* Source, const char* Pattern);
 /* Match the string in Source against Pattern. Pattern may contain the
- * wildcards '*', '?', '[abcd]' '[ab-d]', '[!abcd]', '[!ab-d]'. The
- * function returns a value of zero if Source does not match Pattern,
- * otherwise a non zero value is returned. If Pattern contains an invalid
- * wildcard pattern (e.g. 'A[x'), the function returns zero.
- */
+** wildcards '*', '?', '[abcd]' '[ab-d]', '[!abcd]', '[!ab-d]'. The
+** function returns a value of zero if Source does not match Pattern,
+** otherwise a non zero value is returned. If Pattern contains an invalid
+** wildcard pattern (e.g. 'A[x'), the function returns zero.
+*/
 
 
 
 /* End of matchpat.h */
 
 #endif
-
-
-

@@ -68,9 +68,9 @@ struct Segment;
 
 
 /* Structure holding line information. The Pos.Name field is always the
- * global string id of the file name. If the line info was read from the
- * object file, the File pointer is valid, otherwise it is NULL.
- */
+** global string id of the file name. If the line info was read from the
+** object file, the File pointer is valid, otherwise it is NULL.
+*/
 typedef struct LineInfo LineInfo;
 struct LineInfo {
     unsigned            Id;             /* Line info id */
@@ -102,13 +102,13 @@ LineInfo* DupLineInfo (const LineInfo* LI);
 
 void ReadLineInfoList (FILE* F, struct ObjData* O, Collection* LineInfos);
 /* Read a list of line infos stored as a list of indices in the object file,
- * make real line infos from them and place them into the passed collection.
- */
+** make real line infos from them and place them into the passed collection.
+*/
 
 const LineInfo* GetAsmLineInfo (const Collection* LineInfos);
 /* Find a line info of type LI_TYPE_ASM and count zero in the given collection
- * and return it. Return NULL if no such line info was found.
- */
+** and return it. Return NULL if no such line info was found.
+*/
 
 #if defined(HAVE_INLINE)
 INLINE const FilePos* GetSourcePos (const LineInfo* LI)
@@ -186,7 +186,5 @@ void PrintDbgLineInfo (FILE* F);
 
 
 /* End of lineinfo.h */
+
 #endif
-
-
-

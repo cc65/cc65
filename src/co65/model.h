@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -73,14 +73,11 @@ const char* GetModelName (O65Model M);
 
 O65Model FindModel (const char* ModelName);
 /* Map a model name to its identifier. Return O65_MODEL_INVALID if the name
- * could not be found. Case is ignored when comparing names.
- */
+** could not be found. Case is ignored when comparing names.
+*/
 
 
 
 /* End of model.h */
 
 #endif
-
-
-

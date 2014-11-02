@@ -88,6 +88,3 @@ void InitTypePool (void)
     /* Allocate a type pool */
     TypePool = NewStringPool (137);
 }
-
-
-

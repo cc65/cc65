@@ -1,9 +1,9 @@
 /*
- * Ullrich von Bassewitz, 11.08.1998
- *
- * Hex conversion table. Must be in C since the compiler will convert
- * to the correct character set for the target platform.
- */
+** Ullrich von Bassewitz, 11.08.1998
+**
+** Hex conversion table. Must be in C since the compiler will convert
+** to the correct character set for the target platform.
+*/
 
 
 

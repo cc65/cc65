@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2014, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -65,8 +65,8 @@ void* __fastcall__ memmove (void* dest, const void* src, size_t count);
 void* __fastcall__ memset (void* s, int c, size_t count);
 
 /* The following is an internal function, the compiler will replace memset
- * with it if the fill value is zero. Never use this one directly!
- */
+** with it if the fill value is zero. Never use this one directly!
+*/
 void* __fastcall__ _bzero (void* ptr, size_t n);
 
 /* Non standard: */
@@ -81,6 +81,7 @@ char* __fastcall__ strlwr (char* s);
 char* __fastcall__ strlower (char* s);
 char* __fastcall__ strupr (char* s);
 char* __fastcall__ strupper (char* s);
+char* __fastcall__ strqtok (char* s1, const char* s2);
 #endif
 
 const char* __fastcall__ _stroserror (unsigned char errcode);
@@ -90,6 +91,3 @@ const char* __fastcall__ _stroserror (unsigned char errcode);
 
 /* End of string.h */
 #endif
-
-
-

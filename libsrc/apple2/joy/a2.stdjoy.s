@@ -13,6 +13,8 @@
         .include        "joy-error.inc"
         .include        "apple2.inc"
 
+        .macpack        module
+
 ; ------------------------------------------------------------------------
 
 ; Constants
@@ -29,7 +31,11 @@ PREAD   :=      $FB1E   ; Read paddle in X, return AD conv. value in Y
 
 ; Header. Includes jump table.
 
-        .segment        "JUMPTABLE"
+        .ifdef  __APPLE2ENH__
+        module_header   _a2e_stdjoy_joy
+        .else
+        module_header   _a2_stdjoy_joy
+        .endif
 
 ; Driver signature
 

@@ -533,7 +533,3 @@ void InfoCloseInput (void)
         InputFile = 0;
     }
 }
-
-
-
-

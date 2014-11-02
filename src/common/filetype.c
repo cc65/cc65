@@ -95,8 +95,8 @@ static const FileId TypeTable[] = {
 
 FILETYPE GetFileType (const char* Name)
 /* Determine the type of the given file by looking at the name. If the file
- * type could not be determined, the function returns FILETYPE_UNKOWN.
- */
+** type could not be determined, the function returns FILETYPE_UNKOWN.
+*/
 {
     /* Search for a table entry */
     const FileId* F = GetFileId (Name, TypeTable, FILETYPE_COUNT);
@@ -104,6 +104,3 @@ FILETYPE GetFileType (const char* Name)
     /* Return the result */
     return F? F->Id : FILETYPE_UNKNOWN;
 }
-
-
-

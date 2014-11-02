@@ -57,8 +57,8 @@ Fragment* NewFragment (unsigned char Type, unsigned Size, Section* S)
     Fragment* F;
 
     /* Calculate the size of the memory block. LitBuf is only needed if the
-     * fragment contains literal data.
-     */
+    ** fragment contains literal data.
+    */
     unsigned FragSize = sizeof (Fragment) - 1;
     if (Type == FRAG_LITERAL) {
         FragSize += Size;
@@ -94,6 +94,3 @@ Fragment* NewFragment (unsigned char Type, unsigned Size, Section* S)
     /* Return the new fragment */
     return F;
 }
-
-
-

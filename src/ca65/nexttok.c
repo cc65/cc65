@@ -70,9 +70,9 @@ static unsigned RawMode = 0;            /* Raw token mode flag/counter */
 
 static int LookAtStrCon (void)
 /* Make sure the next token is a string constant. If not, print an error
- * messages skip the remainder of the line and return false. Otherwise return
- * true.
- */
+** messages skip the remainder of the line and return false. Otherwise return
+** true.
+*/
 {
     if (CurTok.Tok != TOK_STRCON) {
         Error ("String constant expected");
@@ -93,10 +93,10 @@ static int LookAtStrCon (void)
 
 static TokList* CollectTokens (unsigned Start, unsigned Count)
 /* Read a list of tokens that is optionally enclosed in curly braces and
- * terminated by a right paren. For all tokens starting at the one with index
- * Start, and ending at (Start+Count-1), place them into a token list, and
- * return this token list.
- */
+** terminated by a right paren. For all tokens starting at the one with index
+** Start, and ending at (Start+Count-1), place them into a token list, and
+** return this token list.
+*/
 {
 
     /* Create the token list */
@@ -176,8 +176,8 @@ static void FuncConcat (void)
     }
 
     /* We expect a closing parenthesis, but will not skip it but replace it
-     * by the string token just created.
-     */
+    ** by the string token just created.
+    */
     if (CurTok.Tok != TOK_RPAREN) {
         Error ("`)' expected");
     } else {
@@ -220,8 +220,8 @@ static void FuncIdent (void)
     }
 
     /* Check that the string contains a valid identifier. While doing so,
-     * determine if it is a cheap local, or global one.
-     */
+    ** determine if it is a cheap local, or global one.
+    */
     SB_Reset (&CurTok.SVal);
 
     /* Check for a cheap local symbol */
@@ -248,8 +248,8 @@ static void FuncIdent (void)
     }
 
     /* If anything is ok, save and skip the string. Check that the next token
-     * is a right paren, then replace the token by an identifier token.
-     */
+    ** is a right paren, then replace the token by an identifier token.
+    */
     SB_Copy (&Buf, &CurTok.SVal);
     NextTok ();
     if (CurTok.Tok != TOK_RPAREN) {
@@ -289,12 +289,12 @@ static void FuncLeft (void)
     List = CollectTokens (0, (unsigned) Count);
 
     /* Since we want to insert the list before the now current token, we have
-     * to save the current token in some way and then skip it. To do this, we
-     * will add the current token at the end of the token list (so the list
-     * will never be empty), push the token list, and then skip the current
-     * token. This will replace the current token by the first token from the
-     * list (which will be the old current token in case the list was empty).
-     */
+    ** to save the current token in some way and then skip it. To do this, we
+    ** will add the current token at the end of the token list (so the list
+    ** will never be empty), push the token list, and then skip the current
+    ** token. This will replace the current token by the first token from the
+    ** list (which will be the old current token in case the list was empty).
+    */
     AddCurTok (List);
 
     /* Insert it into the scanner feed */
@@ -320,8 +320,8 @@ static void FuncMid (void)
     ConsumeLParen ();
 
     /* Start argument. Since the start argument can get negative with
-     * expressions like ".tcount(arg)-2", we correct it to zero silently.
-     */
+    ** expressions like ".tcount(arg)-2", we correct it to zero silently.
+    */
     Start = ConstExpression ();
     if (Start < 0 || Start > 100) {
         Start = 0;
@@ -329,8 +329,8 @@ static void FuncMid (void)
     ConsumeComma ();
 
     /* Count argument. Similar as above, we will accept negative counts and
-     * correct them to zero silently.
-     */
+    ** correct them to zero silently.
+    */
     Count = ConstExpression ();
     if (Count < 0) {
         Count = 0;
@@ -341,12 +341,12 @@ static void FuncMid (void)
     List = CollectTokens ((unsigned) Start, (unsigned) Count);
 
     /* Since we want to insert the list before the now current token, we have
-     * to save the current token in some way and then skip it. To do this, we
-     * will add the current token at the end of the token list (so the list
-     * will never be empty), push the token list, and then skip the current
-     * token. This will replace the current token by the first token from the
-     * list (which will be the old current token in case the list was empty).
-     */
+    ** to save the current token in some way and then skip it. To do this, we
+    ** will add the current token at the end of the token list (so the list
+    ** will never be empty), push the token list, and then skip the current
+    ** token. This will replace the current token by the first token from the
+    ** list (which will be the old current token in case the list was empty).
+    */
     AddCurTok (List);
 
     /* Insert it into the scanner feed */
@@ -396,12 +396,12 @@ static void FuncRight (void)
     }
 
     /* Since we want to insert the list before the now current token, we have
-     * to save the current token in some way and then skip it. To do this, we
-     * will add the current token at the end of the token list (so the list
-     * will never be empty), push the token list, and then skip the current
-     * token. This will replace the current token by the first token from the
-     * list (which will be the old current token in case the list was empty).
-     */
+    ** to save the current token in some way and then skip it. To do this, we
+    ** will add the current token at the end of the token list (so the list
+    ** will never be empty), push the token list, and then skip the current
+    ** token. This will replace the current token by the first token from the
+    ** list (which will be the old current token in case the list was empty).
+    */
     AddCurTok (List);
 
     /* Insert it into the scanner feed */
@@ -474,15 +474,15 @@ static void FuncSPrintF (void)
             break;
         }
 
-        /* Since a format specifier follows, we do expect anotehr argument for
-         * the .sprintf function.
-         */
+        /* Since a format specifier follows, we do expect another argument for
+        ** the .sprintf function.
+        */
         ConsumeComma ();
 
         /* We will copy the format spec into F1 checking for the things we
-         * support, and later use xsprintf to do the actual formatting. This
-         * is easier than adding another printf implementation...
-         */
+        ** support, and later use xsprintf to do the actual formatting. This
+        ** is easier than adding another printf implementation...
+        */
         SB_Clear (&F1);
         SB_AppendChar (&F1, '%');
 
@@ -522,8 +522,8 @@ static void FuncSPrintF (void)
             case 'X':
             case 'x':
                 /* Our ints are actually longs, so we use the 'l' modifier when
-                 * calling xsprintf later. Terminate the format string.
-                 */
+                ** calling xsprintf later. Terminate the format string.
+                */
                 SB_AppendChar (&F1, 'l');
                 SB_AppendChar (&F1, SB_Get (&Format));
                 SB_Terminate (&F1);
@@ -576,8 +576,8 @@ static void FuncSPrintF (void)
                 }
 
                 /* Format this argument according to the spec. Be sure to pass
-                 * an int as the char value.
-                 */
+                ** an int as the char value.
+                */
                 SB_Printf (&R1, SB_GetConstBuf (&F1), (int) IVal);
 
                 /* Append the formatted argument to the result */
@@ -597,8 +597,8 @@ static void FuncSPrintF (void)
     SB_Terminate (&R);
 
     /* We expect a closing parenthesis, but will not skip it but replace it
-     * by the string token just created.
-     */
+    ** by the string token just created.
+    */
     if (CurTok.Tok != TOK_RPAREN) {
         Error ("`)' expected");
     } else {
@@ -636,8 +636,8 @@ static void FuncString (void)
     } else if (CurTok.Tok == TOK_NAMESPACE || CurTok.Tok == TOK_IDENT) {
 
         /* Parse a fully qualified symbol name. We cannot use
-         * ParseScopedSymName here since the name may be invalid.
-         */
+        ** ParseScopedSymName here since the name may be invalid.
+        */
         int NameSpace;
         do {
             NameSpace = (CurTok.Tok == TOK_NAMESPACE);
@@ -657,8 +657,8 @@ static void FuncString (void)
     }
 
     /* We expect a closing parenthesis, but will not skip it but replace it
-     * by the string token just created.
-     */
+    ** by the string token just created.
+    */
     if (CurTok.Tok != TOK_RPAREN) {
         Error ("`)' expected");
     } else {
@@ -680,8 +680,8 @@ void NextTok (void)
     NextRawTok ();
 
     /* In raw mode, or when output is suppressed via conditional assembly,
-     * pass the token unchanged.
-     */
+    ** pass the token unchanged.
+    */
     if (RawMode == 0 && IfCond) {
 
         /* Execute token handling functions */
@@ -787,8 +787,8 @@ void SkipUntilSep (void)
 
 void ExpectSep (void)
 /* Check if we've reached a line separator, and output an error if not. Do
- * not skip the line separator.
- */
+** not skip the line separator.
+*/
 {
     if (!TokIsSep (CurTok.Tok)) {
         ErrorSkip ("Unexpected trailing garbage characters");
@@ -799,11 +799,11 @@ void ExpectSep (void)
 
 void EnterRawTokenMode (void)
 /* Enter raw token mode. In raw mode, token handling functions are not
- * executed, but the function tokens are passed untouched to the upper
- * layer. Raw token mode is used when storing macro tokens for later
- * use.
- * Calls to EnterRawTokenMode and LeaveRawTokenMode may be nested.
- */
+** executed, but the function tokens are passed untouched to the upper
+** layer. Raw token mode is used when storing macro tokens for later
+** use.
+** Calls to EnterRawTokenMode and LeaveRawTokenMode may be nested.
+*/
 {
     ++RawMode;
 }
@@ -816,6 +816,3 @@ void LeaveRawTokenMode (void)
     PRECONDITION (RawMode > 0);
     --RawMode;
 }
-
-
-

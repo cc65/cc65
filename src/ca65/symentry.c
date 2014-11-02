@@ -115,12 +115,12 @@ SymEntry* NewSymEntry (const StrBuf* Name, unsigned Flags)
 
 int SymSearchTree (SymEntry* T, const StrBuf* Name, SymEntry** E)
 /* Search in the given tree for a name. If we find the symbol, the function
- * will return 0 and put the entry pointer into E. If we did not find the
- * symbol, and the tree is empty, E is set to NULL. If the tree is not empty,
- * E will be set to the last entry, and the result of the function is <0 if
- * the entry should be inserted on the left side, and >0 if it should get
- * inserted on the right side.
- */
+** will return 0 and put the entry pointer into E. If we did not find the
+** symbol, and the tree is empty, E is set to NULL. If the tree is not empty,
+** E will be set to the last entry, and the result of the function is <0 if
+** the entry should be inserted on the left side, and >0 if it should get
+** inserted on the right side.
+*/
 {
     /* Is there a tree? */
     if (T == 0) {
@@ -196,8 +196,8 @@ static void SymReplaceExprRefs (SymEntry* S)
         CHECK (E->Op == EXPR_SYMBOL && E->V.Sym == S);
 
         /* We cannot touch the root node, since there are pointers to it.
-         * Replace it by a literal node.
-         */
+        ** Replace it by a literal node.
+        */
         E->Op = EXPR_LITERAL;
         E->V.IVal = Val;
     }
@@ -234,8 +234,8 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags
                 return;
             }
             /* Delete the current symbol expression, since it will get
-             * replaced
-             */
+            ** replaced
+            */
             FreeExpr (S->Expr);
             S->Expr = 0;
         }
@@ -255,17 +255,17 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags
     S->Expr = Expr;
 
     /* In case of a variable symbol, walk over all expressions containing
-     * this symbol and replace the (sub-)expression by the literal value of
-     * the tree. Be sure to replace the expression node in place, since there
-     * may be pointers to it.
-     */
+    ** this symbol and replace the (sub-)expression by the literal value of
+    ** the tree. Be sure to replace the expression node in place, since there
+    ** may be pointers to it.
+    */
     if (Flags & SF_VAR) {
         SymReplaceExprRefs (S);
     }
 
     /* If the symbol is marked as global, export it. Address size is checked
-     * below.
-     */
+    ** below.
+    */
     if (S->Flags & SF_GLOBAL) {
         S->Flags = (S->Flags & ~SF_GLOBAL) | SF_EXPORT;
         ReleaseFullLineInfo (&S->DefLines);
@@ -326,15 +326,15 @@ void SymImport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
     }
 
     /* If no address size is given, use the address size of the enclosing
-     * segment.
-     */
+    ** segment.
+    */
     if (AddrSize == ADDR_SIZE_DEFAULT) {
         AddrSize = GetCurrentSegAddrSize ();
     }
 
     /* If the symbol is marked as import or global, check the address size,
-     * then do silently remove the global flag.
-     */
+    ** then do silently remove the global flag.
+    */
     if (S->Flags & SF_IMPORT) {
         if ((Flags & SF_FORCED) != (S->Flags & SF_FORCED)) {
             Error ("Redeclaration mismatch for symbol `%m%p'", GetSymName (S));
@@ -355,9 +355,9 @@ void SymImport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
     S->AddrSize = AddrSize;
 
     /* Mark the position of the import as the position of the definition.
-     * Please note: In case of multiple .global or .import statements, the line
-     * infos add up.
-     */
+    ** Please note: In case of multiple .global or .import statements, the line
+    ** infos add up.
+    */
     GetFullLineInfo (&S->DefLines);
 }
 
@@ -379,8 +379,8 @@ void SymExport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
     }
 
     /* If the symbol was marked as global before, remove the global flag and
-     * proceed, but check the address size.
-     */
+    ** proceed, but check the address size.
+    */
     if (S->Flags & SF_GLOBAL) {
         if (AddrSize != S->ExportSize) {
             Error ("Address size mismatch for symbol `%m%p'", GetSymName (S));
@@ -388,14 +388,14 @@ void SymExport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
         S->Flags &= ~SF_GLOBAL;
 
         /* .GLOBAL remembers line infos in case an .IMPORT follows. We have
-         * to remove these here.
-         */
+        ** to remove these here.
+        */
         ReleaseFullLineInfo (&S->DefLines);
     }
 
     /* If the symbol was already marked as an export, but wasn't defined
-     * before, the address sizes in both definitions must match.
-     */
+    ** before, the address sizes in both definitions must match.
+    */
     if ((S->Flags & (SF_EXPORT|SF_DEFINED)) == SF_EXPORT) {
         if (S->ExportSize != AddrSize) {
             Error ("Address size mismatch for symbol `%m%p'", GetSymName (S));
@@ -404,8 +404,8 @@ void SymExport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
     S->ExportSize = AddrSize;
 
     /* If the symbol is already defined, check symbol size against the
-     * exported size.
-     */
+    ** exported size.
+    */
     if (S->Flags & SF_DEFINED) {
         if (S->ExportSize == ADDR_SIZE_DEFAULT) {
             /* No export size given, use the real size of the symbol */
@@ -429,8 +429,8 @@ void SymExport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
 
 void SymGlobal (SymEntry* S, unsigned char AddrSize, unsigned Flags)
 /* Mark the given symbol as a global symbol, that is, as a symbol that is
- * either imported or exported.
- */
+** either imported or exported.
+*/
 {
     if (S->Flags & SF_VAR) {
         /* Variable symbols cannot be exported or imported */
@@ -439,8 +439,8 @@ void SymGlobal (SymEntry* S, unsigned char AddrSize, unsigned Flags)
     }
 
     /* If the symbol is already marked as import, the address size must match.
-     * Apart from that, ignore the global declaration.
-     */
+    ** Apart from that, ignore the global declaration.
+    */
     if (S->Flags & SF_IMPORT) {
         if (AddrSize == ADDR_SIZE_DEFAULT) {
             /* Use the size of the current segment */
@@ -453,8 +453,8 @@ void SymGlobal (SymEntry* S, unsigned char AddrSize, unsigned Flags)
     }
 
     /* If the symbol is already an export: If it is not defined, the address
-     * sizes must match.
-     */
+    ** sizes must match.
+    */
     if (S->Flags & SF_EXPORT) {
         if ((S->Flags & SF_DEFINED) == 0) {
             /* Symbol is undefined */
@@ -471,9 +471,9 @@ void SymGlobal (SymEntry* S, unsigned char AddrSize, unsigned Flags)
     }
 
     /* If the symbol is already marked as global, the address size must match.
-     * Use the ExportSize here, since it contains the actual address size
-     * passed to this function.
-     */
+    ** Use the ExportSize here, since it contains the actual address size
+    ** passed to this function.
+    */
     if (S->Flags & SF_GLOBAL) {
         if (AddrSize != S->ExportSize) {
             Error ("Address size mismatch for symbol `%m%p'", GetSymName (S));
@@ -482,10 +482,10 @@ void SymGlobal (SymEntry* S, unsigned char AddrSize, unsigned Flags)
     }
 
     /* If we come here, the symbol was neither declared as export, import or
-     * global before. Check if it is already defined, in which case it will
-     * become an export. If it is not defined, mark it as global and remember
-     * the given address sizes.
-     */
+    ** global before. Check if it is already defined, in which case it will
+    ** become an export. If it is not defined, mark it as global and remember
+    ** the given address sizes.
+    */
     if (S->Flags & SF_DEFINED) {
         /* The symbol is defined, export it */
         S->ExportSize = AddrSize;
@@ -501,9 +501,9 @@ void SymGlobal (SymEntry* S, unsigned char AddrSize, unsigned Flags)
         S->Flags |= (SF_EXPORT | Flags);
     } else {
         /* Since we don't know if the symbol will get exported or imported,
-         * remember two different address sizes: One for an import in AddrSize,
-         * and the other one for an export in ExportSize.
-         */
+        ** remember two different address sizes: One for an import in AddrSize,
+        ** and the other one for an export in ExportSize.
+        */
         S->AddrSize = AddrSize;
         if (S->AddrSize == ADDR_SIZE_DEFAULT) {
             /* Use the size of the current segment */
@@ -513,8 +513,8 @@ void SymGlobal (SymEntry* S, unsigned char AddrSize, unsigned Flags)
         S->Flags |= (SF_GLOBAL | Flags);
 
         /* Remember the current location as location of definition in case
-         * an .IMPORT follows later.
-         */
+        ** an .IMPORT follows later.
+        */
         GetFullLineInfo (&S->DefLines);
     }
 }
@@ -523,8 +523,8 @@ void SymGlobal (SymEntry* S, unsigned char AddrSize, unsigned Flags)
 
 void SymConDes (SymEntry* S, unsigned char AddrSize, unsigned Type, unsigned Prio)
 /* Mark the given symbol as a module constructor/destructor. This will also
- * mark the symbol as an export. Initializers may never be zero page symbols.
- */
+** mark the symbol as an export. Initializers may never be zero page symbols.
+*/
 {
     /* Check the parameters */
 #if (CD_TYPE_MIN != 0)
@@ -547,9 +547,9 @@ void SymConDes (SymEntry* S, unsigned char AddrSize, unsigned Type, unsigned Pri
     }
 
     /* If the symbol was already marked as an export or global, check if
-     * this was done specifiying the same address size. In case of a global
-     * declaration, silently remove the global flag.
-     */
+    ** this was done specifiying the same address size. In case of a global
+    ** declaration, silently remove the global flag.
+    */
     if (S->Flags & (SF_EXPORT | SF_GLOBAL)) {
         if (S->ExportSize != AddrSize) {
             Error ("Address size mismatch for symbol `%m%p'", GetSymName (S));
@@ -559,8 +559,8 @@ void SymConDes (SymEntry* S, unsigned char AddrSize, unsigned Type, unsigned Pri
     S->ExportSize = AddrSize;
 
     /* If the symbol is already defined, check symbol size against the
-     * exported size.
-     */
+    ** exported size.
+    */
     if (S->Flags & SF_DEFINED) {
         if (S->ExportSize == ADDR_SIZE_DEFAULT) {
             /* Use the real size of the symbol */
@@ -571,8 +571,8 @@ void SymConDes (SymEntry* S, unsigned char AddrSize, unsigned Type, unsigned Pri
     }
 
     /* If the symbol was already declared as a condes, check if the new
-     * priority value is the same as the old one.
-     */
+    ** priority value is the same as the old one.
+    */
     if (S->ConDesPrio[Type] != CD_PRIO_NONE) {
         if (S->ConDesPrio[Type] != Prio) {
             Error ("Redeclaration mismatch for symbol `%m%p'", GetSymName (S));
@@ -593,10 +593,10 @@ void SymConDes (SymEntry* S, unsigned char AddrSize, unsigned Type, unsigned Pri
 
 void SymGuessedAddrSize (SymEntry* Sym, unsigned char AddrSize)
 /* Mark the address size of the given symbol as guessed. The address size
- * passed as argument is the one NOT used, because the actual address size
- * wasn't known. Example: Zero page addressing was not used because symbol
- * is undefined, and absolute addressing was available.
- */
+** passed as argument is the one NOT used, because the actual address size
+** wasn't known. Example: Zero page addressing was not used because symbol
+** is undefined, and absolute addressing was available.
+*/
 {
     /* We must have a valid address size passed */
     PRECONDITION (AddrSize != ADDR_SIZE_DEFAULT);
@@ -619,8 +619,8 @@ void SymGuessedAddrSize (SymEntry* Sym, unsigned char AddrSize)
 
 void SymExportFromGlobal (SymEntry* S)
 /* Called at the end of assembly. Converts a global symbol that is defined
- * into an export.
- */
+** into an export.
+*/
 {
     /* Remove the global flag and make the symbol an export */
     S->Flags &= ~SF_GLOBAL;
@@ -631,8 +631,8 @@ void SymExportFromGlobal (SymEntry* S)
 
 void SymImportFromGlobal (SymEntry* S)
 /* Called at the end of assembly. Converts a global symbol that is undefined
- * into an import.
- */
+** into an import.
+*/
 {
     /* Remove the global flag and make it an import */
     S->Flags &= ~SF_GLOBAL;
@@ -643,8 +643,8 @@ void SymImportFromGlobal (SymEntry* S)
 
 int SymIsConst (const SymEntry* S, long* Val)
 /* Return true if the given symbol has a constant value. If Val is not NULL
- * and the symbol has a constant value, store it's value there.
- */
+** and the symbol has a constant value, store it's value there.
+*/
 {
     /* Check for constness */
     return (SymHasExpr (S) && IsConstExpr (S->Expr, Val));
@@ -654,16 +654,16 @@ int SymIsConst (const SymEntry* S, long* Val)
 
 SymTable* GetSymParentScope (SymEntry* S)
 /* Get the parent scope of the symbol (not the one it is defined in). Return
- * NULL if the symbol is a cheap local, or defined on global level.
- */
+** NULL if the symbol is a cheap local, or defined on global level.
+*/
 {
     if ((S->Flags & SF_LOCAL) != 0) {
         /* This is a cheap local symbol */
         return 0;
     } else if (S->Sym.Tab == 0) {
         /* Symbol not in a table. This may happen if there have been errors
-         * before. Return NULL in this case to avoid further errors.
-         */
+        ** before. Return NULL in this case to avoid further errors.
+        */
         return 0;
     } else {
         /* This is a global symbol */
@@ -684,8 +684,8 @@ struct ExprNode* GetSymExpr (SymEntry* S)
 
 const struct ExprNode* SymResolve (const SymEntry* S)
 /* Helper function for DumpExpr. Resolves a symbol into an expression or return
- * NULL. Do not call in other contexts!
- */
+** NULL. Do not call in other contexts!
+*/
 {
     return SymHasExpr (S)? S->Expr : 0;
 }
@@ -694,8 +694,8 @@ const struct ExprNode* SymResolve (const SymEntry* S)
 
 long GetSymVal (SymEntry* S)
 /* Return the value of a symbol assuming it's constant. FAIL will be called
- * in case the symbol is undefined or not constant.
- */
+** in case the symbol is undefined or not constant.
+*/
 {
     long Val;
     CHECK (S != 0 && SymHasExpr (S) && IsConstExpr (GetSymExpr (S), &Val));
@@ -724,10 +724,10 @@ unsigned GetSymExportId (const SymEntry* S)
 
 unsigned GetSymInfoFlags (const SymEntry* S, long* ConstVal)
 /* Return a set of flags used when writing symbol information into a file.
- * If the SYM_CONST bit is set, ConstVal will contain the constant value
- * of the symbol. The result does not include the condes count.
- * See common/symdefs.h for more information.
- */
+** If the SYM_CONST bit is set, ConstVal will contain the constant value
+** of the symbol. The result does not include the condes count.
+** See common/symdefs.h for more information.
+*/
 {
     /* Setup info flags */
     unsigned Flags = 0;
@@ -744,6 +744,3 @@ unsigned GetSymInfoFlags (const SymEntry* S, long* ConstVal)
     /* Return the result */
     return Flags;
 }
-
-
-

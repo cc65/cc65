@@ -15,11 +15,13 @@
         .import         paldata
 
         .macpack        generic
+        .macpack        module
+
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table and constants.
 
-.segment        "JUMPTABLE"
+        module_header   _nes_64_56_2_tgi
 
 ; First part of the header is a structure that has a magic and defines the
 ; capabilities of the driver

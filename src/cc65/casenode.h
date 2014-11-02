@@ -115,20 +115,18 @@ void FreeCaseNodeColl (Collection* Nodes);
 
 int SearchCaseNode (const Collection* Nodes, unsigned char Key, int* Index);
 /* Search for a node in the given collection. If the node has been found,
- * set Index to the index of the node and return true. If the node was not
- * found, set Index the the insertion position of the node and return
- * false.
- */
+** set Index to the index of the node and return true. If the node was not
+** found, set Index the the insertion position of the node and return
+** false.
+*/
 
 unsigned InsertCaseValue (Collection* Nodes, unsigned long Val, unsigned Depth);
 /* Insert a new case value into a CaseNode tree with the given depth. Return
- * the code label for the value.
- */
+** the code label for the value.
+*/
 
 
 
 /* End of casenode.h */
+
 #endif
-
-
-

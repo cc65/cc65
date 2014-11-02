@@ -50,7 +50,5 @@ void AsmInc (const char* Filename, char CommentStart, int IgnoreUnknown);
 
 
 /* End of asminc.h */
+
 #endif
-
-
-

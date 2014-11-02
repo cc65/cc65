@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2005 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -60,8 +60,8 @@ enum {
 
 void CreateMapFile (int ShortMap);
 /* Create a map file. If ShortMap is true, only the segment lists are
- * generated, not the import/export lists.
- */
+** generated, not the import/export lists.
+*/
 
 void CreateLabelFile (void);
 /* Create a label file */
@@ -71,6 +71,3 @@ void CreateLabelFile (void);
 /* End of mapfile.h */
 
 #endif
-
-
-

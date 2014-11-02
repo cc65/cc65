@@ -12,12 +12,13 @@
         .include        "cbm510.inc"
 
         .macpack        generic
+        .macpack        module
 
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-.segment        "JUMPTABLE"
+        module_header   _cbm510_ram_emd
 
 ; Driver signature
 

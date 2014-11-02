@@ -1,8 +1,8 @@
 /*
- * _afailed.c
- *
- * Maciej 'YTM/Elysium' Witkowiak 28.10.2001
- */
+** _afailed.c
+**
+** Maciej 'YTM/Elysium' Witkowiak 28.10.2001
+*/
 
 #include <stdio.h>
 #include <stdlib.h>

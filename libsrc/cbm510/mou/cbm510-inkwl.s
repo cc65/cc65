@@ -3,7 +3,7 @@
 ;
 ; This driver reads only the main button on the 184-C.
 ;
-; 2013-09-05, Greg King
+; 2014-09-10, Greg King
 ;
 
         .include        "zeropage.inc"
@@ -13,11 +13,13 @@
         .include        "cbm510.inc"
 
         .macpack        generic
+        .macpack        module
+
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table.
 
-.segment        "JUMPTABLE"
+        module_header   _cbm510_inkwl_mou
 
 HEADER:
 
@@ -53,6 +55,8 @@ LIBREF: .addr   $0000
 
 CHIDE:  jmp     $0000                   ; Hide the cursor
 CSHOW:  jmp     $0000                   ; Show the cursor
+CPREP:  jmp     $0000                   ; Prepare to move the cursor
+CDRAW:  jmp     $0000                   ; Draw the cursor
 CMOVEX: jmp     $0000                   ; Move the cursor to X co-ord.
 CMOVEY: jmp     $0000                   ; Move the cursor to Y co-ord.
 
@@ -99,6 +103,8 @@ OldPenY:        .res    1
 ; Default Inkwell calibration.
 ; The first number is the width of the left border;
 ; the second number is the actual calibration value.
+; See a comment below (at "Calculate the new X co-ordinate")
+; for the reason for the third number.
 
 XOffset:        .byte   (24 + 24) / 2   ; x-offset
 
@@ -276,7 +282,7 @@ BUTTONS:
         asl     a                       ; ... to fire-button bit
         eor     #MOUSE_BTN_LEFT
         and     #MOUSE_BTN_LEFT
-        ldx     #>0
+        ldx     #>$0000
         rts
 
 ;----------------------------------------------------------------------------
@@ -336,7 +342,8 @@ IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioctls, for now
 ; MUST return carry clear.
 ;
 
-IRQ:    ldx     #15                     ; To system bank
+IRQ:    jsr     CPREP
+        ldx     #15                     ; To system bank
         stx     IndReg
 
 ; Read the VIC-II lightpen registers.
@@ -357,7 +364,7 @@ IRQ:    ldx     #15                     ; To system bank
 
         sub     #50
         tay                             ; Remember low byte
-        ldx     #>0
+        ldx     #>$0000
 
 ; Limit the Y co-ordinate to the bounding box.
 
@@ -403,7 +410,7 @@ IRQ:    ldx     #15                     ; To system bank
 
         asl     a
         tay                             ; Remember low byte
-        lda     #>0
+        lda     #>$0000
         rol     a
         tax                             ; Remember high byte
 
@@ -428,7 +435,8 @@ IRQ:    ldx     #15                     ; To system bank
 
 ; Done
 
-@SkipX: clc                             ; Interrupt not "handled"
+@SkipX: jsr     CDRAW
+        clc                             ; Interrupt not "handled"
         rts
 
 ; Move the lightpen pointer to the new Y pos.

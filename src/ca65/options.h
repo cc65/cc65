@@ -73,6 +73,3 @@ void WriteOptions (void);
 /* End of options.h */
 
 #endif
-
-
-

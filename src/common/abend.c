@@ -50,8 +50,8 @@
 
 void AbEnd (const char* Format, ...)
 /* Print a message preceeded by the program name and terminate the program
- * with an error exit code.
- */
+** with an error exit code.
+*/
 {
     va_list ap;
 
@@ -69,6 +69,3 @@ void AbEnd (const char* Format, ...)
     /* Terminate the program */
     exit (EXIT_FAILURE);
 }
-
-
-

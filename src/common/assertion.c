@@ -58,6 +58,3 @@ int AssertAtAsmTime (AssertAction A)
 {
     return (A & 0x02U) == 0;
 }
-
-
-

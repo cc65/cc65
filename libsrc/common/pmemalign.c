@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2004-2005 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -43,23 +43,23 @@
 
 
 /* This is a very simple version of an aligned memory allocator.  We will
- * allocate a greater block, so that we can place the aligned block (that is
- * returned) within it.  We use our knowledge about the internal heap
- * structures to free the unused parts of the bigger block (the two chunks
- * below and above the aligned block).
- */
+** allocate a greater block, so that we can place the aligned block (that is
+** returned) within it.  We use our knowledge about the internal heap
+** structures to free the unused parts of the bigger block (the two chunks
+** below and above the aligned block).
+*/
 
 
 
 int __fastcall__ posix_memalign (void** memptr, size_t alignment, size_t size)
 /* Allocate a block of memory with the given "size", which is aligned to a
- * memory address that is a multiple of "alignment".  "alignment" MUST NOT be
- * zero, and MUST be a power of two; otherwise, this function will return
- * EINVAL.  The function returns ENOMEM if not enough memory is available
- * to satisfy the request.  "memptr" must point to a variable; that variable
- * will return the address of the allocated memory.  Use free() to release that
- * allocated block.
- */
+** memory address that is a multiple of "alignment".  "alignment" MUST NOT be
+** zero, and MUST be a power of two; otherwise, this function will return
+** EINVAL.  The function returns ENOMEM if not enough memory is available
+** to satisfy the request.  "memptr" must point to a variable; that variable
+** will return the address of the allocated memory.  Use free() to release that
+** allocated block.
+*/
 {
     size_t rawsize;
     size_t uppersize;
@@ -81,11 +81,11 @@ int __fastcall__ posix_memalign (void** memptr, size_t alignment, size_t size)
     }
 
     /* Augment the block size up to the alignment, and allocate memory.
-     * We don't need to account for the additional admin. data that's needed to
-     * manage the used block, because the block returned by malloc() has that
-     * overhead added one time; and, the worst thing that might happen is that
-     * we cannot free the upper and lower blocks.
-     */
+    ** We don't need to account for the additional admin. data that's needed to
+    ** manage the used block, because the block returned by malloc() has that
+    ** overhead added one time; and, the worst thing that might happen is that
+    ** we cannot free the upper and lower blocks.
+    */
     b = malloc (size + alignment);
 
     /* Handle out-of-memory */
@@ -95,26 +95,26 @@ int __fastcall__ posix_memalign (void** memptr, size_t alignment, size_t size)
     }
 
     /* Create (and return) a new pointer that points to the user-visible
-     * aligned block.
-     */
+    ** aligned block.
+    */
     u = *memptr = (struct usedblock*) (((unsigned)b + alignment) & ~alignment);
 
     /* Get a pointer to the (raw) upper block */
     p = (struct usedblock*) ((char*)u + size);
 
     /* Get the raw-block pointer, which is located just below the visible
-     * unaligned block.  The first word of this raw block is the total size
-     * of the block, including the admin. space.
-     */
+    ** unaligned block.  The first word of this raw block is the total size
+    ** of the block, including the admin. space.
+    */
     b = (b-1)->start;
     rawsize = b->size;
 
     /* Check if we can free the space above the user block.  That is the case
-     * if the size of the block is at least sizeof (struct freeblock) bytes,
-     * and the size of the remaining block is at least that size, too.
-     * If the upper block is smaller, then we just will pass it to the caller,
-     * together with the requested aligned block.
-     */
+    ** if the size of the block is at least sizeof (struct freeblock) bytes,
+    ** and the size of the remaining block is at least that size, too.
+    ** If the upper block is smaller, then we just will pass it to the caller,
+    ** together with the requested aligned block.
+    */
     uppersize = rawsize - (lowersize = (char*)p - (char*)b);
     if (uppersize >= sizeof (struct freeblock) &&
         lowersize >= sizeof (struct freeblock)) {
@@ -131,20 +131,20 @@ int __fastcall__ posix_memalign (void** memptr, size_t alignment, size_t size)
     }
 
     /* Check if we can free the space below the user block.  That is the case
-     * if the size of the block is at least sizeof (struct freeblock) bytes,
-     * and the size of the remaining block is at least that size, too.  If the
-     * lower block is smaller, we just will pass it to the caller, together
-     * with the requested aligned block.
-     * Beware:  We need an additional struct usedblock, in the lower block,
-     * which is part of the block that is passed back to the caller.
-     */
+    ** if the size of the block is at least sizeof (struct freeblock) bytes,
+    ** and the size of the remaining block is at least that size, too.  If the
+    ** lower block is smaller, we just will pass it to the caller, together
+    ** with the requested aligned block.
+    ** Beware:  We need an additional struct usedblock, in the lower block,
+    ** which is part of the block that is passed back to the caller.
+    */
     lowersize = ((char*)u - (char*)b) - sizeof (struct usedblock);
     if (           lowersize  >= sizeof (struct freeblock) &&
         (rawsize - lowersize) >= sizeof (struct freeblock)) {
 
         /* b already points to the raw lower-block.
-         * Set up the usedblock structure.
-         */
+        ** Set up the usedblock structure.
+        */
         b->size  = lowersize;
         b->start = b;
 
@@ -159,11 +159,11 @@ int __fastcall__ posix_memalign (void** memptr, size_t alignment, size_t size)
     }
 
     /* u points to the user-visible block, while b points to the raw block,
-     * and rawsize contains the length of the raw block.  Set up the usedblock
-     * structure, but beware:  If we didn't free the lower block, then it is
-     * split; which means that we must use b to write the size,
-     * and u to write the start field.
-     */
+    ** and rawsize contains the length of the raw block.  Set up the usedblock
+    ** structure, but beware:  If we didn't free the lower block, then it is
+    ** split; which means that we must use b to write the size,
+    ** and u to write the start field.
+    */
     b->size = rawsize;
     (u-1)->start = b;
 

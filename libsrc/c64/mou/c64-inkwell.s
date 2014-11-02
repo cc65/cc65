@@ -1,7 +1,7 @@
 ;
 ; Driver for the Inkwell Systems 170-C and 184-C lightpens.
 ;
-; 2013-07-01, Greg King
+; 2014-09-10, Greg King
 ;
 
         .include        "zeropage.inc"
@@ -9,11 +9,13 @@
         .include        "c64.inc"
 
         .macpack        generic
+        .macpack        module
+
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table.
 
-.segment        "JUMPTABLE"
+        module_header   _c64_inkwell_mou
 
 HEADER:
 
@@ -49,6 +51,8 @@ LIBREF: .addr   $0000
 
 CHIDE:  jmp     $0000                   ; Hide the cursor
 CSHOW:  jmp     $0000                   ; Show the cursor
+CPREP:  jmp     $0000                   ; Prepare to move the cursor
+CDRAW:  jmp     $0000                   ; Draw the cursor
 CMOVEX: jmp     $0000                   ; Move the cursor to X co-ord.
 CMOVEY: jmp     $0000                   ; Move the cursor to Y co-ord.
 
@@ -98,6 +102,8 @@ OldPenY:        .res    1
 ; Default Inkwell calibration.
 ; The first number is the width of the left border;
 ; the second number is the actual calibration value.
+; See a comment below (at "Calculate the new X co-ordinate")
+; for the reason for the third number.
 
 XOffset:        .byte   (24 + 24) / 2   ; x-offset
 
@@ -256,7 +262,7 @@ MOVE:   sei                             ; No interrupts
 
 BUTTONS:
         lda     Buttons
-        ldx     #>0
+        ldx     #>$0000
 
 ; Make the lightpen buttons look like a 1351 mouse.
 
@@ -324,7 +330,7 @@ IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioctls, for now
 ; MUST return carry clear.
 ;
 
-IRQ:
+IRQ:    jsr     CPREP
 
 ; Record the state of the buttons.
 ; Try to avoid crosstalk between the keyboard and the lightpen.
@@ -356,7 +362,7 @@ IRQ:
 
         sub     #50
         tay                             ; Remember low byte
-        ldx     #>0
+        ldx     #>$0000
 
 ; Limit the Y co-ordinate to the bounding box.
 
@@ -397,7 +403,7 @@ IRQ:
 
         asl     a
         tay                             ; Remember low byte
-        lda     #>0
+        lda     #>$0000
         rol     a
         tax                             ; Remember high byte
 
@@ -422,7 +428,8 @@ IRQ:
 
 ; Done
 
-@SkipX: clc                             ; Interrupt not "handled"
+@SkipX: jsr     CDRAW
+        clc                             ; Interrupt not "handled"
         rts
 
 ; Move the lightpen pointer to the new Y pos.

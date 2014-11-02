@@ -92,11 +92,11 @@ struct SymEntry {
     Collection          DefLines;       /* Line infos for definition */
     Collection          RefLines;       /* Line infos for references */
     FilePos*            GuessedUse[1];  /* File position where symbol
-                                         * address size was guessed, and the
-                                         * smallest possible addressing was NOT
-                                         * used. Currently only for zero page
-                                         * addressing
-                                         */
+                                        ** address size was guessed, and the
+                                        ** smallest possible addressing was NOT
+                                        ** used. Currently only for zero page
+                                        ** addressing
+                                        */
     struct HLLDbgSym*   HLLSym;         /* Symbol from high level language */
     unsigned            Flags;          /* Symbol flags */
     unsigned            DebugSymId;     /* Debug symbol id */
@@ -130,12 +130,12 @@ SymEntry* NewSymEntry (const StrBuf* Name, unsigned Flags);
 
 int SymSearchTree (SymEntry* T, const StrBuf* Name, SymEntry** E);
 /* Search in the given tree for a name. If we find the symbol, the function
- * will return 0 and put the entry pointer into E. If we did not find the
- * symbol, and the tree is empty, E is set to NULL. If the tree is not empty,
- * E will be set to the last entry, and the result of the function is <0 if
- * the entry should be inserted on the left side, and >0 if it should get
- * inserted on the right side.
- */
+** will return 0 and put the entry pointer into E. If we did not find the
+** symbol, and the tree is empty, E is set to NULL. If the tree is not empty,
+** E will be set to the last entry, and the result of the function is <0 if
+** the entry should be inserted on the left side, and >0 if it should get
+** inserted on the right side.
+*/
 
 #if defined(HAVE_INLINE)
 INLINE void SymAddExprRef (SymEntry* Sym, struct ExprNode* Expr)
@@ -174,30 +174,30 @@ void SymExport (SymEntry* Sym, unsigned char AddrSize, unsigned Flags);
 
 void SymGlobal (SymEntry* Sym, unsigned char AddrSize, unsigned Flags);
 /* Mark the given symbol as a global symbol, that is, as a symbol that is
- * either imported or exported.
- */
+** either imported or exported.
+*/
 
 void SymConDes (SymEntry* Sym, unsigned char AddrSize, unsigned Type, unsigned Prio);
 /* Mark the given symbol as a module constructor/destructor. This will also
- * mark the symbol as an export. Initializers may never be zero page symbols.
- */
+** mark the symbol as an export. Initializers may never be zero page symbols.
+*/
 
 void SymGuessedAddrSize (SymEntry* Sym, unsigned char AddrSize);
 /* Mark the address size of the given symbol as guessed. The address size
- * passed as argument is the one NOT used, because the actual address size
- * wasn't known. Example: Zero page addressing was not used because symbol
- * is undefined, and absolute addressing was available.
- */
+** passed as argument is the one NOT used, because the actual address size
+** wasn't known. Example: Zero page addressing was not used because symbol
+** is undefined, and absolute addressing was available.
+*/
 
 void SymExportFromGlobal (SymEntry* S);
 /* Called at the end of assembly. Converts a global symbol that is defined
- * into an export.
- */
+** into an export.
+*/
 
 void SymImportFromGlobal (SymEntry* S);
 /* Called at the end of assembly. Converts a global symbol that is undefined
- * into an import.
- */
+** into an import.
+*/
 
 #if defined(HAVE_INLINE)
 INLINE int SymIsDef (const SymEntry* S)
@@ -254,8 +254,8 @@ INLINE int SymIsVar (const SymEntry* S)
 
 int SymIsConst (const SymEntry* Sym, long* Val);
 /* Return true if the given symbol has a constant value. If Val is not NULL
- * and the symbol has a constant value, store it's value there.
- */
+** and the symbol has a constant value, store it's value there.
+*/
 
 #if defined(HAVE_INLINE)
 INLINE int SymHasExpr (const SymEntry* S)
@@ -303,16 +303,16 @@ INLINE int SymHasUserMark (SymEntry* S)
 
 struct SymTable* GetSymParentScope (SymEntry* S);
 /* Get the parent scope of the symbol (not the one it is defined in). Return
- * NULL if the symbol is a cheap local, or defined on global level.
- */
+** NULL if the symbol is a cheap local, or defined on global level.
+*/
 
 struct ExprNode* GetSymExpr (SymEntry* Sym);
 /* Get the expression for a non-const symbol */
 
 const struct ExprNode* SymResolve (const SymEntry* Sym);
 /* Helper function for DumpExpr. Resolves a symbol into an expression or return
- * NULL. Do not call in other contexts!
- */
+** NULL. Do not call in other contexts!
+*/
 
 #if defined(HAVE_INLINE)
 INLINE const StrBuf* GetSymName (const SymEntry* S)
@@ -327,8 +327,8 @@ INLINE const StrBuf* GetSymName (const SymEntry* S)
 #if defined(HAVE_INLINE)
 INLINE unsigned char GetSymAddrSize (const SymEntry* S)
 /* Return the address size of the symbol. Beware: This function will just
- * return the AddrSize member, it will not look at the expression!
- */
+** return the AddrSize member, it will not look at the expression!
+*/
 {
     return S->AddrSize;
 }
@@ -338,8 +338,8 @@ INLINE unsigned char GetSymAddrSize (const SymEntry* S)
 
 long GetSymVal (SymEntry* Sym);
 /* Return the value of a symbol assuming it's constant. FAIL will be called
- * in case the symbol is undefined or not constant.
- */
+** in case the symbol is undefined or not constant.
+*/
 
 unsigned GetSymImportId (const SymEntry* Sym);
 /* Return the import id for the given symbol */
@@ -349,17 +349,13 @@ unsigned GetSymExportId (const SymEntry* Sym);
 
 unsigned GetSymInfoFlags (const SymEntry* Sym, long* ConstVal);
 /* Return a set of flags used when writing symbol information into a file.
- * If the SYM_CONST bit is set, ConstVal will contain the constant value
- * of the symbol. The result does not include the condes count.
- * See common/symdefs.h for more information.
- */
+** If the SYM_CONST bit is set, ConstVal will contain the constant value
+** of the symbol. The result does not include the condes count.
+** See common/symdefs.h for more information.
+*/
 
 
 
 /* End of symentry.h */
 
 #endif
-
-
-
-

@@ -103,8 +103,8 @@ copy:   lda     (ptr1),y
 ;----------------------------------------------------------------------------
 ; unsigned char ser_uninstall (void);
 ; /* Uninstall the currently loaded driver and return an error code.
-;  * Note: This call does not free allocated memory.
-;  */
+; ** Note: This call does not free allocated memory.
+; */
 
 _ser_uninstall:
         jsr     ser_uninstall           ; Call driver routine

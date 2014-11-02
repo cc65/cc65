@@ -78,9 +78,9 @@ Span* ReadSpan (FILE* F, struct ObjData* O, unsigned Id);
 
 unsigned* ReadSpanList (FILE* F);
 /* Read a list of span ids from a file. The list is returned as an array of
- * unsigneds, the first being the number of spans (never zero) followed by
- * the span ids. If the number of spans is zero, NULL is returned.
- */
+** unsigneds, the first being the number of spans (never zero) followed by
+** the span ids. If the number of spans is zero, NULL is returned.
+*/
 
 unsigned* DupSpanList (const unsigned* S);
 /* Duplicate a span list */
@@ -93,9 +93,9 @@ unsigned SpanCount (void);
 
 void PrintDbgSpanList (FILE* F, const struct ObjData* O, const unsigned* List);
 /* Output a string ",span=x[+y...]" for the given list. If the list is empty
- * or NULL, output nothing. This is a helper function for other modules to
- * print a list of spans read by ReadSpanList to the debug info file.
- */
+** or NULL, output nothing. This is a helper function for other modules to
+** print a list of spans read by ReadSpanList to the debug info file.
+*/
 
 void PrintDbgSpans (FILE* F);
 /* Output the spans to a debug info file */
@@ -103,7 +103,5 @@ void PrintDbgSpans (FILE* F);
 
 
 /* End of span.h */
+
 #endif
-
-
-

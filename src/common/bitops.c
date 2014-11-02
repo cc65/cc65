@@ -123,6 +123,3 @@ void BitMerge (void* Target, const void* Source, unsigned Size)
         *T++ |= *S++;
     }
 }
-
-
-

@@ -232,8 +232,8 @@ static ObjData* ReadIndexEntry (Library* L)
 
 static void ReadBasicData (Library* L, ObjData* O)
 /* Read basic data for an object file that is necessary to resolve external
- * references.
- */
+** references.
+*/
 {
     /* Seek to the start of the object file and read the header */
     LibSeek (L, O->Start);
@@ -275,8 +275,8 @@ static void LibReadIndex (Library* L)
     }
 
     /* Walk over the index and read basic data for all object files in the
-     * library.
-     */
+    ** library.
+    */
     for (I = 0; I < CollCount (&L->Modules); ++I) {
         ReadBasicData (L, CollAtUnchecked (&L->Modules, I));
     }
@@ -292,8 +292,8 @@ static void LibReadIndex (Library* L)
 
 static void LibCheckExports (ObjData* O)
 /* Check if the exports from this file can satisfy any import requests. If so,
- * insert the imports and exports from this file and mark the file as added.
- */
+** insert the imports and exports from this file and mark the file as added.
+*/
 {
     unsigned I;
 
@@ -336,8 +336,8 @@ static void LibResolve (void)
     unsigned Additions;
 
     /* Walk repeatedly over all open libraries until there's nothing more
-     * to add.
-     */
+    ** to add.
+    */
     do {
 
         Additions = 0;
@@ -349,9 +349,9 @@ static void LibResolve (void)
             Library* L = CollAt (&OpenLibs, I);
 
             /* Walk through all modules in this library and check for each
-             * module if there are unresolved externals in existing modules
-             * that may be resolved by adding the module.
-             */
+            ** module if there are unresolved externals in existing modules
+            ** that may be resolved by adding the module.
+            */
             for (J = 0; J < CollCount (&L->Modules); ++J) {
 
                 /* Get the next module */
@@ -371,17 +371,17 @@ static void LibResolve (void)
     } while (Additions > 0);
 
     /* We do know now which modules must be added, so we can load the data
-     * for these modues into memory. Since we're walking over all modules
-     * anyway, we will also remove data for unneeded modules.
-     */
+    ** for these modues into memory. Since we're walking over all modules
+    ** anyway, we will also remove data for unneeded modules.
+    */
     for (I = 0; I < CollCount (&OpenLibs); ++I) {
 
         /* Get the next library */
         Library* L = CollAt (&OpenLibs, I);
 
         /* Walk over all modules in this library and add the files list and
-         * sections for all referenced modules.
-         */
+        ** sections for all referenced modules.
+        */
         J = 0;
         while (J < CollCount (&L->Modules)) {
 
@@ -398,22 +398,22 @@ static void LibResolve (void)
                 ObjReadAssertions (L->F, O->Start + O->Header.AssertOffs, O);
 
                 /* Seek to the start of the segment list and read the segments.
-                 * This must be late, since the data here may reference other
-                 * stuff.
-                 */
+                ** This must be late, since the data here may reference other
+                ** stuff.
+                */
                 ObjReadSections (L->F, O->Start + O->Header.SegOffs, O);
 
                 /* Read the scope table from the object file. Scopes reference
-                 * segments, so we must read them after the sections.
-                 */
+                ** segments, so we must read them after the sections.
+                */
                 ObjReadScopes (L->F, O->Start + O->Header.ScopeOffs, O);
 
                 /* Read the spans */
                 ObjReadSpans (L->F, O->Start + O->Header.SpanOffs, O);
 
                 /* All references to strings are now resolved, so we can delete
-                 * the module string pool.
-                 */
+                ** the module string pool.
+                */
                 FreeObjStrings (O);
 
                 /* Insert the object into the list of all used object files */
@@ -432,8 +432,8 @@ static void LibResolve (void)
         }
 
         /* If we have referenced modules in this library, assign it an id
-         * (which is the index in the library collection) and keep it.
-         */
+        ** (which is the index in the library collection) and keep it.
+        */
         if (CollCount (&L->Modules) > 0) {
             CloseLibrary (L);
             L->Id = CollCount (&LibraryList);
@@ -453,16 +453,16 @@ static void LibResolve (void)
 
 void LibAdd (FILE* F, const char* Name)
 /* Add files from the library to the list if there are references that could
- * be satisfied.
- */
+** be satisfied.
+*/
 {
     /* Add the library to the list of open libraries */
     LibOpen (F, Name);
 
     /* If there is no library group open, just resolve all open symbols and
-     * close the library. Otherwise we will do nothing because resolving will
-     * be done when the group is closed.
-     */
+    ** close the library. Otherwise we will do nothing because resolving will
+    ** be done when the group is closed.
+    */
     if (!Grouping) {
         LibResolve ();
     }
@@ -472,9 +472,9 @@ void LibAdd (FILE* F, const char* Name)
 
 void LibStartGroup (void)
 /* Start a library group. Objects within a library group may reference each
- * other, and libraries are searched repeatedly until all references are
- * satisfied.
- */
+** other, and libraries are searched repeatedly until all references are
+** satisfied.
+*/
 {
     /* We cannot already have a group open */
     if (Grouping) {
@@ -489,9 +489,9 @@ void LibStartGroup (void)
 
 void LibEndGroup (void)
 /* End a library group and resolve all open references. Objects within a
- * library group may reference each other, and libraries are searched
- * repeatedly until all references are satisfied.
- */
+** library group may reference each other, and libraries are searched
+** repeatedly until all references are satisfied.
+*/
 {
     /* We must have a library group open */
     if (!Grouping) {
@@ -553,7 +553,3 @@ void PrintDbgLibraries (FILE* F)
         fprintf (F, "lib\tid=%u,name=\"%s\"\n", L->Id, GetString (L->Name));
     }
 }
-
-
-
-

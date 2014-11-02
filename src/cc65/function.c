@@ -228,8 +228,8 @@ int F_GetTopLevelSP (const Function* F)
 
 int F_ReserveLocalSpace (Function* F, unsigned Size)
 /* Reserve (but don't allocate) the given local space and return the stack
- * offset.
- */
+** offset.
+*/
 {
     F->Reserved += Size;
     return StackPtr - F->Reserved;
@@ -239,8 +239,8 @@ int F_ReserveLocalSpace (Function* F, unsigned Size)
 
 int F_GetStackPtr (const Function* F)
 /* Return the current stack pointer including reserved (but not allocated)
- * space on the stack.
- */
+** space on the stack.
+*/
 {
     return StackPtr - F->Reserved;
 }
@@ -249,8 +249,8 @@ int F_GetStackPtr (const Function* F)
 
 void F_AllocLocalSpace (Function* F)
 /* Allocate any local space previously reserved. The function will do
- * nothing if there is no reserved local space.
- */
+** nothing if there is no reserved local space.
+*/
 {
     if (F->Reserved > 0) {
 
@@ -269,9 +269,9 @@ void F_AllocLocalSpace (Function* F)
 
 int F_AllocRegVar (Function* F, const Type* Type)
 /* Allocate a register variable for the given variable type. If the allocation
- * was successful, return the offset of the register variable in the register
- * bank (zero page storage). If there is no register space left, return -1.
- */
+** was successful, return the offset of the register variable in the register
+** bank (zero page storage). If there is no register space left, return -1.
+*/
 {
     /* Allow register variables only on top level and if enabled */
     if (IS_Get (&EnableRegVars) && GetLexicalLevel () == LEX_LEVEL_FUNCTION) {
@@ -282,9 +282,9 @@ int F_AllocRegVar (Function* F, const Type* Type)
         /* Do we have space left? */
         if (F->RegOffs >= Size) {
             /* Space left. We allocate the variables from high to low addresses,
-             * so the adressing is compatible with the saved values on stack.
-             * This allows shorter code when saving/restoring the variables.
-             */
+            ** so the addressing is compatible with the saved values on stack.
+            ** This allows shorter code when saving/restoring the variables.
+            */
             F->RegOffs -= Size;
             return F->RegOffs;
         }
@@ -408,16 +408,16 @@ void NewFunc (SymEntry* Func)
     ReenterFunctionLevel (D);
 
     /* Check if the function header contains unnamed parameters. These are
-     * only allowed in cc65 mode.
-     */
+    ** only allowed in cc65 mode.
+    */
     if ((D->Flags & FD_UNNAMED_PARAMS) != 0 && (IS_Get (&Standard) != STD_CC65)) {
         Error ("Parameter name omitted");
     }
 
     /* Declare two special functions symbols: __fixargs__ and __argsize__.
-     * The latter is different depending on the type of the function (variadic
-     * or not).
-     */
+    ** The latter is different depending on the type of the function (variadic
+    ** or not).
+    */
     AddConstSym ("__fixargs__", type_uint, SC_DEF | SC_CONST, D->ParamSize);
     if (D->Flags & FD_VARIADIC) {
         /* Variadic function. The variable must be const. */
@@ -443,28 +443,28 @@ void NewFunc (SymEntry* Func)
         }
 
         /* If cc65 extensions aren't enabled, don't allow a main function that
-         * doesn't return an int.
-         */
+        ** doesn't return an int.
+        */
         if (IS_Get (&Standard) != STD_CC65 && CurrentFunc->ReturnType[0].C != T_INT) {
             Error ("`main' must always return an int");
         }
 
         /* Add a forced import of a symbol that is contained in the startup
-         * code. This will force the startup code to be linked in.
-         */
+        ** code. This will force the startup code to be linked in.
+        */
         g_importstartup ();
 
         /* If main() takes parameters, generate a forced import to a function
-         * that will setup these parameters. This way, programs that do not
-         * need the additional code will not get it.
-         */
+        ** that will setup these parameters. This way, programs that do not
+        ** need the additional code will not get it.
+        */
         if (D->ParamCount > 0 || (D->Flags & FD_VARIADIC) != 0) {
             g_importmainargs ();
         }
 
         /* Determine if this is a main function in a C99 environment that
-         * returns an int.
-         */
+        ** returns an int.
+        */
         if (IsTypeInt (F_GetReturnType (CurrentFunc)) &&
             IS_Get (&Standard) == STD_C99) {
             C99MainFunc = 1;
@@ -507,9 +507,9 @@ void NewFunc (SymEntry* Func)
     StackPtr = 0;
 
     /* Walk through the parameter list and allocate register variable space
-     * for parameters declared as register. Generate code to swap the contents
-     * of the register bank with the save area on the stack.
-     */
+    ** for parameters declared as register. Generate code to swap the contents
+    ** of the register bank with the save area on the stack.
+    */
     Param = D->SymTab->SymHead;
     while (Param && (Param->Flags & SC_PARAM) != 0) {
 
@@ -543,8 +543,8 @@ void NewFunc (SymEntry* Func)
     DeclareLocals ();
 
     /* Remember the current stack pointer. All variables allocated elsewhere
-     * must be dropped when doing a return from an inner block.
-     */
+    ** must be dropped when doing a return from an inner block.
+    */
     CurrentFunc->TopLevelSP = StackPtr;
 
     /* Now process statements in this block */
@@ -553,18 +553,18 @@ void NewFunc (SymEntry* Func)
     }
 
     /* If this is not a void function, and not the main function in a C99
-     * environment returning int, output a warning if we didn't see a return
-     * statement.
-     */
+    ** environment returning int, output a warning if we didn't see a return
+    ** statement.
+    */
     if (!F_HasVoidReturn (CurrentFunc) && !F_HasReturn (CurrentFunc) && !C99MainFunc) {
         Warning ("Control reaches end of non-void function");
     }
 
     /* If this is the main function in a C99 environment returning an int, let
-     * it always return zero. Note: Actual return statements jump to the return
-     * label defined below.
-     * The code is removed by the optimizer if unused.
-     */
+    ** it always return zero. Note: Actual return statements jump to the return
+    ** label defined below.
+    ** The code is removed by the optimizer if unused.
+    */
     if (C99MainFunc) {
         g_getimmed (CF_INT | CF_CONST, 0, 0);
     }
@@ -601,6 +601,3 @@ void NewFunc (SymEntry* Func)
     FreeFunction (CurrentFunc);
     CurrentFunc = 0;
 }
-
-
-

@@ -77,28 +77,28 @@ LineInfo* StartLine (const FilePos* Pos, unsigned Type, unsigned Count);
 
 void NewAsmLine (void);
 /* Start a new assembler input line. Use this function when generating new
- * line of LI_TYPE_ASM. It will check if line and/or file have actually
- * changed, end the old and start the new line as necessary.
- */
+** line of LI_TYPE_ASM. It will check if line and/or file have actually
+** changed, end the old and start the new line as necessary.
+*/
 
 LineInfo* GetAsmLineInfo (void);
 /* Return the line info for the current assembler file. The function will
- * bump the reference counter before returning the line info.
- */
+** bump the reference counter before returning the line info.
+*/
 
 void ReleaseLineInfo (LineInfo* LI);
 /* Decrease the reference count for a line info */
 
 void GetFullLineInfo (Collection* LineInfos);
 /* Return full line infos, that is line infos for currently active Slots. The
- * infos will be added to the given collection, existing entries will be left
- * intact. The reference count of all added entries will be increased.
- */
+** infos will be added to the given collection, existing entries will be left
+** intact. The reference count of all added entries will be increased.
+*/
 
 void ReleaseFullLineInfo (Collection* LineInfos);
 /* Decrease the reference count for a collection full of LineInfos, then clear
- * the collection.
- */
+** the collection.
+*/
 
 const FilePos* GetSourcePos (const LineInfo* LI);
 /* Return the source file position from the given line info */
@@ -115,8 +115,5 @@ void WriteLineInfos (void);
 
 
 /* End of lineinfo.h */
+
 #endif
-
-
-
-

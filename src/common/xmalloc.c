@@ -125,6 +125,3 @@ void* xdup (const void* Buf, size_t Size)
 {
     return memcpy (xmalloc (Size), Buf, Size);
 }
-
-
-

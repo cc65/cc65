@@ -51,36 +51,32 @@
 
 unsigned OptPush1 (CodeSeg* S);
 /* Given a sequence
- *
- *     ldy     #xx
- *     jsr     ldaxysp
- *     jsr     pushax
- *
- * If a/x are not used later, replace that by
- *
- *     ldy     #xx+2
- *     jsr     pushwysp
- *
- * saving 3 bytes and several cycles.
- */
+**
+**     ldy     #xx
+**     jsr     ldaxysp
+**     jsr     pushax
+**
+** If a/x are not used later, replace that by
+**
+**     ldy     #xx+2
+**     jsr     pushwysp
+**
+** saving 3 bytes and several cycles.
+*/
 
 unsigned OptPush2 (CodeSeg* S);
 /* A sequence
- *
- *     jsr     ldaxidx
- *     jsr     pushax
- *
- * may get replaced by
- *
- *     jsr     pushwidx
- *
- */
+**
+**     jsr     ldaxidx
+**     jsr     pushax
+**
+** may get replaced by
+**
+**     jsr     pushwidx
+*/
 
 
 
 /* End of coptpush.h */
 
 #endif
-
-
-

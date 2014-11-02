@@ -166,8 +166,8 @@ static int CmpKey (const void* Key, const void* Elem)
 
 static token_t FindKey (const char* Key)
 /* Find a keyword and return the token. Return IDENT if the token is not a
- * keyword.
- */
+** keyword.
+*/
 {
     struct Keyword* K;
     K = bsearch (Key, Keywords, KEY_COUNT, sizeof (Keywords [0]), CmpKey);
@@ -182,8 +182,8 @@ static token_t FindKey (const char* Key)
 
 static int SkipWhite (void)
 /* Skip white space in the input stream, reading and preprocessing new lines
- * if necessary. Return 0 if end of file is reached, return 1 otherwise.
- */
+** if necessary. Return 0 if end of file is reached, return 1 otherwise.
+*/
 {
     while (1) {
         while (CurC == '\0') {
@@ -214,9 +214,9 @@ int TokIsFuncSpec (const Token* T)
 
 void SymName (char* S)
 /* Read a symbol from the input stream. The first character must have been
- * checked before calling this function. The buffer is expected to be at
- * least of size MAX_IDENTLEN+1.
- */
+** checked before calling this function. The buffer is expected to be at
+** least of size MAX_IDENTLEN+1.
+*/
 {
     unsigned Len = 0;
     do {
@@ -354,8 +354,8 @@ static int ParseChar (void)
                 Error ("Illegal character constant");
                 C = ' ';
                 /* Try to do error recovery, otherwise the compiler will spit
-                 * out thousands of errors in this place and abort.
-                 */
+                ** out thousands of errors in this place and abort.
+                */
                 if (CurC != '\'' && CurC != '\0') {
                     while (NextC != '\'' && NextC != '\"' && NextC != '\0') {
                         NextChar ();
@@ -417,9 +417,9 @@ static void StringConst (void)
     NextTok.Tok  = TOK_SCONST;
 
     /* Concatenate strings. If at least one of the concenated strings is a wide
-     * character literal, the whole string is a wide char literal, otherwise
-     * it's a normal string literal.
-     */
+    ** character literal, the whole string is a wide char literal, otherwise
+    ** it's a normal string literal.
+    */
     while (1) {
 
         /* Check if this is a normal or a wide char string */
@@ -477,8 +477,8 @@ static void NumericConst (void)
     unsigned long IVal;         /* Value */
 
     /* Check for a leading hex or octal prefix and determine the possible
-     * integer types.
-     */
+    ** integer types.
+    */
     if (CurC == '0') {
         /* Gobble 0 and examine next char */
         NextChar ();
@@ -494,10 +494,10 @@ static void NumericConst (void)
     }
 
     /* Because floating point numbers don't have octal prefixes (a number
-     * with a leading zero is decimal), we first have to read the number
-     * before converting it, so we can determine if it's a float or an
-     * integer.
-     */
+    ** with a leading zero is decimal), we first have to read the number
+    ** before converting it, so we can determine if it's a float or an
+    ** integer.
+    */
     while (IsXDigit (CurC) && HexVal (CurC) < Base) {
         SB_AppendChar (&S, CurC);
         NextChar ();
@@ -505,23 +505,23 @@ static void NumericConst (void)
     SB_Terminate (&S);
 
     /* The following character tells us if we have an integer or floating
-     * point constant. Note: Hexadecimal floating point constants aren't
-     * supported in C89.
-     */
+    ** point constant. Note: Hexadecimal floating point constants aren't
+    ** supported in C89.
+    */
     IsFloat = (CurC == '.' ||
                (Base == 10 && toupper (CurC) == 'E') ||
                (Base == 16 && toupper (CurC) == 'P' && IS_Get (&Standard) >= STD_C99));
 
     /* If we don't have a floating point type, an octal prefix results in an
-     * octal base.
-     */
+    ** octal base.
+    */
     if (!IsFloat && Prefix == 8) {
         Base = 8;
     }
 
     /* Since we do now know the correct base, convert the remembered input
-     * into a number.
-     */
+    ** into a number.
+    */
     SB_Reset (&S);
     IVal = 0;
     while ((C = SB_Get (&S)) != '\0') {
@@ -577,9 +577,9 @@ static void NumericConst (void)
             /* Out of range for int */
             Types &= ~IT_INT;
             /* If the value is in the range 0x8000..0xFFFF, unsigned int is not
-             * allowed, and we don't have a type specifying suffix, emit a
-             * warning, because the constant is of type long.
-             */
+            ** allowed, and we don't have a type specifying suffix, emit a
+            ** warning, because the constant is of type long.
+            */
             if (IVal <= 0xFFFF && (Types & IT_UINT) == 0 && !HaveSuffix) {
                 Warning ("Constant is long");
             }
@@ -653,11 +653,11 @@ static void NumericConst (void)
             }
 
             /* Read exponent digits. Since we support only 32 bit floats
-             * with a maximum exponent of +-/127, we read the exponent
-             * part as integer with up to 3 digits and drop the remainder.
-             * This avoids an overflow of Exp. The exponent is always
-             * decimal, even for hex float consts.
-             */
+            ** with a maximum exponent of +-/127, we read the exponent
+            ** part as integer with up to 3 digits and drop the remainder.
+            ** This avoids an overflow of Exp. The exponent is always
+            ** decimal, even for hex float consts.
+            */
             Digits = 0;
             Exp    = 0;
             while (IsDigit (CurC)) {
@@ -668,8 +668,8 @@ static void NumericConst (void)
             }
 
             /* Check for errors: We must have exponent digits, and not more
-             * than three.
-             */
+            ** than three.
+            */
             if (Digits == 0) {
                 Error ("Floating constant exponent has no digits");
             } else if (Digits > 3) {
@@ -705,10 +705,10 @@ void NextToken (void)
     ident token;
 
     /* We have to skip white space here before shifting tokens, since the
-     * tokens and the current line info is invalid at startup and will get
-     * initialized by reading the first time from the file. Remember if
-     * we were at end of input and handle that later.
-     */
+    ** tokens and the current line info is invalid at startup and will get
+    ** initialized by reading the first time from the file. Remember if
+    ** we were at end of input and handle that later.
+    */
     int GotEOF = (SkipWhite() == 0);
 
     /* Current token is the lookahead token */
@@ -718,9 +718,9 @@ void NextToken (void)
     CurTok = NextTok;
 
     /* When reading the first time from the file, the line info in NextTok,
-     * which was copied to CurTok is invalid. Since the information from
-     * the token is used for error messages, we must make it valid.
-     */
+    ** which was copied to CurTok is invalid. Since the information from
+    ** the token is used for error messages, we must make it valid.
+    */
     if (CurTok.LI == 0) {
         CurTok.LI = UseLineInfo (GetCurLineInfo ());
     }
@@ -1015,8 +1015,8 @@ void NextToken (void)
 
 void SkipTokens (const token_t* TokenList, unsigned TokenCount)
 /* Skip tokens until we reach TOK_CEOF or a token in the given token list.
- * This routine is used for error recovery.
- */
+** This routine is used for error recovery.
+*/
 {
     while (CurTok.Tok != TOK_CEOF) {
 
@@ -1039,8 +1039,8 @@ void SkipTokens (const token_t* TokenList, unsigned TokenCount)
 
 int Consume (token_t Token, const char* ErrorMsg)
 /* Eat token if it is the next in the input stream, otherwise print an error
- * message. Returns true if the token was found and false otherwise.
- */
+** message. Returns true if the token was found and false otherwise.
+*/
 {
     if (CurTok.Tok == Token) {
         NextToken ();
@@ -1142,6 +1142,3 @@ int ConsumeRCurly (void)
 {
     return Consume (TOK_RCURLY, "`}' expected");
 }
-
-
-

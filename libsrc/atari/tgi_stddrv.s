@@ -10,4 +10,9 @@
 
 .rodata
 
-_tgi_stddrv:    .asciiz "atr8.tgi"
+_tgi_stddrv:
+        .ifdef  __ATARIXL__
+                .asciiz "atrx8.tgi"
+        .else
+                .asciiz "atr8.tgi"
+        .endif

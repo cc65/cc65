@@ -49,8 +49,8 @@
 
 
 
-extern SearchPath*      SysIncSearchPath;       /* System include path */
-extern SearchPath*      UsrIncSearchPath;       /* User include path */
+extern SearchPaths*     SysIncSearchPath;       /* System include path */
+extern SearchPaths*     UsrIncSearchPath;       /* User include path */
 
 
 
@@ -69,7 +69,5 @@ void FinishIncludePaths (void);
 
 
 /* End of incpath.h */
+
 #endif
-
-
-

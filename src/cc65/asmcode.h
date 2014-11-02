@@ -76,8 +76,8 @@ void RemoveCode (const CodeMark* M);
 
 void MoveCode (const CodeMark* Start, const CodeMark* End, const CodeMark* Target);
 /* Move the code between Start (inclusive) and End (exclusive) to
- * (before) Target. The code marks aren't updated.
- */
+** (before) Target. The code marks aren't updated.
+*/
 
 int CodeRangeIsEmpty (const CodeMark* Start, const CodeMark* End);
 /* Return true if the given code range is empty (no code between Start and End) */
@@ -88,8 +88,5 @@ void WriteAsmOutput (void);
 
 
 /* End of asmcode.h */
+
 #endif
-
-
-
-

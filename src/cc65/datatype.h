@@ -220,8 +220,8 @@ Type* TypeDup (const Type* T);
 
 Type* TypeAlloc (unsigned Len);
 /* Allocate memory for a type string of length Len. Len *must* include the
- * trailing T_END.
- */
+** trailing T_END.
+*/
 
 void TypeFree (Type* T);
 /* Free a type string */
@@ -240,8 +240,8 @@ Type* GetImplicitFuncType (void);
 
 Type* PointerTo (const Type* T);
 /* Return a type string that is "pointer to T". The type string is allocated
- * on the heap and may be freed after use.
- */
+** on the heap and may be freed after use.
+*/
 
 void PrintType (FILE* F, const Type* T);
 /* Output translation of type array. */
@@ -283,22 +283,22 @@ unsigned PSizeOf (const Type* T);
 
 unsigned CheckedSizeOf (const Type* T);
 /* Return the size of a data type. If the size is zero, emit an error and
- * return some valid size instead (so the rest of the compiler doesn't have
- * to work with invalid sizes).
- */
+** return some valid size instead (so the rest of the compiler doesn't have
+** to work with invalid sizes).
+*/
 unsigned CheckedPSizeOf (const Type* T);
 /* Return the size of a data type that is pointed to by a pointer. If the
- * size is zero, emit an error and return some valid size instead (so the
- * rest of the compiler doesn't have to work with invalid sizes).
- */
+** size is zero, emit an error and return some valid size instead (so the
+** rest of the compiler doesn't have to work with invalid sizes).
+*/
 
 unsigned TypeOf (const Type* T);
 /* Get the code generator base type of the object */
 
 Type* Indirect (Type* T);
 /* Do one indirection for the given type, that is, return the type where the
- * given type points to.
- */
+** given type points to.
+*/
 
 Type* ArrayToPtr (Type* T);
 /* Convert an array to a pointer to it's first element */
@@ -605,8 +605,8 @@ INLINE int IsQualCDecl (const Type* T)
 
 int IsVariadicFunc (const Type* T) attribute ((const));
 /* Return true if this is a function type or pointer to function type with
- * variable parameter list
- */
+** variable parameter list
+*/
 
 #if defined(HAVE_INLINE)
 INLINE TypeCode GetSizeModifier (const Type* T)
@@ -629,22 +629,22 @@ Type* GetFuncReturn (Type* T) attribute ((const));
 
 long GetElementCount (const Type* T);
 /* Get the element count of the array specified in T (which must be of
- * array type).
- */
+** array type).
+*/
 
 void SetElementCount (Type* T, long Count);
 /* Set the element count of the array specified in T (which must be of
- * array type).
- */
+** array type).
+*/
 
 Type* GetElementType (Type* T);
 /* Return the element type of the given array type. */
 
 Type* GetBaseElementType (Type* T);
 /* Return the base element type of a given type. If T is not an array, this
- * will return. Otherwise it will return the base element type, which means
- * the element type that is not an array.
- */
+** will return. Otherwise it will return the base element type, which means
+** the element type that is not an array.
+*/
 
 struct SymEntry* GetSymEntry (const Type* T) attribute ((const));
 /* Return a SymEntry pointer from a type */
@@ -654,14 +654,14 @@ void SetSymEntry (Type* T, struct SymEntry* S);
 
 Type* IntPromotion (Type* T);
 /* Apply the integer promotions to T and return the result. The returned type
- * string may be T if there is no need to change it.
- */
+** string may be T if there is no need to change it.
+*/
 
 Type* PtrConversion (Type* T);
 /* If the type is a function, convert it to pointer to function. If the
- * expression is an array, convert it to pointer to first element. Otherwise
- * return T.
- */
+** expression is an array, convert it to pointer to first element. Otherwise
+** return T.
+*/
 
 TypeCode AddrSizeQualifier (unsigned AddrSize);
 /* Return T_QUAL_NEAR or T_QUAL_FAR depending on the address size */
@@ -691,6 +691,3 @@ INLINE TypeCode DataAddrSizeQualifier (void)
 /* End of datatype.h */
 
 #endif
-
-
-

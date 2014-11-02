@@ -51,68 +51,66 @@
 
 unsigned OptShift1 (CodeSeg* S);
 /* A call to the shlaxN routine may get replaced by one or more asl insns
- * if the value of X is not used later. If X is used later, but it is zero
- * on entry and it's a shift by one, it may get replaced by:
- *
- *      asl     a
- *      bcc     L1
- *      inx
- *  L1:
- *
- */                            
+** if the value of X is not used later. If X is used later, but it is zero
+** on entry and it's a shift by one, it may get replaced by:
+**
+**      asl     a
+**      bcc     L1
+**      inx
+**  L1:
+*/
 
 unsigned OptShift2(CodeSeg* S);
 /* A call to the asrax1 routines may get replaced by something simpler, if
- * X is not used later:
- *
- *      cmp     #$80
- *      ror     a
- *
- */
+** X is not used later:
+**
+**      cmp     #$80
+**      ror     a
+*/
 
 unsigned OptShift3 (CodeSeg* S);
 /* The sequence
- *
- *      bcc     L
- *      inx
- * L:   jsr     shrax1
- *
- * may get replaced by
- *
- *      ror     a
- *
- * if X is zero on entry and unused later. For shift counts > 1, more
- *
- *      shr     a
- *
- * must be added.
- */
+**
+**      bcc     L
+**      inx
+** L:   jsr     shrax1
+**
+** may get replaced by
+**
+**      ror     a
+**
+** if X is zero on entry and unused later. For shift counts > 1, more
+**
+**      shr     a
+**
+** must be added.
+*/
 
 unsigned OptShift4 (CodeSeg* S);
 /* Calls to the asraxN or shraxN routines may get replaced by one or more lsr
- * insns if the value of X is zero.
- */
+** insns if the value of X is zero.
+*/
 
 unsigned OptShift5 (CodeSeg* S);
 /* Search for the sequence
- *
- *      lda     xxx
- *      ldx     yyy
- *      jsr     aslax1/asrax1/shlax1/shrax1
- *      sta     aaa
- *      stx     bbb
- *
- * and replace it by
- *
- *      lda     xxx
- *      asl     a
- *      sta     aaa
- *      lda     yyy
- *      rol     a
- *      sta     bbb
- *
- * or similar, provided that a/x is not used later
- */
+**
+**      lda     xxx
+**      ldx     yyy
+**      jsr     aslax1/asrax1/shlax1/shrax1
+**      sta     aaa
+**      stx     bbb
+**
+** and replace it by
+**
+**      lda     xxx
+**      asl     a
+**      sta     aaa
+**      lda     yyy
+**      rol     a
+**      sta     bbb
+**
+** or similar, provided that a/x is not used later
+*/
 
 unsigned OptShift6 (CodeSeg* S);
 /* Inline the shift subroutines. */
@@ -120,7 +118,5 @@ unsigned OptShift6 (CodeSeg* S);
 
 
 /* End of coptshift.h */
+
 #endif
-
-
-

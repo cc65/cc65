@@ -69,10 +69,10 @@ void WriteBinFile (const StrBuf* Data, const Collection* A,
     }
 
     /* Write to the file. We will use fwrite here instead of the fileio
-     * module, since it's just one call, so the latter doesn't have any
-     * advantages, and we can output a more readable error message in case of
-     * problems.
-     */
+    ** module, since it's just one call, so the latter doesn't have any
+    ** advantages, and we can output a more readable error message in case of
+    ** problems.
+    */
     Size = SB_GetLen (Data);
     if (fwrite (SB_GetConstBuf (Data), 1, Size, F) != Size) {
         Error ("Error writing to output file `%s': %s", Name, strerror (errno));
@@ -83,6 +83,3 @@ void WriteBinFile (const StrBuf* Data, const Collection* A,
         Error ("Error closing output file `%s': %s", Name, strerror (errno));
     }
 }
-
-
-

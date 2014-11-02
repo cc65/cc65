@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                       */
-/*                Roemerstrasse 52                                            */
-/*                D-70794 Filderstadt                                         */
-/* EMail:         uz@cc65.org                                                 */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -108,8 +108,8 @@ static void Usage (void)
 static void RangeCheck (const char* Opt, unsigned long Val,
                         unsigned long Min, unsigned long Max)
 /* Do a range check for the given option and abort if there's a range
- * error.
- */
+** error.
+*/
 {
     if (Val < Min || Val > Max) {
         Error ("Argument for %s outside valid range (%ld-%ld)", Opt, Min, Max);
@@ -120,8 +120,8 @@ static void RangeCheck (const char* Opt, unsigned long Val,
 
 static unsigned long CvtNumber (const char* Arg, const char* Number)
 /* Convert a number from a string. Allow '$' and '0x' prefixes for hex
- * numbers.
- */
+** numbers.
+*/
 {
     unsigned long Val;
     int           Converted;
@@ -357,8 +357,8 @@ static void OneOpcode (unsigned RemainingBytes)
     attr_t Style = GetStyleAttr (PC);
 
     /* If we have a label at this address, output the label and an attached
-     * comment, provided that we aren't in a skip area.
-     */
+    ** comment, provided that we aren't in a skip area.
+    */
     if (Style != atSkip && MustDefLabel (PC)) {
         const char* Comment = GetComment (PC);
         if (Comment) {
@@ -368,11 +368,11 @@ static void OneOpcode (unsigned RemainingBytes)
     }
 
     /* Check...
-     *   - ...if we have enough bytes remaining for the code at this address.
-     *   - ...if the current instruction is valid for the given CPU.
-     *   - ...if there is no label somewhere between the instruction bytes.
-     * If any of these conditions is false, switch to data mode.
-     */
+    **   - ...if we have enough bytes remaining for the code at this address.
+    **   - ...if the current instruction is valid for the given CPU.
+    **   - ...if there is no label somewhere between the instruction bytes.
+    ** If any of these conditions is false, switch to data mode.
+    */
     if (Style == atDefault) {
         if (D->Size > RemainingBytes) {
             Style = atIllegal;
@@ -402,8 +402,8 @@ static void OneOpcode (unsigned RemainingBytes)
 
         case atCode:
             /* Beware: If we don't have enough bytes left to disassemble the
-             * following insn, fall through to byte mode.
-             */
+            ** following insn, fall through to byte mode.
+            */
             if (D->Size <= RemainingBytes) {
                 /* Output labels within the next insn */
                 unsigned I;
@@ -594,9 +594,9 @@ int main (int argc, char* argv [])
     }
 
     /* Check the formatting options for reasonable values. Note: We will not
-     * really check that they make sense, just that they aren't complete
-     * garbage.
-     */
+    ** really check that they make sense, just that they aren't complete
+    ** garbage.
+    */
     if (MCol >= ACol) {
         AbEnd ("mnemonic-column value must be smaller than argument-column value");
     }
@@ -613,8 +613,8 @@ int main (int argc, char* argv [])
     }
 
     /* Get the current time and convert it to string so it can be used in
-     * the output page headers.
-     */
+    ** the output page headers.
+    */
     T = time (0);
     strftime (Now, sizeof (Now), "%Y-%m-%d %H:%M:%S", localtime (&T));
 
@@ -633,6 +633,3 @@ int main (int argc, char* argv [])
     /* Done */
     return EXIT_SUCCESS;
 }
-
-
-

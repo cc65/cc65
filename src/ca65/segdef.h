@@ -81,6 +81,3 @@ SegDef* DupSegDef (const SegDef* D);
 /* End of segdef.h */
 
 #endif
-
-
-

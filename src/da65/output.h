@@ -69,8 +69,8 @@ void DefLabel (const char* Name);
 
 void DefForward (const char* Name, const char* Comment, unsigned Offs);
 /* Define a label as "* + x", where x is the offset relative to the
- * current PC.
- */
+** current PC.
+*/
 
 void DefConst (const char* Name, const char* Comment, unsigned Addr);
 /* Define an address constant */
@@ -111,8 +111,5 @@ void OutputSettings (void);
 
 
 /* End of output.h */
+
 #endif
-
-
-
-

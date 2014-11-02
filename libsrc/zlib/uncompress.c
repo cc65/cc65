@@ -1,8 +1,8 @@
 /*
- * uncompress.c
- *
- * Piotr Fusik, 18.11.2001
- */
+** uncompress.c
+**
+** Piotr Fusik, 18.11.2001
+*/
 
 #include <zlib.h>
 

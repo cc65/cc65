@@ -1,8 +1,8 @@
 /*
- * perror.c
- *
- * Maciej 'YTM/Elysium' Witkowiak, 15.07.2001
- */
+** perror.c
+**
+** Maciej 'YTM/Elysium' Witkowiak, 15.07.2001
+*/
 
 #include <stdio.h>
 #include <string.h>

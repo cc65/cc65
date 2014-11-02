@@ -71,6 +71,3 @@ void BitMerge (void* Target, const void* Source, unsigned Size);
 /* End of bitops.h */
 
 #endif
-
-
-

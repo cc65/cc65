@@ -119,12 +119,13 @@ struct TargetEntry {
 };
 
 /* Table that maps target names to ids. Sorted alphabetically for bsearch.
- * Allows multiple entries for one target id (target name aliases).
- */
+** Allows mupltiple entries for one target id (target name aliases).
+*/
 static const TargetEntry TargetMap[] = {
     {   "apple2",       TGT_APPLE2      },
     {   "apple2enh",    TGT_APPLE2ENH   },
     {   "atari",        TGT_ATARI       },
+    {   "atari5200",    TGT_ATARI5200   },
     {   "atarixl",      TGT_ATARIXL     },
     {   "atmos",        TGT_ATMOS       },
     {   "bbc",          TGT_BBC         },
@@ -158,6 +159,7 @@ static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "none",           CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "module",         CPU_6502,       BINFMT_O65,         CTNone  },
     { "atari",          CPU_6502,       BINFMT_BINARY,      CTAtari },
+    { "atari5200",      CPU_6502,       BINFMT_BINARY,      CTAtari },
     { "atarixl",        CPU_6502,       BINFMT_BINARY,      CTAtari },
     { "vic20",          CPU_6502,       BINFMT_BINARY,      CTPET   },
     { "c16",            CPU_6502,       BINFMT_BINARY,      CTPET   },
@@ -203,8 +205,8 @@ static int Compare (const void* Key, const void* Entry)
 
 target_t FindTarget (const char* Name)
 /* Find a target by name and return the target id. TGT_UNKNOWN is returned if
- * the given name is no valid target.
- */
+** the given name is no valid target.
+*/
 {
     /* Search for the name in the map */
     const TargetEntry* T;
@@ -234,4 +236,3 @@ const char* GetTargetName (target_t Target)
     /* Return the array entry */
     return GetTargetProperties (Target)->Name;
 }
-

@@ -78,8 +78,8 @@ Collection* InitCollection (Collection* C)
 
 void DoneCollection (Collection* C)
 /* Free the data for a collection. This will not free the data contained in
- * the collection.
- */
+** the collection.
+*/
 {
     /* Free the pointer array */
     xfree (C->Items);
@@ -110,9 +110,9 @@ void FreeCollection (Collection* C)
 
 void CollGrow (Collection* C, unsigned Size)
 /* Grow the collection C so it is able to hold Size items without a resize
- * being necessary. This can be called for performance reasons if the number
- * of items to be placed in the collection is known in advance.
- */
+** being necessary. This can be called for performance reasons if the number
+** of items to be placed in the collection is known in advance.
+*/
 {
     void** NewItems;
 
@@ -225,8 +225,8 @@ const void* CollConstLast (const Collection* C)
 #if !defined(HAVE_INLINE)
 void* CollPop (Collection* C)
 /* Remove the last segment from the stack and return it. Calls FAIL if the
- * collection is empty.
- */
+** collection is empty.
+*/
 {
     /* We must have at least one entry */
     PRECONDITION (C->Count > 0);
@@ -240,8 +240,8 @@ void* CollPop (Collection* C)
 
 int CollIndex (Collection* C, const void* Item)
 /* Return the index of the given item in the collection. Return -1 if the
- * item was not found in the collection.
- */
+** item was not found in the collection.
+*/
 {
     /* Linear search */
     unsigned I;
@@ -260,9 +260,9 @@ int CollIndex (Collection* C, const void* Item)
 
 void CollDelete (Collection* C, unsigned Index)
 /* Remove the item with the given index from the collection. This will not
- * free the item itself, just the pointer. All items with higher indices
- * will get moved to a lower position.
- */
+** free the item itself, just the pointer. All items with higher indices
+** will get moved to a lower position.
+*/
 {
     /* Check the index */
     PRECONDITION (Index < C->Count);
@@ -276,8 +276,8 @@ void CollDelete (Collection* C, unsigned Index)
 
 void CollDeleteItem (Collection* C, const void* Item)
 /* Delete the item pointer from the collection. The item must be in the
- * collection, otherwise FAIL will be called.
- */
+** collection, otherwise FAIL will be called.
+*/
 {
     /* Get the index of the entry */
     int Index = CollIndex (C, Item);
@@ -293,8 +293,8 @@ void CollDeleteItem (Collection* C, const void* Item)
 #if !defined(HAVE_INLINE)
 void CollReplace (Collection* C, void* Item, unsigned Index)
 /* Replace the item at the given position. The old item will not be freed,
- * just the pointer will get replaced.
- */
+** just the pointer will get replaced.
+*/
 {
     /* Check the index */
     PRECONDITION (Index < C->Count);
@@ -308,10 +308,10 @@ void CollReplace (Collection* C, void* Item, unsigned Index)
 
 void CollReplaceExpand (Collection* C, void* Item, unsigned Index)
 /* If Index is a valid index for the collection, replace the item at this
- * position by the one passed. If the collection is too small, expand it,
- * filling unused pointers with NULL, then add the new item at the given
- * position.
- */
+** position by the one passed. If the collection is too small, expand it,
+** filling unused pointers with NULL, then add the new item at the given
+** position.
+*/
 {
     if (Index < C->Count) {
         /* Collection is already large enough */
@@ -341,10 +341,10 @@ void CollReplaceExpand (Collection* C, void* Item, unsigned Index)
 
 void CollMove (Collection* C, unsigned OldIndex, unsigned NewIndex)
 /* Move an item from one position in the collection to another. OldIndex
- * is the current position of the item, NewIndex is the new index after
- * the function has done it's work. Existing entries with indices NewIndex
- * and up are moved one position upwards.
- */
+** is the current position of the item, NewIndex is the new index after
+** the function has done it's work. Existing entries with indices NewIndex
+** and up are moved one position upwards.
+*/
 {
     /* Get the item and remove it from the collection */
     void* Item = CollAt (C, OldIndex);
@@ -364,11 +364,11 @@ void CollMove (Collection* C, unsigned OldIndex, unsigned NewIndex)
 
 void CollMoveMultiple (Collection* C, unsigned Start, unsigned Count, unsigned Target)
 /* Move a range of items from one position to another. Start is the index
- * of the first item to move, Count is the number of items and Target is
- * the index of the target item. The item with the index Start will later
- * have the index Target. All items with indices Target and above are moved
- * to higher indices.
- */
+** of the first item to move, Count is the number of items and Target is
+** the index of the target item. The item with the index Start will later
+** have the index Target. All items with indices Target and above are moved
+** to higher indices.
+*/
 {
     void** TmpItems;
     unsigned Bytes;
@@ -391,9 +391,9 @@ void CollMoveMultiple (Collection* C, unsigned Start, unsigned Count, unsigned T
     memcpy (TmpItems, C->Items + Start, Bytes);
 
     /* Check if the range has to be moved upwards or downwards. Move the
-     * existing items to their final location, so that the space needed
-     * for the items now in temporary storage is unoccupied.
-     */
+    ** existing items to their final location, so that the space needed
+    ** for the items now in temporary storage is unoccupied.
+    */
     if (Target < Start) {
 
         /* Move downwards */
@@ -473,9 +473,9 @@ static void QuickSort (Collection* C, int Lo, int Hi,
 
 void CollTransfer (Collection* Dest, const Collection* Source)
 /* Transfer all items from Source to Dest. Anything already in Dest is left
- * untouched. The items in Source are not changed and are therefore in both
- * Collections on return.
- */
+** untouched. The items in Source are not changed and are therefore in both
+** Collections on return.
+*/
 {
     /* Be sure there's enough room in Dest */
     CollGrow (Dest, Dest->Count + Source->Count);
@@ -495,15 +495,12 @@ void CollSort (Collection* C,
                int (*Compare) (void*, const void*, const void*),
                void* Data)
 /* Sort the collection using the given compare function. The data pointer is
- * passed as *first* element to the compare function, it's not used by the
- * sort function itself. The other two pointer passed to the Compare function
- * are pointers to objects.
- */
+** passed as *first* element to the compare function, it's not used by the
+** sort function itself. The other two pointer passed to the Compare function
+** are pointers to objects.
+*/
 {
     if (C->Count > 1) {
         QuickSort (C, 0, C->Count-1, Compare, Data);
     }
 }
-
-
-

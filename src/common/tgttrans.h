@@ -54,18 +54,18 @@ void TgtTranslateInit (void);
 
 int TgtTranslateChar (int C);
 /* Translate one character from the source character set into the target
- * system character set.
- */
+** system character set.
+*/
 
 void TgtTranslateBuf (void* Buf, unsigned Len);
 /* Translate a buffer of the given length from the source character set into
- * the target system character set.
- */
+** the target system character set.
+*/
 
 void TgtTranslateStrBuf (StrBuf* Buf);
 /* Translate a string buffer from the source character set into the target
- * system character set.
- */
+** system character set.
+*/
 
 void TgtTranslateSet (unsigned Index, unsigned char C);
 /* Set the translation code for the given character */
@@ -75,6 +75,3 @@ void TgtTranslateSet (unsigned Index, unsigned char C);
 /* End of tgttrans.h */
 
 #endif
-
-
-

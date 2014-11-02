@@ -128,10 +128,10 @@ static void AddNotifications (const Collection* LineInfos)
     unsigned Skipped;
 
     /* The basic line info is always in slot zero. It has been used to
-     * output the actual error or warning. The following slots may contain
-     * more information. Check them and print additional notifications if
-     * they're present, but limit the number to a reasonable value.
-     */
+    ** output the actual error or warning. The following slots may contain
+    ** more information. Check them and print additional notifications if
+    ** they're present, but limit the number to a reasonable value.
+    */
     for (I = 1, Output = 0, Skipped = 0; I < CollCount (LineInfos); ++I) {
         /* Get next line info */
         const LineInfo* LI = CollConstAt (LineInfos, I);
@@ -400,6 +400,3 @@ void Internal (const char* Format, ...)
 
     exit (EXIT_FAILURE);
 }
-
-
-

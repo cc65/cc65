@@ -34,9 +34,9 @@
 
 
 /* Note: This file is not fully ISO 9899-1999 compliant because cc65 lacks
- * a 64 bit data types and is not able to return structs > 4 bytes. The
- * declarations have been adjusted accordingly or left out.
- */
+** a 64 bit data types and is not able to return structs > 4 bytes. The
+** declarations have been adjusted accordingly or left out.
+*/
 
 
 

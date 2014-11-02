@@ -75,48 +75,48 @@ void DumpAttrColl (const Collection* C);
 
 int FindAttr (const Collection* C, const char* Name, unsigned* Index);
 /* Search for an attribute with the given name in the collection. If it is
- * found, the function returns true and Index contains the index of the
- * entry. If Name isn't found, the function returns false and Index
- * will contain the insert position.
- */
+** found, the function returns true and Index contains the index of the
+** entry. If Name isn't found, the function returns false and Index
+** will contain the insert position.
+*/
 
 const Attr* GetAttr (const Collection* C, const char* Name);
 /* Search for an attribute with the given name and return it. The function
- * returns NULL if the attribute wasn't found.
- */
+** returns NULL if the attribute wasn't found.
+*/
 
 const Attr* NeedAttr (const Collection* C, const char* Name, const char* Op);
 /* Search for an attribute with the given name and return it. If the attribute
- * is not found, the function terminates with an error using Op as additional
- * context in the error message.
- */
+** is not found, the function terminates with an error using Op as additional
+** context in the error message.
+*/
 
 const char* GetAttrVal (const Collection* C, const char* Name);
 /* Search for an attribute with the given name and return its value. The
- * function returns NULL if the attribute wasn't found.
- */
+** function returns NULL if the attribute wasn't found.
+*/
 
 const char* NeedAttrVal (const Collection* C, const char* Name, const char* Op);
 /* Search for an attribute with the given name and return its value. If the
- * attribute wasn't not found, the function terminates with an error using
- * Op as additional context in the error message.
- */
+** attribute wasn't not found, the function terminates with an error using
+** Op as additional context in the error message.
+*/
 
 void AddAttr (Collection* C, const char* Name, const char* Value);
 /* Add an attribute to an alphabetically sorted attribute collection */
 
 void SplitAddAttr (Collection* C, const char* Combined, const char* Name);
 /* Split a combined name/value pair and add it as an attribute to C. Some
- * attributes may not need a name. If the name is missing, use Name. If
- * Name is NULL, terminate with an error.
- */
+** attributes may not need a name. If the name is missing, use Name. If
+** Name is NULL, terminate with an error.
+*/
 
 Collection* ParseAttrList (const char* List, const char** NameList, unsigned NameCount);
 /* Parse a list containing name/value pairs into a sorted collection. Some
- * attributes may not need a name, so NameList contains these names. If there
- * were no errors, the function returns a alphabetically sorted collection
- * containing Attr entries.
- */
+** attributes may not need a name, so NameList contains these names. If there
+** were no errors, the function returns a alphabetically sorted collection
+** containing Attr entries.
+*/
 
 void FreeAttrList (Collection* C);
 /* Free a list of attributes */
@@ -126,6 +126,3 @@ void FreeAttrList (Collection* C);
 /* End of attr.h */
 
 #endif
-
-
-

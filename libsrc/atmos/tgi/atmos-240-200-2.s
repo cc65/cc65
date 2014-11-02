@@ -2,7 +2,7 @@
 ; Graphics driver for the 240x200x2 monochrome mode on the Atmos
 ;
 ; Stefan Haubenthal <polluks@sdf.lonestar.org>
-; 2013-07-16, Greg King <gregdk@users.sf.net>
+; 2014-09-10, Greg King <gregdk@users.sf.net>
 ;
 
         .include        "zeropage.inc"
@@ -12,6 +12,7 @@
         .include        "atmos.inc"
 
         .macpack        generic
+        .macpack        module
 
 XSIZE   =       6                       ; System font width
 YSIZE   =       8                       ; System font height
@@ -19,7 +20,7 @@ YSIZE   =       8                       ; System font height
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table and constants.
 
-.segment        "JUMPTABLE"
+        module_header   _atmos_240_200_2_tgi
 
 ; First part of the header is a structure that has a magic and defines the
 ; capabilities of the driver
@@ -253,7 +254,7 @@ SETPIXEL:
 mymode: sta     PARAM3
         lda     X1
         sta     PARAM1
-        lda     #0
+        lda     #>$0000
         sta     PARAM1+1
         sta     PARAM2+1
         sta     PARAM3+1
@@ -269,13 +270,13 @@ GETPIXEL:
         sta     PARAM1
         lda     Y1
         sta     PARAM2
-        lda     #0
+        lda     #>$0000
         sta     PARAM1+1
         sta     PARAM2+1
         jsr     POINT
         lda     PARAM1
         and     #%00000001
-        ldx     #0
+        ldx     #>$0000
         rts
 
 ; ------------------------------------------------------------------------
@@ -301,7 +302,7 @@ LINE:
         sta     PARAM2+1
         lda     MODE
         sta     PARAM3
-        ldx     #>0
+        ldx     #>$0000
         stx     PARAM3+1
         jmp     DRAW
 

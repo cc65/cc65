@@ -91,8 +91,8 @@ struct HLLDbgSym {
 };
 
 /* We will collect all debug symbols in the following array and remove
- * duplicates before outputing them into a label file.
- */
+** duplicates before outputing them into a label file.
+*/
 static DbgSym*  DbgSymPool[256];
 
 
@@ -141,8 +141,8 @@ static HLLDbgSym* NewHLLDbgSym (void)
 
 static DbgSym* GetDbgSym (DbgSym* D, long Val)
 /* Check if we find the same debug symbol in the table. If we find it, return
- * a pointer to the other occurrence, if we didn't find it, return NULL.
- */
+** a pointer to the other occurrence, if we didn't find it, return NULL.
+*/
 {
     /* Create the hash. We hash over the symbol value */
     unsigned Hash = ((Val >> 24) & 0xFF) ^
@@ -219,8 +219,8 @@ DbgSym* ReadDbgSym (FILE* F, ObjData* O, unsigned Id)
     }
 
     /* If its an exports, there's also the export id, but we don't remember
-     * it but use it to let the export point back to us.
-     */
+    ** it but use it to let the export point back to us.
+    */
     if (SYM_IS_EXPORT (D->Type)) {
         /* Get the export from the export id, then set the our id */
         GetObjExport (O, ReadVar (F))->DbgSymId = Id;
@@ -377,8 +377,8 @@ void PrintDbgSyms (FILE* F)
             }
 
             /* For cheap local symbols, add the owner symbol, for others,
-             * add the owner scope.
-             */
+            ** add the owner scope.
+            */
             if (SYM_IS_STD (S->Type)) {
                 fprintf (F, ",scope=%u", O->ScopeBaseId + S->OwnerId);
             } else {
@@ -390,9 +390,9 @@ void PrintDbgSyms (FILE* F)
             PrintLineInfo (F, &S->RefLines, ",ref=%u");
 
             /* If this is an import, output the id of the matching export.
-             * If this is not an import, output its value and - if we have
-             * it - the segment.
-             */
+            ** If this is not an import, output its value and - if we have
+            ** it - the segment.
+            */
             if (SYM_IS_IMPORT (S->Type)) {
 
                 /* Get the import */
@@ -405,9 +405,9 @@ void PrintDbgSyms (FILE* F)
                 fputs (",type=imp", F);
 
                 /* If this is not a linker generated symbol, and the module
-                 * that contains the export has debug info, output the debug
-                 * symbol id for the export
-                 */
+                ** that contains the export has debug info, output the debug
+                ** symbol id for the export
+                */
                 if (Exp->Obj && OBJ_HAS_DBGINFO (Exp->Obj->Header.Flags)) {
                     fprintf (F, ",exp=%u", Exp->Obj->SymBaseId + Exp->DbgSymId);
                 }
@@ -423,8 +423,8 @@ void PrintDbgSyms (FILE* F)
                 fprintf (F, ",val=0x%lX", Val);
 
                 /* Check for a segmented expression and add the segment id to
-                 * the debug info if we have one.
-                 */
+                ** the debug info if we have one.
+                */
                 GetSegExprVal (S->Expr, &D);
                 if (!D.TooComplex && D.Seg != 0) {
                     fprintf (F, ",seg=%u", D.Seg->Id);
@@ -526,9 +526,9 @@ void PrintDbgSymLabels (FILE* F)
             Val = GetDbgSymVal (D);
 
             /* Lookup this symbol in the table. If it is found in the table, it was
-             * already written to the file, so don't emit it twice. If it is not in
-             * the table, insert and output it.
-             */
+            ** already written to the file, so don't emit it twice. If it is not in
+            ** the table, insert and output it.
+            */
             if (GetDbgSym (D, Val) == 0) {
 
                 /* Emit the VICE label line */
@@ -540,7 +540,3 @@ void PrintDbgSymLabels (FILE* F)
         }
     }
 }
-
-
-
-

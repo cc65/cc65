@@ -96,11 +96,11 @@ struct Export {
 
 
 /* Prototype of a function that is called if an undefined symbol is found. It
- * may check if the symbol is an external symbol (for binary formats that
- * support externals) and will return zero if the symbol could not be
- * resolved, or a value != zero if the symbol could be resolved. The
- * CheckExports routine will print out the missing symbol in the first case.
- */
+** may check if the symbol is an external symbol (for binary formats that
+** support externals) and will return zero if the symbol could not be
+** resolved, or a value != zero if the symbol could be resolved. The
+** CheckExports routine will print out the missing symbol in the first case.
+*/
 typedef int (*ExpCheckFunc) (unsigned Name, void* Data);
 
 
@@ -113,9 +113,9 @@ typedef int (*ExpCheckFunc) (unsigned Name, void* Data);
 
 void FreeImport (Import* I);
 /* Free an import. NOTE: This won't remove the import from the exports table,
- * so it may only be called for unused imports (imports from modules that
- * aren't referenced).
- */
+** so it may only be called for unused imports (imports from modules that
+** aren't referenced).
+*/
 
 Import* ReadImport (FILE* F, ObjData* Obj);
 /* Read an import from a file and insert it into the table */
@@ -131,9 +131,9 @@ const LineInfo* GetImportPos (const Import* I);
 
 void FreeExport (Export* E);
 /* Free an export. NOTE: This won't remove the export from the exports table,
- * so it may only be called for unused exports (exports from modules that
- * aren't referenced).
- */
+** so it may only be called for unused exports (exports from modules that
+** aren't referenced).
+*/
 
 Export* ReadExport (FILE* F, ObjData* Obj);
 /* Read an export from a file */
@@ -161,8 +161,8 @@ Export* CreateSectionExport (unsigned Name, Section* S, unsigned long Offs);
 
 Export* FindExport (unsigned Name);
 /* Check for an identifier in the list. Return 0 if not found, otherwise
- * return a pointer to the export.
- */
+** return a pointer to the export.
+*/
 
 int IsUnresolved (unsigned Name);
 /* Check if this symbol is an unresolved export */
@@ -178,16 +178,19 @@ long GetExportVal (const Export* E);
 
 void CheckExports (void);
 /* Setup the list of all exports and check for export/import symbol type
- * mismatches.
- */
+** mismatches.
+*/
 
 void CheckUnresolvedImports (ExpCheckFunc F, void* Data);
 /* Check if there are any unresolved imports. On unresolved imports, F is
- * called (see the comments on ExpCheckFunc in the data section).
- */
+** called (see the comments on ExpCheckFunc in the data section).
+*/
 
-void PrintExportMap (FILE* F);
-/* Print an export map to the given file */
+void PrintExportMapByName (FILE* F);
+/* Print an export map to the given file (sorted by symbol name) */
+
+void PrintExportMapByValue (FILE* F);
+/* Print an export map to the given file (sorted by export value) */
 
 void PrintImportMap (FILE* F);
 /* Print an import map to the given file */
@@ -212,7 +215,3 @@ void CircularRefError (const Export* E);
 /* End of exports.h */
 
 #endif
-
-
-
-

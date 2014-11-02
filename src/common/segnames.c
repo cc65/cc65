@@ -65,6 +65,3 @@ int ValidSegName (const char* Name)
     /* Name is ok */
     return 1;
 }
-
-
-

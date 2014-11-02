@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -104,8 +104,8 @@ unsigned long ReadVar (FILE* F);
 
 unsigned ReadStr (FILE* F);
 /* Read a string from the file, place it into the global string pool, and
- * return its string id.
- */
+** return its string id.
+*/
 
 FilePos* ReadFilePos (FILE* F, FilePos* Pos);
 /* Read a file position from the file */
@@ -118,6 +118,3 @@ void* ReadData (FILE* F, void* Data, unsigned Size);
 /* End of fileio.h */
 
 #endif
-
-
-

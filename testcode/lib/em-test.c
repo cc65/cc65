@@ -143,8 +143,8 @@ int main (void)
     cputs ("\r\nTesting em_copyfrom/em_copyto");
 
     /* We're filling now 384 bytes per run to test the copy routines with
-     * other sizes.
-     */
+    ** other sizes.
+    */
     PageCount = (PageCount * 2) / 3;
 
     /* Setup the copy structure */

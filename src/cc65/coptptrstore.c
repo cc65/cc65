@@ -97,9 +97,9 @@ static unsigned OptPtrStore1Sub (CodeSeg* S, unsigned I, CodeEntry** const L)
 
 static const char* LoadAXZP (CodeSeg* S, unsigned I)
 /* If the two instructions preceeding S/I are a load of A/X from a two byte
- * zero byte location, return the name of the zero page location. Otherwise
- * return NULL.
- */
+** zero byte location, return the name of the zero page location. Otherwise
+** return NULL.
+*/
 {
     CodeEntry* L[2];
     unsigned Len;
@@ -131,11 +131,11 @@ static const char* LoadAXZP (CodeSeg* S, unsigned I)
 
 static const char* LoadAXImm (CodeSeg* S, unsigned I)
 /* If the instructions preceeding S/I are a load of A/X of a constant value
- * or a word sized address label, return the address of the location as a
- * string.
- * Beware: In case of a numeric value, the result is returned in static
- * storage which is overwritten with each call.
- */
+** or a word sized address label, return the address of the location as a
+** string.
+** Beware: In case of a numeric value, the result is returned in static
+** storage which is overwritten with each call.
+*/
 {
     static StrBuf Buf = STATIC_STRBUF_INITIALIZER;
     CodeEntry* L[2];
@@ -162,9 +162,9 @@ static const char* LoadAXImm (CodeSeg* S, unsigned I)
     }
 
     /* Search back for the two instructions loading A and X. Abort
-     * the search if the registers are changed in any other way or
-     * if a label is reached while we don't have both loads.
-     */
+    ** the search if the registers are changed in any other way or
+    ** if a label is reached while we don't have both loads.
+    */
     ALoad = 0;
     XLoad = 0;
     while (I-- > 0) {
@@ -223,49 +223,49 @@ static const char* LoadAXImm (CodeSeg* S, unsigned I)
 
 unsigned OptPtrStore1 (CodeSeg* S)
 /* Search for the sequence:
- *
- *      clc
- *      adc     xxx
- *      bcc     L
- *      inx
- * L:   jsr     pushax
- *      ldx     #$00
- *      lda     yyy
- *      ldy     #$00
- *      jsr     staspidx
- *
- * and replace it by:
- *
- *      sta     ptr1
- *      stx     ptr1+1
- *      ldy     xxx
- *      ldx     #$00
- *      lda     yyy
- *      sta     (ptr1),y
- *
- * or by
- *
- *      ldy     xxx
- *      ldx     #$00
- *      lda     yyy
- *      sta     (zp),y
- *
- * or by
- *
- *      ldy     xxx
- *      ldx     #$00
- *      lda     yyy
- *      sta     label,y
- *
- * or by
- *
- *      ldy     xxx
- *      ldx     #$00
- *      lda     yyy
- *      sta     $xxxx,y
- *
- * depending on the code preceeding the sequence above.
- */
+**
+**      clc
+**      adc     xxx
+**      bcc     L
+**      inx
+** L:   jsr     pushax
+**      ldx     #$00
+**      lda     yyy
+**      ldy     #$00
+**      jsr     staspidx
+**
+** and replace it by:
+**
+**      sta     ptr1
+**      stx     ptr1+1
+**      ldy     xxx
+**      ldx     #$00
+**      lda     yyy
+**      sta     (ptr1),y
+**
+** or by
+**
+**      ldy     xxx
+**      ldx     #$00
+**      lda     yyy
+**      sta     (zp),y
+**
+** or by
+**
+**      ldy     xxx
+**      ldx     #$00
+**      lda     yyy
+**      sta     label,y
+**
+** or by
+**
+**      ldy     xxx
+**      ldx     #$00
+**      lda     yyy
+**      sta     $xxxx,y
+**
+** depending on the code preceeding the sequence above.
+*/
 {
     unsigned Changes = 0;
     unsigned I;
@@ -309,22 +309,22 @@ unsigned OptPtrStore1 (CodeSeg* S)
             unsigned IP = I + 9;
             if ((Loc = LoadAXZP (S, I)) != 0) {
                 /* If the sequence is preceeded by a load of a ZP value,
-                 * we can use this ZP value as a pointer using ZP
-                 * indirect Y addressing.
-                 */
+                ** we can use this ZP value as a pointer using ZP
+                ** indirect Y addressing.
+                */
                 AM = AM65_ZP_INDY;
             } else if ((Loc = LoadAXImm (S, I)) != 0) {
                 /* If the sequence is preceeded by a load of an immediate
-                 * value, we can use this absolute value as an address
-                 * using absolute indexed Y addressing.
-                 */
+                ** value, we can use this absolute value as an address
+                ** using absolute indexed Y addressing.
+                */
                 AM = AM65_ABSY;
             }
 
             /* If we don't have a store location, we use ptr1 with zp
-             * indirect Y addressing. We must store the value in A/X into
-             * ptr1 in this case.
-             */
+            ** indirect Y addressing. We must store the value in A/X into
+            ** ptr1 in this case.
+            */
             if (Loc == 0) {
 
                 /* Must use ptr1 */
@@ -340,10 +340,10 @@ unsigned OptPtrStore1 (CodeSeg* S)
             }
 
             /* If the index is loaded from (zp),y, we cannot do that directly.
-             * Note: In this case, the Y register will contain the correct
-             * value after removing the old code, so we don't need to load
-             * it here.
-             */
+            ** Note: In this case, the Y register will contain the correct
+            ** value after removing the old code, so we don't need to load
+            ** it here.
+            */
             if (L[1]->AM == AM65_ZP_INDY) {
                 X = NewCodeEntry (OP65_LDA, L[1]->AM, L[1]->Arg, 0, L[1]->LI);
                 CS_InsertEntry (S, X, IP++);
@@ -388,54 +388,54 @@ unsigned OptPtrStore1 (CodeSeg* S)
 
 unsigned OptPtrStore2 (CodeSeg* S)
 /* Search for the sequence:
- *
- *      clc
- *      adc     xxx
- *      bcc     L
- *      inx
- * L:   jsr     pushax
- *      ldy     yyy
- *      ldx     #$00
- *      lda     (sp),y
- *      ldy     #$00
- *      jsr     staspidx
- *
- * and replace it by:
- *
- *      sta     ptr1
- *      stx     ptr1+1
- *      ldy     yyy-2
- *      ldx     #$00
- *      lda     (sp),y
- *      ldy     xxx
- *      sta     (ptr1),y
- *
- * or by
- *
- *      ldy     yyy-2
- *      ldx     #$00
- *      lda     (sp),y
- *      ldy     xxx
- *      sta     (zp),y
- *
- * or by
- *
- *      ldy     yyy-2
- *      ldx     #$00
- *      lda     (sp),y
- *      ldy     xxx
- *      sta     label,y
- *
- * or by
- *
- *      ldy     yyy-2
- *      ldx     #$00
- *      lda     (sp),y
- *      ldy     xxx
- *      sta     $xxxx,y
- *
- * depending on the code preceeding the sequence above.
- */
+**
+**      clc
+**      adc     xxx
+**      bcc     L
+**      inx
+** L:   jsr     pushax
+**      ldy     yyy
+**      ldx     #$00
+**      lda     (sp),y
+**      ldy     #$00
+**      jsr     staspidx
+**
+** and replace it by:
+**
+**      sta     ptr1
+**      stx     ptr1+1
+**      ldy     yyy-2
+**      ldx     #$00
+**      lda     (sp),y
+**      ldy     xxx
+**      sta     (ptr1),y
+**
+** or by
+**
+**      ldy     yyy-2
+**      ldx     #$00
+**      lda     (sp),y
+**      ldy     xxx
+**      sta     (zp),y
+**
+** or by
+**
+**      ldy     yyy-2
+**      ldx     #$00
+**      lda     (sp),y
+**      ldy     xxx
+**      sta     label,y
+**
+** or by
+**
+**      ldy     yyy-2
+**      ldx     #$00
+**      lda     (sp),y
+**      ldy     xxx
+**      sta     $xxxx,y
+**
+** depending on the code preceeding the sequence above.
+*/
 {
     unsigned Changes = 0;
     unsigned I;
@@ -486,22 +486,22 @@ unsigned OptPtrStore2 (CodeSeg* S)
             unsigned IP = I + 10;
             if ((Loc = LoadAXZP (S, I)) != 0) {
                 /* If the sequence is preceeded by a load of a ZP value,
-                 * we can use this ZP value as a pointer using ZP
-                 * indirect Y addressing.
-                 */
+                ** we can use this ZP value as a pointer using ZP
+                ** indirect Y addressing.
+                */
                 AM = AM65_ZP_INDY;
             } else if ((Loc = LoadAXImm (S, I)) != 0) {
                 /* If the sequence is preceeded by a load of an immediate
-                 * value, we can use this absolute value as an address
-                 * using absolute indexed Y addressing.
-                 */
+                ** value, we can use this absolute value as an address
+                ** using absolute indexed Y addressing.
+                */
                 AM = AM65_ABSY;
             }
 
             /* If we don't have a store location, we use ptr1 with zp
-             * indirect Y addressing. We must store the value in A/X into
-             * ptr1 in this case.
-             */
+            ** indirect Y addressing. We must store the value in A/X into
+            ** ptr1 in this case.
+            */
             if (Loc == 0) {
 
                 /* Must use ptr1 */
@@ -517,20 +517,20 @@ unsigned OptPtrStore2 (CodeSeg* S)
             }
 
             /* Generate four different replacements depending on the addressing
-             * mode of the store and from where the index is loaded:
-             *
-             * 1. If the index is not loaded ZP indirect Y, we can use Y for
-             *    the store index.
-             *
-             * 2. If the index is loaded ZP indirect Y and we store absolute
-             *    indexed, we need Y to load the index and will therefore
-             *    use X as index for the store. The disadvantage is that we
-             *    need to reload X later.
-             *
-             * 3. If the index is loaded ZP indirect Y and we store ZP indirect
-             *    Y, we must use Y for load and store and must therefore save
-             *    the A register when loading Y the second time.
-             */
+            ** mode of the store and from where the index is loaded:
+            **
+            ** 1. If the index is not loaded ZP indirect Y, we can use Y for
+            **    the store index.
+            **
+            ** 2. If the index is loaded ZP indirect Y and we store absolute
+            **    indexed, we need Y to load the index and will therefore
+            **    use X as index for the store. The disadvantage is that we
+            **    need to reload X later.
+            **
+            ** 3. If the index is loaded ZP indirect Y and we store ZP indirect
+            **    Y, we must use Y for load and store and must therefore save
+            **    the A register when loading Y the second time.
+            */
             if (L[1]->AM != AM65_ZP_INDY) {
 
                 /* Case 1 */
@@ -630,29 +630,28 @@ unsigned OptPtrStore2 (CodeSeg* S)
 
 unsigned OptPtrStore3 (CodeSeg* S)
 /* Search for the sequence:
- *
- *      jsr     pushax
- *      ldy     xxx
- *      jsr     ldauidx
- *      subop
- *      ldy     yyy
- *      jsr     staspidx
- *
- * and replace it by:
- *
- *      sta     ptr1
- *      stx     ptr1+1
- *      ldy     xxx
- *      ldx     #$00
- *      lda     (ptr1),y
- *      subop
- *      ldy     yyy
- *      sta     (ptr1),y
- *
- * In case a/x is loaded from the register bank before the pushax, we can even
- * use the register bank instead of ptr1.
- *
- */
+**
+**      jsr     pushax
+**      ldy     xxx
+**      jsr     ldauidx
+**      subop
+**      ldy     yyy
+**      jsr     staspidx
+**
+** and replace it by:
+**
+**      sta     ptr1
+**      stx     ptr1+1
+**      ldy     xxx
+**      ldx     #$00
+**      lda     (ptr1),y
+**      subop
+**      ldy     yyy
+**      sta     (ptr1),y
+**
+** In case a/x is loaded from the register bank before the pushax, we can even
+** use the register bank instead of ptr1.
+*/
 {
     unsigned Changes = 0;
 
@@ -689,10 +688,10 @@ unsigned OptPtrStore3 (CodeSeg* S)
 
 
             /* Get the preceeding two instructions and check them. We check
-             * for:
-             *          lda     regbank+n
-             *          ldx     regbank+n+1
-             */
+            ** for:
+            **          lda     regbank+n
+            **          ldx     regbank+n+1
+            */
             if (I > 1) {
                 CodeEntry* P[2];
                 P[0] = CS_GetEntry (S, I-2);
@@ -740,8 +739,8 @@ unsigned OptPtrStore3 (CodeSeg* S)
             }
 
             /* Delete more old code. Do it here to keep a label attached to
-             * entry I in place.
-             */
+            ** entry I in place.
+            */
             CS_DelEntry (S, I);         /* jsr pushax */
 
             /* Remember, we had changes */
@@ -757,6 +756,3 @@ unsigned OptPtrStore3 (CodeSeg* S)
     /* Return the number of changes made */
     return Changes;
 }
-
-
-

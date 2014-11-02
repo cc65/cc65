@@ -73,9 +73,9 @@ extern void (*CheckFailed) (const char* Msg, const char* Cond,
 
 #define ABORT(s) CheckFailed (MsgProgramAborted, s, __FILE__, __LINE__)
 /* Use this one instead of FAIL if there is no internal program error but an
- * error condition that is caused by the user or operating system (FAIL and
- * ABORT are essentially the same but the message differs).
- */
+** error condition that is caused by the user or operating system (FAIL and
+** ABORT are essentially the same but the message differs).
+*/
 
 #define PRECONDITION(c) \
     ((void) ((c)? 0 : (CheckFailed (MsgPrecondition, #c, __FILE__, __LINE__), 0)))
@@ -86,7 +86,5 @@ extern void (*CheckFailed) (const char* Msg, const char* Cond,
 
 
 /* End of check.h */
+
 #endif
-
-
-

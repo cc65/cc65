@@ -84,6 +84,3 @@ void ListObjFiles (int argc, char* argv [])
     /* Successful end */
     exit (EXIT_SUCCESS);
 }
-
-
-

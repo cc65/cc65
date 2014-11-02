@@ -169,9 +169,16 @@ extern char *_getdefdev(void);          /* get default floppy device */
 
 /* global variables */
 extern unsigned char _dos_type;         /* the DOS flavour */
+#ifndef __ATARIXL__
 extern void atr130_emd[];
 extern void atrstd_joy[];               /* referred to by joy_static_stddrv[] */
 extern void atrmj8_joy[];
+extern void atrjoy_mou[];
+extern void atrst_mou[];                /* referred to by mouse_static_stddrv[] */
+extern void atrami_mou[];
+extern void atrtrk_mou[];
+extern void atrtt_mou[];
+extern void atrrdev_ser[];
 extern void atr3_tgi[];
 extern void atr4_tgi[];
 extern void atr5_tgi[];
@@ -187,6 +194,32 @@ extern void atr11_tgi[];
 extern void atr14_tgi[];
 extern void atr15_tgi[];
 extern void atr15p2_tgi[];
+#else
+extern void atrx130_emd[];
+extern void atrxstd_joy[];              /* referred to by joy_static_stddrv[] */
+extern void atrxmj8_joy[];
+extern void atrxjoy_mou[];
+extern void atrxst_mou[];               /* referred to by mouse_static_stddrv[] */
+extern void atrxami_mou[];
+extern void atrxtrk_mou[];
+extern void atrxtt_mou[];
+extern void atrxrdev_ser[];
+extern void atrx3_tgi[];
+extern void atrx4_tgi[];
+extern void atrx5_tgi[];
+extern void atrx6_tgi[];
+extern void atrx7_tgi[];
+extern void atrx8_tgi[];                /* referred to by tgi_static_stddrv[] */
+extern void atrx8p2_tgi[];
+extern void atrx9_tgi[];
+extern void atrx9p2_tgi[];
+extern void atrx10_tgi[];
+extern void atrx10p2_tgi[];
+extern void atrx11_tgi[];
+extern void atrx14_tgi[];
+extern void atrx15_tgi[];
+extern void atrx15p2_tgi[];
+#endif
 
 /* provide old names for backwards compatibility */
 #ifdef ATARI_COMPAT_PRE_2_11

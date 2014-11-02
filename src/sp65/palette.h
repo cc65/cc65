@@ -85,6 +85,3 @@ void DumpPalette (FILE* F, const Palette* P);
 /* End of palette.h */
 
 #endif
-
-
-

@@ -26,11 +26,13 @@
         .include        "ser-error.inc"
         .include        "c64.inc"
 
+        .macpack        module
+
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-.segment        "JUMPTABLE"
+        module_header   _c64_swlink_ser
 
 ; Driver signature
 

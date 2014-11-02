@@ -48,17 +48,17 @@
 
 unsigned OptPush1 (CodeSeg* S)
 /* Given a sequence
- *
- *     jsr     ldaxysp
- *     jsr     pushax
- *
- * If a/x are not used later, and Y is known, replace that by
- *
- *     ldy     #xx+2
- *     jsr     pushwysp
- *
- * saving 3 bytes and several cycles.
- */
+**
+**     jsr     ldaxysp
+**     jsr     pushax
+**
+** If a/x are not used later, and Y is known, replace that by
+**
+**     ldy     #xx+2
+**     jsr     pushwysp
+**
+** saving 3 bytes and several cycles.
+*/
 {
     unsigned I;
     unsigned Changes = 0;
@@ -115,15 +115,14 @@ unsigned OptPush1 (CodeSeg* S)
 
 unsigned OptPush2 (CodeSeg* S)
 /* A sequence
- *
- *     jsr     ldaxidx
- *     jsr     pushax
- *
- * may get replaced by
- *
- *     jsr     pushwidx
- *
- */
+**
+**     jsr     ldaxidx
+**     jsr     pushax
+**
+** may get replaced by
+**
+**     jsr     pushwidx
+*/
 {
     unsigned I;
     unsigned Changes = 0;
@@ -166,6 +165,3 @@ unsigned OptPush2 (CodeSeg* S)
     /* Return the number of changes made */
     return Changes;
 }
-
-
-

@@ -93,8 +93,8 @@ static void OneLine (const OpcDesc* D, const char* Arg, ...)
 
 static const char* GetAbsOverride (unsigned Flags, unsigned Addr)
 /* If the instruction requires an abs override modifier, return the necessary
- * string, otherwise return the empty string.
- */
+** string, otherwise return the empty string.
+*/
 {
     if ((Flags & flAbsOverride) != 0 && Addr < 0x100) {
         return "a:";
@@ -137,10 +137,10 @@ static void GenerateLabel (unsigned Flags, unsigned Addr)
          ((Flags & flUseLabel) != 0 && Addr >= CodeStart && Addr <= CodeEnd))) {
 
         /* As a special case, handle ranges with tables or similar. Within
-         * such a range with a granularity > 1, do only generate dependent
-         * labels for all addresses but the first one. Be sure to generate
-         * a label for the start of the range, however.
-         */
+        ** such a range with a granularity > 1, do only generate dependent
+        ** labels for all addresses but the first one. Be sure to generate
+        ** a label for the start of the range, however.
+        */
         attr_t Style         = GetStyleAttr (Addr);
         unsigned Granularity = GetGranularity (Style);
 
@@ -153,8 +153,8 @@ static void GenerateLabel (unsigned Flags, unsigned Addr)
 
 
             /* Search for the start of the range or the last non dependent
-             * label in the range.
-             */
+            ** label in the range.
+            */
             unsigned Offs;
             attr_t LabelAttr;
             unsigned LabelAddr = Addr;
@@ -414,10 +414,10 @@ void OH_BitBranch (const OpcDesc* D)
     unsigned BranchAddr = (((int) PC+3) + BranchOffs) & 0xFFFF;
 
     /* Generate labels in pass 1. The bit branch codes are special in that
-     * they don't really match the remainder of the 6502 instruction set (they
-     * are a Rockwell addon), so we must pass additional flags as direct
-     * value to the second GenerateLabel call.
-     */
+    ** they don't really match the remainder of the 6502 instruction set (they
+    ** are a Rockwell addon), so we must pass additional flags as direct
+    ** value to the second GenerateLabel call.
+    */
     GenerateLabel (D->Flags, TestAddr);
     GenerateLabel (flLabel, BranchAddr);
 
@@ -662,6 +662,3 @@ void OH_JmpAbsoluteIndirect (const OpcDesc* D)
     }
     SeparatorLine ();
 }
-
-
-

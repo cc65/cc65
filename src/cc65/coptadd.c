@@ -51,29 +51,29 @@
 
 unsigned OptAdd1 (CodeSeg* S)
 /* Search for the sequence
- *
- *      ldy     #xx
- *      jsr     ldaxysp
- *      jsr     pushax
- *      ldy     #yy
- *      jsr     ldaxysp
- *      jsr     tosaddax
- *
- * and replace it by:
- *
- *      ldy     #xx-1
- *      lda     (sp),y
- *      ldy     #yy-3
- *      clc
- *      adc     (sp),y
- *      pha
- *      ldy     #xx
- *      lda     (sp),y
- *      ldy     #yy-2
- *      adc     (sp),y
- *      tax
- *      pla
- */
+**
+**      ldy     #xx
+**      jsr     ldaxysp
+**      jsr     pushax
+**      ldy     #yy
+**      jsr     ldaxysp
+**      jsr     tosaddax
+**
+** and replace it by:
+**
+**      ldy     #xx-1
+**      lda     (sp),y
+**      ldy     #yy-3
+**      clc
+**      adc     (sp),y
+**      pha
+**      ldy     #xx
+**      lda     (sp),y
+**      ldy     #yy-2
+**      adc     (sp),y
+**      tax
+**      pla
+*/
 {
     unsigned Changes = 0;
 
@@ -172,28 +172,28 @@ unsigned OptAdd1 (CodeSeg* S)
 
 unsigned OptAdd2 (CodeSeg* S)
 /* Search for the sequence
- *
- *      ldy     #xx
- *      jsr     ldaxysp
- *      ldy     #yy
- *      jsr     addeqysp
- *
- * and replace it by:
- *
- *      ldy     #xx-1
- *      lda     (sp),y
- *      ldy     #yy
- *      clc
- *      adc     (sp),y
- *      sta     (sp),y
- *      ldy     #xx
- *      lda     (sp),y
- *      ldy     #yy+1
- *      adc     (sp),y
- *      sta     (sp),y
- *
- * provided that a/x is not used later.
- */
+**
+**      ldy     #xx
+**      jsr     ldaxysp
+**      ldy     #yy
+**      jsr     addeqysp
+**
+** and replace it by:
+**
+**      ldy     #xx-1
+**      lda     (sp),y
+**      ldy     #yy
+**      clc
+**      adc     (sp),y
+**      sta     (sp),y
+**      ldy     #xx
+**      lda     (sp),y
+**      ldy     #yy+1
+**      adc     (sp),y
+**      sta     (sp),y
+**
+** provided that a/x is not used later.
+*/
 {
     unsigned Changes = 0;
 
@@ -288,20 +288,20 @@ unsigned OptAdd2 (CodeSeg* S)
 
 unsigned OptAdd3 (CodeSeg* S)
 /* Search for the sequence
- *
- *      jsr     pushax
- *      ldx     #$00
- *      lda     xxx
- *      jsr     tosaddax
- *
- * and replace it by
- *
- *      clc
- *      adc     xxx
- *      bcc     L1
- *      inx
- * L1:
- */
+**
+**      jsr     pushax
+**      ldx     #$00
+**      lda     xxx
+**      jsr     tosaddax
+**
+** and replace it by
+**
+**      clc
+**      adc     xxx
+**      bcc     L1
+**      inx
+** L1:
+*/
 {
     unsigned Changes = 0;
 
@@ -364,22 +364,22 @@ unsigned OptAdd3 (CodeSeg* S)
 
 unsigned OptAdd4 (CodeSeg* S)
 /* Search for the sequence
- *
- *      jsr     pushax
- *      lda     xxx
- *      ldx     yyy
- *      jsr     tosaddax
- *
- * and replace it by
- *
- *      clc
- *      adc     xxx
- *      pha
- *      txa
- *      adc     yyy
- *      tax
- *      pla
- */
+**
+**      jsr     pushax
+**      lda     xxx
+**      ldx     yyy
+**      jsr     tosaddax
+**
+** and replace it by
+**
+**      clc
+**      adc     xxx
+**      pha
+**      txa
+**      adc     yyy
+**      tax
+**      pla
+*/
 {
     unsigned Changes = 0;
 
@@ -453,8 +453,8 @@ unsigned OptAdd4 (CodeSeg* S)
 
 unsigned OptAdd5 (CodeSeg* S)
 /* Search for a call to incaxn and replace it by an 8 bit add if the X register
- * is not used later.
- */
+** is not used later.
+*/
 {
     unsigned Changes = 0;
 
@@ -506,14 +506,14 @@ unsigned OptAdd5 (CodeSeg* S)
 
 unsigned OptAdd6 (CodeSeg* S)
 /* Search for the sequence
- *
- *      adc     ...
- *      bcc     L
- *      inx
- * L:
- *
- * and remove the handling of the high byte if X is not used later.
- */
+**
+**      adc     ...
+**      bcc     L
+**      inx
+** L:
+**
+** and remove the handling of the high byte if X is not used later.
+*/
 {
     unsigned Changes = 0;
 
@@ -553,6 +553,3 @@ unsigned OptAdd6 (CodeSeg* S)
     /* Return the number of changes made */
     return Changes;
 }
-
-
-

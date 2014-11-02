@@ -71,8 +71,8 @@ static void LoadConstant (unsigned Flags, ExprDesc* Expr)
 
         case E_LOC_REGISTER:
             /* Register variable. Taking the address is usually not
-             * allowed.
-             */
+            ** allowed.
+            */
             if (IS_Get (&AllowRegVarAddr) == 0) {
                 Error ("Cannot take the address of a register variable");
             }
@@ -96,10 +96,10 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
     if (ED_IsLVal (Expr)) {
 
         /* Dereferenced lvalue. If this is a bit field its type is unsigned.
-         * But if the field is completely contained in the lower byte, we will
-         * throw away the high byte anyway and may therefore load just the
-         * low byte.
-         */
+        ** But if the field is completely contained in the lower byte, we will
+        ** throw away the high byte anyway and may therefore load just the
+        ** low byte.
+        */
         if (ED_IsBitField (Expr)) {
             Flags |= (Expr->BitOffs + Expr->BitWidth <= CHAR_BITS)? CF_CHAR : CF_INT;
             Flags |= CF_UNSIGNED;
@@ -155,9 +155,9 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
         }
 
         /* Handle bit fields. The actual type may have been casted or
-         * converted, so be sure to always use unsigned ints for the
-         * operations.
-         */
+        ** converted, so be sure to always use unsigned ints for the
+        ** operations.
+        */
         if (ED_IsBitField (Expr)) {
             unsigned F = CF_INT | CF_UNSIGNED | CF_CONST | (Flags & CF_TEST);
             /* Shift right by the bit offset */
@@ -177,8 +177,8 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
         if (ED_IsLocExpr (Expr)) {
             if (Expr->IVal != 0) {
                 /* We have an expression in the primary plus a constant
-                 * offset. Adjust the value in the primary accordingly.
-                 */
+                ** offset. Adjust the value in the primary accordingly.
+                */
                 Flags |= TypeOf (Expr->Type);
                 g_inc (Flags | CF_CONST, Expr->IVal);
             }
@@ -197,6 +197,3 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
     }
 
 }
-
-
-

@@ -96,8 +96,8 @@ static char* GetArgCopy (const char* Arg)
 
 static int NumArg (const char* Arg, unsigned long* Num)
 /* If the given argument is numerical, convert it and return true. Otherwise
- * set Num to zero and return false.
- */
+** set Num to zero and return false.
+*/
 {
     char* End;
     unsigned long Val;
@@ -113,8 +113,8 @@ static int NumArg (const char* Arg, unsigned long* Num)
     }
 
     /* Convert the value. strtol is not exactly what we want here, but it's
-     * cheap and may be replaced by something fancier later.
-     */
+    ** cheap and may be replaced by something fancier later.
+    */
     Val = strtoul (Arg, &End, Base);
 
     /* Check if the conversion was successful */
@@ -141,16 +141,16 @@ static void SetUseChgInfo (CodeEntry* E, const OPCDesc* D)
     const ZPInfo* Info;
 
     /* If this is a subroutine call, or a jump to an external function,
-     * lookup the information about this function and use it. The jump itself
-     * does not change any registers, so we don't need to use the data from D.
-     */
+    ** lookup the information about this function and use it. The jump itself
+    ** does not change any registers, so we don't need to use the data from D.
+    */
     if ((E->Info & (OF_UBRA | OF_CALL)) != 0 && E->JumpTo == 0) {
         /* A subroutine call or jump to external symbol (function exit) */
         GetFuncInfo (E->Arg, &E->Use, &E->Chg);
     } else {
         /* Some other instruction. Use the values from the opcode description
-         * plus addressing mode info.
-         */
+        ** plus addressing mode info.
+        */
         E->Use = D->Use | GetAMUseInfo (E->AM);
         E->Chg = D->Chg;
 
@@ -218,11 +218,11 @@ static void SetUseChgInfo (CodeEntry* E, const OPCDesc* D)
 
 const char* MakeHexArg (unsigned Num)
 /* Convert Num into a string in the form $XY, suitable for passing it as an
- * argument to NewCodeEntry, and return a pointer to the string.
- * BEWARE: The function returns a pointer to a static buffer, so the value is
- * gone if you call it twice (and apart from that it's not thread and signal
- * safe).
- */
+** argument to NewCodeEntry, and return a pointer to the string.
+** BEWARE: The function returns a pointer to a static buffer, so the value is
+** gone if you call it twice (and apart from that it's not thread and signal
+** safe).
+*/
 {
     static char Buf[16];
     xsprintf (Buf, sizeof (Buf), "$%02X", (unsigned char) Num);
@@ -288,8 +288,8 @@ void FreeCodeEntry (CodeEntry* E)
 
 void CE_ReplaceOPC (CodeEntry* E, opc_t OPC)
 /* Replace the opcode of the instruction. This will also replace related info,
- * Size, Use and Chg, but it will NOT update any arguments or labels.
- */
+** Size, Use and Chg, but it will NOT update any arguments or labels.
+*/
 {
     /* Get the opcode descriptor */
     const OPCDesc* D = GetOPCDesc (OPC);
@@ -325,9 +325,9 @@ void CE_AttachLabel (CodeEntry* E, CodeLabel* L)
 
 void CE_ClearJumpTo (CodeEntry* E)
 /* Clear the JumpTo entry and the argument (which contained the name of the
- * label). Note: The function will not clear the backpointer from the label,
- * so use it with care.
- */
+** label). Note: The function will not clear the backpointer from the label,
+** so use it with care.
+*/
 {
     /* Clear the JumpTo entry */
     E->JumpTo = 0;
@@ -366,8 +366,8 @@ void CE_SetArg (CodeEntry* E, const char* Arg)
 
 void CE_SetNumArg (CodeEntry* E, long Num)
 /* Set a new numeric argument for the given code entry that must already
- * have a numeric argument.
- */
+** have a numeric argument.
+*/
 {
     char Buf[16];
 
@@ -404,8 +404,8 @@ int CE_IsConstImm (const CodeEntry* E)
 
 int CE_IsKnownImm (const CodeEntry* E, unsigned long Num)
 /* Return true if the argument of E is a constant immediate value that is
- * equal to Num.
- */
+** equal to Num.
+*/
 {
     return (E->AM == AM65_IMM && CE_HasNumArg (E) && E->Num == Num);
 }
@@ -414,12 +414,12 @@ int CE_IsKnownImm (const CodeEntry* E, unsigned long Num)
 
 int CE_UseLoadFlags (CodeEntry* E)
 /* Return true if the instruction uses any flags that are set by a load of
- * a register (N and Z).
- */
+** a register (N and Z).
+*/
 {
     /* Follow unconditional branches, but beware of endless loops. After this,
-     * E will point to the first entry that is not a branch.
-     */
+    ** E will point to the first entry that is not a branch.
+    */
     if (E->Info & OF_UBRA) {
         Collection C = AUTO_COLLECTION_INITIALIZER;
 
@@ -491,8 +491,8 @@ void CE_FreeRegInfo (CodeEntry* E)
 
 void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 /* Generate register info for this instruction. If an old info exists, it is
- * overwritten.
- */
+** overwritten.
+*/
 {
     /* Pointers to the register contents */
     RegContents* In;
@@ -522,8 +522,8 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 
         case OP65_ADC:
             /* We don't know the value of the carry, so the result is
-             * always unknown.
-             */
+            ** always unknown.
+            */
             Out->RegA = UNKNOWN_REGVAL;
             break;
 
@@ -1490,9 +1490,3 @@ void CE_Output (const CodeEntry* E)
     /* Terminate the line */
     WriteOutput ("\n");
 }
-
-
-
-
-
-

@@ -63,8 +63,8 @@ static const char AnonTag[] = "$anon";
 
 char* AnonName (char* Buf, const char* Spec)
 /* Get a name for an anonymous variable or type. The given buffer is expected
- * to be IDENTSIZE characters long. A pointer to the buffer is returned.
- */
+** to be IDENTSIZE characters long. A pointer to the buffer is returned.
+*/
 {
     static unsigned ACount = 0;
     xsprintf (Buf, IDENTSIZE, "%s-%s-%04X", AnonTag, Spec, ++ACount);
@@ -78,6 +78,3 @@ int IsAnonName (const char* Name)
 {
     return (strncmp (Name, AnonTag, sizeof (AnonTag) - 1) == 0);
 }
-
-
-

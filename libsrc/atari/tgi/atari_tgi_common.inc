@@ -3,6 +3,7 @@
 ;
 
 .macpack longbranch
+.macpack module
 
 .ifdef __ATARIXL__
         CIO_vec := my_CIOV
@@ -18,7 +19,19 @@
         ;
         ; ----------------------------------------------------------------------
 
-.segment        "JUMPTABLE"
+.ifdef __ATARIXL__
+        .define LABEL_X "x"
+.else
+        .define LABEL_X ""
+.endif
+
+.if pages = 2
+        .define LABEL_P2 "p2"
+.else
+        .define LABEL_P2 ""
+.endif
+
+        module_header   .ident (.sprintf ("_atr%s%d%s_tgi", LABEL_X, ::grmode, LABEL_P2))
 
 ; Header
 

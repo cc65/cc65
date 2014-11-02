@@ -55,8 +55,8 @@
 
 static TokList* CollectRepeatTokens (void)
 /* Collect all tokens inside the .REPEAT body in a token list and return
- * this list. In case of errors, NULL is returned.
- */
+** this list. In case of errors, NULL is returned.
+*/
 {
     /* Create the token list */
     TokList* List = NewTokList ();
@@ -97,8 +97,8 @@ static TokList* CollectRepeatTokens (void)
 
 static void RepeatTokenCheck (TokList* L)
 /* Called each time a token from a repeat token list is set. Is used to check
- * for and replace identifiers that are the repeat counter.
- */
+** for and replace identifiers that are the repeat counter.
+*/
 {
     if (CurTok.Tok == TOK_IDENT &&
         L->Data != 0            &&
@@ -161,8 +161,8 @@ void ParseRepeat (void)
     List->Check  = RepeatTokenCheck;
 
     /* If the list is empty, or repeat count zero, there is nothing
-     * to repeat.
-     */
+    ** to repeat.
+    */
     if (List->Count == 0 || RepCount == 0) {
         FreeTokList (List);
         goto Done;
@@ -175,6 +175,3 @@ Done:
     /* Switch out of raw token mode */
     LeaveRawTokenMode ();
 }
-
-
-

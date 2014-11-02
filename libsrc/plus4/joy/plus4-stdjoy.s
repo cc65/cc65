@@ -12,12 +12,17 @@
         .include        "plus4.inc"
 
         .macpack        generic
+        .macpack        module
 
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-.segment        "JUMPTABLE"
+        .if .xmatch ("MODULE_LABEL", .string(MODULE_LABEL))
+        module_header   _plus4_stdjoy_joy
+        .else
+        module_header   MODULE_LABEL
+        .endif
 
 ; Driver signature
 

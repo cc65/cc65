@@ -141,8 +141,8 @@ typedef enum {
 
 static void PragmaErrorSkip (void)
 /* Called in case of an error, skips tokens until the closing paren or a
- * semicolon is reached.
- */
+** semicolon is reached.
+*/
 {
     static const token_t TokenList[] = { TOK_RPAREN, TOK_SEMI };
     SkipTokens (TokenList, sizeof(TokenList) / sizeof(TokenList[0]));
@@ -160,8 +160,8 @@ static int CmpKey (const void* Key, const void* Elem)
 
 static pragma_t FindPragma (const StrBuf* Key)
 /* Find a pragma and return the token. Return PRAGMA_ILLEGAL if the keyword is
- * not a valid pragma.
- */
+** not a valid pragma.
+*/
 {
     struct Pragma* P;
     P = bsearch (SB_GetConstBuf (Key), Pragmas, PRAGMA_COUNT, sizeof (Pragmas[0]), CmpKey);
@@ -172,8 +172,8 @@ static pragma_t FindPragma (const StrBuf* Key)
 
 static int GetComma (StrBuf* B)
 /* Expects and skips a comma in B. Prints an error and returns zero if no
- * comma is found. Return a value <> 0 otherwise.
- */
+** comma is found. Return a value <> 0 otherwise.
+*/
 {
     SB_SkipWhite (B);
     if (SB_Get (B) != ',') {
@@ -188,8 +188,8 @@ static int GetComma (StrBuf* B)
 
 static int GetString (StrBuf* B, StrBuf* S)
 /* Expects and skips a string in B. Prints an error and returns zero if no
- * string is found. Returns a value <> 0 otherwise.
- */
+** string is found. Returns a value <> 0 otherwise.
+*/
 {
     if (!SB_GetString (B, S)) {
         Error ("String literal expected");
@@ -202,8 +202,8 @@ static int GetString (StrBuf* B, StrBuf* S)
 
 static int GetNumber (StrBuf* B, long* Val)
 /* Expects and skips a number in B. Prints an eror and returns zero if no
- * number is found. Returns a value <> 0 otherwise.
- */
+** number is found. Returns a value <> 0 otherwise.
+*/
 {
     if (!SB_GetNumber (B, Val)) {
         Error ("Constant integer expected");
@@ -216,9 +216,9 @@ static int GetNumber (StrBuf* B, long* Val)
 
 static IntStack* GetWarning (StrBuf* B)
 /* Get a warning name from the string buffer. Returns a pointer to the intstack
- * that holds the state of the warning, and NULL in case of errors. The
- * function will output error messages in case of problems.
- */
+** that holds the state of the warning, and NULL in case of errors. The
+** function will output error messages in case of problems.
+*/
 {
     IntStack* S = 0;
     StrBuf W = AUTO_STRBUF_INITIALIZER;
@@ -262,8 +262,8 @@ static int HasStr (StrBuf* B, const char* E)
 
 static PushPopResult ParsePushPop (StrBuf* B)
 /* Check for and parse the "push" and "pop" keywords. In case of "push", a
- * following comma is expected and skipped.
- */
+** following comma is expected and skipped.
+*/
 {
     StrBuf Ident      = AUTO_STRBUF_INITIALIZER;
     PushPopResult Res = PP_NONE;
@@ -330,8 +330,8 @@ static void PushInt (IntStack* S, long Val)
 
 static int BoolKeyword (StrBuf* Ident)
 /* Check if the identifier in Ident is a keyword for a boolean value. Currently
- * accepted are true/false/on/off.
- */
+** accepted are true/false/on/off.
+*/
 {
     if (SB_CompareStr (Ident, "true") == 0) {
         return 1;
@@ -676,8 +676,8 @@ static void ParsePragma (void)
     /* Do we know this pragma? */
     if (Pragma == PRAGMA_ILLEGAL) {
         /* According to the ANSI standard, we're not allowed to generate errors
-         * for unknown pragmas, but warn about them if enabled (the default).
-         */
+        ** for unknown pragmas, but warn about them if enabled (the default).
+        */
         if (IS_Get (&WarnUnknownPragma)) {
             Warning ("Unknown pragma `%s'", SB_GetConstBuf (&Ident));
         }
@@ -838,8 +838,8 @@ void DoPragma (void)
         Error ("String literal expected");
 
         /* Try some smart error recovery: Skip tokens until we reach the
-         * enclosing paren, or a semicolon.
-         */
+        ** enclosing paren, or a semicolon.
+        */
         PragmaErrorSkip ();
 
     } else {
@@ -851,6 +851,3 @@ void DoPragma (void)
     /* Closing paren needed */
     ConsumeRParen ();
 }
-
-
-

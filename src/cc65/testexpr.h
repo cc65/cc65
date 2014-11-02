@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2004      Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -58,22 +58,19 @@
 
 unsigned Test (unsigned Label, int Invert);
 /* Evaluate a boolean test expression and jump depending on the result of
- * the test and on Invert. The function returns one of the TESTEXPR_xx codes
- * defined above. If the jump is always true, a warning is output.
- */
+** the test and on Invert. The function returns one of the TESTEXPR_xx codes
+** defined above. If the jump is always true, a warning is output.
+*/
 
 unsigned TestInParens (unsigned Label, int Invert);
 /* Evaluate a boolean test expression in parenthesis and jump depending on
- * the result of the test * and on Invert. The function returns one of the
- * TESTEXPR_xx codes defined above. If the jump is always true, a warning is
- * output.
- */
+** the result of the test * and on Invert. The function returns one of the
+** TESTEXPR_xx codes defined above. If the jump is always true, a warning is
+** output.
+*/
 
 
 
 /* End of testexpr.h */
+
 #endif
-
-
-
-

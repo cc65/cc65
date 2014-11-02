@@ -1,9 +1,9 @@
 /*
- * _file.h
- *
- * (C) Copyright 1998, 2002 Ullrich von Bassewitz (uz@cc65.org)
- *
- */
+** _file.h
+**
+** (C) Copyright 1998, 2002 Ullrich von Bassewitz (uz@cc65.org)
+**
+*/
 
 
 

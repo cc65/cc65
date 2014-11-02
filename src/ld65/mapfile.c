@@ -59,8 +59,8 @@
 
 void CreateMapFile (int ShortMap)
 /* Create a map file. If ShortMap is true, only the segment lists are
- * generated, not the import/export lists.
- */
+** generated, not the import/export lists.
+*/
 {
     unsigned I;
 
@@ -90,8 +90,8 @@ void CreateMapFile (int ShortMap)
         for (J = 0; J < CollCount (&O->Sections); ++J) {
             const Section* S = CollConstAt (&O->Sections, J);
             /* Don't include zero sized sections if not explicitly
-             * requested
-             */
+            ** requested
+            */
             if (VerboseMap || S->Size > 0) {
                 fprintf (F, 
                          "    %-17s Offs=%06lX  Size=%06lX  "
@@ -111,11 +111,17 @@ void CreateMapFile (int ShortMap)
     /* The remainder is not written for short map files */
     if (!ShortMap) {
 
-        /* Write the exports list */
+        /* Write the exports list by name */
         fprintf (F, "\n\n"
-                    "Exports list:\n"
-                    "-------------\n");
-        PrintExportMap (F);
+                    "Exports list by name:\n"
+                    "---------------------\n");
+        PrintExportMapByName (F);
+
+        /* Write the exports list by value */
+        fprintf (F, "\n\n"
+                    "Exports list by value:\n"
+                    "----------------------\n");
+        PrintExportMapByValue (F);
 
         /* Write the imports list */
         fprintf (F, "\n\n"
@@ -152,6 +158,3 @@ void CreateLabelFile (void)
         Error ("Error closing label file `%s': %s", LabelFileName, strerror (errno));
     }
 }
-
-
-

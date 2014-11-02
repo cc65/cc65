@@ -1,8 +1,9 @@
 ;
-; Driver for a potentiometer "mouse" e.g. Koala Pad
+; Driver for a potentiometer "mouse", e.g. Koala Pad
 ;
-; Ullrich von Bassewitz, 2004-03-29, 2009-09-26
-; Stefan Haubenthal, 2006-08-20
+; 2006-08-20, Stefan Haubenthal
+; 2009-09-26, Ullrich von Bassewitz
+; 2014-05-05, Greg King
 ;
 
         .include        "zeropage.inc"
@@ -10,11 +11,13 @@
         .include        "c64.inc"
 
         .macpack        generic
+        .macpack        module
+
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-.segment        "JUMPTABLE"
+        module_header   _c64_pot_mou
 
 HEADER:
 
@@ -42,10 +45,16 @@ HEADER:
         .addr   IOCTL
         .addr   IRQ
 
+; Mouse driver flags
+
+        .byte   MOUSE_FLAG_LATE_IRQ
+
 ; Callback table, set by the kernel before INSTALL is called
 
 CHIDE:  jmp     $0000                   ; Hide the cursor
 CSHOW:  jmp     $0000                   ; Show the cursor
+CPREP:  jmp     $0000                   ; Prepare to move the cursor
+CDRAW:  jmp     $0000                   ; Draw the cursor
 CMOVEX: jmp     $0000                   ; Move the cursor to X coord
 CMOVEY: jmp     $0000                   ; Move the cursor to Y coord
 
@@ -84,17 +93,18 @@ Buttons:        .res    1               ; Button mask
 
 Temp:           .res    1
 
-; Default values for above variables
-
 .rodata
+
+; Default values for above variables
+; (We use ".proc" because we want to define both a label and a scope.)
 
 .proc   DefVars
         .word   SCREEN_HEIGHT/2         ; YPos
         .word   SCREEN_WIDTH/2          ; XPos
         .word   0                       ; XMin
         .word   0                       ; YMin
-        .word   SCREEN_WIDTH            ; XMax
-        .word   SCREEN_HEIGHT           ; YMax
+        .word   SCREEN_WIDTH - 1        ; XMax
+        .word   SCREEN_HEIGHT - 1       ; YMax
         .byte   0                       ; Buttons
 .endproc
 
@@ -296,7 +306,8 @@ IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioclts for now
 ; (so be careful).
 ;
 
-IRQ:    lda     #$7F
+IRQ:    jsr     CPREP
+        lda     #$7F
         sta     CIA1_PRA
         lda     CIA1_PRB                ; Read port #1
         and     #%00001100
@@ -391,4 +402,7 @@ IRQ:    lda     #$7F
 ; Move the mouse pointer to the new X pos
 
         tya
-        jmp     CMOVEY
+        jsr     CMOVEY
+        jsr     CDRAW
+        clc                             ; Interrupt not "handled"
+        rts

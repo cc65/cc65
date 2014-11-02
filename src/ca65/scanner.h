@@ -69,8 +69,8 @@ int IsIdStart (int C);
 
 int NewInputFile (const char* Name);
 /* Open a new input file. Returns true if the file could be successfully opened
- * and false otherwise.
- */
+** and false otherwise.
+*/
 
 void NewInputData (char* Text, int Malloced);
 /* Add a chunk of input data to the input stream */
@@ -86,16 +86,16 @@ void NextRawTok (void);
 
 int GetSubKey (const char** Keys, unsigned Count);
 /* Search for a subkey in a table of keywords. The current token must be an
- * identifier and all keys must be in upper case. The identifier will be
- * uppercased in the process. The function returns the index of the keyword,
- * or -1 if the keyword was not found.
- */
+** identifier and all keys must be in upper case. The identifier will be
+** uppercased in the process. The function returns the index of the keyword,
+** or -1 if the keyword was not found.
+*/
 
 unsigned char ParseAddrSize (void);
 /* Check if the next token is a keyword that denotes an address size specifier.
- * If so, return the corresponding address size constant, otherwise output an
- * error message and return ADDR_SIZE_DEFAULT.
- */
+** If so, return the corresponding address size constant, otherwise output an
+** error message and return ADDR_SIZE_DEFAULT.
+*/
 
 void InitScanner (const char* InFile);
 /* Initialize the scanner, open the given input file */
@@ -108,7 +108,3 @@ void DoneScanner (void);
 /* End of scanner.h */
 
 #endif
-
-
-
-

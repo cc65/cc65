@@ -131,8 +131,8 @@ void EnableListing (void)
 {
     if (SB_GetLen (&ListingName) > 0) {
         /* If we're about to enable the listing, do this for the current line
-         * also, so we will see the source line that did this.
-         */
+        ** also, so we will see the source line that did this.
+        */
         if (ListingEnabled++ == 0) {
             LineCur->Output = 1;
         }
@@ -172,9 +172,9 @@ void InitListingLine (void)
 {
     if (SB_GetLen (&ListingName) > 0) {
         /* Make the last loaded line the current line */
-        /* ###### This code is a hack! We really need to do it right
-         * as soon as we know, how:-(
-         */
+        /* ###### This code is a hack! We really need to do it right --
+        ** as soon as we know how. :-(
+        */
         if (LineCur && LineCur->Next && LineCur->Next != LineLast) {
             ListLine* L = LineCur;
             do {
@@ -217,8 +217,8 @@ static char* AddHex (char* S, unsigned Val)
 
 static void PrintPageHeader (FILE* F, const ListLine* L)
 /* Print the header for a new page. It is assumed that the given line is the
- * last line of the previous page.
- */
+** last line of the previous page.
+*/
 {
     /* Gte a pointer to the current input file */
     const StrBuf* CurFile = GetFileName (L->File);
@@ -250,8 +250,8 @@ static void PrintLine (FILE* F, const char* Header, const char* Line, const List
     ++PageLines;
 
     /* Switch to a new page if needed. Do not switch, if the current line is
-     * the last one, to avoid pages that consist of just the header.
-     */
+    ** the last one, to avoid pages that consist of just the header.
+    */
     if (PageLength > 0 && PageLines >= PageLength && L->Next != 0) {
         /* Do a formfeed */
         putc ('\f', F);
@@ -392,16 +392,16 @@ void CreateListing (void)
         }
 
         /* Output the data. The format of a listing line is:
-         *
-         *      PPPPPPm I  11 22 33 44
-         *
-         * where
-         *
-         *      PPPPPP  is the PC
-         *      m       is the mode ('r' or empty)
-         *      I       is the include level
-         *      11 ..   are code or data bytes
-         */
+        **
+        **      PPPPPPm I  11 22 33 44
+        **
+        ** where
+        **
+        **      PPPPPP  is the PC
+        **      m       is the mode ('r' or empty)
+        **      I       is the include level
+        **      11 ..   are code or data bytes
+        */
         Line = L->Line;
         B    = Buf;
         while (Count) {
@@ -420,9 +420,9 @@ void CreateListing (void)
             Count -= Chunk;
 
             /* Increment the program counter. Since we don't need the PC stored
-             * in the LineList object for anything else, just increment this
-             * variable.
-             */
+            ** in the LineList object for anything else, just increment this
+            ** variable.
+            */
             L->PC += Chunk;
 
             /* Copy the bytes into the line */
@@ -452,6 +452,3 @@ void CreateListing (void)
     /* Close the listing file */
     (void) fclose (F);
 }
-
-
-

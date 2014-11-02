@@ -11,6 +11,8 @@
         .include        "tgi-error.inc"
         .include        "apple2.inc"
 
+        .macpack        module
+
 ; ------------------------------------------------------------------------
 
 ; Zero page stuff
@@ -68,7 +70,11 @@ Y2      :=      ptr4
 
 ; ------------------------------------------------------------------------
 
-        .segment        "JUMPTABLE"
+        .ifdef  __APPLE2ENH__
+        module_header   _a2e_hi_tgi
+        .else
+        module_header   _a2_hi_tgi
+        .endif
 
 ; Header. Includes jump table and constants.
 

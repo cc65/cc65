@@ -1,8 +1,8 @@
 /*
- * Ullrich von Bassewitz, 11.08.1998
- *
- * char* fgets (char* s, int size, FILE* f);
- */
+** Ullrich von Bassewitz, 11.08.1998
+**
+** char* fgets (char* s, int size, FILE* f);
+*/
 
 
 

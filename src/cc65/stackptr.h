@@ -71,6 +71,3 @@ void SP_Pop (const Type* T);
 /* End of stackptr.h */
 
 #endif
-
-
-

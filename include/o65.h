@@ -34,12 +34,12 @@
 
 
 /* This files exports structures and constants to handle the o65 relocatable
- * file format as defined by Andre Fachat. See the original document under
- *
- *      http://www.6502.org/users/andre/o65/fileformat.html
- *
- * for more information.
- */
+** file format as defined by Andre Fachat. See the original document under
+**
+**      http://www.6502.org/users/andre/o65/fileformat.html
+**
+** for more information.
+*/
 
 
 

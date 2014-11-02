@@ -118,38 +118,38 @@ INLINE unsigned CS_GetEntryCount (const CodeSeg* S)
 
 void CS_InsertEntry (CodeSeg* S, struct CodeEntry* E, unsigned Index);
 /* Insert the code entry at the index given. Following code entries will be
- * moved to slots with higher indices.
- */
+** moved to slots with higher indices.
+*/
 
 void CS_DelEntry (CodeSeg* S, unsigned Index);
 /* Delete an entry from the code segment. This includes moving any associated
- * labels, removing references to labels and even removing the referenced labels
- * if the reference count drops to zero.
- * Note: Labels are moved forward if possible, that is, they are moved to the
- * next insn (not the preceeding one).
- */
+** labels, removing references to labels and even removing the referenced labels
+** if the reference count drops to zero.
+** Note: Labels are moved forward if possible, that is, they are moved to the
+** next insn (not the preceeding one).
+*/
 
 void CS_DelEntries (CodeSeg* S, unsigned Start, unsigned Count);
 /* Delete a range of code entries. This includes removing references to labels,
- * labels attached to the entries and so on.
- */
+** labels attached to the entries and so on.
+*/
 
 void CS_MoveEntries (CodeSeg* S, unsigned Start, unsigned Count, unsigned NewPos);
 /* Move a range of entries from one position to another. Start is the index
- * of the first entry to move, Count is the number of entries and NewPos is
- * the index of the target entry. The entry with the index Start will later
- * have the index NewPos. All entries with indices NewPos and above are
- * moved to higher indices. If the code block is moved to the end of the
- * current code, and if pending labels exist, these labels will get attached
- * to the first instruction of the moved block (the first one after the
- * current code end)
- */
+** of the first entry to move, Count is the number of entries and NewPos is
+** the index of the target entry. The entry with the index Start will later
+** have the index NewPos. All entries with indices NewPos and above are
+** moved to higher indices. If the code block is moved to the end of the
+** current code, and if pending labels exist, these labels will get attached
+** to the first instruction of the moved block (the first one after the
+** current code end)
+*/
 
 #if defined(HAVE_INLINE)
 INLINE void CS_MoveEntry (CodeSeg* S, unsigned OldPos, unsigned NewPos)
 /* Move an entry from one position to another. OldPos is the current position
- * of the entry, NewPos is the new position of the entry.
- */
+** of the entry, NewPos is the new position of the entry.
+*/
 {
     CollMove (&S->Entries, OldPos, NewPos);
 }
@@ -169,34 +169,34 @@ INLINE struct CodeEntry* CS_GetEntry (CodeSeg* S, unsigned Index)
 
 struct CodeEntry* CS_GetPrevEntry (CodeSeg* S, unsigned Index);
 /* Get the code entry preceeding the one with the index Index. If there is no
- * preceeding code entry, return NULL.
- */
+** preceeding code entry, return NULL.
+*/
 
 struct CodeEntry* CS_GetNextEntry (CodeSeg* S, unsigned Index);
 /* Get the code entry following the one with the index Index. If there is no
- * following code entry, return NULL.
- */
+** following code entry, return NULL.
+*/
 
 int CS_GetEntries (CodeSeg* S, struct CodeEntry** List,
                    unsigned Start, unsigned Count);
 /* Get Count code entries into List starting at index start. Return true if
- * we got the lines, return false if not enough lines were available.
- */
+** we got the lines, return false if not enough lines were available.
+*/
 
 unsigned CS_GetEntryIndex (CodeSeg* S, struct CodeEntry* E);
 /* Return the index of a code entry */
 
 int CS_RangeHasLabel (CodeSeg* S, unsigned Start, unsigned Count);
 /* Return true if any of the code entries in the given range has a label
- * attached. If the code segment does not span the given range, check the
- * possible span instead.
- */
+** attached. If the code segment does not span the given range, check the
+** possible span instead.
+*/
 
 #if defined(HAVE_INLINE)
 INLINE int CS_HavePendingLabel (const CodeSeg* S)
 /* Return true if there are open labels that will get attached to the next
- * instruction that is added.
- */
+** instruction that is added.
+*/
 {
     return (CollCount (&S->Labels) > 0);
 }
@@ -209,43 +209,43 @@ CodeLabel* CS_AddLabel (CodeSeg* S, const char* Name);
 
 CodeLabel* CS_GenLabel (CodeSeg* S, struct CodeEntry* E);
 /* If the code entry E does already have a label, return it. Otherwise
- * create a new label, attach it to E and return it.
- */
+** create a new label, attach it to E and return it.
+*/
 
 void CS_DelLabel (CodeSeg* S, CodeLabel* L);
 /* Remove references from this label and delete it. */
 
 void CS_MergeLabels (CodeSeg* S);
 /* Merge code labels. That means: For each instruction, remove all labels but
- * one and adjust references accordingly.
- */
+** one and adjust references accordingly.
+*/
 
 void CS_MoveLabels (CodeSeg* S, struct CodeEntry* Old, struct CodeEntry* New);
 /* Move all labels from Old to New. The routine will move the labels itself
- * if New does not have any labels, and move references if there is at least
- * a label for new. If references are moved, the old label is deleted
- * afterwards.
- */
+** if New does not have any labels, and move references if there is at least
+** a label for new. If references are moved, the old label is deleted
+** afterwards.
+*/
 
 void CS_RemoveLabelRef (CodeSeg* S, struct CodeEntry* E);
 /* Remove the reference between E and the label it jumps to. The reference
- * will be removed on both sides and E->JumpTo will be 0 after that. If
- * the reference was the only one for the label, the label will get
- * deleted.
- */
+** will be removed on both sides and E->JumpTo will be 0 after that. If
+** the reference was the only one for the label, the label will get
+** deleted.
+*/
 
 void CS_MoveLabelRef (CodeSeg* S, struct CodeEntry* E, CodeLabel* L);
 /* Change the reference of E to L instead of the current one. If this
- * was the only reference to the old label, the old label will get
- * deleted.
- */
+** was the only reference to the old label, the old label will get
+** deleted.
+*/
 
 void CS_DelCodeRange (CodeSeg* S, unsigned First, unsigned Last);
 /* Delete all entries between first and last, both inclusive. The function
- * can only handle basic blocks (First is the only entry, Last the only exit)
- * and no open labels. It will call FAIL if any of these preconditions are
- * violated.
- */
+** can only handle basic blocks (First is the only entry, Last the only exit)
+** and no open labels. It will call FAIL if any of these preconditions are
+** violated.
+*/
 
 void CS_DelCodeAfter (CodeSeg* S, unsigned Last);
 /* Delete all entries including the given one */
@@ -268,22 +268,22 @@ INLINE void CS_ResetAllMarks (CodeSeg* S)
 
 int CS_IsBasicBlock (CodeSeg* S, unsigned First, unsigned Last);
 /* Check if the given code segment range is a basic block. That is, check if
- * First is the only entrance and Last is the only exit. This means that no
- * jump/branch inside the block may jump to an insn below First or after(!)
- * Last, and that no insn may jump into this block from the outside.
- */
+** First is the only entrance and Last is the only exit. This means that no
+** jump/branch inside the block may jump to an insn below First or after(!)
+** Last, and that no insn may jump into this block from the outside.
+*/
 
 void CS_OutputPrologue (const CodeSeg* S);
 /* If the given code segment is a code segment for a function, output the
- * assembler prologue into the file. That is: Output a comment header, switch
- * to the correct segment and enter the local function scope. If the code
- * segment is global, do nothing.
- */
+** assembler prologue into the file. That is: Output a comment header, switch
+** to the correct segment and enter the local function scope. If the code
+** segment is global, do nothing.
+*/
 
 void CS_OutputEpilogue (const CodeSeg* S);
 /* If the given code segment is a code segment for a function, output the
- * assembler epilogue into the file. That is: Close the local function scope.
- */
+** assembler epilogue into the file. That is: Close the local function scope.
+*/
 
 void CS_Output (CodeSeg* S);
 /* Output the code segment data to a file */
@@ -297,7 +297,5 @@ void CS_GenRegInfo (CodeSeg* S);
 
 
 /* End of codeseg.h */
+
 #endif
-
-
-

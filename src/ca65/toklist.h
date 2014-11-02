@@ -111,25 +111,21 @@ void FreeTokList (TokList* T);
 
 token_t GetTokListTerm (token_t Term);
 /* Determine if the following token list is enclosed in curly braces. This is
- * the case if the next token is the opening brace. If so, skip it and return
- * a closing brace, otherwise return Term.
- */
+** the case if the next token is the opening brace. If so, skip it and return
+** a closing brace, otherwise return Term.
+*/
 
 void AddCurTok (TokList* T);
 /* Add the current token to the token list */
 
 void PushTokList (TokList* List, const char* Desc);
 /* Push a token list to be used as input for InputFromStack. This includes
- * several initializations needed in the token list structure, so don't use
- * PushInput directly.
- */
+** several initializations needed in the token list structure, so don't use
+** PushInput directly.
+*/
 
 
 
 /* End of toklist.h */
 
 #endif
-
-
-
-

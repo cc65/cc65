@@ -77,9 +77,9 @@ static unsigned char __fastcall__ IsLeapYear (unsigned Year)
 
 time_t __fastcall__ mktime (register struct tm* TM)
 /* Make a time in seconds since 1/1/1970 from the broken down time in TM.
- * A call to mktime does also correct the time in TM to contain correct
- * values.
- */
+** A call to mktime does also correct the time in TM to contain correct
+** values.
+*/
 {
     register div_t D;
     int Max;
@@ -118,8 +118,8 @@ time_t __fastcall__ mktime (register struct tm* TM)
     TM->tm_mday += D.quot;
 
     /* Adjust month and year. This is an iterative process, since changing
-     * the month will change the allowed days for this month.
-     */
+    ** the month will change the allowed days for this month.
+    */
     while (1) {
 
         /* Make sure, month is in the range 0..11 */
@@ -131,8 +131,8 @@ time_t __fastcall__ mktime (register struct tm* TM)
         TM->tm_year += D.quot;
 
         /* Now check if mday is in the correct range, if not, correct month
-         * and eventually year and repeat the process.
-         */
+        ** and eventually year and repeat the process.
+        */
         if (TM->tm_mon == FEBRUARY && IsLeapYear (TM->tm_year + 1900)) {
             Max = 29;
         } else {
@@ -154,18 +154,18 @@ time_t __fastcall__ mktime (register struct tm* TM)
     }
 
     /* Ok, all time/date fields are now correct. Calculate the days in this
-     * year.
-     */
+    ** year.
+    */
     TM->tm_yday = MonthDays[TM->tm_mon] + TM->tm_mday - 1;
     if (TM->tm_mon > FEBRUARY && IsLeapYear (TM->tm_year + 1900)) {
         ++TM->tm_yday;
     }
 
     /* Calculate days since 1/1/1970. In the complete epoch (1/1/1970 to
-     * somewhere in 2038) all years dividable by 4 are leap years, so
-     * dividing by 4 gives the days that must be added cause of leap years.
-     * (and the last leap year before 1970 was 1968)
-     */
+    ** somewhere in 2038) all years dividable by 4 are leap years, so
+    ** dividing by 4 gives the days that must be added cause of leap years.
+    ** (and the last leap year before 1970 was 1968)
+    */
     DayCount = ((unsigned) (TM->tm_year-70)) * 365U +
                (((unsigned) (TM->tm_year-(68+1))) / 4) +
                TM->tm_yday;

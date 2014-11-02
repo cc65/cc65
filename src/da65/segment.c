@@ -66,8 +66,8 @@ struct Segment {
 };
 
 /* Tables containing the segments. A segment is inserted using it's hash
- * value. Collision is done by single linked lists.
- */
+** value. Collision is done by single linked lists.
+*/
 static Segment* StartTab[HASH_SIZE];    /* Table containing segment starts */
 static Segment* EndTab[HASH_SIZE];      /* Table containing segment ends */
 
@@ -107,6 +107,3 @@ void AddAbsSegment (unsigned Start, unsigned End, const char* Name)
     /* Mark the addresses within the segment */
     MarkRange (Start, End, atSegment);
 }
-
-
-

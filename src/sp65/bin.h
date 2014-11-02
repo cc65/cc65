@@ -61,6 +61,3 @@ void WriteBinFile (const StrBuf* Data, const Collection* A, const Bitmap* B);
 /* End of bin.h */
 
 #endif
-
-
-

@@ -34,16 +34,15 @@
 
 
 /* The compiler must use the same floating point arithmetic as the target
- * platform, otherwise expressions will yield a different result when
- * evaluated in the compiler or on the target platform. Since writing a target
- * and source library is almost double the work, we will at least add the
- * hooks here, and define functions for a plug in library that may be added
- * at a later time. Currently we use the builtin data types of the compiler
- * that translates cc65.
- *
- * BEWARE: This code will currently only work on little endian systems!
- *
- */
+** platform, otherwise expressions will yield a different result when
+** evaluated in the compiler or on the target platform. Since writing a target
+** and source library is almost double the work, we will at least add the
+** hooks here, and define functions for a plug in library that may be added
+** at a later time. Currently we use the builtin data types of the compiler
+** that translates cc65.
+**
+** BEWARE: This code will currently only work on little endian systems!
+*/
 
 
 
@@ -140,8 +139,3 @@ Double FP_D_Div (Double Left, Double Right);
 /* End of fp.h */
 
 #endif
-
-
-
-
-

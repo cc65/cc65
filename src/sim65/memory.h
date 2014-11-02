@@ -55,9 +55,9 @@ unsigned MemReadWord (unsigned Addr);
 
 unsigned MemReadZPWord (unsigned char Addr);
 /* Read a word from the zero page. This function differs from ReadMemW in that
- * the read will always be in the zero page, even in case of an address
- * overflow.
- */
+** the read will always be in the zero page, even in case of an address
+** overflow.
+*/
 
 void MemInit (void);
 /* Initialize the memory subsystem */
@@ -67,7 +67,3 @@ void MemInit (void);
 /* End of memory.h */
 
 #endif
-
-
-
-

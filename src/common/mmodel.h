@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -74,14 +74,11 @@ mmodel_t FindMemoryModel (const char* Name);
 
 void SetMemoryModel (mmodel_t Model);
 /* Set the memory model updating the MemoryModel variables and the address
- * sizes for the segments.
- */
+** sizes for the segments.
+*/
 
 
 
 /* End of mmodel.h */
 
 #endif
-
-
-

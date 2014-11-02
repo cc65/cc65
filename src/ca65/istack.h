@@ -52,23 +52,19 @@ void PopInput (void);
 
 int InputFromStack (void);
 /* Try to get input from the input stack. Return true if we had such input,
- * return false otherwise.
- */
+** return false otherwise.
+*/
 
 int HavePushedInput (void);
 /* Return true if we have stacked input available, return false if not */
 
 void CheckInputStack (void);
 /* Called from the scanner before closing an input file. Will check for any
- * stuff on the input stack.
- */
+** stuff on the input stack.
+*/
 
 
 
 /* End of istack.h */
 
 #endif
-
-
-
-

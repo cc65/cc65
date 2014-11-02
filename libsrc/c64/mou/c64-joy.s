@@ -2,7 +2,7 @@
 ; Driver for a "joystick mouse".
 ;
 ; Ullrich von Bassewitz, 2004-03-29, 2009-09-26
-; 2010-02-08, Greg King
+; 2014-03-17, Greg King
 ;
 ; The driver prevents the keyboard from interfering by changing the
 ; keyboard's output port into an input port while the driver reads its
@@ -28,11 +28,13 @@
         .include        "c64.inc"
 
         .macpack        generic
+        .macpack        module
+
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-.segment        "JUMPTABLE"
+        module_header   _c64_joy_mou
 
 HEADER:
 
@@ -68,6 +70,8 @@ HEADER:
 
 CHIDE:  jmp     $0000                   ; Hide the cursor
 CSHOW:  jmp     $0000                   ; Show the cursor
+CPREP:  jmp     $0000                   ; Prepare to move the cursor
+CDRAW:  jmp     $0000                   ; Draw the cursor
 CMOVEX: jmp     $0000                   ; Move the cursor to X coord
 CMOVEY: jmp     $0000                   ; Move the cursor to Y coord
 
@@ -106,17 +110,18 @@ Buttons:        .res    1               ; Button mask
 
 Temp:           .res    1
 
-; Default values for above variables
-
 .rodata
+
+; Default values for above variables
+; (We use ".proc" because we want to define both a label and a scope.)
 
 .proc   DefVars
         .word   SCREEN_HEIGHT/2         ; YPos
         .word   SCREEN_WIDTH/2          ; XPos
         .word   0                       ; XMin
         .word   0                       ; YMin
-        .word   SCREEN_WIDTH            ; XMax
-        .word   SCREEN_HEIGHT           ; YMax
+        .word   SCREEN_WIDTH - 1        ; XMax
+        .word   SCREEN_HEIGHT - 1       ; YMax
         .byte   0                       ; Buttons
 .endproc
 
@@ -318,9 +323,11 @@ IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioclts for now
 ; MUST return carry clear.
 ;
 
+IRQ:    jsr     CPREP
+
 ; Avoid crosstalk between the keyboard and a joystick.
 
-IRQ:    ldy     #%00000000              ; Set ports A and B to input
+        ldy     #%00000000              ; Set ports A and B to input
         sty     CIA1_DDRB
         sty     CIA1_DDRA               ; Keyboard won't look like joystick
         lda     CIA1_PRB                ; Read Control-Port 1
@@ -437,6 +444,7 @@ IRQ:    ldy     #%00000000              ; Set ports A and B to input
 
 ; Done
 
-@SkipY: clc                             ; Interrupt not handled
+@SkipY: jsr     CDRAW
+        clc                             ; Interrupt not "handled"
         rts
 

@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2004      Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -74,15 +74,11 @@ extern IntStack         Standard;               /* Language standard */
 
 standard_t FindStandard (const char* Name);
 /* Find a standard by name. Returns one of the constants defined above.
- * STD_UNKNOWN is returned if Name doesn't match a standard.
- */
+** STD_UNKNOWN is returned if Name doesn't match a standard.
+*/
 
 
 
 /* End of standard.h */
 
 #endif
-
-
-
-

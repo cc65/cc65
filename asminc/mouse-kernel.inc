@@ -78,6 +78,10 @@
                         .byte
             CSHOW       .addr
                         .byte
+            CPREP       .addr
+                        .byte
+            CDRAW       .addr
+                        .byte
             CMOVEX      .addr
                         .byte
             CMOVEY      .addr
@@ -90,14 +94,16 @@
 .struct MOUSE_CALLBACKS
         HIDE    .addr                   ; Hide the mouse cursor
         SHOW    .addr                   ; Show the mouse cursor
-        MOVEX   .addr                   ; Move the mouse cursor
-        MOVEY   .addr                   ; Dito for Y
+        PREP    .addr                   ; Prepare to move the mouse cursor
+        DRAW    .addr                   ; Draw the mouse cursor
+        MOVEX   .addr                   ; Move the mouse cursor to X coord
+        MOVEY   .addr                   ; Move the mouse cursor to Y coord
 .endstruct
 
 ;------------------------------------------------------------------------------
 ; The mouse API version, stored in MOUSE_HDR::VERSION
 
-MOUSE_API_VERSION       = $04
+MOUSE_API_VERSION       = $05
 
 ;------------------------------------------------------------------------------
 ; Bitmapped mouse driver flags, stored in MOUSE_HDR::FLAGS.
@@ -169,12 +175,10 @@ MOUSE_BTN_RIGHT         = $01
         .global mouse_uninstall
         .global mouse_hide
         .global mouse_show
-        .global mouse_setbox                     
+        .global mouse_setbox
         .global mouse_getbox
         .global mouse_move
         .global mouse_buttons
         .global mouse_pos
         .global mouse_info
         .global mouse_ioctl
-
-

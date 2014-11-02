@@ -61,11 +61,7 @@ void InitStrPool (void)
     StrPool = NewStringPool (1103);
 
     /* We insert a first string here, which will have id zero. This means
-     * that we can treat index zero later as invalid.
-     */
+    ** that we can treat index zero later as invalid.
+    */
     SP_AddStr (StrPool, "<invalid message #0>");
 }
-
-
-
-

@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2002-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -34,12 +34,12 @@
 
 
 /* This files exports structures and constants to handle the o65 relocatable
- * file format as defined by Andre Fachat. See the original document under
- *
- *      http://www.6502.org/users/andre/o65/fileformat.html
- *
- * for more information.
- */
+** file format as defined by Andre Fachat. See the original document under
+**
+**      http://www.6502.org/users/andre/o65/fileformat.html
+**
+** for more information.
+*/
 
 
 
@@ -215,23 +215,20 @@ struct O65Data {
 
 O65Data* ReadO65File (const char* Name);
 /* Read a complete o65 file into dynamically allocated memory and return the
- * created O65Data struct.
- */
+** created O65Data struct.
+*/
 
 const char* GetO65OSName (unsigned char OS);
 /* Return the name of the operating system given by OS */
 
 const char* GetO65OptionText (const O65Option* O);
 /* Return the data of the given option as a readable text. The function returns
- * a pointer to a static buffer that is reused on the next call, so if in doubt,
- * make a copy (and no, the function is not thread safe).
- */
+** a pointer to a static buffer that is reused on the next call, so if in doubt,
+** make a copy (and no, the function is not thread safe).
+*/
 
 
 
 /* End of o65.h */
+
 #endif
-
-
-
-

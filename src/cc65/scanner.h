@@ -254,9 +254,9 @@ int TokIsFuncSpec (const Token* T);
 
 void SymName (char* S);
 /* Read a symbol from the input stream. The first character must have been
- * checked before calling this function. The buffer is expected to be at
- * least of size MAX_IDENTLEN+1.
- */
+** checked before calling this function. The buffer is expected to be at
+** least of size MAX_IDENTLEN+1.
+*/
 
 int IsSym (char* S);
 /* If a symbol follows, read it and return 1, otherwise return 0 */
@@ -266,13 +266,13 @@ void NextToken (void);
 
 void SkipTokens (const token_t* TokenList, unsigned TokenCount);
 /* Skip tokens until we reach TOK_CEOF or a token in the given token list.
- * This routine is used for error recovery.
- */
+** This routine is used for error recovery.
+*/
 
 int Consume (token_t Token, const char* ErrorMsg);
 /* Eat token if it is the next in the input stream, otherwise print an error
- * message. Returns true if the token was found and false otherwise.
- */
+** message. Returns true if the token was found and false otherwise.
+*/
 
 int ConsumeColon (void);
 /* Check for a colon and skip it. */
@@ -304,10 +304,5 @@ int ConsumeRCurly (void);
 
 
 /* End of scanner.h */
+
 #endif
-
-
-
-
-
-

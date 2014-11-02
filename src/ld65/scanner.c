@@ -580,6 +580,3 @@ void CfgCloseInput (void)
         InputFile = 0;
     }
 }
-
-
-

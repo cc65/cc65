@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -45,30 +45,30 @@
 
 
 /*
- * Suggested field contents:
- *
- *   sysname
- *      Should contain the name of the underlying operating system, or "cc65"
- *      if the program runs on the bare machine.
- *
- *   nodename
- *      Is empty or may be defined by the implementor.
- *
- *   release
- *      Contains the operating system release or the major/minor cc65 version
- *      if sysname contains "cc65".
- *
- *   version
- *      Contains the operating system version or the cc65 patch version if
- *      sysname contains "cc65".
- *
- *   machine
- *      Contains the complete name of the machine, like "Commodore 64",
- *      "Oric Atmos" or similar.
- *
- * Beware: The library sources written in assembler have knowledge about this
- * struct!
- */
+** Suggested field contents:
+**
+**   sysname
+**      Should contain the name of the underlying operating system, or "cc65"
+**      if the program runs on the bare machine.
+**
+**   nodename
+**      Is empty or may be defined by the implementor.
+**
+**   release
+**      Contains the operating system release or the major/minor cc65 version
+**      if sysname contains "cc65".
+**
+**   version
+**      Contains the operating system version or the cc65 patch version if
+**      sysname contains "cc65".
+**
+**   machine
+**      Contains the complete name of the machine, like "Commodore 64",
+**      "Oric Atmos" or similar.
+**
+** Beware: The library sources written in assembler have knowledge about this
+** struct!
+*/
 struct utsname {
     char sysname[17];
     char nodename[9];

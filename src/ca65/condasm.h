@@ -60,14 +60,14 @@ void DoConditionals (void);
 
 int CheckConditionals (void);
 /* Check if the current token is one that starts a conditional directive, and
- * call DoConditionals if so. Return true if a conditional directive was found,
- * return false otherwise.
- */
+** call DoConditionals if so. Return true if a conditional directive was found,
+** return false otherwise.
+*/
 
 void CheckOpenIfs (void);
 /* Called from the scanner before closing an input file. Will check for any
- * open .ifs in this file.
- */
+** open .ifs in this file.
+*/
 
 unsigned GetIfStack (void);
 /* Get the current .IF stack pointer */
@@ -80,6 +80,3 @@ void CleanupIfStack (unsigned SP);
 /* End of condasm.h */
 
 #endif
-
-
-

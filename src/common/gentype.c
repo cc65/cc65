@@ -48,8 +48,8 @@
 
 void GT_AddArray (StrBuf* Type, unsigned ArraySize)
 /* Add an array with the given size to the type string in Type. This will
- * NOT add the element type!
- */
+** NOT add the element type!
+*/
 {
     unsigned SizeBytes;
 
@@ -75,10 +75,10 @@ void GT_AddArray (StrBuf* Type, unsigned ArraySize)
 
 unsigned GT_GetElementCount (StrBuf* Type)
 /* Retrieve the element count of an array stored in Type at the current index
- * position. Note: Index must point to the array token itself, since the size
- * of the element count is encoded there. The index position will get moved
- * past the array.
- */
+** position. Note: Index must point to the array token itself, since the size
+** of the element count is encoded there. The index position will get moved
+** past the array.
+*/
 {
     /* Get the number of bytes for the element count */
     unsigned SizeBytes = GT_GET_SIZE (SB_Get (Type));
@@ -99,15 +99,15 @@ unsigned GT_GetElementCount (StrBuf* Type)
 
 const char* GT_AsString (const StrBuf* Type, StrBuf* String)
 /* Convert the type into a readable representation. The target string buffer
- * will be zero terminated and a pointer to the contents are returned.
- */
+** will be zero terminated and a pointer to the contents are returned.
+*/
 {
     static const char HexTab[16] = "0123456789ABCDEF";
     unsigned I;
 
     /* Convert Type into readable hex. String will have twice then length
-     * plus a terminator.
-     */
+    ** plus a terminator.
+    */
     SB_Realloc (String, 2 * SB_GetLen (Type) + 1);
     SB_Clear (String);
 
@@ -123,6 +123,3 @@ const char* GT_AsString (const StrBuf* Type, StrBuf* String)
     /* Return the contents of String */
     return SB_GetConstBuf (String);
 }
-
-
-

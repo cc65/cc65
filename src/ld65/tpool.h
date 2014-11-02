@@ -106,7 +106,3 @@ void InitTypePool (void);
 /* End of tpool.h */
 
 #endif
-
-
-
-

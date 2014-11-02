@@ -50,8 +50,8 @@
 
 unsigned HexVal (int C)
 /* Convert a hex digit into a value. The function will emit an error for
- * invalid hex digits.
- */
+** invalid hex digits.
+*/
 {
     if (!IsXDigit (C)) {
         Error ("Invalid hexadecimal digit: `%c'", C);
@@ -62,6 +62,3 @@ unsigned HexVal (int C)
         return toupper (C) - 'A' + 10;
     }
 }
-
-
-

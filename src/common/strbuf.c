@@ -75,8 +75,8 @@ StrBuf* SB_Init (StrBuf* B)
 
 StrBuf* SB_InitFromString (StrBuf* B, const char* S)
 /* Initialize a string buffer from a literal string. Beware: The buffer won't
- * store a copy but a pointer to the actual string.
- */
+** store a copy but a pointer to the actual string.
+*/
 {
     B->Allocated = 0;
     B->Len       = strlen (S);
@@ -126,8 +126,8 @@ void FreeStrBuf (StrBuf* B)
 
 void SB_Realloc (StrBuf* B, unsigned NewSize)
 /* Reallocate the string buffer space, make sure at least NewSize bytes are
- * available.
- */
+** available.
+*/
 {
     /* Get the current size, use a minimum of 8 bytes */
     unsigned NewAllocated = B->Allocated;
@@ -141,9 +141,9 @@ void SB_Realloc (StrBuf* B, unsigned NewSize)
     }
 
     /* Reallocate the buffer. Beware: The allocated size may be zero while the
-     * length is not. This means that we have a buffer that wasn't allocated
-     * on the heap.
-     */
+    ** length is not. This means that we have a buffer that wasn't allocated
+    ** on the heap.
+    */
     if (B->Allocated) {
         /* Just reallocate the block */
         B->Buf   = xrealloc (B->Buf, NewAllocated);
@@ -160,9 +160,9 @@ void SB_Realloc (StrBuf* B, unsigned NewSize)
 
 static void SB_CheapRealloc (StrBuf* B, unsigned NewSize)
 /* Reallocate the string buffer space, make sure at least NewSize bytes are
- * available. This function won't copy the old buffer contents over to the new
- * buffer and may be used if the old contents are overwritten later.
- */
+** available. This function won't copy the old buffer contents over to the new
+** buffer and may be used if the old contents are overwritten later.
+*/
 {
     /* Get the current size, use a minimum of 8 bytes */
     unsigned NewAllocated = B->Allocated;
@@ -214,8 +214,8 @@ void SB_Drop (StrBuf* B, unsigned Count)
 
 void SB_Terminate (StrBuf* B)
 /* Zero terminate the given string buffer. NOTE: The terminating zero is not
- * accounted for in B->Len, if you want that, you have to use AppendChar!
- */
+** accounted for in B->Len, if you want that, you have to use AppendChar!
+*/
 {
     unsigned NewLen = B->Len + 1;
     if (NewLen > B->Allocated) {
@@ -310,8 +310,8 @@ void SB_Append (StrBuf* Target, const StrBuf* Source)
 #if !defined(HAVE_INLINE)
 void SB_Cut (StrBuf* B, unsigned Len)
 /* Cut the contents of B at the given length. If the current length of the
- * buffer is smaller than Len, nothing will happen.
- */
+** buffer is smaller than Len, nothing will happen.
+*/
 {
     if (Len < B->Len) {
         B->Len = Len;
@@ -323,10 +323,10 @@ void SB_Cut (StrBuf* B, unsigned Len)
 
 void SB_Slice (StrBuf* Target, const StrBuf* Source, unsigned Start, unsigned Len)
 /* Copy a slice from Source into Target. The current contents of Target are
- * destroyed. If Start is greater than the length of Source, or if Len
- * characters aren't available, the result will be a buffer with less than Len
- * bytes.
- */
+** destroyed. If Start is greater than the length of Source, or if Len
+** characters aren't available, the result will be a buffer with less than Len
+** bytes.
+*/
 {
     /* Calculate the length of the resulting buffer */
     if (Start >= Source->Len) {
@@ -352,8 +352,8 @@ void SB_Slice (StrBuf* Target, const StrBuf* Source, unsigned Start, unsigned Le
 
 void SB_Move (StrBuf* Target, StrBuf* Source)
 /* Move the complete contents of Source to target. This will delete the old
- * contents of Target, and Source will be empty after the call.
- */
+** contents of Target, and Source will be empty after the call.
+*/
 {
     /* Free the target string */
     if (Target->Allocated) {
@@ -448,18 +448,18 @@ int SB_CompareStr (const StrBuf* S1, const char* S2)
 
 void SB_VPrintf (StrBuf* S, const char* Format, va_list ap)
 /* printf function with S as target. The function is safe, which means that
- * the current contents of S are discarded, and are allocated again with
- * a matching size for the output. The function will call FAIL when problems
- * are detected (anything that let xsnprintf return -1).
- */
+** the current contents of S are discarded, and are allocated again with
+** a matching size for the output. The function will call FAIL when problems
+** are detected (anything that let xsnprintf return -1).
+*/
 {
     va_list tmp;
     int SizeNeeded;
 
     /* Since we must determine the space needed anyway, we will try with
-     * the currently allocated memory. If the call succeeds, we've saved
-     * an allocation. If not, we have to reallocate and try again.
-     */
+    ** the currently allocated memory. If the call succeeds, we've saved
+    ** an allocation. If not, we have to reallocate and try again.
+    */
     va_copy (tmp, ap);
     SizeNeeded = xvsnprintf (S->Buf, S->Allocated, Format, tmp);
     va_end (tmp);
@@ -483,16 +483,13 @@ void SB_VPrintf (StrBuf* S, const char* Format, va_list ap)
 
 void SB_Printf (StrBuf* S, const char* Format, ...)
 /* vprintf function with S as target. The function is safe, which means that
- * the current contents of S are discarded, and are allocated again with
- * a matching size for the output. The function will call FAIL when problems
- * are detected (anything that let xsnprintf return -1).
- */
+** the current contents of S are discarded, and are allocated again with
+** a matching size for the output. The function will call FAIL when problems
+** are detected (anything that let xsnprintf return -1).
+*/
 {
     va_list ap;
     va_start (ap, Format);
     SB_VPrintf (S, Format, ap);
     va_end (ap);
 }
-
-
-

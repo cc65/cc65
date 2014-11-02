@@ -1,11 +1,11 @@
-/*****************************************************************************
- * plasma test program for cc65.                                             *
- *                                                                           *
- * (w)2001 by groepaz/hitmen                                                 *
- *                                                                           *
- * Cleanup and porting by Ullrich von Bassewitz.                             *
- *                                                                           *
- *****************************************************************************/
+/*****************************************************************************\
+** plasma test program for cc65.                                             **
+**                                                                           **
+** (w)2001 by groepaz/hitmen                                                 **
+**                                                                           **
+** Cleanup and porting by Ullrich von Bassewitz.                             **
+**                                                                           **
+\*****************************************************************************/
 
 
 
@@ -121,9 +121,9 @@ static void doplasma (register unsigned char* scrn)
     c2B -= 3;
     for (ii = 0; ii < 25; ++ii) {
         /* Unrolling the following loop will give a speed increase of
-         * nearly 100% (~24fps), but it will also increase the code
-         * size a lot.
-         */
+        ** nearly 100% (~24fps), but it will also increase the code
+        ** size a lot.
+        */
         for (i = 0; i < 40; ++i, ++scrn) {
             *scrn = (xbuf[i] + ybuf[ii]);
         }
@@ -203,9 +203,9 @@ int main (void)
     outb (&CIA2.pra, (block & 0xFC) | ((SCREEN1 >> 14) ^ 0x03));
 #endif
 #if defined(__C128__)
-    /* Save and change some flags, so that kernal/basic interupt handler will
-     * not interfere with our routine.
-     */
+    /* Save and change some flags, so that kernal/basic interrupt handler will
+    ** not interfere with our routine.
+    */
     initflag = *(unsigned char*) 0xA04;
     *(unsigned char*) 0xA04 &= 0xFE;
     graphflag = *(unsigned char*) 0xD8;

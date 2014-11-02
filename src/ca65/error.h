@@ -38,6 +38,12 @@
 
 
 
+#if defined( __MINGW32__)
+#  pragma GCC diagnostic ignored "-Wformat"
+#endif
+
+
+
 /* common */
 #include "attrib.h"
 #include "coll.h"
@@ -98,7 +104,3 @@ void Internal (const char* Format, ...) attribute((noreturn, format(printf,1,2))
 /* End of error.h */
 
 #endif
-
-
-
-

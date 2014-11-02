@@ -80,8 +80,8 @@
 
 static unsigned OptLoad1 (CodeSeg* S)
 /* Search for a call to ldaxysp where X is not used later and replace it by
- * a load of just the A register.
- */
+** a load of just the A register.
+*/
 {
     unsigned I;
     unsigned Changes = 0;
@@ -161,8 +161,8 @@ static unsigned OptLoad2 (CodeSeg* S)
                 !RegXUsed (S, I+3)) {
 
                 /* A/X are stored into memory somewhere and X is not used
-                 * later
-                 */
+                ** later
+                */
 
                 /* lda (sp),y */
                 X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, L[0]->LI);
@@ -251,8 +251,8 @@ static unsigned OptLoad3 (CodeSeg* S)
             CodeEntry* N;
 
             /* If we had a preceeding load that is identical, remove this one.
-             * If it is not identical, or we didn't have one, remember it.
-             */
+            ** If it is not identical, or we didn't have one, remember it.
+            */
             if (Load != 0                               &&
                 E->OPC == Load->OPC                     &&
                 E->AM == Load->AM                       &&
@@ -299,21 +299,21 @@ static unsigned OptLoad3 (CodeSeg* S)
 
 static unsigned OptDecouple (CodeSeg* S)
 /* Decouple operations, that is, do the following replacements:
- *
- *   dex        -> ldx #imm
- *   inx        -> ldx #imm
- *   dey        -> ldy #imm
- *   iny        -> ldy #imm
- *   tax        -> ldx #imm
- *   txa        -> lda #imm
- *   tay        -> ldy #imm
- *   tya        -> lda #imm
- *   lda zp     -> lda #imm
- *   ldx zp     -> ldx #imm
- *   ldy zp     -> ldy #imm
- *
- * Provided that the register values are known of course.
- */
+**
+**   dex        -> ldx #imm
+**   inx        -> ldx #imm
+**   dey        -> ldy #imm
+**   iny        -> ldy #imm
+**   tax        -> ldx #imm
+**   txa        -> lda #imm
+**   tay        -> ldy #imm
+**   tya        -> lda #imm
+**   lda zp     -> lda #imm
+**   ldx zp     -> ldx #imm
+**   ldy zp     -> ldy #imm
+**
+** Provided that the register values are known of course.
+*/
 {
     unsigned Changes = 0;
     unsigned I;
@@ -529,9 +529,9 @@ static unsigned OptDecouple (CodeSeg* S)
 
 static unsigned IsDecSP (const CodeEntry* E)
 /* Check if this is an insn that decrements the stack pointer. If so, return
- * the decrement. If not, return zero.
- * The function expects E to be a subroutine call.
- */
+** the decrement. If not, return zero.
+** The function expects E to be a subroutine call.
+*/
 {
     if (strncmp (E->Arg, "decsp", 5) == 0) {
         if (E->Arg[5] >= '1' && E->Arg[5] <= '8') {
@@ -549,8 +549,8 @@ static unsigned IsDecSP (const CodeEntry* E)
 
 static unsigned OptStackPtrOps (CodeSeg* S)
 /* Merge adjacent calls to decsp into one. NOTE: This function won't merge all
- * known cases!
- */
+** known cases!
+*/
 {
     unsigned Changes = 0;
     unsigned I;
@@ -851,8 +851,8 @@ static int CmpOptStep (const void* Key, const void* Func)
 
 static OptFunc* FindOptFunc (const char* Name)
 /* Find an optimizer step by name in the table and return a pointer. Return
- * NULL if no such step is found.
- */
+** NULL if no such step is found.
+*/
 {
     /* Search for the function in the list */
     OptFunc** O = bsearch (Name, OptFuncs, OPTFUNC_COUNT, sizeof (OptFuncs[0]), CmpOptStep);
@@ -863,8 +863,8 @@ static OptFunc* FindOptFunc (const char* Name)
 
 static OptFunc* GetOptFunc (const char* Name)
 /* Find an optimizer step by name in the table and return a pointer. Print an
- * error and call AbEnd if not found.
- */
+** error and call AbEnd if not found.
+*/
 {
     /* Search for the function in the list */
     OptFunc* F = FindOptFunc (Name);
@@ -1074,8 +1074,8 @@ static unsigned RunOptFunc (CodeSeg* S, OptFunc* F, unsigned Max)
     unsigned Changes, C;
 
     /* Don't run the function if it is disabled or if it is prohibited by the
-     * code size factor
-     */
+    ** code size factor
+    */
     if (F->Disabled || F->CodeSizeFactor > S->CodeSizeFactor) {
         return 0;
     }
@@ -1113,10 +1113,10 @@ static unsigned RunOptFunc (CodeSeg* S, OptFunc* F, unsigned Max)
 
 static unsigned RunOptGroup1 (CodeSeg* S)
 /* Run the first group of optimization steps. These steps translate known
- * patterns emitted by the code generator into more optimal patterns. Order
- * of the steps is important, because some of the steps done earlier cover
- * the same patterns as later steps as subpatterns.
- */
+** patterns emitted by the code generator into more optimal patterns. Order
+** of the steps is important, because some of the steps done earlier cover
+** the same patterns as later steps as subpatterns.
+*/
 {
     unsigned Changes = 0;
 
@@ -1168,10 +1168,10 @@ static unsigned RunOptGroup1 (CodeSeg* S)
 
 static unsigned RunOptGroup2 (CodeSeg* S)
 /* Run one group of optimization steps. This step involves just decoupling
- * instructions by replacing them by instructions that do not depend on
- * previous instructions. This makes it easier to find instructions that
- * aren't used.
- */
+** instructions by replacing them by instructions that do not depend on
+** previous instructions. This makes it easier to find instructions that
+** aren't used.
+*/
 {
     unsigned Changes = 0;
 
@@ -1185,9 +1185,9 @@ static unsigned RunOptGroup2 (CodeSeg* S)
 
 static unsigned RunOptGroup3 (CodeSeg* S)
 /* Run one group of optimization steps. These steps depend on each other,
- * that means that one step may allow another step to do additional work,
- * so we will repeat the steps as long as we see any changes.
- */
+** that means that one step may allow another step to do additional work,
+** so we will repeat the steps as long as we see any changes.
+*/
 {
     unsigned Changes, C;
 
@@ -1254,8 +1254,8 @@ static unsigned RunOptGroup3 (CodeSeg* S)
 
 static unsigned RunOptGroup4 (CodeSeg* S)
 /* Run another round of pattern replacements. These are done late, since there
- * may be better replacements before.
- */
+** may be better replacements before.
+*/
 {
     unsigned Changes = 0;
 
@@ -1287,9 +1287,9 @@ static unsigned RunOptGroup5 (CodeSeg* S)
         Changes += RunOptFunc (S, &DOpt65C02Stores, 1);
         if (Changes) {
             /* The 65C02 replacement codes do often make the use of a register
-             * value unnecessary, so if we have changes, run another load
-             * removal pass.
-             */
+            ** value unnecessary, so if we have changes, run another load
+            ** removal pass.
+            */
             Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
         }
     }
@@ -1302,18 +1302,18 @@ static unsigned RunOptGroup5 (CodeSeg* S)
 
 static unsigned RunOptGroup6 (CodeSeg* S)
 /* This one is quite special. It tries to replace "lda (sp),y" by "lda (sp,x)".
- * The latter is ony cycle slower, but if we're able to remove the necessary
- * load of the Y register, because X is zero anyway, we gain 1 cycle and
- * shorten the code by one (transfer) or two bytes (load). So what we do is
- * to replace the insns, remove unused loads, and then change back all insns
- * where Y is still zero (meaning that the load has not been removed).
- */
+** The latter is ony cycle slower, but if we're able to remove the necessary
+** load of the Y register, because X is zero anyway, we gain 1 cycle and
+** shorten the code by one (transfer) or two bytes (load). So what we do is
+** to replace the insns, remove unused loads, and then change back all insns
+** where Y is still zero (meaning that the load has not been removed).
+*/
 {
     unsigned Changes = 0;
 
     /* This group will only run for a standard 6502, because the 65C02 has a
-     * better addressing mode that covers this case.
-     */
+    ** better addressing mode that covers this case.
+    */
     if ((CPUIsets[CPU] & CPU_ISET_65SC02) == 0) {
         Changes += RunOptFunc (S, &DOptIndLoads1, 1);
         Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
@@ -1328,21 +1328,21 @@ static unsigned RunOptGroup6 (CodeSeg* S)
 
 static unsigned RunOptGroup7 (CodeSeg* S)
 /* The last group of optimization steps. Adjust branches, do size optimizations.
- */
+*/
 {
     unsigned Changes = 0;
     unsigned C;
 
     /* Optimize for size, that is replace operations by shorter ones, even
-     * if this does hinder further optimizations (no problem since we're
-     * done soon).
-     */
+    ** if this does hinder further optimizations (no problem since we're
+    ** done soon).
+    */
     C = RunOptFunc (S, &DOptSize1, 1);
     if (C) {
         Changes += C;
         /* Run some optimization passes again, since the size optimizations
-         * may have opened new oportunities.
-         */
+        ** may have opened new oportunities.
+        */
         Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
         Changes += RunOptFunc (S, &DOptUnusedStores, 1);
         Changes += RunOptFunc (S, &DOptJumpTarget1, 5);
@@ -1353,8 +1353,8 @@ static unsigned RunOptGroup7 (CodeSeg* S)
     if (C) {
         Changes += C;
         /* Run some optimization passes again, since the size optimizations
-         * may have opened new oportunities.
-         */
+        ** may have opened new oportunities.
+        */
         Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
         Changes += RunOptFunc (S, &DOptJumpTarget1, 5);
         Changes += RunOptFunc (S, &DOptStore5, 1);
@@ -1366,8 +1366,8 @@ static unsigned RunOptGroup7 (CodeSeg* S)
     Changes += RunOptFunc (S, &DOptBranchDist, 3);
 
     /* Replace conditional branches to RTS. If we had changes, we must run dead
-     * code elimination again, since the change may have introduced dead code.
-     */
+    ** code elimination again, since the change may have introduced dead code.
+    */
     C = RunOptFunc (S, &DOptRTSJumps2, 1);
     Changes += C;
     if (C) {
@@ -1432,6 +1432,3 @@ void RunOpt (CodeSeg* S)
         WriteOptStats (StatFileName);
     }
 }
-
-
-

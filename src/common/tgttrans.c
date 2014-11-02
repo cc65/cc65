@@ -87,8 +87,8 @@ void TgtTranslateInit (void)
 
 int TgtTranslateChar (int C)
 /* Translate one character from the source character set into the target
- * system character set.
- */
+** system character set.
+*/
 {
     /* Translate */
     return Tab[C & 0xFF];
@@ -98,8 +98,8 @@ int TgtTranslateChar (int C)
 
 void TgtTranslateBuf (void* Buf, unsigned Len)
 /* Translate a buffer of the given length from the source character set into
- * the target system character set.
- */
+** the target system character set.
+*/
 {
     /* Translate */
     unsigned char* B = (unsigned char*)Buf;
@@ -113,8 +113,8 @@ void TgtTranslateBuf (void* Buf, unsigned Len)
 
 void TgtTranslateStrBuf (StrBuf* Buf)
 /* Translate a string buffer from the source character set into the target
- * system character set.
- */
+** system character set.
+*/
 {
     TgtTranslateBuf (SB_GetBuf (Buf), SB_GetLen (Buf));
 }
@@ -127,8 +127,3 @@ void TgtTranslateSet (unsigned Index, unsigned char C)
     CHECK (Index > 0 && Index < sizeof (Tab));
     Tab[Index] = C;
 }
-
-
-
-
-

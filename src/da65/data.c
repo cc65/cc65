@@ -57,9 +57,9 @@ static unsigned GetSpan (attr_t Style)
     unsigned RemainingBytes = GetRemainingBytes ();
 
     /* Count how many bytes are available. This number is limited by the
-     * number of remaining bytes, a label, a segment change, or the end of
-     * the given Style attribute.
-     */
+    ** number of remaining bytes, a label, a segment change, or the end of
+    ** the given Style attribute.
+    */
     unsigned Count = 1;
     while (Count < RemainingBytes) {
         attr_t Attr;
@@ -91,9 +91,9 @@ static unsigned DoTable (attr_t Style, unsigned MemberSize, void (*TableFunc) (u
     unsigned Count = GetSpan (Style);
 
     /* If the count is less than the member size, print a row of Count data
-     * bytes. We assume here that there is no member with a size that is less
-     * than BytesPerLine.
-     */
+    ** bytes. We assume here that there is no member with a size that is less
+    ** than BytesPerLine.
+    */
     if (Count < MemberSize) {
         DataByteLine (Count);
         PC += Count;
@@ -172,8 +172,8 @@ unsigned AddrTable (void)
     unsigned long Start = PC;
 
     /* Loop while table bytes left and we don't need to create a label at the
-     * current position.
-     */
+    ** current position.
+    */
     while (BytesLeft && GetStyleAttr (PC) == atAddrTab) {
 
         unsigned Addr;
@@ -238,8 +238,8 @@ unsigned RtsTable (void)
     unsigned long Start = PC;
 
     /* Loop while table bytes left and we don't need to create a label at the
-     * current position.
-     */
+    ** current position.
+    */
     while (BytesLeft && GetStyleAttr (PC) == atRtsTab) {
 
         unsigned Addr;
@@ -373,6 +373,3 @@ unsigned TextTable (void)
     /* Return the number of bytes output */
     return ByteCount;
 }
-
-
-

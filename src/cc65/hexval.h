@@ -46,15 +46,11 @@
 
 unsigned HexVal (int C);
 /* Convert a hex digit into a value. The function will emit an error for 
- * invalid hex digits.
- */
+** invalid hex digits.
+*/
 
 
 
 /* End of hexval.h */
+
 #endif
-
-
-
-
-

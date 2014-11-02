@@ -104,20 +104,17 @@ void ParseDeclSpec (DeclSpec* D, unsigned DefStorage, long DefType);
 
 void CheckEmptyDecl (const DeclSpec* D);
 /* Called after an empty type declaration (that is, a type declaration without
- * a variable). Checks if the declaration does really make sense and issues a
- * warning if not.
- */
+** a variable). Checks if the declaration does really make sense and issues a
+** warning if not.
+*/
 
 unsigned ParseInit (Type* T);
 /* Parse initialization of variables. Return the number of initialized data
- * bytes.
- */
+** bytes.
+*/
 
 
 
 /* End of declare.h */
 
 #endif
-
-
-

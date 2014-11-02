@@ -78,8 +78,8 @@ struct tgi_vectorfont {
 
 void __fastcall__ tgi_vectorchar (char C);
 /* Draw one character of the vector font at the current graphics cursor
- * position using the current font magnification.
- */
+** position using the current font magnification.
+*/
 
 
 

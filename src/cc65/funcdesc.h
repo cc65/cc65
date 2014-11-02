@@ -86,7 +86,5 @@ void FreeFuncDesc (FuncDesc* D);
 
 
 /* End of funcdesc.h */
+
 #endif
-
-
-

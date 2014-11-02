@@ -62,8 +62,8 @@ const char* AddrSizeToStr (unsigned char AddrSize)
 
 unsigned char AddrSizeFromStr (const char* Str)
 /* Return the address size for a given string. Returns ADDR_SIZE_INVALID if
- * the string cannot be mapped to an address size.
- */
+** the string cannot be mapped to an address size.
+*/
 {
     static const struct {
         const char*     Name;
@@ -92,6 +92,3 @@ unsigned char AddrSizeFromStr (const char* Str)
     /* Not found */
     return ADDR_SIZE_INVALID;
 }
-
-
-

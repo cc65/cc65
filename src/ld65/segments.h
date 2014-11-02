@@ -95,8 +95,8 @@ struct Section {
 
 
 /* Prototype for a function that is used to write expressions to the target
- * file (used in SegWrite). It returns one of the following values:
- */
+** file (used in SegWrite). It returns one of the following values:
+*/
 #define SEG_EXPR_OK             0U      /* Ok */
 #define SEG_EXPR_RANGE_ERROR    1U      /* Range error */
 #define SEG_EXPR_TOO_COMPLEX    2U      /* Expression too complex */
@@ -118,9 +118,9 @@ typedef unsigned (*SegWriteFunc) (ExprNode* E,        /* The expression to write
 
 Segment* GetSegment (unsigned Name, unsigned char AddrSize, const char* ObjName);
 /* Search for a segment and return an existing one. If the segment does not
- * exist, create a new one and return that. ObjName is only used for the error
- * message and may be NULL if the segment is linker generated.
- */
+** exist, create a new one and return that. ObjName is only used for the error
+** message and may be NULL if the segment is linker generated.
+*/
 
 Section* NewSection (Segment* Seg, unsigned long Alignment, unsigned char AddrSize);
 /* Create a new section for the given segment */
@@ -133,21 +133,21 @@ Segment* SegFind (unsigned Name);
 
 int IsBSSType (Segment* S);
 /* Check if the given segment is a BSS style segment, that is, it does not
- * contain non-zero data.
- */
+** contain non-zero data.
+*/
 
 void SegDump (void);
 /* Dump the segments and it's contents */
 
 unsigned SegWriteConstExpr (FILE* F, ExprNode* E, int Signed, unsigned Size);
 /* Write a supposedly constant expression to the target file. Do a range
- * check and return one of the SEG_EXPR_xxx codes.
- */
+** check and return one of the SEG_EXPR_xxx codes.
+*/
 
 void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void* Data);
 /* Write the data from the given segment to a file. For expressions, F is
- * called (see description of SegWriteFunc above).
- */
+** called (see description of SegWriteFunc above).
+*/
 
 unsigned SegmentCount (void);
 /* Return the total number of segments */
@@ -160,15 +160,11 @@ void PrintDbgSegments (FILE* F);
 
 void CheckSegments (void);
 /* Walk through the segment list and check if there are segments that were
- * not written to the output file. Output an error if this is the case.
- */
+** not written to the output file. Output an error if this is the case.
+*/
 
 
 
 /* End of segments.h */
 
 #endif
-
-
-
-

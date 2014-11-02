@@ -315,14 +315,14 @@ int ED_CodeRangeIsEmpty (const ExprDesc* Expr);
 
 const char* ED_GetLabelName (const ExprDesc* Expr, long Offs);
 /* Return the assembler label name of the given expression. Beware: This
- * function may use a static buffer, so the name may get "lost" on the second
- * call to the function.
- */
+** function may use a static buffer, so the name may get "lost" on the second
+** call to the function.
+*/
 
 int ED_GetStackOffs (const ExprDesc* Expr, int Offs);
 /* Get the stack offset of an address on the stack in Expr taking into account
- * an additional offset in Offs.
- */
+** an additional offset in Offs.
+*/
 
 ExprDesc* ED_MakeConstAbs (ExprDesc* Expr, long Value, Type* Type);
 /* Make Expr an absolute const with the given value and type. */
@@ -332,25 +332,25 @@ ExprDesc* ED_MakeConstAbsInt (ExprDesc* Expr, long Value);
 
 ExprDesc* ED_MakeRValExpr (ExprDesc* Expr);
 /* Convert Expr into a rvalue which is in the primary register without an
- * offset.
- */
+** offset.
+*/
 
 ExprDesc* ED_MakeLValExpr (ExprDesc* Expr);
 /* Convert Expr into a lvalue which is in the primary register without an
- * offset.
- */
+** offset.
+*/
 
 int ED_IsConst (const ExprDesc* Expr);
 /* Return true if the expression denotes a constant of some sort. This can be a
- * numeric constant, the address of a global variable (maybe with offset) or
- * similar.
- */
+** numeric constant, the address of a global variable (maybe with offset) or
+** similar.
+*/
 
 #if defined(HAVE_INLINE)
 INLINE int ED_IsConstAbs (const ExprDesc* Expr)
 /* Return true if the expression denotes a constant absolute value. This can be
- * a numeric constant, cast to any type.
- */
+** a numeric constant, cast to any type.
+*/
 {
     return (Expr->Flags & (E_MASK_LOC|E_MASK_RTYPE)) == (E_LOC_ABS|E_RTYPE_RVAL);
 }
@@ -367,8 +367,8 @@ int ED_IsNullPtr (const ExprDesc* Expr);
 
 int ED_IsBool (const ExprDesc* Expr);
 /* Return true of the expression can be treated as a boolean, that is, it can
- * be an operand to a compare operation.
- */
+** be an operand to a compare operation.
+*/
 
 void PrintExprDesc (FILE* F, ExprDesc* Expr);
 /* Print an ExprDesc */
@@ -379,7 +379,5 @@ Type* ReplaceType (ExprDesc* Expr, const Type* NewType);
 
 
 /* End of exprdesc.h */
+
 #endif
-
-
-

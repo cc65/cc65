@@ -15,12 +15,13 @@
 
 
         .macpack        generic
+        .macpack        module
 
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-.segment        "JUMPTABLE"
+        module_header   _c64_georam_emd
 
 ; Driver signature
 

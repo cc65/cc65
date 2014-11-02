@@ -62,9 +62,9 @@
 
 StrBuf* GenKoala (const Bitmap* B, const Collection* A attribute ((unused)))
 /* Generate binary output in koala format for the bitmap B. The output is
- * stored in a string buffer (which is actually a dynamic char array) and
- * returned.
- */
+** stored in a string buffer (which is actually a dynamic char array) and
+** returned.
+*/
 {
     StrBuf* D;
     unsigned char Screen[160][200];
@@ -101,6 +101,3 @@ StrBuf* GenKoala (const Bitmap* B, const Collection* A attribute ((unused)))
     /* Return the converted bitmap */
     return D;
 }
-
-
-

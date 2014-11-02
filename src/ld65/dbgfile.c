@@ -60,10 +60,10 @@
 
 static void AssignIds (void)
 /* Assign the base ids for debug info output. Within each module, many of the
- * items are addressed by ids which are actually the indices of the items in
- * the collections. To make them unique, we must assign a unique base to each
- * range.
- */
+** items are addressed by ids which are actually the indices of the items in
+** the collections. To make them unique, we must assign a unique base to each
+** range.
+*/
 {
     /* Walk over all modules */
     unsigned I;
@@ -114,8 +114,8 @@ void CreateDbgFile (void)
     fprintf (F, "version\tmajor=2,minor=0\n");
 
     /* Output a line with the item numbers so the debug info module is able
-     * to preallocate the required memory.
-     */
+    ** to preallocate the required memory.
+    */
     fprintf (
         F,
         "info\tcsym=%u,file=%u,lib=%u,line=%u,mod=%u,scope=%u,seg=%u,span=%u,sym=%u,type=%u\n",
@@ -169,6 +169,3 @@ void CreateDbgFile (void)
         Error ("Error closing debug file `%s': %s", DbgFileName, strerror (errno));
     }
 }
-
-
-

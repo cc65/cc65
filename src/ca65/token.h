@@ -244,7 +244,6 @@ typedef enum token_t {
     TOK_STRING,
     TOK_STRLEN,
     TOK_STRUCT,
-    TOK_SUNPLUS,
     TOK_TAG,
     TOK_TCOUNT,
     TOK_TIME,
@@ -307,14 +306,11 @@ INLINE int TokIsSep (enum token_t T)
 
 void CopyToken (Token* Dst, const Token* Src);
 /* Copy a token. The current value of Dst.SVal is free'd, so Dst must be
- * initialized.
- */
+** initialized.
+*/
 
 
 
 /* End of token.h */
 
 #endif
-
-
-

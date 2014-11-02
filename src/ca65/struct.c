@@ -102,9 +102,9 @@ static long DoStructInternal (long Offs, unsigned Type)
     long Size = 0;
 
     /* Outside of other structs, we need a name. Inside another struct or
-     * union, the struct may be anonymous, in which case no new lexical level
-     * is started.
-     */
+    ** union, the struct may be anonymous, in which case no new lexical level
+    ** is started.
+    */
     int Anon = (CurTok.Tok != TOK_IDENT);
     if (!Anon) {
         /* Enter a new scope, then skip the name */
@@ -137,8 +137,8 @@ static long DoStructInternal (long Offs, unsigned Type)
         if (CurTok.Tok == TOK_IDENT) {
 
             /* Beware: An identifier may also be a macro, in which case we have
-             * to start over.
-             */
+            ** to start over.
+            */
             Macro* M = FindMacro (&CurTok.SVal);
             if (M) {
                 MacExpandStart (M);
@@ -245,11 +245,11 @@ static long DoStructInternal (long Offs, unsigned Type)
     }
 
     /* If this is not a anon struct, enter a special symbol named ".size"
-     * into the symbol table of the struct that holds the size of the
-     * struct. Since the symbol starts with a dot, it cannot be accessed
-     * by user code.
-     * Leave the struct scope level.
-     */
+    ** into the symbol table of the struct that holds the size of the
+    ** struct. Since the symbol starts with a dot, it cannot be accessed
+    ** by user code.
+    ** Leave the struct scope level.
+    */
     if (!Anon) {
         /* Add a symbol */
         SymEntry* SizeSym = GetSizeOfScope (CurrentScope);
@@ -299,6 +299,3 @@ void DoUnion (void)
 {
     DoStructInternal (0, UNION);
 }
-
-
-

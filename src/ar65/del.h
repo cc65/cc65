@@ -52,7 +52,3 @@ void DelObjFiles (int argc, char* argv []);
 /* End of del.h */               
 
 #endif
-
-
-
-

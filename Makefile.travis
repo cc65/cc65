@@ -19,7 +19,7 @@ ifdef GH_TOKEN
 	cp html/*.* $(GH_PATH)
 	cd $(GH_PATH) && git add -A
 	-cd $(GH_PATH) && git commit -m "Updated from commit $(TRAVIS_COMMIT)."
-	cd $(GH_PATH) && git push
+	cd $(GH_PATH) && git push -q
 endif
 
 SF_USER = oliverschmidt

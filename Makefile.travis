@@ -6,19 +6,18 @@ all: gh-pages sf-files
 
 GH_NAME = Oliver Schmidt
 GH_MAIL = ol.sc@web.de
-GH_PATH = ../gh-pages
+GH_PATH = ../doc
 
 gh-pages:
 ifdef GH_TOKEN
-	@echo 'git clone --branch=gh-pages https://$$(GH_TOKEN)@github.com/cc65/cc65.git $(GH_PATH)'
-	@git clone --branch=gh-pages https://$(GH_TOKEN)@github.com/cc65/cc65.git $(GH_PATH)
+	@echo 'git clone --branch=gh-pages https://$$(GH_TOKEN)@github.com/cc65/doc.git $(GH_PATH)'
+	@git clone --branch=gh-pages https://$(GH_TOKEN)@github.com/cc65/doc.git $(GH_PATH)
 	cd $(GH_PATH) && git config user.name "$(GH_NAME)"
 	cd $(GH_PATH) && git config user.email "$(GH_MAIL)"
 	cd $(GH_PATH) && git config push.default simple
-	cd $(GH_PATH) && $(RM) -r doc
-	cd $(GH_PATH) && mkdir doc
-	cp html/*.* $(GH_PATH)/doc
-	cd $(GH_PATH) && git add -A doc
+	$(RM) $(GH_PATH)/*.*
+	cp html/*.* $(GH_PATH)
+	cd $(GH_PATH) && git add -A
 	-cd $(GH_PATH) && git commit -m "Updated from commit $(TRAVIS_COMMIT)."
 	cd $(GH_PATH) && git push
 endif

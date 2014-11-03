@@ -1,4 +1,4 @@
-[documentation](http://cc65.github.io/cc65/doc)
+[documentation](http://cc65.github.io/doc)
 
 [wiki](https://github.com/cc65/wiki/wiki)
 

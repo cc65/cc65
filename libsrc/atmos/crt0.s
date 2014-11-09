@@ -2,38 +2,17 @@
 ; Startup code for cc65 (Oric version)
 ;
 ; By Debrune Jérôme <jede@oric.org> and Ullrich von Bassewitz <uz@cc65.org>
-; 2014-08-22, Greg King
+; 2014-11-09, Greg King
 ;
 
         .export         _exit
         .export         __STARTUP__ : absolute = 1      ; Mark as startup
         .import         initlib, donelib
         .import         callmain, zerobss
-        .import         __RAM_START__, __RAM_SIZE__
-        .import         __ZPSAVE_LOAD__, __STACKSIZE__
+        .import         __RAM_START__, __RAM_SIZE__, __STACKSIZE__
 
         .include        "zeropage.inc"
         .include        "atmos.inc"
-
-; ------------------------------------------------------------------------
-; Oric tape header
-
-.segment        "TAPEHDR"
-
-        .byte   $16, $16, $16   ; Sync bytes
-        .byte   $24             ; End of header marker
-
-        .byte   $00                             ; $2B0
-        .byte   $00                             ; $2AF
-        .byte   $80                             ; $2AE Machine code flag
-        .byte   $C7                             ; $2AD Autoload flag
-        .dbyt   __ZPSAVE_LOAD__ - 1             ; $2AB
-        .dbyt   __RAM_START__                   ; $2A9
-        .byte   $00                             ; $2A8
-        .byte   ((.VERSION >> 8) & $0F) + '0'
-        .byte   ((.VERSION >> 4) & $0F) + '0'
-        .byte   (.VERSION & $0F) + '0'
-        .byte   $00                             ; Zero terminated compiler version
 
 ; ------------------------------------------------------------------------
 ; Place the startup code in a special segment.
@@ -79,7 +58,7 @@ L1:     lda     sp,x
 
 ; Call the module destructors. This is also the exit() entry.
 
-_exit:  jsr     donelib         ; Run module destructors
+_exit:  jsr     donelib
 
 ; Restore the system stuff.
 
@@ -104,7 +83,15 @@ L2:     lda     zpsave,x
 
 .segment        "ZPSAVE"
 
-zpsave: .res    zpspace
+zpsave:
+
+; This padding is needed by a bug in the ROM.
+; (The CLOAD command starts BASIC's variables table on top of the last byte
+; that was loaded [instead of at the next address].)
+
+        .byte   0
+
+        .res    zpspace - 1
 
 ; ------------------------------------------------------------------------
 

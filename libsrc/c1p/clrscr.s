@@ -9,15 +9,17 @@
 ; This is self-modifying code!
 BANKS = VIDEORAMSIZE / $100
 
-_clrscr:	LDA #$20 ;' '
-		LDY #BANKS
-		LDX #$00
-STALOC:		STA SCRNBASE,X
-		INX
-		BNE STALOC
-		INC STALOC+2
-		DEY
-		BNE STALOC
-		LDA #>(SCRNBASE) ; load high byte
-		STA STALOC+2     ; restore base address
-		RTS
+_clrscr:
+        lda #$20 ;' '
+		ldy #BANKS
+		ldx #$00
+staloc:
+		sta SCRNBASE,X
+		inx
+		bne staloc
+		inc staloc+2
+		dey
+		bne staloc
+		lda #>(SCRNBASE) ; load high byte
+		sta staloc+2     ; restore base address
+		rts

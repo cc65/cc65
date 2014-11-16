@@ -133,7 +133,7 @@ int main (int argc, char *argv[])
 	FILE *OutputFileFp = 0;
 
 	/* Initialize with default start address defined in c1p.cfg */
-	unsigned long StartAddr = 0x400;
+	unsigned long StartAddr = 0x300;
 
     unsigned int I;
 

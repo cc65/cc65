@@ -783,7 +783,7 @@ static const InsTable* InsTabs[CPU_COUNT] = {
 const InsTable* InsTab = (const InsTable*) &InsTab6502;
 
 /* Table to build the effective 65xx opcode from a base opcode and an
-** addressing mode.
+** addressing mode. (The value in the table is ORed with the base opcode)
 */
 static unsigned char EATab[10][AM65I_COUNT] = {
     {   /* Table 0 */

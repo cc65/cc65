@@ -215,7 +215,7 @@ static const struct {
 /* Instruction table for the 6502 with illegal instructions */
 static const struct {
     unsigned Count;
-    InsDesc  Ins[70];
+    InsDesc  Ins[75];
 } InsTab6502X = {
     sizeof (InsTab6502X.Ins) / sizeof (InsTab6502X.Ins[0]),
     {
@@ -223,6 +223,7 @@ static const struct {
         { "ALR",  0x0800000, 0x4B, 0, PutAll },         /* X */
         { "ANC",  0x0800000, 0x0B, 0, PutAll },         /* X */
         { "AND",  0x080A26C, 0x20, 0, PutAll },
+        { "ANE",  0x0800000, 0x8B, 0, PutAll },         /* X */
         { "ARR",  0x0800000, 0x6B, 0, PutAll },         /* X */
         { "ASL",  0x000006e, 0x02, 1, PutAll },
         { "AXS",  0x0800000, 0xCB, 0, PutAll },         /* X */
@@ -278,6 +279,10 @@ static const struct {
         { "SEC",  0x0000001, 0x38, 0, PutAll },
         { "SED",  0x0000001, 0xf8, 0, PutAll },
         { "SEI",  0x0000001, 0x78, 0, PutAll },
+        { "SHA",  0x0002200, 0x93, 1, PutAll },         /* X */
+        { "SHS",  0x0000200, 0x9b, 0, PutAll },         /* X */
+        { "SHX",  0x0000200, 0x9e, 1, PutAll },         /* X */
+        { "SHY",  0x0000040, 0x9c, 1, PutAll },         /* X */
         { "SLO",  0x000A26C, 0x03, 0, PutAll },         /* X */
         { "SRE",  0x000A26C, 0x43, 0, PutAll },         /* X */
         { "STA",  0x000A26C, 0x80, 0, PutAll },

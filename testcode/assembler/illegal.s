@@ -1,7 +1,7 @@
 
         .setcpu         "6502X"
 
-; first all totally staple undocs:
+; first all totally stable undocs:
 
         slo $12             ; 07 12
         slo $1234           ; 0f 34 12
@@ -65,7 +65,7 @@
 
 
         anc #$12            ; 0b 12
-        ;anc #$12            ; 2b 12
+        ;anc #$12           ; 2b 12
 
         arr #$12            ; 6b 12
 
@@ -101,36 +101,33 @@
 ;        nop                 ; da
 
 ;        jam                 ; 02
-;        jam                 ; 12
-;        jam                 ; 22
-;        jam                 ; 32
-;        jam                 ; 42
-;        jam                 ; 52
-;        jam                 ; 62
-;        jam                 ; 72
-;        jam                 ; 92
-;        jam                 ; b2
-;        jam                 ; d2
-;        jam                 ; f2
+        ;jam                ; 12
+        ;jam                ; 22
+        ;jam                ; 32
+        ;jam                ; 42
+        ;jam                ; 52
+        ;jam                ; 62
+        ;jam                ; 72
+        ;jam                ; 92
+        ;jam                ; b2
+        ;jam                ; d2
+        ;jam                ; f2
 
         ;sbc #$12           ; eb 12
 
-; and the so called "unstable" ones:
+; and the so-called "unstable" ones:
 
+        sha ($12),y         ; 93 12
+        sha $1234,y         ; 9f 34 12
+
+        shx $1234,y         ; 9e 34 12
+        shy $1234,x         ; 9c 34 12
+
+        shs $1234,y         ; 9b 34 12
         las $1234,y         ; bb 34 12
-
-;        sha $1234,y         ; 9f 34 12
-;        sha ($12),y         ; 93 12
-
-;        shs $1234,y         ; 9b 34 12
-
-;        shx $1234,y         ; 9e 34 12
-
-;        shy $1234,x         ; 9c 34 12
 
 ; the two "highly unstable" ones:
 
 ;        lax #$12            ; ab 12
 
-;        ane #$12            ; 8b 12
-
+        ane #$12            ; 8b 12

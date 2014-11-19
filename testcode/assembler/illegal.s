@@ -63,7 +63,6 @@
         lax ($12),y         ; b3 12
         lax $12,y           ; b7 12
 
-
         anc #$12            ; 0b 12
         ;anc #$12           ; 2b 12
 
@@ -73,34 +72,34 @@
 
         axs #$12            ; cb 12
 
-;        nop $12             ; 04 12
-;        nop $1234           ; 0c 34 12
-;        nop $1234,x         ; 1c 34 12
-;        nop $1234,x         ; 3c 34 12
-;        nop $1234,x         ; 5c 34 12
-;        nop $1234,x         ; 7c 34 12
-;        nop $1234,x         ; dc 34 12
-;        nop $1234,x         ; fc 34 12
-;        nop $12             ; 44 12
-;        nop $12             ; 64 12
-;        nop #$12            ; 80 12
-;        nop #$12            ; 82 12
-;        nop #$12            ; 89 12
-;        nop #$12            ; c2 12
-;        nop #$12            ; e2 12
-;        nop $12,x           ; 14 12
-;        nop $12,x           ; 34 12
-;        nop $12,x           ; 54 12
-;        nop $12,x           ; 74 12
-;        nop $12,x           ; d4 12
-;        nop $12,x           ; f4 12
-;        nop                 ; 1a
-;        nop                 ; 3a
-;        nop                 ; 5a
-;        nop                 ; 7a
-;        nop                 ; da
+        nop $1234           ; 0c 34 12
+        nop $1234,x         ; 1c 34 12
+        nop $12             ; 04 12
+        nop $12,x           ; 14 12
+        nop #$12            ; 80 12
+        ;nop $1234,x        ; 3c 34 12
+        ;nop $1234,x        ; 5c 34 12
+        ;nop $1234,x        ; 7c 34 12
+        ;nop $1234,x        ; dc 34 12
+        ;nop $1234,x        ; fc 34 12
+        ;nop $12            ; 44 12
+        ;nop $12            ; 64 12
+        ;nop #$12           ; 82 12
+        ;nop #$12           ; 89 12
+        ;nop #$12           ; c2 12
+        ;nop #$12           ; e2 12
+        ;nop $12,x          ; 34 12
+        ;nop $12,x          ; 54 12
+        ;nop $12,x          ; 74 12
+        ;nop $12,x          ; d4 12
+        ;nop $12,x          ; f4 12
+        ;nop                ; 1a
+        ;nop                ; 3a
+        ;nop                ; 5a
+        ;nop                ; 7a
+        ;nop                ; da
 
-;        jam                 ; 02
+        jam                 ; 02
         ;jam                ; 12
         ;jam                ; 22
         ;jam                ; 32
@@ -115,7 +114,7 @@
 
         ;sbc #$12           ; eb 12
 
-; and the so-called "unstable" ones:
+; the so-called "unstable" ones:
 
         sha ($12),y         ; 93 12
         sha $1234,y         ; 9f 34 12
@@ -126,7 +125,7 @@
         shs $1234,y         ; 9b 34 12
         las $1234,y         ; bb 34 12
 
-; the two "highly unstable" ones:
+; the two so-called "highly unstable" ones:
 
 ;        lax #$12            ; ab 12
 

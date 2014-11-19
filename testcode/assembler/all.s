@@ -1,3 +1,5 @@
+        .setcpu         "6502X"
+
             brk                 ; 00
             ora ($12,x)         ; 01 12
             jam                 ; 02

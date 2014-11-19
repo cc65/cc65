@@ -268,7 +268,9 @@ void EnterFunctionLevel (void)
     TagTab  = S;
 
     /* Create and assign a new label table */
-    LabelTab = NewSymTable (SYMTAB_SIZE_LABEL);
+    S = NewSymTable (SYMTAB_SIZE_LABEL);
+    S->PrevTab = LabelTab;
+    LabelTab = S;
 }
 
 
@@ -286,6 +288,7 @@ void RememberFunctionLevel (struct FuncDesc* F)
     /* Don't delete the tables */
     SymTab = SymTab->PrevTab;
     TagTab = TagTab->PrevTab;
+    LabelTab = LabelTab->PrevTab;
 }
 
 

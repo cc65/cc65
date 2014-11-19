@@ -1,7 +1,7 @@
 language:
   - c
 install:
-  - sudo apt-get install linuxdoc-tools linuxdoc-tools-info binutils-mingw-w64-i686 gcc-mingw-w64-i686
+  - sudo apt-get install linuxdoc-tools linuxdoc-tools-info binutils-mingw-w64-i686 gcc-mingw-w64-i686 sshpass
 script:
   - make bin USER_CFLAGS=-Werror
   - make lib QUIET=1
@@ -9,7 +9,8 @@ script:
   - make bin USER_CFLAGS=-Werror CROSS_COMPILE=i686-w64-mingw32-
   - make doc zip
 after_success:
-  - make -f Makefile.gh-pages
+  - make -f Makefile.travis
 env:
   global:
     - secure: "h+hoQdEHGPLNwaqGKmSaM8NBRDLc2X+W05VsnNG2Feq/wPv/AiBjONNlzN7jRf6D6f3aoPXaQ2Lc3bYWdxGvFRCmwiofdxkJI9n5L8HPHLZ2lf37MQsXmGJzoTFOvjPLj73H6HlbI9Ux0El3zO6hvalxiXj6TfoZ41dbhNyvpYk="
+    - secure: "A4hMEe5RRfUtYjFGbT7QAvT1Tyo434N+/TiuQeQ4q0L46c79LnXuGQzbFLOFZshZiplLkJr7lFg466CoI1bf2L0cQOew/LesMhE75v0HQ7tZnExWhdpAk0ri6nWixbjn/dmQ0+HxjzJ48A44DMMBYcvSIsO4vflvuJ8etfSg42k="

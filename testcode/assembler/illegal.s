@@ -1,6 +1,9 @@
 
         .setcpu         "6502X"
 
+; all so called "illegal" opcodes. duplicated (functionally identical) ones
+; are commented out
+
 ; first all totally stable undocs:
 
         slo $12             ; 07 12
@@ -127,6 +130,6 @@
 
 ; the two so-called "highly unstable" ones:
 
-;        lax #$12            ; ab 12
+        lax #$12            ; ab 12
 
         ane #$12            ; 8b 12

@@ -125,7 +125,7 @@
         shx $1234,y         ; 9e 34 12
         shy $1234,x         ; 9c 34 12
 
-        shs $1234,y         ; 9b 34 12
+        tas $1234,y         ; 9b 34 12
         las $1234,y         ; bb 34 12
 
 ; the two so-called "highly unstable" ones:

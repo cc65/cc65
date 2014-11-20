@@ -280,7 +280,6 @@ static const struct {
         { "SED",  0x0000001, 0xf8, 0, PutAll },
         { "SEI",  0x0000001, 0x78, 0, PutAll },
         { "SHA",  0x0002200, 0x93, 1, PutAll },         /* X */
-        { "TAS",  0x0000200, 0x9b, 0, PutAll },         /* X */
         { "SHX",  0x0000200, 0x9e, 1, PutAll },         /* X */
         { "SHY",  0x0000040, 0x9c, 1, PutAll },         /* X */
         { "SLO",  0x000A26C, 0x03, 0, PutAll },         /* X */
@@ -288,6 +287,7 @@ static const struct {
         { "STA",  0x000A26C, 0x80, 0, PutAll },
         { "STX",  0x000010c, 0x82, 1, PutAll },
         { "STY",  0x000002c, 0x80, 1, PutAll },
+        { "TAS",  0x0000200, 0x9b, 0, PutAll },         /* X */
         { "TAX",  0x0000001, 0xaa, 0, PutAll },
         { "TAY",  0x0000001, 0xa8, 0, PutAll },
         { "TSX",  0x0000001, 0xba, 0, PutAll },

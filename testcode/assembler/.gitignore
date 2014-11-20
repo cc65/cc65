@@ -1,0 +1,6 @@
+chkillegal.bin
+chklegal.bin
+chkall.bin
+legal.o
+illegal.o
+all.o

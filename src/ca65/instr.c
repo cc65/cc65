@@ -215,7 +215,7 @@ static const struct {
 /* Instruction table for the 6502 with illegal instructions */
 static const struct {
     unsigned Count;
-    InsDesc  Ins[70];
+    InsDesc  Ins[75];
 } InsTab6502X = {
     sizeof (InsTab6502X.Ins) / sizeof (InsTab6502X.Ins[0]),
     {
@@ -223,6 +223,7 @@ static const struct {
         { "ALR",  0x0800000, 0x4B, 0, PutAll },         /* X */
         { "ANC",  0x0800000, 0x0B, 0, PutAll },         /* X */
         { "AND",  0x080A26C, 0x20, 0, PutAll },
+        { "ANE",  0x0800000, 0x8B, 0, PutAll },         /* X */
         { "ARR",  0x0800000, 0x6B, 0, PutAll },         /* X */
         { "ASL",  0x000006e, 0x02, 1, PutAll },
         { "AXS",  0x0800000, 0xCB, 0, PutAll },         /* X */
@@ -256,12 +257,12 @@ static const struct {
         { "JMP",  0x0000808, 0x4c, 6, PutJMP },
         { "JSR",  0x0000008, 0x20, 7, PutAll },
         { "LAS",  0x0000200, 0xBB, 0, PutAll },         /* X */
-        { "LAX",  0x000A30C, 0xA3, 1, PutAll },         /* X */
+        { "LAX",  0x080A30C, 0xA3, 11, PutAll },        /* X */
         { "LDA",  0x080A26C, 0xa0, 0, PutAll },
         { "LDX",  0x080030C, 0xa2, 1, PutAll },
         { "LDY",  0x080006C, 0xa0, 1, PutAll },
         { "LSR",  0x000006F, 0x42, 1, PutAll },
-        { "NOP",  0x0000001, 0xea, 0, PutAll },
+        { "NOP",  0x080006D, 0x00, 10, PutAll },        /* X */
         { "ORA",  0x080A26C, 0x00, 0, PutAll },
         { "PHA",  0x0000001, 0x48, 0, PutAll },
         { "PHP",  0x0000001, 0x08, 0, PutAll },
@@ -278,11 +279,15 @@ static const struct {
         { "SEC",  0x0000001, 0x38, 0, PutAll },
         { "SED",  0x0000001, 0xf8, 0, PutAll },
         { "SEI",  0x0000001, 0x78, 0, PutAll },
+        { "SHA",  0x0002200, 0x93, 1, PutAll },         /* X */
+        { "SHX",  0x0000200, 0x9e, 1, PutAll },         /* X */
+        { "SHY",  0x0000040, 0x9c, 1, PutAll },         /* X */
         { "SLO",  0x000A26C, 0x03, 0, PutAll },         /* X */
         { "SRE",  0x000A26C, 0x43, 0, PutAll },         /* X */
         { "STA",  0x000A26C, 0x80, 0, PutAll },
         { "STX",  0x000010c, 0x82, 1, PutAll },
         { "STY",  0x000002c, 0x80, 1, PutAll },
+        { "TAS",  0x0000200, 0x9b, 0, PutAll },         /* X */
         { "TAX",  0x0000001, 0xaa, 0, PutAll },
         { "TAY",  0x0000001, 0xa8, 0, PutAll },
         { "TSX",  0x0000001, 0xba, 0, PutAll },
@@ -783,9 +788,9 @@ static const InsTable* InsTabs[CPU_COUNT] = {
 const InsTable* InsTab = (const InsTable*) &InsTab6502;
 
 /* Table to build the effective 65xx opcode from a base opcode and an
-** addressing mode.
+** addressing mode. (The value in the table is ORed with the base opcode)
 */
-static unsigned char EATab[10][AM65I_COUNT] = {
+static unsigned char EATab[12][AM65I_COUNT] = {
     {   /* Table 0 */
         0x00, 0x00, 0x05, 0x0D, 0x0F, 0x15, 0x1D, 0x1F,
         0x00, 0x19, 0x12, 0x00, 0x07, 0x11, 0x17, 0x01,
@@ -845,6 +850,18 @@ static unsigned char EATab[10][AM65I_COUNT] = {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00
+    },
+    {   /* Table 10 (NOPs) */
+        0xea, 0x00, 0x04, 0x0c, 0x00, 0x14, 0x1c, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80,
+        0x00, 0x00, 0x00
+    },
+    {   /* Table 11 (LAX) */
+        0x08, 0x08, 0x04, 0x0C, 0x00, 0x14, 0x1C, 0x00,
+        0x14, 0x1C, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08,
+        0x00, 0x00, 0x80
     },
 };
 

@@ -60,7 +60,8 @@
 /* Name of program file */
 const char* ProgramFile;
 
-
+/* exit simulator after MaxCycles Cycles */
+unsigned long MaxCycles = 0;
 
 /*****************************************************************************/
 /*                                   Code                                    */
@@ -75,6 +76,7 @@ static void Usage (void)
             "  -h\t\t\tHelp (this text)\n"
             "  -v\t\t\tIncrease verbosity\n"
             "  -V\t\t\tPrint the simulator version number\n"
+            "  -x <num>\t\tExit simulator after <num> cycles\n"
             "\n"
             "Long options:\n"
             "  --help\t\tHelp (this text)\n"
@@ -111,7 +113,12 @@ static void OptVersion (const char* Opt attribute ((unused)),
     fprintf (stderr, "sim65 V%s\n", GetVersionAsString ());
 }
 
-
+static void OptQuitXIns (const char* Opt attribute ((unused)),
+                        const char* Arg attribute ((unused)))
+/* quit after MaxCycles cycles */
+{
+    MaxCycles = strtoul(Arg, NULL, 0);
+}
 
 static void ReadProgramFile (void)
 /* Load program into memory */
@@ -197,6 +204,10 @@ int main (int argc, char* argv[])
                     OptVersion (Arg, 0);
                     break;
 
+                case 'x':
+                    OptQuitXIns (Arg, GetArg (&I, 2));
+                    break;
+
                 default:
                     UnknownOption (Arg);
                     break;
@@ -225,6 +236,11 @@ int main (int argc, char* argv[])
 
     while (1) {
         ExecuteInsn ();
+        if (MaxCycles && (GetCycles () >= MaxCycles)) {
+            Error ("Maximum number of cycles reached.");
+            exit (-99); /* do not ues EXIT_FAILURE to avoid conflicts with the
+                           same value being used in a test program */
+        }
     }
 
     /* Return an apropriate exit code */

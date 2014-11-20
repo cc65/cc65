@@ -238,7 +238,8 @@ int main (int argc, char* argv[])
         ExecuteInsn ();
         if (MaxCycles && (GetCycles () >= MaxCycles)) {
             Error ("Maximum number of cycles reached.");
-            exit (EXIT_FAILURE);
+            exit (-99); /* do not ues EXIT_FAILURE to avoid conflicts with the
+                           same value being used in a test program */
         }
     }
 

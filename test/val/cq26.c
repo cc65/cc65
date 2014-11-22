@@ -4,6 +4,8 @@
   !!LICENCE!!     own, freely distributeable for non-profit. read CPYRIGHT.LCC
 */
 
+#include "common.h"
+
 #ifndef CQ26_INCLUDED
 struct defs {
      int cbits;          /* No. of bits per char           */

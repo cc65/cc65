@@ -4,6 +4,8 @@
   !!LICENCE!!     GPL, read COPYING.GPL
 */
 
+#include "common.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>

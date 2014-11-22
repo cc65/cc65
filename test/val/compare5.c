@@ -4,6 +4,8 @@
   !!LICENCE!!     GPL, read COPYING.GPL
 */
 
+#include "common.h"
+
 #include <stdio.h>
 #include <limits.h>
 
@@ -291,19 +293,16 @@ void c_minus1(void)
   printf("(long0 != -1)\n");
   if(long0 != -1)
   {
-	LOG_ERROR(1);
 	failures++;
   }
   printf("(long0 > 0)\n");
   if(long0 > 0)
   {
-	LOG_ERROR(1);
 	failures++;
   }
   printf("(long1 < 0)\n");
   if(long1 < 0)
   {
-	LOG_ERROR(1);
 	failures++;
   }
 /*

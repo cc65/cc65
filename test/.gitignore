@@ -1,3 +1,5 @@
 *.o
 *.prg
 *.out
+*.host
+*.ref

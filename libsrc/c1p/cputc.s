@@ -1,10 +1,10 @@
 ;
-; Ullrich von Bassewitz, 06.08.1998
+; cputc/cputcxy for Challenger 1P
+; Based on PET/CBM implementation
 ;
 ; void cputcxy (unsigned char x, unsigned char y, char c);
 ; void cputc (char c);
 ;
-
         .export         _cputcxy, _cputc, cputdirect, putchar
         .export         newline, plot
         .import         popa, _gotoxy
@@ -28,18 +28,6 @@ _cputc: cmp     #$0A            ; CR?
 
 L1:     cmp     #$0D            ; LF?
         beq     newline         ; Recalculate pointers
-
-; Printable char of some sort
-
-;        cmp     #' '
-;        bcc     cputdirect      ; Other control char < 0x20
-;        tay
-;        bmi     L10
-;        cmp     #$60
-;        bcc     L2
-;        and     #$DF
-;        bne     cputdirect      ; Branch always
-;L2:     and     #$3F
 
 cputdirect:
         jsr     putchar         ; Write the character to the screen
@@ -65,39 +53,17 @@ newline:
 L4:     inc     CURS_Y
         rts
 
-; Handle character if high bit set
-
-; L10:    and     #$7F
-;        cmp     #$7E            ; PI?
-;        bne     L11
-;        lda     #$5E            ; Load screen code for PI
-;        bne     cputdirect
-; L11:    ora     #$40
-;        bne     cputdirect
-
-
-
-; Set cursor position, calculate RAM pointers
-
 plot:   ldy     CURS_Y
         lda     ScrLo,y
         sta     SCREEN_PTR
         lda     ScrHi,y
-;        ldy     SCR_LINELEN
-;        cpy     #40+1
-;        bcc     @L1
-;        asl     SCREEN_PTR              ; 80 column mode
-;        rol     a
-;@L1:    ora     #$80                    ; Screen at $8000
         sta     SCREEN_PTR+1
         rts
-
 
 ; Write one character to the screen without doing anything else, return X
 ; position in Y
 
 putchar:
-;        ora     RVS             ; Set revers bit
         ldy     CURS_X
         sta     (SCREEN_PTR),y  ; Set char
         rts

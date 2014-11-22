@@ -4,6 +4,7 @@
   !!LICENCE!!     Public Domain
 */
 
+#include "common.h"
 #include <limits.h>
 #include <ctype.h>
 

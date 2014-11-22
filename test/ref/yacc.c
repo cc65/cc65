@@ -6,6 +6,8 @@
 
 /*#define STANDALONE*/
 
+#include "common.h"
+
 #ifndef YACCDBG
 
 #include <stdio.h>
@@ -18,6 +20,9 @@
 */
 
 #endif
+
+FILE *infile, *outfile;
+#define getchar() fgetc(infile)
 
 /* hack the original tables to work with both petscii and ascii */
 #define CHARSETHACK
@@ -61,7 +66,6 @@ int yymorfg;
 extern char *yysptr, yysbuf[];
 int yytchar;
 
-/*FILE *yyin ={stdin}, *yyout ={stdout};*/
 #define yyin  infile
 #define yyout outfile
 
@@ -665,7 +669,13 @@ yyunput(c)
 main() 
 {
         printf("main start\n");
+        infile = fopen("yacc.in","rb");
+        if (infile == NULL) {
+            return EXIT_FAILURE;
+        }
+        outfile = stdout;
         yyparse();
+        fclose(infile);
         printf("main end\n");
         return 0;
 }

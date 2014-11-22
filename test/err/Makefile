@@ -1,8 +1,7 @@
 
-# makefile for the regression tests that return an error code on failure
+# makefile for the tests that MUST NOT compile
 
 CC65FLAGS = -t sim6502
-SIM65FLAGS = -x 200000000
 
 CL65 := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
 SIM65 := $(if $(wildcard ../../bin/sim65*),../../bin/sim65,sim65)
@@ -23,37 +22,21 @@ TESTS += $(patsubst %.c,%.or.prg,$(wildcard *.c))
 all: $(TESTS)
 
 %.prg: %.c
-	$(CL65) $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@
-
+	! $(CL65) $(CC65FLAGS) $< -o $@
 %.o.prg: %.c
-	$(CL65) $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@
-
+	! $(CL65) $(CC65FLAGS) $< -o $@
 %.os.prg: %.c
-	$(CL65) $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@
-
+	! $(CL65) $(CC65FLAGS) $< -o $@
 %.osi.prg: %.c
-	$(CL65) $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@
-
+	! $(CL65) $(CC65FLAGS) $< -o $@
 %.osir.prg: %.c
-	$(CL65) $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@
-
+	! $(CL65) $(CC65FLAGS) $< -o $@
 %.oi.prg: %.c
-	$(CL65) $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@
-
+	! $(CL65) $(CC65FLAGS) $< -o $@
 %.oir.prg: %.c
-	$(CL65) $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@
-
+	! $(CL65) $(CC65FLAGS) $< -o $@
 %.or.prg: %.c
-	$(CL65) $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@
-
+	! $(CL65) $(CC65FLAGS) $< -o $@
 clean:
 	@$(RM) *.o
 	@$(RM) *.prg

@@ -5,6 +5,8 @@
   !!AUTHOR!!
 */
 
+#include <stdio.h>
+
 /*
 there is a bug in the preprocessor (i think) ... the following works 
 (compiles) correctly:

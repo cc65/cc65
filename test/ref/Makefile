@@ -1,5 +1,6 @@
 
-# makefile for the regression tests that return an error code on failure
+# makefile for the regression tests that generate output which has to be
+# compared with reference output
 
 CC65FLAGS = -t sim6502
 SIM65FLAGS = -x 200000000
@@ -24,36 +25,38 @@ all: $(TESTS)
 
 %.prg: %.c
 	$(CL65) $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@
+	$(SIM65) $(SIM65FLAGS) $@ > $*.out
 
 %.o.prg: %.c
 	$(CL65) $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@
+	$(SIM65) $(SIM65FLAGS) $@ > $*.out
 
 %.os.prg: %.c
 	$(CL65) $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@
+	$(SIM65) $(SIM65FLAGS) $@ > $*.out
 
 %.osi.prg: %.c
 	$(CL65) $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@
+	$(SIM65) $(SIM65FLAGS) $@ > $*.out
 
 %.osir.prg: %.c
 	$(CL65) $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@
+	$(SIM65) $(SIM65FLAGS) $@ > $*.out
 
 %.oi.prg: %.c
 	$(CL65) $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@
+	$(SIM65) $(SIM65FLAGS) $@ > $*.out
 
 %.oir.prg: %.c
 	$(CL65) $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@
+	$(SIM65) $(SIM65FLAGS) $@ > $*.out
 
 %.or.prg: %.c
 	$(CL65) $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@
+	$(SIM65) $(SIM65FLAGS) $@ > $*.out
 
 clean:
 	@$(RM) *.o
 	@$(RM) *.prg
+	@$(RM) *.out
+	@$(RM) *.ref

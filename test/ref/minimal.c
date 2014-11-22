@@ -5,6 +5,8 @@
   !!AUTHOR!!      Groepaz/Hitmen
 */
 
+#include <stdio.h>
+
 int main(void)
 {
 #if 1

@@ -28,7 +28,7 @@ static void Usage (void)
         "  -V\t\t\tPrint the version number\n"
         "  -h\t\t\tHelp (this text)\n"
 		"  -o name\t\tName the C1P output file (default: <input>.c1p)\n"
-		"  -S addr\t\tLoad address (default 0x400)\n"
+		"  -S addr\t\tLoad address (default 0x300)\n"
         "\n"
         "Long options:\n"
         "  --help\t\tHelp (this text)\n"

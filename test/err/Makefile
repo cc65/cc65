@@ -1,14 +1,21 @@
 
 # makefile for the tests that MUST NOT compile
 
+ifneq ($(shell echo),)
+  CMD_EXE = 1
+endif
+
 CC65FLAGS = -t sim6502
 
 CL65 := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
-SIM65 := $(if $(wildcard ../../bin/sim65*),../../bin/sim65,sim65)
 
+ifdef CMD_EXE
+RM := del /f
+else
 RM := rm -f
+endif
 
-.PHONY: all
+.PHONY: all clean
 
 TESTS := $(patsubst %.c,%.prg,$(wildcard *.c))
 TESTS += $(patsubst %.c,%.o.prg,$(wildcard *.c))

@@ -1,14 +1,25 @@
 
+# makefile for the remaining tests that need special care in one way or another
+
+ifneq ($(shell echo),)
+  CMD_EXE = 1
+endif
+
 CC65FLAGS = -t sim6502
 SIM65FLAGS = -x 200000000
 
 CL65 := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
 SIM65 := $(if $(wildcard ../../bin/sim65*),../../bin/sim65,sim65)
 
+ifdef CMD_EXE
+RM := del /f
+DIFF := fc
+else
 RM := rm -f
 DIFF := diff -q
+endif
 
-.PHONY: all
+.PHONY: all clean
 
 TESTS := $(patsubst %.c,%.prg,$(wildcard *.c))
 TESTS += $(patsubst %.c,%.o.prg,$(wildcard *.c))

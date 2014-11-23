@@ -6,10 +6,10 @@ MAKE := make --no-print-dir
 .PHONY: all clean
 
 all:
-	@$(MAKE) -C val all
-	@$(MAKE) -C ref all
-	@$(MAKE) -C err all
-	@$(MAKE) -C misc all
+	@$(MAKE) -C val clean all
+	@$(MAKE) -C ref clean all
+	@$(MAKE) -C err clean all
+	@$(MAKE) -C misc clean all
 
 clean:
 	@$(MAKE) -C val clean

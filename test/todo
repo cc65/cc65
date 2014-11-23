@@ -1,10 +1,4 @@
 
-- the tests in ./misc need special care
-
 - check all tests in ./ref and make them return their results as exit code
-
-- in ./val use some other tool than "diff" for comparing the results
-
-- fixup makefiles to use "del" instead of "rm -f" on windows
 
 - reduce usage of "common.h" to a minimum

@@ -12,5 +12,5 @@ compiler.
 /misc - a few tests that need special care of some sort
 
 
-to run the tests use "make clean all" in this (top) directory, the makefile
-should exit with no error.
+to run the tests use "make" in this (top) directory, the makefile should exit
+with no error.

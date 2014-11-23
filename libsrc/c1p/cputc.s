@@ -44,14 +44,12 @@ L3:     iny
         rts
 
 newline:
-        lda     SCR_LINELEN     ; xsize-1
-        sec                     ; Account for -1 above
-        adc     SCREEN_PTR
-        sta     SCREEN_PTR
-        bcc     L4
-        inc     SCREEN_PTR+1
-L4:     inc     CURS_Y
-        rts
+        inc     CURS_Y
+        lda     CURS_Y
+        cmp     #24             ; screen height 25 lines hardcoded
+        bne     plot
+        lda     #0              ; wrap around to line 0
+        sta     CURS_Y
 
 plot:   ldy     CURS_Y
         lda     ScrLo,y

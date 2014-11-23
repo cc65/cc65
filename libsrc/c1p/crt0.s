@@ -13,6 +13,7 @@
 .import    zerobss, initlib, donelib
 
 .include  "zeropage.inc"
+.include  "extzp.inc"
 
 ; ---------------------------------------------------------------------------
 ; Place the startup code in a special segment
@@ -25,6 +26,13 @@
 _init:    LDX     #$FF                 ; Initialize stack pointer to $01FF
           TXS
           CLD                          ; Clear decimal mode
+
+; ---------------------------------------------------------------------------
+; Initialize screen width
+; TODO: Can initialization be done in a more idiomatic way?
+; TODO: Create function for changing screen width
+          LDA     #$18
+          STA     SCR_LINELEN
 
 ; ---------------------------------------------------------------------------
 ; Set cc65 argument stack pointer

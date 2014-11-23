@@ -14,3 +14,10 @@ compiler.
 
 to run the tests use "make" in this (top) directory, the makefile should exit
 with no error.
+
+--------------------------------------------------------------------------------
+
+TODO:
+
+- reduce usage of "common.h" to a minimum
+- convert more tests from using reference output to returning an exit code

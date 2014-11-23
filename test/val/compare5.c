@@ -4,8 +4,6 @@
   !!LICENCE!!     GPL, read COPYING.GPL
 */
 
-#include "common.h"
-
 #include <stdio.h>
 #include <limits.h>
 
@@ -19,9 +17,6 @@ unsigned char success = 0;
 unsigned char failures = 0;
 unsigned char dummy = 0;
 
-#ifdef SUPPORT_BIT_TYPES
-bit bit0 = 0;
-#endif
 int int0 = 0;
 int int1 = 0;
 char char0 = 0;

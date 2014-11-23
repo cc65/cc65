@@ -27,6 +27,7 @@ static void Usage (void)
         "Short options:\n"
         "  -V\t\t\tPrint the version number\n"
         "  -h\t\t\tHelp (this text)\n"
+		"  -n\t\tNo automatic start after loading program\n"
 		"  -o name\t\tName the C1P output file (default: <input>.c1p)\n"
 		"  -S addr\t\tLoad address (default 0x300)\n"
         "\n"
@@ -79,16 +80,17 @@ static unsigned long CvtNumber (const char* Arg, const char* Number)
 }
 
 /* Commands of C1P PROM monitor */
-#define ADDRESS_MODE_CMD     '.'
-#define DATA_MODE_CMD        '/'
-#define EXECUTE_CMD          'G'
+#define ADDRESS_MODE_CMD	'.'
+#define DATA_MODE_CMD		'/'
+#define EXECUTE_CMD			'G'
 #define DATA_MODE_ADDRESS	0x00FB
 
 /* Transform the cc65 executable binary into a series of
    commands that make the C1P PROM monitor load the bytes
    into memory.
 */
-static void Transform (unsigned long StartAddress, FILE *In, FILE *Out)
+static void Transform (unsigned long StartAddress, FILE *In, FILE *Out,
+	unsigned AutoStart)
 {
 	int c;
 
@@ -101,15 +103,17 @@ static void Transform (unsigned long StartAddress, FILE *In, FILE *Out)
 		fprintf(Out, "%02.2X\n", (unsigned int) c & 0xFF);
 	}
 
-	/* Store 00 to 0x00FB to enable keyboard input at the end */
-	fprintf(Out, "%c%04.4X%c%02.2X\n", ADDRESS_MODE_CMD,
-		0x00FB, DATA_MODE_CMD, 0x00);
-
-	/* And execute
-	fprintf (Out, "%c%04.4x%c",
+	if (AutoStart) {
+		/* Execute */
+		fprintf (Out, "%c%04.4x%c",
 			ADDRESS_MODE_CMD, (unsigned int) StartAddress & 0xFFFF,
 			EXECUTE_CMD);
-			 */
+	}
+	else {
+		/* Store 00 to 0x00FB to enable keyboard input at the end */
+		fprintf(Out, "%c%04.4X%c%02.2X\n", ADDRESS_MODE_CMD,
+			0x00FB, DATA_MODE_CMD, 0x00);
+	}
 } 
 
 /* Default suffix for C1P object file */
@@ -135,6 +139,9 @@ int main (int argc, char *argv[])
 	/* Initialize with default start address defined in c1p.cfg */
 	unsigned long StartAddr = 0x300;
 
+	/* Start program automatically after loading */
+	unsigned AutoStart = 1;
+
     unsigned int I;
 
     /* Initialize the cmdline module */
@@ -155,11 +162,15 @@ int main (int argc, char *argv[])
                     LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
                     break;
 
-                case 'o':
-                    OutputFile = GetArg (&I, 2);
-                    break;
+				case 'n':
+					AutoStart = 0;
+					break;
 
-                case 'S':
+				case 'o':
+					OutputFile = GetArg(&I, 2);
+					break;
+
+				case 'S':
                     StartAddr = CvtNumber (Arg, GetArg (&I, 2));
                     break;
 
@@ -206,7 +217,7 @@ int main (int argc, char *argv[])
 	if (!OutputFileFp) AbEnd ("Unable to open output file");
 
 	/* Generate object file */
-	Transform (StartAddr, InputFileFp, OutputFileFp);
+	Transform (StartAddr, InputFileFp, OutputFileFp, AutoStart);
 
 	/* Cleanup */
 	if (fclose(InputFileFp) == EOF) AbEnd ("Error closing input file");

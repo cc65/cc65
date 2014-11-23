@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/* (C) 2000-2014, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -62,6 +62,8 @@ static FILE*    F       = 0;            /* Output stream */
 static unsigned Col     = 1;            /* Current column */
 static unsigned Line    = 0;            /* Current line on page */
 static unsigned Page    = 1;            /* Current output page */
+
+static const char* SegmentName = 0;     /* Name of current segment */
 
 
 
@@ -223,23 +225,6 @@ void DefConst (const char* Name, const char* Comment, unsigned Addr)
 
 
 
-void StartSegment (const char* Name, unsigned AddrSize)
-/* Start a segment */
-{
-    if (Pass == PassCount) {
-        Output (".segment");
-        Indent (ACol);
-        if (AddrSize == ADDR_SIZE_DEFAULT) {
-            Output ("\"%s\"", Name);
-        } else {
-            Output ("\"%s\": %s", Name, AddrSizeToStr (AddrSize));
-        }
-        LineFeed ();
-    }
-}
-
-
-
 void DataByteLine (unsigned ByteCount)
 /* Output a line with bytes */
 {
@@ -331,6 +316,39 @@ void SeparatorLine (void)
         Output ("; ----------------------------------------------------------------------------");
         LineFeed ();
     }
+}
+
+
+
+void StartSegment (const char* Name, unsigned AddrSize)
+/* Start a segment */
+{
+    if (Pass == PassCount) {
+        LineFeed ();
+        Output (".segment");
+        Indent (ACol);
+        SegmentName = Name;
+        Output ("\"%s\"", Name);
+        if (AddrSize != ADDR_SIZE_DEFAULT) {
+            Output (": %s", AddrSizeToStr (AddrSize));
+        }
+        LineFeed ();
+        LineFeed ();
+    }
+}
+
+
+
+void EndSegment (void)
+/* End a segment */
+{
+    LineFeed ();
+    Output ("; End of \"%s\" segment", SegmentName);
+    LineFeed ();
+    SeparatorLine ();
+    Output (".code");
+    LineFeed ();
+    LineFeed ();
 }
 
 

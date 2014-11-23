@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/* (C) 1998-2014, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -60,6 +60,7 @@
 #include "opctable.h"
 #include "output.h"
 #include "scanner.h"
+#include "segment.h"
 
 
 
@@ -356,6 +357,14 @@ static void OneOpcode (unsigned RemainingBytes)
     /* Get the output style for the current PC */
     attr_t Style = GetStyleAttr (PC);
 
+    /* If a segment begins here, then name that segment.
+    ** Note that the segment is named even if its code is being skipped,
+    ** because some of its later code might not be skipped.
+    */
+    if (IsSegmentStart (PC)) {
+        StartSegment (GetSegmentStartName (PC), GetSegmentAddrSize (PC));
+    }
+
     /* If we have a label at this address, output the label and an attached
     ** comment, provided that we aren't in a skip area.
     */
@@ -371,7 +380,7 @@ static void OneOpcode (unsigned RemainingBytes)
     **   - ...if we have enough bytes remaining for the code at this address.
     **   - ...if the current instruction is valid for the given CPU.
     **   - ...if there is no label somewhere between the instruction bytes.
-    ** If any of these conditions is false, switch to data mode.
+    ** If any of those conditions is false, switch to data mode.
     */
     if (Style == atDefault) {
         if (D->Size > RemainingBytes) {
@@ -383,7 +392,14 @@ static void OneOpcode (unsigned RemainingBytes)
         } else {
             unsigned I;
             for (I = 1; I < D->Size; ++I) {
-                if (HaveLabel (PC+I) || HaveSegmentChange (PC+I)) {
+                if (HaveLabel (PC+I)) {
+                    Style = atIllegal;
+                    MarkAddr (PC, Style);
+                    break;
+                }
+            }
+            for (I = 1; I < D->Size - 1u; ++I) {
+                if (HaveSegmentChange (PC+I)) {
                     Style = atIllegal;
                     MarkAddr (PC, Style);
                     break;
@@ -454,6 +470,10 @@ static void OneOpcode (unsigned RemainingBytes)
             ++PC;
             break;
 
+    }
+
+    if (IsSegmentEnd (PC - 1)) {
+        EndSegment ();
     }
 }
 

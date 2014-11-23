@@ -748,9 +748,6 @@ static void SegmentSection (void)
     if (Start < 0) {
         InfoError ("Start address is missing");
     }
-    if (Start == End) {
-        InfoError ("Segment is empty");
-    }
     if (Start > End) {
         InfoError ("Start address of segment is greater than end address");
     }

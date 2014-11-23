@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2007      Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2007-2014, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -47,8 +47,13 @@
 void AddAbsSegment (unsigned Start, unsigned End, const char* Name);
 /* Add an absolute segment to the segment table */
 
+char* GetSegmentStartName (unsigned Addr);
+/* Return the name of the segment which starts at the given address */
+
+unsigned GetSegmentAddrSize (unsigned Addr);
+/* Return the address size of the segment which starts at the given address */
+
 
 
 /* End of segment.h */
-
 #endif

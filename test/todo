@@ -1,4 +1,2 @@
 
-- check all tests in ./ref and make them return their results as exit code
-
 - reduce usage of "common.h" to a minimum

@@ -41,7 +41,7 @@ _lseek:
         bcs     einval
 
         ; Set fd
-        sta     mliparam + MLI::RW::REF_NUM
+        sta     mliparam + MLI::MARK::REF_NUM
 
         txa
         beq     cur
@@ -61,7 +61,9 @@ cur:
 
 ; SEEK_END
 end:
-        ldx     #MARK_COUNT ; conveniently same as EOF_COUNT
+        ; MARK_COUNT must == EOF_COUNT, otherwise unexpected behaviour
+        .assert MARK_COUNT = EOF_COUNT, error
+        ldx     #MARK_COUNT
         jsr     callmli
         bcs     oserr
         lda     mliparam + MLI::MARK::POSITION

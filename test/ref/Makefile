@@ -14,11 +14,11 @@ SIM65 := $(if $(wildcard ../../bin/sim65*),../../bin/sim65,sim65)
 
 ifdef CMD_EXE
 RM := del /f
-DIFF := fc
 else
 RM := rm -f
-DIFF := diff -q
 endif
+
+DIFF := ./../bdiff
 
 CFLAGS := -O2 -Wall -W -Wextra -fwrapv -fno-strict-overflow
 

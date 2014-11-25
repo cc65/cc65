@@ -15,6 +15,8 @@ else
 RM := rm -f
 endif
 
+WORKDIR := ./../../testwrk
+
 .PHONY: all clean
 
 TESTS := $(patsubst %.c,%.prg,$(wildcard *.c))

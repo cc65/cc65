@@ -8,21 +8,28 @@ ifneq ($(shell echo),)
 endif
 
 ifdef CMD_EXE
-RM := del /f
-EXE := .exe
+  RM := del /f
+  EXE := .exe
+  MKDIR = mkdir
 else
-RM := rm -f
-EXE :=
+  RM := rm -f
+  EXE :=
+  MKDIR = mkdir -p
 endif
+
+WORKDIR := ../testwrk
 
 .PHONY: dotests clean
 
 all: dotests
 
-bdiff:
-	@$(CC) -o bdiff$(EXE) bdiff.c
+$(WORKDIR):
+	@$(MKDIR) $(WORKDIR)
 
-dotests: bdiff
+$(WORKDIR)/bdiff$(EXE): $(WORKDIR)
+	@$(CC) -o $(WORKDIR)/bdiff$(EXE) bdiff.c
+
+dotests: $(WORKDIR)/bdiff$(EXE)
 	@$(MAKE) -C val clean all
 	@$(MAKE) -C ref clean all
 	@$(MAKE) -C err clean all
@@ -33,4 +40,4 @@ clean:
 	@$(MAKE) -C ref clean
 	@$(MAKE) -C err clean
 	@$(MAKE) -C misc clean
-	@$(RM) bdiff$(EXE)
+	@$(RM) $(WORKDIR)/bdiff$(EXE)

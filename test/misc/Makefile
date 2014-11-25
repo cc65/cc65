@@ -17,7 +17,9 @@ else
 RM := rm -f
 endif
 
-DIFF := ./../bdiff
+WORKDIR := ./../../testwrk
+
+DIFF := $(WORKDIR)/bdiff
 
 .PHONY: all clean
 

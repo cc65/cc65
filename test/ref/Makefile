@@ -18,7 +18,9 @@ else
 RM := rm -f
 endif
 
-DIFF := ./../bdiff
+WORKDIR := ./../../testwrk
+
+DIFF := $(WORKDIR)/bdiff
 
 CFLAGS := -O2 -Wall -W -Wextra -fwrapv -fno-strict-overflow
 

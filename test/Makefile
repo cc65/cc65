@@ -11,10 +11,12 @@ ifdef CMD_EXE
   RM := del /f
   EXE := .exe
   MKDIR = mkdir
+  RMDIR = rmdir
 else
   RM := rm -f
   EXE :=
   MKDIR = mkdir -p
+  RMDIR = rmdir
 endif
 
 WORKDIR := ../testwrk
@@ -41,3 +43,4 @@ clean:
 	@$(MAKE) -C err clean
 	@$(MAKE) -C misc clean
 	@$(RM) $(WORKDIR)/bdiff$(EXE)
+	@$(RMDIR) $(WORKDIR)

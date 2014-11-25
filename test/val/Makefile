@@ -21,49 +21,49 @@ WORKDIR := ./../../testwrk
 
 .PHONY: all clean
 
-TESTS := $(patsubst %.c,%.prg,$(wildcard *.c))
-TESTS += $(patsubst %.c,%.o.prg,$(wildcard *.c))
-TESTS += $(patsubst %.c,%.os.prg,$(wildcard *.c))
-TESTS += $(patsubst %.c,%.osi.prg,$(wildcard *.c))
-TESTS += $(patsubst %.c,%.osir.prg,$(wildcard *.c))
-TESTS += $(patsubst %.c,%.oi.prg,$(wildcard *.c))
-TESTS += $(patsubst %.c,%.oir.prg,$(wildcard *.c))
-TESTS += $(patsubst %.c,%.or.prg,$(wildcard *.c))
+TESTS := $(patsubst %.c,$(WORKDIR)/%.prg,$(wildcard *.c))
+TESTS += $(patsubst %.c,$(WORKDIR)/%.o.prg,$(wildcard *.c))
+TESTS += $(patsubst %.c,$(WORKDIR)/%.os.prg,$(wildcard *.c))
+TESTS += $(patsubst %.c,$(WORKDIR)/%.osi.prg,$(wildcard *.c))
+TESTS += $(patsubst %.c,$(WORKDIR)/%.osir.prg,$(wildcard *.c))
+TESTS += $(patsubst %.c,$(WORKDIR)/%.oi.prg,$(wildcard *.c))
+TESTS += $(patsubst %.c,$(WORKDIR)/%.oir.prg,$(wildcard *.c))
+TESTS += $(patsubst %.c,$(WORKDIR)/%.or.prg,$(wildcard *.c))
 
 all: $(TESTS)
 
-%.prg: %.c
+$(WORKDIR)/%.prg: %.c
 	$(CL65) $(CC65FLAGS) $< -o $@
 	$(SIM65) $(SIM65FLAGS) $@
 
-%.o.prg: %.c
+$(WORKDIR)/%.o.prg: %.c
 	$(CL65) $(CC65FLAGS) $< -o $@
 	$(SIM65) $(SIM65FLAGS) $@
 
-%.os.prg: %.c
+$(WORKDIR)/%.os.prg: %.c
 	$(CL65) $(CC65FLAGS) $< -o $@
 	$(SIM65) $(SIM65FLAGS) $@
 
-%.osi.prg: %.c
+$(WORKDIR)/%.osi.prg: %.c
 	$(CL65) $(CC65FLAGS) $< -o $@
 	$(SIM65) $(SIM65FLAGS) $@
 
-%.osir.prg: %.c
+$(WORKDIR)/%.osir.prg: %.c
 	$(CL65) $(CC65FLAGS) $< -o $@
 	$(SIM65) $(SIM65FLAGS) $@
 
-%.oi.prg: %.c
+$(WORKDIR)/%.oi.prg: %.c
 	$(CL65) $(CC65FLAGS) $< -o $@
 	$(SIM65) $(SIM65FLAGS) $@
 
-%.oir.prg: %.c
+$(WORKDIR)/%.oir.prg: %.c
 	$(CL65) $(CC65FLAGS) $< -o $@
 	$(SIM65) $(SIM65FLAGS) $@
 
-%.or.prg: %.c
+$(WORKDIR)/%.or.prg: %.c
 	$(CL65) $(CC65FLAGS) $< -o $@
 	$(SIM65) $(SIM65FLAGS) $@
 
 clean:
-	@$(RM) *.o
-	@$(RM) *.prg
+	@$(RM) $(TESTS)
+	@$(RM) $(patsubst %.c,$(WORKDIR)/%.o,$(wildcard *.c))

@@ -26,66 +26,66 @@ CFLAGS := -O2 -Wall -W -Wextra -fwrapv -fno-strict-overflow
 
 .PHONY: all clean
 
-REFS := $(patsubst %.c,%.ref,$(wildcard *.c))
+REFS := $(patsubst %.c,$(WORKDIR)/%.ref,$(wildcard *.c))
 
-TESTS := $(patsubst %.c,%.prg,$(wildcard *.c))
-TESTS += $(patsubst %.c,%.o.prg,$(wildcard *.c))
-TESTS += $(patsubst %.c,%.os.prg,$(wildcard *.c))
-TESTS += $(patsubst %.c,%.osi.prg,$(wildcard *.c))
-TESTS += $(patsubst %.c,%.osir.prg,$(wildcard *.c))
-TESTS += $(patsubst %.c,%.oi.prg,$(wildcard *.c))
-TESTS += $(patsubst %.c,%.oir.prg,$(wildcard *.c))
-TESTS += $(patsubst %.c,%.or.prg,$(wildcard *.c))
+TESTS := $(patsubst %.c,$(WORKDIR)/%.prg,$(wildcard *.c))
+TESTS += $(patsubst %.c,$(WORKDIR)/%.o.prg,$(wildcard *.c))
+TESTS += $(patsubst %.c,$(WORKDIR)/%.os.prg,$(wildcard *.c))
+TESTS += $(patsubst %.c,$(WORKDIR)/%.osi.prg,$(wildcard *.c))
+TESTS += $(patsubst %.c,$(WORKDIR)/%.osir.prg,$(wildcard *.c))
+TESTS += $(patsubst %.c,$(WORKDIR)/%.oi.prg,$(wildcard *.c))
+TESTS += $(patsubst %.c,$(WORKDIR)/%.oir.prg,$(wildcard *.c))
+TESTS += $(patsubst %.c,$(WORKDIR)/%.or.prg,$(wildcard *.c))
 
 all: $(REFS) $(TESTS)
 
-%.ref: %.c
-	$(CC) $(CFLAGS) $< -o $*.host
-	./$*.host > $@
+$(WORKDIR)/%.ref: %.c
+	$(CC) $(CFLAGS) $< -o $(WORKDIR)/$*.host
+	$(WORKDIR)/$*.host > $@
 
-%.prg: %.c %.ref
+$(WORKDIR)/%.prg: %.c $(WORKDIR)/%.ref
 	$(CL65) $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@ > $*.out
-	$(DIFF) $*.out $*.ref
+	$(SIM65) $(SIM65FLAGS) $@ > $(WORKDIR)/$*.out
+	$(DIFF) $(WORKDIR)/$*.out $(WORKDIR)/$*.ref
 
-%.o.prg: %.c %.ref
+$(WORKDIR)/%.o.prg: %.c $(WORKDIR)/%.ref
 	$(CL65) $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@ > $*.out
-	$(DIFF) $*.out $*.ref
+	$(SIM65) $(SIM65FLAGS) $@ > $(WORKDIR)/$*.out
+	$(DIFF) $(WORKDIR)/$*.out $(WORKDIR)/$*.ref
 
-%.os.prg: %.c %.ref
+$(WORKDIR)/%.os.prg: %.c $(WORKDIR)/%.ref
 	$(CL65) $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@ > $*.out
-	$(DIFF) $*.out $*.ref
+	$(SIM65) $(SIM65FLAGS) $@ > $(WORKDIR)/$*.out
+	$(DIFF) $(WORKDIR)/$*.out $(WORKDIR)/$*.ref
 
-%.osi.prg: %.c %.ref
+$(WORKDIR)/%.osi.prg: %.c $(WORKDIR)/%.ref
 	$(CL65) $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@ > $*.out
-	$(DIFF) $*.out $*.ref
+	$(SIM65) $(SIM65FLAGS) $@ > $(WORKDIR)/$*.out
+	$(DIFF) $(WORKDIR)/$*.out $(WORKDIR)/$*.ref
 
-%.osir.prg: %.c %.ref
+$(WORKDIR)/%.osir.prg: %.c $(WORKDIR)/%.ref
 	$(CL65) $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@ > $*.out
-	$(DIFF) $*.out $*.ref
+	$(SIM65) $(SIM65FLAGS) $@ > $(WORKDIR)/$*.out
+	$(DIFF) $(WORKDIR)/$*.out $(WORKDIR)/$*.ref
 
-%.oi.prg: %.c %.ref
+$(WORKDIR)/%.oi.prg: %.c $(WORKDIR)/%.ref
 	$(CL65) $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@ > $*.out
-	$(DIFF) $*.out $*.ref
+	$(SIM65) $(SIM65FLAGS) $@ > $(WORKDIR)/$*.out
+	$(DIFF) $(WORKDIR)/$*.out $(WORKDIR)/$*.ref
 
-%.oir.prg: %.c %.ref
+$(WORKDIR)/%.oir.prg: %.c $(WORKDIR)/%.ref
 	$(CL65) $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@ > $*.out
-	$(DIFF) $*.out $*.ref
+	$(SIM65) $(SIM65FLAGS) $@ > $(WORKDIR)/$*.out
+	$(DIFF) $(WORKDIR)/$*.out $(WORKDIR)/$*.ref
 
-%.or.prg: %.c %.ref
+$(WORKDIR)/%.or.prg: %.c $(WORKDIR)/%.ref
 	$(CL65) $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@ > $*.out
-	$(DIFF) $*.out $*.ref
+	$(SIM65) $(SIM65FLAGS) $@ > $(WORKDIR)/$*.out
+	$(DIFF) $(WORKDIR)/$*.out $(WORKDIR)/$*.ref
 
 clean:
-	@$(RM) *.o
-	@$(RM) *.prg
-	@$(RM) *.out
-	@$(RM) *.ref
-	@$(RM) *.host
+	@$(RM) $(TESTS)
+	@$(RM) $(patsubst %.c,$(WORKDIR)/%.o,$(wildcard *.c))
+	@$(RM) $(patsubst %.c,$(WORKDIR)/%.out,$(wildcard *.c))
+	@$(RM) $(patsubst %.c,$(WORKDIR)/%.ref,$(wildcard *.c))
+	@$(RM) $(patsubst %.c,$(WORKDIR)/%.host,$(wildcard *.c))

@@ -100,7 +100,7 @@ static void Transform (unsigned long StartAddress, FILE *In, FILE *Out,
 
 	/* Loop over all input bytes and enter them one by one */
 	for (c = getc(In); c != EOF; c = getc(In)) {
-		fprintf(Out, "%02.2X\n", (unsigned int) c & 0xFF);
+		fprintf(Out, "%02.2X\r", (unsigned int) c & 0xFF);
 	}
 
 	if (AutoStart) {
@@ -111,7 +111,7 @@ static void Transform (unsigned long StartAddress, FILE *In, FILE *Out,
 	}
 	else {
 		/* Store 00 to 0x00FB to enable keyboard input at the end */
-		fprintf(Out, "%c%04.4X%c%02.2X\n", ADDRESS_MODE_CMD,
+		fprintf(Out, "%c%04.4X%c%02.2X", ADDRESS_MODE_CMD,
 			0x00FB, DATA_MODE_CMD, 0x00);
 	}
 } 

@@ -33,19 +33,19 @@ all: $(TESTS)
 $(WORKDIR)/%.prg: %.c
 	! $(CL65) $(CC65FLAGS) $< -o $@
 $(WORKDIR)/%.o.prg: %.c
-	! $(CL65) $(CC65FLAGS) $< -o $@
+	! $(CL65) -O $(CC65FLAGS) $< -o $@
 $(WORKDIR)/%.os.prg: %.c
-	! $(CL65) $(CC65FLAGS) $< -o $@
+	! $(CL65) -Os $(CC65FLAGS) $< -o $@
 $(WORKDIR)/%.osi.prg: %.c
-	! $(CL65) $(CC65FLAGS) $< -o $@
+	! $(CL65) -Osi $(CC65FLAGS) $< -o $@
 $(WORKDIR)/%.osir.prg: %.c
-	! $(CL65) $(CC65FLAGS) $< -o $@
+	! $(CL65) -Osir $(CC65FLAGS) $< -o $@
 $(WORKDIR)/%.oi.prg: %.c
-	! $(CL65) $(CC65FLAGS) $< -o $@
+	! $(CL65) -Oi $(CC65FLAGS) $< -o $@
 $(WORKDIR)/%.oir.prg: %.c
-	! $(CL65) $(CC65FLAGS) $< -o $@
+	! $(CL65) -Oir $(CC65FLAGS) $< -o $@
 $(WORKDIR)/%.or.prg: %.c
-	! $(CL65) $(CC65FLAGS) $< -o $@
+	! $(CL65) -Or $(CC65FLAGS) $< -o $@
 clean:
 	@$(RM) $(TESTS)
 	@$(RM) $(patsubst %.c,$(WORKDIR)/%.o,$(wildcard *.c))

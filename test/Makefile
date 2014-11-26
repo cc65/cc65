@@ -37,6 +37,12 @@ dotests: $(WORKDIR)/bdiff$(EXE)
 	@$(MAKE) -C err clean all
 	@$(MAKE) -C misc clean all
 
+continue: $(WORKDIR)/bdiff$(EXE)
+	@$(MAKE) -C val all
+	@$(MAKE) -C ref all
+	@$(MAKE) -C err all
+	@$(MAKE) -C misc all
+
 clean:
 	@$(MAKE) -C val clean
 	@$(MAKE) -C ref clean

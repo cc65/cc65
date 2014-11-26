@@ -32,6 +32,8 @@ TESTS += $(patsubst %.c,$(WORKDIR)/%.oi.prg,$(wildcard *.c))
 TESTS += $(patsubst %.c,$(WORKDIR)/%.oir.prg,$(wildcard *.c))
 TESTS += $(patsubst %.c,$(WORKDIR)/%.or.prg,$(wildcard *.c))
 
+# FIXME: actually use/build differently optimized programs here
+
 all: $(TESTS)
 
 # should compile, but then hangs in an endless loop

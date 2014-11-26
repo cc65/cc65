@@ -49,37 +49,37 @@ $(WORKDIR)/%.prg: %.c $(WORKDIR)/%.ref
 	$(DIFF) $(WORKDIR)/$*.out $(WORKDIR)/$*.ref
 
 $(WORKDIR)/%.o.prg: %.c $(WORKDIR)/%.ref
-	$(CL65) $(CC65FLAGS) $< -o $@
+	$(CL65) -O $(CC65FLAGS) $< -o $@
 	$(SIM65) $(SIM65FLAGS) $@ > $(WORKDIR)/$*.out
 	$(DIFF) $(WORKDIR)/$*.out $(WORKDIR)/$*.ref
 
 $(WORKDIR)/%.os.prg: %.c $(WORKDIR)/%.ref
-	$(CL65) $(CC65FLAGS) $< -o $@
+	$(CL65) -Os $(CC65FLAGS) $< -o $@
 	$(SIM65) $(SIM65FLAGS) $@ > $(WORKDIR)/$*.out
 	$(DIFF) $(WORKDIR)/$*.out $(WORKDIR)/$*.ref
 
 $(WORKDIR)/%.osi.prg: %.c $(WORKDIR)/%.ref
-	$(CL65) $(CC65FLAGS) $< -o $@
+	$(CL65) -Osi $(CC65FLAGS) $< -o $@
 	$(SIM65) $(SIM65FLAGS) $@ > $(WORKDIR)/$*.out
 	$(DIFF) $(WORKDIR)/$*.out $(WORKDIR)/$*.ref
 
 $(WORKDIR)/%.osir.prg: %.c $(WORKDIR)/%.ref
-	$(CL65) $(CC65FLAGS) $< -o $@
+	$(CL65) -Osir $(CC65FLAGS) $< -o $@
 	$(SIM65) $(SIM65FLAGS) $@ > $(WORKDIR)/$*.out
 	$(DIFF) $(WORKDIR)/$*.out $(WORKDIR)/$*.ref
 
 $(WORKDIR)/%.oi.prg: %.c $(WORKDIR)/%.ref
-	$(CL65) $(CC65FLAGS) $< -o $@
+	$(CL65) -Oi $(CC65FLAGS) $< -o $@
 	$(SIM65) $(SIM65FLAGS) $@ > $(WORKDIR)/$*.out
 	$(DIFF) $(WORKDIR)/$*.out $(WORKDIR)/$*.ref
 
 $(WORKDIR)/%.oir.prg: %.c $(WORKDIR)/%.ref
-	$(CL65) $(CC65FLAGS) $< -o $@
+	$(CL65) -Oir $(CC65FLAGS) $< -o $@
 	$(SIM65) $(SIM65FLAGS) $@ > $(WORKDIR)/$*.out
 	$(DIFF) $(WORKDIR)/$*.out $(WORKDIR)/$*.ref
 
 $(WORKDIR)/%.or.prg: %.c $(WORKDIR)/%.ref
-	$(CL65) $(CC65FLAGS) $< -o $@
+	$(CL65) -Or $(CC65FLAGS) $< -o $@
 	$(SIM65) $(SIM65FLAGS) $@ > $(WORKDIR)/$*.out
 	$(DIFF) $(WORKDIR)/$*.out $(WORKDIR)/$*.ref
 

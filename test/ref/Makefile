@@ -28,14 +28,15 @@ CFLAGS := -O2 -Wall -W -Wextra -fwrapv -fno-strict-overflow
 
 REFS := $(patsubst %.c,$(WORKDIR)/%.ref,$(wildcard *.c))
 
-TESTS := $(patsubst %.c,$(WORKDIR)/%.prg,$(wildcard *.c))
-TESTS += $(patsubst %.c,$(WORKDIR)/%.o.prg,$(wildcard *.c))
-TESTS += $(patsubst %.c,$(WORKDIR)/%.os.prg,$(wildcard *.c))
-TESTS += $(patsubst %.c,$(WORKDIR)/%.osi.prg,$(wildcard *.c))
-TESTS += $(patsubst %.c,$(WORKDIR)/%.osir.prg,$(wildcard *.c))
-TESTS += $(patsubst %.c,$(WORKDIR)/%.oi.prg,$(wildcard *.c))
-TESTS += $(patsubst %.c,$(WORKDIR)/%.oir.prg,$(wildcard *.c))
-TESTS += $(patsubst %.c,$(WORKDIR)/%.or.prg,$(wildcard *.c))
+SOURCES := $(wildcard *.c)
+TESTS := $(SOURCES:%.c=$(WORKDIR)/%.prg)
+TESTS += $(SOURCES:%.c=$(WORKDIR)/%.o.prg)
+TESTS += $(SOURCES:%.c=$(WORKDIR)/%.os.prg)
+TESTS += $(SOURCES:%.c=$(WORKDIR)/%.osi.prg)
+TESTS += $(SOURCES:%.c=$(WORKDIR)/%.osir.prg)
+TESTS += $(SOURCES:%.c=$(WORKDIR)/%.oi.prg)
+TESTS += $(SOURCES:%.c=$(WORKDIR)/%.oir.prg)
+TESTS += $(SOURCES:%.c=$(WORKDIR)/%.or.prg)
 
 all: $(REFS) $(TESTS)
 
@@ -85,7 +86,7 @@ $(WORKDIR)/%.or.prg: %.c $(WORKDIR)/%.ref
 
 clean:
 	@$(RM) $(TESTS)
-	@$(RM) $(patsubst %.c,$(WORKDIR)/%.o,$(wildcard *.c))
-	@$(RM) $(patsubst %.c,$(WORKDIR)/%.out,$(wildcard *.c))
-	@$(RM) $(patsubst %.c,$(WORKDIR)/%.ref,$(wildcard *.c))
-	@$(RM) $(patsubst %.c,$(WORKDIR)/%.host,$(wildcard *.c))
+	@$(RM) $(SOURCES:%.c=$(WORKDIR)/%.o)
+	@$(RM) $(SOURCES:%.c=$(WORKDIR)/%.out)
+	@$(RM) $(SOURCES:%.c=$(WORKDIR)/%.ref)
+	@$(RM) $(SOURCES:%.c=$(WORKDIR)/%.host)

@@ -19,14 +19,15 @@ WORKDIR := ./../../testwrk
 
 .PHONY: all clean
 
-TESTS := $(patsubst %.c,$(WORKDIR)/%.prg,$(wildcard *.c))
-TESTS += $(patsubst %.c,$(WORKDIR)/%.o.prg,$(wildcard *.c))
-TESTS += $(patsubst %.c,$(WORKDIR)/%.os.prg,$(wildcard *.c))
-TESTS += $(patsubst %.c,$(WORKDIR)/%.osi.prg,$(wildcard *.c))
-TESTS += $(patsubst %.c,$(WORKDIR)/%.osir.prg,$(wildcard *.c))
-TESTS += $(patsubst %.c,$(WORKDIR)/%.oi.prg,$(wildcard *.c))
-TESTS += $(patsubst %.c,$(WORKDIR)/%.oir.prg,$(wildcard *.c))
-TESTS += $(patsubst %.c,$(WORKDIR)/%.or.prg,$(wildcard *.c))
+SOURCES := $(wildcard *.c)
+TESTS := $(SOURCES:%.c=$(WORKDIR)/%.prg)
+TESTS += $(SOURCES:%.c=$(WORKDIR)/%.o.prg)
+TESTS += $(SOURCES:%.c=$(WORKDIR)/%.os.prg)
+TESTS += $(SOURCES:%.c=$(WORKDIR)/%.osi.prg)
+TESTS += $(SOURCES:%.c=$(WORKDIR)/%.osir.prg)
+TESTS += $(SOURCES:%.c=$(WORKDIR)/%.oi.prg)
+TESTS += $(SOURCES:%.c=$(WORKDIR)/%.oir.prg)
+TESTS += $(SOURCES:%.c=$(WORKDIR)/%.or.prg)
 
 all: $(TESTS)
 
@@ -48,4 +49,4 @@ $(WORKDIR)/%.or.prg: %.c
 	! $(CL65) -Or $(CC65FLAGS) $< -o $@
 clean:
 	@$(RM) $(TESTS)
-	@$(RM) $(patsubst %.c,$(WORKDIR)/%.o,$(wildcard *.c))
+	@$(RM) $(SOURCES:%.c=$(WORKDIR)/%.o)

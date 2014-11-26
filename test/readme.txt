@@ -15,6 +15,8 @@ compiler.
 to run the tests use "make" in this (top) directory, the makefile should exit
 with no error.
 
+when a test failed you can use "make continue" to run further tests
+
 --------------------------------------------------------------------------------
 
 TODO:

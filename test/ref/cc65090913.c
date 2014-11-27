@@ -18,6 +18,8 @@
 
 */
 
+#include <stdio.h>
+
 int foo=0,bar=2;
 
 int main(void)

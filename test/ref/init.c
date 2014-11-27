@@ -4,6 +4,7 @@
   !!LICENCE!!     own, freely distributeable for non-profit. read CPYRIGHT.LCC
 */
 
+#include "common.h"
 /* todo: add back conditional stuff here ! */
 
 typedef struct { int codes[3]; char name[6]; } Word;

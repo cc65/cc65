@@ -4,11 +4,14 @@
   !!LICENCE!!     own, freely distributeable for non-profit. read CPYRIGHT.LCC
 */
 
+#include "common.h"
+
 #ifdef NO_FLOATS
 
 main()
 {
         printf("NO_FLOATS\n\r");
+        return 0;
 }
 
 #else

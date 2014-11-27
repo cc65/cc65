@@ -4,6 +4,8 @@
   !!LICENCE!!     own, freely distributeable for non-profit. read CPYRIGHT.LCC
 */
 
+#include "common.h"
+
 struct defs {
      int cbits;          /* No. of bits per char           */
      int ibits;          /*                 int            */

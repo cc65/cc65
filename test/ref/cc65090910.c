@@ -5,6 +5,8 @@
   !!AUTHOR!!      Oliver Schmidt
 */
 
+#include <stdio.h>
+
 /*
 After spending a "little" time I finally succeeded in isolating an
 (maybe THE) optimizer bug causing Contiki to fail.

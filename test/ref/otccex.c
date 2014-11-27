@@ -4,6 +4,8 @@
   !!LICENCE!!     GPL (?), read COPYING.GPL
 */
 
+#include "common.h"
+
 /*
  * Sample OTCC C example. You can uncomment the first line and install
  * otcc in /usr/local/bin to make otcc scripts !  

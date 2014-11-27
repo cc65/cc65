@@ -17,9 +17,6 @@ unsigned char success = 0;
 unsigned char failures = 0;
 unsigned char dummy = 0;
 
-#ifdef SUPPORT_BIT_TYPES
-bit bit0 = 0;
-#endif
 int int0 = 0;
 int int1 = 0;
 char char0 = 0;
@@ -291,19 +288,16 @@ void c_minus1(void)
   printf("(long0 != -1)\n");
   if(long0 != -1)
   {
-	LOG_ERROR(1);
 	failures++;
   }
   printf("(long0 > 0)\n");
   if(long0 > 0)
   {
-	LOG_ERROR(1);
 	failures++;
   }
   printf("(long1 < 0)\n");
   if(long1 < 0)
   {
-	LOG_ERROR(1);
 	failures++;
   }
 /*

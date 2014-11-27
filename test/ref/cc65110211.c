@@ -8,6 +8,8 @@
     test2 and test3 will result in an endless loop (SVN version: 4974M)
 */
 
+#include <stdio.h>
+
 #define OPENTEST()
 #define CLOSETEST()
 

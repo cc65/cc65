@@ -11,13 +11,11 @@
 
 .segment        "EXTZP" : zeropage
 
-; The following values get initialized from a table in the startup code.
-; While this sounds crazy, it has reasons that have to do with modules (and
-; we have the space anyway). So when changing anything, be sure to adjust the
-; initializer table
 CURS_X:         .byte   0
 CURS_Y:         .byte   0
+CURS_SAV:       .byte   0
 SCR_LINELEN:    .byte   24
 SCREEN_PTR:     .res    2
 
-; size 5
+; size 6
+; Adjust size of this segment in c1p.cfg if the size changes

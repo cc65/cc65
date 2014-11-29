@@ -69,27 +69,27 @@ _conio_init:
 ;
 ;----------------------------------------------------------------------------
 
-						.importzp ptr1
+                        .importzp ptr1
 
 conio_init:
 
                         ; Load font
-				        st0     #VDC_MAWR
+                        st0     #VDC_MAWR
                         st1     #<$2000
                         st2     #>$2000
 
                         ; ptr to font data
-						lda 	#<font
-						sta	 	ptr1
-						lda 	#>font
-						sta	 	ptr1+1
+                        lda 	#<font
+                        sta	 	ptr1
+                        lda 	#>font
+                        sta	 	ptr1+1
 
                         st0     #VDC_VWR            ; VWR
                         ldy     #$80            ; 128 chars
         charloop:       ldx     #$08            ; 8 bytes/char
         lineloop:
 						;;lda     [$00]           ; read font byte
-						ldaind  ptr1
+                        lda (ptr1)
                         staio	VDC_DATA_LO       ; bitplane 0
                         stzio	VDC_DATA_HI       ; bitplane 1
 
@@ -110,13 +110,13 @@ conio_init:
                         dey
                         bne     charloop        ; next character
 
-						ldx #0
-						stx	BGCOLOR  
-						inx	
-						stx	CHARCOLOR	
+                        ldx #0
+                        stx	BGCOLOR
+                        inx
+                        stx	CHARCOLOR
 
 
                         rts
 
-	.rodata
+                        .rodata
 font:                   .include "vga.inc"

@@ -1,6 +1,4 @@
 
-			.include "huc6280.inc"
-
 ; Write VDC register
                   .macro VREG arg1,arg2
                         st0     #arg1
@@ -73,3 +71,20 @@ IRQ_STATUS	= $1403
 
 CDR_MEM_DISABLE = $1803
 CDR_MEM_ENABLE  = $1807
+
+
+;; lda abs
+.macro ldaio arg1
+        .byte $ad
+        .word arg1
+.endmacro
+;; sta abs
+.macro staio arg1
+        .byte $8d
+        .word arg1
+.endmacro
+;; stz abs
+.macro stzio arg1
+        .byte $9c
+        .word arg1
+.endmacro

@@ -100,9 +100,6 @@ int IsSegmentEnd (unsigned Addr);
 int IsSegmentStart (unsigned Addr);
 /* Return true if a segment starts at the given address */
 
-int HaveSegmentChange (unsigned Addr);
-/* Return true if the segment change attributes are set for the given address */
-
 unsigned GetGranularity (attr_t Style);
 /* Get the granularity for the given style */
 

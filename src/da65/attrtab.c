@@ -107,14 +107,6 @@ int IsSegmentStart (unsigned Addr)
 
 
 
-int HaveSegmentChange (unsigned Addr)
-/* Return true if the segment change attributes are set for the given address */
-{
-    return (GetAttr (Addr) & (atSegmentStart | atSegmentEnd)) != 0x0000;
-}
-
-
-
 unsigned GetGranularity (attr_t Style)
 /* Get the granularity for the given style */
 {

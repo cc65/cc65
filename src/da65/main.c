@@ -348,6 +348,8 @@ static void OptVersion (const char* Opt attribute ((unused)),
 static void OneOpcode (unsigned RemainingBytes)
 /* Disassemble one opcode */
 {
+    unsigned I;
+
     /* Get the opcode from the current address */
     unsigned char OPC = GetCodeByte (PC);
 
@@ -380,7 +382,8 @@ static void OneOpcode (unsigned RemainingBytes)
     **   - ...if we have enough bytes remaining for the code at this address.
     **   - ...if the current instruction is valid for the given CPU.
     **   - ...if there is no label somewhere between the instruction bytes.
-    ** If any of those conditions is false, switch to data mode.
+    **   - ...if there is no segment change between the instruction bytes.
+    ** If any one of those conditions is false, switch to data mode.
     */
     if (Style == atDefault) {
         if (D->Size > RemainingBytes) {
@@ -390,16 +393,15 @@ static void OneOpcode (unsigned RemainingBytes)
             Style = atIllegal;
             MarkAddr (PC, Style);
         } else {
-            unsigned I;
-            for (I = 1; I < D->Size; ++I) {
-                if (HaveLabel (PC+I)) {
+            for (I = PC + D->Size; --I > PC; ) {
+                if (HaveLabel (I) || IsSegmentStart (I)) {
                     Style = atIllegal;
                     MarkAddr (PC, Style);
                     break;
                 }
             }
-            for (I = 1; I < D->Size - 1u; ++I) {
-                if (HaveSegmentChange (PC+I)) {
+            for (I = 0; I < D->Size - 1u; ++I) {
+                if (IsSegmentEnd (PC + I)) {
                     Style = atIllegal;
                     MarkAddr (PC, Style);
                     break;
@@ -422,7 +424,6 @@ static void OneOpcode (unsigned RemainingBytes)
             */
             if (D->Size <= RemainingBytes) {
                 /* Output labels within the next insn */
-                unsigned I;
                 for (I = 1; I < D->Size; ++I) {
                     ForwardLabel (I);
                 }
@@ -469,11 +470,16 @@ static void OneOpcode (unsigned RemainingBytes)
             DataByteLine (1);
             ++PC;
             break;
-
     }
 
-    if (IsSegmentEnd (PC - 1)) {
-        EndSegment ();
+    /* Change back to the default CODE segment if
+    ** a named segment stops at the current address.
+    */
+    for (I = D->Size; I >= 1; --I) {
+        if (IsSegmentEnd (PC - I)) {
+            EndSegment ();
+            break;
+        }
     }
 }
 

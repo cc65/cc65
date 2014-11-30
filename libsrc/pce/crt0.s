@@ -8,6 +8,7 @@
 ;
 
 	.export		_exit
+        .export         __STARTUP__ : absolute = 1      ; Mark as startup
 	.import		initlib, donelib
 	.import	    push0, _main, zerobss
 	.import     initheap

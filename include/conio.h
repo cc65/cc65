@@ -77,6 +77,8 @@
 #  include <lynx.h>
 #elif defined(__NES__)
 #  include <nes.h>
+#elif defined(__PCE__)
+#  include <pce.h>
 #endif
 
 

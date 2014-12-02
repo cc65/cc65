@@ -5,6 +5,7 @@
   !!AUTHOR!!      Johan Kotlinski
 */
 
+#include <stdio.h>
 #include <assert.h>
 
 struct {

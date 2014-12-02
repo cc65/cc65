@@ -4,6 +4,9 @@
   !!LICENCE!!     own, freely distributeable for non-profit. read CPYRIGHT.LCC
 */
 
+#include "common.h"
+#include <stdio.h>
+
 signed char c;
 signed short s;
 signed int i;

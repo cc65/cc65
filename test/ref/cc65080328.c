@@ -13,6 +13,8 @@ optimizations. If I remove the struct inside f() it compiles fine ?!?
 Best, Oliver
 */
 
+#include <stdio.h>
+
 void f(void){struct{int i;}d;}
 struct{void(*p)(void);}s={f};
 

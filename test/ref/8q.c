@@ -4,6 +4,8 @@
   !!LICENCE!!     own, freely distributeable for non-profit. read CPYRIGHT.LCC
 */
 
+#include <stdio.h>
+
 int up[15], down[15], rows[8], x[8];
 void queens(int c);
 void print(void);

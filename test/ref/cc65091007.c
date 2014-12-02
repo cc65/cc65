@@ -5,6 +5,8 @@
   !!AUTHOR!!      Johan Kotlinski
 */
 
+#include <stdio.h>
+
 /*
 This produces the compiler error "test.c(9): Error: Assignment to const"
 Shouldn't be an error, should it? baz is const, bar isn't.

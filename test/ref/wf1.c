@@ -11,6 +11,9 @@
 
 #define MAXWORDS 250
 
+FILE *in;
+#define getchar() fgetc(in)
+
 struct node
 {
 	int count;		/* frequency count */
@@ -122,11 +125,17 @@ int main(void)
 	struct node *root;
 	char word[20];
 
+        in = fopen("wf1.in","rb");
+        if (in == NULL) {
+            return EXIT_FAILURE;
+        }
+
 	root = 0;
 	next = 0;
 	while (getword(word))
 		lookup(word, &root)->count++;
 	tprint(root);
 
+        fclose(in);
         return 0;
 }

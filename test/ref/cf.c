@@ -8,11 +8,16 @@
         cf - print character frequencies
 */
 
+#include "common.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
 
+FILE *in;
+
 #define INFILE   "cf.in"
+#define GETCHAR() fgetc(in)
 
 #ifndef NO_FLOATS
 float f[0x100];
@@ -34,6 +39,11 @@ char *argv[];
 #else
         signed cutoff;
 #endif
+
+        in = fopen(INFILE, "rb");
+        if (in == NULL) {
+            return EXIT_FAILURE;
+        }
 
 	if (argc <= 1)
 #ifndef NO_FLOATS
@@ -176,6 +186,6 @@ char *argv[];
 #endif
 		}
     }
-
+    fclose(in);
     return 0;
 }

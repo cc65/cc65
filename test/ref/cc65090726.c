@@ -5,6 +5,8 @@
   !!AUTHOR!!
 */
 
+#include "common.h"
+
 struct Record {
   struct Record *PtrComp;
   int x;

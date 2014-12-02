@@ -5,6 +5,8 @@
   !!AUTHOR!!
 */
 
+#include <stdio.h>
+
 /*
 cc65 doesn't compile this, if i use the "-O"-option.
 but it works with "while(!0)"; instead of  "for(;;);"

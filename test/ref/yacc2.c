@@ -5,6 +5,8 @@
   !!AUTHOR!!      Groepaz/Hitmen
 */
 
+#include <stdio.h>
+
 # define YYTYPE char
 struct yywork 
 { 

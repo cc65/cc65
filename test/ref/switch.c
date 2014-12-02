@@ -4,6 +4,7 @@
   !!LICENCE!!     own, freely distributeable for non-profit. read CPYRIGHT.LCC
 */
 
+#include "common.h"
 #include <limits.h>
 
 #ifdef NO_IMPLICIT_FUNC_PROTOTYPES

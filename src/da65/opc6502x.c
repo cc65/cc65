@@ -51,7 +51,7 @@
 const OpcDesc OpcTable_6502X[256] = {
     {   "brk",  1,  flNone,                   OH_Implicit              }, /* $00 */
     {   "ora",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $01 */
-    {   "kil",  1,  flNone,                   OH_Implicit              }, /* $02 */
+    {   "jam",  1,  flNone,                   OH_Implicit              }, /* $02 */
     {   "slo",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $03 */
     {   "nop",  2,  flUseLabel,               OH_Direct                }, /* $04 */
     {   "ora",  2,  flUseLabel,               OH_Direct                }, /* $05 */
@@ -67,7 +67,7 @@ const OpcDesc OpcTable_6502X[256] = {
     {   "slo",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $0f */
     {   "bpl",  2,  flLabel,                  OH_Relative              }, /* $10 */
     {   "ora",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $11 */
-    {   "kil",  1,  flNone,                   OH_Implicit              }, /* $12 */
+    {   "jam",  1,  flNone,                   OH_Implicit              }, /* $12 */
     {   "slo",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $13 */
     {   "nop",  2,  flUseLabel,               OH_DirectX               }, /* $14 */
     {   "ora",  2,  flUseLabel,               OH_DirectX               }, /* $15 */
@@ -83,7 +83,7 @@ const OpcDesc OpcTable_6502X[256] = {
     {   "slo",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $1f */
     {   "jsr",  3,  flLabel,                  OH_Absolute              }, /* $20 */
     {   "and",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $21 */
-    {   "kil",  1,  flNone,                   OH_Implicit,             }, /* $22 */
+    {   "jam",  1,  flNone,                   OH_Implicit,             }, /* $22 */
     {   "rla",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $23 */
     {   "bit",  2,  flUseLabel,               OH_Direct                }, /* $24 */
     {   "and",  2,  flUseLabel,               OH_Direct                }, /* $25 */
@@ -99,7 +99,7 @@ const OpcDesc OpcTable_6502X[256] = {
     {   "rla",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $2f */
     {   "bmi",  2,  flLabel,                  OH_Relative              }, /* $30 */
     {   "and",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $31 */
-    {   "kil",  1,  flNone,                   OH_Implicit              }, /* $32 */
+    {   "jam",  1,  flNone,                   OH_Implicit              }, /* $32 */
     {   "rla",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $33 */
     {   "nop",  2,  flUseLabel,               OH_DirectX               }, /* $34 */
     {   "and",  2,  flUseLabel,               OH_DirectX               }, /* $35 */
@@ -115,7 +115,7 @@ const OpcDesc OpcTable_6502X[256] = {
     {   "rla",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $3f */
     {   "rti",  1,  flNone,                   OH_Rts                   }, /* $40 */
     {   "eor",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $41 */
-    {   "kil",  1,  flNone,                   OH_Implicit              }, /* $42 */
+    {   "jam",  1,  flNone,                   OH_Implicit              }, /* $42 */
     {   "sre",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $43 */
     {   "nop",  2,  flUseLabel,               OH_Direct                }, /* $44 */
     {   "eor",  2,  flUseLabel,               OH_Direct                }, /* $45 */
@@ -131,7 +131,7 @@ const OpcDesc OpcTable_6502X[256] = {
     {   "sre",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $4f */
     {   "bvc",  2,  flLabel,                  OH_Relative              }, /* $50 */
     {   "eor",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $51 */
-    {   "kil",  1,  flNone,                   OH_Implicit              }, /* $52 */
+    {   "jam",  1,  flNone,                   OH_Implicit              }, /* $52 */
     {   "sre",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $53 */
     {   "nop",  2,  flUseLabel,               OH_DirectX               }, /* $54 */
     {   "eor",  2,  flUseLabel,               OH_DirectX               }, /* $55 */
@@ -147,7 +147,7 @@ const OpcDesc OpcTable_6502X[256] = {
     {   "sre",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $5f */
     {   "rts",  1,  flNone,                   OH_Rts                   }, /* $60 */
     {   "adc",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $61 */
-    {   "kil",  1,  flNone,                   OH_Implicit              }, /* $62 */
+    {   "jam",  1,  flNone,                   OH_Implicit              }, /* $62 */
     {   "rra",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $63 */
     {   "nop",  2,  flUseLabel,               OH_Direct                }, /* $64 */
     {   "adc",  2,  flUseLabel,               OH_Direct                }, /* $65 */
@@ -163,7 +163,7 @@ const OpcDesc OpcTable_6502X[256] = {
     {   "rra",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $6f */
     {   "bvs",  2,  flLabel,                  OH_Relative              }, /* $70 */
     {   "adc",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $71 */
-    {   "kil",  1,  flNone,                   OH_Implicit              }, /* $72 */
+    {   "jam",  1,  flNone,                   OH_Implicit              }, /* $72 */
     {   "rra",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $73 */
     {   "nop",  2,  flUseLabel,               OH_DirectX               }, /* $74 */
     {   "adc",  2,  flUseLabel,               OH_DirectX               }, /* $75 */
@@ -195,7 +195,7 @@ const OpcDesc OpcTable_6502X[256] = {
     {   "sax",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $8f */
     {   "bcc",  2,  flLabel,                  OH_Relative              }, /* $90 */
     {   "sta",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $91 */
-    {   "kil",  1,  flNone,                   OH_Implicit              }, /* $92 */
+    {   "jam",  1,  flNone,                   OH_Implicit              }, /* $92 */
     {   "ahx",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $93 */
     {   "sty",  2,  flUseLabel,               OH_DirectX               }, /* $94 */
     {   "sta",  2,  flUseLabel,               OH_DirectX               }, /* $95 */
@@ -227,7 +227,7 @@ const OpcDesc OpcTable_6502X[256] = {
     {   "lax",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $af */
     {   "bcs",  2,  flLabel,                  OH_Relative              }, /* $b0 */
     {   "lda",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $b1 */
-    {   "kil",  1,  flNone,                   OH_Implicit              }, /* $b2 */
+    {   "jam",  1,  flNone,                   OH_Implicit              }, /* $b2 */
     {   "lax",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $b3 */
     {   "ldy",  2,  flUseLabel,               OH_DirectX               }, /* $b4 */
     {   "lda",  2,  flUseLabel,               OH_DirectX               }, /* $b5 */
@@ -259,7 +259,7 @@ const OpcDesc OpcTable_6502X[256] = {
     {   "dcp",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $cf */
     {   "bne",  2,  flLabel,                  OH_Relative              }, /* $d0 */
     {   "cmp",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $d1 */
-    {   "kil",  1,  flNone,                   OH_Implicit              }, /* $d2 */
+    {   "jam",  1,  flNone,                   OH_Implicit              }, /* $d2 */
     {   "dcp",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $d3 */
     {   "nop",  2,  flUseLabel,               OH_DirectX               }, /* $d4 */
     {   "cmp",  2,  flUseLabel,               OH_DirectX               }, /* $d5 */
@@ -291,7 +291,7 @@ const OpcDesc OpcTable_6502X[256] = {
     {   "isc",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $ef */
     {   "beq",  2,  flLabel,                  OH_Relative              }, /* $f0 */
     {   "sbc",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $f1 */
-    {   "kil",  1,  flNone,                   OH_Implicit              }, /* $f2 */
+    {   "jam",  1,  flNone,                   OH_Implicit              }, /* $f2 */
     {   "isc",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $f3 */
     {   "nop",  2,  flUseLabel,               OH_DirectX               }, /* $f4 */
     {   "sbc",  2,  flUseLabel,               OH_DirectX               }, /* $f5 */

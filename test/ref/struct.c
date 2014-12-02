@@ -4,6 +4,8 @@
   !!LICENCE!!     own, freely distributeable for non-profit. read CPYRIGHT.LCC
 */
 
+#include "common.h"
+
 typedef struct point { int x,y; } point;
 typedef struct rect { point pt1, pt2; } rect;
 

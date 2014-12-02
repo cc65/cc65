@@ -5,6 +5,8 @@
   !!AUTHOR!!      Johan Kotlinski
 */
 
+#include <stdio.h>
+
 /*
 ...gives "test.c(2): Error: Variable `foo' has unknown size" using -Cl.
 Is it really unknown?

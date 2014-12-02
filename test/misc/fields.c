@@ -4,6 +4,8 @@
   !!LICENCE!!     own, freely distributeable for non-profit. read CPYRIGHT.LCC
 */
 
+#include "common.h"
+
 #ifdef NO_BITFIELDS
 
 main()

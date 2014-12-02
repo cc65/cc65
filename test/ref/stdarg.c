@@ -4,6 +4,7 @@
   !!LICENCE!!     own, freely distributeable for non-profit. read CPYRIGHT.LCC
 */
 
+#include "common.h"
 #include <stdarg.h>
 
 #ifndef NO_FUNCS_TAKE_STRUCTS

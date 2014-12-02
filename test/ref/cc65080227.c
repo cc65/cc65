@@ -5,6 +5,8 @@
   !!AUTHOR!!
 */
 
+#include <stdio.h>
+
 long a;  /* must be static life */
 long b;  /* must be static life */
 

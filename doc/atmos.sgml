@@ -7,7 +7,7 @@
 <url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:polluks@sdf.lonestar.org" name="Stefan A. Haubenthal">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2014-09-23
+<date>2014-12-03
 
 <abstract>
 An overview over the Atmos runtime system as it is implemented for the cc65 C
@@ -219,8 +219,9 @@ They are defined to be FUNCT + a number key.
 
 <sect1>Capitals Lock<p>
 
-The "CAPS Lock" mode is turned off while the program is running.  The previous
-mode (usually turned on) is restored when the program stops.
+The keyboard's "CAPS Lock" mode is turned off while the program is running.
+The previous mode (usually, CAPS Lock turned on [because Oric BASIC keywords
+must be UPPER-case]) is restored when the program stops.
 
 
 <sect1>Passing arguments to the program<p>
@@ -234,7 +235,7 @@ supported directly by BASIC, the following syntax was chosen:
 
 <enum>
 <item>You must turn <tt/CAPS/ lock off (tap CTRL-T) when you want to type
-      lower-case arguments.
+      lower-case arguments (but, <tt/RUN/ and <tt/REM/ must be UPPER-case).
 <item>Arguments are separated by spaces.
 <item>Arguments may be quoted.
 <item>Leading and trailing spaces around an argument are ignored. Spaces within

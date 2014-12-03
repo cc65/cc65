@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2007 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2014, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -74,12 +74,6 @@ void DefForward (const char* Name, const char* Comment, unsigned Offs);
 
 void DefConst (const char* Name, const char* Comment, unsigned Addr);
 /* Define an address constant */
-        
-void StartSegment (const char* Name, unsigned AddrSize);
-/* Start a segment */
-
-void EndSegment (void);
-/* End a segment */
 
 void OneDataByte (void);
 /* Output a .byte line with the current code byte */
@@ -99,6 +93,12 @@ void DataDWordLine (unsigned ByteCount);
 void SeparatorLine (void);
 /* Print a separator line */
 
+void StartSegment (const char* Name, unsigned AddrSize);
+/* Start a segment */
+
+void EndSegment (void);
+/* End a segment */
+
 void UserComment (const char* Comment);
 /* Output a comment line */
 
@@ -111,5 +111,4 @@ void OutputSettings (void);
 
 
 /* End of output.h */
-
 #endif

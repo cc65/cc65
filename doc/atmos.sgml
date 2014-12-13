@@ -7,7 +7,7 @@
 <url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:polluks@sdf.lonestar.org" name="Stefan A. Haubenthal">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2014-12-03
+<date>2014-12-05
 
 <abstract>
 An overview over the Atmos runtime system as it is implemented for the cc65 C
@@ -50,9 +50,9 @@ In the standard setup, cc65-generated programs use the memory from
 available. ROM calls are possible without further precautions.
 
 If your program needs more memory, and it won't use TGI graphics, then you can
-use the ld65 command-line option, <tt/-D __RAMEND__=$B400/, when building the
-program, to "grab" the graphics screen RAM.  Then, nearly 44K of memory is
-available.
+use the ld65 command-line option, <tt/-D __GRAB__=1/, when building the
+program, to include the graphics screen RAM.  Then, nearly 44K of memory
+(&dollar;0501 to &dollar;B400) is available.
 
 Special locations:
 
@@ -100,7 +100,7 @@ structures; accessing the struct fields will access the chip registers.
 <descrip>
 
   <tag><tt/VIA/</tag>
-  Access to the VIA (versatile interface adapter) chip is available via the
+  Access to the VIA (Versatile Interface Adapter) chip is available via the
   <tt/VIA/ variable. The structure behind this variable is explained in <tt/_6522.h/.
 
 </descrip><p>
@@ -217,7 +217,7 @@ following functions (and a few others):
 They are defined to be FUNCT + a number key.
 
 
-<sect1>Capitals Lock<p>
+<sect1>Capitals lock<p>
 
 The keyboard's "CAPS Lock" mode is turned off while the program is running.
 The previous mode (usually, CAPS Lock turned on [because Oric BASIC keywords
@@ -244,6 +244,15 @@ supported directly by BASIC, the following syntax was chosen:
 <item>A maximum number of 10 arguments (including the program name) are
       supported.
 </enum>
+
+
+<sect1>Automatic starting<p>
+
+Usually, a cc65-built program just will sit quietly in memory, after it is
+CLOADed.  It waits for you to start it (by typing BASIC's <tt/RUN/ command).
+But, if you want to create a program that will start running immediately after
+it is loaded, then you can use the linker command-line option
+<tt/-D __AUTORUN__=$C7/.
 
 
 <sect1>Interrupts<p>

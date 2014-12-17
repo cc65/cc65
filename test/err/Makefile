@@ -2,10 +2,10 @@
 # makefile for the tests that MUST NOT compile
 
 ifneq ($(shell echo),)
-  CMD_EXE = 1
+  CMD_EXE := 1
 endif
 
-CC65FLAGS = -t sim6502
+CC65FLAGS := -t sim6502
 
 CL65 := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
 
@@ -15,7 +15,7 @@ else
 RM := rm -f
 endif
 
-WORKDIR := ./../../testwrk
+WORKDIR := ../../testwrk
 
 .PHONY: all clean
 
@@ -48,6 +48,7 @@ $(WORKDIR)/%.oir.prg: %.c
 	! $(CL65) -Oir $(CC65FLAGS) $< -o $@
 $(WORKDIR)/%.or.prg: %.c
 	! $(CL65) -Or $(CC65FLAGS) $< -o $@
+
 clean:
 	@$(RM) $(TESTS)
 	@$(RM) $(SOURCES:.c=.o)

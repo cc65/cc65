@@ -3,11 +3,11 @@
 # compared with reference output
 
 ifneq ($(shell echo),)
-  CMD_EXE = 1
+  CMD_EXE := 1
 endif
 
-CC65FLAGS = -t sim6502
-SIM65FLAGS = -x 200000000
+CC65FLAGS := -t sim6502
+SIM65FLAGS := -x 200000000
 
 CL65 := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
 SIM65 := $(if $(wildcard ../../bin/sim65*),../../bin/sim65,sim65)
@@ -18,7 +18,7 @@ else
 RM := rm -f
 endif
 
-WORKDIR := ./../../testwrk
+WORKDIR := ../../testwrk
 
 DIFF := $(WORKDIR)/bdiff
 

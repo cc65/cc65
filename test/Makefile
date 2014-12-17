@@ -1,24 +1,24 @@
 
-# toplevel makefile for the regression tests
+# top-level makefile for the regression tests
 
 # You can comment this special target when you debug the regression tests.
 # Then, make will give you more progress reports.
 .SILENT:
 
 ifneq ($(shell echo),)
-  CMD_EXE = 1
+  CMD_EXE := 1
 endif
 
 ifdef CMD_EXE
   RM := del /f
   EXE := .exe
-  MKDIR = mkdir
-  RMDIR = rmdir
+  MKDIR := mkdir
+  RMDIR := rmdir
 else
   RM := rm -f
   EXE :=
-  MKDIR = mkdir -p
-  RMDIR = rmdir
+  MKDIR := mkdir -p
+  RMDIR := rmdir
 endif
 
 WORKDIR := ../testwrk

@@ -59,7 +59,7 @@ $(WORKDIR)/sitest%prg: sitest.c
 
 clean:
 	@$(RM) $(TESTS)
-	@$(RM) $(SOURCES:%.c=$(WORKDIR)/%.o)
+	@$(RM) $(SOURCES:.c=.o)
 	@$(RM) $(SOURCES:%.c=$(WORKDIR)/%.out)
 
 

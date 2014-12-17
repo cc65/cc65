@@ -67,4 +67,4 @@ $(WORKDIR)/%.or.prg: %.c
 
 clean:
 	@$(RM) $(TESTS)
-	@$(RM) $(SOURCES:%.c=$(WORKDIR)/%.o)
+	@$(RM) $(SOURCES:.c=.o)

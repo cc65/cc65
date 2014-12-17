@@ -86,7 +86,7 @@ $(WORKDIR)/%.or.prg: %.c $(WORKDIR)/%.ref
 
 clean:
 	@$(RM) $(TESTS)
-	@$(RM) $(SOURCES:%.c=$(WORKDIR)/%.o)
+	@$(RM) $(SOURCES:.c=.o)
 	@$(RM) $(SOURCES:%.c=$(WORKDIR)/%.out)
 	@$(RM) $(SOURCES:%.c=$(WORKDIR)/%.ref)
 	@$(RM) $(SOURCES:%.c=$(WORKDIR)/%.host)

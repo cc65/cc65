@@ -49,4 +49,4 @@ $(WORKDIR)/%.or.prg: %.c
 	! $(CL65) -Or $(CC65FLAGS) $< -o $@
 clean:
 	@$(RM) $(TESTS)
-	@$(RM) $(SOURCES:%.c=$(WORKDIR)/%.o)
+	@$(RM) $(SOURCES:.c=.o)

@@ -1,7 +1,9 @@
 
 # toplevel makefile for the regression tests
 
-MAKE := make --no-print-dir
+# You can comment this special target when you debug the regression tests.
+# Then, make will give you more progress reports.
+.SILENT:
 
 ifneq ($(shell echo),)
   CMD_EXE = 1
@@ -21,21 +23,17 @@ endif
 
 WORKDIR := ../testwrk
 
-.PHONY: dotests clean
+.PHONY: all dotests continue mostly-clean clean
 
 all: dotests
 
 $(WORKDIR):
-	@$(MKDIR) $(WORKDIR)
+	$(MKDIR) $(WORKDIR)
 
-$(WORKDIR)/bdiff$(EXE): $(WORKDIR)
-	@$(CC) -o $(WORKDIR)/bdiff$(EXE) bdiff.c
+$(WORKDIR)/bdiff$(EXE): bdiff.c | $(WORKDIR)
+	$(CC) -O2 -o $@ $<
 
-dotests: $(WORKDIR)/bdiff$(EXE)
-	@$(MAKE) -C val clean all
-	@$(MAKE) -C ref clean all
-	@$(MAKE) -C err clean all
-	@$(MAKE) -C misc clean all
+dotests: mostly-clean continue
 
 continue: $(WORKDIR)/bdiff$(EXE)
 	@$(MAKE) -C val all
@@ -43,10 +41,12 @@ continue: $(WORKDIR)/bdiff$(EXE)
 	@$(MAKE) -C err all
 	@$(MAKE) -C misc all
 
-clean:
+mostly-clean:
 	@$(MAKE) -C val clean
 	@$(MAKE) -C ref clean
 	@$(MAKE) -C err clean
 	@$(MAKE) -C misc clean
-	@$(RM) $(WORKDIR)/bdiff$(EXE)
-	@$(RMDIR) $(WORKDIR)
+
+clean: mostly-clean
+	$(RM) $(WORKDIR)/bdiff$(EXE)
+	$(RMDIR) $(WORKDIR)

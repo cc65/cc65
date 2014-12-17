@@ -20,6 +20,7 @@ WORKDIR := ./../../testwrk
 .PHONY: all clean
 
 SOURCES := $(wildcard *.c)
+
 TESTS := $(SOURCES:%.c=$(WORKDIR)/%.prg)
 TESTS += $(SOURCES:%.c=$(WORKDIR)/%.o.prg)
 TESTS += $(SOURCES:%.c=$(WORKDIR)/%.os.prg)

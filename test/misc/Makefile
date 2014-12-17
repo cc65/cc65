@@ -24,6 +24,7 @@ DIFF := $(WORKDIR)/bdiff
 .PHONY: all clean
 
 SOURCES := $(wildcard *.c)
+
 TESTS := $(SOURCES:%.c=$(WORKDIR)/%.prg)
 TESTS += $(SOURCES:%.c=$(WORKDIR)/%.o.prg)
 TESTS += $(SOURCES:%.c=$(WORKDIR)/%.os.prg)
@@ -61,5 +62,3 @@ clean:
 	@$(RM) $(TESTS)
 	@$(RM) $(SOURCES:.c=.o)
 	@$(RM) $(SOURCES:%.c=$(WORKDIR)/%.out)
-
-

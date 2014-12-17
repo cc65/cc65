@@ -26,9 +26,10 @@ CFLAGS := -O2 -Wall -W -Wextra -fwrapv -fno-strict-overflow
 
 .PHONY: all clean
 
-REFS := $(patsubst %.c,$(WORKDIR)/%.ref,$(wildcard *.c))
-
 SOURCES := $(wildcard *.c)
+
+REFS := $(SOURCES:%.c=$(WORKDIR)/%.ref)
+
 TESTS := $(SOURCES:%.c=$(WORKDIR)/%.prg)
 TESTS += $(SOURCES:%.c=$(WORKDIR)/%.o.prg)
 TESTS += $(SOURCES:%.c=$(WORKDIR)/%.os.prg)

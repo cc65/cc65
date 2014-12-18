@@ -33,6 +33,8 @@ $(WORKDIR):
 $(WORKDIR)/bdiff$(EXE): bdiff.c | $(WORKDIR)
 	$(CC) -O2 -o $@ $<
 
+.NOTPARALLEL:
+
 dotests: mostly-clean continue
 
 continue: $(WORKDIR)/bdiff$(EXE)

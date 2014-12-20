@@ -3,11 +3,11 @@
 # compared with reference output
 
 ifneq ($(shell echo),)
-  CMD_EXE = 1
+  CMD_EXE := 1
 endif
 
-CC65FLAGS = -t sim6502
-SIM65FLAGS = -x 200000000
+CC65FLAGS := -t sim6502
+SIM65FLAGS := -x 200000000
 
 CL65 := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
 SIM65 := $(if $(wildcard ../../bin/sim65*),../../bin/sim65,sim65)
@@ -18,7 +18,7 @@ else
 RM := rm -f
 endif
 
-WORKDIR := ./../../testwrk
+WORKDIR := ../../testwrk
 
 DIFF := $(WORKDIR)/bdiff
 
@@ -26,17 +26,9 @@ CFLAGS := -O2 -Wall -W -Wextra -fwrapv -fno-strict-overflow
 
 .PHONY: all clean
 
-REFS := $(patsubst %.c,$(WORKDIR)/%.ref,$(wildcard *.c))
-
 SOURCES := $(wildcard *.c)
-TESTS := $(SOURCES:%.c=$(WORKDIR)/%.prg)
-TESTS += $(SOURCES:%.c=$(WORKDIR)/%.o.prg)
-TESTS += $(SOURCES:%.c=$(WORKDIR)/%.os.prg)
-TESTS += $(SOURCES:%.c=$(WORKDIR)/%.osi.prg)
-TESTS += $(SOURCES:%.c=$(WORKDIR)/%.osir.prg)
-TESTS += $(SOURCES:%.c=$(WORKDIR)/%.oi.prg)
-TESTS += $(SOURCES:%.c=$(WORKDIR)/%.oir.prg)
-TESTS += $(SOURCES:%.c=$(WORKDIR)/%.or.prg)
+REFS := $(SOURCES:%.c=$(WORKDIR)/%.ref)
+TESTS := $(foreach option,. .o. .os. .osi. .osir. .oi. .oir. .or.,$(SOURCES:%.c=$(WORKDIR)/%$(option)prg))
 
 all: $(REFS) $(TESTS)
 
@@ -86,7 +78,7 @@ $(WORKDIR)/%.or.prg: %.c $(WORKDIR)/%.ref
 
 clean:
 	@$(RM) $(TESTS)
-	@$(RM) $(SOURCES:%.c=$(WORKDIR)/%.o)
+	@$(RM) $(SOURCES:.c=.o)
 	@$(RM) $(SOURCES:%.c=$(WORKDIR)/%.out)
 	@$(RM) $(SOURCES:%.c=$(WORKDIR)/%.ref)
 	@$(RM) $(SOURCES:%.c=$(WORKDIR)/%.host)

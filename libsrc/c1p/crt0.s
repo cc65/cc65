@@ -23,41 +23,41 @@
 ; ---------------------------------------------------------------------------
 ; A little light 6502 housekeeping
 
-_init:    LDX     #$FF                 ; Initialize stack pointer to $01FF
-          TXS
-          CLD                          ; Clear decimal mode
+_init:    ldx     #$FF                 ; Initialize stack pointer to $01FF
+          txs
+          cld                          ; Clear decimal mode
 
 ; ---------------------------------------------------------------------------
 ; Initialize screen width
 ; TODO: Can initialization be done in a more idiomatic way?
 ; TODO: Create function for changing screen width
-          LDA     #$18
-          STA     SCR_LINELEN
+          lda     #$18
+          sta     SCR_LINELEN
 
 ; ---------------------------------------------------------------------------
 ; Set cc65 argument stack pointer
 
-          LDA     #<(__RAM_START__ + __RAM_SIZE__)
-          STA     sp
-          LDA     #>(__RAM_START__ + __RAM_SIZE__)
-          STA     sp+1
+          lda     #<(__RAM_START__ + __RAM_SIZE__)
+          sta     sp
+          lda     #>(__RAM_START__ + __RAM_SIZE__)
+          sta     sp+1
 
 ; ---------------------------------------------------------------------------
 ; Initialize memory storage
 ; copydata seems to be only necessary for special systems
 
-          JSR     zerobss              ; Clear BSS segment
-          ; JSR     copydata           ; Initialize DATA segment
-          JSR     initlib              ; Run constructors
+          jsr     zerobss              ; Clear BSS segment
+          ; jsr     copydata           ; Initialize DATA segment
+          jsr     initlib              ; Run constructors
 
 ; ---------------------------------------------------------------------------
 ; Call main()
 
-          JSR     _main
+          jsr     _main
 
 ; ---------------------------------------------------------------------------
 ; Back from main (this is also the _exit entry):  force a software break
 
-_exit:    JSR     donelib              ; Run destructors
-          BRK
+_exit:    jsr     donelib              ; Run destructors
+          brk
 

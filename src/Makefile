@@ -3,7 +3,6 @@ ifneq ($(shell echo),)
 endif
 
 PROGS = ar65  \
-        c1p65 \
         ca65  \
         cc65  \
         cl65  \

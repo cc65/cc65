@@ -1,8 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
-MinimumVisualStudioVersion = 10.0.40219.1
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C++ Express 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common", "common.vcxproj", "{71DC1F68-BFC4-478C-8655-C8E9C9654D2B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cc65", "cc65.vcxproj", "{B17EDBD5-DC04-4970-9CBD-56A98B6A3FCA}"
@@ -56,11 +54,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sp65", "sp65.vcxproj", "{43
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sim65", "sim65.vcxproj", "{002A366E-2863-46A8-BDDE-DDF534AAEC73}"
-	ProjectSection(ProjectDependencies) = postProject
-		{71DC1F68-BFC4-478C-8655-C8E9C9654D2B} = {71DC1F68-BFC4-478C-8655-C8E9C9654D2B}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "c1p65", "c1p65.vcxproj", "{4E031DE0-82B4-4204-8529-536626F7E0DF}"
 	ProjectSection(ProjectDependencies) = postProject
 		{71DC1F68-BFC4-478C-8655-C8E9C9654D2B} = {71DC1F68-BFC4-478C-8655-C8E9C9654D2B}
 	EndProjectSection
@@ -119,10 +112,6 @@ Global
 		{002A366E-2863-46A8-BDDE-DDF534AAEC73}.Debug|Win32.Build.0 = Debug|Win32
 		{002A366E-2863-46A8-BDDE-DDF534AAEC73}.Release|Win32.ActiveCfg = Release|Win32
 		{002A366E-2863-46A8-BDDE-DDF534AAEC73}.Release|Win32.Build.0 = Release|Win32
-		{4E031DE0-82B4-4204-8529-536626F7E0DF}.Debug|Win32.ActiveCfg = Debug|Win32
-		{4E031DE0-82B4-4204-8529-536626F7E0DF}.Debug|Win32.Build.0 = Debug|Win32
-		{4E031DE0-82B4-4204-8529-536626F7E0DF}.Release|Win32.ActiveCfg = Release|Win32
-		{4E031DE0-82B4-4204-8529-536626F7E0DF}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

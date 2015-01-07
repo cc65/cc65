@@ -7,6 +7,7 @@
         ; to force this module to be included into the output file.
         .export __TAPEHDR__:abs = 1
 
+        ; These symbols, also, come from the configuration file.
         .import __BASHDR_LOAD__, __ZPSAVE_LOAD__, __AUTORUN__, __PROGFLAG__
 
 

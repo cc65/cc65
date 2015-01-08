@@ -92,6 +92,9 @@ zpsave:
 
         .byte   0
 
+; The segments "ZPSAVE1" and "ZPSAVE2" always must be together.
+; They create a single object (the zpsave buffer).
+
 .segment        "ZPSAVE2"
 
         .res    zpspace - 1

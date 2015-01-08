@@ -2,7 +2,7 @@
 ; Startup code for cc65 (Oric version)
 ;
 ; By Debrune Jérôme <jede@oric.org> and Ullrich von Bassewitz <uz@cc65.org>
-; 2014-11-09, Greg King
+; 2015-01-08, Greg King
 ;
 
         .export         _exit
@@ -31,7 +31,8 @@ L1:     lda     sp,x
 
         jsr     zerobss
 
-; Unprotect screen columns 0 and 1.
+; Currently, color isn't supported on the text screen.
+; Unprotect screen columns 0 and 1 (where each line's color codes would sit).
 
         lda     STATUS
         sta     stsave
@@ -81,7 +82,7 @@ L2:     lda     zpsave,x
 
 ; ------------------------------------------------------------------------
 
-.segment        "ZPSAVE"
+.segment        "ZPSAVE1"
 
 zpsave:
 
@@ -90,6 +91,8 @@ zpsave:
 ; that was loaded [instead of at the next address].)
 
         .byte   0
+
+.segment        "ZPSAVE2"
 
         .res    zpspace - 1
 

@@ -2,7 +2,7 @@
 ; Startup code for cc65 (Oric version)
 ;
 ; By Debrune Jérôme <jede@oric.org> and Ullrich von Bassewitz <uz@cc65.org>
-; 2015-01-08, Greg King
+; 2015-01-09, Greg King
 ;
 
         .export         _exit
@@ -89,6 +89,7 @@ zpsave:
 ; This padding is needed by a bug in the ROM.
 ; (The CLOAD command starts BASIC's variables table on top of the last byte
 ; that was loaded [instead of at the next address].)
+; This is overlaid on a buffer, so that it doesn't use extra space in RAM.
 
         .byte   0
 

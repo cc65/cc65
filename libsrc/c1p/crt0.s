@@ -60,4 +60,3 @@ _init:    ldx     #$FF                 ; Initialize stack pointer to $01FF
 
 _exit:    jsr     donelib              ; Run destructors
           brk
-

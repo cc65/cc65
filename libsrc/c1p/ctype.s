@@ -287,4 +287,3 @@ __ctype:
         .byte   $00                                     ; 253/fd _y'_acute__
         .byte   $00                                     ; 254/fe _sm_thorn__
         .byte   $00                                     ; 255/ff _y"_dieres_
-

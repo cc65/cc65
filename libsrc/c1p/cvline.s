@@ -27,6 +27,3 @@ L1:     lda     #$95             ; Vertical bar
         dec     tmp1
         bne     L1
 L9:     rts
-
-
-

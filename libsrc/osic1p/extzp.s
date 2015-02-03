@@ -18,4 +18,4 @@ SCR_LINELEN:    .byte   24
 SCREEN_PTR:     .res    2
 
 ; size 6
-; Adjust size of this segment in c1p.cfg if the size changes
+; Adjust size of this segment in osic1p.cfg if the size changes

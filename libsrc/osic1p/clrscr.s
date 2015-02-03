@@ -4,7 +4,7 @@
         .export         _clrscr
         .import         plot
         .importzp       CURS_X, CURS_Y
-        .include        "c1p.inc"
+        .include        "osic1p.inc"
 
 ; Adapted from the Challenger Character Graphics
 ; Reference Manual, "2.3.3 MACHINE LANGUAGE SCREEN CLEAR"

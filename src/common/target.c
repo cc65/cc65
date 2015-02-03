@@ -131,7 +131,6 @@ static const TargetEntry TargetMap[] = {
     {   "bbc",          TGT_BBC         },
     {   "c128",         TGT_C128        },
     {   "c16",          TGT_C16         },
-	{   "c1p",          TGT_C1P         },
     {   "c64",          TGT_C64         },
     {   "cbm510",       TGT_CBM510      },
     {   "cbm610",       TGT_CBM610      },
@@ -143,6 +142,7 @@ static const TargetEntry TargetMap[] = {
     {   "module",       TGT_MODULE      },
     {   "nes",          TGT_NES         },
     {   "none",         TGT_NONE        },
+    {   "osic1p",       TGT_OSIC1P      },
     {   "pet",          TGT_PET         },
     {   "plus4",        TGT_PLUS4       },
     {   "sim6502",      TGT_SIM6502     },
@@ -163,12 +163,12 @@ static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "atarixl",        CPU_6502,       BINFMT_BINARY,      CTAtari },
     { "vic20",          CPU_6502,       BINFMT_BINARY,      CTPET   },
     { "c16",            CPU_6502,       BINFMT_BINARY,      CTPET   },
-    { "c1p",            CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "c64",            CPU_6502,       BINFMT_BINARY,      CTPET   },
     { "c128",           CPU_6502,       BINFMT_BINARY,      CTPET   },
     { "plus4",          CPU_6502,       BINFMT_BINARY,      CTPET   },
     { "cbm510",         CPU_6502,       BINFMT_BINARY,      CTPET   },
     { "cbm610",         CPU_6502,       BINFMT_BINARY,      CTPET   },
+	{ "osic1p",         CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "pet",            CPU_6502,       BINFMT_BINARY,      CTPET   },
     { "bbc",            CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "apple2",         CPU_6502,       BINFMT_BINARY,      CTNone  },
@@ -201,7 +201,7 @@ static int Compare (const void* Key, const void* Entry)
     return strcmp ((const char*) Key, ((const TargetEntry*)Entry)->Name);
 }
 
-
+#include <stdio.h>
 
 target_t FindTarget (const char* Name)
 /* Find a target by name and return the target id. TGT_UNKNOWN is returned if

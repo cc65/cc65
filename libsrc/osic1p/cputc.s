@@ -9,7 +9,7 @@
         .export         newline, plot
         .import         popa, _gotoxy
 
-        .include        "c1p.inc"
+        .include        "osic1p.inc"
         .include        "extzp.inc"
 
 _cputcxy:

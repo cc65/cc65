@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                   c1p.h                                   */
+/*                                osic1p.h                                   */
 /*                                                                           */
 /*                Challenger 1P system specific definitions                  */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2014 Stephan Muehlstrasser                                            */
+/* (C) 2015 Stephan Muehlstrasser                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -28,8 +28,8 @@
 /*                                                                           */
 /*****************************************************************************/
 
-#ifndef _C1P_H
-#define _C1P_H
+#ifndef _OSIC1P_H
+#define _OSIC1P_H
 
 /* Check for errors */
 #if !defined(__OSIC1P__)

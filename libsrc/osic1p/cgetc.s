@@ -4,7 +4,7 @@
         .export         _cgetc
         .import         cursor
 
-        .include        "c1p.inc"
+        .include        "osic1p.inc"
         .include        "extzp.inc"
 
 ; Input routine from 65V PROM MONITOR, show cursor if enabled

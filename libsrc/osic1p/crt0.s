@@ -14,6 +14,7 @@
 
 .include  "zeropage.inc"
 .include  "extzp.inc"
+.include  "osic1p.inc"
 
 ; ---------------------------------------------------------------------------
 ; Place the startup code in a special segment
@@ -59,4 +60,4 @@ _init:    ldx     #$FF                 ; Initialize stack pointer to $01FF
 ; Back from main (this is also the _exit entry):  force a software break
 
 _exit:    jsr     donelib              ; Run destructors
-          brk
+          jmp     RESET                ; Display boot menu after program exit

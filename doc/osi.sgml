@@ -42,7 +42,7 @@ is a machine language program.<p>
 For uploading into a real machine over the serial port or into an emulator a
 program must be converted to a text file that is understood by the 65V PROM
 monitor. For this purpose the srec_cat program from the
-<url url="http://srecord.sourceforge.net/" name="SRecord"> tool collection can be used.
+SRecord (http://srecord.sourceforge.net/) tool collection can be used.
 
 Care must be taken that the -offset and -execution-start-address options for the srec_cat
 program correspond to the start address of the executable.
@@ -92,11 +92,11 @@ cl65 --start-addr 0x300 -Wl -D,__HIMEM__=$2000,-D,__STACKSIZE__=$0300 -t osic1p 
 
 <sect>Platform-specific header files<p>
 
-Programs containing PET-specific code may use the <tt/pet.h/ or <tt/cbm.h/
-header files. 
+Programs containing Ohio Scientific-specific code may use the <tt/osic1p.h/ 
+header file. 
 
 
-<sect1>PET-specific functions<p>
+<sect1>Ohio Scientific-specific functions<p>
 
 There are currently no special Ohio Scientific functions.
 

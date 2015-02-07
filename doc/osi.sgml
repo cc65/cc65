@@ -42,7 +42,8 @@ is a machine language program.<p>
 For uploading into a real machine over the serial port or into an emulator a
 program must be converted to a text file that is understood by the 65V PROM
 monitor. For this purpose the srec_cat program from the
-SRecord (http://srecord.sourceforge.net/) tool collection can be used.
+<url url="http://srecord.sourceforge.net/" name="SRecord">
+tool collection can be used.
 
 Care must be taken that the -offset and -execution-start-address options for the srec_cat
 program correspond to the start address of the executable.

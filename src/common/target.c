@@ -201,7 +201,7 @@ static int Compare (const void* Key, const void* Entry)
     return strcmp ((const char*) Key, ((const TargetEntry*)Entry)->Name);
 }
 
-#include <stdio.h>
+
 
 target_t FindTarget (const char* Name)
 /* Find a target by name and return the target id. TGT_UNKNOWN is returned if

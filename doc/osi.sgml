@@ -85,10 +85,10 @@ Special locations:
 </descrip><p>
 
 Example for building a program with start address &dollar;0300, stack size
-&dollar;0200 and RAM size &dollar;0200:
+&dollar;0200 and RAM size &dollar;2000:
 
 <tscreen>
-cl65 --start-addr 0x300 -Wl -D,__HIMEM__=$2000,-D,__STACKSIZE__=$0300 -t osic1p hello.c
+cl65 --start-addr 0x300 -Wl -D,__HIMEM__=$2000,-D,__STACKSIZE__=$0200 -t osic1p hello.c
 </tscreen>
 
 <sect>Linker configurations<p>

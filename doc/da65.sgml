@@ -2,12 +2,14 @@
 
 <article>
 <title>da65 Users Guide
-<author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2003-08-08
+<author>
+<url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
+<url url="mailto:greg.king5@verizon.net" name="Greg King">
+<date>2014-11-23
 
 <abstract>
-da65 is a 6502/65C02 disassembler that is able to read user supplied
-information about its input data for better results. The output is ready for
+da65 is a 6502/65C02 disassembler that is able to read user-supplied
+information about its input data, for better results. The output is ready for
 feeding into ca65, the macro assembler supplied with the cc65 C compiler.
 </abstract>
 
@@ -23,7 +25,7 @@ the cc65 C compiler and generates output that is suitable for the ca65
 macro assembler.
 
 Besides generating output for ca65, one of the design goals was that the user
-is able to feed additional information about the code into the disassembler
+is able to feed additional information about the code into the disassembler,
 for improved results. This information may include the location and size of
 tables, and their format.
 
@@ -106,11 +108,16 @@ Here is a description of all the command line options:
   <tag><tt>--cpu type</tt></tag>
 
   Set the CPU type. The option takes a parameter, which may be one of
+  <itemize>
+  <item>6502
+  <item>6502x
+  <item>65sc02
+  <item>65c02
+  <item>huc6280
+  </itemize>
 
-       	6502, 6502x, 65sc02, 65c02, huc6280
-
-  6502x is the NMOS 6502 with illegal opcodes. huc6280 is the CPU of the PC
-  engine. Support for the 65816 is currently not available.
+  6502x is for the NMOS 6502 with unofficial opcodes. huc6280 is the CPU of
+  the PC engine. Support for the 65816 currently is not available.
 
 
   <label id="option--formfeeds">
@@ -125,7 +132,7 @@ Here is a description of all the command line options:
   <tag><tt>-g, --debug-info</tt></tag>
 
   This option adds the <tt/.DEBUGINFO/ command to the output file, so the
-  assembler will generate debug information when reassembling the generated
+  assembler will generate debug information when re-assembling the generated
   output.
 
 
@@ -241,7 +248,7 @@ unsupported.
 The disassembler works by creating an attribute map for the whole address
 space ($0000 - $FFFF). Initially, all attributes are cleared. Then, an
 external info file (if given) is read. Disassembly is done in several passes.
-In all passes with the exception of the last one, information about the
+In all passes, with the exception of the last one, information about the
 disassembled code is gathered and added to the symbol and attribute maps. The
 last pass generates output using the information from the maps.
 
@@ -275,19 +282,19 @@ braces. Attributes have a name followed by a value. The syntax of the value
 depends on the type of the attribute. String attributes are places in double
 quotes, numeric attributes may be specified as decimal numbers or hexadecimal
 with a leading dollar sign. There are also attributes where the attribute
-value is a keyword, in this case the keyword is given as is (without quotes or
+value is a keyword; in this case, the keyword is given as-is (without quotes or
 anything). Each attribute is terminated by a semicolon.
 
 <tscreen><verb>
-       	group-name { attribute1 attribute-value; attribute2 attribute-value; }
+        group-name { attribute1 attribute-value; attribute2 attribute-value; }
 </verb></tscreen>
 
 
 <sect1>Comments<p>
 
-Comments start with a hash mark (<tt/#/)  and extend from the position of
+Comments start with a hash mark (<tt/#/); and, extend from the position of
 the mark to the end of the current line. Hash marks inside of strings will
-of course <em/not/ start a comment.
+<em/not/ start a comment, of course.
 
 
 <sect1>Specifying global options<label id="global-options"><p>
@@ -543,18 +550,17 @@ disassembled code. The following attributes are recognized:
 
   <tag><tt>END</tt></tag>
   Followed by a numerical value. Specifies the end address of the segment. The
-  end address is last the address that is part of the segment.
+  end address is the last address that is a part of the segment.
 
   <tag><tt>NAME</tt></tag>
   The attribute is followed by a string value which gives the name of the
   segment.
 </descrip>
 
-All attributes are mandatory. Segments may not overlap. Since there is no
-explicit "end this segment" pseudo op, the disassembler cannot notify the
-assembler that one segment has ended. This may lead to errors if you don't
-define your segments carefully. As a rule of thumb, if you're using segments,
-your should define segments for all disassembled code.
+All attributes are mandatory. Segments must not overlap. The disassembler will
+change back to the (default) <tt/.code/ segment after the end of each defined
+segment. That might not be what you want. As a rule of thumb, if you're using
+segments, you should define segments for all disassembled code.
 
 
 <sect1>Specifying Assembler Includes<label id="infofile-asminc"><p>
@@ -563,8 +569,8 @@ The <tt/ASMINC/ directive is used to give the names of input files containing
 symbol assignments in assembler syntax:
 
 <tscreen><verb>
-       	Name = value
-	Name := value
+        Name = value
+        Name := value
 </verb></tscreen>
 
 The usual conventions apply for symbol names. Values may be specified as hex
@@ -613,48 +619,46 @@ directives explained above:
         };
 
         # One segment for the whole stuff
-        SEGMENT { START $E000;  END   $FFFF; NAME kernal; };
+        SEGMENT { START $E000;  END   $FFFF; NAME "kernal"; };
 
-        RANGE {	START $E612;   	END   $E631; TYPE Code;      };
-        RANGE {	START $E632;	END   $E640; TYPE ByteTable; };
-        RANGE {	START $EA51;	END   $EA84; TYPE RtsTable;  };
-        RANGE { START $EC6C;	END   $ECAB; TYPE RtsTable;  };
-        RANGE {	START $ED08; 	END   $ED11; TYPE AddrTable; };
+        RANGE { START $E612;    END   $E631; TYPE Code;      };
+        RANGE { START $E632;    END   $E640; TYPE ByteTable; };
+        RANGE { START $EA51;    END   $EA84; TYPE RtsTable;  };
+        RANGE { START $EC6C;    END   $ECAB; TYPE RtsTable;  };
+        RANGE { START $ED08;    END   $ED11; TYPE AddrTable; };
 
-        # Zero page variables
-        LABEL { NAME "fnadr";  	ADDR  $90;   SIZE 3;	};
-        LABEL { NAME "sal";	ADDR  $93;   };
-        LABEL { NAME "sah";	ADDR  $94;   };
-        LABEL { NAME "sas";	ADDR  $95;   };
+        # Zero-page variables
+        LABEL { NAME "fnadr";   ADDR  $90;   SIZE 3;    };
+        LABEL { NAME "sal";     ADDR  $93;   };
+        LABEL { NAME "sah";     ADDR  $94;   };
+        LABEL { NAME "sas";     ADDR  $95;   };
 
         # Stack
-        LABEL { NAME "stack";  	ADDR  $100;  SIZE 255;  };
+        LABEL { NAME "stack";   ADDR  $100;  SIZE 255;  };
 
         # Indirect vectors
-        LABEL { NAME "cinv";   	ADDR  $300;  SIZE 2;	};	# IRQ
-        LABEL { NAME "cbinv";  	ADDR  $302;  SIZE 2;	};	# BRK
-        LABEL { NAME "nminv";  	ADDR  $304;  SIZE 2;	};	# NMI
+        LABEL { NAME "cinv";    ADDR  $300;  SIZE 2;    };      # IRQ
+        LABEL { NAME "cbinv";   ADDR  $302;  SIZE 2;    };      # BRK
+        LABEL { NAME "nminv";   ADDR  $304;  SIZE 2;    };      # NMI
 
         # Jump table at end of kernal ROM
-        LABEL { NAME "kscrorg";	ADDR  $FFED; };
-        LABEL { NAME "kplot";  	ADDR  $FFF0; };
-        LABEL { NAME "kiobase";	ADDR  $FFF3; };
-        LABEL { NAME "kgbye";	ADDR  $FFF6; };
+        LABEL { NAME "kscrorg"; ADDR  $FFED; };
+        LABEL { NAME "kplot";   ADDR  $FFF0; };
+        LABEL { NAME "kiobase"; ADDR  $FFF3; };
+        LABEL { NAME "kgbye";   ADDR  $FFF6; };
 
         # Hardware vectors
-        LABEL { NAME "hanmi";  	ADDR  $FFFA; };
-        LABEL { NAME "hares";  	ADDR  $FFFC; };
-        LABEL { NAME "hairq";  	ADDR  $FFFE; };
+        LABEL { NAME "hanmi";   ADDR  $FFFA; };
+        LABEL { NAME "hares";   ADDR  $FFFC; };
+        LABEL { NAME "hairq";   ADDR  $FFFE; };
 </verb></tscreen>
-
-
 
 
 
 <sect>Copyright<p>
 
-da65 (and all cc65 binutils) are (C) Copyright 1998-2007 Ullrich von
-Bassewitz. For usage of the binaries and/or sources the following
+da65 (and all cc65 binutils) is (C) Copyright 1998-2011, Ullrich von
+Bassewitz. For usage of the binaries and/or sources, the following
 conditions do apply:
 
 This software is provided 'as-is', without any expressed or implied
@@ -666,20 +670,16 @@ including commercial applications, and to alter it and redistribute it
 freely, subject to the following restrictions:
 
 <enum>
-<item> 	The origin of this software must not be misrepresented; you must not
-       	claim that you wrote the original software. If you use this software
-       	in a product, an acknowledgment in the product documentation would be
-	appreciated but is not required.
-<item>	Altered source versions must be plainly marked as such, and must not
-	be misrepresented as being the original software.
-<item>	This notice may not be removed or altered from any source
-	distribution.
+<item>  The origin of this software must not be misrepresented; you must not
+        claim that you wrote the original software. If you use this software
+        in a product, an acknowledgment in the product documentation would be
+        appreciated but is not required.
+<item>  Altered source versions must be plainly marked as such, and must not
+        be misrepresented as being the original software.
+<item>  This notice may not be removed or altered from any source
+        distribution.
 </enum>
 
 
 
 </article>
-
-
-
-

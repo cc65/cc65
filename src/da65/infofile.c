@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2011, Ullrich von Bassewitz                                      */
+/* (C) 2000-2014, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -748,16 +748,13 @@ static void SegmentSection (void)
     if (Start < 0) {
         InfoError ("Start address is missing");
     }
-    if (Start == End) {
-        InfoError ("Segment is empty");
-    }
     if (Start > End) {
         InfoError ("Start address of segment is greater than end address");
     }
 
     /* Check that segments do not overlap */
     if (SegmentDefined ((unsigned) Start, (unsigned) End)) {
-        InfoError ("Segments cannot overlap");
+        InfoError ("Segments must not overlap");
     }
 
     /* Remember the segment data */

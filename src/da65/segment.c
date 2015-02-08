@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2007      Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2007-2014, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -58,18 +58,15 @@
 typedef struct Segment Segment;
 struct Segment {
     Segment*            NextStart;      /* Pointer to next segment */
-    Segment*            NextEnd;        /* Pointer to next segment */
     unsigned long       Start;
-    unsigned long       End;
     unsigned            AddrSize;
     char                Name[1];        /* Name, dynamically allocated */
 };
 
-/* Tables containing the segments. A segment is inserted using it's hash
-** value. Collision is done by single linked lists.
+/* Table containing the segments. A segment is inserted using its hash
+** value. Collisions are handled by single-linked lists.
 */
 static Segment* StartTab[HASH_SIZE];    /* Table containing segment starts */
-static Segment* EndTab[HASH_SIZE];      /* Table containing segment ends */
 
 
 
@@ -90,20 +87,53 @@ void AddAbsSegment (unsigned Start, unsigned End, const char* Name)
 
     /* Fill in the data */
     S->Start    = Start;
-    S->End      = End;
     S->AddrSize = ADDR_SIZE_ABS;
     memcpy (S->Name, Name, Len + 1);
 
-    /* Insert the segment into the hash tables */
+    /* Insert the segment into the hash table */
     S->NextStart = StartTab[Start % HASH_SIZE];
     StartTab[Start % HASH_SIZE] = S;
-    S->NextEnd = EndTab[End % HASH_SIZE];
-    EndTab[End % HASH_SIZE] = S;
 
     /* Mark start and end of the segment */
-    MarkAddr (Start, atSegmentChange);
-    MarkAddr (End, atSegmentChange);
+    MarkAddr (Start, atSegmentStart);
+    MarkAddr (End, atSegmentEnd);
 
     /* Mark the addresses within the segment */
     MarkRange (Start, End, atSegment);
+}
+
+
+
+char* GetSegmentStartName (unsigned Addr)
+/* Return the name of the segment which starts at the given address */
+{
+    Segment* S = StartTab[Addr % HASH_SIZE];
+
+    /* Search the collision list for the exact address */
+    while (S != 0) {
+        if (S->Start == Addr) {
+            return S->Name;
+        }
+        S = S->NextStart;
+    }
+
+    return 0;
+}
+
+
+
+unsigned GetSegmentAddrSize (unsigned Addr)
+/* Return the address size of the segment which starts at the given address */
+{
+    Segment* S = StartTab[Addr % HASH_SIZE];
+
+    /* Search the collision list for the exact address */
+    while (S != 0) {
+        if (S->Start == Addr) {
+            return S->AddrSize;
+        }
+        S = S->NextStart;
+    }
+
+    return 0;
 }

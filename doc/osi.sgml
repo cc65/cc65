@@ -79,7 +79,7 @@ Special locations:
   <tag/Video RAM/
   The 1 kB video RAM is located at &dollar;D000. On the monitor only a subset
   of the available video RAM is visible. The address of the upper left corner
-  of the visible area is $dollar;D085 and corresponds to conio cursor
+  of the visible area is &dollar;D085 and corresponds to conio cursor
   position (0, 0).
 
 </descrip><p>
@@ -91,11 +91,37 @@ Example for building a program with start address &dollar;0300, stack size
 cl65 --start-addr 0x300 -Wl -D,__HIMEM__=$2000,-D,__STACKSIZE__=$0300 -t osic1p hello.c
 </tscreen>
 
+<sect>Linker configurations<p>
+
+The ld65 linker comes with a default config file "osic1p.cfg" for the Ohio Scientific
+Challenger 1P, which is implicitly used via <tt/-t osic1p/. The
+osic1p package comes with additional secondary linker config files, which are
+used via <tt/-t osic1p -C &lt;configfile&gt;/.
+
+<sect1>default config file (<tt/osic1p.cfg/)<p>
+
+The default configuration is tailored to C programs.
+
+<sect1><tt/osic1p-asm.cfg/<p>
+
+This configuration is made for assembler programmers who don't need a special
+setup.
+
+To use this config file, assemble with <tt/-t osic1p/ and link with
+<tt/-C osic1p-asm.cfg/. The former will make sure that correct runtime library
+is used, while the latter supplies the actual config. When using <tt/cl65/,
+use both command line options.
+
+Sample command line for <tt/cl65/:
+
+<tscreen><verb>
+cl65 -o program -t osic1p -C osic1p-asm.cfg source.s
+</verb></tscreen>
+
 <sect>Platform-specific header files<p>
 
 Programs containing Ohio Scientific-specific code may use the <tt/osic1p.h/ 
 header file. 
-
 
 <sect1>Ohio Scientific-specific functions<p>
 

@@ -38,10 +38,8 @@ _init:    ldx     #$FF                 ; Initialize stack pointer to $01FF
 
 ; ---------------------------------------------------------------------------
 ; Initialize memory storage
-; copydata seems to be only necessary for special systems
 
           jsr     zerobss              ; Clear BSS segment
-          ; jsr     copydata           ; Initialize DATA segment
           jsr     initlib              ; Run constructors
 
 ; ---------------------------------------------------------------------------

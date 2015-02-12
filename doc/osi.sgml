@@ -139,8 +139,8 @@ There are no loadable drivers available.
 
 <sect1>conio implementation<p>
 
-The conio implementation is complete except for the kbhit() function. A
-call to cgetc() always blocks until a character is entered.
+The conio implementation is complete except for a working kbhit() function. 
+kbhit() currently returns true unconditionally.
 
 <sect1>stdio implementation<p>
 

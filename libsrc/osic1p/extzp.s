@@ -11,8 +11,8 @@
 
 .segment        "EXTZP" : zeropage
 
-CURS_X:         .byte   0
-CURS_Y:         .byte   0
+CURS_X:         .res    1
+CURS_Y:         .res    1
 SCREEN_PTR:     .res    2
 
 ; size 4

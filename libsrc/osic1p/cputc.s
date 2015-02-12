@@ -35,7 +35,7 @@ cputdirect:
 ; Advance cursor position
 
 advance:
-        cpy     SCR_LINELEN     ; xsize-1
+        cpy     #SCR_LINELEN    ; xsize-1
         bne     L3
         jsr     newline         ; new line
         ldy     #$FF            ; + cr
@@ -46,7 +46,7 @@ L3:     iny
 newline:
         inc     CURS_Y
         lda     CURS_Y
-        cmp     #24             ; screen height 25 lines hardcoded
+        cmp     #SCR_HEIGHT     ; screen height
         bne     plot
         lda     #0              ; wrap around to line 0
         sta     CURS_Y

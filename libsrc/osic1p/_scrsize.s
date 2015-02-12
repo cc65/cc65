@@ -10,12 +10,10 @@
         .export         screensize
 
         .include        "extzp.inc"
+        .include        "osic1p.inc"
 
 .proc   screensize
-
-        ldx     SCR_LINELEN
-        inx                     ; Variable is one less
-        ldy     #25
+        ldx     #(SCR_LINELEN + 1)
+        ldy     #(SCR_HEIGHT + 1)
         rts
-
 .endproc

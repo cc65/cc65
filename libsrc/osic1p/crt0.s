@@ -29,13 +29,6 @@ _init:    ldx     #$FF                 ; Initialize stack pointer to $01FF
           cld                          ; Clear decimal mode
 
 ; ---------------------------------------------------------------------------
-; Initialize screen width
-; TODO: Can initialization be done in a more idiomatic way?
-; TODO: Create function for changing screen width
-          lda     #$18
-          sta     SCR_LINELEN
-
-; ---------------------------------------------------------------------------
 ; Set cc65 argument stack pointer
 
           lda     #<(__RAM_START__ + __RAM_SIZE__)

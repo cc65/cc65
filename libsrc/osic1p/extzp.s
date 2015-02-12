@@ -14,8 +14,7 @@
 CURS_X:         .byte   0
 CURS_Y:         .byte   0
 CURS_SAV:       .byte   0
-SCR_LINELEN:    .byte   24
 SCREEN_PTR:     .res    2
 
-; size 6
+; size 5
 ; Adjust size of this segment in osic1p.cfg if the size changes

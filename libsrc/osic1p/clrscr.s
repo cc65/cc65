@@ -3,7 +3,7 @@
 ;
         .export         _clrscr
         .import         plot
-        .importzp       CURS_X, CURS_Y
+        .include        "extzp.inc"
         .include        "osic1p.inc"
 
 ; Adapted from the Challenger Character Graphics

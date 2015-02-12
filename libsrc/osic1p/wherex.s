@@ -5,7 +5,7 @@
 ; unsigned char wherex (void);
 ;
         .export         _wherex
-        .import         CURS_X: zp
+        .include        "extzp.inc"
 
 .proc   _wherex
         lda     CURS_X

@@ -5,7 +5,7 @@
 ; unsigned char wherey (void);
 ;
         .export         _wherey
-        .import         CURS_Y: zp
+        .include        "extzp.inc"
 
 .proc   _wherey
         lda     CURS_Y

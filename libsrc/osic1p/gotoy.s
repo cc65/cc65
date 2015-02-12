@@ -7,7 +7,7 @@
 ;
         .export         _gotoy
         .import         plot
-        .importzp       CURS_Y
+        .include        "extzp.inc"
 
 _gotoy: sta     CURS_Y          ; Set the new position
         jmp     plot            ; And activate it

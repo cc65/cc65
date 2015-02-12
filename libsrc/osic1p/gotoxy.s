@@ -8,7 +8,7 @@
 ;
         .export         _gotoxy
         .import         popa, plot
-        .importzp       CURS_X, CURS_Y
+        .include        "extzp.inc"
 
 _gotoxy:
         sta     CURS_Y          ; Set Y

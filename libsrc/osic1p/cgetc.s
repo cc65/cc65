@@ -6,6 +6,7 @@
 
         .include        "osic1p.inc"
         .include        "extzp.inc"
+        .include        "zeropage.inc"
 
 ; Input routine from 65V PROM MONITOR, show cursor if enabled
 _cgetc:
@@ -13,7 +14,7 @@ _cgetc:
         beq     nocursor
         ldy     CURS_X
         lda     (SCREEN_PTR),y  ; fetch current character
-        sta     CURS_SAV        ; save it
+        sta     tmp1            ; save it
         lda     #$A1            ; full white square
         sta     (SCREEN_PTR),y  ; store at cursor position
 nocursor:
@@ -21,7 +22,7 @@ nocursor:
         pha                     ; save retrieved character
         lda     cursor          ; was cursor on?
         beq     nocursor2
-        lda     CURS_SAV        ; fetch saved character
+        lda     tmp1            ; fetch saved character
         ldy     CURS_X
         sta     (SCREEN_PTR),y  ; store at cursor position
 nocursor2:

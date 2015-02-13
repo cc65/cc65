@@ -18,13 +18,14 @@ _cgetc:
         lda     #$A1            ; full white square
         sta     (SCREEN_PTR),y  ; store at cursor position
 nocursor:
-        jsr     INPUTC
-        pha                     ; save retrieved character
-        lda     cursor          ; was cursor on?
-        beq     nocursor2
+        jsr     INPUTC          ; get input character in A
+        ldx     cursor
+        beq     done            ; was cursor on?
+        tax                     ; save A in X
         lda     tmp1            ; fetch saved character
         ldy     CURS_X
         sta     (SCREEN_PTR),y  ; store at cursor position
-nocursor2:
-        pla                     ; restore retrieved character
+        txa                     ; restore saved character from X
+        ldx     #$00            ; high byte of int return value
+done:
         rts

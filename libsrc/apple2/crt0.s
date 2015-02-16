@@ -164,10 +164,6 @@ basic:  lda     HIMEM
 :       sta     sp
         stx     sp+1
 
-        ; Enable interrupts, as old ProDOS versions (i.e. 1.1.1)
-        ; jump to SYS and BIN programs with interrupts disabled.
-        cli
-
         ; Call the module constructors.
         jsr     initlib
 

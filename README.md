@@ -27,6 +27,7 @@ including
 - the Supervision console.
 - the Oric Atmos.
 - the Lynx console.
+- the Ohio Scientific Challenger 1P
 
 The libraries are fairly portable, so creating a version for other 6502s
 shouldn't be too much work.

@@ -513,6 +513,75 @@ directory notePad.  Look at the eight file-positions on each page until you see
 The output is shown in a GEOS dialog box; click <bf/OK/ when you have finished
 reading it.
 
+<sect1>Ohio Scientific Challenger 1P<p>
+Available at <url url="http://www.pcjs.org/docs/c1pjs/" name="C1Pjs">:
+
+Emulates the Ohio Scientific Challenger 1P computer in different configurations.
+The 32 kb RAM machine that must be used with the default compiler settings is
+<url url="http://www.pcjs.org/devices/c1p/machine/32kb/" name="here">.
+
+In addition to cc65 the srec_cat program from the
+<url url="http://srecord.sourceforge.net/" name="SRecord">
+tool collection must be installed. Some Linux distributions also provide the
+srecord package directly as an installable package.
+
+The osic1p runtime library returns to the boot prompt when the
+main() program exits. Therefore the C file in the tutorial must be slightly
+modified in order to see the results on the screen. Otherwise the program
+would print the text string and then jump to the boot prompt, making it
+impossible to see the results of running the tutorial program.
+
+In addition to that the osic1p target does not yet have support for stdio
+functions. Only the functions from the conio library are available.
+
+Therefore modify the hello.c source file as follows:
+
+<tscreen><code>
+#include <conio.h>
+#include <stdlib.h>
+
+extern const char text[];       /* In text.s */
+
+int main (void)
+{
+    clrscr ();
+    cprintf ("%s\r\nPress <RETURN>\r\n", text);
+    cgetc ();
+    return EXIT_SUCCESS;
+}
+</code></tscreen>
+
+Compile the tutorial with
+
+<tscreen><verb>
+cl65 -O -t osic1p hello.c text.s
+</verb></tscreen>
+
+Convert the executable file into a text file that can be loaded via
+the Ohio Scientific 65V PROM monitor at start address 0x200:
+
+<tscreen><verb>
+srec_cat hello -binary -offset 0x200 -o hello.c1p -Ohio_Scientific -execution-start-address=0x200
+</verb></tscreen>
+
+Open the URL <url url="http://www.pcjs.org/devices/c1p/machine/32kb/" name="http://www.pcjs.org/devices/c1p/machine/32kb/">
+and wait until the emulator has been loaded. Click on the "BREAK"
+button to display the boot prompt, then press the "M" key to enter the
+65V PROM monitor. Click the "Choose File" button and select the file "hello.c1p"
+that was created as the output of the above invocation of the "srec_cat"
+command. Press the "Load" button. You should see the following text on the
+screen:
+
+<tscreen><verb>
+Hello world!
+Press <RETURN>
+</verb></tscreen>
+
+After hitting the RETURN key you should see the boot prompt again.
+
+The program can also be uploaded over the serial port to a real Challenger 1P
+computer with 32 kB RAM. See the <url url="osi.html" name="Ohio Scientifc-specific documentation"> for instructions how to
+compile for other RAM sizes.
 
 <sect1>Contributions wanted<p>
 

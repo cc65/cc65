@@ -24,6 +24,7 @@ TARGETS = apple2    \
           $(GEOS)   \
           lynx      \
           nes       \
+          osic1p    \
           sim6502   \
           sim65c02  \
           supervision

@@ -258,6 +258,10 @@ static void SetSys (const char* Sys)
             DefineNumericMacro ("__SIM65C02__", 1);
             break;
 
+        case TGT_OSIC1P:
+            DefineNumericMacro ("__OSIC1P__", 1);
+            break;
+
         default:
             AbEnd ("Unknown target system type %d", Target);
     }

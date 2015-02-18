@@ -139,8 +139,7 @@ There are no loadable drivers available.
 
 <sect1>conio implementation<p>
 
-The conio implementation is complete except for a working kbhit() function. 
-kbhit() currently returns true unconditionally.
+The conio implementation is complete except for a kbhit() function. 
 
 <sect1>stdio implementation<p>
 

@@ -22,7 +22,7 @@ _chline:
         cmp     #0              ; Is the length zero?
         beq     L9              ; Jump if done
         sta     tmp1
-L1:     lda     #$94             ; Horizontal line, screen code
+L1:     lda     #$94            ; Horizontal line, screen code
         jsr     cputdirect      ; Direct output
         dec     tmp1
         bne     L1

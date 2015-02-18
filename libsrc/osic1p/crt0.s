@@ -7,8 +7,8 @@
 .export   _init, _exit
 .import   _main
 
-.export   __STARTUP__ : absolute = 1        ; Mark as startup
-.import   __RAM_START__, __RAM_SIZE__       ; Linker generated
+.export   __STARTUP__ : absolute = 1    ; Mark as startup
+.import   __RAM_START__, __RAM_SIZE__   ; Linker generated
 
 .import    zerobss, initlib, donelib
 
@@ -24,9 +24,9 @@
 ; ---------------------------------------------------------------------------
 ; A little light 6502 housekeeping
 
-_init:    ldx     #$FF                 ; Initialize stack pointer to $01FF
+_init:    ldx     #$FF          ; Initialize stack pointer to $01FF
           txs
-          cld                          ; Clear decimal mode
+          cld                   ; Clear decimal mode
 
 ; ---------------------------------------------------------------------------
 ; Set cc65 argument stack pointer
@@ -39,8 +39,8 @@ _init:    ldx     #$FF                 ; Initialize stack pointer to $01FF
 ; ---------------------------------------------------------------------------
 ; Initialize memory storage
 
-          jsr     zerobss              ; Clear BSS segment
-          jsr     initlib              ; Run constructors
+          jsr     zerobss       ; Clear BSS segment
+          jsr     initlib       ; Run constructors
 
 ; ---------------------------------------------------------------------------
 ; Call main()
@@ -48,7 +48,7 @@ _init:    ldx     #$FF                 ; Initialize stack pointer to $01FF
           jsr     _main
 
 ; ---------------------------------------------------------------------------
-; Back from main (this is also the _exit entry):  force a software break
+; Back from main (this is also the _exit entry):
 
-_exit:    jsr     donelib              ; Run destructors
-          jmp     RESET                ; Display boot menu after program exit
+_exit:    jsr     donelib       ; Run destructors
+          jmp     RESET         ; Display boot menu after program exit

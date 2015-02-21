@@ -19,10 +19,13 @@ scan:
         rol     a               ; Rotate row select to next bit position
         cmp     #$FF            ; Done?
         bne     scan            ; If not, continue
-        ldx     #$00            ; High byte of return is always zero
         lda     #$00            ; Return false
+        tax                     ; High byte of return is also zero
+        sta     CHARBUF         ; No character in buffer
         rts
 keypressed:
+        jsr     INPUTC          ; Get input character in A
+        sta     CHARBUF         ; Save in buffer
         ldx     #$00            ; High byte of return is always zero
         lda     #$01            ; Return true
         rts

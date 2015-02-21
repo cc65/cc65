@@ -12,7 +12,7 @@
 BANKS = VIDEORAMSIZE / $100
 
 _clrscr:
-        lda       #$20          ; ' '
+        lda       #' '
         ldy       #BANKS
         ldx       #$00
 staloc:

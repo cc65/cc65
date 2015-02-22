@@ -48,8 +48,16 @@ newline:
         lda     CURS_Y
         cmp     #SCR_HEIGHT     ; screen height
         bne     plot
-        lda     #0              ; wrap around to line 0
-        sta     CURS_Y
+        dec     CURS_Y          ; bottom of screen reached, scroll
+        ldx     #0
+scroll: lda     SCRNBASE+$00A5,x
+        sta     SCRNBASE+$0085,x
+        lda     SCRNBASE+$01A5,x
+        sta     SCRNBASE+$0185,x
+        lda     SCRNBASE+$02A5,x
+        sta     SCRNBASE+$0285,x
+        inx
+        bne scroll
 
 plot:   ldy     CURS_Y
         lda     ScrLo,y

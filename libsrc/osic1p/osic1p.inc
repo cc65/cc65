@@ -6,5 +6,5 @@ KBD             := $DF00        ; Polled keyboard register
 
 ; Other definitions
 VIDEORAMSIZE    = $0400         ; Size of C1P video RAM (1 kB)
-SCR_LINELEN     = $19           ; screen width
-SCR_HEIGHT      = $19           ; screen height
+SCR_WIDTH       = $19           ; Screen width
+SCR_HEIGHT      = $19           ; Screen height

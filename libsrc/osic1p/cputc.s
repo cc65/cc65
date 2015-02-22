@@ -35,7 +35,7 @@ cputdirect:
 ; Advance cursor position
 
 advance:
-        cpy     #SCR_LINELEN    ; xsize-1
+        cpy     #(SCR_LINELEN - 1)
         bne     L3
         jsr     newline         ; new line
         ldy     #$FF            ; + cr

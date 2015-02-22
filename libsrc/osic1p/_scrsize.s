@@ -13,7 +13,7 @@
         .include        "osic1p.inc"
 
 .proc   screensize
-        ldx     #(SCR_LINELEN + 1)
-        ldy     #(SCR_HEIGHT + 1)
+        ldx     #SCR_WIDTH
+        ldy     #SCR_HEIGHT
         rts
 .endproc

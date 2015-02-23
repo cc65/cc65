@@ -137,10 +137,6 @@ There are no loadable drivers available.
 
 <sect>Limitations<p>
 
-<sect1>conio implementation<p>
-
-The conio implementation is complete except for a kbhit() function. 
-
 <sect1>stdio implementation<p>
 
 There is no support for stdio at the moment.

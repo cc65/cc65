@@ -58,6 +58,12 @@ scroll: lda     SCRNBASE+$00A5,x
         sta     SCRNBASE+$0285,x
         inx
         bne scroll
+bottom:
+        lda     #' '            ; Clear bottom line of screen
+        sta     SCRNBASE+$0385,x
+        inx
+        cpx     #SCR_WIDTH
+        bne     bottom
 
 plot:   ldy     CURS_Y
         lda     ScrLo,y

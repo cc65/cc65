@@ -23,7 +23,7 @@ _cgetc:
         tax                     ; save character in X
         lda     #$00
         sta     CHARBUF         ; empty buffer
-        jmp     restorex        ; restore X and return
+        beq     restorex        ; restore X and return
 nobuffer:
         lda     cursor          ; show cursor?
         beq     nocursor

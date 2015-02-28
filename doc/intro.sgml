@@ -7,7 +7,7 @@
 <url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:cbmnut@hushmail.com" name="CbmNut">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2014-4-24
+<date>2015-2-27
 
 <abstract>
 How to use the cc65 C language system -- an introduction.
@@ -342,8 +342,8 @@ Available at <url
 url="http://code.google.com/p/oriculator/">:
 
 Emulates Oric-1 and Atmos computers, with sound, disk images,
-scanline-exact NTSC/PAL video, and movie export. Includes monitor.
-Fortunately for all SDL platforms. You will just need the emulator, all
+scanline-exact NTSC/PAL video, and movie export. Includes a monitor.
+Fortunately, for all SDL platforms. You will need just the emulator; all
 ROMs are supplied.
 
 Compile the tutorial with
@@ -353,8 +353,11 @@ cl65 -O -t atmos hello.c text.s -o hello.tap
 </verb></tscreen>
 
 Start the emulator, choose <bf/F1/ and <bf/Insert tape.../, and point to
-the "<bf/hello.tap/" executable. The file has an auto start header meant to
-be loaded directly from tape.
+the "<bf/hello.tap/" executable. After it has finished loading, type
+
+<tscreen><verb>
+RUN
+</verb></tscreen>
 
 On a real Atmos, you would need a tape drive.
 Turn on the computer, type
@@ -363,7 +366,11 @@ Turn on the computer, type
 CLOAD""
 </verb></tscreen>
 
-at the BASIC prompt.
+at the BASIC prompt. After it has finished loading, type
+
+<tscreen><verb>
+RUN
+</verb></tscreen>
 
 The emulation, also, supports that method.
 

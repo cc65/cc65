@@ -12,6 +12,10 @@
         .include        "osic1p.inc"
         .include        "extzp.inc"
 
+FIRSTVISC       = $85           ; Offset of first visible character in video RAM
+LINEDIST        = $20           ; Offset in video RAM between two lines
+BLOCKSIZE       = $100          ; Size of block to scroll
+
 _cputcxy:
         pha                     ; Save C
         jsr     popa            ; Get Y
@@ -37,7 +41,7 @@ cputdirect:
 advance:
         cpy     #(SCR_WIDTH - 1)
         bne     L3
-        jsr     newline         ; new line
+        jsr     newline         ; New line
         ldy     #$FF            ; + cr
 L3:     iny
         sty     CURS_X
@@ -46,22 +50,22 @@ L3:     iny
 newline:
         inc     CURS_Y
         lda     CURS_Y
-        cmp     #SCR_HEIGHT     ; screen height
+        cmp     #SCR_HEIGHT     ; Screen height
         bne     plot
-        dec     CURS_Y          ; bottom of screen reached, scroll
+        dec     CURS_Y          ; Bottom of screen reached, scroll
         ldx     #0
-scroll: lda     SCRNBASE+$00A5,x
-        sta     SCRNBASE+$0085,x
-        lda     SCRNBASE+$01A5,x
-        sta     SCRNBASE+$0185,x
-        lda     SCRNBASE+$02A5,x
-        sta     SCRNBASE+$0285,x
+scroll:
+.repeat 3, I                    ; Scroll screen in three blocks of size
+                                ; BLOCKSIZE
+        lda     SCRNBASE+(I*BLOCKSIZE)+FIRSTVISC+LINEDIST,x
+        sta     SCRNBASE+(I*BLOCKSIZE)+FIRSTVISC,x
+.endrepeat
         inx
         bne scroll
 
         lda     #' '            ; Clear bottom line of screen
 bottom:
-        sta     SCRNBASE+$0385,x
+        sta     SCRNBASE+(3*BLOCKSIZE)+FIRSTVISC,x
         inx
         cpx     #SCR_WIDTH
         bne     bottom

@@ -4,4 +4,4 @@
 
 ; ------------------------------------------------------------------------
 
-        .globalzp       CURS_X, CURS_Y, SCREEN_PTR
+        .globalzp       CURS_X, CURS_Y, SCREEN_PTR, CHARBUF

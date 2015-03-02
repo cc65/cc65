@@ -1,6 +1,8 @@
 ;
 ; char cgetc (void);
 ;
+
+        .constructor    initcgetc
         .export         _cgetc
         .import         cursor
 
@@ -8,8 +10,21 @@
         .include        "extzp.inc"
         .include        "zeropage.inc"
 
+; Initialize one-character buffer that is filled by kbhit()
+initcgetc:
+        lda     #$00
+        sta     CHARBUF         ; No character in buffer initially
+        rts
+
 ; Input routine from 65V PROM MONITOR, show cursor if enabled
 _cgetc:
+        lda     CHARBUF         ; character in buffer available?
+        beq     nobuffer
+        tax                     ; save character in X
+        lda     #$00
+        sta     CHARBUF         ; empty buffer
+        beq     restorex        ; restore X and return
+nobuffer:
         lda     cursor          ; show cursor?
         beq     nocursor
         ldy     CURS_X
@@ -25,7 +40,9 @@ nocursor:
         lda     tmp1            ; fetch saved character
         ldy     CURS_X
         sta     (SCREEN_PTR),y  ; store at cursor position
+
+restorex:
         txa                     ; restore saved character from X
-        ldx     #$00            ; high byte of int return value
 done:
+        ldx     #$00            ; high byte of int return value
         rts

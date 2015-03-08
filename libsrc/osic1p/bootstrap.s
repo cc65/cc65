@@ -1,5 +1,5 @@
 ;
-; 2015-03-06, Greg King
+; 2015-03-08, Greg King
 ;
 
 ; When you want to create a program with the alternate file format,
@@ -18,6 +18,19 @@ load_size       =       __BSS_RUN__ - __RAM_START__
 ram_top         :=      __RAM_START__ + __RAM_SIZE__
 
         .segment        "BOOT"
+
+; If you want to change how this bootstrap loader works, then:
+; 1. edit this assembly source code,
+; 2. define the constant ASM (uncomment the line below),
+; 3. assemble this file (and, make a listing of that assembly),
+; 4. copy the listing's hex codes into the .byte lines below (notice that most
+;    of the strings are followed by CR; it's required by the OS65V monitor)
+;    (be sure to match the listing's lines against the .byte lines),
+; 5. undefine ASM (recomment the line),
+; 6. assemble this file, again,
+; 7. and, add the object file to "osic1p.lib".
+
+;ASM = 1
 
 .ifdef ASM
 

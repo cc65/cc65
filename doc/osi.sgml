@@ -6,7 +6,7 @@
 <author>
 <url url="mailto:stephan.muehlstrasser@web.de" name="Stephan M&uuml;hlstrasser">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2015-03-07
+<date>2015-03-08
 
 <abstract>
 An overview over the Ohio Scientific runtime system as it is implemented for the cc65 C
@@ -73,7 +73,10 @@ Challenger 1P machine.
   This format doesn't need to be converted. It is smaller than the text-only
   format.  But, it cannot be loaded by <url
   url="http://www.pcjs.org/docs/c1pjs/" name="C1Pjs">; you must use the
-  SRecord-produced text-only format with that emulator.
+  SRecord-produced text-only format with that emulator. (However, if you know
+  that you never will use C1Pjs, then you can edit the
+  <tt>cfg/osic1p*.cfg</tt> files; uncomment the lines that import <tt/__BOOT__/.
+  Then, you won't need to use <tt/-u __BOOT__/ on your command lines.)
 
 </descrip>
 

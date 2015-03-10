@@ -83,8 +83,8 @@ unsigned __fastcall__ inflatemem (char* dest, const char* source);
 */
 
 
-int uncompress (char* dest, unsigned* destLen,
-                const char* source, unsigned sourceLen);
+int __cdecl__ uncompress (char* dest, unsigned* destLen,
+                          const char* source, unsigned sourceLen);
 /*
    Original zlib description:
 

@@ -2,7 +2,7 @@
 /*                                                                           */
 /*                                  lynx.h                                   */
 /*                                                                           */
-/*                     Lynx system specific definitions                      */
+/*                     Lynx system-specific definitions                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -109,25 +109,25 @@ extern void lynx_160_102_16_tgi[];    /* Referred to by tgi_static_stddrv[] */
 /*                           Sound support                                   */
 /*****************************************************************************/
 
-void lynx_snd_init ();
+void lynx_snd_init (void);
 /* Initialize the sound driver */
 
-void lynx_snd_pause ();
+void lynx_snd_pause (void);
 /* Pause sound */
 
-void lynx_snd_continue ();
+void lynx_snd_continue (void);
 /* Continue sound after pause */
 
 void __fastcall__ lynx_snd_play (unsigned char channel, unsigned char *music);
 /* Play tune on channel */
 
-void lynx_snd_stop ();
+void lynx_snd_stop (void);
 /* Stop sound on all channels */
 
 void __fastcall__ lynx_snd_stop_channel (unsigned char channel);
 /* Stop sound on all channels */
 
-unsigned char lynx_snd_active();
+unsigned char lynx_snd_active(void);
 /* Show which channels are active */
 
 /*****************************************************************************/

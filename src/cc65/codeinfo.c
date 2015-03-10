@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2012, Ullrich von Bassewitz                                      */
+/* (C) 2001-2015, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -386,33 +386,32 @@ void GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg)
     ** Search for it in the list of builtin functions.
     */
     if (Name[0] == '_') {
-
         /* Search in the symbol table, skip the leading underscore */
         SymEntry* E = FindGlobalSym (Name+1);
 
-        /* Did we find it in the top level table? */
+        /* Did we find it in the top-level table? */
         if (E && IsTypeFunc (E->Type)) {
-
             FuncDesc* D = E->V.F.Func;
 
-            /* A function may use the A or A/X registers if it is a fastcall
-            ** function. If it is not a fastcall function but a variadic one,
-            ** it will use the Y register (the parameter size is passed here).
-            ** In all other cases, no registers are used. However, we assume
-            ** that any function will destroy all registers.
+            /* A variadic function will use the Y register (the parameter list
+            ** size is passed there). A fastcall function will use the A or A/X
+            ** registers. In all other cases, no registers are used. However,
+            ** we assume that any function will destroy all registers.
             */
-            if (IsQualFastcall (E->Type) && D->ParamCount > 0) {
-                /* Will use registers depending on the last param */
-                unsigned LastParamSize = CheckedSizeOf (D->LastParam->Type);
-                if (LastParamSize == 1) {
-                    *Use = REG_A;
-                } else if (LastParamSize == 2) {
-                    *Use = REG_AX;
-                } else {
-                    *Use = REG_EAX;
-                }
-            } else if ((D->Flags & FD_VARIADIC) != 0) {
+            if ((D->Flags & FD_VARIADIC) != 0) {
                 *Use = REG_Y;
+            } else if (!IsQualCDecl (E->Type) && D->ParamCount > 0) {
+                /* Will use registers depending on the last param. */
+                switch (CheckedSizeOf (D->LastParam->Type)) {
+                    case 1u:
+                        *Use = REG_A;
+                        break;
+                    case 2u:
+                        *Use = REG_AX;
+                        break;
+                    default:
+                        *Use = REG_EAX;
+                }
             } else {
                 /* Will not use any registers */
                 *Use = REG_NONE;

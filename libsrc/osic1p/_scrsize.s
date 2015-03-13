@@ -8,12 +8,13 @@
 ;
 
         .export         screensize
+        .import         ScrWidth, ScrHeight
 
         .include        "extzp.inc"
         .include        "osic1p.inc"
 
 .proc   screensize
-        ldx     #SCR_WIDTH
-        ldy     #SCR_HEIGHT
+        ldx     ScrWidth
+        ldy     ScrHeight
         rts
 .endproc

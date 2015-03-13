@@ -353,8 +353,12 @@ static void FixQualifiers (Type* DataType)
                             Error ("Mismatch between pointer's and function's calling conventions");
                         }
                     } else {
-                        /* Move the qualifier from the pointer to the function. */
-                        T[1].C |= Q;
+                        if (Q == T_QUAL_FASTCALL && IsVariadicFunc (T + 1)) {
+                            Error ("Variadic-function pointers cannot be `__fastcall__'");
+                        } else {
+                            /* Move the qualifier from the pointer to the function. */
+                            T[1].C |= Q;
+                        }
                     }
                 } else {
                     Error ("Not pointer to a function; can't use a calling convention");

@@ -45,8 +45,8 @@ GETCHAR         :=      $FFBF           ; gets one character from ACIA
 FIRSTVISC       =       $85             ; Offset of first visible character in video RAM
 LINEDIST        =       $20             ; Offset in video RAM between two lines
 
-		lda		#0
-		sta		load
+        lda     #0
+        sta     load
         lda     #<load_addr
         ldx     #>load_addr
         tay

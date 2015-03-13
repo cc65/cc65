@@ -45,6 +45,8 @@ GETCHAR         :=      $FFBF           ; gets one character from ACIA
 FIRSTVISC       =       $85             ; Offset of first visible character in video RAM
 LINEDIST        =       $20             ; Offset in video RAM between two lines
 
+		lda		#0
+		sta		load
         lda     #<load_addr
         ldx     #>load_addr
         tay
@@ -105,6 +107,8 @@ CR      =       $0D
 ; ASCII-coded hexadecimal translation of the above assembly code.
 ; It was copied from the assembler listing.
 
+        .byte   "A9", CR, "00", CR
+        .byte   "85", CR, "08", CR
         .byte   "A9", CR
         hex2    <load_addr
         .byte   CR, "A2", CR

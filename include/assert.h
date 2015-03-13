@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000, Ullrich von Bassewitz                                      */
+/* (C) 1998-2015, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -42,7 +42,7 @@
 #ifdef NDEBUG
 #  define assert(expr)
 #else
-extern void __cdecl__ _afailed (const char*, unsigned);
+extern void __fastcall__ _afailed (const char*, unsigned);
 #  define assert(expr)  ((expr)? (void)0 : _afailed(__FILE__, __LINE__))
 #endif
 

@@ -1,9 +1,9 @@
 /*
 ** Marc 'BlackJack' Rintsch, 06.03.2001
 **
-** unsigned int __cdecl__ cbm_load(const char* name,
-**                                 unsigned char device,
-**                                 const unsigned char* data);
+** unsigned int __fastcall__ cbm_load(const char* name,
+**                                    unsigned char device,
+**                                    const unsigned char* data);
 */
 
 #include <cbm.h>

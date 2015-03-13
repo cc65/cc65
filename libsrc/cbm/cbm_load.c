@@ -11,7 +11,7 @@
 /* loads file "name" from given device to given address or to the load address
 ** of the file if "data" is 0
 */
-unsigned int __cdecl__ cbm_load(const char* name, unsigned char device, void* data)
+unsigned int __fastcall__ cbm_load(const char* name, unsigned char device, void* data)
 {
     /* LFN is set to 0; but, it's not needed for loading
     ** (BASIC V2 sets it to the value of the SA for LOAD).

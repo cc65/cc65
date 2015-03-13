@@ -3,7 +3,7 @@
 <article>
 <title>cc65 Users Guide
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2000-09-03, 2001-10-02, 2005-08-01
+<date>2015-03-13
 
 <abstract>
 cc65 is a C compiler for 6502 targets. It supports several 6502 based home
@@ -549,9 +549,9 @@ and the one defined by the ISO standard:
         be passed as parameters by value. However, struct assignment *is*
       	possible.
       	<p>
-<item>	Part of the C library is available only with fastcall calling
-	conventions (see below).  It means that you must not mix pointers to
-	those functions with pointers to user-written, not-fastcall functions.
+<item>	Most of the C library is available only with the fastcall calling
+	convention (see below).  It means that you must not mix pointers to
+	those functions with pointers to user-written, cdecl functions.
 	<p>
 <item>	The <tt/volatile/ keyword doesn't have an effect. This is not as bad
         as it sounds, since the 6502 has so few registers that it isn't
@@ -589,29 +589,54 @@ This cc65 version has some extensions to the ISO C standard.
 	<ref id="inline-asm" name="see there">.
 	<p>
 
-<item>	There is a special calling convention named "fastcall".
-     	The syntax for a function declaration using fastcall is
+<item>  The normal calling convention -- for non-variadic functions -- is
+        named "fastcall". The syntax for a function declaration that
+        <em/explicitly/ uses fastcall is
 
-	<tscreen><verb>
-	&lt;return type&gt; fastcall &lt;function name&gt; (&lt;parameter list&gt;)
-     	</verb></tscreen>
-     	or
-	<tscreen><verb>
-       	&lt;return type&gt; __fastcall__ &lt;function name&gt; (&lt;parameter list&gt;)
-     	</verb></tscreen>
-	An example would be
-	<tscreen><verb>
-       	void __fastcall__ f (unsigned char c)
-     	</verb></tscreen>
-	The first form of the fastcall keyword is in the user namespace and can
-	therefore be disabled with the <tt><ref id="option--standard"
+        <tscreen><verb>
+        &lt;return type&gt; fastcall &lt;function name&gt; (&lt;parameter list&gt;)
+        </verb></tscreen>
+        or
+        <tscreen><verb>
+        &lt;return type&gt; __fastcall__ &lt;function name&gt; (&lt;parameter list&gt;)
+        </verb></tscreen>
+        An example would be
+        <tscreen><verb>
+        void __fastcall__ f (unsigned char c)
+        </verb></tscreen>
+        The first form of the fastcall keyword is in the user namespace and can
+        therefore be disabled with the <tt><ref id="option--standard"
         name="--standard"></tt> command line option.
 
-	For functions declared as <tt/fastcall/, the rightmost parameter is not
-	pushed on the stack but left in the primary register when the function
-	is called. This will reduce the cost when calling assembler functions
-	significantly, especially when the function itself is rather small.
-	<p>
+        For functions that are <tt/fastcall/, the rightmost parameter is not
+        pushed on the stack but left in the primary register when the function
+        is called. That significantly reduces the cost of calling functions.
+        <p>
+
+<item>  There is another calling convention named "cdecl". Variadic functions
+        (their prototypes have an ellipsis [<tt/.../]) always use this
+        convention. The syntax for a function declaration using cdecl is
+
+        <tscreen><verb>
+        &lt;return type&gt; cdecl &lt;function name&gt; (&lt;parameter list&gt;)
+        </verb></tscreen>
+        or
+        <tscreen><verb>
+        &lt;return type&gt; __cdecl__ &lt;function name&gt; (&lt;parameter list&gt;)
+        </verb></tscreen>
+        An example would be
+        <tscreen><verb>
+        void __cdecl__ f (unsigned char c)
+        </verb></tscreen>
+        The first form of the cdecl keyword is in the user namespace and can
+        therefore be disabled with the <tt><ref id="option--standard"
+        name="--standard"></tt> command line option.
+
+        For functions that are <tt/cdecl/, the rightmost parameter is pushed
+        onto the stack before the function is called. That increases the cost
+        of calling those functions, especially when they are called from many
+        places.
+        <p>
 
 <item>	There are two pseudo variables named <tt/__AX__/ and <tt/__EAX__/.
 	Both refer to the primary register that is used by the compiler to
@@ -663,7 +688,7 @@ This cc65 version has some extensions to the ISO C standard.
 	</verb></tscreen>
 
 	Since the variable is of type <tt/void/ you may not use it as is.
-	However, taking the address of the variable results in a <tt/void*/
+	However, taking the address of the variable results in a <tt/void */
 	which may be passed to any function expecting a pointer.
 
 	See the <url url="geos.html" name="GEOS library document"> for examples

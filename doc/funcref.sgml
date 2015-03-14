@@ -39,7 +39,7 @@ Each entry for a function contains a detailed description
 <tag/Declaration/Describes the needed header files and declaration of the
 function.
 <tag/Description/Description of the function.
-<tag/Limits/Limits.
+<tag/Notes/Notes on the function.
 <tag/Availability/The availability of the function.
 <tag/See also/Other related functions.
 <tag/Example/A piece of actual code using the function.
@@ -4953,9 +4953,8 @@ if (rename (OLDNAME, NEWNAME) == 0) {
 <tag/Description/<tt/reset_brk/ resets the break vector to the value it had
 before a call to <tt/set_brk/.
 <tag/Notes/<itemize>
-<item>Since <tt/<ref id="set_brk" name="set_brk">/ installs an exit handler,
-it is not strictly necessary to call this function as part of the cleanup when
-the program ends.
+<item>The break vector is reset on program termination, so it's not strictly
+necessary to call this function as a part of your clean-up when exitting the program.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -4976,8 +4975,8 @@ the program ends.
 <tag/Declaration/<tt/void reset_irq (void);/
 <tag/Description/<tt/reset_irq/ resets the C level interrupt request vector.
 <tag/Notes/<itemize>
-<item>The original IRQ vector is restored on program termination even without
-calling this function.
+<item>The interrupt vector is reset on program termination, so it's not strictly
+necessary to call this function as a part of your clean-up when exitting the program.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -5336,9 +5335,9 @@ function called from it.
 <item>The <tt/brk_pc/ variable points to the <tt/BRK/ instruction. If you want
 the continue with the interrupted code, you have to adjust <tt/brk_pc/,
 otherwise the <tt/BRK/ instruction will get executed over and over again.
-<item>Since <tt/set_brk/ installs an exit handler, it is not strictly necessary
-to call <tt/<ref id="reset_brk" name="reset_brk">/ as part of the cleanup when
-the program terminates.
+<item>The break vector is reset on program termination, so it's not strictly
+necessary to call <tt/<ref id="reset_brk" name="reset_brk">/ as a part of your
+clean-up when exitting the program.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -5374,9 +5373,9 @@ runtime overhead, but it it is safe to execute C code, even if other C code
 was interrupted. Be careful however not to call C library functions, and do not
 enable stack checks for the handler function or any other function called from
 it.
-<item>The interrupt vector is reset on function termination, so it's not
-strictly necessary to call <tt/<ref id="reset_irq" name="reset_irq">/ as part
-of the cleanup when the program terminates.
+<item>The interrupt vector is reset on program termination, so it's not strictly
+necessary to call <tt/<ref id="reset_irq" name="reset_irq">/ as a part of your
+clean-up when exitting the program.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/

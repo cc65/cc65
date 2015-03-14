@@ -3,7 +3,7 @@
 <article>
 <title>cc65 Users Guide
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2015-03-13
+<date>2015-03-14
 
 <abstract>
 cc65 is a C compiler for 6502 targets. It supports several 6502 based home
@@ -614,7 +614,7 @@ This cc65 version has some extensions to the ISO C standard.
         <p>
 
 <item>  There is another calling convention named "cdecl". Variadic functions
-        (their prototypes have an ellipsis [<tt/.../]) always use this
+        (their prototypes have an ellipsis &lsqb;<tt/.../&rsqb;) always use this
         convention. The syntax for a function declaration using cdecl is
 
         <tscreen><verb>

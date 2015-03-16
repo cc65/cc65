@@ -32,7 +32,7 @@ information.
 <sect>Targets<p>
 
 Currently the target "osic1p" is implemented. This works for the Ohio Scientific
-Challenger 1P machine.
+Challenger 1P machine and for the Briel Superboard /// replica.
 
 <sect>Binary format<p>
 
@@ -98,7 +98,7 @@ Challenger 1P, which is implicitly used via <tt/-t osic1p/. The
 osic1p package comes with additional secondary linker config files, which are
 used via <tt/-t osic1p -C &lt;configfile&gt;/.
 
-<sect1>default config file (<tt/osic1p.cfg/)<p>
+<sect1>Default config file (<tt/osic1p.cfg/)<p>
 
 The default configuration is tailored to C programs.
 
@@ -134,6 +134,42 @@ There is no specific support for direct hardware access.
 <sect>Loadable drivers<p>
 
 There are no loadable drivers available.
+
+<sect>Support for different screen layouts<p>
+
+By default the conio library uses a 24 columns by 24 lines screen layout
+for the Challenger 1P, like under BASIC. In addition to that there is support
+for other screen layouts with extra configuration modules.
+
+There is a default module <tt/screen.s/ in the OSI-specific
+cc65 runtime library. This module contains all parameters
+related to the screen layout. No further configuration is needed for using the
+default screen layout of the Challenger 1P.
+
+For other screen layouts additional copies of the screen.s module must
+be created in the <tt>libsrc/osic1p/extra</tt> directory. The cc65 build
+system compiles these modules in the <tt/extra/ directory, but it does not
+put them into the library archive. The extra modules are stored
+as separate files with the prefix <tt/osic1p/ next to the library
+archive <tt/osic1p.lib/. The linker finds these modules without
+further configuration if they are specified on the compiler
+or linker command line. The extra module then overrides the default
+<tt/screen.s/ module.
+
+Sample <tt/cl65/ command line to override the default screen
+configuration module with the screen configuration module
+<tt/osic1p-screen-s3-32x28.o/:
+
+<tscreen><verb>
+cl65 -o hello -t osic1p osic1p-screen-s3-32x28.o hello.c
+</verb></tscreen>
+
+Currently the following extra screen configuration modules are implemented:
+
+<itemize>
+<item><tt>osic1p-screen-s3-32x28.o</tt>: 32 columns by 28 lines mode
+for Briel Superboard ///</item>
+</itemize>
 
 <sect>Limitations<p>
 

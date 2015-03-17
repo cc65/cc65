@@ -1,6 +1,6 @@
 ;
 ; cputc/cputcxy for Challenger 1P
-; Based on PET/CBM implementation
+; Originally based on PET/CBM implementation
 ;
 ; void cputcxy (unsigned char x, unsigned char y, char c);
 ; void cputc (char c);
@@ -8,6 +8,11 @@
         .export         _cputcxy, _cputc, cputdirect, putchar
         .export         newline, plot
         .import         popa, _gotoxy
+        .import         ScrLo, ScrHi, ScrollLength, ScrollDist, ScrFirstChar
+        .import         ScrWidth, ScrHeight
+        .import         _memmove, pushax
+        .importzp       tmp2, ptr1
+                                ; tmp1 is used by cputs!
 
         .include        "osic1p.inc"
         .include        "extzp.inc"
@@ -36,10 +41,13 @@ L1:     cmp     #$0D            ; LF?
 cputdirect:
         jsr     putchar         ; Write the character to the screen
 
-; Advance cursor position
+; Advance cursor position, register Y contains horizontal position after
+; putchar
 
-advance:
-        cpy     #(SCR_WIDTH - 1)
+        ldx     ScrWidth        ; Check whether line is full
+        dex
+        stx     tmp2
+        cpy     tmp2
         bne     L3
         jsr     newline         ; New line
         ldy     #$FF            ; + cr
@@ -50,25 +58,38 @@ L3:     iny
 newline:
         inc     CURS_Y
         lda     CURS_Y
-        cmp     #SCR_HEIGHT     ; Screen height
+        cmp     ScrHeight       ; Screen height
         bne     plot
         dec     CURS_Y          ; Bottom of screen reached, scroll
-        ldx     #0
-scroll:
-.repeat 3, I                    ; Scroll screen in three blocks of size
-                                ; BLOCKSIZE
-        lda     SCRNBASE+(I*BLOCKSIZE)+FIRSTVISC+LINEDIST,x
-        sta     SCRNBASE+(I*BLOCKSIZE)+FIRSTVISC,x
-.endrepeat
-        inx
-        bne scroll
 
-        lda     #' '            ; Clear bottom line of screen
-bottom:
-        sta     SCRNBASE+(3*BLOCKSIZE)+FIRSTVISC,x
-        inx
-        cpx     #SCR_WIDTH
-        bne     bottom
+        lda     ScrFirstChar    ; Scroll destination address
+        ldx     ScrFirstChar+1
+        jsr     pushax
+        clc                     ; Compute from address by adding the
+        adc     ScrollDist      ; distance for one line in video RAM
+        sta     tmp2
+        txa
+        adc     #0
+        tax
+        lda     tmp2
+        jsr     pushax
+        lda     ScrollLength    ; Distance for shifting by one line
+        ldx     ScrollLength+1
+        jsr     _memmove
+
+        clc                     ; Compute address of first character
+        lda     ScrFirstChar    ; in last line of screen
+        adc     ScrollLength
+        sta     ptr1
+        lda     ScrFirstChar+1
+        adc     ScrollLength+1
+        sta     ptr1+1
+
+        ldy     ScrWidth        ; Fill line with blanks
+        lda     #' '
+clrln:  sta     (ptr1),y
+        dey
+        bpl     clrln
 
 plot:   ldy     CURS_Y
         lda     ScrLo,y
@@ -84,17 +105,3 @@ putchar:
         ldy     CURS_X
         sta     (SCREEN_PTR),y  ; Set char
         rts
-
-; Screen address tables - offset to real screen
-
-.rodata
-
-ScrLo:  .byte   $85, $A5, $C5, $E5, $05, $25, $45, $65
-        .byte   $85, $A5, $C5, $E5, $05, $25, $45, $65
-        .byte   $85, $A5, $C5, $E5, $05, $25, $45, $65
-        .byte   $85
-
-ScrHi:  .byte   $D0, $D0, $D0, $D0, $D1, $D1, $D1, $D1
-        .byte   $D1, $D1, $D1, $D1, $D2, $D2, $D2, $D2
-        .byte   $D2, $D2, $D2, $D2, $D3, $D3, $D3, $D3
-        .byte   $D3

@@ -290,18 +290,18 @@ void PrintType (FILE* F, const Type* T)
                 fprintf (F, "union %s", ((SymEntry*) T->A.P)->Name);
                 break;
             case T_TYPE_ARRAY:
-                if (T->A.L == UNSPECIFIED) {
-                    fprintf (F, "[] ");
-                } else {
-                    fprintf (F, "[%ld] ", T->A.L);
-                }
                 /* Recursive call */
                 PrintType (F, T + 1);
+                if (T->A.L == UNSPECIFIED) {
+                    fprintf (F, " []");
+                } else {
+                    fprintf (F, " [%ld]", T->A.L);
+                }
                 return;
             case T_TYPE_PTR:
-                fprintf (F, "* ");
                 /* Recursive call */
                 PrintType (F, T + 1);
+                fprintf (F, " *");
                 return;
             case T_TYPE_FUNC:
                 fprintf (F, "function returning ");

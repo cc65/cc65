@@ -4418,6 +4418,7 @@ compiler, depending on the target system selected:
 <item><tt/__LUNIX__/ - Target system is <tt/lunix/
 <item><tt/__LYNX__/ - Target system is <tt/lynx/
 <item><tt/__NES__/ - Target system is <tt/nes/
+<item><tt/__OSIC1P__/ - Target system is <tt/osic1p/
 <item><tt/__PET__/ - Target system is <tt/pet/
 <item><tt/__PLUS4__/ - Target system is <tt/plus4/
 <item><tt/__SIM6502__/ - Target system is <tt/sim6502/

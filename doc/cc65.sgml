@@ -348,6 +348,7 @@ Here is a description of all the command line options:
   <item>lunix
   <item>lynx
   <item>nes
+  <item>osic1p
   <item>pet (all CBM PET systems except the 2001)
   <item>plus4
   <item>sim6502
@@ -818,6 +819,11 @@ The compiler defines several macros at startup:
   <tag><tt>__OPT_s__</tt></tag>
 
   Is defined if the compiler was called with the <tt/-Os/ command line option.
+
+  <tag><tt>__OSIC1P__</tt></tag>
+
+  This macro is defined if the target is the Ohio Scientific Challenger 1P
+  (-t osic1p).
 
   <tag><tt>__PET__</tt></tag>
 

@@ -28,6 +28,20 @@ _exec:
         jsr     pushname
         bne     oserr
 
+        ; ProDOS TechRefMan, chapter 5.1.5.1:
+        ; "The complete or partial pathname of the system program
+        ;  is stored at $280, starting with a length byte."
+        ; In fact BASIC.SYSTEM does the same for BLOAD and BRUN of
+        ; binary programs so we should do the same too in any case
+        ; especially as _we_ rely on it in mainargs.s for argv[0].
+        ldy     #$00
+        lda     (sp),y
+        tay
+:       lda     (sp),y
+        sta     $0280,y
+        dey
+        bpl     :-
+
         ; Set pushed name
         lda     sp
         ldx     sp+1
@@ -53,17 +67,6 @@ _exec:
         cmp     #$FF            ; SYS file?
         bne     binary          ; No, check for BIN file
 
-        ; ProDOS TechRefMan, chapter 5.1.5.1:
-        ; "The complete or partial pathname of the system program
-        ;  is stored at $280, starting with a length byte."
-        ldy     #$00
-        lda     (sp),y
-        tay
-:       lda     (sp),y
-        sta     $0280,y
-        dey
-        bpl     :-
-        
         ; SYS programs replace BASIC.SYSTEM so set in the ProDOS system bit map
         ; protection for pages $80 - $BF just in case BASIC.SYSTEM is there now
         ldx     #$0F            ; Start with protection for pages $B8 - $BF

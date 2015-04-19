@@ -95,8 +95,8 @@ PRESS_ANY_KEY:
         jmp     :+
         .byte   $EE
         .byte   $EE
-        .byte   65
-STARTUP:.res    65
+        .byte   $80
+STARTUP:.res    $80
 
         ; Reset stack
 :       ldx     #$FF
@@ -127,7 +127,7 @@ STARTUP:.res    65
 :       lda     STARTUP + 1,x
 :       sta     STACK,x
         dex
-        bpl     :--     
+        bpl     :--
 
         ; Provide some user feedback
         lda     #<LOADING

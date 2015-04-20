@@ -1288,7 +1288,6 @@ either a string or an expression.
 
   <tscreen><verb>
         .macro myLDA foo
-
   	        .if .ADDRSIZE(foo) = 1
   	          	        ;do custom command based on zeropage addressing:
   	          	        .byte .A5h, foo

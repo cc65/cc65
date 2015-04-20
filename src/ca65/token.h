@@ -123,6 +123,7 @@ typedef enum token_t {
     TOK_A16             = TOK_FIRSTPSEUDO,
     TOK_A8,
     TOK_ADDR,
+    TOK_ADDRSIZE,
     TOK_ALIGN,
     TOK_ASCIIZ,
     TOK_ASSERT,

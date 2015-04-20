@@ -739,9 +739,10 @@ static token_t FindDotKeyword (void)
             default:
                 break;
         }
+
         return R->Tok;
-    }
-    else {
+
+    } else {
         return TOK_NONE;
     }
 }

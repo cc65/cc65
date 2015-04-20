@@ -1281,13 +1281,12 @@ either a string or an expression.
 <sect1><tt>.ADDRSIZE</tt><label id=".ADDRSIZE"><p>
 
   The <tt/.ADDRSIZE/ function is used to return the interal address size 
-  associated with a symbol. This can be helpful in macros when knowing address 
+  associated with a symbol. This can be helpful in macros when knowing the address 
   size of symbol can allow for custom instructions.
 
   Example:
 
   <tscreen><verb>
-        
         .macro myLDA foo
 
   	        .if .ADDRSIZE(foo) = 1

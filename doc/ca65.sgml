@@ -1297,7 +1297,7 @@ either a string or an expression.
                         .byte 0ADh
                         .word foo
                 .elseif .ADDRSIZE(foo) = 0
-                        ; no address size define for this symbol:
+                        ; no address size defined for this symbol:
                         .out .sprintf("Error, address size unknown for symbol %s", .string(foo))
                 .endif
         .endmacro

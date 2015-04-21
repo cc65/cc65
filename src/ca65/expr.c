@@ -688,15 +688,13 @@ static ExprNode* FuncAddrSize (void)
         if (Sym) {
             AddrSize = Sym->AddrSize;
         } else {
-            Error ("Unknown symbol or scope: `%m%p%m%p'",
-                &ScopeName, &Name);
+            Error ("Unknown symbol or scope: `%m%p%m%p'", &ScopeName, &Name);
         }
 
     }
 
     if (AddrSize == 0) {
-        Warning(1, "Unknown address size: `%m%p%m%p'",
-            &ScopeName, &Name);
+        Warning (1, "Unknown address size: `%m%p%m%p'", &ScopeName, &Name);
     }
 
     /* Free the string buffers */

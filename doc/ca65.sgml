@@ -1278,33 +1278,34 @@ writable.
 Pseudo functions expect their arguments in parenthesis, and they have a result,
 either a string or an expression.
 
+
 <sect1><tt>.ADDRSIZE</tt><label id=".ADDRSIZE"><p>
 
   The <tt/.ADDRSIZE/ function is used to return the interal address size 
   associated with a symbol. This can be helpful in macros when knowing the address 
-  size of symbol can allow for custom instructions.
+  size of symbol can help with custom instructions.
 
   Example:
 
   <tscreen><verb>
         .macro myLDA foo
-  	        .if .ADDRSIZE(foo) = 1
-  	          	        ;do custom command based on zeropage addressing:
-  	          	        .byte .A5h, foo
-  	        .elseif .ADDRSIZE(foo) = 2
-  	          	        ;do custom command based on absolute addressing:
-  	          	        .byte .ADh, foo
-  	        .elseif .ADDRSIZE(foo) = 0
-  	          	        ; no address size define for this symbol:
-  	          	        .out .sprinft("Error, address size unknown for symbol %s", .string(foo))
-  	        .endif
+                .if .ADDRSIZE(foo) = 1
+                        ;do custom command based on zeropage addressing:
+                        .byte 0A5h, foo
+                .elseif .ADDRSIZE(foo) = 2
+                        ;do custom command based on absolute addressing:
+                        .byte 0ADh
+                        .word foo
+                .elseif .ADDRSIZE(foo) = 0
+                        ; no address size define for this symbol:
+                        .out .sprintf("Error, address size unknown for symbol %s", .string(foo))
+                .endif
         .endmacro
   </verb></tscreen>
 
   This command is new and must be enabled with the <tt/.FEATURE addrsize/ command.
 
   See: <tt><ref id=".FEATURE" name=".FEATURE"></tt>
-
 
 
 <sect1><tt>.BANK</tt><label id=".BANK"><p>
@@ -2681,6 +2682,11 @@ Here's a list of all control commands and a description, what they do:
     reserved keywords built into the assembler, that starts with a dot, may be
     overridden. When using this feature, you may also get into trouble if
     later versions of the assembler define new keywords starting with a dot.
+
+  <tag><tt>loose_char_term</tt><label id="loose_char_term"></tag>
+
+    Accept single quotes as well as double quotes as terminators for char
+    constants.
 
   <tag><tt>loose_string_term</tt><label id="loose_string_term"></tag>
 

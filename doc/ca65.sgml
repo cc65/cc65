@@ -1279,6 +1279,35 @@ Pseudo functions expect their arguments in parenthesis, and they have a result,
 either a string or an expression.
 
 
+<sect1><tt>.ADDRSIZE</tt><label id=".ADDRSIZE"><p>
+
+  The <tt/.ADDRSIZE/ function is used to return the interal address size 
+  associated with a symbol. This can be helpful in macros when knowing the address 
+  size of symbol can help with custom instructions.
+
+  Example:
+
+  <tscreen><verb>
+        .macro myLDA foo
+                .if .ADDRSIZE(foo) = 1
+                        ;do custom command based on zeropage addressing:
+                        .byte 0A5h, foo
+                .elseif .ADDRSIZE(foo) = 2
+                        ;do custom command based on absolute addressing:
+                        .byte 0ADh
+                        .word foo
+                .elseif .ADDRSIZE(foo) = 0
+                        ; no address size defined for this symbol:
+                        .out .sprintf("Error, address size unknown for symbol %s", .string(foo))
+                .endif
+        .endmacro
+  </verb></tscreen>
+
+  This command is new and must be enabled with the <tt/.FEATURE addrsize/ command.
+
+  See: <tt><ref id=".FEATURE" name=".FEATURE"></tt>
+
+
 <sect1><tt>.BANK</tt><label id=".BANK"><p>
 
   The <tt/.BANK/ function is used to support systems with banked memory. The
@@ -2595,6 +2624,12 @@ Here's a list of all control commands and a description, what they do:
   The following features are available:
 
   <descrip>
+
+  <tag><tt>addrsize</tt><label id="addrsize"></tag>
+
+    Enables the .ADDRSIZE pseudo function. This function is experimental and not enabled by default.
+
+    See also: <tt><ref id=".ADDRSIZE" name=".ADDRSIZE"></tt>
 
   <tag><tt>at_in_identifiers</tt><label id="at_in_identifiers"></tag>
 

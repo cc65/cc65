@@ -629,6 +629,85 @@ static ExprNode* FuncReferenced (void)
 
 
 
+static ExprNode* FuncAddrSize (void)
+/* Handle the .ADDRSIZE function */
+{
+    StrBuf    ScopeName = STATIC_STRBUF_INITIALIZER;
+    StrBuf    Name = STATIC_STRBUF_INITIALIZER;
+    SymEntry* Sym;
+    int       AddrSize;
+    int       NoScope;
+
+
+    /* Assume we don't know the size */
+    AddrSize = 0;
+
+    /* Check for a cheap local which needs special handling */
+    if (CurTok.Tok == TOK_LOCAL_IDENT) {
+
+        /* Cheap local symbol */
+        Sym = SymFindLocal (SymLast, &CurTok.SVal, SYM_FIND_EXISTING);
+        if (Sym == 0) {
+            Error ("Unknown symbol or scope: `%m%p'", &CurTok.SVal);
+        } else {
+            AddrSize = Sym->AddrSize;
+        }
+
+        /* Remember and skip SVal, terminate ScopeName so it is empty */
+        SB_Copy (&Name, &CurTok.SVal);
+        NextTok ();
+        SB_Terminate (&ScopeName);
+
+    } else {
+
+        /* Parse the scope and the name */
+        SymTable* ParentScope = ParseScopedIdent (&Name, &ScopeName);
+
+        /* Check if the parent scope is valid */
+        if (ParentScope == 0) {
+            /* No such scope */
+            SB_Done (&ScopeName);
+            SB_Done (&Name);
+            return GenLiteral0 ();
+        }
+
+        /* If ScopeName is empty, no explicit scope was specified. We have to
+        ** search upper scope levels in this case.
+        */
+        NoScope = SB_IsEmpty (&ScopeName);
+
+        /* If we did find a scope with the name, read the symbol defining the
+        ** size, otherwise search for a symbol entry with the name and scope.
+        */
+        if (NoScope) {
+            Sym = SymFindAny (ParentScope, &Name);
+        } else {
+            Sym = SymFind (ParentScope, &Name, SYM_FIND_EXISTING);
+        }
+        /* If we found the symbol retrieve the size, otherwise complain */
+        if (Sym) {
+            AddrSize = Sym->AddrSize;
+        } else {
+            Error ("Unknown symbol or scope: `%m%p%m%p'", &ScopeName, &Name);
+        }
+
+    }
+
+    if (AddrSize == 0) {
+        Warning (1, "Unknown address size: `%m%p%m%p'", &ScopeName, &Name);
+    }
+
+    /* Free the string buffers */
+    SB_Done (&ScopeName);
+    SB_Done (&Name);
+
+    /* Return the size. */
+
+    return GenLiteralExpr (AddrSize);
+}
+
+
+
 static ExprNode* FuncSizeOf (void)
 /* Handle the .SIZEOF function */
 {
@@ -963,6 +1042,10 @@ static ExprNode* Factor (void)
 
         case TOK_BANKBYTE:
             N = Function (FuncBankByte);
+            break;
+
+        case TOK_ADDRSIZE:
+            N = Function (FuncAddrSize);
             break;
 
         case TOK_BLANK:

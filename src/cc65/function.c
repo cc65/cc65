@@ -481,7 +481,10 @@ void NewFunc (SymEntry* Func)
     PushLiteralPool (Func);
 
     /* If this is a fastcall function, push the last parameter onto the stack */
-    if ((D->Flags & FD_VARIADIC) == 0 && !IsQualCDecl (Func->Type) && D->ParamCount > 0) {
+    if ((D->Flags & FD_VARIADIC) == 0 && D->ParamCount > 0 &&
+        (AutoCDecl ?
+         IsQualFastcall (Func->Type) :
+         !IsQualCDecl (Func->Type))) {
         unsigned Flags;
 
         /* Generate the push */

@@ -3,7 +3,7 @@
 <article>
 <title>cc65 Users Guide
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2015-03-14
+<date>2015-04-21
 
 <abstract>
 cc65 is a C compiler for 6502 targets. It supports several 6502 based home
@@ -74,6 +74,7 @@ Short options:
 
 Long options:
   --add-source                  Include source as comment
+  --all-cdecl                   Make functions default to __cdecl__
   --bss-name seg                Set the name of the BSS segment
   --check-stack                 Generate stack overflow checks
   --code-name seg               Set the name of the CODE segment
@@ -113,6 +114,14 @@ Long options:
 Here is a description of all the command line options:
 
 <descrip>
+
+  <tag><tt>--all-cdecl</tt></tag>
+
+  Tells the compiler that functions which aren't declared explicitly with
+  either the <tt/__cdecl__/ or <tt/__fastcall__/ calling conventions should
+  have the cdecl convention.  (Normally, functions that aren't variadic are
+  fast-called.)
+
 
   <label id="option-bss-name">
   <tag><tt>--bss-name seg</tt></tag>
@@ -550,8 +559,9 @@ and the one defined by the ISO standard:
       	possible.
       	<p>
 <item>	Most of the C library is available only with the fastcall calling
-	convention (see below).  It means that you must not mix pointers to
-	those functions with pointers to user-written, cdecl functions.
+        convention (<ref id="extension-fastcall" name="see below">).  It means
+        that you must not mix pointers to those functions with pointers to
+        user-written, cdecl functions.
 	<p>
 <item>	The <tt/volatile/ keyword doesn't have an effect. This is not as bad
         as it sounds, since the 6502 has so few registers that it isn't
@@ -589,6 +599,7 @@ This cc65 version has some extensions to the ISO C standard.
 	<ref id="inline-asm" name="see there">.
 	<p>
 
+<label id="extension-fastcall">
 <item>  The normal calling convention -- for non-variadic functions -- is
         named "fastcall". The syntax for a function declaration that
         <em/explicitly/ uses fastcall is
@@ -611,10 +622,11 @@ This cc65 version has some extensions to the ISO C standard.
         For functions that are <tt/fastcall/, the rightmost parameter is not
         pushed on the stack but left in the primary register when the function
         is called. That significantly reduces the cost of calling functions.
+        <newline><newline>
         <p>
 
 <item>  There is another calling convention named "cdecl". Variadic functions
-        (their prototypes have an ellipsis &lsqb;<tt/.../&rsqb;) always use this
+        (their prototypes have an ellipsis &lsqb;<tt/.../&rsqb;) always use that
         convention. The syntax for a function declaration using cdecl is
 
         <tscreen><verb>
@@ -626,16 +638,17 @@ This cc65 version has some extensions to the ISO C standard.
         </verb></tscreen>
         An example would be
         <tscreen><verb>
-        void __cdecl__ f (unsigned char c)
+        int * __cdecl__ f (unsigned char c)
         </verb></tscreen>
-        The first form of the cdecl keyword is in the user namespace and can
-        therefore be disabled with the <tt><ref id="option--standard"
-        name="--standard"></tt> command line option.
+
+        The first form of the cdecl keyword is in the user namespace;
+        and therefore, can be disabled with the <tt><ref id="option--standard"
+        name="--standard"></tt> command-line option.
 
         For functions that are <tt/cdecl/, the rightmost parameter is pushed
         onto the stack before the function is called. That increases the cost
         of calling those functions, especially when they are called from many
-        places.
+        places.<newline><newline>
         <p>
 
 <item>	There are two pseudo variables named <tt/__AX__/ and <tt/__EAX__/.

@@ -46,6 +46,7 @@
 #include "codeseg.h"
 #include "datatype.h"
 #include "error.h"
+#include "global.h"
 #include "reginfo.h"
 #include "symtab.h"
 #include "codeinfo.h"
@@ -400,7 +401,10 @@ void GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg)
             */
             if ((D->Flags & FD_VARIADIC) != 0) {
                 *Use = REG_Y;
-            } else if (!IsQualCDecl (E->Type) && D->ParamCount > 0) {
+            } else if (D->ParamCount > 0 &&
+                       (AutoCDecl ?
+                        IsQualFastcall (E->Type) :
+                        !IsQualCDecl (E->Type))) {
                 /* Will use registers depending on the last param. */
                 switch (CheckedSizeOf (D->LastParam->Type)) {
                     case 1u:

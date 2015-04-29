@@ -858,6 +858,44 @@ symbol file via the linker. Unnamed labels are not written to the object file,
 because they don't have a name which would allow to access them.
 
 
+<sect1>String Constants<label id="String_Constants"><p>
+
+String constants must be enclosed within a pair of quotation marks.
+
+Example:
+
+<tscreen><verb>
+      	.byte "SOS V2.3"
+</verb></tscreen>
+
+Only <tt/.DEFINE/ style macros can be used to define a string to be used elsewhere.
+Note that ca65 has experimental support for raw string constants that can span more 
+than one line and can use user defined delimiters. The start of a raw string is defined 
+by the characters <tt>R"(</tt> where you would normally just use a single <tt>"</tt>. 
+In this case, only the characters <tt>)"</tt> will signal the end of the string. 
+Line breaks become part of the string.
+
+A custom delimiter may be added as well. The delimiter string follows the same rules 
+as an identifier, but leading characters can be numeric.
+
+Example:
+
+<tscreen><verb>
+      	.DEFINE ImportantNotice R"STRING_END(
+      	      	I can put anything here!
+      	      	It will all become part of the string, until ca65 finds the 
+      	      	keyword "STRING_END". But it has to find a ")" first, and a 
+      	      	single '"' at the very end!      	
+      	)STRING_END"
+
+      	.out ImportantNotice
+</verb></tscreen>
+
+  This command is new and must be enabled with the <tt/.FEATURE raw_strings/ command.
+
+  See: <tt><ref id=".FEATURE" name=".FEATURE"></tt>
+
+
 
 <sect>Scopes<label id="scopes"><p>
 
@@ -2717,6 +2755,12 @@ Here's a list of all control commands and a description, what they do:
     id=".ORG" name=".ORG"></tt> command (which is usually not needed, so just
     removing the lines with the assignments may also be an option when porting
     code written for older assemblers).
+
+  <tag><tt>raw_strings</tt><label id="raw_strings"></tag>
+
+    Enables support for raw string constants. This feature is somewhat experimental.
+
+    See also: <tt><ref id="String_Constants" name="String Constants"></tt>
 
   <tag><tt>ubiquitous_idents</tt><label id="ubiquitous_idents"></tag>
 

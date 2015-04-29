@@ -769,6 +769,101 @@ static void ReadIdent (void)
     }
 }
 
+static void ReadRawStringConst (void)
+/* Called if we found the chars: 'R"'
+** Now Read a raw literal string constant into SVal.
+*/
+{
+    /* Space to store the keyword delimiter */
+    StrBuf* D = NewStrBuf ();
+
+    /* Skip the leading " string terminator */
+    NextChar ();
+
+    /* See if there is a delimiter defined after the: "
+    ** The delimiter string will follow the same rules as an identifier, but leading chars can be numeric.
+    */
+    while (IsIdChar (C)) {
+        /* Add character to the delimiter */
+        SB_AppendChar (D, C);
+        NextChar ();
+    }
+
+    /* next char after the delimiter has to be '(' */
+    if (C != '(') {
+        Error ("Error in raw string. Expected: `('");
+    }
+
+    /* skip the '(' */
+    NextChar ();
+
+    /* Read the string */
+    while (1) {
+
+        /* Maybe we are done ? */
+        if (C == ')') {
+            NextChar ();
+
+            /* If we had a opening delimiter, try a match to previous delimiter */
+            if (D->Len)
+            {
+                /* Does the first char match the first char of the stored delimiter ? */
+                if (C == D->Buf[0]) {
+                    /* Scan through the keyword if the char matches */
+                    unsigned K = 1;
+                    NextChar ();
+                    while ((K < D->Len) && (C == D->Buf[K]))  {
+                        NextChar ();
+                        K++;
+                    }
+
+                    /* If was not a match, append anything we skipped to the string:
+                    ** If Len is less then the length of the delimiter OR the next char is NOT a quote it wasn't a match
+                    */
+                    if ((K < D->Len) || (C != '\"')) {
+                        SB_AppendChar (&CurTok.SVal, ')');
+                        SB_AppendBuf (&CurTok.SVal, D->Buf, K);
+                    } else {
+                        /* Matched delimiter, break from loop */
+                        break;
+                    }
+
+                } else { /* If the first char did not match, add a ')' to the string */
+                    SB_AppendChar (&CurTok.SVal, ')');
+                }
+
+
+            } else if (C == '\"') {
+                /* Matched ')"' and there is no delimiter, break from loop */
+                break;
+            } else {
+                /* ')' was not a match for a delimiter, so add it to the string */
+                SB_AppendChar (&CurTok.SVal, ')');
+            }
+
+        }
+
+        if (C == EOF) {
+            Error ("End of file in raw string constant");
+            break;
+        }
+
+        /* Append the char to the string */
+        SB_AppendChar (&CurTok.SVal, C);
+
+        /* Skip the character */
+        NextChar ();
+    } /* End while */
+
+    /* Skip the trailing terminator */
+    NextChar ();
+
+    /* Terminate the string */
+    SB_Terminate (&CurTok.SVal);
+    /* Release buffer memory */
+    FreeStrBuf (D);
+}
+
 
 
 static void ReadStringConst (int StringTerm)
@@ -1121,6 +1216,23 @@ Again:
                         NextChar ();
                         CurTok.Tok = TOK_OVERRIDE_FAR;
                         return;
+                    }
+                    break;
+
+                case 'R':
+
+                    /* Possible raw string - check if feature is enabled */
+                    if (RawStrings) {
+
+                        /* if next char is a quote and the 'R' is uppercase */
+                        if (C == '\"' && SB_AtUnchecked (&CurTok.SVal, 0) == 'R') {
+                            /* Clear the string attribute */
+                            SB_Clear (&CurTok.SVal);
+                            /* Read Raw String */
+                            ReadRawStringConst ();
+                            CurTok.Tok = TOK_STRCON;
+                            return;
+                        }
                     }
                     break;
 

@@ -1463,8 +1463,26 @@ void CE_Output (const CodeEntry* E)
             Chars += WriteOutput ("%*s%s", Space, "", Target);
             break;
 
+        case AM65_BARBAS:
+            /* c39 bar/bas branch */
+            if(E->JumpTo->Name == NULL) {
+              Internal ("Invalid jump to name for bar/bas");
+            }
+            Target = E->JumpTo->Name;
+            Chars += WriteOutput ("%*s%s,%s", Space, "", E->Arg, Target);
+            break;
+
+        case AM65_BBRBBS:
+            /* c39 bar/bas branch */
+            if(E->JumpTo->Name == NULL) {
+              Internal ("Invalid jump to name for bbr/bbs");
+            }
+            Target = E->JumpTo->Name;
+            Chars += WriteOutput ("%*s%s,%s", Space, "", E->Arg, Target);
+            break;
+            
         default:
-            Internal ("Invalid addressing mode");
+            Internal ("Invalid addressing mode in %s: 0x%x", __FUNCTION__, E->AM);
 
     }
 

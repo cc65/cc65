@@ -262,6 +262,14 @@ static void SetSys (const char* Sys)
             DefineNumericMacro ("__OSIC1P__", 1);
             break;
 
+        case TGT_CREATIX_EMUL:
+            DefineNumericMacro ("__CREATIX_EMUL__", 1);
+            break;
+
+        case TGT_CREATIX_NATIVE:
+            DefineNumericMacro ("__CREATIX_NATIVE__", 1);
+            break;
+            
         default:
             AbEnd ("Unknown target system type %d", Target);
     }
@@ -422,7 +430,8 @@ static void OptCPU (const char* Opt, const char* Arg)
     /* Find the CPU from the given name */
     CPU = FindCPU (Arg);
     if (CPU != CPU_6502 && CPU != CPU_6502X && CPU != CPU_65SC02 &&
-        CPU != CPU_65C02 && CPU != CPU_65816 && CPU != CPU_HUC6280) {
+        CPU != CPU_65C02 && CPU != CPU_65816 && CPU != CPU_HUC6280 &&
+        CPU != CPU_C39_EMUL && CPU != CPU_C39_NATIVE) {
         AbEnd ("Invalid argument for %s: `%s'", Opt, Arg);
     }
 }

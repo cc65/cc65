@@ -216,7 +216,7 @@ static const char* ReadToken (const char* L, const char* Term,
             /* Cannot store this character, this is an input error (maybe
             ** identifier too long or similar).
             */
-            Error ("ASM code error: syntax error");
+            Error ("ASM code error: syntax error:%s:%d", __FILE__, __LINE__);
         }
         ++I;
         if (*L == ')') {
@@ -248,6 +248,9 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
     const OPCDesc*      OPC;
     am_t                AM = 0;         /* Initialize to keep gcc silent */
     char                Arg[IDENTSIZE+10];
+    char                Mask[IDENTSIZE+10];
+    char                Var[IDENTSIZE+10];
+    char                LabelName[IDENTSIZE+10];
     char                Reg;
     CodeEntry*          E;
     CodeLabel*          Label;
@@ -308,7 +311,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 
             /* Check for errors */
             if (*L == '\0') {
-                Error ("ASM code error: syntax error");
+                Error ("ASM code error: syntax error:%s:%d", __FILE__, __LINE__);
                 return 0;
             }
 
@@ -327,7 +330,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
                 }
                 L = SkipSpace (L+1);
                 if (*L != '\0') {
-                    Error ("ASM code error: syntax error");
+                    Error ("ASM code error: syntax error:%s:%d", __FILE__, __LINE__);
                     return 0;
                 }
                 AM = AM65_ZPX_IND;
@@ -342,14 +345,14 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
                     }
                     L = SkipSpace (L+1);
                     if (*L != '\0') {
-                        Error ("ASM code error: syntax error");
+                        Error ("ASM code error: syntax error:%s:%d", __FILE__, __LINE__);
                         return 0;
                     }
                     AM = AM65_ZP_INDY;
                 } else if (*L == '\0') {
                     AM = AM65_ZP_IND;
                 } else {
-                    Error ("ASM code error: syntax error");
+                    Error ("ASM code error: syntax error:%s:%d", __FILE__, __LINE__);
                     return 0;
                 }
             }
@@ -372,7 +375,18 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
                 if ((OPC->Info & OF_BRA) != 0) {
                     /* Branch */
                     AM = AM65_BRA;
-                } else if (GetZPInfo(Arg) != 0) {
+                }
+                else if ((OPC->Info & OF_BARBAS) != 0) {
+                    /* C39 BARBAS Branch */
+                    Error("Innvalid BAR/BAS args");
+                    return 0;
+                }
+                else if ((OPC->Info & OF_BBRBBS) != 0) {
+                    /* C39 BBRBBS Branch */
+                    Error("Innvalid BBR/BBS args");
+                    return 0;
+                }
+                else if (GetZPInfo(Arg) != 0) {
                     AM = AM65_ZP;
                 } else {
                     /* Check for subroutine call to local label */
@@ -384,10 +398,54 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
                     AM = AM65_ABS;
                 }
             } else if (*L == ',') {
+              // C39
+              if(OPC->Info & OF_BARBAS) {
+                // copy var
+                strcpy(Var, Arg);
+                
+                L = SkipSpace (L+1);
+                
+                if(*L != '#') {
+                  Error ("ASM code error: syntax error:%s:%d: No # found for mask", __FILE__, __LINE__);
+                  return 0;
+                }
+
+                // get mask
+                L = ReadToken (L, ",", Mask, sizeof (Mask));
+
+                L = SkipSpace (L+1);
+                
+                // get label
+                L = ReadToken (L, ",", LabelName, sizeof (LabelName));
+
+                AM = AM65_BARBAS;
+              }
+              else if(OPC->Info & OF_BBRBBS) {
+                // copy mask
+                strcpy(Mask, Arg);
+
+                if(Mask[0] != '#') {
+                  Error ("ASM code error: syntax error:%s:%d: No # found for mask", __FILE__, __LINE__);
+                  return 0;
+                }
+                
+                L = SkipSpace (L+1);
+
+                // get var
+                L = ReadToken (L, ",", Var, sizeof (Var));
+
+                L = SkipSpace (L+1);
+                
+                // get label
+                L = ReadToken (L, ",", LabelName, sizeof (LabelName));
+
+                AM = AM65_BBRBBS;
+              }
+              else {
                 /* Indexed */
                 L = SkipSpace (L+1);
                 if (*L == '\0') {
-                    Error ("ASM code error: syntax error");
+                    Error ("ASM code error: syntax error:%s:%d", __FILE__, __LINE__);
                     return 0;
                 } else {
                     Reg = toupper (*L);
@@ -401,14 +459,14 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
                     } else if (Reg == 'Y') {
                         AM = AM65_ABSY;
                     } else {
-                        Error ("ASM code error: syntax error");
+                        Error ("ASM code error: syntax error:%s:%d:L='%s'", __FILE__, __LINE__, L);
                         return 0;
                     }
                     if (*L != '\0') {
-                        Error ("ASM code error: syntax error");
-                        return 0;
+                        Error ("ASM code error: syntax error:%s:%d", __FILE__, __LINE__);
                     }
                 }
+              }
             }
             break;
 
@@ -431,6 +489,41 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
             /* Generate a new label */
             Label = CS_NewCodeLabel (S, Arg, Hash);
         }
+    }
+    else if (AM == AM65_BARBAS) {
+
+        /* Generate the hash over the label, then search for the label */
+        unsigned Hash = HashStr (LabelName) % CS_LABEL_HASH_SIZE;
+        
+        Label = CS_FindLabel (S, LabelName, Hash);
+
+        /* If we don't have the label, it's a forward ref - create it */
+        if (Label == 0) {
+            /* Generate a new label */
+            Label = CS_NewCodeLabel (S, LabelName, Hash);
+        }
+
+        snprintf(Arg, sizeof(Arg), "%s,%s", Var, Mask);
+        
+        Arg[sizeof(Arg)-1] = 0;
+    }
+    else if (AM == AM65_BBRBBS) {
+
+        /* Generate the hash over the label, then search for the label */
+        unsigned Hash = HashStr (LabelName) % CS_LABEL_HASH_SIZE;
+        
+        Label = CS_FindLabel (S, LabelName, Hash);
+
+        /* If we don't have the label, it's a forward ref - create it */
+        if (Label == 0) {
+            /* Generate a new label */
+            Label = CS_NewCodeLabel (S, LabelName, Hash);
+        }
+
+        snprintf(Arg, sizeof(Arg), "%s,%s", Mask, Var);
+        
+        Arg[sizeof(Arg)-1] = 0;
+
     }
 
     /* We do now have the addressing mode in AM. Allocate a new CodeEntry

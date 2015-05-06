@@ -106,7 +106,10 @@ void GetEA (EffAddr* A)
         if (CurTok.Tok == TOK_COMMA) {
             /* [dir],y */
             NextTok ();
-            Consume (TOK_Y, "`Y' expected");
+            if (GetCPU() == CPU_C39_NATIVE)
+              Consume (TOK_X, "`X' expected");
+            else
+              Consume (TOK_Y, "`Y' expected");
             A->AddrModeSet = AM65_DIR_IND_LONG_Y;
         } else {
             /* [dir] */
@@ -134,7 +137,10 @@ void GetEA (EffAddr* A)
                 A->AddrModeSet = AM65_STACK_REL_IND_Y;
                 ConsumeRParen ();
                 ConsumeComma ();
-                Consume (TOK_Y, "`Y' expected");
+                if (GetCPU() == CPU_C39_NATIVE || GetCPU() == CPU_C39_EMUL)
+                  Error ("Syntax error: (rel,s),y not supported");
+                else
+                  Consume (TOK_Y, "`Y' expected");
             } else {
                 Error ("Syntax error");
             }
@@ -146,7 +152,10 @@ void GetEA (EffAddr* A)
             if (CurTok.Tok == TOK_COMMA) {
                 /* (adr),y */
                 NextTok ();
-                Consume (TOK_Y, "`Y' expected");
+                if (GetCPU() == CPU_C39_NATIVE)
+                  Consume (TOK_X, "`X' expected");
+                else
+                  Consume (TOK_Y, "`Y' expected");
                 A->AddrModeSet = AM65_DIR_IND_Y;
             } else {
                 /* (adr) */

@@ -417,7 +417,11 @@ void SegDone (void)
                     if ((F->Len == 1 && ED.AddrSize > ADDR_SIZE_ZP)  ||
                         (F->Len == 2 && ED.AddrSize > ADDR_SIZE_ABS) ||
                         (F->Len == 3 && ED.AddrSize > ADDR_SIZE_FAR)) {
-                        LIError (&F->LI, "Range error");
+                         LIError (&F->LI, "Range error in %s:%d: FLEN %d ADDRSIZE %d", __FILE__, __LINE__, F->Len, ED.AddrSize);
+                      
+                      if(F->Len == 1 && ED.AddrSize > ADDR_SIZE_ZP) {
+                         LIError (&F->LI, "Expecting zeropage addr");
+                      }
                     }
                 }
 

@@ -1314,6 +1314,12 @@ static unsigned RunOptGroup6 (CodeSeg* S)
     /* This group will only run for a standard 6502, because the 65C02 has a
     ** better addressing mode that covers this case.
     */
+
+    // C39: using (indir,x) is not supported
+    if(CPU == CPU_C39_EMUL || CPU == CPU_C39_NATIVE) {
+        return 0;
+    }
+    
     if ((CPUIsets[CPU] & CPU_ISET_65SC02) == 0) {
         Changes += RunOptFunc (S, &DOptIndLoads1, 1);
         Changes += RunOptFunc (S, &DOptUnusedLoads, 1);

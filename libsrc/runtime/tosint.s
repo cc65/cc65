@@ -15,7 +15,7 @@
 .proc   tosint
 
         pha
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if (.cpu .bitand ::CPU_ISET_65SC02) .or (.cpu .bitand ::CPU_ISET_C39_EMUL)
         lda     (sp)
 .else
         ldy     #0

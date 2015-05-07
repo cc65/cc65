@@ -79,7 +79,9 @@ struct InputFile {
     FilePos         Pos;                /* Position in file */
     token_t         Tok;                /* Last token */
     int             C;                  /* Last character */
-    StrBuf          Line;               /* The current input line */
+    StrBuf          Line;               /* The current input line, trailing whitespace removed */
+    StrBuf          RawLine;            /* The current input line untouched */
+    int             RawMode;            /* True if reading in raw mode */
     int             IncSearchPath;      /* True if we've added a search path */
     int             BinSearchPath;      /* True if we've added a search path */
     InputFile*      Next;               /* Linked list of input files */
@@ -104,6 +106,7 @@ typedef struct CharSourceFunctions CharSourceFunctions;
 struct CharSourceFunctions {
     void (*MarkStart) (CharSource*);    /* Mark the start pos of a token */
     void (*NextChar) (CharSource*);     /* Read next char from input */
+    void (*NextRawChar) (CharSource*);  /* Read next raw char from input */
     void (*Done) (CharSource*);         /* Close input source */
 };
 
@@ -401,19 +404,27 @@ static void IFNextChar (CharSource* S)
         }
 
 
+        /* First, save a raw copy of the line in case we need it. */
+        Len = SB_GetLen (&S->V.File.Line);
+        SB_CopyBuf (&S->V.File.RawLine, S->V.File.Line.Buf, Len);
+        
+        /* We didn't copy the EOL, so add it now */
+        SB_AppendChar (&S->V.File.RawLine, '\n');
+
         /* If we come here, we have a new input line. To avoid problems
         ** with strange line terminators, remove all whitespace from the
         ** end of the line, the add a single newline.
         */
-        Len = SB_GetLen (&S->V.File.Line);
+
         while (Len > 0 && IsSpace (SB_AtUnchecked (&S->V.File.Line, Len-1))) {
             --Len;
         }
         SB_Drop (&S->V.File.Line, SB_GetLen (&S->V.File.Line) - Len);
         SB_AppendChar (&S->V.File.Line, '\n');
 
-        /* Terminate the string buffer */
+        /* Terminate the string buffers */
         SB_Terminate (&S->V.File.Line);
+        SB_Terminate (&S->V.File.RawLine);
 
         /* One more line */
         S->V.File.Pos.Line++;
@@ -428,6 +439,88 @@ static void IFNextChar (CharSource* S)
 
     /* Return the next character from the buffer */
     C = SB_Get (&S->V.File.Line);
+}
+
+
+
+static void IFNextRawChar(CharSource* S)
+/* Read the next raw character from the input file */
+{
+    /* Check for end of line, read the next line if needed */
+    while (SB_GetIndex (&S->V.File.RawLine) >= SB_GetLen (&S->V.File.RawLine)) {
+
+        unsigned Len;
+
+        /* End of current line reached, read next line */
+        SB_Clear (&S->V.File.RawLine);
+        while (1) {
+
+            int N = fgetc (S->V.File.F);
+            if (N == EOF) {
+                /* End of file. Accept files without a newline at the end */
+                if (SB_NotEmpty (&S->V.File.RawLine)) {
+                    break;
+                }
+
+                /* No more data - add an empty line to the listing. This
+                ** is a small hack needed to keep the PC output in sync.
+                */
+                NewListingLine (&EmptyStrBuf, S->V.File.Pos.Name, FCount);
+                C = EOF;
+                return;
+
+                /* Check for end of line */
+            }
+            else if (N == '\n') {
+
+                /* End of line */
+                break;
+
+                /* Collect other stuff */
+            }
+            else {
+
+                /* Append data to line */
+                SB_AppendChar (&S->V.File.RawLine, N);
+
+            }
+        }
+
+        /* Copy the raw line into the regular line buffer to be processed. */
+        Len = SB_GetLen (&S->V.File.RawLine);
+        SB_CopyBuf (&S->V.File.Line, S->V.File.RawLine.Buf, Len);
+
+        /* We didn't copy the EOL, so add it now */
+        SB_AppendChar (&S->V.File.RawLine, '\n');
+
+        /* If we come here, we have a new input line. To avoid problems
+        ** with strange line terminators, remove all whitespace from the
+        ** end of the line, the add a single newline.
+        */
+
+        while (Len > 0 && IsSpace (SB_AtUnchecked (&S->V.File.Line, Len - 1))) {
+            --Len;
+        }
+        SB_Drop (&S->V.File.Line, SB_GetLen (&S->V.File.Line) - Len);
+        SB_AppendChar (&S->V.File.Line, '\n');
+
+        /* Terminate the string buffers */
+        SB_Terminate (&S->V.File.Line);
+        SB_Terminate (&S->V.File.RawLine);
+
+        /* One more line */
+        S->V.File.Pos.Line++;
+
+        /* Remember the new line for the listing */
+        NewListingLine (&S->V.File.RawLine, S->V.File.Pos.Name, FCount);
+
+    }
+
+    /* Set the column pointer */
+    S->V.File.Pos.Col = SB_GetIndex (&S->V.File.RawLine);
+
+    /* Return the next character from the buffer */
+    C = SB_Get (&S->V.File.RawLine);
 }
 
 
@@ -467,6 +560,7 @@ void IFDone (CharSource* S)
 static const CharSourceFunctions IFFunc = {
     IFMarkStart,
     IFNextChar,
+    IFNextRawChar,
     IFDone
 };
 
@@ -535,7 +629,9 @@ int NewInputFile (const char* Name)
     S->V.File.Pos.Line  = 0;
     S->V.File.Pos.Col   = 0;
     S->V.File.Pos.Name  = FileIdx;
+    S->V.File.RawMode   = 0;
     SB_Init (&S->V.File.Line);
+    SB_Init (&S->V.File.RawLine);
 
     /* Push the path for this file onto the include search lists */
     SB_CopyBuf (&Path, Name, FindName (Name) - Name);
@@ -674,7 +770,53 @@ static unsigned DigitVal (unsigned char C)
 static void NextChar (void)
 /* Read the next character from the input file */
 {
-    Source->Func->NextChar (Source);
+    if (Source->V.File.RawMode) 
+        Source->Func->NextRawChar (Source);
+    else
+        Source->Func->NextChar (Source);
+}
+
+
+
+static void EnterRawTextMode (void)
+/* Switch to raw character mode at the current position in the input file.
+**  Calls to EnterRawTextMode and LeaveRawTextMode may be nested.
+*/
+{
+    if (Source->V.File.RawMode == 0) {
+        unsigned Index;
+        Index = SB_GetIndex (&Source->V.File.Line);
+        SB_SetIndex (&Source->V.File.RawLine, Index);
+    }
+
+    ++Source->V.File.RawMode;
+}
+
+
+
+static void LeaveRawTextMode (void)
+/* Switch out of raw character mode at the current position in the input file */
+{
+    /* Make sure we are okay to Leave */
+    PRECONDITION (Source->V.File.RawMode > 0);
+
+    --Source->V.File.RawMode;
+
+    if (Source->V.File.RawMode == 0) {
+        
+        /* Set the index for non-raw mode while making sure that we don't set it past the end of the line */
+        unsigned IndexRaw;
+        unsigned LenLine;
+        
+        IndexRaw = SB_GetIndex (&Source->V.File.RawLine);
+        LenLine = SB_GetLen (&Source->V.File.Line);
+
+        if (IndexRaw < LenLine) {
+            SB_SetIndex (&Source->V.File.Line, IndexRaw);
+        } else {
+            SB_SetIndex (&Source->V.File.Line, LenLine);
+        }
+    }
 }
 
 
@@ -769,23 +911,29 @@ static void ReadIdent (void)
     }
 }
 
+
+
 static void ReadRawStringConst (void)
 /* Called if we found the chars: 'R"'
 ** Now Read a raw literal string constant into SVal.
 */
 {
+    /* Switch to raw text mode */
+    EnterRawTextMode ();
+    
     /* Space to store the keyword delimiter */
-    StrBuf* D = NewStrBuf ();
+    StrBuf D;
+    SB_Init (&D);
 
     /* Skip the leading " string terminator */
     NextChar ();
 
-    /* See if there is a delimiter defined after the: "
+    /* See if there is a custom delimiter defined after the: "
     ** The delimiter string will follow the same rules as an identifier, but leading chars can be numeric.
     */
     while (IsIdChar (C)) {
         /* Add character to the delimiter */
-        SB_AppendChar (D, C);
+        SB_AppendChar (&D, C);
         NextChar ();
     }
 
@@ -804,25 +952,24 @@ static void ReadRawStringConst (void)
         if (C == ')') {
             NextChar ();
 
-            /* If we had a opening delimiter, try a match to previous delimiter */
-            if (D->Len)
-            {
+            /* If we had an opening delimiter, try to find a match */
+            if (D.Len) {
                 /* Does the first char match the first char of the stored delimiter ? */
-                if (C == D->Buf[0]) {
+                if (C == D.Buf[0]) {
                     /* Scan through the keyword if the char matches */
                     unsigned K = 1;
                     NextChar ();
-                    while ((K < D->Len) && (C == D->Buf[K]))  {
+                    while ((K < D.Len) && (C == D.Buf[K]))  {
                         NextChar ();
                         K++;
                     }
 
-                    /* If was not a match, append anything we skipped to the string:
+                    /* If was not a match, append anything we skipped to the string literal.
                     ** If Len is less then the length of the delimiter OR the next char is NOT a quote it wasn't a match
                     */
-                    if ((K < D->Len) || (C != '\"')) {
+                    if ((K < D.Len) || (C != '\"')) {
                         SB_AppendChar (&CurTok.SVal, ')');
-                        SB_AppendBuf (&CurTok.SVal, D->Buf, K);
+                        SB_AppendBuf (&CurTok.SVal, D.Buf, K);
                     } else {
                         /* Matched delimiter, break from loop */
                         break;
@@ -847,21 +994,24 @@ static void ReadRawStringConst (void)
             Error ("End of file in raw string constant");
             break;
         }
+        
+        /* Ignore Carriage Return, Vertical Tab and Formfeed */
+        if (C != '\r' && C != '\v' && C != '\f')
+            SB_AppendChar (&CurTok.SVal, C);
 
-        /* Append the char to the string */
-        SB_AppendChar (&CurTok.SVal, C);
-
-        /* Skip the character */
+        /* Skip to the next character */
         NextChar ();
     } /* End while */
 
     /* Skip the trailing terminator */
     NextChar ();
-
+    
+    LeaveRawTextMode ();
+    
     /* Terminate the string */
     SB_Terminate (&CurTok.SVal);
     /* Release buffer memory */
-    FreeStrBuf (D);
+    SB_Done (&D);
 }
 
 
@@ -1527,11 +1677,14 @@ CharAgain:
             /* Line continuation? */
             if (LineCont) {
                 NextChar ();
+                /* Next char should be a LF, if not, will result in an error later */
                 if (C == '\n') {
-                    /* Handle as white space */
+                    /* Ignore the '\n' */
                     NextChar ();
-                    C = ' ';
                     goto Again;
+                } else {
+                    /* Make it clear what the problem is: */
+                    Error ("Newline expected after line continuation.");
                 }
             }
             break;

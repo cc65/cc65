@@ -27,7 +27,8 @@ TARGETS = apple2    \
           osic1p    \
           sim6502   \
           sim65c02  \
-          supervision
+          supervision \
+          creatix-emul
 
 DRVTYPES = emd \
            joy \

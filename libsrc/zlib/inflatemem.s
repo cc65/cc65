@@ -9,10 +9,10 @@
         .import         incsp2
         .importzp       sp, sreg, ptr1, ptr2, ptr3, ptr4, tmp1
 
-	.macpack	cpu
+        .macpack        cpu
 
 .if (.cpu .bitand CPU_ISET_C39_EMUL)
-	.importzp	tx
+        .importzp       tx
 .endif
 
 ; --------------------------------------------------------------------------
@@ -144,8 +144,8 @@ inflateCopyBlock:
 ; Get 16-bit length
         ldx     #inputPointer
 .if (.cpu .bitand CPU_ISET_C39_EMUL)
-	stx	tx
-	lda	(tx)
+        stx     tx
+        lda     (tx)
 .else
         lda     (0,x)
 .endif
@@ -174,12 +174,12 @@ moveBlock:
         inc     moveBlock_len+1
 moveBlock_1:
 .if (.cpu .bitand CPU_ISET_C39_EMUL)
-	stx	tx
-	lda	(tx)
+        stx     tx
+        lda     (tx)
 .else
         lda     (0,x)
 .endif
-	
+        
 .ifpc02
         sta     (outputPointer)
 .else

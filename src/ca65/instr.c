@@ -1089,7 +1089,7 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
 {
     /* Get the set of possible addressing modes */
     GetEA (A);
-    
+
     /* From the possible addressing modes, remove the ones that are invalid
     ** for this instruction or CPU.
     */

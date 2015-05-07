@@ -157,8 +157,8 @@ typedef enum {
     AM65_ZP_INDY,               /* (zeropage),y */
     AM65_ZP_IND,                /* (zeropage) */
     AM65_BRA,                   /* branch */
-    AM65_BARBAS,                /* c49 bar/bas branch */
-    AM65_BBRBBS                 /* c49 bar/bas branch */
+    AM65_BARBAS,                /* c39 bar/bas branch */
+    AM65_BBRBBS                 /* c39 bbr/bbs branch */
 } am_t;
 
 /* Branch conditions */

@@ -19,7 +19,7 @@ tosadd0ax:
 
 tosaddeax:
         clc
-.if (.cpu .bitand CPU_ISET_65SC02) .or (.cpu .bitand CPU_ISET_C39_EMUL)
+.if (.cpu .bitand CPU_ISET_65SC02) .or (.cpu .bitand CPU_ISET_C39)
         adc     (sp)            ; 65SC02 version - saves 2 cycles
         ldy     #1
 .else

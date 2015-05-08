@@ -11,7 +11,7 @@
 
 .proc   popa
 
-.if (.cpu .bitand ::CPU_ISET_65SC02) .or (.cpu .bitand ::CPU_ISET_C39_EMUL)
+.if (.cpu .bitand ::CPU_ISET_65SC02) .or (.cpu .bitand ::CPU_ISET_C39)
         lda     (sp)
 .else
         ldy     #0              ; (2)

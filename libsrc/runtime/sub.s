@@ -17,7 +17,7 @@ tossuba0:
 tossubax:
         sec
         eor     #$FF
-.if (.cpu .bitand CPU_ISET_65SC02) .or (.cpu .bitand CPU_ISET_C39_EMUL)
+.if (.cpu .bitand CPU_ISET_65SC02) .or (.cpu .bitand CPU_ISET_C39)
         adc     (sp)
         ldy     #1
 .else

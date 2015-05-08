@@ -388,6 +388,7 @@ static const struct {
 } InsTabC39 = {
     sizeof (InsTabC39.Ins) / sizeof (InsTabC39.Ins[0]),
     {
+      /* AMs: immed; zp; zp,x */
       { "ADA",  0x0800024, 0x80, 0, C39PutAdd }, /* C39: renamed ADD to ADA because it conflicts with add macro */
       /* C39: (ind)   = AM65_DIR_IND   = 0x0400 allowed */
       /* C39: (ind,x) = AM65_DIR_X_IND = 0x8000 not allowed */

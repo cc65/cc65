@@ -381,7 +381,11 @@ static const struct {
     }
 };
 
-/* Instruction table for the Rockwell C39 */
+/* Instruction table for the Rockwell R6746, R6750, R6760, C19, C39, L39, C40 etc */
+
+/* R6502 instruction compatible except "(indirect,X)" addressing mode changed to "(Indirect)" 
+   and "(Indirect),Y" addressing mode changed to "(Indirect),X" */
+  
 static const struct {
   unsigned Count;
   InsDesc  Ins[135]; /* FIX WHEN ADDING INSN! */

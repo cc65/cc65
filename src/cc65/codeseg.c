@@ -398,9 +398,9 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
                     AM = AM65_ABS;
                 }
             } else if (*L == ',') {
-              // C39
+              /* C39 */
               if(OPC->Info & OF_BARBAS) {
-                // copy var
+                /* copy var */
                 strcpy(Var, Arg);
                 
                 L = SkipSpace (L+1);
@@ -410,18 +410,18 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
                   return 0;
                 }
 
-                // get mask
+                /* get mask */
                 L = ReadToken (L, ",", Mask, sizeof (Mask));
 
                 L = SkipSpace (L+1);
                 
-                // get label
+                /* get label */
                 L = ReadToken (L, ",", LabelName, sizeof (LabelName));
 
                 AM = AM65_BARBAS;
               }
               else if(OPC->Info & OF_BBRBBS) {
-                // copy mask
+                /* copy mask */
                 strcpy(Mask, Arg);
 
                 if(Mask[0] != '#') {
@@ -431,12 +431,12 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
                 
                 L = SkipSpace (L+1);
 
-                // get var
+                /* get var */
                 L = ReadToken (L, ",", Var, sizeof (Var));
 
                 L = SkipSpace (L+1);
                 
-                // get label
+                /* get label */
                 L = ReadToken (L, ",", LabelName, sizeof (LabelName));
 
                 AM = AM65_BBRBBS;

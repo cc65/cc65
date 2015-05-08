@@ -788,7 +788,7 @@ static void ReadStringConst (int StringTerm)
             break;
         }
 
-        // handle escaped chars..
+        /* handle escaped chars.. */
         cprev = C;
         
         if (C == '\n' || C == EOF) {

@@ -483,7 +483,7 @@ static void ConvertEscapesStrBuf (StrBuf *Data)
 
               s++;
               
-              // hex
+              /* hex */
               if(sscanf(s, "%02x", &c) != 1)
                 {
                   ErrorSkip ("Invalid hex escape in string constant");
@@ -497,7 +497,7 @@ static void ConvertEscapesStrBuf (StrBuf *Data)
             {
               int c;
 
-              // octal
+              /* octal */
               if(sscanf(s, "%03o", &c) != 1)
                 {
                   ErrorSkip ("Invalid octal escape in string constant");
@@ -582,7 +582,7 @@ static void DoASCIIWithXtensions (void)
             return;
         }
 
-        // convert escapes..
+        /* convert escapes.. */
         ConvertEscapesStrBuf (&CurTok.SVal);
         
         /* Translate into target charset and emit */
@@ -608,7 +608,7 @@ static void DoASCIIZWithXtensions (void)
             return;
         }
 
-        // convert escapes..
+        /* Convert escapes.. */
         ConvertEscapesStrBuf (&CurTok.SVal);
         
         /* Translate into target charset and emit */

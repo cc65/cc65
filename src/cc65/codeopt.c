@@ -1315,7 +1315,7 @@ static unsigned RunOptGroup6 (CodeSeg* S)
     ** better addressing mode that covers this case.
     */
 
-    // C39: using (indir,x) is not supported
+    /* C39: using (indir,x) is not supported */
     if(CPU == CPU_C39_EMUL || CPU == CPU_C39_NATIVE) {
         return 0;
     }

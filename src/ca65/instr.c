@@ -384,21 +384,21 @@ static const struct {
 /* Instruction table for the Rockwell C39 */
 static const struct {
   unsigned Count;
-  InsDesc  Ins[135]; // FIX WHEN ADDING INSN!
+  InsDesc  Ins[135]; /* FIX WHEN ADDING INSN! */
 } InsTabC39 = {
     sizeof (InsTabC39.Ins) / sizeof (InsTabC39.Ins[0]),
     {
-      // C39: (ind)   = AM65_DIR_IND   = 0x0400 allowed
-      // C39: (ind,x) = AM65_DIR_X_IND = 0x8000 not allowed
+      /* C39: (ind)   = AM65_DIR_IND   = 0x0400 allowed */
+      /* C39: (ind,x) = AM65_DIR_X_IND = 0x8000 not allowed */
       { "ADC",  0x080266C, 0x60, 0, C39PutArith }, 
-      { "ADX",  0x0800024, 0x80, 0, C39PutAdd }, // C39: renamed ADD to ADX because it conflicts with add macro
-      { "AND",  0x080266C, 0x20, 0, C39PutArith }, // C39: (ind,x) not allowed
+      { "ADA",  0x0800024, 0x80, 0, C39PutAdd }, /* C39: renamed ADD to ADA because it conflicts with add macro */
+      { "AND",  0x080266C, 0x20, 0, C39PutArith }, /* C39: (ind,x) not allowed */
       { "ASL",  0x000006e, 0x02, 1, PutAll },
-      { "ASR",  0x000006e, 0x3A, 1, PutAll }, // C39
-      { "BAR",  0x0000008, 0xE2, 0, C39PutBARBAS }, // C39
-      { "BAS",  0x0000008, 0xF2, 0, C39PutBARBAS }, // C39
-      { "BBR",  0x0000004, 0x0F, 0, C39PutBBRBBS }, // use #immed for bit
-      { "BBR0", 0x0000000, 0x0F, 0, PutBitBranch }, // amode wrong!?
+      { "ASR",  0x000006e, 0x3A, 1, PutAll }, /* C39 */
+      { "BAR",  0x0000008, 0xE2, 0, C39PutBARBAS }, /* C39 */
+      { "BAS",  0x0000008, 0xF2, 0, C39PutBARBAS }, /* C39 */
+      { "BBR",  0x0000004, 0x0F, 0, C39PutBBRBBS }, /* use #immed for bit */
+      { "BBR0", 0x0000000, 0x0F, 0, PutBitBranch }, /* amode wrong!? */
       { "BBR1", 0x0000000, 0x1F, 0, PutBitBranch },
       { "BBR2", 0x0000000, 0x2F, 0, PutBitBranch },
       { "BBR3", 0x0000000, 0x3F, 0, PutBitBranch },
@@ -406,8 +406,8 @@ static const struct {
       { "BBR5", 0x0000000, 0x5F, 0, PutBitBranch },
       { "BBR6", 0x0000000, 0x6F, 0, PutBitBranch },
       { "BBR7", 0x0000000, 0x7F, 0, PutBitBranch },
-      { "BBS",  0x0000004, 0x8F, 0, C39PutBBRBBS }, // use #immed for bit
-      { "BBS0", 0x0000000, 0x8F, 0, PutBitBranch }, // amode wrong?
+      { "BBS",  0x0000004, 0x8F, 0, C39PutBBRBBS }, /* use #immed for bit */
+      { "BBS0", 0x0000000, 0x8F, 0, PutBitBranch }, /* amode wrong? */
       { "BBS1", 0x0000000, 0x9F, 0, PutBitBranch },
       { "BBS2", 0x0000000, 0xAF, 0, PutBitBranch },
       { "BBS3", 0x0000000, 0xBF, 0, PutBitBranch },
@@ -430,61 +430,61 @@ static const struct {
       { "CLD",  0x0000001, 0xd8, 0, PutAll },
       { "CLI",  0x0000001, 0x58, 0, PutAll },
       { "CLV",  0x0000001, 0xb8, 0, PutAll },
-      { "CLW",  0x0000001, 0x52, 0, PutAll }, // C39
-      { "CMP",  0x080266C, 0xc0, 0, C39PutArith }, // C39: (ind,x) not allowed
+      { "CLW",  0x0000001, 0x52, 0, PutAll }, /* C39 */
+      { "CMP",  0x080266C, 0xc0, 0, C39PutArith }, /* C39: (ind,x) not allowed */
       { "CPX",  0x080000C, 0xe0, 1, PutAll },
       { "CPY",  0x080000C, 0xc0, 1, PutAll },
       { "DEC",  0x000006F, 0x00, 3, PutAll },
       { "DEX",  0x0000001, 0xca, 0, PutAll },
       { "DEY",  0x0000001, 0x88, 0, PutAll },
-      { "EOR",  0x080266C, 0x40, 0, C39PutArith }, // C39: (ind,x) not allowed
-      { "EXC",  0x0000020, 0xd3, 0, C39PutExchange }, // C39 
+      { "EOR",  0x080266C, 0x40, 0, C39PutArith }, /* C39: (ind,x) not allowed */
+      { "EXC",  0x0000020, 0xd3, 0, C39PutExchange }, /* C39  */
       { "INC",  0x000006f, 0x00, 4, PutAll },
-      { "INI",  0x0000001, 0xbb, 0, PutAll }, // C39
+      { "INI",  0x0000001, 0xbb, 0, PutAll }, /* C39 */
       { "INX",  0x0000001, 0xe8, 0, PutAll },
       { "INY",  0x0000001, 0xc8, 0, PutAll },
-      { "JMP",  0x0010808, 0x4c, 6, PutAll }, // C39: (abs,x) allowed..
-      { "JPI",  0x0000001, 0x0c, 0, PutAll }, // C39
-      { "JSB0", 0x0000001, 0x0b, 0, PutAll }, // C39
-      { "JSB1", 0x0000001, 0x1b, 0, PutAll }, // C39
-      { "JSB2", 0x0000001, 0x2b, 0, PutAll }, // C39
-      { "JSB3", 0x0000001, 0x3b, 0, PutAll }, // C39
-      { "JSB4", 0x0000001, 0x4b, 0, PutAll }, // C39
-      { "JSB5", 0x0000001, 0x5b, 0, PutAll }, // C39
-      { "JSB6", 0x0000001, 0x6b, 0, PutAll }, // C39
-      { "JSB7", 0x0000001, 0x7b, 0, PutAll }, // C39
+      { "JMP",  0x0010808, 0x4c, 6, PutAll }, /* C39: (abs,x) allowed.. */
+      { "JPI",  0x0000001, 0x0c, 0, PutAll }, /* C39 */
+      { "JSB0", 0x0000001, 0x0b, 0, PutAll }, /* C39 */
+      { "JSB1", 0x0000001, 0x1b, 0, PutAll }, /* C39 */
+      { "JSB2", 0x0000001, 0x2b, 0, PutAll }, /* C39 */
+      { "JSB3", 0x0000001, 0x3b, 0, PutAll }, /* C39 */
+      { "JSB4", 0x0000001, 0x4b, 0, PutAll }, /* C39 */
+      { "JSB5", 0x0000001, 0x5b, 0, PutAll }, /* C39 */
+      { "JSB6", 0x0000001, 0x6b, 0, PutAll }, /* C39 */
+      { "JSB7", 0x0000001, 0x7b, 0, PutAll }, /* C39 */
       { "JSR",  0x0000008, 0x20, 7, PutAll },
-      { "LAB",  0x0000001, 0x13, 0, PutAll }, // C39
-      { "LAI",  0x0000001, 0xeb, 0, PutAll }, // C39
-      { "LAN",  0x0000001, 0xab, 0, PutAll }, // C39
-      { "LDA",  0x080266C, 0xa0, 0, C39PutArith }, // C39: (ind,x) not allowed
+      { "LAB",  0x0000001, 0x13, 0, PutAll }, /* C39 */
+      { "LAI",  0x0000001, 0xeb, 0, PutAll }, /* C39 */
+      { "LAN",  0x0000001, 0xab, 0, PutAll }, /* C39 */
+      { "LDA",  0x080266C, 0xa0, 0, C39PutArith }, /* C39: (ind,x) not allowed */
       { "LDX",  0x080030C, 0xa2, 1, PutAll },
       { "LDY",  0x080006C, 0xa0, 1, PutAll },
-      { "LII",  0x0000001, 0x9b, 0, PutAll }, // C39
+      { "LII",  0x0000001, 0x9b, 0, PutAll }, /* C39 */
       { "LSR",  0x000006F, 0x42, 1, PutAll },
-      { "MPA",  0x0000001, 0x12, 0, PutAll }, // C39
-      { "MPY",  0x0000001, 0x02, 0, PutAll }, // C39
-      { "NEG",  0x0000001, 0x1a, 0, PutAll }, // C39
+      { "MPA",  0x0000001, 0x12, 0, PutAll }, /* C39 */
+      { "MPY",  0x0000001, 0x02, 0, PutAll }, /* C39 */
+      { "NEG",  0x0000001, 0x1a, 0, PutAll }, /* C39 */
       { "NOP",  0x0000001, 0xea, 0, PutAll },
-      { "NXT",  0x0000001, 0x8b, 0, PutAll }, // C39
-      { "ORA",  0x080266C, 0x00, 0, C39PutArith }, // C39: (ind,x) not allowed
+      { "NXT",  0x0000001, 0x8b, 0, PutAll }, /* C39 */
+      { "ORA",  0x080266C, 0x00, 0, C39PutArith }, /* C39: (ind,x) not allowed */
       { "PHA",  0x0000001, 0x48, 0, PutAll },
-      { "PHI",  0x0000001, 0xcb, 0, PutAll }, // C39
+      { "PHI",  0x0000001, 0xcb, 0, PutAll }, /* C39 */
       { "PHP",  0x0000001, 0x08, 0, PutAll },
-      { "PHW",  0x0000001, 0x23, 0, PutAll }, // C39
+      { "PHW",  0x0000001, 0x23, 0, PutAll }, /* C39 */
       { "PHX",  0x0000001, 0xda, 0, PutAll },
       { "PHY",  0x0000001, 0x5a, 0, PutAll },
-      { "PIA",  0x0000001, 0xfb, 0, PutAll }, // C39
+      { "PIA",  0x0000001, 0xfb, 0, PutAll }, /* C39 */
       { "PLA",  0x0000001, 0x68, 0, PutAll },
-      { "PLI",  0x0000001, 0xdb, 0, PutAll }, // C39
+      { "PLI",  0x0000001, 0xdb, 0, PutAll }, /* C39 */
       { "PLP",  0x0000001, 0x28, 0, PutAll },
-      { "PLW",  0x0000001, 0x33, 0, PutAll }, // C39
+      { "PLW",  0x0000001, 0x33, 0, PutAll }, /* C39 */
       { "PLX",  0x0000001, 0xfa, 0, PutAll },
       { "PLY",  0x0000001, 0x7a, 0, PutAll },
-      { "PSH",  0x0000001, 0x22, 0, PutAll }, // C39
-      { "PUL",  0x0000001, 0x32, 0, PutAll }, // C39
-      { "RBA",  0x0000008, 0xc2, 0, C39PutRBASBA }, // C39
-      { "RMB",  0x0000004, 0x07, 0, C39PutRMBSMB }, // use #immed for bit..
+      { "PSH",  0x0000001, 0x22, 0, PutAll }, /* C39 */
+      { "PUL",  0x0000001, 0x32, 0, PutAll }, /* C39 */
+      { "RBA",  0x0000008, 0xc2, 0, C39PutRBASBA }, /* C39 */
+      { "RMB",  0x0000004, 0x07, 0, C39PutRMBSMB }, /* use #immed for bit.. */
       { "RMB0", 0x0000004, 0x07, 1, PutAll },
       { "RMB1", 0x0000004, 0x17, 1, PutAll },
       { "RMB2", 0x0000004, 0x27, 1, PutAll },
@@ -493,17 +493,17 @@ static const struct {
       { "RMB5", 0x0000004, 0x57, 1, PutAll },
       { "RMB6", 0x0000004, 0x67, 1, PutAll },
       { "RMB7", 0x0000004, 0x77, 1, PutAll },
-      { "RND",  0x0000001, 0x42, 0, PutAll }, // C39
+      { "RND",  0x0000001, 0x42, 0, PutAll }, /* C39 */
       { "ROL",  0x000006F, 0x22, 1, PutAll },
       { "ROR",  0x000006F, 0x62, 1, PutAll },
       { "RTI",  0x0000001, 0x40, 0, PutAll },
       { "RTS",  0x0000001, 0x60, 0, PutAll },
-      { "SBA",  0x0000008, 0xd2, 0, C39PutRBASBA }, // C39
-      { "SBC",  0x080266C, 0xe0, 0, C39PutArith }, // C39: (ind,x) not allowed
+      { "SBA",  0x0000008, 0xd2, 0, C39PutRBASBA }, /* C39 */
+      { "SBC",  0x080266C, 0xe0, 0, C39PutArith }, /* C39: (ind,x) not allowed */
       { "SEC",  0x0000001, 0x38, 0, PutAll },
       { "SED",  0x0000001, 0xf8, 0, PutAll },
       { "SEI",  0x0000001, 0x78, 0, PutAll },
-      { "SMB",  0x0000004, 0x87, 0, C39PutRMBSMB }, // use #immed for bit
+      { "SMB",  0x0000004, 0x87, 0, C39PutRMBSMB }, /* use #immed for bit */
       { "SMB0", 0x0000004, 0x87, 1, PutAll },
       { "SMB1", 0x0000004, 0x97, 1, PutAll },
       { "SMB2", 0x0000004, 0xA7, 1, PutAll },
@@ -512,16 +512,16 @@ static const struct {
       { "SMB5", 0x0000004, 0xD7, 1, PutAll },
       { "SMB6", 0x0000004, 0xE7, 1, PutAll },
       { "SMB7", 0x0000004, 0xF7, 1, PutAll },
-      { "STA",  0x000266C, 0x80, 0, C39PutArith }, // C39: (ind,x) not allowed
-      { "STI",  0x0000004, 0xb2, 0, C39PutStoreImm }, // C39 
+      { "STA",  0x000266C, 0x80, 0, C39PutArith }, /* C39: (ind,x) not allowed */
+      { "STI",  0x0000004, 0xb2, 0, C39PutStoreImm }, /* C39  */
       { "STX",  0x000010c, 0x82, 1, PutAll },
       { "STY",  0x000002c, 0x80, 1, PutAll },
-      { "TAW",  0x0000001, 0x62, 0, PutAll }, // C39
+      { "TAW",  0x0000001, 0x62, 0, PutAll }, /* C39 */
       { "TAX",  0x0000001, 0xaa, 0, PutAll },
       { "TAY",  0x0000001, 0xa8, 0, PutAll },
-      { "TIP",  0x0000001, 0x03, 0, PutAll }, // C39
+      { "TIP",  0x0000001, 0x03, 0, PutAll }, /* C39 */
       { "TSX",  0x0000001, 0xba, 0, PutAll },
-      { "TWA",  0x0000001, 0x72, 0, PutAll }, // C39
+      { "TWA",  0x0000001, 0x72, 0, PutAll }, /* C39 */
       { "TXA",  0x0000001, 0x8a, 0, PutAll },
       { "TXS",  0x0000001, 0x9a, 0, PutAll },
       { "TYA",  0x0000001, 0x98, 0, PutAll },
@@ -1703,9 +1703,9 @@ void HandleInstruction (unsigned Index)
     InsTab->Ins[Index].Emit (&InsTab->Ins[Index]);
 }
 
-//////////////////////////////////////////////////////////////////////
-// C39 Funcs
-//////////////////////////////////////////////////////////////////////
+/*//////////////////////////////////////////////////////////////////// */
+/* C39 Funcs */
+/*//////////////////////////////////////////////////////////////////// */
 
 static void C39PutArith (const InsDesc* Ins)
 {
@@ -1718,31 +1718,31 @@ static void C39PutArith (const InsDesc* Ins)
         {
           switch(Ins->BaseCode)
             {
-              // emulate (ind),y with jsb calls, the zp addr is put as a const
-              // which is fetched by the jsb func
+              /* emulate (ind),y with jsb calls, the zp addr is put as a const */
+              /* which is fetched by the jsb func */
             case 0xA0: 
-              Emit1(0x0B, A.Expr); // LDA (zp),y -> JSB0 .db expr
+              Emit1(0x0B, A.Expr); /* LDA (zp),y -> JSB0 .db expr */
               break;
             case 0x80: 
-              Emit1(0x1B, A.Expr); // STA (zp),y -> JSB1 .db expr
+              Emit1(0x1B, A.Expr); /* STA (zp),y -> JSB1 .db expr */
               break;
             case 0x60: 
-              Emit1(0x2B, A.Expr); // ADC (zp),y -> JSB2 .db expr
+              Emit1(0x2B, A.Expr); /* ADC (zp),y -> JSB2 .db expr */
               break;
             case 0xE0: 
-              Emit1(0x3B, A.Expr); // SBC (zp),y -> JSB3 .db expr
+              Emit1(0x3B, A.Expr); /* SBC (zp),y -> JSB3 .db expr */
               break;
             case 0x20: 
-              Emit1(0x4B, A.Expr); // AND (zp),y -> JSB4 .db expr
+              Emit1(0x4B, A.Expr); /* AND (zp),y -> JSB4 .db expr */
               break;
             case 0x00: 
-              Emit1(0x5B, A.Expr); // ORA (zp),y -> JSB5 .db expr
+              Emit1(0x5B, A.Expr); /* ORA (zp),y -> JSB5 .db expr */
               break;
             case 0x40: 
-              Emit1(0x6B, A.Expr); // EOR (zp),y -> JSB6 .db expr
+              Emit1(0x6B, A.Expr); /* EOR (zp),y -> JSB6 .db expr */
               break;
             case 0xC0: 
-              Emit1(0x7B, A.Expr); // CMP (zp),y -> JSB7 .db expr
+              Emit1(0x7B, A.Expr); /* CMP (zp),y -> JSB7 .db expr */
               break;
             default:
               ErrorSkip ("ARITH: Invalid arith base code 0x%x", Ins->BaseCode);
@@ -1751,8 +1751,8 @@ static void C39PutArith (const InsDesc* Ins)
         }
       else if (A.AddrModeBit & AM65_DIR_IND)
         {
-          // (zp,x) changed to (zp), code using this must be manually fixed with a subroutine..
-          Emit1(Ins->BaseCode + 0x01, A.Expr); // LDA (zp) etc
+          /* (zp,x) changed to (zp), code using this must be manually fixed with a subroutine.. */
+          Emit1(Ins->BaseCode + 0x01, A.Expr); /* LDA (zp) etc */
         }
       else
         {
@@ -1856,7 +1856,7 @@ static void C39PutBARBAS (const InsDesc* Ins)
     
     NextTok ();
     
-    // MUST USE .DEFINE, NOT = FOR CONSTANTS!
+    /* MUST USE .DEFINE, NOT = FOR CONSTANTS! */
     mask = ConstExpression();
     ConsumeComma ();
 
@@ -1879,7 +1879,7 @@ static void C39PutBBRBBS (const InsDesc* Ins)
     
     NextTok ();
 
-    // MUST USE .DEFINE, NOT = FOR CONSTANTS!
+    /* MUST USE .DEFINE, NOT = FOR CONSTANTS! */
     bit = ConstExpression();
 
     ConsumeComma ();
@@ -1912,7 +1912,7 @@ static void C39PutRBASBA (const InsDesc* Ins)
     
   NextTok ();
 
-  // MUST USE .DEFINE, NOT = FOR CONSTANTS!
+  /* MUST USE .DEFINE, NOT = FOR CONSTANTS! */
   mask = ConstExpression ();
     
   ConsumeComma ();
@@ -1937,7 +1937,7 @@ static void C39PutRMBSMB (const InsDesc* Ins)
     
   NextTok ();
     
-  // MUST USE .DEFINE, NOT = FOR CONSTANTS!
+  /* MUST USE .DEFINE, NOT = FOR CONSTANTS! */
   bit = ConstExpression ();
 
   if(bit < 0 || bit > 7)

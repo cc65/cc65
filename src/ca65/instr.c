@@ -388,10 +388,10 @@ static const struct {
 } InsTabC39 = {
     sizeof (InsTabC39.Ins) / sizeof (InsTabC39.Ins[0]),
     {
+      { "ADA",  0x0800024, 0x80, 0, C39PutAdd }, /* C39: renamed ADD to ADA because it conflicts with add macro */
       /* C39: (ind)   = AM65_DIR_IND   = 0x0400 allowed */
       /* C39: (ind,x) = AM65_DIR_X_IND = 0x8000 not allowed */
       { "ADC",  0x080266C, 0x60, 0, C39PutArith }, 
-      { "ADA",  0x0800024, 0x80, 0, C39PutAdd }, /* C39: renamed ADD to ADA because it conflicts with add macro */
       { "AND",  0x080266C, 0x20, 0, C39PutArith }, /* C39: (ind,x) not allowed */
       { "ASL",  0x000006e, 0x02, 1, PutAll },
       { "ASR",  0x000006e, 0x3A, 1, PutAll }, /* C39 */

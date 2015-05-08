@@ -449,7 +449,7 @@ static const struct {
       { "INX",  0x0000001, 0xe8, 0, PutAll },
       { "INY",  0x0000001, 0xc8, 0, PutAll },
       { "JMP",  0x0010808, 0x4c, 6, PutAll }, /* C39: (abs,x) allowed.. */
-      { "JPI",  0x0000001, 0x0c, 0, PutAll }, /* C39 */
+      { "JPI",  0x0000800, 0x0c, 0, PutAll }, /* C39: jpi (ind) */
       { "JSB0", 0x0000001, 0x0b, 0, PutAll }, /* C39 */
       { "JSB1", 0x0000001, 0x1b, 0, PutAll }, /* C39 */
       { "JSB2", 0x0000001, 0x2b, 0, PutAll }, /* C39 */

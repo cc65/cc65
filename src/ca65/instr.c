@@ -1750,7 +1750,7 @@ static void C39PutArith (const InsDesc* Ins)
               Emit1(0x7B, A.Expr); /* CMP (zp),y -> JSB7 .db expr */
               break;
             default:
-              ErrorSkip ("ARITH: Invalid arith base code 0x%x", Ins->BaseCode);
+              Internal ("ARITH: Invalid arith base code 0x%x", Ins->BaseCode);
               return;
             }
         }
@@ -1957,7 +1957,7 @@ static void C39PutRMBSMB (const InsDesc* Ins)
     { 
       if(Ins->BaseCode != 0x07 && Ins->BaseCode != 0x87)
         {
-          ErrorSkip ("RMBSMB: Invalid base insn 0x%x", Ins->BaseCode);
+          Internal ("RMBSMB: Invalid base insn 0x%x", Ins->BaseCode);
           return;
         }
         

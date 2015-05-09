@@ -266,10 +266,6 @@ static void SetSys (const char* Sys)
             DefineNumericMacro ("__CREATIX_EMUL__", 1);
             break;
 
-        case TGT_CREATIX_NATIVE:
-            DefineNumericMacro ("__CREATIX_NATIVE__", 1);
-            break;
-            
         default:
             AbEnd ("Unknown target system type %d", Target);
     }

@@ -10,8 +10,8 @@ TIMER_B_RAM_LO = $0106
 TIMER_B_RAM_HI = $0107
 
 ; enable only one of these!        
-XTAL_52_416    = 1
-;XTAL_14_7456   = 1
+;XTAL_52_416    = 1
+XTAL_14_7456   = 1
 ;XTAL_9_8304    = 1
 
 .define BIT_SIR_SIN_STATUS_ENA 2

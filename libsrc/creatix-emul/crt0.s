@@ -1,4 +1,6 @@
 ; crt0.s
+
+        .setcpu "c39-native"
         
         .export         __STARTUP__ : absolute = 1
         

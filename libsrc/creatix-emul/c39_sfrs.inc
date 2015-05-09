@@ -1,4 +1,4 @@
-; c39_sfrs.inc -*- asm -*-
+; c39_sfrs.inc - ca65 -*- asm -*-
         
 P_A             = $00    ; Port A (bidir)
 P_B             = $01    ; Port B (W)
@@ -64,3 +64,7 @@ P_SSR           = $3C    ; serial status register
 P_SFR           = $3D    ; serial form register
 P_SOUTD         = $3E    ; SOUT (RxD) divider latch (R)
 P_SIND          = $3F    ; SIN (TxD) divider latch (R)
+
+SERIAL_BUF    = $38
+SERIAL_SIR    = $39     
+SERIAL_STATUS = $3C

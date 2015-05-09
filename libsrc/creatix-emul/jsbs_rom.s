@@ -16,6 +16,10 @@
 ;; .word jsb5_ora_y
 ;; .word jsb6_eor_y
 ;; .word jsb7_cmp_y
+
+        .setcpu "c39-native"
+
+        .importzp tx,ty,zindptr1,zindptr2
         
 .macro JSB_START_EMUL_IND_Y
         pli                     ; 1 b, 6 c
@@ -28,7 +32,7 @@
         lan                     ; 1 b, 3 c
         sta zindptr1            ; 2 b, 3 c
         ; can be done once at startup!
-        sti #0,zindptr1_hi      ; 3 b, 4 c
+        sti #0,zindptr1+1      ; 3 b, 4 c
         ; indirect load of lo addr
         lda (zindptr1)          ; 2 b, 5 c
         sta zindptr2            ; 2 b, 3 c

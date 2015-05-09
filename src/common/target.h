@@ -79,7 +79,6 @@ typedef enum {
     TGT_SIM6502,
     TGT_SIM65C02,
     TGT_CREATIX_EMUL,
-    TGT_CREATIX_NATIVE,
     TGT_COUNT                   /* Number of target systems */
 } target_t;
 

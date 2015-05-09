@@ -1,5 +1,7 @@
 ; i2c.s
 
+        .setcpu "c39-native"
+        
         .include "c39.inc"
         .include "c39_sfrs.inc"
 

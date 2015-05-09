@@ -1,5 +1,7 @@
 ; wait.s
 
+                .setcpu "c39-native"
+        
                 .include "c39.inc"
 
                 .export _wait_1ms

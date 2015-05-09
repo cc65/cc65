@@ -1,7 +1,9 @@
 ; init_proc_creatix.s - ca65, creatix modem..
 
-        .code
+                .setcpu "c39-native"
 
+                .include "c39.inc"
+        
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 PTG_LO = $00
@@ -17,6 +19,8 @@ PTG_HI_4800_14_7456   = $08
 PTG_HI_9600_14_7456   = $10
 PTG_HI_19200_14_7456  = $20
 PTG_HI_38400_14_7456  = $40
+
+                .code
         
 init_serial3:
                 ; PTGs
@@ -40,9 +44,9 @@ init_serial3:
                 lda     #PTG_LO
                 sta     $0035           ; PAB
 
-.if .def (XTAL_14_7456)
+.if .defined(XTAL_14_7456)
                 lda     #PTG_HI_38400_14_7456
-.elseif .def (XTAL_9_8304)      
+.elseif .defined(XTAL_9_8304)      
                 lda     #PTG_HI_38400_9_8304
 .else
                 .error "Invalid XTAL"
@@ -191,6 +195,6 @@ serial_irq_enable_x_done:
                 jsr init_serial
 
                 ;;  jump to your code..
-                jmp main
+                ;jmp main
 .endproc
         

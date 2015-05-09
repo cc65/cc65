@@ -311,10 +311,6 @@ static void SetSys (const char* Sys)
             NewSymbol ("__CREATIX_EMUL__", 1);
             break;
             
-        case TGT_CREATIX_NATIVE:
-            NewSymbol ("__CREATIX_NATIVE__", 1);
-            break;
-            
         default:
             AbEnd ("Invalid target name: `%s'", Sys);
 

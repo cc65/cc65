@@ -4,6 +4,8 @@
 ; Zero the bss segment.
 ;
 
+        .setcpu "c39-native"
+        
         .export         zerobss
         .import         __BSS_RUN__, __BSS_SIZE__
         .importzp       ptr1, tx, ty

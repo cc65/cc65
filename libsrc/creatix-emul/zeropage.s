@@ -4,6 +4,8 @@
 ; CC65 runtime: zeropage usage
 ;
 
+        .setcpu "c39-native"
+        
         .exportzp       sp, sreg, regsave
         .exportzp       ptr1, ptr2, ptr3, ptr4
         .exportzp       tmp1, tmp2, tmp3, tmp4

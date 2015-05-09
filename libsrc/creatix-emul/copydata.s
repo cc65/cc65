@@ -4,11 +4,13 @@
 ; Copy the data segment from the LOAD to the RUN location
 ;
 
+        .setcpu "c39-native"
+        
         .export         copydata
         .import         __DATA_LOAD__, __DATA_RUN__, __DATA_SIZE__
         .importzp       ptr1, ptr2, tmp1, tx, ty
 
-
+        
 copydata:
         lda     #<__DATA_LOAD__         ; Source pointer
         sta     ptr1

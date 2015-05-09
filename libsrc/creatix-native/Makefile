@@ -12,7 +12,17 @@ LIBDIR = ../../lib
 
 LIB = $(LIBDIR)/$(TARGET).lib
 
-OBJS = $(WRKDIR)/_read.o $(WRKDIR)/_write.o $(WRKDIR)/copydata.o $(WRKDIR)/zerobss.o $(WRKDIR)/zeropage.o
+OBJS = \
+$(WRKDIR)/_read.o \
+$(WRKDIR)/_write.o \
+$(WRKDIR)/copydata.o \
+$(WRKDIR)/zerobss.o \
+$(WRKDIR)/zeropage.o \
+$(WRKDIR)/serial.o \
+$(WRKDIR)/nvram.o \
+$(WRKDIR)/i2c.o \
+$(WRKDIR)/wait.o \
+$(WRKDIR)/c39.o \
 
 all: $(LIB)
 

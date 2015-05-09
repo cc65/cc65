@@ -2,21 +2,12 @@
         
         .import         popax
         .importzp       ptr1, ptr2, ptr3, tmp1
-        
-        .export         _read
 
-SERIAL_BUF    = $38
-SERIAL_STATUS = $3C
+        .import         _serial_getc
+        .export         _read
         
-.define BIT_SIN_BUFFER_FULL    0
-.define BIT_SIN_OVERRUN_ERROR  1
-.define BIT_SIN_PARITY_ERROR   2
-.define BIT_SIN_FRAMING_ERROR  3
-.define BIT_SIN_BREAK_DETECTED 4
-.define BIT_SOUT_BUFFER_EMPTY  5
-.define BIT_SOUT_UNDERRUN      6
-.define BIT_SIN_PARIITY_BIT    7
-        
+        .include "c39.inc"
+                
 .proc _read
         sta     ptr3
         stx     ptr3+1          ; save count as result, was store a!
@@ -54,24 +45,5 @@ L2:
 
 L9:     lda     ptr3
         ldx     ptr3+1
-        rts
-.endproc
-
-.proc _serial_getc
-L1:     
-        bbr #BIT_SIN_BUFFER_FULL, SERIAL_STATUS, _serial_getc
-        lda SERIAL_BUF
-        rts
-.endproc
-        
-.proc _serial_getc_echo
-L1:     
-        bbr #BIT_SIN_BUFFER_FULL, SERIAL_STATUS, L1
-        lda SERIAL_BUF
-        
-        ;; echo
-L2:     
-        bbr #BIT_SOUT_BUFFER_EMPTY, SERIAL_STATUS, L2
-        sta SERIAL_BUF
         rts
 .endproc

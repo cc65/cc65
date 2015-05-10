@@ -364,14 +364,11 @@ static void IFMarkStart (CharSource* S)
 static void IFNextChar (CharSource* S)
 /* Read the next character from the input file */
 {
-    
+    /* Check if we are at the start of trailing whitespace, read next line if needed */
     if (SB_GetIndex (&S->V.File.Line) > S->V.File.EndLinePos) {
 
-        /* If we come here, we need to read a new line */
-
-        unsigned Len;
-
         /* End of current line reached, read next line */
+        unsigned Len;
         SB_Clear (&S->V.File.Line);
         while (1) {
 
@@ -390,22 +387,19 @@ static void IFNextChar (CharSource* S)
                 return;
 
                 /* Check for end of line */
-            }
-            else if (N == '\n') {
+            } else if (N == '\n') {
 
                 /* End of line */
                 break;
 
                 /* Collect other stuff */
-            }
-            else {
+            } else {
 
                 /* Append data to line */
                 SB_AppendChar (&S->V.File.Line, N);
 
             }
         }
-
 
         /* We didn't copy the EOL in the while loop, so add it now */
         SB_AppendChar (&S->V.File.Line, '\n');
@@ -414,19 +408,17 @@ static void IFNextChar (CharSource* S)
         SB_AppendChar (&S->V.File.Line, '\0');
 
         Len = SB_GetLen (&S->V.File.Line);
-        --Len; /* Don't check the NUL */
+        --Len; /* Don't count the NUL */
 
         /* If we come here, we have a new input line. To avoid problems
-        ** with strange line terminators, count all whitespace characters
-        ** at the end of the line.
+        ** with strange line terminators, count and remember the position of 
+        ** trailing whitespace characters, but keep the line intact to
+        ** support raw input.
         */
 
         while (Len > 0 && IsSpace(SB_AtUnchecked (&S->V.File.Line, Len - 1))) {
             --Len;
         }
-        /* Keep the buffer intact in case we need to re-evaluate for raw input,
-        ** but mark the start of whitepsace */
-
         S->V.File.EndLinePos = Len;
 
         /* One more line */
@@ -437,13 +429,13 @@ static void IFNextChar (CharSource* S)
 
     }
 
-    /* Return the next character:
-    ** Special case, we are at the begining of whitespace, so return EOL 
-    */
-
     /* Set the column pointer */
     S->V.File.Pos.Col = SB_GetIndex (&S->V.File.Line);
 
+    /* Return the next character:
+    ** Check for special case - we are at the begining of whitespace
+    ** if so, return EOL
+    */
     if (SB_GetIndex (&S->V.File.Line) == S->V.File.EndLinePos) {
         C = '\n';
         /* Increment the index */
@@ -461,8 +453,8 @@ static void IFNextRawChar (CharSource* S)
 /* Read the next raw character from the input file */
 {
         
-    /* Return the next char from the raw line unless we are at the actual end of the buffer
-    ** SB_Get returns NUL if the end of the string is reached.
+    /* Return the next character from the raw line unless 
+    ** we are at the actual end of the buffer.
     */
 
     /* Set the column pointer */
@@ -635,10 +627,10 @@ int NewInputFile (const char* Name)
     S->V.File.RawMode    = 0;
     SB_Init (&S->V.File.Line);
     
-    /* Small hack: set the index of the line buffer to 1 to
-    ** be read on the first call to IFNextChar() 
+    /* Small hack: set the index of the line buffer to 1 to force 
+    ** IFNextChar to read input on the first call.
     */
-    SB_SetIndex(&S->V.File.Line, 1);
+    SB_SetIndex (&S->V.File.Line, 1);
 
     /* Push the path for this file onto the include search lists */
     SB_CopyBuf (&Path, Name, FindName (Name) - Name);
@@ -811,18 +803,18 @@ static void LeaveRawTextMode (void)
     if (Source->V.File.RawMode == 0) {
         
         unsigned Len;
-        Len = SB_GetLen(&Source->V.File.Line);
-        --Len; /* Don't check the NUL at line end */
+        Len = SB_GetLen (&Source->V.File.Line);
+        --Len; /* Don't count the NUL */
 
         /* Check for and mark the start of any trailing whitespace */
-        while (Len > 0 && IsSpace(SB_AtUnchecked(&Source->V.File.Line, Len - 1))) {
+        while (Len > 0 && IsSpace (SB_AtUnchecked (&Source->V.File.Line, Len - 1))) {
             --Len;
         }
 
         Source->V.File.EndLinePos = Len;
 
-        if (SB_GetIndex(&Source->V.File.Line) > Source->V.File.EndLinePos) {
-            SB_SetIndex(&Source->V.File.Line, Source->V.File.EndLinePos);
+        if (SB_GetIndex (&Source->V.File.Line) > Source->V.File.EndLinePos) {
+            SB_SetIndex (&Source->V.File.Line, Source->V.File.EndLinePos);
         }
 
         /* Read characters normally */

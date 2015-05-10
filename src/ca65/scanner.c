@@ -416,7 +416,7 @@ static void IFNextChar (CharSource* S)
         ** support raw input.
         */
 
-        while (Len > 0 && IsSpace(SB_AtUnchecked (&S->V.File.Line, Len - 1))) {
+        while (Len > 0 && IsSpace (SB_AtUnchecked (&S->V.File.Line, Len - 1))) {
             --Len;
         }
         S->V.File.EndLinePos = Len;

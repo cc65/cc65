@@ -162,6 +162,8 @@ void g_preamble (void)
         case CPU_65C02:     AddTextLine ("\t.setcpu\t\t\"65C02\"");     break;
         case CPU_65816:     AddTextLine ("\t.setcpu\t\t\"65816\"");     break;
         case CPU_HUC6280:   AddTextLine ("\t.setcpu\t\t\"HUC6280\"");   break;
+        case CPU_C39_EMUL:    AddTextLine ("\t.setcpu\t\t\"C39-EMUL\"");   break;
+        case CPU_C39_NATIVE:  AddTextLine ("\t.setcpu\t\t\"C39-NATIVE\""); break;
         default:            Internal ("Unknown CPU: %d", CPU);
     }
 

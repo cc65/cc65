@@ -15,7 +15,7 @@ popsreg:
         ldy     #1
         lda     (sp),y          ; get hi byte
         sta     sreg+1          ; store it
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if (.cpu .bitand ::CPU_ISET_65SC02) .or (.cpu .bitand CPU_ISET_C39)
         lda     (sp)            ; get lo byte
 .else
         dey

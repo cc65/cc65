@@ -11,3 +11,5 @@
 /testwrk/
 /tgi/
 /wrk/
+*~
+*.sh

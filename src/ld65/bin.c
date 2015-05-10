@@ -179,6 +179,7 @@ static void BinWriteMem (BinDesc* D, MemoryArea* M)
             Warning ("Segment `%s' is not aligned properly. Resulting "
                      "executable may not be functional.",
                      GetString (S->Name));
+            Warning ("RunAlignment: 0x%lx SegAlignment 0x%lx", S->RunAlignment, S->Seg->Alignment);
         }
 
         /* If this is the run memory area, we must apply run alignment. If

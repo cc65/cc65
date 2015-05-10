@@ -54,6 +54,11 @@ typedef enum {
     OP65_ADC,
     OP65_AND,
     OP65_ASL,
+    OP65_ASR,
+    OP65_BAR,
+    OP65_BAS,
+    OP65_BBR,
+    OP65_BBS,
     OP65_BCC,
     OP65_BCS,
     OP65_BEQ,
@@ -77,6 +82,7 @@ typedef enum {
     OP65_DEX,
     OP65_DEY,
     OP65_EOR,
+    OP65_EXC,
     OP65_INA,
     OP65_INC,
     OP65_INX,
@@ -95,6 +101,7 @@ typedef enum {
     OP65_LDX,
     OP65_LDY,
     OP65_LSR,
+    OP65_NEG,
     OP65_NOP,
     OP65_ORA,
     OP65_PHA,
@@ -105,15 +112,20 @@ typedef enum {
     OP65_PLP,
     OP65_PLX,
     OP65_PLY,
+    OP65_RBA,
+    OP65_RMB,
     OP65_ROL,
     OP65_ROR,
     OP65_RTI,
     OP65_RTS,
+    OP65_SBA,
     OP65_SBC,
     OP65_SEC,
     OP65_SED,
     OP65_SEI,
+    OP65_SMB,
     OP65_STA,
+    OP65_STI,
     OP65_STX,
     OP65_STY,
     OP65_STZ,
@@ -144,7 +156,9 @@ typedef enum {
     AM65_ZPX_IND,               /* (zeropage,x) */
     AM65_ZP_INDY,               /* (zeropage),y */
     AM65_ZP_IND,                /* (zeropage) */
-    AM65_BRA                    /* branch */
+    AM65_BRA,                   /* branch */
+    AM65_BARBAS,                /* c39 bar/bas branch */
+    AM65_BBRBBS                 /* c39 bbr/bbs branch */
 } am_t;
 
 /* Branch conditions */
@@ -175,6 +189,8 @@ typedef enum {
 #define OF_SETF         0x0800U /* Insn will set all load flags (not carry) */
 #define OF_CMP          0x1000U /* A compare A/X/Y instruction */
 #define OF_NOIMP        0x2000U /* Implicit addressing mode is actually A */
+#define OF_BARBAS       0x4000U /* C39 BAR / BAS insn */
+#define OF_BBRBBS       0x8000U /* C39 BBR / BBS insn */
 
 /* Combined infos */
 #define OF_BRA  (OF_UBRA | OF_CBRA)     /* Operation is a jump/branch */

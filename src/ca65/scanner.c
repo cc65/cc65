@@ -138,7 +138,10 @@ struct DotKeyword {
     { ".ADDRSIZE",      TOK_ADDRSIZE    },
     { ".ALIGN",         TOK_ALIGN       },
     { ".AND",           TOK_BOOLAND     },
+    { ".ASCII",         TOK_ASCII       },
+    { ".ASCIIX",        TOK_ASCIIX      },
     { ".ASCIIZ",        TOK_ASCIIZ      },
+    { ".ASCIIZX",       TOK_ASCIIZX     },
     { ".ASSERT",        TOK_ASSERT      },
     { ".AUTOIMPORT",    TOK_AUTOIMPORT  },
     { ".BANK",          TOK_BANK        },
@@ -774,14 +777,20 @@ static void ReadIdent (void)
 static void ReadStringConst (int StringTerm)
 /* Read a string constant into SVal. */
 {
+    int cprev = 0;
+    
     /* Skip the leading string terminator */
     NextChar ();
 
     /* Read the string */
     while (1) {
-        if (C == StringTerm) {
+        if (C == StringTerm && cprev != '\\') {
             break;
         }
+
+        /* handle escaped chars.. */
+        cprev = C;
+        
         if (C == '\n' || C == EOF) {
             Error ("Newline in string constant");
             break;

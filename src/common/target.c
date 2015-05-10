@@ -134,7 +134,7 @@ static const unsigned char CTPET[256] = {
 /* One entry in the target map */
 typedef struct TargetEntry TargetEntry;
 struct TargetEntry {
-    char        Name[12];               /* Target name */
+    char        Name[20];               /* Target name */
     target_t    Id;                     /* Target id */
 };
 
@@ -154,6 +154,7 @@ static const TargetEntry TargetMap[] = {
     {   "c64",          TGT_C64         },
     {   "cbm510",       TGT_CBM510      },
     {   "cbm610",       TGT_CBM610      },
+    {   "creatix-emul",   TGT_CREATIX_EMUL   },
     {   "geos",         TGT_GEOS_CBM    },
     {   "geos-apple",   TGT_GEOS_APPLE  },
     {   "geos-cbm",     TGT_GEOS_CBM    },
@@ -202,6 +203,7 @@ static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "lynx",           CPU_65C02,      BINFMT_BINARY,      CTNone  },
     { "sim6502",        CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "sim65c02",       CPU_65C02,      BINFMT_BINARY,      CTNone  },
+    { "creatix-emul",   CPU_C39_EMUL,   BINFMT_BINARY,      CTNone  }
 };
 
 /* Target system */

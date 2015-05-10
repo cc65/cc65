@@ -74,10 +74,45 @@ const OPCDesc OPCTable[OP65_COUNT] = {
     },
     {   OP65_ASL,                               /* opcode */
         "asl",                                  /* mnemonic */
+        0,                                      /* size (why 0?) */
+        REG_NONE,                               /* use (why none?) */
+        REG_NONE,                               /* chg (why none?) */
+        OF_SETF | OF_NOIMP                      /* flags */
+    },
+    {   OP65_ASR,                               /* opcode */
+        "asr",                                  /* mnemonic */
         0,                                      /* size */
         REG_NONE,                               /* use */
         REG_NONE,                               /* chg */
         OF_SETF | OF_NOIMP                      /* flags */
+    },
+    {   OP65_BAR,                               /* opcode */
+        "bar",                                  /* mnemonic */
+        5,                                      /* size */
+        REG_NONE,                               /* use */
+        REG_NONE,                               /* chg */
+        OF_BARBAS                              /* flags */
+    },
+    {   OP65_BAS,                               /* opcode */
+        "bas",                                  /* mnemonic */
+        5,                                      /* size */
+        REG_NONE,                               /* use */
+        REG_NONE,                               /* chg */
+        OF_BARBAS                               /* flags */
+    },
+    {   OP65_BBR,                               /* opcode */
+        "bbr",                                  /* mnemonic */
+        3,                                      /* size */
+        REG_NONE,                               /* use */
+        REG_NONE,                               /* chg */
+        OF_BBRBBS                               /* flags */
+    },
+    {   OP65_BBS,                               /* opcode */
+        "bbs",                                  /* mnemonic */
+        3,                                      /* size */
+        REG_NONE,                               /* use */
+        REG_NONE,                               /* chg */
+        OF_BBRBBS                               /* flags */
     },
     {   OP65_BCC,                               /* opcode */
         "bcc",                                  /* mnemonic */
@@ -240,6 +275,13 @@ const OPCDesc OPCTable[OP65_COUNT] = {
         REG_A,                                  /* chg */
         OF_SETF                                 /* flags */
     },
+    {   OP65_EXC,                               /* opcode */
+        "exc",                                  /* mnemonic */
+        2,                                      /* size */
+        REG_A,                                  /* use */
+        REG_A,                                  /* chg */
+        OF_NONE                                 /* flags */
+    },
     {   OP65_INA,                               /* opcode */
         "ina",                                  /* mnemonic */
         1,                                      /* size */
@@ -366,6 +408,13 @@ const OPCDesc OPCTable[OP65_COUNT] = {
         REG_NONE,                               /* chg */
         OF_SETF | OF_NOIMP                      /* flags */
     },
+    {   OP65_NEG,                               /* opcode */
+        "neg",                                  /* mnemonic */
+        1,                                      /* size */
+        REG_A,                                  /* use */
+        REG_A,                                  /* chg */
+        OF_SETF                                 /* flags */
+    },
     {   OP65_NOP,                               /* opcode */
         "nop",                                  /* mnemonic */
         1,                                      /* size */
@@ -436,6 +485,20 @@ const OPCDesc OPCTable[OP65_COUNT] = {
         REG_Y,                                  /* chg */
         OF_SETF                                 /* flags */
     },
+    {   OP65_RBA,                               /* opcode */
+        "rba",                                  /* mnemonic */
+        4,                                      /* size */
+        REG_NONE,                               /* use */
+        REG_NONE,                               /* chg */
+        OF_STORE                                /* flags */
+    },
+    {   OP65_RMB,                               /* opcode */
+        "rmb",                                  /* mnemonic */
+        2,                                      /* size */
+        REG_NONE,                               /* use */
+        REG_NONE,                               /* chg */
+        OF_STORE                                /* flags */
+    },
     {   OP65_ROL,                               /* opcode */
         "rol",                                  /* mnemonic */
         0,                                      /* size */
@@ -467,6 +530,13 @@ const OPCDesc OPCTable[OP65_COUNT] = {
         REG_NONE,                               /* chg */
         OF_RET                                  /* flags */
     },
+    {   OP65_SBA,                               /* opcode */
+        "sba",                                  /* mnemonic */
+        4,                                      /* size */
+        REG_NONE,                               /* use */
+        REG_NONE,                               /* chg */
+        OF_STORE                                /* flags */
+    },
     {   OP65_SBC,                               /* opcode */
         "sbc",                                  /* mnemonic */
         0,                                      /* size */
@@ -495,10 +565,24 @@ const OPCDesc OPCTable[OP65_COUNT] = {
         REG_NONE,                               /* chg */
         OF_NONE                                 /* flags */
     },
+    {   OP65_SMB,                               /* opcode */
+        "smb",                                  /* mnemonic */
+        2,                                      /* size */
+        REG_NONE,                               /* use */
+        REG_NONE,                               /* chg */
+        OF_STORE                                /* flags */
+    },
     {   OP65_STA,                               /* opcode */
         "sta",                                  /* mnemonic */
         0,                                      /* size */
         REG_A,                                  /* use */
+        REG_NONE,                               /* chg */
+        OF_STORE                                /* flags */
+    },
+    {   OP65_STI,                               /* opcode */
+        "sti",                                  /* mnemonic */
+        3,                                      /* size */
+        REG_NONE,                               /* use */
         REG_NONE,                               /* chg */
         OF_STORE                                /* flags */
     },
@@ -649,7 +733,7 @@ unsigned GetInsnSize (opc_t OPC, am_t AM)
         case AM65_ZP_INDY: return 2;
         case AM65_ZP_IND:  return 2;
         default:
-            Internal ("Invalid addressing mode");
+            Internal ("Invalid addressing mode in %s: 0x%x", __FUNCTION__, AM);
             return 0;
     }
 }
@@ -726,7 +810,12 @@ opc_t MakeShortBranch (opc_t OPC)
         case OP65_BVS:
         case OP65_JVS:  return OP65_BVS;
         case OP65_BRA:
-        case OP65_JMP:  return (CPUIsets[CPU] & CPU_ISET_65SC02)? OP65_BRA : OP65_JMP;
+        case OP65_JMP:
+	  {
+	    if((CPUIsets[CPU] & CPU_ISET_65SC02) || CPU == CPU_C39_EMUL || CPU == CPU_C39_NATIVE)
+	      return OP65_BRA;
+	    return OP65_JMP;
+	  }
         default:
             Internal ("MakeShortBranch: Invalid opcode: %d", OPC);
             return 0;

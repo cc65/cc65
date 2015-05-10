@@ -14,14 +14,16 @@ CBMS = c128   \
 GEOS = geos-apple \
        geos-cbm
 
-TARGETS = apple2    \
-          apple2enh \
-          atari     \
-          atarixl   \
-          atari5200 \
-          atmos     \
+TARGETS = \
           $(CBMS)   \
           $(GEOS)   \
+          apple2    \
+          apple2enh \
+          atari     \
+          atari5200 \
+          atarixl   \
+          atmos     \
+          creatix-emul \
           lynx      \
           nes       \
           osic1p    \

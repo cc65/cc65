@@ -17,7 +17,7 @@ tosulong:
         jsr     decsp2          ; Make room
         ldy     #2
         lda     (sp),y
-.if (.cpu .bitand CPU_ISET_65SC02)
+.if (.cpu .bitand CPU_ISET_65SC02) .or (.cpu .bitand CPU_ISET_C39)
         sta     (sp)            ; 65C02 version
         iny                     ; Y = 3
 .else
@@ -43,7 +43,7 @@ toslong:
         jsr     decsp2          ; Make room
         ldy     #2
         lda     (sp),y
-.if (.cpu .bitand CPU_ISET_65SC02)
+.if (.cpu .bitand CPU_ISET_65SC02) .or (.cpu .bitand CPU_ISET_C39)
         sta     (sp)            ; 65C02 version
         iny                     ; Y = 3
 .else

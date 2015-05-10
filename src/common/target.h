@@ -78,13 +78,14 @@ typedef enum {
     TGT_LYNX,
     TGT_SIM6502,
     TGT_SIM65C02,
+    TGT_CREATIX_EMUL,
     TGT_COUNT                   /* Number of target systems */
 } target_t;
 
 /* Collection of target properties */
 typedef struct TargetProperties TargetProperties;
 struct TargetProperties {
-    const char              Name[12];   /* Name of the target */
+    const char              Name[20];   /* Name of the target */
     cpu_t                   DefaultCPU; /* Default CPU for this target */
     unsigned char           BinFmt;     /* Default binary format for this target */
     const unsigned char*    CharMap;    /* Character translation table */

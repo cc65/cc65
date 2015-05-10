@@ -307,6 +307,10 @@ static void SetSys (const char* Sys)
             NewSymbol ("__OSIC1P__", 1);
             break;
 
+        case TGT_CREATIX_EMUL:
+            NewSymbol ("__CREATIX_EMUL__", 1);
+            break;
+            
         default:
             AbEnd ("Invalid target name: `%s'", Sys);
 
@@ -1040,7 +1044,14 @@ int main (int argc, char* argv [])
     /* If no CPU given, use the default CPU for the target */
     if (GetCPU () == CPU_UNKNOWN) {
         if (Target != TGT_UNKNOWN) {
-            SetCPU (GetTargetProperties (Target)->DefaultCPU);
+            int cpu;
+
+            cpu = GetTargetProperties (Target)->DefaultCPU;
+
+            if (cpu == CPU_UNKNOWN) {
+              Error ("CPU of target is unknown");
+            }
+            SetCPU (cpu);
         } else {
             SetCPU (CPU_6502);
         }

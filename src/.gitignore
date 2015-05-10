@@ -4,3 +4,4 @@ ipch/
 *.opensdf
 *.vcxproj.filters
 *.vcxproj.user
+*~

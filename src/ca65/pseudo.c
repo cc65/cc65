@@ -421,7 +421,129 @@ static void DoAlign (void)
     SegAlign (Alignment, (int) FillVal);
 }
 
+static void ConvertEscapesStrBuf (StrBuf *Data)
+{
+  char *bufin;
+  char *bufout;
+  size_t len;
+  size_t byte_len;
+  char *s;
 
+  len = SB_GetLen(Data);
+  
+  bufin = (char *) xmalloc(len+1);
+  
+  strcpy(bufin, SB_GetBuf(Data));
+
+  bufout = SB_GetBuf(Data);
+
+  for(s = bufin, byte_len = 0; *s;)
+    {
+      if(*s == '\\')
+        {
+          s++;
+          
+          if(*s == 'b')
+            {
+              bufout[byte_len++] = '\b';
+              s++;
+            }
+          else if(*s == 'n')
+            {
+              bufout[byte_len++] = '\n';
+              s++;
+            }
+          else if(*s == 'r')
+            {
+              bufout[byte_len++] = '\r';
+              s++;
+            }
+          else if(*s == 't')
+            {
+              bufout[byte_len++] = '\t';
+              s++;
+            }
+          else if(*s == '\\')
+            {
+              bufout[byte_len++] = '\\';
+              s++;
+            }
+          else if(*s == '"')
+            {
+              bufout[byte_len++] = '"';
+              s++;
+            }
+          else if(s[0] == 'x' && isxdigit(s[1]) && isxdigit(s[2]))
+            {
+              int c;
+
+              s++;
+              
+              /* hex */
+              if(sscanf(s, "%02x", &c) != 1)
+                {
+                  ErrorSkip ("Invalid hex escape in string constant");
+                  goto done;
+                }
+              sprintf(bufout + byte_len, "%c", c);
+              byte_len++;
+              s += 2;
+            }
+          else if(isdigit(s[0]) && isdigit(s[1]) && isdigit(s[2]))
+            {
+              int c;
+
+              /* octal */
+              if(sscanf(s, "%03o", &c) != 1)
+                {
+                  ErrorSkip ("Invalid octal escape in string constant");
+                  goto done;
+                }
+              sprintf(bufout + byte_len, "%c", c);
+              byte_len++;
+              s += 3;
+            }
+          else
+            {
+              ErrorSkip ("Invalid escape in string constant");
+              goto done;
+            }
+        }
+      else
+        {
+          bufout[byte_len++] = *s++;
+        }
+    }
+
+  bufout[byte_len] = 0;
+
+  Data->Len = byte_len;
+
+ done:
+  xfree(bufin);
+}
+
+static void DoASCII (void)
+/* Define text without a zero terminator */
+{
+    while (1) {
+        /* Must have a string constant */
+        if (CurTok.Tok != TOK_STRCON) {
+            ErrorSkip ("String constant expected");
+            return;
+        }
+
+        /* Translate into target charset and emit */
+        TgtTranslateStrBuf (&CurTok.SVal);
+        EmitStrBuf (&CurTok.SVal);
+        NextTok ();
+        if (CurTok.Tok == TOK_COMMA) {
+            NextTok ();
+        } else {
+            break;
+        }
+    }
+}
 
 static void DoASCIIZ (void)
 /* Define text with a zero terminator */
@@ -446,6 +568,58 @@ static void DoASCIIZ (void)
     Emit0 (0);
 }
 
+static void DoASCIIWithXtensions (void)
+/* Define text without a zero terminator and with escapes*/
+{
+    while (1) {
+        /* Must have a string constant */
+        if (CurTok.Tok != TOK_STRCON) {
+            ErrorSkip ("String constant expected");
+            return;
+        }
+
+        /* convert escapes.. */
+        ConvertEscapesStrBuf (&CurTok.SVal);
+        
+        /* Translate into target charset and emit */
+        TgtTranslateStrBuf (&CurTok.SVal);
+        
+        EmitStrBuf (&CurTok.SVal);
+        NextTok ();
+        if (CurTok.Tok == TOK_COMMA) {
+            NextTok ();
+        } else {
+            break;
+        }
+    }
+}
+
+static void DoASCIIZWithXtensions (void)
+/* Define text with a zero terminator and escapes*/
+{
+    while (1) {
+        /* Must have a string constant */
+        if (CurTok.Tok != TOK_STRCON) {
+            ErrorSkip ("String constant expected");
+            return;
+        }
+
+        /* Convert escapes.. */
+        ConvertEscapesStrBuf (&CurTok.SVal);
+        
+        /* Translate into target charset and emit */
+        TgtTranslateStrBuf (&CurTok.SVal);
+        
+        EmitStrBuf (&CurTok.SVal);
+        NextTok ();
+        if (CurTok.Tok == TOK_COMMA) {
+            NextTok ();
+        } else {
+            break;
+        }
+    }
+    Emit0 (0);
+}
 
 
 static void DoAssert (void)
@@ -1788,8 +1962,14 @@ static void DoSetCPU (void)
 
         /* Try to find the CPU */
         SB_Terminate (&CurTok.SVal);
+        
         CPU = FindCPU (SB_GetConstBuf (&CurTok.SVal));
 
+        if (CPU == CPU_UNKNOWN) {
+          Error ("Unknown CPU: %s", SB_GetConstBuf (&CurTok.SVal));
+          return;
+        }
+        
         /* Switch to the new CPU */
         SetCPU (CPU);
 
@@ -1966,7 +2146,10 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoAddr          },      /* .ADDR */
     { ccNone,           DoUnexpected    },      /* .ADDRSIZE */
     { ccNone,           DoAlign         },
-    { ccNone,           DoASCIIZ        },
+    { ccNone,           DoASCII         },       /* .ASCII */
+    { ccNone,           DoASCIIWithXtensions  }, /* .ASCIIX */
+    { ccNone,           DoASCIIZ        },       /* .ASCIIZ */
+    { ccNone,           DoASCIIZWithXtensions }, /* .ASCIIZX */
     { ccNone,           DoAssert        },
     { ccNone,           DoAutoImport    },
     { ccNone,           DoUnexpected    },      /* .BANK */

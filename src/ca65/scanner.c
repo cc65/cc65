@@ -386,13 +386,13 @@ static void IFNextChar (CharSource* S)
                 C = EOF;
                 return;
 
-                /* Check for end of line */
+            /* Check for end of line */
             } else if (N == '\n') {
 
                 /* End of line */
                 break;
 
-                /* Collect other stuff */
+            /* Collect other stuff */
             } else {
 
                 /* Append data to line */
@@ -482,14 +482,14 @@ static void IFNextRawChar (CharSource* S)
             C = EOF;
             return;
 
-            /* Check for end of line */
+        /* Check for end of line */
         }
         else if (N == '\n') {
 
             /* End of line */
             break;
 
-            /* Collect other stuff */
+        /* Collect other stuff */
         }
         else {
 

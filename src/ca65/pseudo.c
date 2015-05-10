@@ -431,11 +431,7 @@ static void ConvertEscapesStrBuf (StrBuf *Data)
 
   len = SB_GetLen(Data);
   
-  if((bufin = (char *) malloc(len+1)) == NULL)
-    {
-      perror("malloc");
-      exit(1);
-    }
+  bufin = (char *) xmalloc(len+1);
   
   strcpy(bufin, SB_GetBuf(Data));
 
@@ -524,7 +520,7 @@ static void ConvertEscapesStrBuf (StrBuf *Data)
   Data->Len = byte_len;
 
  done:
-  free(bufin);
+  xfree(bufin);
 }
 
 static void DoASCII (void)

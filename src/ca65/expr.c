@@ -435,13 +435,34 @@ static ExprNode* FuncIsMnemonic (void)
             /* Macros and symbols may NOT use the names of instructions, so just check for the instruction */
             Instr = FindInstruction (&CurTok.SVal);
         }
+    }
+    else {
+        Error ("Identifier expected.");
+    }
+    /* Skip the name */
+    NextTok();
+
+    return GenLiteralExpr (Instr > 0);
+}
+
+
+
+static ExprNode* FuncDefinedMacro (void)
+/* Handle the .DEFINEDMACRO builtin function */
+{
+    Macro* Mac = 0;
+
+    /* Check if the identifier is a macro */
+
+    if (CurTok.Tok == TOK_IDENT) {
+        Mac = FindMacro (&CurTok.SVal);
     } else {
         Error ("Identifier expected.");
     }
     /* Skip the name */
     NextTok ();
 
-    return GenLiteralExpr (Instr > 0);
+    return GenLiteralExpr (Mac != 0);
 }
 
 
@@ -1094,8 +1115,8 @@ static ExprNode* Factor (void)
             N = Function (FuncDefined);
             break;
 
-        case TOK_ISMNEMONIC:
-            N = Function (FuncIsMnemonic);
+        case TOK_DEFINEDMACRO:
+            N = Function (FuncDefinedMacro);
             break;
 
         case TOK_HIBYTE:
@@ -1104,6 +1125,10 @@ static ExprNode* Factor (void)
 
         case TOK_HIWORD:
             N = Function (FuncHiWord);
+            break;
+
+        case TOK_ISMNEMONIC:
+            N = Function (FuncIsMnemonic);
             break;
 
         case TOK_LOBYTE:

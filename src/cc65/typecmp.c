@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2015, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -37,6 +37,7 @@
 
 /* cc65 */
 #include "funcdesc.h"
+#include "global.h"
 #include "symtab.h"
 #include "typecmp.h"
 
@@ -247,21 +248,21 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
         }
         if (LeftQual != RightQual) {
             /* On the first indirection level, different qualifiers mean
-            ** that the types are still compatible. On the second level,
-            ** this is a (maybe minor) error, so we create a special
-            ** return code, since a qualifier is dropped from a pointer.
-            ** Starting from the next level, the types are incompatible
-            ** if the qualifiers differ.
+            ** that the types still are compatible. On the second level,
+            ** that is a (maybe minor) error. We create a special return code
+            ** if a qualifier is dropped from a pointer. But, different calling
+            ** conventions are incompatible. Starting from the next level,
+            ** the types are incompatible if the qualifiers differ.
             */
+            /* (Debugging statement) */
             /* printf ("Ind = %d    %06X != %06X\n", Indirections, LeftQual, RightQual); */
             switch (Indirections) {
-
                 case 0:
                     SetResult (Result, TC_STRICT_COMPATIBLE);
                     break;
 
                 case 1:
-                    /* A non const value on the right is compatible to a
+                    /* A non-const value on the right is compatible to a
                     ** const one to the left, same for volatile.
                     */
                     if ((LeftQual & T_QUAL_CONST) < (RightQual & T_QUAL_CONST) ||
@@ -270,7 +271,27 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
                     } else {
                         SetResult (Result, TC_STRICT_COMPATIBLE);
                     }
-                    break;
+
+                    /* If a calling convention wasn't set explicitly,
+                    ** then assume the default one.
+                    */
+                    LeftQual &= T_QUAL_CCONV;
+                    if (LeftQual == 0) {
+                        LeftQual = AutoCDecl ? T_QUAL_CDECL : T_QUAL_FASTCALL;
+                    }
+                    RightQual &= T_QUAL_CCONV;
+                    if (RightQual == 0) {
+                        RightQual = AutoCDecl ? T_QUAL_CDECL : T_QUAL_FASTCALL;
+                    }
+
+                    /* (If the objects actually aren't pointers to functions,
+                    ** then this test will pass anyway; and, more appropriate
+                    ** tests will be performed.)
+                    */
+                    if (LeftQual == RightQual) {
+                        break;
+                    }
+                    /* else fall through */
 
                 default:
                     SetResult (Result, TC_INCOMPATIBLE);
@@ -280,7 +301,6 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
 
         /* Check for special type elements */
         switch (LeftType) {
-
             case T_TYPE_PTR:
                 ++Indirections;
                 break;

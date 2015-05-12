@@ -62,6 +62,7 @@
 #include "symtab.h"
 #include "toklist.h"
 #include "ulabel.h"
+#include "macro.h"
 
 
 
@@ -413,6 +414,33 @@ static ExprNode* FuncDefined (void)
 
     /* Check if the symbol is defined */
     return GenLiteralExpr (Sym != 0 && SymIsDef (Sym));
+}
+
+
+
+static ExprNode* FuncDefinedInstr (void)
+/* Handle the .DEFINEDINSTR builtin function */
+{
+    int           Instr = 0;
+
+    /* Check for a macro or an instruction depending on UbiquitousIdents */
+
+    if (CurTok.Tok == TOK_IDENT) {
+        if (UbiquitousIdents) {
+            /* Macros CAN be instructions, so check for them first */
+            if (FindMacro(&CurTok.SVal) == 0) {
+                Instr = FindInstruction (&CurTok.SVal);
+            }
+        } else {
+            /* Macros and symbols may NOT use the names of instructions, so just check for the instruction */
+            Instr = FindInstruction(&CurTok.SVal);
+        }
+        NextTok();
+    } else {
+        Error("Idenitifier expected.");
+    }
+
+    return GenLiteralExpr(Instr > 0);
 }
 
 
@@ -1063,6 +1091,10 @@ static ExprNode* Factor (void)
 
         case TOK_DEFINED:
             N = Function (FuncDefined);
+            break;
+
+        case TOK_DEFINEDINSTR:
+            N = Function (FuncDefinedInstr);
             break;
 
         case TOK_HIBYTE:

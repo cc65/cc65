@@ -1989,6 +1989,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoDebugInfo     },
     { ccNone,           DoDefine        },
     { ccNone,           DoUnexpected    },      /* .DEFINED */
+    { ccNone,           DoUnexpected    },      /* .DEFINEDINSTR */
     { ccNone,           DoDelMac        },
     { ccNone,           DoDestructor    },
     { ccNone,           DoDWord         },

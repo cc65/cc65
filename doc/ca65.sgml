@@ -869,14 +869,16 @@ Example:
 </verb></tscreen>
 
 Only <tt/.DEFINE/ style macros can be used to define a string to be used elsewhere.
-Note that ca65 has experimental support for raw string constants that can span more 
-than one line and can use user defined delimiters. The start of a raw string is defined 
-by the characters <tt>R"(</tt> where you would normally just use a single <tt>"</tt>. 
-In this case, only the characters <tt>)"</tt> will signal the end of the string. 
-Line breaks become part of the string.
+Note that ca65 has support for raw string constants that can span more than one line 
+and can use user defined delimiters. The start of a raw string is defined 
+by the characters <tt>R"(</tt> in place of a double quote (<tt>"</tt>). 
+In this case, only the character pair <tt>)"</tt> will signal the end of the string. 
+Newlines become part of the string.
 
 A custom delimiter may be added as well. The delimiter string follows the same rules 
-as an identifier, but leading characters can be numeric.
+as an identifier, but leading characters can be numeric. The custom delimter should be
+defined between the quote and the opening parenthesis, and again after the closing 
+parenthesis, but before the closing quote.
 
 Example:
 
@@ -891,10 +893,19 @@ Example:
       	.out ImportantNotice
 </verb></tscreen>
 
-  This command is new and must be enabled with the <tt/.FEATURE raw_strings/ command.
+Note that there are some pitfalls to be aware of when using this feature:
+
+If the initial or final delimiters are on separate lines, the extra newlines will 
+become part of the string. Everything inside the parenthesis is captured. If the 
+newlines are not added, this can make the string harder to read, and it may not 
+be possible to match the indentation of the first line with the rest of a multiline 
+string. 
+As well, any leading whitespace to match the formatting of the surrounding 
+code will be preserved in the string.
+
+This command is new and must be enabled with the <tt/.FEATURE raw_strings/ command.
 
   See: <tt><ref id=".FEATURE" name=".FEATURE"></tt>
-
 
 
 <sect>Scopes<label id="scopes"><p>

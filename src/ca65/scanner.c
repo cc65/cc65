@@ -114,7 +114,7 @@ struct CharSource {
     CharSource*                 Next;   /* Linked list of char sources */
     token_t                     Tok;    /* Last token */
     int                         C;      /* Last character */
-    CharSourceFunctions*  Func;   /* Pointer to function table */
+    CharSourceFunctions*        Func;   /* Pointer to function table */
     union {
         InputFile               File;   /* File data */
         InputData               Data;   /* Textual data */
@@ -439,7 +439,7 @@ static void IFNextChar (CharSource* S)
     if (SB_GetIndex (&S->V.File.Line) == S->V.File.EndLinePos) {
         C = '\n';
         /* Increment the index */
-        SB_SetIndex(&S->V.File.Line, SB_GetIndex (&S->V.File.Line) + 1);
+        SB_SetIndex (&S->V.File.Line, SB_GetIndex (&S->V.File.Line) + 1);
     } else {
         /* Return the next character from the buffer */
         C = SB_Get (&S->V.File.Line);
@@ -769,8 +769,8 @@ static unsigned DigitVal (unsigned char C)
 static void NextChar (void)
 /* Read the next character from the input file */
 {
-    /* When in raw character mode, call IFNextRawChar
-    ** Otherwise, call IFNextChar
+    /* When in raw character mode, call IFNextRawChar.
+    ** Otherwise, call IFNextChar.
     */
      
     Source->Func->NextChar (Source);
@@ -780,7 +780,7 @@ static void NextChar (void)
 
 static void EnterRawTextMode (void)
 /* Switch to raw character mode at the current position in the input file.
-**  Calls to EnterRawTextMode and LeaveRawTextMode may be nested.
+** Calls to EnterRawTextMode and LeaveRawTextMode may be nested.
 */
 {
     if (Source->V.File.RawMode == 0) {

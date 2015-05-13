@@ -876,7 +876,7 @@ In this case, only the character pair <tt>)"</tt> will signal the end of the str
 Newlines become part of the string.
 
 A custom delimiter may be added as well. The delimiter string follows the same rules 
-as an identifier, but leading characters can be numeric. The custom delimter should be
+as an identifier, but leading characters can be numeric. The custom delimiter should be
 defined between the quote and the opening parenthesis, and again after the closing 
 parenthesis, but before the closing quote.
 

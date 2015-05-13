@@ -968,7 +968,7 @@ static void ReadRawStringConst (void)
                     }
 
                     /* If was not a match, append anything we skipped to the string literal.
-                    ** If Len is less then the length of the delimiter OR the next char is NOT a quote it wasn't a match
+                    ** If Len is less then the length of the delimiter OR the next char is NOT a quote it wasn't a match.
                     */
                     if ((K < D.Len) || (C != '\"')) {
                         SB_AppendChar (&CurTok.SVal, ')');

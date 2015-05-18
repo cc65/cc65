@@ -404,12 +404,12 @@ static void IFNextChar (CharSource* S)
         /* We didn't copy the EOL in the while loop, so add it now */
         SB_AppendChar (&S->V.File.Line, '\n');
 
+        /* Get the length before adding the NUL */
+        Len = SB_GetLen (&S->V.File.Line);
+
         /* Terminate the string buffer with NUL, but count it as part of the length */
         SB_AppendChar (&S->V.File.Line, '\0');
-
-        Len = SB_GetLen (&S->V.File.Line);
-        --Len; /* Don't count the NUL */
-
+        
         /* If we come here, we have a new input line. To avoid problems
         ** with strange line terminators, count and remember the position of 
         ** trailing whitespace characters, but keep the line intact to
@@ -426,15 +426,14 @@ static void IFNextChar (CharSource* S)
 
         /* Remember the new line for the listing */
         NewListingLine (&S->V.File.Line, S->V.File.Pos.Name, FCount);
-
     }
 
     /* Set the column pointer */
     S->V.File.Pos.Col = SB_GetIndex (&S->V.File.Line);
 
     /* Return the next character:
-    ** Check for special case - we are at the begining of whitespace
-    ** if so, return EOL
+    ** Check for special case: Are we at the begining of whitespace?
+    ** If so, return EOL.
     */
     if (SB_GetIndex (&S->V.File.Line) == S->V.File.EndLinePos) {
         C = '\n';
@@ -452,18 +451,16 @@ static void IFNextChar (CharSource* S)
 static void IFNextRawChar (CharSource* S)
 /* Read the next raw character from the input file */
 {
-        
-    /* Return the next character from the raw line unless 
-    ** we are at the actual end of the buffer.
-    */
-
+    
     /* Set the column pointer */
     S->V.File.Pos.Col = SB_GetIndex (&S->V.File.Line);
+        
+    /* Return the next character from the buffer, unless we are at the actual end. */
     C = SB_Get (&S->V.File.Line);
 
     if (C != 0) return;
 
-    /* If we come here, end of current line reached, read next line */
+    /* If we come here, end of current line reached, read next line: */
 
     SB_Clear (&S->V.File.Line);
     while (1) {
@@ -483,15 +480,13 @@ static void IFNextRawChar (CharSource* S)
             return;
 
         /* Check for end of line */
-        }
-        else if (N == '\n') {
+        } else if (N == '\n') {
 
             /* End of line */
             break;
 
         /* Collect other stuff */
-        }
-        else {
+        } else {
 
             /* Append data to line */
             SB_AppendChar (&S->V.File.Line, N);
@@ -513,7 +508,7 @@ static void IFNextRawChar (CharSource* S)
 
     /* Set the column pointer */
     S->V.File.Pos.Col = SB_GetIndex (&S->V.File.Line);
-        
+
     /* Return the next character from the buffer */
     C = SB_Get (&S->V.File.Line);
 }
@@ -999,8 +994,9 @@ static void ReadRawStringConst (void)
         }
         
         /* Ignore Carriage Return, Vertical Tab and Formfeed */
-        if (C != '\r' && C != '\v' && C != '\f')
+        if (C != '\r' && C != '\v' && C != '\f') {
             SB_AppendChar (&CurTok.SVal, C);
+        }
 
         /* Skip to the next character */
         NextChar ();

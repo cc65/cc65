@@ -655,7 +655,54 @@ problem in most cases.
 
 To force a specific order of evaluation, parentheses may be used, as usual.
 
+<sect>String Constants and Raw-String Constants<label id="String_Constants"><p>
 
+String constants must be enclosed within a pair of quotation marks and can be used to
+define data.
+
+Example:
+
+<tscreen><verb>
+      	.byte "SOS V2.3"
+</verb></tscreen>
+
+There is also support for raw string constants that can span more than one line.
+User defined delimiters are also supported. The start of a raw string is defined 
+by the characters <tt>R"(</tt> where a double quote (<tt>"</tt>) would normally be used. 
+In this case, only the character pair <tt>)"</tt> will signal the end of the string. 
+Newlines become part of the string.
+
+A custom delimiter may be added as well. The delimiter string follows the same rules 
+as an identifier, but leading characters can be numeric. The custom delimiter should be
+defined between the quote and the opening parenthesis, and again after the closing 
+parenthesis, but before the closing quote.
+
+Example:
+
+<tscreen><verb>
+      	.DEFINE ImportantNotice R"STRING_END(
+      	      	I can put anything here!
+      	      	It will all become part of the string, until ca65 finds the 
+      	      	keyword "STRING_END". But it has to find a ")" first, and a 
+      	      	single '"' at the very end!      	
+      	)STRING_END"
+
+      	.out ImportantNotice
+</verb></tscreen>
+
+Note that there are some pitfalls to be aware of when using this feature:
+
+If the initial or final delimiters are on separate lines, the extra newlines will 
+become part of the string. Everything inside the parenthesis is captured. If the 
+newlines are not added, this can make the string harder to read, and it may not 
+be possible to match the indentation of the first line with the rest of a multiline 
+string. 
+As well, any leading whitespace to match the formatting of the surrounding 
+code will be preserved in the string.
+
+This command is new and must be enabled with the <tt/.FEATURE raw_strings/ command.
+
+  See: <tt><ref id=".FEATURE" name=".FEATURE"></tt>
 
 <sect>Symbols and labels<p>
 
@@ -817,8 +864,6 @@ convenient in some situations, so it's your decision.
 <em/Note:/ <ref id="scopes" name="Scopes"> organize named symbols, not
 unnamed ones, so scopes don't have an effect on unnamed labels.
 
-
-
 <sect1>Using macros to define labels and constants<p>
 
 While there are drawbacks with this approach, it may be handy in a few rare
@@ -856,57 +901,6 @@ id="option-g" name="-g"> is given on the command line), global, local and
 cheap local labels are written to the object file and will be available in the
 symbol file via the linker. Unnamed labels are not written to the object file,
 because they don't have a name which would allow to access them.
-
-
-<sect1>String Constants<label id="String_Constants"><p>
-
-String constants must be enclosed within a pair of quotation marks.
-
-Example:
-
-<tscreen><verb>
-      	.byte "SOS V2.3"
-</verb></tscreen>
-
-Only <tt/.DEFINE/ style macros can be used to define a string to be used elsewhere.
-Note that ca65 has support for raw string constants that can span more than one line 
-and can use user defined delimiters. The start of a raw string is defined 
-by the characters <tt>R"(</tt> in place of a double quote (<tt>"</tt>). 
-In this case, only the character pair <tt>)"</tt> will signal the end of the string. 
-Newlines become part of the string.
-
-A custom delimiter may be added as well. The delimiter string follows the same rules 
-as an identifier, but leading characters can be numeric. The custom delimiter should be
-defined between the quote and the opening parenthesis, and again after the closing 
-parenthesis, but before the closing quote.
-
-Example:
-
-<tscreen><verb>
-      	.DEFINE ImportantNotice R"STRING_END(
-      	      	I can put anything here!
-      	      	It will all become part of the string, until ca65 finds the 
-      	      	keyword "STRING_END". But it has to find a ")" first, and a 
-      	      	single '"' at the very end!      	
-      	)STRING_END"
-
-      	.out ImportantNotice
-</verb></tscreen>
-
-Note that there are some pitfalls to be aware of when using this feature:
-
-If the initial or final delimiters are on separate lines, the extra newlines will 
-become part of the string. Everything inside the parenthesis is captured. If the 
-newlines are not added, this can make the string harder to read, and it may not 
-be possible to match the indentation of the first line with the rest of a multiline 
-string. 
-As well, any leading whitespace to match the formatting of the surrounding 
-code will be preserved in the string.
-
-This command is new and must be enabled with the <tt/.FEATURE raw_strings/ command.
-
-  See: <tt><ref id=".FEATURE" name=".FEATURE"></tt>
-
 
 <sect>Scopes<label id="scopes"><p>
 

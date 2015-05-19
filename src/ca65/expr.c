@@ -418,10 +418,10 @@ static ExprNode* FuncDefined (void)
 
 
 
-static ExprNode* FuncDefinedInstr (void)
-/* Handle the .DEFINEDINSTR builtin function */
+static ExprNode* FuncIsMnemonic (void)
+/* Handle the .ISMNEMONIC, .ISMNEM builtin function */
 {
-    int Instr = 0;
+    int Instr = -1;
 
     /* Check for a macro or an instruction depending on UbiquitousIdents */
 
@@ -436,7 +436,7 @@ static ExprNode* FuncDefinedInstr (void)
             Instr = FindInstruction (&CurTok.SVal);
         }
     } else {
-        Error ("Idenitifier expected.");
+        Error ("Identifier expected.");
     }
     /* Skip the name */
     NextTok ();
@@ -1094,8 +1094,8 @@ static ExprNode* Factor (void)
             N = Function (FuncDefined);
             break;
 
-        case TOK_DEFINEDINSTR:
-            N = Function (FuncDefinedInstr);
+        case TOK_ISMNEMONIC:
+            N = Function (FuncIsMnemonic);
             break;
 
         case TOK_HIBYTE:

@@ -421,26 +421,27 @@ static ExprNode* FuncDefined (void)
 static ExprNode* FuncDefinedInstr (void)
 /* Handle the .DEFINEDINSTR builtin function */
 {
-    int           Instr = 0;
+    int Instr = 0;
 
     /* Check for a macro or an instruction depending on UbiquitousIdents */
 
     if (CurTok.Tok == TOK_IDENT) {
         if (UbiquitousIdents) {
             /* Macros CAN be instructions, so check for them first */
-            if (FindMacro(&CurTok.SVal) == 0) {
+            if (FindMacro (&CurTok.SVal) == 0) {
                 Instr = FindInstruction (&CurTok.SVal);
             }
         } else {
             /* Macros and symbols may NOT use the names of instructions, so just check for the instruction */
-            Instr = FindInstruction(&CurTok.SVal);
+            Instr = FindInstruction (&CurTok.SVal);
         }
-        NextTok();
     } else {
-        Error("Idenitifier expected.");
+        Error ("Idenitifier expected.");
     }
+    /* Skip the name */
+    NextTok ();
 
-    return GenLiteralExpr(Instr > 0);
+    return GenLiteralExpr (Instr > 0);
 }
 
 

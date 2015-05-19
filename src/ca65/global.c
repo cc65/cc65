@@ -83,4 +83,3 @@ unsigned char CComments          = 0;   /* Allow C like comments */
 unsigned char ForceRange         = 0;   /* Force values into expected range */
 unsigned char UnderlineInNumbers = 0;   /* Allow underlines in numbers */
 unsigned char AddrSize           = 0;   /* Allow .ADDRSIZE function */
-unsigned char DefinedInstr       = 0;   /* Allow .DEFINEDINSTR function */

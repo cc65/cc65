@@ -2316,6 +2316,24 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
+<sect1><tt>.DEFINEDINSTR</tt><label id=".DEFINEDINSTR"><p>
+
+  Builtin function. The function expects an identifier as argument in braces.
+  The argument is evaluated, and the function yields "true" if the identifier
+  is defined as an instruction mnemonic that is recognized by the assembler.
+  Example:
+
+  <tscreen><verb>
+  	.if  	.not .definedinstr(ina)
+  	  	.macro ina
+  	  	  	clc
+  	  	  	adc #$01
+  	  	.endmacro
+  	.endif
+
+  </verb></tscreen>
+
+
 <sect1><tt>.DESTRUCTOR</tt><label id=".DESTRUCTOR"><p>
 
   Export a symbol and mark it as a module destructor. This may be used

@@ -737,13 +737,6 @@ static token_t FindDotKeyword (void)
                 }
                 break;
 
-            case TOK_DEFINEDINSTR:
-                /* Disallow .DEFINEDINSTR function by default */
-                if (DefinedInstr == 0) {
-                    return TOK_NONE;
-                }
-                break;
-
             default:
                 break;
         }

@@ -335,26 +335,23 @@ static void FixQualifiers (Type* DataType)
     T = DataType;
     while (T->C != T_END) {
         if (IsTypePtr (T)) {
-
             /* Calling convention qualifier on the pointer? */
             if (IsQualCConv (T)) {
                 /* Pull the convention off of the pointer */
                 Q = T[0].C & T_QUAL_CCONV;
                 T[0].C &= ~T_QUAL_CCONV;
+
                 /* Pointer to a function which doesn't have an explicit convention? */
                 if (IsTypeFunc (T + 1)) {
                     if (IsQualCConv (T + 1)) {
-                        if (T[1].C == Q) {
-                            /* TODO: The end of Declarator() catches this error.
-                            ** Try to make it let the error be caught here, instead.
-                            */
+                        if ((T[1].C & T_QUAL_CCONV) == Q) {
                             Warning ("Pointer duplicates function's calling convention");
                         } else {
-                            Error ("Mismatch between pointer's and function's calling conventions");
+                            Error ("Function's and pointer's calling conventions are different");
                         }
                     } else {
                         if (Q == T_QUAL_FASTCALL && IsVariadicFunc (T + 1)) {
-                            Error ("Variadic-function pointers cannot be `__fastcall__'");
+                            Error ("Variadic-function pointers cannot be __fastcall__");
                         } else {
                             /* Move the qualifier from the pointer to the function. */
                             T[1].C |= Q;

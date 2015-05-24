@@ -249,7 +249,7 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
         if (LeftQual != RightQual) {
             /* On the first indirection level, different qualifiers mean
             ** that the types still are compatible. On the second level,
-            ** that is a (maybe minor) error. We create a special return code
+            ** that is a (maybe minor) error. We create a special return-code
             ** if a qualifier is dropped from a pointer. But, different calling
             ** conventions are incompatible. Starting from the next level,
             ** the types are incompatible if the qualifiers differ.
@@ -272,22 +272,22 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
                         SetResult (Result, TC_STRICT_COMPATIBLE);
                     }
 
+                    if (LeftType != T_TYPE_FUNC) {
+                        break;
+                    }
+
                     /* If a calling convention wasn't set explicitly,
                     ** then assume the default one.
                     */
                     LeftQual &= T_QUAL_CCONV;
-                    if (LeftQual == 0) {
-                        LeftQual = AutoCDecl ? T_QUAL_CDECL : T_QUAL_FASTCALL;
+                    if (LeftQual == T_QUAL_NONE) {
+                        LeftQual = (AutoCDecl || IsVariadicFunc (lhs)) ? T_QUAL_CDECL : T_QUAL_FASTCALL;
                     }
                     RightQual &= T_QUAL_CCONV;
-                    if (RightQual == 0) {
-                        RightQual = AutoCDecl ? T_QUAL_CDECL : T_QUAL_FASTCALL;
+                    if (RightQual == T_QUAL_NONE) {
+                        RightQual = (AutoCDecl || IsVariadicFunc (rhs)) ? T_QUAL_CDECL : T_QUAL_FASTCALL;
                     }
 
-                    /* (If the objects actually aren't pointers to functions,
-                    ** then this test will pass anyway; and, more appropriate
-                    ** tests will be performed.)
-                    */
                     if (LeftQual == RightQual) {
                         break;
                     }

@@ -1,6 +1,7 @@
 /* expr.c
 **
-** Ullrich von Bassewitz, 21.06.1998
+** 1998-06-21, Ullrich von Bassewitz
+** 2015-04-19, Greg King
 */
 
 
@@ -470,9 +471,11 @@ static void FunctionCall (ExprDesc* Expr)
     /* Handle function pointers transparently */
     IsFuncPtr = IsTypeFuncPtr (Expr->Type);
     if (IsFuncPtr) {
-
-        /* Check wether it's a fastcall function that has parameters */
-        IsFastcall = IsQualFastcall (Expr->Type + 1) && (Func->ParamCount > 0);
+        /* Check whether it's a fastcall function that has parameters */
+        IsFastcall = (Func->Flags & FD_VARIADIC) == 0 && Func->ParamCount > 0 &&
+            (AutoCDecl ?
+             IsQualFastcall (Expr->Type + 1) :
+             !IsQualCDecl (Expr->Type + 1));
 
         /* Things may be difficult, depending on where the function pointer
         ** resides. If the function pointer is an expression of some sort
@@ -517,7 +520,10 @@ static void FunctionCall (ExprDesc* Expr)
         }
 
         /* If we didn't inline the function, get fastcall info */
-        IsFastcall = IsQualFastcall (Expr->Type);
+        IsFastcall = (Func->Flags & FD_VARIADIC) == 0 &&
+            (AutoCDecl ?
+             IsQualFastcall (Expr->Type) :
+             !IsQualCDecl (Expr->Type));
     }
 
     /* Parse the parameter list */

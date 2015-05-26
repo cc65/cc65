@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2000, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -88,7 +88,7 @@ unsigned __fastcall__ DbgDisAsmLen (unsigned Addr);
 int __fastcall__ DbgIsRAM (unsigned Addr);
 /* Return true if we can read and write the given address */
 
-char* DbgMemDump (unsigned Addr, char* Buf, unsigned char Len);
+char* __cdecl__ DbgMemDump (unsigned Addr, char* Buf, unsigned char Len);
 /* Create a line of a memory dump in the given buffer. The buffer contains
 ** the starting address (4 digits hex), then Len bytes in this format:
 ** "AAAA__XX_YY_ZZ_...". The passed char buffer must hold Len*3+5 bytes

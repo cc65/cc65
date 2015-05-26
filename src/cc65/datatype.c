@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2012, Ullrich von Bassewitz                                      */
+/* (C) 1998-2015, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -293,15 +293,15 @@ void PrintType (FILE* F, const Type* T)
                 /* Recursive call */
                 PrintType (F, T + 1);
                 if (T->A.L == UNSPECIFIED) {
-                    fprintf (F, "[]");
+                    fprintf (F, " []");
                 } else {
-                    fprintf (F, "[%ld]", T->A.L);
+                    fprintf (F, " [%ld]", T->A.L);
                 }
                 return;
             case T_TYPE_PTR:
                 /* Recursive call */
                 PrintType (F, T + 1);
-                fprintf (F, "*");
+                fprintf (F, " *");
                 return;
             case T_TYPE_FUNC:
                 fprintf (F, "function returning ");
@@ -659,7 +659,7 @@ Type* GetBaseElementType (Type* T)
 ** will return. Otherwise it will return the base element type, which means
 ** the element type that is not an array.
 */
-{     
+{
     while (IsTypeArray (T)) {
         ++T;
     }

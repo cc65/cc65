@@ -597,7 +597,7 @@ variable which is stored in the zero page memory space in order to allow
 for retrieval of each character in the string via the indirect indexed
 addressing mode.
 
-The assembly language routine is stored in a file named
+The assembly language routine is stored in a file names
 &quot;rs232_tx.s&quot; and is shown below:
 
 <tscreen><code>
@@ -681,7 +681,7 @@ all of the behind-the-scene work is transparent to the user.
 #define TX_FIFO_FULL  (FIFO_STATUS &amp; 0x01)
 #define RX_FIFO_EMPTY (FIFO_STATUS &amp; 0x02)
 
-extern void wait (void);
+extern void wait ();
 extern void __fastcall__ rs232_tx (char *str);
 
 int main () {

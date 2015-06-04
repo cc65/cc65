@@ -199,6 +199,7 @@ typedef enum token_t {
     TOK_INCBIN,
     TOK_INCLUDE,
     TOK_INTERRUPTOR,
+    TOK_ISMNEMONIC,
     TOK_LEFT,
     TOK_LINECONT,
     TOK_LIST,

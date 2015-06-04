@@ -2040,6 +2040,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoIncBin        },
     { ccNone,           DoInclude       },
     { ccNone,           DoInterruptor   },
+    { ccNone,           DoUnexpected    },      /* .ISMNEMONIC */
     { ccNone,           DoInvalid       },      /* .LEFT */
     { ccNone,           DoLineCont      },
     { ccNone,           DoList          },

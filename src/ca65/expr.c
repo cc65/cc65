@@ -62,6 +62,7 @@
 #include "symtab.h"
 #include "toklist.h"
 #include "ulabel.h"
+#include "macro.h"
 
 
 
@@ -413,6 +414,34 @@ static ExprNode* FuncDefined (void)
 
     /* Check if the symbol is defined */
     return GenLiteralExpr (Sym != 0 && SymIsDef (Sym));
+}
+
+
+
+static ExprNode* FuncIsMnemonic (void)
+/* Handle the .ISMNEMONIC, .ISMNEM builtin function */
+{
+    int Instr = -1;
+
+    /* Check for a macro or an instruction depending on UbiquitousIdents */
+
+    if (CurTok.Tok == TOK_IDENT) {
+        if (UbiquitousIdents) {
+            /* Macros CAN be instructions, so check for them first */
+            if (FindMacro (&CurTok.SVal) == 0) {
+                Instr = FindInstruction (&CurTok.SVal);
+            }
+        } else {
+            /* Macros and symbols may NOT use the names of instructions, so just check for the instruction */
+            Instr = FindInstruction (&CurTok.SVal);
+        }
+    } else {
+        Error ("Identifier expected.");
+    }
+    /* Skip the name */
+    NextTok ();
+
+    return GenLiteralExpr (Instr > 0);
 }
 
 
@@ -1063,6 +1092,10 @@ static ExprNode* Factor (void)
 
         case TOK_DEFINED:
             N = Function (FuncDefined);
+            break;
+
+        case TOK_ISMNEMONIC:
+            N = Function (FuncIsMnemonic);
             break;
 
         case TOK_HIBYTE:

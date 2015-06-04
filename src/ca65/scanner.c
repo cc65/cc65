@@ -223,6 +223,8 @@ struct DotKeyword {
     { ".INCBIN",        TOK_INCBIN      },
     { ".INCLUDE",       TOK_INCLUDE     },
     { ".INTERRUPTOR",   TOK_INTERRUPTOR },
+    { ".ISMNEM",        TOK_ISMNEMONIC  },
+    { ".ISMNEMONIC",    TOK_ISMNEMONIC  },
     { ".LEFT",          TOK_LEFT        },
     { ".LINECONT",      TOK_LINECONT    },
     { ".LIST",          TOK_LIST        },

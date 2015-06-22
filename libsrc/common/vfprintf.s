@@ -33,7 +33,7 @@ ptr:    .res    2               ; Points to output file
 ; can ignore the passed pointer d, and access the data directly. While this
 ; is not very clean, it gives better and shorter code.
 ;
-; static void out (struct outdesc* d, const char* buf, unsigned count)
+; static void cdecl out (struct outdesc* d, const char* buf, unsigned count)
 ; /* Routine used for writing */
 ; {
 ;     register size_t cnt;
@@ -56,7 +56,7 @@ out:    ldy     #5
         ldy     #7
         jsr     pushwysp        ; Push count
         lda     ptr
-        ldx     ptr+1   
+        ldx     ptr+1
         jsr     _fwrite
         sta     ptr1            ; Save function result
         stx     ptr1+1

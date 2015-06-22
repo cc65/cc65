@@ -1,7 +1,8 @@
 /*
 ** bsearch.c
 **
-** Ullrich von Bassewitz, 17.06.1998
+** 1998-06-17, Ullrich von Bassewitz
+** 2015-06-21, Greg King
 */
 
 
@@ -11,7 +12,7 @@
 
 
 void* __fastcall__ bsearch (const void* key, const void* base, size_t n,
-                            size_t size, int (*cmp) (const void*, const void*))
+                            size_t size, int __fastcall__ (* cmp) (const void*, const void*))
 {
     int current;
     int result;

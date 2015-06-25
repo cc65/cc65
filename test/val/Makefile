@@ -26,12 +26,12 @@ TESTS := $(foreach option,. .o. .os. .osi. .osir. .oi. .oir. .or.,$(SOURCES:%.c=
 
 all: $(TESTS)
 
-# cq71.c and cq84.c have "K & R"-style syntax.  And, some local forward
-# function-declarations don't match the later global function definitions.
+# Some files have "K & R"-style syntax.  Therefore, some forward
+# function-declarations don't match the later function definitions.
 # Those programs fail when fastcall is used; but, the cdecl calling convention
 # tolerates those conflicts.  Therefore, make their functions default to cdecl.
 #
-$(WORKDIR)/cq71%prg $(WORKDIR)/cq84%prg: CC65FLAGS += -Wc --all-cdecl
+$(WORKDIR)/cq4%prg $(WORKDIR)/cq71.%rg $(WORKDIR)/cq81%prg $(WORKDIR)/cq84%prg: CC65FLAGS += -Wc --all-cdecl
 
 $(WORKDIR)/%.prg: %.c
 	$(CL65) $(CC65FLAGS) $< -o $@

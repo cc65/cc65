@@ -36,6 +36,20 @@ $(WORKDIR)/%.ref: %.c
 	$(CC) $(CFLAGS) $< -o $(WORKDIR)/$*.host
 	$(WORKDIR)/$*.host > $@
 
+# Some files have "K & R"-style syntax.  Therefore, some forward
+# function-declarations don't match the later function definitions.
+# Those programs fail when fastcall is used; but, the cdecl calling convention
+# tolerates those conflicts.  Therefore, make their functions default to cdecl.
+#
+$(WORKDIR)/init%prg: CC65FLAGS += -Wc --all-cdecl
+$(WORKDIR)/switch.%rg: CC65FLAGS += -Wc --all-cdecl
+
+# Also, yacc.c does some things that fail when stack operations are optimized.
+# Therefore, don't optimize them.
+#
+$(WORKDIR)/yacc.%rg: CC65FLAGS += -Wc --all-cdecl,--disable-opt,OptStackOps
+$(WORKDIR)/yaccdbg%prg: CC65FLAGS += -Wc --all-cdecl,--disable-opt,OptStackOps
+
 $(WORKDIR)/%.prg: %.c $(WORKDIR)/%.ref
 	$(CL65) $(CC65FLAGS) $< -o $@
 	$(SIM65) $(SIM65FLAGS) $@ > $(WORKDIR)/$*.out

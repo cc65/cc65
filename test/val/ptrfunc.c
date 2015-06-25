@@ -5,7 +5,8 @@
 */
 
 #include <stdio.h>
-#include <limits.h>
+
+#define NO_IMPLICIT_FUNCPTR_CONV
 
 unsigned char success=0;
 unsigned char failures=0;

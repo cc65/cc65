@@ -5,10 +5,10 @@ install:
 script:
   - make bin USER_CFLAGS=-Werror
   - make lib QUIET=1
+  - make -C test
   - make -C src clean
   - make bin USER_CFLAGS=-Werror CROSS_COMPILE=i686-w64-mingw32-
   - make doc zip
-  - make -C test
 after_success:
   - make -f Makefile.travis
 env:

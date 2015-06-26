@@ -6,22 +6,24 @@ ifneq ($(shell echo),)
   CMD_EXE := 1
 endif
 
+ifdef CMD_EXE
+  S := $(subst /,\,/)
+  RM = del /f $(subst /,\,$1)
+else
+  S := /
+  RM = $(RM) $1
+endif
+
 CC65FLAGS := -t sim6502
 SIM65FLAGS := -x 200000000
 
 CL65 := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
-SIM65 := $(if $(wildcard ../../bin/sim65*),../../bin/sim65,sim65)
+SIM65 := $(if $(wildcard ../../bin/sim65*),..$S..$Sbin$Ssim65,sim65)
 
-ifdef CMD_EXE
-RM := del /f
-else
-RM := rm -f
-endif
-
-WORKDIR := ../../testwrk
-
+WORKDIR := ..$S..$Stestwrk
 DIFF := $(WORKDIR)/bdiff
 
+CC := gcc
 CFLAGS := -O2 -Wall -W -Wextra -fwrapv -fno-strict-overflow
 
 .PHONY: all clean
@@ -34,7 +36,7 @@ all: $(REFS) $(TESTS)
 
 $(WORKDIR)/%.ref: %.c
 	$(CC) $(CFLAGS) $< -o $(WORKDIR)/$*.host
-	$(WORKDIR)/$*.host > $@
+	$(WORKDIR)$S$*.host > $@
 
 # Some files have "K & R"-style syntax.  Therefore, some forward
 # function-declarations don't match the later function definitions.
@@ -91,8 +93,8 @@ $(WORKDIR)/%.or.prg: %.c $(WORKDIR)/%.ref
 	$(DIFF) $(WORKDIR)/$*.out $(WORKDIR)/$*.ref
 
 clean:
-	@$(RM) $(TESTS)
-	@$(RM) $(SOURCES:.c=.o)
-	@$(RM) $(SOURCES:%.c=$(WORKDIR)/%.out)
-	@$(RM) $(SOURCES:%.c=$(WORKDIR)/%.ref)
-	@$(RM) $(SOURCES:%.c=$(WORKDIR)/%.host)
+	-@$(call RM,$(TESTS))
+	-@$(call RM,$(SOURCES:.c=.o))
+	-@$(call RM,$(SOURCES:%.c=$(WORKDIR)/%.out))
+	-@$(call RM,$(SOURCES:%.c=$(WORKDIR)/%.ref))
+	-@$(call RM,$(SOURCES:%.c=$(WORKDIR)/%.host))

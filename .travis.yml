@@ -8,6 +8,7 @@ script:
   - make -C src clean
   - make bin USER_CFLAGS=-Werror CROSS_COMPILE=i686-w64-mingw32-
   - make doc zip
+  - make -C test
 after_success:
   - make -f Makefile.travis
 env:

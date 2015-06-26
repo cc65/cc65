@@ -8,10 +8,10 @@ endif
 
 ifdef CMD_EXE
   S := $(subst /,\,/)
-  RM = del /f $(subst /,\,$1)
+  DEL = del /f $(subst /,\,$1)
 else
   S := /
-  RM = $(RM) $1
+  DEL = $(RM) $1
 endif
 
 CC65FLAGS := -t sim6502
@@ -93,8 +93,8 @@ $(WORKDIR)/%.or.prg: %.c $(WORKDIR)/%.ref
 	$(DIFF) $(WORKDIR)/$*.out $(WORKDIR)/$*.ref
 
 clean:
-	-@$(call RM,$(TESTS))
-	-@$(call RM,$(SOURCES:.c=.o))
-	-@$(call RM,$(SOURCES:%.c=$(WORKDIR)/%.out))
-	-@$(call RM,$(SOURCES:%.c=$(WORKDIR)/%.ref))
-	-@$(call RM,$(SOURCES:%.c=$(WORKDIR)/%.host))
+	-@$(call DEL,$(TESTS))
+	-@$(call DEL,$(SOURCES:.c=.o))
+	-@$(call DEL,$(SOURCES:%.c=$(WORKDIR)/%.out))
+	-@$(call DEL,$(SOURCES:%.c=$(WORKDIR)/%.ref))
+	-@$(call DEL,$(SOURCES:%.c=$(WORKDIR)/%.host))

@@ -8,11 +8,11 @@ endif
 ifdef CMD_EXE
   S := $(subst /,\,/)
   NOT := - # Hack
-  RM = del /f $(subst /,\,$1)
+  DEL = del /f $(subst /,\,$1)
 else
   S := /
   NOT := !
-  RM = $(RM) $1
+  DEL = $(RM) $1
 endif
 
 CC65FLAGS := -t sim6502
@@ -54,6 +54,6 @@ $(WORKDIR)/sitest%prg: sitest.c
 #	-$(SIM65) $(SIM65FLAGS) $@
 
 clean:
-	-@$(call RM,$(TESTS))
-	-@$(call RM,$(SOURCES:.c=.o))
-	-@$(call RM,$(SOURCES:%.c=$(WORKDIR)/%.out))
+	-@$(call DEL,$(TESTS))
+	-@$(call DEL,$(SOURCES:.c=.o))
+	-@$(call DEL,$(SOURCES:%.c=$(WORKDIR)/%.out))

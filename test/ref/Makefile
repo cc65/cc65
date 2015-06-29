@@ -45,10 +45,6 @@ $(WORKDIR)/%.ref: %.c
 #
 $(WORKDIR)/init%prg: CC65FLAGS += -Wc --all-cdecl
 $(WORKDIR)/switch.%rg: CC65FLAGS += -Wc --all-cdecl
-
-# Also, yacc.c does some things that fail when stack operations are optimized.
-# Therefore, don't optimize them.
-#
 $(WORKDIR)/yacc.%rg: CC65FLAGS += -Wc --all-cdecl
 $(WORKDIR)/yaccdbg%prg: CC65FLAGS += -Wc --all-cdecl
 

@@ -52,6 +52,10 @@ $(WORKDIR)/sitest%prg: sitest.c
 	@echo "FIXME: " $@ "currently will fail."
 	-$(CL65) $(subst .,,$(*:.o%=-O%)) $(CC65FLAGS) $< -o $@
 #	-$(SIM65) $(SIM65FLAGS) $@
+$(WORKDIR)/cc65141011%prg: cc65141011.c
+	@echo "FIXME: " $@ "currently will fail."
+	$(CL65) $(subst .,,$(*:.o%=-O%)) $(CC65FLAGS) $< -o $@
+	-$(SIM65) $(SIM65FLAGS) $@
 
 clean:
 	-@$(call DEL,$(TESTS))

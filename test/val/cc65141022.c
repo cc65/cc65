@@ -19,13 +19,13 @@ struct yywork
 struct yysvf
 {
         struct yywork *yystoff;
-};
+} yysvec[1];
 
 unsigned char fails = 0;
 
 int main(int n, char **args)
 {
-    struct yysvf *yystate;
+    struct yysvf *yystate = yysvec;
     struct yywork *yyt;
 
     yystate->yystoff = yycrank;

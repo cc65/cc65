@@ -1,7 +1,7 @@
 /* expr.c
 **
 ** 1998-06-21, Ullrich von Bassewitz
-** 2015-04-19, Greg King
+** 2015-06-26, Greg King
 */
 
 
@@ -1713,8 +1713,13 @@ void hie10 (ExprDesc* Expr)
                 } else {
                     Error ("Illegal indirection");
                 }
-                /* The * operator yields an lvalue */
-                ED_MakeLVal (Expr);
+                /* If the expression points to an array, then don't convert the
+                ** address -- it already is the location of the first element.
+                */
+                if (!IsTypeArray (Expr->Type)) {
+                    /* The * operator yields an lvalue */
+                    ED_MakeLVal (Expr);
+                }
             }
             break;
 

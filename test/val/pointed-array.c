@@ -52,10 +52,10 @@ int main(void)
             }
         } while (++x < sizeof table[0]);
     } while (++y < sizeof table / sizeof table[0]);
-    
+
     vector = (unsigned (*)[])table[1];
     if ((*vector)[1] != 0x0B0A) {
-	++failures;
+        ++failures;
     }
 
     /* Test storing. */

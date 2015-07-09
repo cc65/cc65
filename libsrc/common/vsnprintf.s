@@ -86,9 +86,16 @@ L1:     dex
         sta     bufptr+0
         stx     bufptr+1
 
+; There must be a buffer if its size is non-zero.
+
+        bit     bufsize+1
+        bmi     L5
+        ora     bufptr+1
+        bze     L0              ; The pointer shouldn't be NULL
+
 ; Restore ap and call _printf
 
-        pla
+L5:     pla
         tax
         pla
         jsr     __printf
@@ -125,6 +132,11 @@ L4:     lda     ccount+0
 ; Bail out if size is too high.
 
 L9:     lda     #ERANGE
+        .byte   $2C             ;(bit $xxxx)
+
+; NULL buffer pointers usually are invalid.
+
+L0:     lda     #EINVAL
         jsr     __directerrno   ; Return -1
         jmp     incsp6          ; Drop parameters
 

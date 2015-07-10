@@ -16,9 +16,9 @@ ifdef CMD_EXE
   RMDIR = rmdir /s /q $(subst /,\,$1)
 else
   EXE :=
-  DEL = $(RM) $1
+  DEL = $(RM) -f $1
   MKDIR = mkdir $1
-  RMDIR = rmdir $1
+  RMDIR = $(RM) -rf $1
 endif
 
 WORKDIR := ../testwrk

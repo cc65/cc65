@@ -16,9 +16,9 @@ ifdef CMD_EXE
   RMDIR = rmdir /s /q $(subst /,\,$1)
 else
   EXE :=
-  DEL = $(RM) -f $1
+  DEL = $(RM) $1
   MKDIR = mkdir $1
-  RMDIR = $(RM) -rf $1
+  RMDIR = $(RM) -r $1
 endif
 
 WORKDIR := ../testwrk
@@ -52,5 +52,5 @@ mostly-clean:
 	@$(MAKE) -C misc clean
 
 clean: mostly-clean
-	-@$(call DEL,$(WORKDIR)/bdiff$(EXE))
-	-@$(call RMDIR,$(WORKDIR))
+	@$(call DEL,$(WORKDIR)/bdiff$(EXE))
+	@$(call RMDIR,$(WORKDIR))

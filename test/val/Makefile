@@ -6,10 +6,8 @@ ifneq ($(shell echo),)
 endif
 
 ifdef CMD_EXE
-  M := -
-  DEL = del /f $(subst /,\,$1)
+  DEL = -del /f $(subst /,\,$1)
 else
-  M :=
   DEL = $(RM) $1
 endif
 
@@ -68,5 +66,5 @@ $(WORKDIR)/%.or.prg: %.c
 	$(SIM65) $(SIM65FLAGS) $@
 
 clean:
-	$M@$(call DEL,$(TESTS))
-	$M@$(call DEL,$(SOURCES:.c=.o))
+	@$(call DEL,$(TESTS))
+	@$(call DEL,$(SOURCES:.c=.o))

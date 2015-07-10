@@ -6,9 +6,11 @@ ifneq ($(shell echo),)
 endif
 
 ifdef CMD_EXE
+  M := -
   NOT := - # Hack
   DEL = del /f $(subst /,\,$1)
 else
+  M :=
   NOT := !
   DEL = $(RM) $1
 endif
@@ -44,5 +46,5 @@ $(WORKDIR)/%.or.prg: %.c
 	$(NOT) $(CL65) -Or $(CC65FLAGS) $< -o $@
 
 clean:
-	-@$(call DEL,$(TESTS))
-	-@$(call DEL,$(SOURCES:.c=.o))
+	$M@$(call DEL,$(TESTS))
+	$M@$(call DEL,$(SOURCES:.c=.o))

@@ -6,10 +6,12 @@ ifneq ($(shell echo),)
 endif
 
 ifdef CMD_EXE
+  M := -
   S := $(subst /,\,/)
   NOT := - # Hack
   DEL = del /f $(subst /,\,$1)
 else
+  M :=
   S := /
   NOT := !
   DEL = $(RM) $1
@@ -58,6 +60,6 @@ $(WORKDIR)/cc65141011%prg: cc65141011.c
 	-$(SIM65) $(SIM65FLAGS) $@
 
 clean:
-	-@$(call DEL,$(TESTS))
-	-@$(call DEL,$(SOURCES:.c=.o))
-	-@$(call DEL,$(SOURCES:%.c=$(WORKDIR)/%.out))
+	$M@$(call DEL,$(TESTS))
+	$M@$(call DEL,$(SOURCES:.c=.o))
+	$M@$(call DEL,$(SOURCES:%.c=$(WORKDIR)/%.out))

@@ -18,7 +18,7 @@ else
   EXE :=
   DEL = $(RM) $1
   MKDIR = mkdir $1
-  RMDIR = rmdir $1
+  RMDIR = $(RM) -r $1
 endif
 
 WORKDIR := ../testwrk

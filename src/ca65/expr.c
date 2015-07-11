@@ -418,35 +418,6 @@ static ExprNode* FuncDefined (void)
 
 
 
-static ExprNode* FuncIsMnemonic (void)
-/* Handle the .ISMNEMONIC, .ISMNEM builtin function */
-{
-    int Instr = -1;
-
-    /* Check for a macro or an instruction depending on UbiquitousIdents */
-
-    if (CurTok.Tok == TOK_IDENT) {
-        if (UbiquitousIdents) {
-            /* Macros CAN be instructions, so check for them first */
-            if (FindMacro (&CurTok.SVal) == 0) {
-                Instr = FindInstruction (&CurTok.SVal);
-            }
-        } else {
-            /* Macros and symbols may NOT use the names of instructions, so just check for the instruction */
-            Instr = FindInstruction (&CurTok.SVal);
-        }
-    }
-    else {
-        Error ("Identifier expected.");
-    }
-    /* Skip the name */
-    NextTok();
-
-    return GenLiteralExpr (Instr > 0);
-}
-
-
-
 static ExprNode* FuncDefinedMacro (void)
 /* Handle the .DEFINEDMACRO builtin function */
 {
@@ -479,6 +450,36 @@ static ExprNode* FuncHiWord (void)
 /* Handle the .HIWORD builtin function */
 {
     return HiWord (Expression ());
+}
+
+
+
+static ExprNode* FuncIsMnemonic (void)
+/* Handle the .ISMNEMONIC, .ISMNEM builtin function */
+{
+    int Instr = -1;
+
+    /* Check for a macro or an instruction depending on UbiquitousIdents */
+
+    if (CurTok.Tok == TOK_IDENT) {
+        if (UbiquitousIdents) {
+            /* Macros CAN be instructions, so check for them first */
+            if (FindMacro (&CurTok.SVal) == 0) {
+                Instr = FindInstruction (&CurTok.SVal);
+            }
+        }
+        else {
+            /* Macros and symbols may NOT use the names of instructions, so just check for the instruction */
+            Instr = FindInstruction (&CurTok.SVal);
+        }
+    }
+    else {
+        Error ("Identifier expected.");
+    }
+    /* Skip the name */
+    NextTok ();
+
+    return GenLiteralExpr (Instr > 0);
 }
 
 

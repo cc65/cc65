@@ -11,10 +11,9 @@ endif
 
 ifdef CMD_EXE
   EXE := .exe
-  DEL = del /f $(subst /,\,$1)
+  DEL = -del /f $(subst /,\,$1)
   MKDIR = mkdir $(subst /,\,$1)
-  DIRLIST = $(strip $(foreach dir,$1,$(wildcard $(dir))))
-  RMDIR = $(if $(DIRLIST),rmdir /s /q $(subst /,\,$(DIRLIST)))
+  RMDIR = -rmdir /s /q $(subst /,\,$1)
 else
   EXE :=
   DEL = $(RM) $1

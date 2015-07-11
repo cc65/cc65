@@ -7,7 +7,7 @@ endif
 
 ifdef CMD_EXE
   NOT := - # Hack
-  DEL = del /f $(subst /,\,$1)
+  DEL = -del /f $(subst /,\,$1)
 else
   NOT := !
   DEL = $(RM) $1
@@ -44,5 +44,5 @@ $(WORKDIR)/%.or.prg: %.c
 	$(NOT) $(CL65) -Or $(CC65FLAGS) $< -o $@
 
 clean:
-	-@$(call DEL,$(TESTS))
-	-@$(call DEL,$(SOURCES:.c=.o))
+	@$(call DEL,$(TESTS))
+	@$(call DEL,$(SOURCES:.c=.o))

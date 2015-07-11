@@ -8,7 +8,7 @@ endif
 
 ifdef CMD_EXE
   S := $(subst /,\,/)
-  DEL = del /f $(subst /,\,$1)
+  DEL = -del /f $(subst /,\,$1)
 else
   S := /
   DEL = $(RM) $1
@@ -89,8 +89,8 @@ $(WORKDIR)/%.or.prg: %.c $(WORKDIR)/%.ref
 	$(DIFF) $(WORKDIR)/$*.out $(WORKDIR)/$*.ref
 
 clean:
-	-@$(call DEL,$(TESTS))
-	-@$(call DEL,$(SOURCES:.c=.o))
-	-@$(call DEL,$(SOURCES:%.c=$(WORKDIR)/%.out))
-	-@$(call DEL,$(SOURCES:%.c=$(WORKDIR)/%.ref))
-	-@$(call DEL,$(SOURCES:%.c=$(WORKDIR)/%.host))
+	@$(call DEL,$(TESTS))
+	@$(call DEL,$(SOURCES:.c=.o))
+	@$(call DEL,$(SOURCES:%.c=$(WORKDIR)/%.out))
+	@$(call DEL,$(SOURCES:%.c=$(WORKDIR)/%.ref))
+	@$(call DEL,$(SOURCES:%.c=$(WORKDIR)/%.host))

@@ -8,7 +8,7 @@ endif
 ifdef CMD_EXE
   S := $(subst /,\,/)
   NOT := - # Hack
-  DEL = del /f $(subst /,\,$1)
+  DEL = -del /f $(subst /,\,$1)
 else
   S := /
   NOT := !
@@ -58,6 +58,6 @@ $(WORKDIR)/cc65141011%prg: cc65141011.c
 	-$(SIM65) $(SIM65FLAGS) $@
 
 clean:
-	-@$(call DEL,$(TESTS))
-	-@$(call DEL,$(SOURCES:.c=.o))
-	-@$(call DEL,$(SOURCES:%.c=$(WORKDIR)/%.out))
+	@$(call DEL,$(TESTS))
+	@$(call DEL,$(SOURCES:.c=.o))
+	@$(call DEL,$(SOURCES:%.c=$(WORKDIR)/%.out))
